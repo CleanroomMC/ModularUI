@@ -1,14 +1,14 @@
 [
 {
-  "modid": "examplemod",
-  "name": "Example Mod",
-  "description": "Example placeholder mod.",
+  "modid": "modularui",
+  "name": "ModularUI",
+  "description": "ModularUI from GTCE but cleaned up...",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
   "authorList": ["CleanroomMC"],
-  "credits": "Authors of this project",
+  "credits": "GTCE/GTCEu Dev Team",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []

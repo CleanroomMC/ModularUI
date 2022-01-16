@@ -12,8 +12,8 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.forge'
 
 version = "1.0"
-group = "io.github.cleanroommc.modid" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "modid"
+group = "io.github.cleanroommc" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "modularui"
 
 sourceCompatibility = targetCompatibility = '1.8'
 compileJava {
