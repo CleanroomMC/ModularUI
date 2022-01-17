@@ -1,6 +1,5 @@
 package io.github.cleanroommc.modularui.texture;
 
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 
 public class UITexture {
