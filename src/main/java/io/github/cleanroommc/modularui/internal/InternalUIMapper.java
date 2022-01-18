@@ -33,7 +33,7 @@ public class InternalUIMapper implements IGuiHandler {
 		this.clientGuis = new ArrayList<>();
 	}
 
-	public <CR extends IContainerCreator, GR extends IGuiCreator> int register(CR containerCreator, GR guiCreator) {
+	public <CC extends IContainerCreator<?>, GC extends IGuiCreator<?>> int register(CC containerCreator, GC guiCreator) {
 		this.serverContainers.add(containerCreator);
 		this.clientGuis.add(guiCreator);
 		return id++;

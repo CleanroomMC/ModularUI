@@ -25,11 +25,12 @@ public class Widget {
 	}
 
 	protected void recomputePosition() {
-		this.currentPosition = this.parentPosition.add(selfPosition);
+		// this.currentPosition = this.parentPosition.add(selfPosition);
 		onPositionUpdate();
 	}
 
 	protected void onPositionUpdate() {
+
 	}
 
 }
