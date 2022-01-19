@@ -1,7 +1,8 @@
-package io.github.cleanroommc.modularui.slot;
+package io.github.cleanroommc.modularui.slot.item;
 
-import net.minecraft.inventory.IInventory;
+import io.github.cleanroommc.modularui.slot.BaseSlot;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.items.IItemHandler;
 
 import java.util.function.Predicate;
 
@@ -9,7 +10,7 @@ public class FilteredItemSlot extends BaseSlot {
 
 	protected final Predicate<ItemStack> checkItemValidity;
 
-	public FilteredItemSlot(IInventory inventory, boolean phantom, Predicate<ItemStack> checkItemValidity, int index, int xPos, int yPos) {
+	public FilteredItemSlot(IItemHandler inventory, boolean phantom, Predicate<ItemStack> checkItemValidity, int index, int xPos, int yPos) {
 		super(inventory, false, phantom, index, xPos, yPos);
 		this.checkItemValidity = checkItemValidity;
 	}
