@@ -1,11 +1,13 @@
 package io.github.cleanroommc.modularui.widget;
 
+import net.minecraft.client.gui.Gui;
+
 import java.awt.*;
 
 /**
  * This class depicts a functional element of a ModularUI
  */
-public class Widget {
+public abstract class Widget extends Gui {
 
 	protected Rectangle parentPosition;
 	protected Rectangle currentPosition;
@@ -17,16 +19,6 @@ public class Widget {
 
 	public Widget(int x, int y, int width, int height) {
 		this(new Rectangle(x, y, width, height));
-	}
-
-	public void setParentPosition(Rectangle parentPosition) {
-		this.parentPosition = parentPosition;
-
-	}
-
-	protected void recomputePosition() {
-		// this.currentPosition = this.parentPosition.add(selfPosition);
-		onPositionUpdate();
 	}
 
 	protected void onPositionUpdate() {
