@@ -6,7 +6,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Container;
 
-public class UIBuilder<CC extends Container, GC extends GuiContainer> {
+public class UIBuilder<CC extends Container, GC extends GuiScreen> {
 
 	private static final IContainerCreator<?> DUMMY_CONTAINER_CREATOR = (player, world, x, y, z) -> null;
 	private static final IGuiCreator<?> DUMMY_GUI_CREATOR = (player, world, x, y, z) -> null;
