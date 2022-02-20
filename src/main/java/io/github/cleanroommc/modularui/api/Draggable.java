@@ -1,9 +1,7 @@
 package io.github.cleanroommc.modularui.api;
 
-import brachy84.brachydium.gui.api.Widget;
-import brachy84.brachydium.gui.api.math.Pos2d;
-import net.minecraft.client.util.math.MatrixStack;
-import org.jetbrains.annotations.Nullable;
+import io.github.cleanroommc.modularui.api.math.Pos2d;
+import io.github.cleanroommc.modularui.widget.Widget;
 
 public interface Draggable extends Interactable {
 
@@ -16,7 +14,7 @@ public interface Draggable extends Interactable {
      * @param mousePos current mouse pos
      * @param delta    difference from last from
      */
-    void renderMovingState(MatrixStack matrices, Pos2d mousePos, float delta);
+    void renderMovingState(Pos2d mousePos, float delta);
 
     /**
      * @param button the mouse button that's holding down
@@ -39,7 +37,7 @@ public interface Draggable extends Interactable {
      * @param isInBounds if the mouse is in the gui bounds
      * @return if the location is valid
      */
-    default boolean canDropHere(@Nullable Widget widget, Pos2d mousePos, boolean isInBounds) {
+    default boolean canDropHere(Widget widget, Pos2d mousePos, boolean isInBounds) {
         return isInBounds;
     }
 

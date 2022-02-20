@@ -1,12 +1,13 @@
-package io.github.cleanroommc.modularui.builder;
+package io.github.cleanroommc.modularui.internal;
 
 import com.google.common.collect.ImmutableBiMap;
+import io.github.cleanroommc.modularui.ModularUIMod;
 import io.github.cleanroommc.modularui.api.ISyncedWidget;
 import io.github.cleanroommc.modularui.api.IWidgetParent;
 import io.github.cleanroommc.modularui.api.Interactable;
-import io.github.cleanroommc.modularui.api.math.GuiArea;
+import io.github.cleanroommc.modularui.api.math.Alignment;
 import io.github.cleanroommc.modularui.api.math.Pos2d;
-import io.github.cleanroommc.modularui.internal.ModularGui;
+import io.github.cleanroommc.modularui.api.math.Size;
 import io.github.cleanroommc.modularui.widget.Widget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -27,17 +28,25 @@ public final class ModularUI implements IWidgetParent {
     public final ImmutableBiMap<Integer, ISyncedWidget> syncedWidgets;
     public final List<Interactable> interactables = new ArrayList<>();
     public final Set<Interactable> listeners = new HashSet<>();
-    public final GuiArea area;
+    private Size screenSize = new Size(MC.displayWidth, MC.displayHeight);
+    private final Size size;
+    private Pos2d pos = Pos2d.zero();
+    private final Alignment alignment;
     private boolean initialised = false;
     public final EntityPlayer player;
 
+    @SideOnly(Side.CLIENT)
     private ModularGui guiScreen;
+    @SideOnly(Side.CLIENT)
+    private Pos2d mousePos = Pos2d.zero();
 
-    protected ModularUI(GuiArea area, List<Widget> children, EntityPlayer player) {
-        if (area == null || children == null || player == null) {
+    public ModularUI(Size size, Alignment alignment, List<Widget> children, EntityPlayer player) {
+        if (size == null || children == null || player == null) {
             throw new NullPointerException("Illegal ModularUI creation");
         }
-        this.area = area;
+        ModularUIMod.LOGGER.info("Creating modular ui with {} children", children.size());
+        this.size = size;
+        this.alignment = alignment;
         this.children = Collections.unmodifiableList(children);
         this.player = player;
         ImmutableBiMap.Builder<Integer, ISyncedWidget> syncedWidgetBuilder = ImmutableBiMap.builder();
@@ -54,26 +63,48 @@ public final class ModularUI implements IWidgetParent {
         this.syncedWidgets = syncedWidgetBuilder.build();
     }
 
-    public void initialise(ModularGui gui) {
-        if (initialised) {
+    public void setScreen(ModularGui guiScreen) {
+        this.guiScreen = guiScreen;
+    }
+
+    public void initialise() {
+        if (isInitialised()) {
             throw new IllegalStateException("Can't initialise ModularUI twice!!");
         }
-        this.guiScreen = gui;
 
         for (Widget widget : children) {
             widget.initialize(this, this, 0);
         }
+
+        AtomicInteger count = new AtomicInteger(0);
+        IWidgetParent.forEachByLayer(this, widget -> {
+            count.getAndIncrement();
+            return false;
+        });
+
         // put widgets with higher layers first
         interactables.sort(Comparator.comparingInt(interactable -> ((Widget) interactable).getLayer()).reversed());
 
         initialised = true;
+        ModularUIMod.LOGGER.info("Initialising ModularUI. {} widgets found", count.toString());
     }
 
-    @SideOnly(Side.CLIENT)
-    public Pos2d getMousePos() {
+    public void onResize(Size scaledSize) {
+        screenSize = scaledSize;
+        pos = alignment.getAlignedPos(screenSize, size);
+        if (isInitialised()) {
+            children.forEach(Widget::queueRebuild);
+        }
+    }
+
+    public void update() {
         float x = Mouse.getEventX() * guiScreen.width / (float) MC.displayWidth;
         float y = guiScreen.height - Mouse.getEventY() * guiScreen.height / (float) MC.displayHeight - 1;
-        return new Pos2d(x, y);
+        mousePos = new Pos2d(x, y);
+        IWidgetParent.forEachByLayer(this, widget -> {
+            widget.screenUpdateInternal();
+            return false;
+        });
     }
 
     public int getSyncId(ISyncedWidget syncedWidget) {
@@ -115,8 +146,22 @@ public final class ModularUI implements IWidgetParent {
     }
 
     @Override
-    public GuiArea getArea() {
-        return area;
+    public Size getSize() {
+        return size;
+    }
+
+    public Size getScaledScreenSize() {
+        return screenSize;
+    }
+
+    @Override
+    public Pos2d getAbsolutePos() {
+        return pos;
+    }
+
+    @Override
+    public Pos2d getPos() {
+        return pos;
     }
 
     @Override
@@ -126,5 +171,10 @@ public final class ModularUI implements IWidgetParent {
 
     public boolean isInitialised() {
         return initialised;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public Pos2d getMousePos() {
+        return mousePos;
     }
 }

@@ -22,11 +22,11 @@ public final class GuiArea {
     }
 
     public static GuiArea ofPoints(Pos2d p0, Pos2d p1) {
-        return new GuiArea(p0.getX(), p0.getY(), p1.getX(), p1.getY());
+        return new GuiArea(p0.x, p1.x, p0.y, p1.y);
     }
 
     public static GuiArea of(Size size, Pos2d pos) {
-        return GuiArea.ltwh(pos.getX(), pos.getY(), size.width, size.height);
+        return GuiArea.ltwh(pos.x, pos.y, size.width, size.height);
     }
 
     /**
@@ -142,11 +142,6 @@ public final class GuiArea {
 
     @Override
     public String toString() {
-        return "AABB{" +
-                "x0=" + x0 +
-                ", x1=" + x1 +
-                ", y0=" + y0 +
-                ", y1=" + y1 +
-                '}';
+        return "Size:[" + width + ", " + height + "], Pos:[" + x0 + ", " + y0 + "]";
     }
 }

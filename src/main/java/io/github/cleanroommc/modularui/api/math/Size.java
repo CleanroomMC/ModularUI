@@ -8,11 +8,13 @@ public class Size {
         return new Size(0, 0);
     }
 
-    public float width, height;
+    public final float width, height;
 
     public Size(float width, float height) {
         if(width < 0) throw new IllegalArgumentException("Width in size can't be smaller than 0");
         if(height < 0) throw new IllegalArgumentException("Height in size can't be smaller than 0");
+        this.width = width;
+        this.height = height;
     }
 
     public boolean isLargerThan(Size size) {
@@ -50,9 +52,6 @@ public class Size {
 
     @Override
     public String toString() {
-        return "Size{" +
-                "width=" + width +
-                ", height=" + height +
-                '}';
+        return "[" + width + ", " + height + "]";
     }
 }

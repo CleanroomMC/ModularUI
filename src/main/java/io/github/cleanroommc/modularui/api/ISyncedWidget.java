@@ -1,6 +1,6 @@
 package io.github.cleanroommc.modularui.api;
 
-import io.github.cleanroommc.modularui.builder.ModularUI;
+import io.github.cleanroommc.modularui.internal.ModularUI;
 import io.github.cleanroommc.modularui.network.CWidgetUpdate;
 import io.github.cleanroommc.modularui.network.SWidgetUpdate;
 import io.github.cleanroommc.modularui.widget.Widget;
@@ -23,6 +23,12 @@ public interface ISyncedWidget {
     void readServerData(int id, PacketBuffer buf);
 
     void readClientData(int id, PacketBuffer buf);
+
+    /**
+     * Called each tick on server. Use it to detect and sync changes
+     */
+    default void onServerTick() {
+    }
 
     /**
      * Sends the written data to {@link #readClientData(int, PacketBuffer)}

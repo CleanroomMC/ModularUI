@@ -1,7 +1,5 @@
 package io.github.cleanroommc.modularui.api.math;
 
-import net.minecraft.util.math.Vec2f;
-
 import java.util.Objects;
 
 public class Pos2d {
@@ -10,7 +8,7 @@ public class Pos2d {
         return new Pos2d(0, 0);
     }
 
-    public float x, y;
+    public final float x, y;
 
     public Pos2d(float x, float y) {
         this.x = x;
@@ -43,7 +41,7 @@ public class Pos2d {
         return new Pos2d(x - p.x, y - p.y);
     }
 
-    public void set(Pos2d pos) {
+    /*public void set(Pos2d pos) {
         this.x = pos.x;
         this.y = pos.y;
     }
@@ -61,7 +59,7 @@ public class Pos2d {
     public void move(float x, float y) {
         this.x += x;
         this.y += y;
-    }
+    }*/
 
     public double distance(Pos2d p) {
         float x = Math.max(this.x - p.x, p.x - this.x);
@@ -102,10 +100,7 @@ public class Pos2d {
 
     @Override
     public String toString() {
-        return "Point{" +
-                "x=" + x +
-                ", y=" + y +
-                '}';
+        return "[" + x + ", " + y + ']';
     }
 
 }
