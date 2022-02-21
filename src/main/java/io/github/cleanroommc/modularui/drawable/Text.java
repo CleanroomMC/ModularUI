@@ -3,10 +3,8 @@ package io.github.cleanroommc.modularui.drawable;
 import com.ibm.icu.text.ArabicShaping;
 import com.ibm.icu.text.ArabicShapingException;
 import com.ibm.icu.text.Bidi;
-import io.github.cleanroommc.modularui.ModularUIMod;
 import io.github.cleanroommc.modularui.api.math.Pos2d;
 import io.github.cleanroommc.modularui.api.math.Size;
-import io.github.cleanroommc.modularui.internal.ModularUI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.resources.I18n;
@@ -64,6 +62,14 @@ public class Text implements IDrawable {
         return shadow(true);
     }
 
+    public int getColor() {
+        return color;
+    }
+
+    public boolean isShadow() {
+        return shadow;
+    }
+
     public String getRawText() {
         String text = textSupplier == null ? this.text : textSupplier.get();
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT && dataSupplier != null) {
@@ -74,7 +80,8 @@ public class Text implements IDrawable {
 
     @Override
     public void draw(Pos2d pos, Size size, float partialTicks) {
-        drawText(pos, (int) size.width);
+        String text = TextRenderer.getColorFormatString(color) + getRawText();
+        TextRenderer.drawString(text, pos.x, pos.y, color, shadow, size.width);
     }
 
     @SideOnly(Side.CLIENT)

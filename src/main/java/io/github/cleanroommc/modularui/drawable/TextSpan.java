@@ -16,15 +16,27 @@ public class TextSpan implements IDrawable {
 
     public TextSpan addText(Text... texts) {
         for (Text text : texts) {
-            if(text != null)  {
+            if (text != null) {
                 this.texts.add(text);
             }
         }
         return this;
     }
 
+    public String getRawString() {
+        StringBuilder builder = new StringBuilder();
+        for (Text text : texts) {
+            builder.append(TextRenderer.FORMAT_CHAR)
+                    .append("{#")
+                    .append(Integer.toHexString(text.getColor()))
+                    .append("}")
+                    .append(text.getRawText());
+        }
+        return builder.toString();
+    }
+
     @Override
     public void draw(Pos2d pos, Size size, float partialTicks) {
-        Text.drawText(pos, (int) size.width, texts);
+        TextRenderer.drawString(getRawString(), pos.x, pos.y, 0x212121, false, size.width);
     }
 }
