@@ -7,6 +7,8 @@ import io.github.cleanroommc.modularui.api.math.Pos2d;
 import io.github.cleanroommc.modularui.api.math.Size;
 import io.github.cleanroommc.modularui.internal.ModularUI;
 import net.minecraft.client.gui.Gui;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * This class depicts a functional element of a ModularUI
@@ -41,6 +43,9 @@ public abstract class Widget extends Gui {
         this.alignment = alignment;
     }
 
+    /**
+     * Only used internally
+     */
     public final void initialize(ModularUI modularUI, IWidgetParent parent, int layer) {
         if (modularUI == null || parent == null || initialised) {
             throw new IllegalStateException("Illegal initialise call to widget!! " + toString());
@@ -55,7 +60,6 @@ public abstract class Widget extends Gui {
 
         this.initialised = true;
         rebuildChildren();
-        onRebuild();
         onInit();
 
         if (this instanceof IWidgetParent) {
@@ -82,6 +86,7 @@ public abstract class Widget extends Gui {
             this.relativePos = alignment.getAlignedPos(parent.getSize(), size);
         }
         this.pos = parent.getAbsolutePos().add(relativePos);
+        onRebuild();
         if (this instanceof IWidgetParent) {
             for (Widget widget : ((IWidgetParent) this).getChildren()) {
                 widget.rebuildChildren();
@@ -89,7 +94,18 @@ public abstract class Widget extends Gui {
         }
     }
 
+    /**
+     * Called once per tick
+     */
+    @SideOnly(Side.CLIENT)
     public void onScreenUpdate() {
+    }
+
+    /**
+     * Called each frame, approximately 60 times per second
+     */
+    @SideOnly(Side.CLIENT)
+    public void onFrameUpdate() {
     }
 
     public void onRebuild() {
@@ -183,9 +199,9 @@ public abstract class Widget extends Gui {
     }
 
     public static boolean isUnderMouse(Pos2d mouse, Pos2d areaTopLeft, Size areaSize) {
-        return mouse.x > areaTopLeft.x &&
-                mouse.x < areaTopLeft.x + areaSize.width &&
-                mouse.y > areaTopLeft.y &&
-                mouse.y < areaTopLeft.y + areaSize.height;
+        return mouse.x >= areaTopLeft.x &&
+                mouse.x <= areaTopLeft.x + areaSize.width &&
+                mouse.y >= areaTopLeft.y &&
+                mouse.y <= areaTopLeft.y + areaSize.height;
     }
 }

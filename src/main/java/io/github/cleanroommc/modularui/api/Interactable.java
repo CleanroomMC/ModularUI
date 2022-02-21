@@ -14,14 +14,9 @@ import org.lwjgl.input.Keyboard;
 public interface Interactable {
 
     /**
-     * called when ever the mouse moves on the screen
-     * @param pos of the mouse
-     */
-    //default void onMouseMoved(Pos2d pos) {}
-
-    /**
      * called when clicked on the Interactable
-     * @param pos of the mouse
+     *
+     * @param pos      of the mouse
      * @param buttonId the button id (Left == 1, right == 2)
      * @return determines if further actions are cancelled or not
      */
@@ -31,19 +26,22 @@ public interface Interactable {
 
     /**
      * called when released a click on the Interactable
-     * @param pos of the mouse
+     *
+     * @param pos      of the mouse
      * @param buttonId the button id (Left == 1, right == 2)
      */
-    default void onClickReleased(Pos2d pos, int buttonId) {}
+    default void onClickReleased(Pos2d pos, int buttonId) {
+    }
 
     /**
      * called when the interactable is focused and the mouse gets dragged
-     * @param pos of the mouse
-     * @param buttonId the button id (Left == 1, right == 2)
-     * @param deltaX difference from last call
-     * @param deltaY difference from last call
+     *
+     * @param pos       of the mouse
+     * @param buttonId  the button id (Left == 1, right == 2)
+     * @param deltaTime milliseconds since last mouse event
      */
-    default void onMouseDragged(Pos2d pos, int buttonId, long deltaTime) {}
+    default void onMouseDragged(Pos2d pos, int buttonId, long deltaTime) {
+    }
 
     /**
      * called when the interactable is focused and the scrollweel is used
@@ -54,33 +52,12 @@ public interface Interactable {
 
     /**
      * called when the interactable is focused and a key is pressed
+     *
      * @param character the typed character. Is equal to {@link Character#MIN_VALUE} if it's not a char
-     * @param keyCode code of the typed key. See {@link Keyboard}
+     * @param keyCode   code of the typed key. See {@link Keyboard}
      */
-    default void onKeyPressed(char character, int keyCode) {}
-
-    /**
-     * called when the interactable is focused and a key is released
-     * @param keyCode key
-     * @param scanCode ?
-     * @param modifiers ?
-     */
-    //default void onKeyReleased(int keyCode, int scanCode, int modifiers) {}
-
-    /**
-     * called when the interactable is focused and a char is typed
-     * @param chr character
-     * @param modifiers ?
-     */
-    //default void onCharTyped(char chr, int modifiers) {}
-
-    /**
-     * try change the focus
-     * @param lookForwards should look for next focus
-     * Not yet implemented
-     */
-    @Deprecated
-    default void changeFocus(boolean lookForwards) {}
+    default void onKeyPressed(char character, int keyCode) {
+    }
 
     /**
      * @return if left or right ctrl/cmd is pressed
@@ -106,7 +83,7 @@ public interface Interactable {
     }
 
     /**
-     * @param key of the key, see {@link org.lwjgl.input.Keyboard}
+     * @param key key id, see {@link org.lwjgl.input.Keyboard}
      * @return if the key is pressed
      */
     @SideOnly(Side.CLIENT)

@@ -1,6 +1,5 @@
 package io.github.cleanroommc.modularui.api;
 
-import io.github.cleanroommc.modularui.api.math.GuiArea;
 import io.github.cleanroommc.modularui.api.math.Pos2d;
 import io.github.cleanroommc.modularui.api.math.Size;
 import io.github.cleanroommc.modularui.widget.Widget;

@@ -96,6 +96,7 @@ public class ModularGui extends GuiContainer {
         GlStateManager.disableDepth();
 
         IWidgetParent.forEachByLayer(gui, widget -> {
+            widget.onFrameUpdate();
             if (widget.isEnabled() && widget instanceof IWidgetDrawable) {
                 GlStateManager.pushMatrix();
                 GlStateManager.translate(widget.getAbsolutePos().x, widget.getAbsolutePos().y, 0);

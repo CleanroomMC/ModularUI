@@ -17,6 +17,6 @@ public class ModularUIContainer extends Container {
 
 	@Override
 	public boolean canInteractWith(EntityPlayer playerIn) {
-		return true;
+		return playerIn.isEntityAlive();
 	}
 }
