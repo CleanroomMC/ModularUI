@@ -1,25 +1,5 @@
 buildscript {
     repositories {
-        jcenter()
-        maven { 
-			url = "https://files.minecraftforge.net/maven" 
-		}
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-    }
-}
-apply plugin: 'net.minecraftforge.gradle.forge'
-
-version = "1.0"
-group = "com.cleanroommc" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "modularui"
-
-
-
-
-buildscript {
-    repositories {
         maven {
             url = 'https://maven.cleanroommc.com'
         }
@@ -85,7 +65,7 @@ repositories {
 dependencies {
 
     if (project.use_assetmover) {
-        deobfCompile 'com.cleanroommc:assetmover:0.2'
+        //deobfCompile 'com.cleanroommc:assetmover:0.2'
     }
     if (project.use_mixins) {
         embed ('org.spongepowered:mixin:0.8.3') {
