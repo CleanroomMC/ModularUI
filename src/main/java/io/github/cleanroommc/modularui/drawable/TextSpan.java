@@ -37,6 +37,6 @@ public class TextSpan implements IDrawable {
 
     @Override
     public void draw(Pos2d pos, Size size, float partialTicks) {
-        TextRenderer.drawString(getRawString(), pos.x, pos.y, 0x212121, false, size.width);
+        TextRenderer.drawString(getRawString(), pos, 0x212121, size.width);
     }
 }

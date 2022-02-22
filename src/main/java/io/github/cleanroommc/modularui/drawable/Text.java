@@ -81,7 +81,7 @@ public class Text implements IDrawable {
     @Override
     public void draw(Pos2d pos, Size size, float partialTicks) {
         String text = TextRenderer.getColorFormatString(color) + getRawText();
-        TextRenderer.drawString(text, pos.x, pos.y, color, shadow, size.width);
+        TextRenderer.drawString(text, pos, color, size.width, shadow);
     }
 
     @SideOnly(Side.CLIENT)
