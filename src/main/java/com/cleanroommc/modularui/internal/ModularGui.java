@@ -1,5 +1,7 @@
 package com.cleanroommc.modularui.internal;
 
+import com.cleanroommc.modularui.api.IVanillaSlot;
+import com.cleanroommc.modularui.mixin.GuiContainerAccess;
 import com.google.common.primitives.Ints;
 import com.cleanroommc.modularui.ModularUIMod;
 import com.cleanroommc.modularui.api.IWidgetParent;
@@ -18,6 +20,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.inventory.Slot;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -25,7 +28,7 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
 @SideOnly(Side.CLIENT)
-public class ModularGui extends GuiContainer {
+public class ModularGui extends GuiContainer implements GuiContainerAccess {
 
     private final ModularUI gui;
     private long lastClick = -1;
@@ -279,24 +282,22 @@ public class ModularGui extends GuiContainer {
     }
 
     public static void drawRect(float left, float top, float right, float bottom, int color) {
-        if (left < right)
-        {
+        if (left < right) {
             float i = left;
             left = right;
             right = i;
         }
 
-        if (top < bottom)
-        {
+        if (top < bottom) {
             float j = top;
             top = bottom;
             bottom = j;
         }
 
-        float a = (float)(color >> 24 & 255) / 255.0F;
-        float r = (float)(color >> 16 & 255) / 255.0F;
-        float g = (float)(color >> 8 & 255) / 255.0F;
-        float b = (float)(color & 255) / 255.0F;
+        float a = (float) (color >> 24 & 255) / 255.0F;
+        float r = (float) (color >> 16 & 255) / 255.0F;
+        float g = (float) (color >> 8 & 255) / 255.0F;
+        float b = (float) (color & 255) / 255.0F;
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
         GlStateManager.enableBlend();
@@ -313,4 +314,17 @@ public class ModularGui extends GuiContainer {
         GlStateManager.disableBlend();
     }
 
+    @Override
+    public Slot getSlotAt(float x, float y) {
+        Interactable interactable = getGui().getTopInteractable(new Pos2d(x, y));
+        if (interactable instanceof IVanillaSlot) {
+            return ((IVanillaSlot) interactable).getMcSlot();
+        }
+        return null;
+    }
+
+    @Override
+    public boolean isOverSlot(Slot slot, float x, float y) {
+        return isPointInRegion(slot.xPos, slot.yPos, 16, 16, (int) x, (int) y);
+    }
 }

@@ -2,6 +2,8 @@ package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.ModularUIMod;
 import com.cleanroommc.modularui.api.math.Alignment;
+import com.cleanroommc.modularui.api.math.EdgeOffset;
+import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.builder.ModularUIBuilder;
 import com.cleanroommc.modularui.builder.UIBuilder;
@@ -44,6 +46,8 @@ public class Tests {
                 .setAlignment(Alignment.Center)
                 .drawable(BACKGROUND, Alignment.Center)
                 .drawable(TEXT, Alignment.Center, new Size(30, 11))
+                .bindPlayerInventory(player, new Pos2d(7, 84))
+                //.bindPlayerInventory(player, Alignment.BottomCenter, EdgeOffset.bottom(7f))
                 .build(player);
     }
 

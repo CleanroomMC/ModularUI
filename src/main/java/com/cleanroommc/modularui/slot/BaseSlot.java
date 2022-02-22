@@ -28,7 +28,6 @@ public class BaseSlot extends SlotItemHandler {
 		return !this.output;
 	}
 
-
 	// handle background by widgets
 	@Override
 	public ResourceLocation getBackgroundLocation() {

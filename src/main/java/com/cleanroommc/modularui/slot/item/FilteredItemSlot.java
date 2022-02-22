@@ -10,8 +10,8 @@ public class FilteredItemSlot extends BaseSlot {
 
 	protected final Predicate<ItemStack> checkItemValidity;
 
-	public FilteredItemSlot(IItemHandler inventory, boolean phantom, Predicate<ItemStack> checkItemValidity, int index, int xPos, int yPos) {
-		super(inventory, false, phantom, index, xPos, yPos);
+	public FilteredItemSlot(IItemHandler inventory, boolean phantom, Predicate<ItemStack> checkItemValidity, int index) {
+		super(inventory, index, false, phantom);
 		this.checkItemValidity = checkItemValidity;
 	}
 

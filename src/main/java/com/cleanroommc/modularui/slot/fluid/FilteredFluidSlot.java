@@ -14,14 +14,14 @@ public class FilteredFluidSlot extends FluidSlot {
 	protected final Predicate<FluidStack> fluidValidity;
 	protected final Predicate<ItemStack> itemValidity;
 
-	public FilteredFluidSlot(IItemHandler inventory, Predicate<FluidStack> fluidValidity, Predicate<ItemStack> itemValidity, boolean phantom, int index, int xPos, int yPos) {
-		super(inventory, false, phantom, index, xPos, yPos);
+	public FilteredFluidSlot(IItemHandler inventory, int index, Predicate<FluidStack> fluidValidity, Predicate<ItemStack> itemValidity, boolean phantom) {
+		super(inventory, index, false, phantom);
 		this.fluidValidity = fluidValidity;
 		this.itemValidity = itemValidity;
 	}
 
-	public FilteredFluidSlot(IItemHandler inventory, Predicate<FluidStack> fluidValidity, boolean phantom, int index, int xPos, int yPos) {
-		this(inventory, fluidValidity, Predicates.alwaysTrue(), phantom, index, xPos, yPos);
+	public FilteredFluidSlot(IItemHandler inventory, int index, Predicate<FluidStack> fluidValidity, boolean phantom) {
+		this(inventory, index, fluidValidity, Predicates.alwaysTrue(), phantom);
 	}
 
 	@Override

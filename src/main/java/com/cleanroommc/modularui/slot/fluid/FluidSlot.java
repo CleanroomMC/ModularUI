@@ -8,8 +8,8 @@ import net.minecraftforge.items.IItemHandler;
 
 public class FluidSlot extends BaseSlot {
 
-	public FluidSlot(IItemHandler inventory, boolean isOutput, boolean phantom, int index, int xPos, int yPos) {
-		super(inventory, isOutput, phantom, index, xPos, yPos);
+	public FluidSlot(IItemHandler inventory, int index, boolean isOutput, boolean phantom) {
+		super(inventory, index, isOutput, phantom);
 	}
 
 	@Override

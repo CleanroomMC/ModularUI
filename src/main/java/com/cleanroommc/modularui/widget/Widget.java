@@ -7,6 +7,8 @@ import net.minecraft.client.gui.Gui;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nullable;
+
 /**
  * This class depicts a functional element of a ModularUI
  */
@@ -57,8 +59,9 @@ public abstract class Widget extends Gui {
             size = new Size(parent.getSize().width, parent.getSize().height);
         }
 
+        determineArea();
         this.initialised = true;
-        rebuildChildren();
+        rebuild(false);
         onInit();
 
         if (this instanceof IWidgetParent) {
@@ -71,26 +74,33 @@ public abstract class Widget extends Gui {
 
     public final void screenUpdateInternal() {
         if (needRebuild) {
-            rebuildChildren();
+            rebuild(true);
             needRebuild = false;
         }
         onScreenUpdate();
     }
 
-    protected void rebuildChildren() {
+    protected void rebuild(boolean rebuildChildren) {
         if (!initialised) {
             return;
         }
         if (alignment != null) {
-            this.relativePos = alignment.getAlignedPos(parent.getSize(), size);
+            if (margin != null) {
+                this.relativePos = alignment.getAlignedPos(parent.getSize(), size, margin);
+            } else {
+                this.relativePos = alignment.getAlignedPos(parent.getSize(), size);
+            }
         }
         this.pos = parent.getAbsolutePos().add(relativePos);
         onRebuild();
-        if (this instanceof IWidgetParent) {
+        if (rebuildChildren && this instanceof IWidgetParent) {
             for (Widget widget : ((IWidgetParent) this).getChildren()) {
-                widget.rebuildChildren();
+                widget.rebuild(true);
             }
         }
+    }
+
+    protected void determineArea() {
     }
 
     /**
@@ -141,6 +151,11 @@ public abstract class Widget extends Gui {
         return size;
     }
 
+    @Nullable
+    public Alignment getAlignment() {
+        return alignment;
+    }
+
     public boolean isEnabled() {
         return enabled;
     }
@@ -165,7 +180,7 @@ public abstract class Widget extends Gui {
         return this;
     }
 
-    public Widget setRelativePos(Pos2d relativePos) {
+    public Widget setPos(Pos2d relativePos) {
         if (initialised) {
             queueRebuild();
         }
@@ -190,6 +205,14 @@ public abstract class Widget extends Gui {
             queueRebuild();
         }
         this.alignment = alignment;
+        return this;
+    }
+
+    public Widget setMargin(EdgeOffset margin) {
+        if (initialised) {
+            queueRebuild();
+        }
+        this.margin = margin;
         return this;
     }
 

@@ -120,6 +120,7 @@ public class TextRenderer {
             }
         }
         drawWord();
+        GlStateManager.color(1f, 1f, 1f, 1f);
     }
 
     private void drawWord() {

@@ -2,13 +2,16 @@ package com.cleanroommc.modularui.widget;
 
 import com.cleanroommc.modularui.api.IVanillaSlot;
 import com.cleanroommc.modularui.api.Interactable;
+import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.drawable.UITexture;
 import com.cleanroommc.modularui.slot.BaseSlot;
 import net.minecraft.inventory.Slot;
 
 public class SlotWidget extends Widget implements IVanillaSlot, IWidgetDrawable, Interactable {
 
     public static final Size DEFAULT_SIZE = new Size(18, 18);
+    public static final UITexture TEXTURE = UITexture.fullImage("modularui", "gui/slot/item");
 
     private final BaseSlot slot;
 
@@ -25,6 +28,7 @@ public class SlotWidget extends Widget implements IVanillaSlot, IWidgetDrawable,
     @Override
     public void drawInBackground(float partialTicks) {
         // draw background
+        TEXTURE.draw(Pos2d.zero(), getSize(), partialTicks);
     }
 
     @Override
@@ -34,7 +38,18 @@ public class SlotWidget extends Widget implements IVanillaSlot, IWidgetDrawable,
 
     @Override
     public void onRebuild() {
-        slot.xPos = (int) getAbsolutePos().x;
-        slot.yPos = (int) getAbsolutePos().y;
+        Pos2d pos = getAbsolutePos().subtract(getGui().getPos());
+        slot.xPos = (int) pos.x;
+        slot.yPos = (int) pos.y;
+    }
+
+    @Override
+    public SlotWidget setPos(Pos2d relativePos) {
+        return (SlotWidget) super.setPos(relativePos);
+    }
+
+    @Override
+    public SlotWidget setSize(Size size) {
+        return (SlotWidget) super.setSize(size);
     }
 }
