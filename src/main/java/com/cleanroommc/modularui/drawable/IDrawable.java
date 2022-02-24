@@ -16,11 +16,6 @@ public interface IDrawable {
 	default void tick() {
 	}
 
-	@Nullable
-	default Size estimateSize() {
-		return null;
-	}
-
 	default DrawableWidget asWidget() {
 		return new DrawableWidget().setDrawable(this);
 	}

@@ -21,7 +21,7 @@ public abstract class GuiContainerMixin implements GuiContainerAccess {
      * @reason because mojang dum dum
      */
     @Overwrite
-    public Slot getSlotAtPosition(int x, int y) {
+    private Slot getSlotAtPosition(int x, int y) {
         return getSlotAt(x, y);
     }
 

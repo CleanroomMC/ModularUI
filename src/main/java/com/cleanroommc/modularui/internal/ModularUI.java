@@ -12,6 +12,7 @@ import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.widget.Widget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
@@ -21,6 +22,10 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class ModularUI implements IWidgetParent {
+
+    public static boolean isClient() {
+        return FMLCommonHandler.instance().getSide() == Side.CLIENT;
+    }
 
     @SideOnly(Side.CLIENT)
     public static final Minecraft MC = Minecraft.getMinecraft();
@@ -104,14 +109,17 @@ public final class ModularUI implements IWidgetParent {
         screenSize = scaledSize;
         pos = alignment.getAlignedPos(screenSize, size);
         if (isInitialised()) {
-            children.forEach(Widget::queueRebuild);
+            children.forEach(Widget::checkNeedsRebuild);
         }
     }
 
-    public void update() {
+    public void updateMousePos() {
         float x = Mouse.getEventX() * guiScreen.width / (float) MC.displayWidth;
         float y = guiScreen.height - Mouse.getEventY() * guiScreen.height / (float) MC.displayHeight - 1;
         mousePos = new Pos2d(x, y);
+    }
+
+    public void update() {
         IWidgetParent.forEachByLayer(this, widget -> {
             widget.screenUpdateInternal();
             return false;
