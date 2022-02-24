@@ -17,7 +17,8 @@ public class TextWidget extends Widget implements IWidgetDrawable {
     @Nullable
     private Supplier<Object[]> localisationData;
     private int defaultColor = TextRenderer.DEFAULT_COLOR;
-    private String localised = "";
+    private String localised;
+    private boolean dynamicData = false;
 
     public TextWidget(String text) {
         this.text = text;
@@ -46,11 +47,14 @@ public class TextWidget extends Widget implements IWidgetDrawable {
 
     public TextWidget localise(Supplier<Object[]> localisationData) {
         this.localisationData = localisationData;
+        this.dynamicData = true;
         return this;
     }
 
     public TextWidget localise(Object... localisationData) {
-        return localise(() -> localisationData);
+        localise(() -> localisationData);
+        this.dynamicData = false;
+        return this;
     }
 
     public TextWidget setDefaultColor(int color) {
@@ -60,16 +64,20 @@ public class TextWidget extends Widget implements IWidgetDrawable {
 
     @Override
     public void onScreenUpdate() {
-        super.onScreenUpdate();
-        String l = getLocalised();
-        if (!l.equals(localised)) {
-            checkNeedsRebuild();
-            localised = l;
+        if (isDynamic()) {
+            String l = getLocalised();
+            if (!l.equals(localised)) {
+                checkNeedsRebuild();
+                localised = l;
+            }
         }
     }
 
     @Override
     public void onRebuildPre() {
+        if (localised == null) {
+            localised = getLocalised();
+        }
         setSize(TextRenderer.calcTextSize(localised, getGui().getSize().width, 1));
     }
 
@@ -84,5 +92,9 @@ public class TextWidget extends Widget implements IWidgetDrawable {
     @Override
     public void drawInBackground(float partialTicks) {
         TextRenderer.drawString(localised, Pos2d.ZERO, defaultColor, getSize().width);
+    }
+
+    public boolean isDynamic() {
+        return dynamicData || textSupplier != null;
     }
 }

@@ -56,8 +56,8 @@ public abstract class Widget extends Gui {
         onInit();
         this.initialised = true;
 
-        this.needRebuild = true;
         if (ModularUI.isClient()) {
+            this.needRebuild = true;
             rebuildInternal(false);
         }
 
@@ -67,8 +67,10 @@ public abstract class Widget extends Gui {
                 widget.initialize(this.gui, (IWidgetParent) this, nextLayer);
             }
         }
-        onRebuildPost();
-        this.needRebuild = false;
+        if (ModularUI.isClient()) {
+            onRebuildPost();
+            this.needRebuild = false;
+        }
     }
 
     public final void screenUpdateInternal() {
