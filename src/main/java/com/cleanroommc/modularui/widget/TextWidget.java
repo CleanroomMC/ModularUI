@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.widget;
 
 import com.cleanroommc.modularui.api.math.Pos2d;
-import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.drawable.Text;
 import com.cleanroommc.modularui.drawable.TextRenderer;
 import com.cleanroommc.modularui.internal.ModularUI;
@@ -18,6 +17,7 @@ public class TextWidget extends Widget implements IWidgetDrawable {
     @Nullable
     private Supplier<Object[]> localisationData;
     private int defaultColor = TextRenderer.DEFAULT_COLOR;
+    private String localised = "";
 
     public TextWidget(String text) {
         this.text = text;
@@ -59,8 +59,18 @@ public class TextWidget extends Widget implements IWidgetDrawable {
     }
 
     @Override
-    protected void determineArea(Size parentSize) {
-        setSize(TextRenderer.calcTextSize(getLocalised(), parentSize.width, 1));
+    public void onScreenUpdate() {
+        super.onScreenUpdate();
+        String l = getLocalised();
+        if (!l.equals(localised)) {
+            checkNeedsRebuild();
+            localised = l;
+        }
+    }
+
+    @Override
+    public void onRebuildPre() {
+        setSize(TextRenderer.calcTextSize(localised, getGui().getSize().width, 1));
     }
 
     public String getLocalised() {
@@ -73,6 +83,6 @@ public class TextWidget extends Widget implements IWidgetDrawable {
 
     @Override
     public void drawInBackground(float partialTicks) {
-        TextRenderer.drawString(getLocalised(), Pos2d.ZERO, defaultColor, getSize().width);
+        TextRenderer.drawString(localised, Pos2d.ZERO, defaultColor, getSize().width);
     }
 }

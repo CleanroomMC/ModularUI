@@ -19,9 +19,8 @@ public abstract class Widget extends Gui {
     private Size size = Size.zero();
     private Pos2d relativePos = Pos2d.zero();
     private Pos2d pos = null;
-    private Alignment alignment = Alignment.TopLeft;
-    private EdgeOffset margin;
-    private EdgeOffset padding;
+    private Pos2d fixedPos = null;
+    private boolean fillParent;
     private boolean initialised = false;
     protected boolean enabled = true;
     private int layer = -1;
@@ -39,11 +38,6 @@ public abstract class Widget extends Gui {
         this.relativePos = pos;
     }
 
-    public Widget(Size size, Alignment alignment) {
-        this.size = size;
-        this.alignment = alignment;
-    }
-
     /**
      * Only used internally
      */
@@ -55,14 +49,17 @@ public abstract class Widget extends Gui {
         this.parent = parent;
         this.layer = layer;
 
-        if (size.isZero()) {
-            size = new Size(parent.getSize().width, parent.getSize().height);
+        if (fillParent) {
+            size = parent.getSize();
         }
 
-        determineArea();
-        this.initialised = true;
-        rebuild(false);
         onInit();
+        this.initialised = true;
+
+        this.needRebuild = true;
+        if (ModularUI.isClient()) {
+            rebuildInternal(false);
+        }
 
         if (this instanceof IWidgetParent) {
             int nextLayer = layer + 1;
@@ -70,37 +67,35 @@ public abstract class Widget extends Gui {
                 widget.initialize(this.gui, (IWidgetParent) this, nextLayer);
             }
         }
+        onRebuildPost();
+        this.needRebuild = false;
     }
 
     public final void screenUpdateInternal() {
         if (needRebuild) {
-            rebuild(true);
+            rebuildInternal(true);
             needRebuild = false;
         }
         onScreenUpdate();
     }
 
-    protected void rebuild(boolean rebuildChildren) {
+    protected final void rebuildInternal(boolean runForChildren) {
         if (!initialised) {
             return;
         }
-        if (alignment != null) {
-            if (margin != null) {
-                this.relativePos = alignment.getAlignedPos(parent.getSize(), size, margin);
-            } else {
-                this.relativePos = alignment.getAlignedPos(parent.getSize(), size);
-            }
+        if (isFixed()) {
+            setPos(this.fixedPos.subtract(parent.getAbsolutePos()));
+            setAbsolutePos(this.fixedPos);
+        } else {
+            setAbsolutePos(parent.getAbsolutePos().add(getPos()));
         }
-        this.pos = parent.getAbsolutePos().add(relativePos);
-        onRebuild();
-        if (rebuildChildren && this instanceof IWidgetParent) {
-            for (Widget widget : ((IWidgetParent) this).getChildren()) {
-                widget.rebuild(true);
+        onRebuildPre();
+        if (runForChildren && this instanceof IWidgetParent) {
+            for (Widget child : ((IWidgetParent) this).getChildren()) {
+                child.rebuildInternal(true);
             }
+            onRebuildPost();
         }
-    }
-
-    protected void determineArea() {
     }
 
     /**
@@ -117,7 +112,10 @@ public abstract class Widget extends Gui {
     public void onFrameUpdate() {
     }
 
-    public void onRebuild() {
+    public void onRebuildPre() {
+    }
+
+    public void onRebuildPost() {
     }
 
     protected void onInit() {
@@ -151,11 +149,6 @@ public abstract class Widget extends Gui {
         return size;
     }
 
-    @Nullable
-    public Alignment getAlignment() {
-        return alignment;
-    }
-
     public boolean isEnabled() {
         return enabled;
     }
@@ -172,52 +165,41 @@ public abstract class Widget extends Gui {
         this.enabled = enabled;
     }
 
+    public boolean isFixed() {
+        return fixedPos != null;
+    }
+
     public Widget setSize(Size size) {
-        if (initialised) {
-            queueRebuild();
-        }
+        checkNeedsRebuild();
         this.size = size;
         return this;
     }
 
     public Widget setPos(Pos2d relativePos) {
-        if (initialised) {
-            queueRebuild();
-        }
+        checkNeedsRebuild();
         this.relativePos = relativePos;
-        this.alignment = null;
         return this;
     }
 
-    public Widget setAbsolutePos(Pos2d pos) {
-        if (initialised) {
-            this.relativePos = pos.subtract(getGui().getPos());
-            queueRebuild();
-        } else {
-            this.pos = pos;
+    protected void setAbsolutePos(Pos2d relativePos) {
+        this.pos = relativePos;
+    }
+
+    public Widget setFixedPos(@Nullable Pos2d pos) {
+        checkNeedsRebuild();
+        this.fixedPos = pos;
+        return this;
+    }
+
+    public Widget fillParent() {
+        this.fillParent = true;
+        return this;
+    }
+
+    public void checkNeedsRebuild() {
+        if (initialised && !needRebuild) {
+            this.needRebuild = true;
         }
-        this.alignment = null;
-        return this;
-    }
-
-    public Widget setAlignment(Alignment alignment) {
-        if (initialised) {
-            queueRebuild();
-        }
-        this.alignment = alignment;
-        return this;
-    }
-
-    public Widget setMargin(EdgeOffset margin) {
-        if (initialised) {
-            queueRebuild();
-        }
-        this.margin = margin;
-        return this;
-    }
-
-    public void queueRebuild() {
-        this.needRebuild = true;
     }
 
     public static boolean isUnderMouse(Pos2d mouse, Pos2d areaTopLeft, Size areaSize) {

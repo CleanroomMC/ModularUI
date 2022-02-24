@@ -24,11 +24,6 @@ public abstract class SingleChildWidget extends Widget implements IWidgetParent 
         super(size, pos);
     }
 
-    public SingleChildWidget(Size size, Alignment alignment) {
-        super(size, alignment);
-    }
-
-
     public final SingleChildWidget setChild(Widget widget) {
         if (isInitialised()) {
             ModularUIMod.LOGGER.error("Can't add child after initialised!");

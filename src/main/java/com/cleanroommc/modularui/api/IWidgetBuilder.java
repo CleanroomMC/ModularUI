@@ -21,15 +21,15 @@ public interface IWidgetBuilder<T extends IWidgetBuilder<T>> {
         return (T) this;
     }
 
-    default T drawable(IDrawable drawable, Alignment alignment) {
-        return widget(drawable.asWidget().setAlignment(alignment));
+    default T drawable(IDrawable drawable) {
+        return widget(drawable.asWidget());
     }
 
-    default T drawable(IDrawable drawable, Alignment alignment, Size size) {
+    /*default T drawable(IDrawable drawable, Alignment alignment, Size size) {
         return widget(drawable.asWidget()
                 .setAlignment(alignment)
                 .setSize(size));
-    }
+    }*/
 
     default T slot(BaseSlot slot) {
         return widget(new SlotWidget(slot));
@@ -39,7 +39,7 @@ public interface IWidgetBuilder<T extends IWidgetBuilder<T>> {
         return widget(SlotGroup.playerInventoryGroup(player, pos));
     }
 
-    default T bindPlayerInventory(EntityPlayer player, Alignment alignment) {
+    /*default T bindPlayerInventory(EntityPlayer player, Alignment alignment) {
         return widget(SlotGroup.playerInventoryGroup(player, Pos2d.zero())
                 .setAlignment(alignment));
     }
@@ -48,5 +48,5 @@ public interface IWidgetBuilder<T extends IWidgetBuilder<T>> {
         return widget(SlotGroup.playerInventoryGroup(player, Pos2d.zero())
                 .setAlignment(alignment)
                 .setMargin(margin));
-    }
+    }*/
 }

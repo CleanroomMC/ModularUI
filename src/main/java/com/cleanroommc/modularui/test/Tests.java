@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.ModularUIMod;
 import com.cleanroommc.modularui.api.math.Alignment;
-import com.cleanroommc.modularui.api.math.EdgeOffset;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.builder.ModularUIBuilder;
@@ -10,11 +9,11 @@ import com.cleanroommc.modularui.builder.UIBuilder;
 import com.cleanroommc.modularui.builder.UIInfo;
 import com.cleanroommc.modularui.drawable.IDrawable;
 import com.cleanroommc.modularui.drawable.Text;
-import com.cleanroommc.modularui.drawable.TextSpan;
 import com.cleanroommc.modularui.drawable.UITexture;
 import com.cleanroommc.modularui.internal.ModularGui;
 import com.cleanroommc.modularui.internal.ModularUI;
 import com.cleanroommc.modularui.internal.ModularUIContainer;
+import com.cleanroommc.modularui.widget.TextWidget;
 import net.minecraft.client.gui.GuiYesNo;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -41,12 +40,13 @@ public class Tests {
     }
 
     public static ModularUI createUI(EntityPlayer player) {
-        TextSpan TEXT = new TextSpan(new Text("Blue \u00a7nUnderlined\u00a7rBlue ").color(0x3058B8), new Text("Mint").color(0x469E8F));
+        Text[] TEXT = {new Text("Blue \u00a7nUnderlined\u00a7rBlue ").color(0x3058B8), new Text("Mint").color(0x469E8F)};
         return ModularUIBuilder.create(new Size(176, 166))
                 .setAlignment(Alignment.Center)
-                .drawable(BACKGROUND, Alignment.Center)
-                .drawable(TEXT, Alignment.Center, new Size(30, 11))
+                .widget(BACKGROUND.asWidget().fillParent())
                 .bindPlayerInventory(player, new Pos2d(7, 84))
+                .widget(new TextWidget(TEXT).setPos(new Pos2d(10, 10)))
+                //.drawable(TEXT, Alignment.Center, new Size(30, 11))
                 //.bindPlayerInventory(player, Alignment.BottomCenter, EdgeOffset.bottom(7f))
                 .build(player);
     }
