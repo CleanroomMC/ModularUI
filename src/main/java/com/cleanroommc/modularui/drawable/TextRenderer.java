@@ -2,12 +2,18 @@ package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.ModularUIMod;
 import com.cleanroommc.modularui.api.math.Pos2d;
+import com.cleanroommc.modularui.api.math.Size;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+/**
+ * Renders strings with custom formatting into constrained sizes.
+ * §{#FFFFFF} will color something white
+ * §s will add shadow
+ */
 @SideOnly(Side.CLIENT)
 public class TextRenderer {
 
@@ -20,17 +26,16 @@ public class TextRenderer {
         renderer.draw(text);
     }
 
-    public static void drawString(String text, Pos2d pos, int color, float maxWidth, boolean shadow) {
+    public static void drawString(String text, Pos2d pos, int color, float maxWidth, float textScale) {
         TextRenderer renderer = new TextRenderer(pos, color, maxWidth);
-        renderer.setShadow(shadow);
+        renderer.setScale(textScale);
         renderer.draw(text);
     }
 
-    public static void drawString(String text, Pos2d pos, int color, float maxWidth, boolean shadow, float textScale) {
-        TextRenderer renderer = new TextRenderer(pos, color, maxWidth);
-        renderer.setShadow(shadow);
+    public static Size calcTextSize(String text, float maxWidth, float textScale) {
+        TextRenderer renderer = new TextRenderer(Pos2d.zero(), DEFAULT_COLOR, maxWidth);
         renderer.setScale(textScale);
-        renderer.draw(text);
+        return renderer.calcSize(text);
     }
 
     public static String getColorFormatString(int color) {
@@ -40,7 +45,6 @@ public class TextRenderer {
     private final float maxX;
     private int color;
     private final int defaultColor;
-    private boolean shadow = false;
     private float scale = 1f;
     private final Pos2d pos;
     private float currentX, currentY;
@@ -56,6 +60,12 @@ public class TextRenderer {
     private boolean italicStyle;
     private boolean underlineStyle;
     private boolean strikethroughStyle;
+    /**
+     * Custom style §s
+     */
+    private boolean shadowStyle;
+
+    private boolean calcSizeMode = false;
 
     public TextRenderer(Pos2d pos, int color, float maxWidth) {
         this.maxX = pos.x + maxWidth;
@@ -66,12 +76,17 @@ public class TextRenderer {
         this.currentY = pos.y;
     }
 
-    public void setShadow(boolean shadow) {
-        this.shadow = shadow;
-    }
-
     public void setScale(float scale) {
         this.scale = scale;
+    }
+
+    public Size calcSize(String text) {
+        calcSizeMode = true;
+        draw(text);
+        float sizeX = currentY > pos.y ? maxX - pos.x : currentX - pos.x;
+        float sizeY = currentY - pos.y + FR.FONT_HEIGHT * scale;
+        calcSizeMode = false;
+        return new Size(sizeX, sizeY);
     }
 
     public void draw(String text) {
@@ -88,6 +103,13 @@ public class TextRenderer {
                     wasFormatChar = false;
                 }
                 addChar(' ');
+                drawWord();
+            } else if (c == '\n') {
+                if (wasFormatChar) {
+                    addChar('\u00a7');
+                    wasFormatChar = false;
+                }
+                needsNewLine = true;
                 drawWord();
             } else if (wasFormatChar) {
                 if (c == '{') {
@@ -120,23 +142,27 @@ public class TextRenderer {
             }
         }
         drawWord();
-        GlStateManager.color(1f, 1f, 1f, 1f);
+        if (!calcSizeMode) {
+            GlStateManager.color(1f, 1f, 1f, 1f);
+        }
     }
 
     private void drawWord() {
-        String word = this.word.toString();
-        if (word.isEmpty()) {
-            return;
-        }
-        word = getActiveStyles() + word;
+        if (!calcSizeMode) {
+            String word = this.word.toString();
+            if (word.isEmpty()) {
+                return;
+            }
+            word = getActiveStyles() + word;
 
-        GlStateManager.disableBlend();
-        GlStateManager.pushMatrix();
-        GlStateManager.scale(scale, scale, 0f);
-        float sf = 1 / scale;
-        FR.drawString(word, currentX * sf, currentY * sf, color, shadow);
-        GlStateManager.popMatrix();
-        GlStateManager.enableBlend();
+            GlStateManager.disableBlend();
+            GlStateManager.pushMatrix();
+            GlStateManager.scale(scale, scale, 0f);
+            float sf = 1 / scale;
+            FR.drawString(word, currentX * sf, currentY * sf, color, shadowStyle);
+            GlStateManager.popMatrix();
+            GlStateManager.enableBlend();
+        }
 
         this.word = new StringBuilder();
         currentX += currentWidth;
@@ -178,6 +204,7 @@ public class TextRenderer {
         this.italicStyle = false;
         this.underlineStyle = false;
         this.strikethroughStyle = false;
+        this.shadowStyle = false;
     }
 
     private boolean checkStyleChar(char c) {
@@ -212,9 +239,13 @@ public class TextRenderer {
                 case 'M':
                     strikethroughStyle = true;
                     break;
+                case 's':
+                case 'S':
+                    shadowStyle = true;
+                    break;
             }
         }
-        return !(isFormatColor(c) || formatSpecial);
+        return !(formatSpecial || isFormatColor(c));
     }
 
     private String getActiveStyles() {
@@ -234,6 +265,9 @@ public class TextRenderer {
         if (strikethroughStyle) {
             builder.append(FORMAT_CHAR).append('m');
         }
+        if (shadowStyle) {
+            builder.append(FORMAT_CHAR).append('s');
+        }
         return builder.toString();
     }
 
@@ -242,6 +276,9 @@ public class TextRenderer {
     }
 
     private static boolean isFormatSpecial(char formatChar) {
-        return formatChar >= 'k' && formatChar <= 'o' || formatChar >= 'K' && formatChar <= 'O' || formatChar == 'r' || formatChar == 'R';
+        return formatChar >= 'k' && formatChar <= 'o' ||
+                formatChar >= 'K' && formatChar <= 'O' ||
+                formatChar == 'r' || formatChar == 'R' ||
+                formatChar == 's' || formatChar == 'S';
     }
 }

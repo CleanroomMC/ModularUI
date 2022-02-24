@@ -4,8 +4,6 @@ import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.resources.I18n;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -18,7 +16,6 @@ public class Text implements IDrawable {
     public static final FontRenderer renderer = Minecraft.getMinecraft().fontRenderer;
     private final Supplier<String> textSupplier;
     private final String text;
-    private Supplier<Object[]> dataSupplier;
     private int color = 0x212121;
     private boolean shadow = false;
 
@@ -33,15 +30,6 @@ public class Text implements IDrawable {
 
     public Text(String text) {
         this(Objects.requireNonNull(text, "String in Text can't be null!"), null);
-    }
-
-    public Text localise(Supplier<Object[]> dataSupplier) {
-        this.dataSupplier = dataSupplier;
-        return this;
-    }
-
-    public Text localise(Object... data) {
-        return localise(() -> data);
     }
 
     public Text color(int color) {
@@ -62,21 +50,33 @@ public class Text implements IDrawable {
         return color;
     }
 
-    public boolean isShadow() {
+    public boolean hasShadow() {
         return shadow;
     }
 
-    public String getRawText() {
-        String text = textSupplier == null ? this.text : textSupplier.get();
-        if (FMLCommonHandler.instance().getSide() == Side.CLIENT && dataSupplier != null) {
-            text = I18n.format(text, dataSupplier.get());
-        }
-        return text;
+    public String getText() {
+        return this.text;
     }
 
     @Override
     public void draw(Pos2d pos, Size size, float partialTicks) {
-        String text = TextRenderer.getColorFormatString(color) + getRawText();
-        TextRenderer.drawString(text, pos, color, size.width, shadow);
+        String text = TextRenderer.getColorFormatString(color) + getText();
+        TextRenderer.drawString(text, pos, color, size.width);
+    }
+
+    public String getFormatted() {
+        String text = TextRenderer.getColorFormatString(color);
+        if (hasShadow()) {
+            text += TextRenderer.FORMAT_CHAR + 's';
+        }
+        return text + getText();
+    }
+
+    public static String getFormatted(Text... texts) {
+        StringBuilder builder = new StringBuilder();
+        for (Text text : texts) {
+            builder.append(text.getFormatted());
+        }
+        return builder.toString();
     }
 }
