@@ -1,16 +1,16 @@
 package com.cleanroommc.modularui.internal;
 
-import com.cleanroommc.modularui.api.IVanillaSlot;
-import com.cleanroommc.modularui.mixin.GuiContainerAccess;
-import com.google.common.primitives.Ints;
 import com.cleanroommc.modularui.ModularUIMod;
+import com.cleanroommc.modularui.api.IVanillaSlot;
 import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.Interactable;
-import com.cleanroommc.modularui.api.math.GuiArea;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.mixin.GuiContainerAccess;
 import com.cleanroommc.modularui.widget.IWidgetDrawable;
+import com.cleanroommc.modularui.widget.SlotWidget;
 import com.cleanroommc.modularui.widget.Widget;
+import com.google.common.primitives.Ints;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
@@ -61,6 +61,7 @@ public class ModularGui extends GuiContainer implements GuiContainerAccess {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        gui.updateMousePos();
         super.drawScreen(mouseX, mouseY, partialTicks);
         if (debugMode) {
             GlStateManager.disableRescaleNormal();
@@ -101,7 +102,12 @@ public class ModularGui extends GuiContainer implements GuiContainerAccess {
             widget.onFrameUpdate();
             if (widget.isEnabled() && widget instanceof IWidgetDrawable) {
                 GlStateManager.pushMatrix();
-                GlStateManager.translate(widget.getAbsolutePos().x, widget.getAbsolutePos().y, 0);
+                if (widget instanceof SlotWidget) {
+                    Slot slot = ((SlotWidget) widget).getMcSlot();
+                    GlStateManager.translate(guiLeft + slot.xPos, guiTop + slot.yPos, 0);
+                } else {
+                    GlStateManager.translate(widget.getAbsolutePos().x, widget.getAbsolutePos().y, 0);
+                }
                 GlStateManager.enableBlend();
                 ((IWidgetDrawable) widget).drawInBackground(partialTicks);
                 GlStateManager.popMatrix();
@@ -116,7 +122,6 @@ public class ModularGui extends GuiContainer implements GuiContainerAccess {
 
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-
         GlStateManager.pushMatrix();
         GlStateManager.translate(-this.guiLeft, -this.guiTop, 0);
         GlStateManager.disableRescaleNormal();
@@ -128,14 +133,18 @@ public class ModularGui extends GuiContainer implements GuiContainerAccess {
         IWidgetParent.forEachByLayer(gui, widget -> {
             if (widget.isEnabled() && widget instanceof IWidgetDrawable) {
                 GlStateManager.pushMatrix();
-                GlStateManager.translate(widget.getAbsolutePos().x, widget.getAbsolutePos().y, 0);
+                if (widget instanceof SlotWidget) {
+                    Slot slot = ((SlotWidget) widget).getMcSlot();
+                    GlStateManager.translate(guiLeft + slot.xPos, guiTop + slot.yPos, 0);
+                } else {
+                    GlStateManager.translate(widget.getAbsolutePos().x, widget.getAbsolutePos().y, 0);
+                }
                 GlStateManager.enableBlend();
                 ((IWidgetDrawable) widget).drawInForeground(partialTicks);
                 GlStateManager.popMatrix();
             }
             return false;
         });
-
 
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableLighting();
@@ -162,20 +171,23 @@ public class ModularGui extends GuiContainer implements GuiContainerAccess {
         int color = 0xDB69D2;
         Widget widget = topWidget.get();
         if (widget != null) {
-            GuiArea area = widget.getArea();
+            Size size = widget.getSize();
+            Pos2d pos = widget.getAbsolutePos();
+
+            // non of this shit works
 
             //drawRect(10f, 10, 700, 400, color);
 
-            drawBorder(area.x0, area.y0, area.width, area.height, color, 1);
+            drawBorder(pos.x, pos.y, size.width, size.height, color, 1);
             //drawRect((int) (area.x0 - 1), (int) (area.y0 - 1), (int) (area.x1 + 1), (int) (area.y1 + 1), color);
             //drawHorizontalLine((int) area.x0 - 1, (int) area.x1 + 1, (int) area.y0 - 2, color);
             //drawHorizontalLine((int) area.x0 - 1, (int) area.x1 + 1, (int) area.y1 + 2, color);
             //drawVerticalLine((int) area.x0 - 1, (int) area.y0 - 1, (int) area.y1 + 2, color);
             //drawVerticalLine((int) area.x1 + 1, (int) area.y0 - 1, (int) area.y1 + 2, color);
             //fontRenderer.drawString(info, area.x0, area.y0 - 12, color, false);
-            drawText("Class: " + widget.getClass().getSimpleName(), area.x0, area.y0 - 18, 0.5f, color, false);
-            drawText("Size: " + area.getSize(), area.x0, area.y0 - 12, 0.5f, color, false);
-            drawText("Pos: " + area.getTopLeft(), area.x0, area.y0 - 6, 0.5f, color, false);
+            drawText("Class: " + widget.getClass().getSimpleName(), pos.x, pos.y - 18, 0.5f, color, false);
+            drawText("Size: " + size, pos.x, pos.y - 12, 0.5f, color, false);
+            drawText("Pos: " + widget.getPos(), pos.x, pos.y - 6, 0.5f, color, false);
         }
 
         drawString(fontRenderer, "FPS: " + fps, 5, (int) (gui.getScaledScreenSize().height - 24), color);
