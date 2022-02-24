@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.ModularUIMod;
 import com.cleanroommc.modularui.api.IVanillaSlot;
 import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.Interactable;
+import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.mixin.GuiContainerAccess;
@@ -69,7 +70,6 @@ public class ModularGui extends GuiContainer implements GuiContainerAccess {
             GlStateManager.disableLighting();
             GlStateManager.disableDepth();
             GlStateManager.enableBlend();
-            GlStateManager.colorMask(true, true, true, true);
             drawDebugScreen();
             GlStateManager.color(1f, 1f, 1f, 1f);
             GlStateManager.enableLighting();
@@ -168,23 +168,13 @@ public class ModularGui extends GuiContainer implements GuiContainerAccess {
             }
         });
 
-        int color = 0xDB69D2;
+        int color = Color.rgb(180, 40, 115);
         Widget widget = topWidget.get();
         if (widget != null) {
             Size size = widget.getSize();
             Pos2d pos = widget.getAbsolutePos();
 
-            // non of this shit works
-
-            //drawRect(10f, 10, 700, 400, color);
-
-            drawBorder(pos.x, pos.y, size.width, size.height, color, 1);
-            //drawRect((int) (area.x0 - 1), (int) (area.y0 - 1), (int) (area.x1 + 1), (int) (area.y1 + 1), color);
-            //drawHorizontalLine((int) area.x0 - 1, (int) area.x1 + 1, (int) area.y0 - 2, color);
-            //drawHorizontalLine((int) area.x0 - 1, (int) area.x1 + 1, (int) area.y1 + 2, color);
-            //drawVerticalLine((int) area.x0 - 1, (int) area.y0 - 1, (int) area.y1 + 2, color);
-            //drawVerticalLine((int) area.x1 + 1, (int) area.y0 - 1, (int) area.y1 + 2, color);
-            //fontRenderer.drawString(info, area.x0, area.y0 - 12, color, false);
+            drawBorder(pos.x, pos.y, size.width, size.height, color, 1f);
             drawText("Class: " + widget.getClass().getSimpleName(), pos.x, pos.y - 18, 0.5f, color, false);
             drawText("Size: " + size, pos.x, pos.y - 12, 0.5f, color, false);
             drawText("Pos: " + widget.getPos(), pos.x, pos.y - 6, 0.5f, color, false);
@@ -315,12 +305,12 @@ public class ModularGui extends GuiContainer implements GuiContainerAccess {
         GlStateManager.enableBlend();
         GlStateManager.disableTexture2D();
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-        GlStateManager.color(1, 1, 1, 1);
-        bufferbuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        bufferbuilder.pos(left, bottom, 0.0D).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(right, bottom, 0.0D).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(right, top, 0.0D).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(left, top, 0.0D).color(r, g, b, a).endVertex();
+        GlStateManager.color(r, g, b, a);
+        bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
+        bufferbuilder.pos(left, bottom, 0.0D).endVertex();
+        bufferbuilder.pos(right, bottom, 0.0D).endVertex();
+        bufferbuilder.pos(right, top, 0.0D).endVertex();
+        bufferbuilder.pos(left, top, 0.0D).endVertex();
         tessellator.draw();
         GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();
