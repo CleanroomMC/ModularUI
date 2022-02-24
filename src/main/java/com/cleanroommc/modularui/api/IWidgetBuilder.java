@@ -1,16 +1,12 @@
 package com.cleanroommc.modularui.api;
 
-import com.cleanroommc.modularui.api.math.Alignment;
-import com.cleanroommc.modularui.api.math.EdgeOffset;
 import com.cleanroommc.modularui.api.math.Pos2d;
-import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.drawable.IDrawable;
-import com.cleanroommc.modularui.slot.BaseSlot;
+import com.cleanroommc.modularui.integration.vanilla.slot.BaseSlot;
 import com.cleanroommc.modularui.widget.SlotGroup;
 import com.cleanroommc.modularui.widget.SlotWidget;
 import com.cleanroommc.modularui.widget.Widget;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 
 public interface IWidgetBuilder<T extends IWidgetBuilder<T>> {
 

@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.slot;
+package com.cleanroommc.modularui.integration.vanilla.slot;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.item.ItemStack;

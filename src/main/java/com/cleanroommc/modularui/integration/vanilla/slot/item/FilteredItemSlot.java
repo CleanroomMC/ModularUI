@@ -1,6 +1,6 @@
-package com.cleanroommc.modularui.slot.item;
+package com.cleanroommc.modularui.integration.vanilla.slot.item;
 
-import com.cleanroommc.modularui.slot.BaseSlot;
+import com.cleanroommc.modularui.integration.vanilla.slot.BaseSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 

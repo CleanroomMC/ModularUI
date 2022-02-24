@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.slot.fluid;
+package com.cleanroommc.modularui.integration.vanilla.slot.fluid;
 
 import com.google.common.base.Predicates;
 import net.minecraft.item.ItemStack;

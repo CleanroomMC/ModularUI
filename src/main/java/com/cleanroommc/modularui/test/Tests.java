@@ -23,13 +23,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class Tests {
 
-    static UIInfo<?, ?> diamondGui;
     static UIInfo<?, ?> modularGui;
     public static final IDrawable BACKGROUND = UITexture.fullImage(ModularUIMod.ID, "gui/background/background");
 
     public static void init() {
         MinecraftForge.EVENT_BUS.register(Tests.class);
-        diamondGui = UIBuilder.of().gui(((player, world, x, y, z) -> new DiamondGuiScreen())).build();
         modularGui = UIBuilder.of()
                 .gui((player, world, x, y, z) -> new ModularGui(new ModularUIContainer(createUI(player))))
                 .container((player, world, x, y, z) -> {
@@ -46,8 +44,6 @@ public class Tests {
                 .widget(BACKGROUND.asWidget().fillParent())
                 .bindPlayerInventory(player, new Pos2d(7, 84))
                 .widget(new TextWidget(TEXT).setPos(new Pos2d(10, 10)))
-                //.drawable(TEXT, Alignment.Center, new Size(30, 11))
-                //.bindPlayerInventory(player, Alignment.BottomCenter, EdgeOffset.bottom(7f))
                 .build(player);
     }
 
@@ -58,13 +54,6 @@ public class Tests {
         }
         if (event.getItemStack().getItem() == Items.DIAMOND) {
             modularGui.open(event.getEntityPlayer());
-        }
-    }
-
-    static class DiamondGuiScreen extends GuiYesNo {
-        public DiamondGuiScreen() {
-            super((result, id) -> {
-            }, "Hi", "Hmm", 0);
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.network;
+package com.cleanroommc.modularui.internal.network;
 
 import com.cleanroommc.modularui.api.ISyncedWidget;
 import com.cleanroommc.modularui.internal.ModularUI;

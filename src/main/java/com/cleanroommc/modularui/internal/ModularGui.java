@@ -7,7 +7,7 @@ import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
-import com.cleanroommc.modularui.mixin.GuiContainerAccess;
+import com.cleanroommc.modularui.internal.mixin.GuiContainerAccess;
 import com.cleanroommc.modularui.widget.IWidgetDrawable;
 import com.cleanroommc.modularui.widget.SlotWidget;
 import com.cleanroommc.modularui.widget.Widget;

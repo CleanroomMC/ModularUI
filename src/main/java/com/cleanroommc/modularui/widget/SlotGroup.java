@@ -2,7 +2,7 @@ package com.cleanroommc.modularui.widget;
 
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
-import com.cleanroommc.modularui.slot.BaseSlot;
+import com.cleanroommc.modularui.integration.vanilla.slot.BaseSlot;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 

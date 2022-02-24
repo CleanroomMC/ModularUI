@@ -1,5 +1,5 @@
 {
-  "package": "com.cleanroommc.modularui.mixin",
+  "package": "com.cleanroommc.modularui.internal.mixin",
   "refmap": "mixins.modularui.refmap.json",
   "target": "@env(DEFAULT)",
   "minVersion": "0.8",

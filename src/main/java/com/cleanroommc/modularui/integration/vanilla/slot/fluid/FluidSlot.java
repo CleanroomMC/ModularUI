@@ -1,6 +1,6 @@
-package com.cleanroommc.modularui.slot.fluid;
+package com.cleanroommc.modularui.integration.vanilla.slot.fluid;
 
-import com.cleanroommc.modularui.slot.BaseSlot;
+import com.cleanroommc.modularui.integration.vanilla.slot.BaseSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;

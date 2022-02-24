@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.mixin;
+package com.cleanroommc.modularui.internal.mixin;
 
 import com.cleanroommc.modularui.api.math.Pos2d;
 import net.minecraft.inventory.Slot;
