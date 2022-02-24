@@ -31,8 +31,8 @@ public class Alignment {
     }
 
     public Pos2d getAlignedPos(Size parent, Size child) {
-        if(parent.width < child.width || parent.height < child.height)
-            throw new IllegalArgumentException("Parent size can't be smaller than child size");
+        //if(parent.width < child.width || parent.height < child.height)
+        //    throw new IllegalArgumentException("Parent size can't be smaller than child size");
         float x = (this.x + 1) / 2, y = (this.y + 1) / 2;
         return new Pos2d(parent.width * x - child.width * x, parent.height * y - child.height * y);
     }
@@ -41,9 +41,9 @@ public class Alignment {
         Pos2d pos = getAlignedPos(parent, child);
         float spaceH = parent.width - child.width, spaceV = parent.height - child.height;
         if(edgeOffset.left + edgeOffset.right > spaceH)
-            edgeOffset = new EdgeOffset(edgeOffset.top, edgeOffset.bottom, spaceH / 2, spaceH / 2);
+            edgeOffset = new EdgeOffset(spaceH / 2, edgeOffset.top, spaceH / 2, edgeOffset.bottom);
         if(edgeOffset.top + edgeOffset.bottom > spaceV)
-            edgeOffset = new EdgeOffset(spaceV / 2, spaceV / 2, edgeOffset.left, edgeOffset.right);
+            edgeOffset = new EdgeOffset(edgeOffset.left, spaceV / 2, edgeOffset.right, spaceV / 2);
         float x = pos.x, y = pos.y;
         if(x < edgeOffset.left)
             x = edgeOffset.left;

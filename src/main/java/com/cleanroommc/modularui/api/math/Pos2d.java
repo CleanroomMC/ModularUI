@@ -4,6 +4,8 @@ import java.util.Objects;
 
 public class Pos2d {
 
+    public static final Pos2d ZERO = zero();
+
     public static Pos2d zero() {
         return new Pos2d(0, 0);
     }
