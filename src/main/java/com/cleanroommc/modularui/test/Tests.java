@@ -2,19 +2,16 @@ package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.ModularUIMod;
 import com.cleanroommc.modularui.api.math.Alignment;
-import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
-import com.cleanroommc.modularui.builder.ModularUIBuilder;
-import com.cleanroommc.modularui.builder.UIBuilder;
-import com.cleanroommc.modularui.builder.UIInfo;
-import com.cleanroommc.modularui.drawable.IDrawable;
-import com.cleanroommc.modularui.drawable.Text;
-import com.cleanroommc.modularui.drawable.UITexture;
-import com.cleanroommc.modularui.internal.ModularGui;
-import com.cleanroommc.modularui.internal.ModularUI;
-import com.cleanroommc.modularui.internal.ModularUIContainer;
-import com.cleanroommc.modularui.widget.TextWidget;
-import net.minecraft.client.gui.GuiYesNo;
+import com.cleanroommc.modularui.common.builder.ModularUIBuilder;
+import com.cleanroommc.modularui.common.builder.UIBuilder;
+import com.cleanroommc.modularui.common.builder.UIInfo;
+import com.cleanroommc.modularui.common.drawable.IDrawable;
+import com.cleanroommc.modularui.common.drawable.Text;
+import com.cleanroommc.modularui.common.drawable.UITexture;
+import com.cleanroommc.modularui.common.internal.ModularGui;
+import com.cleanroommc.modularui.common.internal.ModularUI;
+import com.cleanroommc.modularui.common.internal.ModularUIContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraftforge.common.MinecraftForge;
@@ -41,9 +38,10 @@ public class Tests {
         Text[] TEXT = {new Text("Blue \u00a7nUnderlined\u00a7rBlue ").color(0x3058B8), new Text("Mint").color(0x469E8F)};
         return ModularUIBuilder.create(new Size(176, 166))
                 .setAlignment(Alignment.Center)
-                .widget(BACKGROUND.asWidget().fillParent())
+                .addFromJson("test", player)
+                /*.widget(BACKGROUND.asWidget().fillParent())
                 .bindPlayerInventory(player, new Pos2d(7, 84))
-                .widget(new TextWidget(TEXT).setPos(new Pos2d(10, 10)))
+                .widget(new TextWidget(TEXT).setPos(new Pos2d(10, 10)))*/
                 .build(player);
     }
 

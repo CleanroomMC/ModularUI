@@ -2,7 +2,7 @@ package com.cleanroommc.modularui.api;
 
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
-import com.cleanroommc.modularui.widget.Widget;
+import com.cleanroommc.modularui.common.widget.Widget;
 
 import java.util.LinkedList;
 import java.util.List;

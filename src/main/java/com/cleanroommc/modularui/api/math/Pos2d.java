@@ -1,5 +1,10 @@
 package com.cleanroommc.modularui.api.math;
 
+import com.cleanroommc.modularui.ModularUIMod;
+import com.cleanroommc.modularui.common.internal.JsonHelper;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import java.util.Objects;
 
 public class Pos2d {
@@ -85,4 +90,29 @@ public class Pos2d {
         return "[" + x + ", " + y + ']';
     }
 
+    public static Pos2d ofJson(JsonElement jsonElement) {
+        float x = 0, y = 0;
+        if (jsonElement.isJsonObject()) {
+            JsonObject json = jsonElement.getAsJsonObject();
+            x = JsonHelper.getFloat(json, 0, "x");
+            y = JsonHelper.getFloat(json, 0, "y");
+        } else {
+            String raw = jsonElement.getAsString();
+            if (raw.contains(",")) {
+                String[] parts = raw.split(",");
+                try {
+                    if (!parts[0].isEmpty()) {
+                        x = Float.parseFloat(parts[0]);
+                    }
+                    if(parts.length > 1 && !parts[1].isEmpty()) {
+                        y = Float.parseFloat(parts[1]);
+                    }
+                } catch (NumberFormatException e) {
+                    ModularUIMod.LOGGER.error("Error parsing JSON pos: {}", raw);
+                    e.printStackTrace();
+                }
+            }
+        }
+        return new Pos2d(x, y);
+    }
 }

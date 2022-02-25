@@ -1,9 +1,9 @@
 package com.cleanroommc.modularui.api;
 
-import com.cleanroommc.modularui.internal.ModularUI;
-import com.cleanroommc.modularui.internal.network.CWidgetUpdate;
-import com.cleanroommc.modularui.internal.network.SWidgetUpdate;
-import com.cleanroommc.modularui.widget.Widget;
+import com.cleanroommc.modularui.common.internal.ModularUI;
+import com.cleanroommc.modularui.common.internal.network.CWidgetUpdate;
+import com.cleanroommc.modularui.common.internal.network.SWidgetUpdate;
+import com.cleanroommc.modularui.common.widget.Widget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;

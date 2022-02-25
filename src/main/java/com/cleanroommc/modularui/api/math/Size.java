@@ -1,5 +1,10 @@
 package com.cleanroommc.modularui.api.math;
 
+import com.cleanroommc.modularui.ModularUIMod;
+import com.cleanroommc.modularui.common.internal.JsonHelper;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import java.util.Objects;
 
 public class Size {
@@ -53,5 +58,31 @@ public class Size {
     @Override
     public String toString() {
         return "[" + width + ", " + height + "]";
+    }
+
+    public static Size ofJson(JsonElement jsonElement) {
+        float width = 0, height = 0;
+        if (jsonElement.isJsonObject()) {
+            JsonObject json = jsonElement.getAsJsonObject();
+            width = JsonHelper.getFloat(json, 0, "width", "w");
+            height = JsonHelper.getFloat(json, 0, "height", "h");
+        } else {
+            String raw = jsonElement.getAsString();
+            if (raw.contains(",")) {
+                String[] parts = raw.split(",");
+                try {
+                    if (!parts[0].isEmpty()) {
+                        width = Float.parseFloat(parts[0]);
+                    }
+                    if(parts.length > 1 && !parts[1].isEmpty()) {
+                        height = Float.parseFloat(parts[1]);
+                    }
+                } catch (NumberFormatException e) {
+                    ModularUIMod.LOGGER.error("Error parsing JSON pos: {}", raw);
+                    e.printStackTrace();
+                }
+            }
+        }
+        return new Size(width, height);
     }
 }

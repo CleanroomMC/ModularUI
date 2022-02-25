@@ -1,0 +1,29 @@
+{
+  "widgets": [
+    {
+      "name": "background",
+      "type": "image",
+      "fillParent": true,
+      "src": "modularui:textures/gui/background/background"
+    },
+    {
+      "name": "player_inventory",
+      "type": "player_inventory",
+      "pos": "7,84"
+    },
+    {
+      "name": "test_text",
+      "type": "text",
+      "pos": "10,10",
+      "text": "§{#3058B8}Blue §nUnderlined§rBlue §{#469E8F}Mint Hello"
+    }
+  ],
+  "__examples:": {
+    "pos": {
+      "x": 1.5,
+      "y": 2
+    },
+    "_pos": "1.5,2"
+  }
+}
+
