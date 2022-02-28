@@ -77,7 +77,6 @@ public final class ModularWindow implements IWidgetParent {
     @SideOnly(Side.CLIENT)
     protected void rebuild() {
         for (Widget child : getChildren()) {
-            //Widget.rebuildChild(this, child);
             child.rebuildInternal();
         }
     }

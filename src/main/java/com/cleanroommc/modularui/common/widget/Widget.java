@@ -124,23 +124,6 @@ public abstract class Widget extends Gui {
         onRebuild();
     }
 
-    public static void rebuildChild(IWidgetParent parent, Widget child) {
-        if (child.isFixed()) {
-            child.relativePos = child.fixedPos.subtract(parent.getAbsolutePos());
-            child.pos = child.fixedPos;
-        } else {
-            child.pos = parent.getAbsolutePos().add(parent.getPos());
-        }
-        child.rebuildInternal();
-        if (!child.fillParent && child.autoSized) {
-            Size determinedSize = child.determineSize();
-            if (determinedSize != null) {
-                child.size = determinedSize;
-            }
-        }
-        child.onRebuild();
-    }
-
 
     //==== Sizing & Positioning ====
 
@@ -208,6 +191,7 @@ public abstract class Widget extends Gui {
      */
     public void onDestroy() {
     }
+
 
     //==== focus ====
 
