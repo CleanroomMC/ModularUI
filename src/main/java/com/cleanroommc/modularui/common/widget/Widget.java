@@ -52,19 +52,13 @@ public abstract class Widget extends Gui {
     }
 
     public void readJson(JsonObject json, String type) {
-        if (json.has("name")) {
-            this.name = json.get("name").getAsString();
-        }
-        if (json.has("pos")) {
-            setPos(Pos2d.ofJson(json.get("pos")));
-        }
-        if (json.has("size")) {
-            setSize(Size.ofJson(json.get("size")));
-        }
-        if (json.has("fixedPos")) {
-            setPos(Pos2d.ofJson(json.get("fixedPos")));
-        }
-        fillParent = JsonHelper.getBoolean(json, false, "fillParent");
+        this.name = JsonHelper.getString(json, "", "name");
+        this.relativePos = JsonHelper.getElement(json, relativePos, Pos2d::ofJson, "pos");
+        this.fixedPos = JsonHelper.getElement(json, null, Pos2d::ofJson, "fixedPos");
+        this.size = JsonHelper.getElement(json, size, Size::ofJson, "size");
+        this.fillParent = JsonHelper.getBoolean(json, false, "fillParent");
+        this.enabled = JsonHelper.getBoolean(json, true, "enabled");
+        this.autoSized = JsonHelper.getBoolean(json, !json.has("size"), "autoSized");
     }
 
     /**
