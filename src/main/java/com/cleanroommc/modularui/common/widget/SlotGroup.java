@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.common.widget;
 
 import com.cleanroommc.modularui.api.math.Pos2d;
-import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.integration.vanilla.slot.BaseSlot;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
@@ -11,7 +10,6 @@ public class SlotGroup extends MultiChildWidget {
     public static SlotGroup playerInventoryGroup(EntityPlayer player, Pos2d pos) {
         PlayerMainInvWrapper wrapper = new PlayerMainInvWrapper(player.inventory);
         SlotGroup slotGroup = new SlotGroup();
-        slotGroup.setSize(new Size(18 * 9, 18 + 58));
         slotGroup.setPos(pos);
 
         for (int row = 0; row < 3; row++) {
@@ -31,22 +29,5 @@ public class SlotGroup extends MultiChildWidget {
     public SlotGroup addSlot(SlotWidget slotWidget) {
         addChild(slotWidget);
         return this;
-    }
-
-    @Override
-    public void onRebuildPre() {
-        /*
-         if (!getChildren().isEmpty()) {
-            float x0 = Float.MAX_VALUE, x1 = 0, y0 = Float.MAX_VALUE, y1 = 0;
-            for (Widget widget : getChildren()) {
-                widget.determineArea(maxSize);
-                x0 = Math.min(x0, widget.getPos().x);
-                x1 = Math.max(x1, widget.getPos().x + widget.getSize().width);
-                y0 = Math.min(y0, widget.getPos().y);
-                y1 = Math.max(y1, widget.getPos().y + widget.getSize().height);
-            }
-            setSize(new Size(x1 - x0, y1 - y0));
-        }
-         */
     }
 }

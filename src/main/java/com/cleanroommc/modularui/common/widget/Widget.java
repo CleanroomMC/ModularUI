@@ -1,37 +1,46 @@
 package com.cleanroommc.modularui.common.widget;
 
 import com.cleanroommc.modularui.api.IWidgetParent;
-import com.cleanroommc.modularui.api.math.*;
+import com.cleanroommc.modularui.api.Interactable;
+import com.cleanroommc.modularui.api.math.GuiArea;
+import com.cleanroommc.modularui.api.math.Pos2d;
+import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.internal.JsonHelper;
-import com.cleanroommc.modularui.common.internal.ModularUI;
+import com.cleanroommc.modularui.common.internal.ModularUIContext;
+import com.cleanroommc.modularui.common.internal.ModularWindow;
 import com.google.gson.JsonObject;
 import net.minecraft.client.gui.Gui;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
-import java.util.Random;
 
 /**
  * This class depicts a functional element of a ModularUI
  */
 public abstract class Widget extends Gui {
 
-    public static final Random RNG = new Random();
+    public static boolean isClient() {
+        return ModularUIContext.isClient();
+    }
 
+    // gui
     private String name = "";
-
-    private ModularUI gui = null;
+    private ModularWindow window = null;
     private IWidgetParent parent = null;
-    private Size size = Size.zero();
-    private Pos2d relativePos = Pos2d.zero();
-    private Pos2d pos = null;
-    private Pos2d fixedPos = null;
-    private boolean fillParent;
+
+    // sizing and positioning
+    protected Size size = Size.zero();
+    protected Pos2d relativePos = Pos2d.zero();
+    protected Pos2d pos = null;
+    protected Pos2d fixedPos = null;
+    private boolean fillParent = false;
+    private boolean autoSized = true;
+
+    // flags and stuff
     private boolean initialised = false;
     protected boolean enabled = true;
     private int layer = -1;
-    private boolean needRebuild = false;
 
     public Widget() {
     }
@@ -47,10 +56,6 @@ public abstract class Widget extends Gui {
         this.relativePos = pos;
     }
 
-    protected String createDefaultName() {
-        return this.getClass().getName() + ";" + Integer.toHexString(RNG.nextInt() & 0xFFFFFF);
-    }
-
     public void readJson(JsonObject json, String type) {
         this.name = JsonHelper.getString(json, "", "name");
         this.relativePos = JsonHelper.getElement(json, relativePos, Pos2d::ofJson, "pos");
@@ -61,67 +66,106 @@ public abstract class Widget extends Gui {
         this.autoSized = JsonHelper.getBoolean(json, !json.has("size"), "autoSized");
     }
 
-    /**
-     * Only used internally
-     */
-    public final void initialize(ModularUI modularUI, IWidgetParent parent, int layer) {
-        if (modularUI == null || parent == null || initialised) {
+
+    //==== Internal methods ====
+
+    public final void initialize(ModularWindow window, IWidgetParent parent, int layer) {
+        if (window == null || parent == null || initialised) {
             throw new IllegalStateException("Illegal initialise call to widget!! " + toString());
         }
-        this.gui = modularUI;
+        this.window = window;
         this.parent = parent;
         this.layer = layer;
-
-        if (fillParent) {
-            size = parent.getSize();
-        }
 
         onInit();
         this.initialised = true;
 
-        if (ModularUI.isClient()) {
-            this.needRebuild = true;
-            rebuildInternal(false);
-        }
-
         if (this instanceof IWidgetParent) {
             int nextLayer = layer + 1;
             for (Widget widget : ((IWidgetParent) this).getChildren()) {
-                widget.initialize(this.gui, (IWidgetParent) this, nextLayer);
+                widget.initialize(this.window, (IWidgetParent) this, nextLayer);
             }
-        }
-        if (ModularUI.isClient()) {
-            onRebuildPost();
-            this.needRebuild = false;
         }
     }
 
+    @SideOnly(Side.CLIENT)
     public final void screenUpdateInternal() {
-        if (needRebuild) {
-            rebuildInternal(true);
-            needRebuild = false;
-        }
         onScreenUpdate();
     }
 
-    protected final void rebuildInternal(boolean runForChildren) {
+    @SideOnly(Side.CLIENT)
+    public final void rebuildInternal() {
         if (!initialised) {
             return;
         }
-        if (isFixed()) {
-            setPos(this.fixedPos.subtract(parent.getAbsolutePos()));
-            setAbsolutePos(this.fixedPos);
-        } else {
-            setAbsolutePos(parent.getAbsolutePos().add(getPos()));
+        if (fillParent) {
+            this.size = parent.getSize();
         }
-        onRebuildPre();
-        if (runForChildren && this instanceof IWidgetParent) {
+
+        if (isFixed()) {
+            relativePos = fixedPos.subtract(parent.getAbsolutePos());
+            pos = fixedPos;
+        } else {
+            pos = parent.getAbsolutePos().add(relativePos);
+        }
+
+        if (this instanceof IWidgetParent) {
             for (Widget child : ((IWidgetParent) this).getChildren()) {
-                child.rebuildInternal(true);
+                child.rebuildInternal();
             }
-            onRebuildPost();
+        }
+
+        if (!fillParent && autoSized) {
+            Size determinedSize = determineSize();
+            if (determinedSize != null) {
+                size = determinedSize;
+            }
+        }
+        onRebuild();
+    }
+
+    public static void rebuildChild(IWidgetParent parent, Widget child) {
+        if (child.isFixed()) {
+            child.relativePos = child.fixedPos.subtract(parent.getAbsolutePos());
+            child.pos = child.fixedPos;
+        } else {
+            child.pos = parent.getAbsolutePos().add(parent.getPos());
+        }
+        child.rebuildInternal();
+        if (!child.fillParent && child.autoSized) {
+            Size determinedSize = child.determineSize();
+            if (determinedSize != null) {
+                child.size = determinedSize;
+            }
+        }
+        child.onRebuild();
+    }
+
+
+    //==== Sizing & Positioning ====
+
+    /**
+     * If autoSized is true, this method is called after all children are build.
+     *
+     * @return the desired size for this widget. Null will do nothing
+     */
+    @Nullable
+    protected Size determineSize() {
+        return null;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void onRebuild() {
+    }
+
+    public void checkNeedsRebuild() {
+        if (initialised && window != null) {
+            window.markNeedsRebuild();
         }
     }
+
+
+    //==== Update ====
 
     /**
      * Called once per tick
@@ -137,27 +181,74 @@ public abstract class Widget extends Gui {
     public void onFrameUpdate() {
     }
 
-    public void onRebuildPre() {
+
+    //==== Lifecycle ====
+
+    /**
+     * Called once when the window opens
+     */
+    public void onInit() {
     }
 
-    public void onRebuildPost() {
+    /**
+     * Called when another window opens over the current one
+     * or when this window is active and it closes
+     */
+    public void onPause() {
     }
 
-    protected void onInit() {
+    /**
+     * Called when this window becomes the current window again
+     */
+    public void onResume() {
     }
 
+    /**
+     * Called when this window closes
+     */
+    public void onDestroy() {
+    }
+
+    //==== focus ====
+
+    /**
+     * Called when this widget is clicked.
+     *
+     * @return if the ui focus should be set to this widget
+     */
+    @SideOnly(Side.CLIENT)
+    public boolean shouldGetFocus() {
+        return this instanceof Interactable;
+    }
+
+    /**
+     * Called when this widget was focused and now something else is focused
+     */
+    @SideOnly(Side.CLIENT)
+    public void onRemoveFocus() {
+    }
+
+
+    //==== Getter ====
+
+    @SideOnly(Side.CLIENT)
     public boolean isUnderMouse() {
-        return isUnderMouse(gui.getMousePos(), getAbsolutePos(), getSize());
+        return isUnderMouse(getContext().getMousePos(), getAbsolutePos(), getSize());
     }
 
-    public ModularUI getGui() {
-        return gui;
+    public ModularUIContext getContext() {
+        return window.getContext();
+    }
+
+    public ModularWindow getWindow() {
+        return window;
     }
 
     public IWidgetParent getParent() {
         return parent;
     }
 
+    @SideOnly(Side.CLIENT)
     public GuiArea getArea() {
         return GuiArea.of(size, pos);
     }
@@ -186,16 +277,20 @@ public abstract class Widget extends Gui {
         return initialised;
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
     public boolean isFixed() {
         return fixedPos != null;
     }
 
+
+    //==== Setter/Builder ====
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     public Widget setSize(Size size) {
         checkNeedsRebuild();
+        this.autoSized = false;
         this.size = size;
         return this;
     }
@@ -206,10 +301,6 @@ public abstract class Widget extends Gui {
         return this;
     }
 
-    protected void setAbsolutePos(Pos2d relativePos) {
-        this.pos = relativePos;
-    }
-
     public Widget setFixedPos(@Nullable Pos2d pos) {
         checkNeedsRebuild();
         this.fixedPos = pos;
@@ -218,14 +309,12 @@ public abstract class Widget extends Gui {
 
     public Widget fillParent() {
         this.fillParent = true;
+        this.autoSized = true;
         return this;
     }
 
-    public void checkNeedsRebuild() {
-        if (initialised && !needRebuild) {
-            this.needRebuild = true;
-        }
-    }
+
+    //==== Utility ====
 
     public static boolean isUnderMouse(Pos2d mouse, Pos2d areaTopLeft, Size areaSize) {
         return mouse.x >= areaTopLeft.x &&

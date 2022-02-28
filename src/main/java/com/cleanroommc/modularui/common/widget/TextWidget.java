@@ -1,10 +1,10 @@
 package com.cleanroommc.modularui.common.widget;
 
 import com.cleanroommc.modularui.api.math.Pos2d;
+import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.drawable.Text;
 import com.cleanroommc.modularui.common.drawable.TextRenderer;
 import com.cleanroommc.modularui.common.internal.JsonHelper;
-import com.cleanroommc.modularui.common.internal.ModularUI;
 import com.google.gson.JsonObject;
 import net.minecraft.client.resources.I18n;
 
@@ -79,6 +79,11 @@ public class TextWidget extends Widget implements IWidgetDrawable {
     }
 
     @Override
+    public void onInit() {
+        localised = getLocalised();
+    }
+
+    @Override
     public void onScreenUpdate() {
         if (isDynamic()) {
             String l = getLocalised();
@@ -89,17 +94,18 @@ public class TextWidget extends Widget implements IWidgetDrawable {
         }
     }
 
+    @Nullable
     @Override
-    public void onRebuildPre() {
+    protected Size determineSize() {
         if (localised == null) {
             localised = getLocalised();
         }
-        setSize(TextRenderer.calcTextSize(localised, getGui().getSize().width, 1));
+        return TextRenderer.calcTextSize(localised, getWindow().getSize().width, 1);
     }
 
     public String getLocalised() {
         String text = textSupplier == null ? this.text : textSupplier.get();
-        if (ModularUI.isClient() && localisationData != null) {
+        if (isClient() && localisationData != null) {
             return I18n.format(text, localisationData.get());
         }
         return text;

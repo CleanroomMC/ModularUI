@@ -57,13 +57,8 @@ public class SlotWidget extends Widget implements IVanillaSlot, IWidgetDrawable,
     }
 
     @Override
-    public void onRebuildPre() {
-
-    }
-
-    @Override
-    public void onRebuildPost() {
-        Pos2d pos = getAbsolutePos().subtract(getGui().getPos());
+    public void onRebuild() {
+        Pos2d pos = getAbsolutePos().subtract(getWindow().getPos());
         slot.xPos = (int) (pos.x + 0.5);
         slot.yPos = (int) (pos.y + 0.5);
     }

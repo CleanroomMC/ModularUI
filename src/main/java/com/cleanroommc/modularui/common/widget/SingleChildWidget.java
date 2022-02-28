@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,5 +42,11 @@ public abstract class SingleChildWidget extends Widget implements IWidgetParent 
 
     public Widget getChild() {
         return child;
+    }
+
+    @Nullable
+    @Override
+    protected Size determineSize() {
+        return child.getSize();
     }
 }
