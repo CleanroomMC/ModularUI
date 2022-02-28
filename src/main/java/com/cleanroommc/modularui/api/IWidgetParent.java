@@ -19,6 +19,10 @@ public interface IWidgetParent {
 
     List<Widget> getChildren();
 
+    static boolean forEachByLayer(List<Widget> parent, Function<Widget, Boolean> consumer) {
+        return forEachByLayer(new Wrapper(parent), consumer);
+    }
+
     static boolean forEachByLayer(IWidgetParent parent, Function<Widget, Boolean> consumer) {
         LinkedList<IWidgetParent> stack = new LinkedList<>();
         stack.addLast(parent);
@@ -41,5 +45,33 @@ public interface IWidgetParent {
             consumer.accept(widget);
             return false;
         });
+    }
+
+    class Wrapper implements IWidgetParent {
+        private final List<Widget> children;
+
+        public Wrapper(List<Widget> children) {
+            this.children = children;
+        }
+
+        @Override
+        public Size getSize() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Pos2d getAbsolutePos() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Pos2d getPos() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public List<Widget> getChildren() {
+            return children;
+        }
     }
 }

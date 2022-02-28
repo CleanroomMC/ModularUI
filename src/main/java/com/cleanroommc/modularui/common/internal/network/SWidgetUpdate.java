@@ -1,8 +1,7 @@
 package com.cleanroommc.modularui.common.internal.network;
 
-import com.cleanroommc.modularui.api.ISyncedWidget;
-import com.cleanroommc.modularui.common.internal.ModularGui;
-import com.cleanroommc.modularui.common.internal.ModularUI;
+import com.cleanroommc.modularui.common.internal.ModularUIContext;
+import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.network.Packet;
@@ -38,9 +37,8 @@ public class SWidgetUpdate implements Packet<INetHandlerPlayClient> {
     public void processPacket(INetHandlerPlayClient handler) {
         GuiScreen screen = Minecraft.getMinecraft().currentScreen;
         if (screen instanceof ModularGui) {
-            ModularUI modularUI = ((ModularGui) screen).getGui();
-            ISyncedWidget syncedWidget = modularUI.getSyncedWidget(packet.readVarInt());
-            syncedWidget.readClientData(packet.readVarInt(), packet);
+            ModularUIContext context = ((ModularGui) screen).getContext();
+            context.readServerPacket(packet);
         }
     }
 }

@@ -1,18 +1,17 @@
 package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.ModularUIMod;
-import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.math.Size;
-import com.cleanroommc.modularui.common.builder.ModularUIBuilder;
 import com.cleanroommc.modularui.common.builder.UIBuilder;
 import com.cleanroommc.modularui.common.builder.UIInfo;
 import com.cleanroommc.modularui.common.drawable.IDrawable;
 import com.cleanroommc.modularui.common.drawable.Text;
 import com.cleanroommc.modularui.common.drawable.UITexture;
-import com.cleanroommc.modularui.common.internal.ModularGui;
-import com.cleanroommc.modularui.common.internal.ModularUI;
-import com.cleanroommc.modularui.common.internal.ModularUIContainer;
-import net.minecraft.entity.player.EntityPlayer;
+import com.cleanroommc.modularui.common.internal.ModularUIContext;
+import com.cleanroommc.modularui.common.internal.ModularWindow;
+import com.cleanroommc.modularui.common.internal.UIBuildContext;
+import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
+import com.cleanroommc.modularui.common.internal.wrapper.ModularUIContainer;
 import net.minecraft.init.Items;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -26,23 +25,23 @@ public class Tests {
     public static void init() {
         MinecraftForge.EVENT_BUS.register(Tests.class);
         modularGui = UIBuilder.of()
-                .gui((player, world, x, y, z) -> new ModularGui(new ModularUIContainer(createUI(player))))
-                .container((player, world, x, y, z) -> {
-                    ModularUI modularUI = createUI(player);
-                    modularUI.initialise();
-                    return new ModularUIContainer(modularUI);
-                }).build();
+                .gui(((player, world, x, y, z) -> {
+                    UIBuildContext buildContext = new UIBuildContext(player);
+                    ModularWindow window = createWindow(buildContext);
+                    return new ModularGui(new ModularUIContainer(new ModularUIContext(buildContext), window));
+                }))
+                .container(((player, world, x, y, z) -> {
+                    UIBuildContext buildContext = new UIBuildContext(player);
+                    ModularWindow window = createWindow(buildContext);
+                    return new ModularUIContainer(new ModularUIContext(buildContext), window);
+                })).build();
     }
 
-    public static ModularUI createUI(EntityPlayer player) {
+    public static ModularWindow createWindow(UIBuildContext buildContext) {
         Text[] TEXT = {new Text("Blue \u00a7nUnderlined\u00a7rBlue ").color(0x3058B8), new Text("Mint").color(0x469E8F)};
-        return ModularUIBuilder.create(new Size(176, 166))
-                .setAlignment(Alignment.Center)
-                .addFromJson("test", player)
-                /*.widget(BACKGROUND.asWidget().fillParent())
-                .bindPlayerInventory(player, new Pos2d(7, 84))
-                .widget(new TextWidget(TEXT).setPos(new Pos2d(10, 10)))*/
-                .build(player);
+        return ModularWindow.builder(new Size(176, 166))
+                .addFromJson("test", buildContext.getPlayer())
+                .build();
     }
 
     @SubscribeEvent

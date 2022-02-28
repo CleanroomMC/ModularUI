@@ -1,12 +1,8 @@
 package com.cleanroommc.modularui.api;
 
-import com.cleanroommc.modularui.common.internal.ModularUI;
-import com.cleanroommc.modularui.common.internal.network.CWidgetUpdate;
-import com.cleanroommc.modularui.common.internal.network.SWidgetUpdate;
+import com.cleanroommc.modularui.common.internal.ModularWindow;
 import com.cleanroommc.modularui.common.widget.Widget;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -41,7 +37,7 @@ public interface ISyncedWidget {
         if (!(this instanceof Widget)) {
             throw new IllegalStateException("Tried syncing a non Widget ISyncedWidget");
         }
-        if (!getGui().isInitialised()) {
+        /*if (!getGui().isInitialised()) {
             return;
         }
         Consumer<PacketBuffer> buffer = buf -> {
@@ -49,7 +45,7 @@ public interface ISyncedWidget {
             bufBuilder.accept(buf);
         };
         CWidgetUpdate packet = new CWidgetUpdate(buffer);
-        Minecraft.getMinecraft().player.connection.sendPacket(packet);
+        Minecraft.getMinecraft().player.connection.sendPacket(packet);*/
     }
 
     /**
@@ -63,7 +59,7 @@ public interface ISyncedWidget {
         if (!(this instanceof Widget)) {
             throw new IllegalStateException("Tried syncing a non Widget ISyncedWidget");
         }
-        if (!(player instanceof EntityPlayerMP) || !getGui().isInitialised()) {
+        /*if (!(player instanceof EntityPlayerMP) || !getGui().isInitialised()) {
             return;
         }
         Consumer<PacketBuffer> buffer = buf -> {
@@ -71,8 +67,8 @@ public interface ISyncedWidget {
             bufBuilder.accept(buf);
         };
         SWidgetUpdate packet = new SWidgetUpdate(buffer);
-        ((EntityPlayerMP) player).connection.sendPacket(packet);
+        ((EntityPlayerMP) player).connection.sendPacket(packet);*/
     }
 
-    ModularUI getGui();
+    ModularWindow getWindow();
 }

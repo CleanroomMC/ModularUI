@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.common.internal;
+package com.cleanroommc.modularui.common.internal.wrapper;
 
 import com.cleanroommc.modularui.ModularUIMod;
 import com.cleanroommc.modularui.api.IVanillaSlot;
@@ -7,6 +7,7 @@ import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.common.internal.ModularUIContext;
 import com.cleanroommc.modularui.common.internal.mixin.GuiContainerAccess;
 import com.cleanroommc.modularui.common.widget.IWidgetDrawable;
 import com.cleanroommc.modularui.common.widget.SlotWidget;
@@ -24,6 +25,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.inventory.Slot;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Mouse;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
@@ -31,10 +33,13 @@ import java.util.concurrent.atomic.AtomicReference;
 @SideOnly(Side.CLIENT)
 public class ModularGui extends GuiContainer implements GuiContainerAccess {
 
-    private final ModularUI gui;
+    private final ModularUIContext context;
+    private Pos2d mousePos = Pos2d.ZERO;
+
+    //private final ModularUI gui;
     private long lastClick = -1;
     private long lastFocusedClick = -1;
-    private Interactable focused;
+    private Widget focused;
     public boolean debugMode = true;
     private int drawCalls = 0;
     private long drawTime = 0;
@@ -42,27 +47,35 @@ public class ModularGui extends GuiContainer implements GuiContainerAccess {
 
     public ModularGui(ModularUIContainer container) {
         super(container);
-        this.gui = container.getGui();
-        this.gui.setScreen(this);
+        this.context = container.getContext();
+        this.context.initializeClient(this);
         ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
-        this.gui.onResize(new Size(scaledResolution.getScaledWidth(), scaledResolution.getScaledHeight()));
-        this.gui.initialise();
+        this.context.resize(new Size(scaledResolution.getScaledWidth(), scaledResolution.getScaledHeight()));
+        this.context.buildWindowOnStart();
     }
 
-    public ModularUI getGui() {
-        return gui;
+    public ModularUIContext getContext() {
+        return context;
+    }
+
+    public Pos2d getMousePos() {
+        return mousePos;
     }
 
     @Override
     public void onResize(Minecraft mc, int w, int h) {
         super.onResize(mc, w, h);
-        gui.onResize(new Size(w, h));
+        context.resize(new Size(w, h));
         ModularUIMod.LOGGER.info("Resized screen");
     }
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        gui.updateMousePos();
+        // calculate exact mouse pos
+        float x = Mouse.getEventX() * width / (float) mc.displayWidth;
+        float y = height - Mouse.getEventY() * height / (float) mc.displayHeight - 1;
+        mousePos = new Pos2d(x, y);
+
         super.drawScreen(mouseX, mouseY, partialTicks);
         if (debugMode) {
             GlStateManager.disableRescaleNormal();
@@ -98,7 +111,7 @@ public class ModularGui extends GuiContainer implements GuiContainerAccess {
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
 
-        IWidgetParent.forEachByLayer(gui, widget -> {
+        IWidgetParent.forEachByLayer(context.getCurrentWindow(), widget -> {
             widget.onFrameUpdate();
             if (widget.isEnabled() && widget instanceof IWidgetDrawable) {
                 GlStateManager.pushMatrix();
@@ -130,7 +143,7 @@ public class ModularGui extends GuiContainer implements GuiContainerAccess {
         GlStateManager.disableDepth();
 
         float partialTicks = Minecraft.getMinecraft().getTickLength();
-        IWidgetParent.forEachByLayer(gui, widget -> {
+        IWidgetParent.forEachByLayer(context.getCurrentWindow(), widget -> {
             if (widget.isEnabled() && widget instanceof IWidgetDrawable) {
                 GlStateManager.pushMatrix();
                 if (widget instanceof SlotWidget) {
@@ -155,7 +168,7 @@ public class ModularGui extends GuiContainer implements GuiContainerAccess {
     public void drawDebugScreen() {
         AtomicReference<Widget> topWidget = new AtomicReference<>();
 
-        IWidgetParent.forEachByLayer(gui, widget -> {
+        IWidgetParent.forEachByLayer(context.getCurrentWindow(), widget -> {
             if (!widget.isUnderMouse()) {
                 return;
             }
@@ -180,14 +193,14 @@ public class ModularGui extends GuiContainer implements GuiContainerAccess {
             drawText("Pos: " + widget.getPos(), pos.x, pos.y - 6, 0.5f, color, false);
         }
 
-        drawString(fontRenderer, "FPS: " + fps, 5, (int) (gui.getScaledScreenSize().height - 24), color);
-        drawString(fontRenderer, "Mouse Pos: " + gui.getMousePos(), 5, (int) (gui.getScaledScreenSize().height - 13), color);
+        drawString(fontRenderer, "FPS: " + fps, 5, (int) (context.getScaledScreenSize().height - 24), color);
+        drawString(fontRenderer, "Mouse Pos: " + getMousePos(), 5, (int) (context.getScaledScreenSize().height - 13), color);
     }
 
     @Override
     public void updateScreen() {
         super.updateScreen();
-        gui.update();
+        context.getCurrentWindow().update();
     }
 
     @Override
@@ -196,44 +209,57 @@ public class ModularGui extends GuiContainer implements GuiContainerAccess {
         long time = Minecraft.getSystemTime();
         int diff = Ints.saturatedCast(time - lastClick);
         lastClick = time;
-        Pos2d mousePos = gui.getMousePos();
-        for (Interactable interactable : gui.getListeners()) {
+        Pos2d mousePos = getMousePos();
+        for (Interactable interactable : context.getCurrentWindow().getInteractionListeners()) {
             interactable.onClick(mousePos, mouseButton, diff);
         }
-        Interactable interactable = gui.getTopInteractable(gui.getMousePos());
-        if (interactable != null) {
-            if (focused == interactable) {
-                diff = Ints.saturatedCast(time - lastFocusedClick);
-            } else {
-                diff = Integer.MAX_VALUE;
+        Widget widget = context.getTopWidgetAt(mousePos);
+        if (widget != null) {
+            if (widget instanceof Interactable) {
+                Interactable interactable = (Interactable) widget;
+                if (focused == interactable) {
+                    diff = Ints.saturatedCast(time - lastFocusedClick);
+                } else {
+                    diff = Integer.MAX_VALUE;
+                }
+                interactable.onClick(mousePos, mouseButton, diff);
             }
-            interactable.onClick(mousePos, mouseButton, diff);
+            if (widget.shouldGetFocus()) {
+                if (focused != null) {
+                    focused.onRemoveFocus();
+                }
+                focused = widget;
+            } else {
+                focused = null;
+            }
+        } else if (focused != null) {
+            focused.onRemoveFocus();
+            focused = null;
         }
         lastFocusedClick = time;
-        focused = interactable;
     }
 
     @Override
     protected void mouseReleased(int mouseX, int mouseY, int mouseButton) {
         super.mouseReleased(mouseX, mouseY, mouseButton);
-        Pos2d mousePos = gui.getMousePos();
-        for (Interactable interactable : gui.getListeners()) {
+        Pos2d mousePos = getMousePos();
+        for (Interactable interactable : context.getCurrentWindow().getInteractionListeners()) {
             interactable.onClickReleased(mousePos, mouseButton);
         }
-        if (isFocusedValid()) {
-            focused.onClickReleased(mousePos, mouseButton);
+        if (isFocusedValid() && focused instanceof Interactable) {
+            ((Interactable) focused).onClickReleased(mousePos, mouseButton);
         }
     }
 
     @Override
     protected void mouseClickMove(int mouseX, int mouseY, int mouseButton, long timeSinceLastClick) {
         super.mouseClickMove(mouseX, mouseY, mouseButton, timeSinceLastClick);
-        Pos2d mousePos = gui.getMousePos();
-        for (Interactable interactable : gui.getListeners()) {
+        Pos2d mousePos = getMousePos();
+        for (Interactable interactable : context.getCurrentWindow().getInteractionListeners()) {
             interactable.onMouseDragged(mousePos, mouseButton, timeSinceLastClick);
         }
-        if (isFocusedValid()) {
-            focused.onMouseDragged(mousePos, mouseButton, timeSinceLastClick);
+        if (isFocusedValid() && focused instanceof Interactable) {
+            ((Interactable) focused).onMouseDragged(mousePos, mouseButton, timeSinceLastClick);
         }
     }
 
@@ -244,16 +270,16 @@ public class ModularGui extends GuiContainer implements GuiContainerAccess {
         if (keyCode == 46 && isCtrlKeyDown() && isShiftKeyDown() && isAltKeyDown()) {
             this.debugMode = !this.debugMode;
         }
-        for (Interactable interactable : gui.getListeners()) {
+        for (Interactable interactable : context.getCurrentWindow().getInteractionListeners()) {
             interactable.onKeyPressed(typedChar, keyCode);
         }
-        if (isFocusedValid()) {
-            focused.onKeyPressed(typedChar, keyCode);
+        if (isFocusedValid() && focused instanceof Interactable) {
+            ((Interactable) focused).onKeyPressed(typedChar, keyCode);
         }
     }
 
     public boolean isFocusedValid() {
-        return focused != null && ((Widget) focused).isEnabled();
+        return focused != null && focused.isEnabled();
     }
 
     @SideOnly(Side.CLIENT)
@@ -318,9 +344,9 @@ public class ModularGui extends GuiContainer implements GuiContainerAccess {
 
     @Override
     public Slot getSlotAt(float x, float y) {
-        Interactable interactable = getGui().getTopInteractable(new Pos2d(x, y));
-        if (interactable instanceof IVanillaSlot) {
-            return ((IVanillaSlot) interactable).getMcSlot();
+        Widget widget = context.getTopWidgetAt(new Pos2d(x, y));
+        if (widget instanceof IVanillaSlot) {
+            return ((IVanillaSlot) widget).getMcSlot();
         }
         return null;
     }
