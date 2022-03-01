@@ -10,9 +10,9 @@ import com.cleanroommc.modularui.integration.vanilla.slot.BaseSlot;
 import net.minecraft.inventory.Slot;
 import org.apache.commons.lang3.ArrayUtils;
 
-public class SlotWidget extends Widget implements IVanillaSlot, IWidgetDrawable, Interactable {
+import javax.annotation.Nullable;
 
-    // TODO make my own custom slot widget that does not wrap fucking vanilla slot
+public class SlotWidget extends Widget implements IVanillaSlot, IWidgetDrawable, Interactable {
 
     public static final Size TEXTURE_SIZE = new Size(18, 18);
     public static final Size ACTUAL_SLOT_SIZE = new Size(16, 16);
@@ -54,6 +54,12 @@ public class SlotWidget extends Widget implements IVanillaSlot, IWidgetDrawable,
     @Override
     public void drawInForeground(float partialTicks) {
         // draw item??
+    }
+
+    @Nullable
+    @Override
+    protected Size determineSize() {
+        return ACTUAL_SLOT_SIZE;
     }
 
     @Override

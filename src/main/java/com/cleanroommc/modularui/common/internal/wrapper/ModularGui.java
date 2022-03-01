@@ -203,26 +203,26 @@ public class ModularGui extends GuiContainer implements GuiContainerAccess {
         context.getCurrentWindow().update();
     }
 
+    private boolean isDoubleClick(long lastClick, long currentClick) {
+        return currentClick - lastClick > 500;
+    }
+
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
         long time = Minecraft.getSystemTime();
-        int diff = Ints.saturatedCast(time - lastClick);
+        boolean doubleClick = isDoubleClick(lastClick, time);
         lastClick = time;
         Pos2d mousePos = getMousePos();
         for (Interactable interactable : context.getCurrentWindow().getInteractionListeners()) {
-            interactable.onClick(mousePos, mouseButton, diff);
+            interactable.onClick(mouseButton, doubleClick);
         }
         Widget widget = context.getTopWidgetAt(mousePos);
         if (widget != null) {
             if (widget instanceof Interactable) {
                 Interactable interactable = (Interactable) widget;
-                if (focused == interactable) {
-                    diff = Ints.saturatedCast(time - lastFocusedClick);
-                } else {
-                    diff = Integer.MAX_VALUE;
-                }
-                interactable.onClick(mousePos, mouseButton, diff);
+                doubleClick = focused == interactable && isDoubleClick(lastFocusedClick, time);
+                interactable.onClick(mouseButton, doubleClick);
             }
             if (widget.shouldGetFocus()) {
                 if (focused != null) {
@@ -242,24 +242,22 @@ public class ModularGui extends GuiContainer implements GuiContainerAccess {
     @Override
     protected void mouseReleased(int mouseX, int mouseY, int mouseButton) {
         super.mouseReleased(mouseX, mouseY, mouseButton);
-        Pos2d mousePos = getMousePos();
         for (Interactable interactable : context.getCurrentWindow().getInteractionListeners()) {
-            interactable.onClickReleased(mousePos, mouseButton);
+            interactable.onClickReleased(mouseButton);
         }
         if (isFocusedValid() && focused instanceof Interactable) {
-            ((Interactable) focused).onClickReleased(mousePos, mouseButton);
+            ((Interactable) focused).onClickReleased(mouseButton);
         }
     }
 
     @Override
     protected void mouseClickMove(int mouseX, int mouseY, int mouseButton, long timeSinceLastClick) {
         super.mouseClickMove(mouseX, mouseY, mouseButton, timeSinceLastClick);
-        Pos2d mousePos = getMousePos();
         for (Interactable interactable : context.getCurrentWindow().getInteractionListeners()) {
-            interactable.onMouseDragged(mousePos, mouseButton, timeSinceLastClick);
+            interactable.onMouseDragged(mouseButton, timeSinceLastClick);
         }
         if (isFocusedValid() && focused instanceof Interactable) {
-            ((Interactable) focused).onMouseDragged(mousePos, mouseButton, timeSinceLastClick);
+            ((Interactable) focused).onMouseDragged(mouseButton, timeSinceLastClick);
         }
     }
 

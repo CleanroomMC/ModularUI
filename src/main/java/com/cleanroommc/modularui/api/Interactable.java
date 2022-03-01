@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.api;
 
-import com.cleanroommc.modularui.api.math.Pos2d;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -16,31 +15,27 @@ public interface Interactable {
     /**
      * called when clicked on the Interactable
      *
-     * @param pos      of the mouse
      * @param buttonId the button id (Left == 1, right == 2)
-     * @return determines if further actions are cancelled or not
+     * @param doubleClick if it is the second click within 400ms
      */
-    default boolean onClick(Pos2d pos, int buttonId, int msLastClick) {
-        return false;
+    default void onClick(int buttonId, boolean doubleClick) {
     }
 
     /**
      * called when released a click on the Interactable
      *
-     * @param pos      of the mouse
      * @param buttonId the button id (Left == 1, right == 2)
      */
-    default void onClickReleased(Pos2d pos, int buttonId) {
+    default void onClickReleased(int buttonId) {
     }
 
     /**
      * called when the interactable is focused and the mouse gets dragged
      *
-     * @param pos       of the mouse
      * @param buttonId  the button id (Left == 1, right == 2)
      * @param deltaTime milliseconds since last mouse event
      */
-    default void onMouseDragged(Pos2d pos, int buttonId, long deltaTime) {
+    default void onMouseDragged(int buttonId, long deltaTime) {
     }
 
     /**
