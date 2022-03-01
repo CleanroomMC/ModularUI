@@ -14,8 +14,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * A window in a modular gui. Only the "main" window can exist on both, server and client.
+ * All other only exist and needs to be opened on client.
+ */
 public final class ModularWindow implements IWidgetParent {
 
     public static Builder builder(Size size) {
@@ -32,7 +37,6 @@ public final class ModularWindow implements IWidgetParent {
     private final Alignment alignment = Alignment.Center;
     private boolean draggable = false;
     private boolean active;
-
     private boolean needsRebuild = false;
 
     public ModularWindow(Size size, List<Widget> children) {
@@ -149,6 +153,22 @@ public final class ModularWindow implements IWidgetParent {
 
     public List<Interactable> getInteractionListeners() {
         return interactionListeners;
+    }
+
+    public int getSyncedWidgetId(ISyncedWidget syncedWidget) {
+        Integer id = syncedWidgets.inverse().get(syncedWidget);
+        if (id == null) {
+            throw new NoSuchElementException("Can't find id for ISyncedWidget " + syncedWidget);
+        }
+        return id;
+    }
+
+    public ISyncedWidget getSyncedWidget(int id) {
+        ISyncedWidget syncedWidget = syncedWidgets.get(id);
+        if (syncedWidget == null) {
+            throw new NoSuchElementException("Can't find ISyncedWidget for id " + id);
+        }
+        return syncedWidget;
     }
 
     public static class Builder implements IWidgetBuilder<Builder> {

@@ -5,12 +5,14 @@ import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.IWindowCreator;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.common.internal.network.CWidgetUpdate;
+import com.cleanroommc.modularui.common.internal.network.SWidgetUpdate;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularUIContainer;
 import com.cleanroommc.modularui.common.widget.Widget;
-import com.google.common.collect.ImmutableBiMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
@@ -29,8 +31,6 @@ public class ModularUIContext {
         return FMLCommonHandler.instance().getSide() == Side.CLIENT;
     }
 
-    private final ImmutableBiMap<Byte, IWindowCreator> SYNCED_WINDOWS;
-
     private final Stack<ModularWindow> windows = new Stack<>();
     @SideOnly(Side.CLIENT)
     private ModularGui screen;
@@ -42,7 +42,6 @@ public class ModularUIContext {
 
     public ModularUIContext(UIBuildContext context) {
         this.player = context.player;
-        this.SYNCED_WINDOWS = context.windowMap.build();
     }
 
     public void initialize(ModularUIContainer container, ModularWindow mainWindow) {
@@ -66,17 +65,6 @@ public class ModularUIContext {
         for (ModularWindow window : windows) {
             window.onResize(scaledSize);
         }
-    }
-
-    public void openSyncedWindow(byte windowId) {
-        IWindowCreator windowCreator = SYNCED_WINDOWS.get(windowId);
-        if (windowCreator == null) {
-            throw new IllegalArgumentException("Can't find synced window with id " + windowId);
-        }
-        if (isClient()) {
-            pushWindow(windowCreator.create(player));
-        }
-
     }
 
     public void openWindow(IWindowCreator windowCreator) {
@@ -156,11 +144,30 @@ public class ModularUIContext {
     }
 
     @SideOnly(Side.CLIENT)
-    public void sendClientPacket(ISyncedWidget widget, Consumer<PacketBuffer> bufferConsumer) {
+    public void sendClientPacket(int discriminator, ISyncedWidget syncedWidget, ModularWindow window, Consumer<PacketBuffer> bufferConsumer) {
+
+        int syncId = window.getSyncedWidgetId(syncedWidget);
+        Consumer<PacketBuffer> buffer = buf -> {
+            buf.writeVarInt(syncId);
+            buf.writeVarInt(discriminator);
+            bufferConsumer.accept(buf);
+        };
+        CWidgetUpdate packet = new CWidgetUpdate(buffer);
+        Minecraft.getMinecraft().player.connection.sendPacket(packet);
+
 
     }
 
-    public void sendServerPacket(ISyncedWidget widget, Consumer<PacketBuffer> bufferConsumer) {
-
+    public void sendServerPacket(int discriminator, ISyncedWidget syncedWidget, ModularWindow window, Consumer<PacketBuffer> bufferConsumer) {
+        if (player instanceof EntityPlayerMP) {
+            int syncId = window.getSyncedWidgetId(syncedWidget);
+            Consumer<PacketBuffer> buffer = buf -> {
+                buf.writeVarInt(syncId);
+                buf.writeVarInt(discriminator);
+                bufferConsumer.accept(buf);
+            };
+            SWidgetUpdate packet = new SWidgetUpdate(buffer);
+            ((EntityPlayerMP) player).connection.sendPacket(packet);
+        }
     }
 }

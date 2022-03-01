@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.api;
 
 import com.cleanroommc.modularui.common.internal.ModularWindow;
 import com.cleanroommc.modularui.common.widget.Widget;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -37,37 +36,20 @@ public interface ISyncedWidget {
         if (!(this instanceof Widget)) {
             throw new IllegalStateException("Tried syncing a non Widget ISyncedWidget");
         }
-        /*if (!getGui().isInitialised()) {
-            return;
-        }
-        Consumer<PacketBuffer> buffer = buf -> {
-            buf.writeInt(getGui().getSyncId(this));
-            bufBuilder.accept(buf);
-        };
-        CWidgetUpdate packet = new CWidgetUpdate(buffer);
-        Minecraft.getMinecraft().player.connection.sendPacket(packet);*/
+        getWindow().getContext().sendClientPacket(id, this, getWindow(), bufBuilder);
     }
 
     /**
      * Sends the written data to {@link #readServerData(int, PacketBuffer)}
      *
-     * @param player     player to send data to. Usually just getGui().player
      * @param id         helper to determine the type
      * @param bufBuilder data builder
      */
-    default void syncToClient(EntityPlayer player, int id, Consumer<PacketBuffer> bufBuilder) {
+    default void syncToClient(int id, Consumer<PacketBuffer> bufBuilder) {
         if (!(this instanceof Widget)) {
             throw new IllegalStateException("Tried syncing a non Widget ISyncedWidget");
         }
-        /*if (!(player instanceof EntityPlayerMP) || !getGui().isInitialised()) {
-            return;
-        }
-        Consumer<PacketBuffer> buffer = buf -> {
-            buf.writeInt(getGui().getSyncId(this));
-            bufBuilder.accept(buf);
-        };
-        SWidgetUpdate packet = new SWidgetUpdate(buffer);
-        ((EntityPlayerMP) player).connection.sendPacket(packet);*/
+        getWindow().getContext().sendServerPacket(id, this, getWindow(), bufBuilder);
     }
 
     ModularWindow getWindow();
