@@ -1,14 +1,7 @@
 package com.cleanroommc.modularui.api.math;
 
-import org.lwjgl.opengl.GL11;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
 public class Shape {
-
+/*
     private float[] vertices;
     private int gl_begin_mode;
 
@@ -59,7 +52,7 @@ public class Shape {
                 .vertex(Point.ZERO)
                 //.changeBuildMode(BuildMode.INCREMENT)
                 .vertex(Point.polar(angle, diameter / 2));
-            angle += 360f / triangles;*/
+            angle += 360f / triangles;
             //builder.vertex(Point.polar(angle, sideLength));
         }
         return builder.build();
@@ -171,12 +164,12 @@ public class Shape {
         /**
          * The next vertices will refer to 0, 0
          */
-        ABSOLUTE,
+        /*ABSOLUTE,
 
         /**
          * The next vertices will refer to the last set vertex
          * (0, 0 if it is the first vertex)
          */
-        INCREMENT
-    }
+        /*INCREMENT
+    }*/
 }

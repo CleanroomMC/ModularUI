@@ -54,7 +54,6 @@ public class CycleButtonWidget extends Widget implements Interactable, ISyncedWi
         this.state = state;
         if (sync) {
             if (isClient()) {
-                ModularUIMod.LOGGER.info("Syncing to server");
                 syncToServer(1, buffer -> buffer.writeVarInt(state));
             } else {
                 syncToClient(1, buffer -> buffer.writeVarInt(state));
@@ -70,7 +69,6 @@ public class CycleButtonWidget extends Widget implements Interactable, ISyncedWi
 
     @Override
     public void onClick(int buttonId, boolean doubleClick) {
-        ModularUIMod.LOGGER.info("Clicked {}", buttonId);
         switch (buttonId) {
             case 0:
                 next();
@@ -85,7 +83,6 @@ public class CycleButtonWidget extends Widget implements Interactable, ISyncedWi
     public void onServerTick() {
         int actualValue = getter.getAsInt();
         if (actualValue != state) {
-            ModularUIMod.LOGGER.info("Widget value changed {}", actualValue);
             setState(actualValue, true, false);
         }
     }
@@ -99,7 +96,6 @@ public class CycleButtonWidget extends Widget implements Interactable, ISyncedWi
     public void readServerData(int id, PacketBuffer buf) {
         if (id == 1) {
             setState(buf.readVarInt(), false, true);
-            ModularUIMod.LOGGER.info("Read state {} on client", state);
         }
     }
 

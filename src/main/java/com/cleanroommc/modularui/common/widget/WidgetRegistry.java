@@ -14,6 +14,7 @@ public class WidgetRegistry {
     public static void init() {
         registerWidget("text", TextWidget::new);
         registerWidget("image", DrawableWidget::new);
+        registerWidget("cycle_button", CycleButtonWidget::new);
         registerWidgetSpecial("player_inventory", player -> SlotGroup.playerInventoryGroup(player, Pos2d.ZERO));
     }
 

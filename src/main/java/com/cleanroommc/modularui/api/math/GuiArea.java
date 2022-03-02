@@ -9,16 +9,20 @@ import java.util.Objects;
  */
 public final class GuiArea {
 
-    public final float x0, x1, y0, y1;
-    public final float width, height;
+    public final int x0, x1, y0, y1;
+    public final int width, height;
 
-    public GuiArea(float x0, float x1, float y0, float y1) {
+    public GuiArea(int x0, int x1, int y0, int y1) {
         this.x0 = Math.min(x0, x1);
         this.x1 = Math.max(x0, x1);
         this.y0 = Math.min(y0, y1);
         this.y1 = Math.max(y0, y1);
         this.width = this.x1 - this.x0;
         this.height = this.y1 - this.y0;
+    }
+
+    public static GuiArea ofRectangle(Rectangle rectangle) {
+        return GuiArea.ltwh(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
     }
 
     public static GuiArea ofPoints(Pos2d p0, Pos2d p1) {
@@ -33,11 +37,11 @@ public final class GuiArea {
      * Makes an area of the top left corner and width and height
      * left - top - width - height
      */
-    public static GuiArea ltwh(float x, float y, float width, float height) {
+    public static GuiArea ltwh(int x, int y, int width, int height) {
         return new GuiArea(x, x + width, y, y + height);
     }
 
-    public GuiArea withSize(float width, float height) {
+    public GuiArea withSize(int width, int height) {
         return new GuiArea(x0, x0 + width, y0, y0 + height);
     }
 
@@ -45,11 +49,11 @@ public final class GuiArea {
         return withSize(size.width, height);
     }
 
-    public GuiArea withPos(float x, float y) {
+    public GuiArea withPos(int x, int y) {
         return new GuiArea(x, x + width, y, y + height);
     }
 
-    public GuiArea translate(float x, float y) {
+    public GuiArea translate(int x, int y) {
         return new GuiArea(x0 + x, x1 + x, y0 + y, y1 + y);
     }
 
@@ -58,11 +62,11 @@ public final class GuiArea {
     }
 
     public GuiArea scale(float xScale, float yScale, float xPivot, float yPivot) {
-        float x0 = this.x0, x1 = this.x1, y0 = this.y0, y1 = this.y1;
-        x0 = xPivot - (xPivot - x0) * xScale;
-        y0 = yPivot - (yPivot - y0) * yScale;
-        x1 = xPivot + (x1 - xPivot) * xScale;
-        y1 = yPivot + (y1 - yPivot) * yScale;
+        int x0 = this.x0, x1 = this.x1, y0 = this.y0, y1 = this.y1;
+        x0 = (int) (xPivot - (xPivot - x0) * xScale);
+        y0 = (int) (yPivot - (yPivot - y0) * yScale);
+        x1 = (int) (xPivot + (x1 - xPivot) * xScale);
+        y1 = (int) (yPivot + (y1 - yPivot) * yScale);
         return new GuiArea(x0, x1, y0, y1);
     }
 
@@ -92,8 +96,8 @@ public final class GuiArea {
      * @return if bounds are fully inside this bounds
      */
     public boolean covers(GuiArea bounds) {
-        for(Alignment alignment : Alignment.CORNERS) {
-            if(!contains(bounds.corner(alignment))) {
+        for (Alignment alignment : Alignment.CORNERS) {
+            if (!contains(bounds.corner(alignment))) {
                 return false;
             }
         }
@@ -110,8 +114,8 @@ public final class GuiArea {
 
     public Pos2d corner(Alignment alignment) {
         Pos2d center = getCenter();
-        float x = center.getX() + width / 2 * alignment.x;
-        float y = center.getY() + height / 2 * alignment.y;
+        int x = (int) (center.getX() + width / 2 * alignment.x);
+        int y = (int) (center.getY() + height / 2 * alignment.y);
         return new Pos2d(x, y);
     }
 
@@ -123,16 +127,12 @@ public final class GuiArea {
         return new Size(width, height);
     }
 
-    public Rectangle asRectangle() {
-        return new Rectangle((int)x0, (int)y0, (int)width, (int)height);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GuiArea GuiArea = (GuiArea) o;
-        return Float.compare(GuiArea.x0, x0) == 0 && Float.compare(GuiArea.x1, x1) == 0 && Float.compare(GuiArea.y0, y0) == 0 && Float.compare(GuiArea.y1, y1) == 0;
+        return GuiArea.x0 == x0 && GuiArea.x1 == x1 && GuiArea.y0 == y0 && GuiArea.y1 == y1;
     }
 
     @Override
@@ -143,5 +143,9 @@ public final class GuiArea {
     @Override
     public String toString() {
         return "Size:[" + width + ", " + height + "], Pos:[" + x0 + ", " + y0 + "]";
+    }
+
+    public Rectangle asRectangle() {
+        return new Rectangle(x0, y0, width, height);
     }
 }

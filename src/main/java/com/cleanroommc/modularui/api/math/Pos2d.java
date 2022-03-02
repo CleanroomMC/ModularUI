@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.common.internal.JsonHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.awt.*;
 import java.util.Objects;
 
 public class Pos2d {
@@ -15,18 +16,22 @@ public class Pos2d {
         return new Pos2d(0, 0);
     }
 
-    public final float x, y;
+    public final int x, y;
 
-    public Pos2d(float x, float y) {
+    public Pos2d(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
     public Pos2d(double x, double y) {
-        this((float) x, (float) y);
+        this((int) x, (int) y);
     }
 
-    public static Pos2d cartesian(float x, float y) {
+    public static Pos2d ofPoint(Point point) {
+        return new Pos2d(point.x, point.y);
+    }
+
+    public static Pos2d cartesian(int x, int y) {
         return new Pos2d(x, y);
     }
 
@@ -40,7 +45,7 @@ public class Pos2d {
         return new Pos2d(x + p.x, y + p.y);
     }
 
-    public Pos2d add(float x, float y) {
+    public Pos2d add(int x, int y) {
         return new Pos2d(x + this.x, y + this.y);
     }
 
@@ -90,22 +95,26 @@ public class Pos2d {
         return "[" + x + ", " + y + ']';
     }
 
+    public Point asPoint() {
+        return new Point(x, y);
+    }
+
     public static Pos2d ofJson(JsonElement jsonElement) {
-        float x = 0, y = 0;
+        int x = 0, y = 0;
         if (jsonElement.isJsonObject()) {
             JsonObject json = jsonElement.getAsJsonObject();
-            x = JsonHelper.getFloat(json, 0, "x");
-            y = JsonHelper.getFloat(json, 0, "y");
+            x = JsonHelper.getInt(json, 0, "x");
+            y = JsonHelper.getInt(json, 0, "y");
         } else {
             String raw = jsonElement.getAsString();
             if (raw.contains(",")) {
                 String[] parts = raw.split(",");
                 try {
                     if (!parts[0].isEmpty()) {
-                        x = Float.parseFloat(parts[0]);
+                        x = Integer.parseInt(parts[0]);
                     }
-                    if(parts.length > 1 && !parts[1].isEmpty()) {
-                        y = Float.parseFloat(parts[1]);
+                    if (parts.length > 1 && !parts[1].isEmpty()) {
+                        y = Integer.parseInt(parts[1]);
                     }
                 } catch (NumberFormatException e) {
                     ModularUIMod.LOGGER.error("Error parsing JSON pos: {}", raw);

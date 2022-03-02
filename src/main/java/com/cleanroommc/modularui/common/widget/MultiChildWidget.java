@@ -14,7 +14,7 @@ public abstract class MultiChildWidget extends Widget implements IWidgetParent {
     private final List<Widget> children = new ArrayList<>();
 
     public MultiChildWidget addChild(Widget widget) {
-        if(widget == this) {
+        if (widget == this) {
             ModularUIMod.LOGGER.error("Can't add self!");
             return this;
         }
@@ -35,7 +35,7 @@ public abstract class MultiChildWidget extends Widget implements IWidgetParent {
     @Override
     protected Size determineSize() {
         if (!getChildren().isEmpty()) {
-            float x0 = Float.MAX_VALUE, x1 = 0, y0 = Float.MAX_VALUE, y1 = 0;
+            int x0 = Integer.MAX_VALUE, x1 = 0, y0 = Integer.MAX_VALUE, y1 = 0;
             for (Widget widget : getChildren()) {
                 x0 = Math.min(x0, widget.getPos().x);
                 x1 = Math.max(x1, widget.getPos().x + widget.getSize().width);

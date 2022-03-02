@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.common.internal.JsonHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.awt.*;
 import java.util.Objects;
 
 public class Size {
@@ -13,13 +14,15 @@ public class Size {
         return new Size(0, 0);
     }
 
-    public final float width, height;
+    public final int width, height;
 
-    public Size(float width, float height) {
-        if(width < 0) throw new IllegalArgumentException("Width in size can't be smaller than 0");
-        if(height < 0) throw new IllegalArgumentException("Height in size can't be smaller than 0");
-        this.width = width;
-        this.height = height;
+    public Size(int width, int height) {
+        this.width = Math.max(0, width);
+        this.height = Math.max(0, height);
+    }
+
+    public static Size ofDimension(Dimension dimension) {
+        return new Size(dimension.width, dimension.height);
     }
 
     public boolean isLargerThan(Size size) {
@@ -60,22 +63,26 @@ public class Size {
         return "[" + width + ", " + height + "]";
     }
 
+    public Dimension asDimension() {
+        return new Dimension(width, height);
+    }
+
     public static Size ofJson(JsonElement jsonElement) {
-        float width = 0, height = 0;
+        int width = 0, height = 0;
         if (jsonElement.isJsonObject()) {
             JsonObject json = jsonElement.getAsJsonObject();
-            width = JsonHelper.getFloat(json, 0, "width", "w");
-            height = JsonHelper.getFloat(json, 0, "height", "h");
+            width = JsonHelper.getInt(json, 0, "width", "w");
+            height = JsonHelper.getInt(json, 0, "height", "h");
         } else {
             String raw = jsonElement.getAsString();
             if (raw.contains(",")) {
                 String[] parts = raw.split(",");
                 try {
                     if (!parts[0].isEmpty()) {
-                        width = Float.parseFloat(parts[0]);
+                        width = Integer.parseInt(parts[0]);
                     }
                     if(parts.length > 1 && !parts[1].isEmpty()) {
-                        height = Float.parseFloat(parts[1]);
+                        height = Integer.parseInt(parts[1]);
                     }
                 } catch (NumberFormatException e) {
                     ModularUIMod.LOGGER.error("Error parsing JSON pos: {}", raw);

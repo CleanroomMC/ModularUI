@@ -34,7 +34,6 @@ public abstract class Widget extends Gui {
     private boolean autoSized = true;
 
     // flags and stuff
-    private boolean initialised = false;
     protected boolean enabled = true;
     private int layer = -1;
 
@@ -43,13 +42,18 @@ public abstract class Widget extends Gui {
 
     public Widget(Size size) {
         this();
-        this.size = size;
+        setSize(size);
+    }
+
+    public Widget(Pos2d pos) {
+        this();
+        setPos(pos);
     }
 
     public Widget(Size size, Pos2d pos) {
         this();
-        this.size = size;
-        this.relativePos = pos;
+        setSize(size);
+        setPos(pos);
     }
 
     public boolean isClient() {
@@ -70,7 +74,7 @@ public abstract class Widget extends Gui {
     //==== Internal methods ====
 
     public final void initialize(ModularWindow window, IWidgetParent parent, int layer) {
-        if (window == null || parent == null || initialised) {
+        if (window == null || parent == null || isInitialised()) {
             throw new IllegalStateException("Illegal initialise call to widget!! " + toString());
         }
         this.window = window;
@@ -78,7 +82,6 @@ public abstract class Widget extends Gui {
         this.layer = layer;
 
         onInit();
-        this.initialised = true;
 
         if (this instanceof IWidgetParent) {
             int nextLayer = layer + 1;
@@ -95,7 +98,7 @@ public abstract class Widget extends Gui {
 
     @SideOnly(Side.CLIENT)
     public final void rebuildInternal() {
-        if (!initialised) {
+        if (!isInitialised()) {
             return;
         }
         if (fillParent) {
@@ -142,7 +145,7 @@ public abstract class Widget extends Gui {
     }
 
     public void checkNeedsRebuild() {
-        if (initialised && window != null) {
+        if (isInitialised()) {
             window.markNeedsRebuild();
         }
     }
@@ -181,7 +184,7 @@ public abstract class Widget extends Gui {
     }
 
     /**
-     * Called when this window becomes the current window again
+     * Called when this window becomes active after being paused
      */
     public void onResume() {
     }
@@ -258,7 +261,7 @@ public abstract class Widget extends Gui {
     }
 
     public final boolean isInitialised() {
-        return initialised;
+        return window != null;
     }
 
     public boolean isFixed() {
@@ -272,6 +275,10 @@ public abstract class Widget extends Gui {
         this.enabled = enabled;
     }
 
+    public Widget setSize(int width, int height) {
+        return setSize(new Size(width, height));
+    }
+
     public Widget setSize(Size size) {
         checkNeedsRebuild();
         this.autoSized = false;
@@ -279,10 +286,18 @@ public abstract class Widget extends Gui {
         return this;
     }
 
+    public Widget setPos(int x, int y) {
+        return setPos(new Pos2d(x, y));
+    }
+
     public Widget setPos(Pos2d relativePos) {
         checkNeedsRebuild();
         this.relativePos = relativePos;
         return this;
+    }
+
+    public Widget setFixedPos(int x, int y) {
+        return setFixedPos(new Pos2d(x, y));
     }
 
     public Widget setFixedPos(@Nullable Pos2d pos) {

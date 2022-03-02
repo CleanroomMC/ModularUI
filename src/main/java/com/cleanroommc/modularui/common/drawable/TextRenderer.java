@@ -83,8 +83,8 @@ public class TextRenderer {
     public Size calcSize(String text) {
         calcSizeMode = true;
         draw(text);
-        float sizeX = currentY > pos.y ? maxX - pos.x : currentX - pos.x;
-        float sizeY = currentY - pos.y + FR.FONT_HEIGHT * scale;
+        int sizeX = (int) (currentY > pos.y ? maxX - pos.x : currentX - pos.x);
+        int sizeY = (int) (currentY - pos.y + FR.FONT_HEIGHT * scale);
         calcSizeMode = false;
         return new Size(sizeX, sizeY);
     }
