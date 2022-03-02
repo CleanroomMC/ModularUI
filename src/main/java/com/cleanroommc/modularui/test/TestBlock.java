@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.test;
 
+import com.cleanroommc.modularui.api.UIInfos;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -27,7 +28,7 @@ public class TestBlock extends Block implements ITileEntityProvider {
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (!worldIn.isRemote) {
-            Tests.TILE_MODULAR_UI.open(playerIn, worldIn, pos);
+            UIInfos.TILE_MODULAR_UI.open(playerIn, worldIn, pos);
         }
         return true;
     }

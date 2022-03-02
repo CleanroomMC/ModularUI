@@ -9,7 +9,6 @@ import com.cleanroommc.modularui.common.internal.JsonHelper;
 import com.cleanroommc.modularui.common.internal.ModularUIContext;
 import com.cleanroommc.modularui.common.internal.ModularWindow;
 import com.google.gson.JsonObject;
-import net.minecraft.client.gui.Gui;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -18,7 +17,7 @@ import javax.annotation.Nullable;
 /**
  * This class depicts a functional element of a ModularUI
  */
-public abstract class Widget extends Gui {
+public abstract class Widget {
 
     // gui
     private String name = "";

@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.test;
 import com.cleanroommc.modularui.api.ITileWithModularUI;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.common.drawable.Text;
 import com.cleanroommc.modularui.common.drawable.UITexture;
 import com.cleanroommc.modularui.common.internal.ModularWindow;
 import com.cleanroommc.modularui.common.internal.UIBuildContext;
@@ -18,6 +19,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
 
     @Override
     public ModularWindow createWindow(UIBuildContext buildContext) {
+        Text[] TEXT = {new Text("Blue \u00a7nUnderlined\u00a7rBlue ").color(0x3058B8), new Text("Mint").color(0x469E8F)};
         return ModularWindow.builder(new Size(176, 166))
                 .addFromJson("modularui:test", buildContext)
                 .widget(new CycleButtonWidget()

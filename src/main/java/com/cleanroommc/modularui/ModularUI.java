@@ -2,7 +2,6 @@ package com.cleanroommc.modularui;
 
 import com.cleanroommc.modularui.common.internal.JsonLoader;
 import com.cleanroommc.modularui.common.widget.WidgetRegistry;
-import com.cleanroommc.modularui.test.Tests;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -38,12 +37,10 @@ public class ModularUI {
         if (FMLCommonHandler.instance().getSide() == Side.SERVER) {
             JsonLoader.loadJson();
         }
-        Tests.init();
     }
 
     @Mod.EventHandler
     public void onPostInit(FMLPostInitializationEvent event) {
         proxy.postInit();
     }
-
 }
