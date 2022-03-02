@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.common.internal;
 
-import com.cleanroommc.modularui.ModularUIMod;
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IContainerCreator;
 import com.cleanroommc.modularui.api.IGuiCreator;
 import net.minecraft.entity.player.EntityPlayer;
@@ -28,7 +28,7 @@ public class InternalUIMapper implements IGuiHandler {
 	private final List<IGuiCreator<?>> clientGuis;
 
 	public InternalUIMapper() {
-		NetworkRegistry.INSTANCE.registerGuiHandler(ModularUIMod.INSTANCE, this);
+		NetworkRegistry.INSTANCE.registerGuiHandler(ModularUI.INSTANCE, this);
 		this.serverContainers = new ArrayList<>();
 		this.clientGuis = new ArrayList<>();
 	}

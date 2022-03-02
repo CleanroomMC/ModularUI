@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.common.internal.wrapper;
 
-import com.cleanroommc.modularui.ModularUIMod;
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IVanillaSlot;
 import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.Interactable;
@@ -12,7 +12,6 @@ import com.cleanroommc.modularui.common.internal.mixin.GuiContainerAccess;
 import com.cleanroommc.modularui.common.widget.IWidgetDrawable;
 import com.cleanroommc.modularui.common.widget.SlotWidget;
 import com.cleanroommc.modularui.common.widget.Widget;
-import com.google.common.primitives.Ints;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
@@ -25,7 +24,6 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.inventory.Slot;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.input.Mouse;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
@@ -66,15 +64,12 @@ public class ModularGui extends GuiContainer implements GuiContainerAccess {
     public void onResize(Minecraft mc, int w, int h) {
         super.onResize(mc, w, h);
         context.resize(new Size(w, h));
-        ModularUIMod.LOGGER.info("Resized screen");
+        ModularUI.LOGGER.info("Resized screen");
     }
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        // calculate exact mouse pos
-        float x = Mouse.getEventX() * width / (float) mc.displayWidth;
-        float y = height - Mouse.getEventY() * height / (float) mc.displayHeight - 1;
-        mousePos = new Pos2d(x, y);
+        mousePos = new Pos2d(mouseX, mouseY);
 
         super.drawScreen(mouseX, mouseY, partialTicks);
         if (debugMode) {

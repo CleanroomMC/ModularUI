@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.common.drawable;
 
-import com.cleanroommc.modularui.ModularUIMod;
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import net.minecraft.client.Minecraft;
@@ -124,7 +124,7 @@ public class TextRenderer {
                     try {
                         this.color = Integer.parseInt(color, 16);
                     } catch (NumberFormatException e) {
-                        ModularUIMod.LOGGER.throwing(e);
+                        ModularUI.LOGGER.throwing(e);
                     }
                     i = closing;
                 } else {

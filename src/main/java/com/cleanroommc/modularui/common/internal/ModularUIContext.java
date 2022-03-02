@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.common.internal;
 
-import com.cleanroommc.modularui.ModularUIMod;
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ISyncedWidget;
 import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.IWindowCreator;
@@ -154,7 +154,7 @@ public class ModularUIContext {
     @SideOnly(Side.CLIENT)
     public void sendClientPacket(int discriminator, ISyncedWidget syncedWidget, ModularWindow window, Consumer<PacketBuffer> bufferConsumer) {
         if (window != mainWindow) {
-            ModularUIMod.LOGGER.error("Tried syncing from non main window");
+            ModularUI.LOGGER.error("Tried syncing from non main window");
             return;
         }
         int syncId = window.getSyncedWidgetId(syncedWidget);

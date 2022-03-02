@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.ModularUIMod;
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ISyncedWidget;
 import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.api.math.Pos2d;
@@ -27,7 +27,7 @@ public class CycleButtonWidget extends Widget implements Interactable, ISyncedWi
     @Override
     public void onInit() {
         if (setter == null || getter == null) {
-            ModularUIMod.LOGGER.error("{} was not properly initialised!", this);
+            ModularUI.LOGGER.error("{} was not properly initialised!", this);
             return;
         }
         setState(getter.getAsInt(), false, false);

@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 
-@Mod.EventBusSubscriber(modid = ModularUIMod.ID)
+@Mod.EventBusSubscriber(modid = ModularUI.ID)
 public class CommonProxy {
 
     public static Block testBlock = new TestBlock();

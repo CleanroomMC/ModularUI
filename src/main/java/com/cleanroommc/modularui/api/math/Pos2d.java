@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.api.math;
 
-import com.cleanroommc.modularui.ModularUIMod;
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.common.internal.JsonHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -117,7 +117,7 @@ public class Pos2d {
                         y = Integer.parseInt(parts[1]);
                     }
                 } catch (NumberFormatException e) {
-                    ModularUIMod.LOGGER.error("Error parsing JSON pos: {}", raw);
+                    ModularUI.LOGGER.error("Error parsing JSON pos: {}", raw);
                     e.printStackTrace();
                 }
             }

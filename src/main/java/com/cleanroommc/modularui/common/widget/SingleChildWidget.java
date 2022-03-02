@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.ModularUIMod;
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
@@ -26,9 +26,9 @@ public abstract class SingleChildWidget extends Widget implements IWidgetParent 
 
     public final SingleChildWidget setChild(Widget widget) {
         if (isInitialised()) {
-            ModularUIMod.LOGGER.error("Can't add child after initialised!");
+            ModularUI.LOGGER.error("Can't add child after initialised!");
         } else if (this.child != null) {
-            ModularUIMod.LOGGER.error("Child is already set!");
+            ModularUI.LOGGER.error("Child is already set!");
         } else {
             this.child = widget;
         }

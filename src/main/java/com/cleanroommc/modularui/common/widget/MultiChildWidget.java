@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.ModularUIMod;
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.math.Size;
 
@@ -15,11 +15,11 @@ public abstract class MultiChildWidget extends Widget implements IWidgetParent {
 
     public MultiChildWidget addChild(Widget widget) {
         if (widget == this) {
-            ModularUIMod.LOGGER.error("Can't add self!");
+            ModularUI.LOGGER.error("Can't add self!");
             return this;
         }
         if (isInitialised()) {
-            ModularUIMod.LOGGER.error("Can't add child after initialised!");
+            ModularUI.LOGGER.error("Can't add child after initialised!");
         } else {
             children.add(widget);
         }

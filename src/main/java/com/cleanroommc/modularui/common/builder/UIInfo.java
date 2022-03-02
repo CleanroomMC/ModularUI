@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.common.builder;
 
-import com.cleanroommc.modularui.ModularUIMod;
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IContainerCreator;
 import com.cleanroommc.modularui.api.IGuiCreator;
 import com.cleanroommc.modularui.common.internal.InternalUIMapper;
@@ -22,7 +22,7 @@ public class UIInfo<CC extends IContainerCreator<?>, GC extends IGuiCreator<?>> 
 	}
 
 	public void open(EntityPlayer player, World world, int x, int y, int z) {
-		FMLNetworkHandler.openGui(player, ModularUIMod.INSTANCE, id, world, x, y, z);
+		FMLNetworkHandler.openGui(player, ModularUI.INSTANCE, id, world, x, y, z);
 	}
 
 	public void open(EntityPlayer player, World world, BlockPos pos) {

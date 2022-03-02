@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.common.internal;
 
-import com.cleanroommc.modularui.ModularUIMod;
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.common.widget.Widget;
 import net.minecraft.entity.player.EntityPlayer;
 
@@ -23,7 +23,7 @@ public class UIBuildContext {
 
     protected void addJsonWidgets(String name, Widget widget) {
         if (jsonWidgets.containsKey(name)) {
-            ModularUIMod.LOGGER.warn("Widget {} is already registered from json", name);
+            ModularUI.LOGGER.warn("Widget {} is already registered from json", name);
         }
         jsonWidgets.put(name, widget);
     }

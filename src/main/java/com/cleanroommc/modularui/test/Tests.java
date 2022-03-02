@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.test;
 
-import com.cleanroommc.modularui.ModularUIMod;
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITileWithModularUI;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.builder.UIBuilder;
@@ -44,7 +44,7 @@ public class Tests {
             })
             .build();
 
-    public static final IDrawable BACKGROUND = UITexture.fullImage(ModularUIMod.ID, "gui/background/background");
+    public static final IDrawable BACKGROUND = UITexture.fullImage(ModularUI.ID, "gui/background/background");
 
     public static void init() {
         MinecraftForge.EVENT_BUS.register(Tests.class);
@@ -64,7 +64,7 @@ public class Tests {
     public static ModularWindow createWindow(UIBuildContext buildContext) {
         Text[] TEXT = {new Text("Blue \u00a7nUnderlined\u00a7rBlue ").color(0x3058B8), new Text("Mint").color(0x469E8F)};
         return ModularWindow.builder(new Size(176, 166))
-                .addFromJson("test", buildContext)
+                .addFromJson("modularui:test", buildContext)
                 .build();
     }
 

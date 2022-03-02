@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.ModularUIMod;
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.common.drawable.IDrawable;
 import com.cleanroommc.modularui.common.drawable.Text;
@@ -22,7 +22,7 @@ public class DrawableWidget extends Widget implements IWidgetDrawable {
 
     public DrawableWidget setDrawable(IDrawable drawable) {
         if (drawable instanceof Text || drawable instanceof TextSpan) {
-            ModularUIMod.LOGGER.warn("Please use TextWidget for Text");
+            ModularUI.LOGGER.warn("Please use TextWidget for Text");
         }
         this.drawable = drawable;
         return this;

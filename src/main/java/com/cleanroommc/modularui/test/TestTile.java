@@ -19,7 +19,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
     @Override
     public ModularWindow createWindow(UIBuildContext buildContext) {
         return ModularWindow.builder(new Size(176, 166))
-                .addFromJson("test", buildContext)
+                .addFromJson("modularui:test", buildContext)
                 .widget(new CycleButtonWidget()
                         .setLength(3)
                         .setGetter(() -> serverValue)
