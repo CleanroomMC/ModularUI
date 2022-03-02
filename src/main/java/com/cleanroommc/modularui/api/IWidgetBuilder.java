@@ -1,10 +1,10 @@
 package com.cleanroommc.modularui.api;
 
-import com.cleanroommc.modularui.ClientProxy;
-import com.cleanroommc.modularui.ModularUIMod;
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.common.drawable.IDrawable;
 import com.cleanroommc.modularui.common.internal.JsonHelper;
+import com.cleanroommc.modularui.common.internal.JsonLoader;
 import com.cleanroommc.modularui.common.internal.UIBuildContext;
 import com.cleanroommc.modularui.common.widget.SlotGroup;
 import com.cleanroommc.modularui.common.widget.SlotWidget;
@@ -12,6 +12,7 @@ import com.cleanroommc.modularui.common.widget.Widget;
 import com.cleanroommc.modularui.integration.vanilla.slot.BaseSlot;
 import com.google.gson.JsonObject;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
 
 public interface IWidgetBuilder<T extends IWidgetBuilder<T>> {
 
@@ -19,7 +20,6 @@ public interface IWidgetBuilder<T extends IWidgetBuilder<T>> {
 
     default T widget(Widget widget) {
         addWidgetInternal(widget);
-        ModularUIMod.LOGGER.info("Adding widget {}", widget);
         return (T) this;
     }
 
@@ -52,10 +52,18 @@ public interface IWidgetBuilder<T extends IWidgetBuilder<T>> {
                 .setMargin(margin));
     }*/
 
+    default T addFromJson(String mod, String location, UIBuildContext buildContext) {
+        return addFromJson(new ResourceLocation(mod, location), buildContext);
+    }
+
     default T addFromJson(String location, UIBuildContext buildContext) {
-        JsonObject json = ClientProxy.GUIS.get(location);
+        return addFromJson(new ResourceLocation(location), buildContext);
+    }
+
+    default T addFromJson(ResourceLocation location, UIBuildContext buildContext) {
+        JsonObject json = JsonLoader.GUIS.get(location);
         if (json == null) {
-            ModularUIMod.LOGGER.error("Couldn't not find json file " + location);
+            ModularUI.LOGGER.error("Couldn't not find json file " + location);
             return (T) this;
         }
         JsonHelper.parseJson(this, json, buildContext);
