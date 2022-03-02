@@ -6,13 +6,12 @@ import com.cleanroommc.modularui.common.widget.WidgetRegistry;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.entity.player.EntityPlayer;
 
 import java.util.function.Function;
 
 public class JsonHelper {
 
-    public static void parseJson(IWidgetBuilder<?> widgetBuilder, JsonObject json, EntityPlayer player) {
+    public static void parseJson(IWidgetBuilder<?> widgetBuilder, JsonObject json, UIBuildContext buildContext) {
         if (json.has("widgets")) {
             JsonArray widgets = json.getAsJsonArray("widgets");
             for (JsonElement jsonElement : widgets) {
@@ -26,7 +25,7 @@ public class JsonHelper {
                     type = jsonWidget.get("type").getAsString();
                     WidgetRegistry.WidgetFactory widgetFactory = WidgetRegistry.getFactory(type);
                     if (widgetFactory != null) {
-                        widget = widgetFactory.create(player);
+                        widget = widgetFactory.create(buildContext.getPlayer());
                     }
                     if (widget == null) {
                         continue;
@@ -34,7 +33,7 @@ public class JsonHelper {
                     widget.readJson(jsonWidget, type);
                     widgetBuilder.widget(widget);
                     if (widget instanceof IWidgetBuilder && jsonWidget.has("widgets")) {
-                        parseJson((IWidgetBuilder<?>) widget, jsonWidget, player);
+                        parseJson((IWidgetBuilder<?>) widget, jsonWidget, buildContext);
                     }
                 }
             }

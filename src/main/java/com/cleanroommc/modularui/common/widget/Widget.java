@@ -20,10 +20,6 @@ import javax.annotation.Nullable;
  */
 public abstract class Widget extends Gui {
 
-    public static boolean isClient() {
-        return ModularUIContext.isClient();
-    }
-
     // gui
     private String name = "";
     private ModularWindow window = null;
@@ -54,6 +50,10 @@ public abstract class Widget extends Gui {
         this();
         this.size = size;
         this.relativePos = pos;
+    }
+
+    public boolean isClient() {
+        return getContext().isClient();
     }
 
     public void readJson(JsonObject json, String type) {

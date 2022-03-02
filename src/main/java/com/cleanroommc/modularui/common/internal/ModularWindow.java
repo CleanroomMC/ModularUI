@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.common.internal;
 
+import com.cleanroommc.modularui.ModularUIMod;
 import com.cleanroommc.modularui.api.ISyncedWidget;
 import com.cleanroommc.modularui.api.IWidgetBuilder;
 import com.cleanroommc.modularui.api.IWidgetParent;
@@ -47,6 +48,7 @@ public final class ModularWindow implements IWidgetParent {
         AtomicInteger i = new AtomicInteger();
         IWidgetParent.forEachByLayer(this, widget -> {
             if (widget instanceof ISyncedWidget) {
+                ModularUIMod.LOGGER.info("SyncedWidget {} : {}", this, i.get());
                 syncedWidgetBuilder.put(i.getAndIncrement(), (ISyncedWidget) widget);
             }
             return false;
@@ -76,6 +78,12 @@ public final class ModularWindow implements IWidgetParent {
             needsRebuild = false;
         }
         IWidgetParent.forEachByLayer(this, Widget::onScreenUpdate);
+    }
+
+    public void serverUpdate() {
+        for (ISyncedWidget syncedWidget : syncedWidgets.values()) {
+            syncedWidget.onServerTick();
+        }
     }
 
     @SideOnly(Side.CLIENT)

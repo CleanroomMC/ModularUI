@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.common.internal;
 
+import com.cleanroommc.modularui.ModularUIMod;
 import com.cleanroommc.modularui.api.ISyncedWidget;
 import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.IWindowCreator;
@@ -10,7 +11,9 @@ import com.cleanroommc.modularui.common.internal.network.SWidgetUpdate;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularUIContainer;
 import com.cleanroommc.modularui.common.widget.Widget;
+import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
@@ -27,11 +30,8 @@ public class ModularUIContext {
 
     public static final Minecraft MC = Minecraft.getMinecraft();
 
-    public static boolean isClient() {
-        return FMLCommonHandler.instance().getSide() == Side.CLIENT;
-    }
-
     private final Stack<ModularWindow> windows = new Stack<>();
+    private ModularWindow mainWindow;
     @SideOnly(Side.CLIENT)
     private ModularGui screen;
     private ModularUIContainer container;
@@ -44,8 +44,13 @@ public class ModularUIContext {
         this.player = context.player;
     }
 
+    public boolean isClient() {
+        return FMLCommonHandler.instance().getSide() == Side.CLIENT && player instanceof EntityPlayerSP;
+    }
+
     public void initialize(ModularUIContainer container, ModularWindow mainWindow) {
         this.container = container;
+        this.mainWindow = mainWindow;
         pushWindow(mainWindow);
     }
 
@@ -117,16 +122,17 @@ public class ModularUIContext {
     }
 
     private Widget getTopWidgetAt(Pos2d pos, List<Widget> widgets) {
+        Widget widgetUnderMouse = null;
         for (Widget widget : widgets) {
             if (Widget.isUnderMouse(pos, widget.getAbsolutePos(), widget.getSize())) {
                 if (widget instanceof IWidgetParent) {
                     Widget childUnderMouse = getTopWidgetAt(pos, ((IWidgetParent) widget).getChildren());
                     return childUnderMouse == null ? widget : childUnderMouse;
                 }
-                return widget;
+                widgetUnderMouse = widget;
             }
         }
-        return null;
+        return widgetUnderMouse;
     }
 
     @SideOnly(Side.CLIENT)
@@ -134,39 +140,38 @@ public class ModularUIContext {
         return screenSize;
     }
 
-    public void readClientPacket(PacketBuffer buf) {
-
+    public void readClientPacket(PacketBuffer buf, int widgetId) {
+        ISyncedWidget syncedWidget = mainWindow.getSyncedWidget(widgetId);
+        syncedWidget.readClientData(buf.readVarInt(), buf);
     }
 
     @SideOnly(Side.CLIENT)
-    public void readServerPacket(PacketBuffer buf) {
-
+    public void readServerPacket(PacketBuffer buf, int widgetId) {
+        ISyncedWidget syncedWidget = mainWindow.getSyncedWidget(widgetId);
+        syncedWidget.readServerData(buf.readVarInt(), buf);
     }
 
     @SideOnly(Side.CLIENT)
     public void sendClientPacket(int discriminator, ISyncedWidget syncedWidget, ModularWindow window, Consumer<PacketBuffer> bufferConsumer) {
-
+        if (window != mainWindow) {
+            ModularUIMod.LOGGER.error("Tried syncing from non main window");
+            return;
+        }
         int syncId = window.getSyncedWidgetId(syncedWidget);
-        Consumer<PacketBuffer> buffer = buf -> {
-            buf.writeVarInt(syncId);
-            buf.writeVarInt(discriminator);
-            bufferConsumer.accept(buf);
-        };
-        CWidgetUpdate packet = new CWidgetUpdate(buffer);
+        PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
+        buffer.writeVarInt(discriminator);
+        bufferConsumer.accept(buffer);
+        CWidgetUpdate packet = new CWidgetUpdate(buffer, syncId);
         Minecraft.getMinecraft().player.connection.sendPacket(packet);
-
-
     }
 
     public void sendServerPacket(int discriminator, ISyncedWidget syncedWidget, ModularWindow window, Consumer<PacketBuffer> bufferConsumer) {
         if (player instanceof EntityPlayerMP) {
             int syncId = window.getSyncedWidgetId(syncedWidget);
-            Consumer<PacketBuffer> buffer = buf -> {
-                buf.writeVarInt(syncId);
-                buf.writeVarInt(discriminator);
-                bufferConsumer.accept(buf);
-            };
-            SWidgetUpdate packet = new SWidgetUpdate(buffer);
+            PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
+            buffer.writeVarInt(discriminator);
+            bufferConsumer.accept(buffer);
+            SWidgetUpdate packet = new SWidgetUpdate(buffer, syncId);
             ((EntityPlayerMP) player).connection.sendPacket(packet);
         }
     }

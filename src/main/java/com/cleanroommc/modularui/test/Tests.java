@@ -28,7 +28,7 @@ public class Tests {
                 TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
                 if (te instanceof ITileWithModularUI) {
                     UIBuildContext buildContext = new UIBuildContext(player);
-                    ModularWindow window = createWindow(buildContext);
+                    ModularWindow window = ((ITileWithModularUI) te).createWindow(buildContext);
                     return new ModularGui(new ModularUIContainer(new ModularUIContext(buildContext), window));
                 }
                 return null;
@@ -37,7 +37,7 @@ public class Tests {
                 TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
                 if (te instanceof ITileWithModularUI) {
                     UIBuildContext buildContext = new UIBuildContext(player);
-                    ModularWindow window = createWindow(buildContext);
+                    ModularWindow window = ((ITileWithModularUI) te).createWindow(buildContext);
                     return new ModularUIContainer(new ModularUIContext(buildContext), window);
                 }
                 return null;
@@ -64,7 +64,7 @@ public class Tests {
     public static ModularWindow createWindow(UIBuildContext buildContext) {
         Text[] TEXT = {new Text("Blue \u00a7nUnderlined\u00a7rBlue ").color(0x3058B8), new Text("Mint").color(0x469E8F)};
         return ModularWindow.builder(new Size(176, 166))
-                .addFromJson("test", buildContext.getPlayer())
+                .addFromJson("test", buildContext)
                 .build();
     }
 

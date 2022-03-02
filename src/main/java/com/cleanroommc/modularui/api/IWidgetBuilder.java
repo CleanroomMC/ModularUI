@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.ModularUIMod;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.common.drawable.IDrawable;
 import com.cleanroommc.modularui.common.internal.JsonHelper;
+import com.cleanroommc.modularui.common.internal.UIBuildContext;
 import com.cleanroommc.modularui.common.widget.SlotGroup;
 import com.cleanroommc.modularui.common.widget.SlotWidget;
 import com.cleanroommc.modularui.common.widget.Widget;
@@ -18,6 +19,7 @@ public interface IWidgetBuilder<T extends IWidgetBuilder<T>> {
 
     default T widget(Widget widget) {
         addWidgetInternal(widget);
+        ModularUIMod.LOGGER.info("Adding widget {}", widget);
         return (T) this;
     }
 
@@ -50,13 +52,13 @@ public interface IWidgetBuilder<T extends IWidgetBuilder<T>> {
                 .setMargin(margin));
     }*/
 
-    default T addFromJson(String location, EntityPlayer player) {
+    default T addFromJson(String location, UIBuildContext buildContext) {
         JsonObject json = ClientProxy.GUIS.get(location);
         if (json == null) {
             ModularUIMod.LOGGER.error("Couldn't not find json file " + location);
             return (T) this;
         }
-        JsonHelper.parseJson(this, json, player);
+        JsonHelper.parseJson(this, json, buildContext);
         return (T) this;
     }
 }

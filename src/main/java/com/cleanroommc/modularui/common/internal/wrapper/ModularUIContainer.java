@@ -28,4 +28,10 @@ public class ModularUIContainer extends Container {
     public Slot addSlotToContainer(Slot slotIn) {
         return super.addSlotToContainer(slotIn);
     }
+
+    @Override
+    public void detectAndSendChanges() {
+        super.detectAndSendChanges();
+        context.getCurrentWindow().serverUpdate();
+    }
 }
