@@ -116,6 +116,14 @@ public class ModularUIContext {
         return player;
     }
 
+    public ModularUIContainer getContainer() {
+        return container;
+    }
+
+    public ModularGui getScreen() {
+        return screen;
+    }
+
     @Nullable
     public Widget getTopWidgetAt(Pos2d pos) {
         return getTopWidgetAt(pos, getCurrentWindow().getChildren());

@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui;
 
-import com.cleanroommc.modularui.common.internal.JsonHelper;
 import com.cleanroommc.modularui.common.internal.JsonLoader;
 import com.cleanroommc.modularui.common.widget.WidgetRegistry;
 import com.cleanroommc.modularui.test.Tests;
@@ -32,11 +31,6 @@ public class ModularUI {
     public void preInit(FMLPreInitializationEvent event) {
         proxy.preInit();
         WidgetRegistry.init();
-        try {
-            JsonHelper.loadGuiJsons(ID);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Mod.EventHandler

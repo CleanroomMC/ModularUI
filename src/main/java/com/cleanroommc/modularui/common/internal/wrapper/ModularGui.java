@@ -1,14 +1,12 @@
 package com.cleanroommc.modularui.common.internal.wrapper;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.IVanillaSlot;
 import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.internal.ModularUIContext;
-import com.cleanroommc.modularui.common.internal.mixin.GuiContainerAccess;
 import com.cleanroommc.modularui.common.widget.IWidgetDrawable;
 import com.cleanroommc.modularui.common.widget.SlotWidget;
 import com.cleanroommc.modularui.common.widget.Widget;
@@ -29,7 +27,7 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
 @SideOnly(Side.CLIENT)
-public class ModularGui extends GuiContainer implements GuiContainerAccess {
+public class ModularGui extends GuiContainer {
 
     private final ModularUIContext context;
     private Pos2d mousePos = Pos2d.ZERO;
@@ -110,12 +108,7 @@ public class ModularGui extends GuiContainer implements GuiContainerAccess {
             widget.onFrameUpdate();
             if (widget.isEnabled() && widget instanceof IWidgetDrawable) {
                 GlStateManager.pushMatrix();
-                if (widget instanceof SlotWidget) {
-                    Slot slot = ((SlotWidget) widget).getMcSlot();
-                    GlStateManager.translate(guiLeft + slot.xPos, guiTop + slot.yPos, 0);
-                } else {
-                    GlStateManager.translate(widget.getAbsolutePos().x, widget.getAbsolutePos().y, 0);
-                }
+                GlStateManager.translate(widget.getAbsolutePos().x, widget.getAbsolutePos().y, 0);
                 GlStateManager.enableBlend();
                 ((IWidgetDrawable) widget).drawInBackground(partialTicks);
                 GlStateManager.popMatrix();
@@ -333,19 +326,5 @@ public class ModularGui extends GuiContainer implements GuiContainerAccess {
         tessellator.draw();
         GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();
-    }
-
-    @Override
-    public Slot getSlotAt(float x, float y) {
-        Widget widget = context.getTopWidgetAt(new Pos2d(x, y));
-        if (widget instanceof IVanillaSlot) {
-            return ((IVanillaSlot) widget).getMcSlot();
-        }
-        return null;
-    }
-
-    @Override
-    public boolean isOverSlot(Slot slot, float x, float y) {
-        return isPointInRegion(slot.xPos, slot.yPos, 16, 16, (int) x, (int) y);
     }
 }
