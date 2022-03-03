@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.common.drawable;
+package com.cleanroommc.modularui.api.drawable;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.math.Pos2d;
