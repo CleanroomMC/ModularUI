@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.api.ITileWithModularUI;
+import com.cleanroommc.modularui.api.TooltipContainer;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.drawable.Text;
@@ -27,7 +28,8 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                         .setGetter(() -> serverValue)
                         .setSetter(val -> this.serverValue = val)
                         .setTexture(UITexture.fullImage("modularui", "gui/widgets/cycle_button_demo"))
-                        .setPos(new Pos2d(20, 20)))
+                        .setPos(new Pos2d(20, 20))
+                        .setTooltip(new TooltipContainer().addLine("Test Tooltip").setShowUpDelay(10)))
                 .build();
     }
 

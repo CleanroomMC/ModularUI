@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IWidgetDrawable;
 import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.Interactable;
+import com.cleanroommc.modularui.api.TooltipContainer;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
@@ -35,6 +36,8 @@ public class ModularGui extends GuiContainer {
     private long lastClick = -1;
     private long lastFocusedClick = -1;
     private Widget focused;
+    private Widget hovered = null;
+    private int timeHovered = 0;
     public boolean debugMode = true;
     private int drawCalls = 0;
     private long drawTime = 0;
@@ -65,6 +68,13 @@ public class ModularGui extends GuiContainer {
         if (isFocused(widget)) {
             focused.onRemoveFocus();
             focused = null;
+        }
+    }
+
+    public void setHovered(Widget widget) {
+        if (hovered != widget) {
+            hovered = widget;
+            timeHovered = 0;
         }
     }
 
@@ -158,6 +168,14 @@ public class ModularGui extends GuiContainer {
             return false;
         });
 
+        setHovered(context.getTopWidgetAt(getMousePos()));
+        if (hovered != null) {
+            TooltipContainer tooltipContainer = hovered.getTooltip();
+            if (tooltipContainer != null && tooltipContainer.getShowUpDelay() <= timeHovered) {
+                tooltipContainer.draw(context);
+            }
+        }
+
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableLighting();
         RenderHelper.enableStandardItemLighting();
@@ -200,6 +218,9 @@ public class ModularGui extends GuiContainer {
     public void updateScreen() {
         super.updateScreen();
         context.getCurrentWindow().update();
+        if (hovered != null) {
+            timeHovered++;
+        }
     }
 
     private boolean isDoubleClick(long lastClick, long currentClick) {

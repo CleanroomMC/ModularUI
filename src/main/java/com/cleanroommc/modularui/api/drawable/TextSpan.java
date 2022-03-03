@@ -26,4 +26,8 @@ public class TextSpan implements IDrawable {
     public void draw(Pos2d pos, Size size, float partialTicks) {
         TextRenderer.drawString(Text.getFormatted(texts), pos, 0x212121, size.width);
     }
+
+    public Text[] getTexts() {
+        return texts;
+    }
 }

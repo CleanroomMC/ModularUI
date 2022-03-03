@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.common.widget;
 import com.cleanroommc.modularui.api.IWidgetDrawable;
 import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.Interactable;
+import com.cleanroommc.modularui.api.TooltipContainer;
 import com.cleanroommc.modularui.api.math.GuiArea;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
@@ -38,8 +39,10 @@ public abstract class Widget {
     protected boolean enabled = true;
     private int layer = -1;
 
+    // visuals
     @Nullable
     private IDrawable background;
+    private TooltipContainer tooltip;
 
     public Widget() {
     }
@@ -81,6 +84,7 @@ public abstract class Widget {
         this.fillParent = JsonHelper.getBoolean(json, false, "fillParent");
         this.enabled = JsonHelper.getBoolean(json, true, "enabled");
         this.autoSized = JsonHelper.getBoolean(json, !json.has("size"), "autoSized");
+        this.background = JsonHelper.getObject(json, null, IDrawable::ofJson, "background");
     }
 
 
@@ -312,6 +316,9 @@ public abstract class Widget {
         return background;
     }
 
+    public TooltipContainer getTooltip() {
+        return tooltip;
+    }
 
     //==== Setter/Builder ====
 
@@ -389,6 +396,15 @@ public abstract class Widget {
         return this;
     }
 
+    /**
+     * Sets the tooltip container
+     *
+     * @param tooltip tooltip to render
+     */
+    public Widget setTooltip(TooltipContainer tooltip) {
+        this.tooltip = tooltip;
+        return this;
+    }
 
     //==== Utility ====
 
