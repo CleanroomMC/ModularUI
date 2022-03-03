@@ -2,7 +2,7 @@ package com.cleanroommc.modularui.api;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.math.Pos2d;
-import com.cleanroommc.modularui.common.drawable.IDrawable;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.common.internal.JsonHelper;
 import com.cleanroommc.modularui.common.internal.JsonLoader;
 import com.cleanroommc.modularui.common.internal.UIBuildContext;

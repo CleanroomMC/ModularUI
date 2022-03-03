@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui;
 
 import com.cleanroommc.modularui.common.internal.JsonLoader;
-import com.cleanroommc.modularui.common.widget.WidgetRegistry;
+import com.cleanroommc.modularui.common.widget.WidgetJsonRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -29,7 +29,7 @@ public class ModularUI {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         proxy.preInit();
-        WidgetRegistry.init();
+        WidgetJsonRegistry.init();
     }
 
     @Mod.EventHandler

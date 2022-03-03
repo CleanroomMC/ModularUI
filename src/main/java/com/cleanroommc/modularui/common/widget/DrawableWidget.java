@@ -1,11 +1,12 @@
 package com.cleanroommc.modularui.common.widget;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.IWidgetDrawable;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.drawable.Text;
+import com.cleanroommc.modularui.api.drawable.TextSpan;
+import com.cleanroommc.modularui.api.drawable.UITexture;
 import com.cleanroommc.modularui.api.math.Pos2d;
-import com.cleanroommc.modularui.common.drawable.IDrawable;
-import com.cleanroommc.modularui.common.drawable.Text;
-import com.cleanroommc.modularui.common.drawable.TextSpan;
-import com.cleanroommc.modularui.common.drawable.UITexture;
 import com.google.gson.JsonObject;
 
 public class DrawableWidget extends Widget implements IWidgetDrawable {

@@ -1,14 +1,14 @@
 package com.cleanroommc.modularui.common.internal.wrapper;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.IWidgetDrawable;
 import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.Interactable;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.internal.ModularUIContext;
-import com.cleanroommc.modularui.common.widget.IWidgetDrawable;
-import com.cleanroommc.modularui.common.widget.SlotWidget;
 import com.cleanroommc.modularui.common.widget.Widget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -19,7 +19,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.inventory.Slot;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -56,6 +55,17 @@ public class ModularGui extends GuiContainer {
 
     public Pos2d getMousePos() {
         return mousePos;
+    }
+
+    public boolean isFocused(Widget widget) {
+        return focused != null && focused == widget;
+    }
+
+    public void removeFocus(Widget widget) {
+        if (isFocused(widget)) {
+            focused.onRemoveFocus();
+            focused = null;
+        }
     }
 
     @Override
@@ -106,11 +116,17 @@ public class ModularGui extends GuiContainer {
 
         IWidgetParent.forEachByLayer(context.getCurrentWindow(), widget -> {
             widget.onFrameUpdate();
-            if (widget.isEnabled() && widget instanceof IWidgetDrawable) {
+            if (widget.isEnabled()) {
                 GlStateManager.pushMatrix();
                 GlStateManager.translate(widget.getAbsolutePos().x, widget.getAbsolutePos().y, 0);
                 GlStateManager.enableBlend();
-                ((IWidgetDrawable) widget).drawInBackground(partialTicks);
+                IDrawable background = widget.getBackground();
+                if (background != null) {
+                    background.draw(Pos2d.ZERO, widget.getSize(), partialTicks);
+                }
+                if (widget instanceof IWidgetDrawable) {
+                    ((IWidgetDrawable) widget).drawInBackground(partialTicks);
+                }
                 GlStateManager.popMatrix();
             }
             return false;
@@ -134,12 +150,7 @@ public class ModularGui extends GuiContainer {
         IWidgetParent.forEachByLayer(context.getCurrentWindow(), widget -> {
             if (widget.isEnabled() && widget instanceof IWidgetDrawable) {
                 GlStateManager.pushMatrix();
-                if (widget instanceof SlotWidget) {
-                    Slot slot = ((SlotWidget) widget).getMcSlot();
-                    GlStateManager.translate(guiLeft + slot.xPos, guiTop + slot.yPos, 0);
-                } else {
-                    GlStateManager.translate(widget.getAbsolutePos().x, widget.getAbsolutePos().y, 0);
-                }
+                GlStateManager.translate(widget.getAbsolutePos().x, widget.getAbsolutePos().y, 0);
                 GlStateManager.enableBlend();
                 ((IWidgetDrawable) widget).drawInForeground(partialTicks);
                 GlStateManager.popMatrix();
@@ -206,19 +217,22 @@ public class ModularGui extends GuiContainer {
             interactable.onClick(mouseButton, doubleClick);
         }
         Widget widget = context.getTopWidgetAt(mousePos);
+        boolean shouldFocus = false;
         if (widget != null) {
             if (widget instanceof Interactable) {
                 Interactable interactable = (Interactable) widget;
                 doubleClick = focused == interactable && isDoubleClick(lastFocusedClick, time);
                 interactable.onClick(mouseButton, doubleClick);
             }
-            if (widget.shouldGetFocus()) {
-                if (focused != null) {
+            if (focused != null) {
+                if (focused != widget) {
                     focused.onRemoveFocus();
+                    if (widget.shouldGetFocus()) {
+                        focused = widget;
+                    } else {
+                        focused = null;
+                    }
                 }
-                focused = widget;
-            } else {
-                focused = null;
             }
         } else if (focused != null) {
             focused.onRemoveFocus();

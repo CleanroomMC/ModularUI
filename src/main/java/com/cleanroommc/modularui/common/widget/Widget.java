@@ -1,10 +1,12 @@
 package com.cleanroommc.modularui.common.widget;
 
+import com.cleanroommc.modularui.api.IWidgetDrawable;
 import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.api.math.GuiArea;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.common.internal.JsonHelper;
 import com.cleanroommc.modularui.common.internal.ModularUIContext;
 import com.cleanroommc.modularui.common.internal.ModularWindow;
@@ -36,6 +38,9 @@ public abstract class Widget {
     protected boolean enabled = true;
     private int layer = -1;
 
+    @Nullable
+    private IDrawable background;
+
     public Widget() {
     }
 
@@ -55,10 +60,19 @@ public abstract class Widget {
         setPos(pos);
     }
 
+    /**
+     * @return if we are on logical client or server
+     */
     public boolean isClient() {
         return getContext().isClient();
     }
 
+    /**
+     * Called when this widget is created from json. Make sure to call super.readJson(json, type);
+     *
+     * @param json the widget json
+     * @param type the type this widget was created with
+     */
     public void readJson(JsonObject json, String type) {
         this.name = JsonHelper.getString(json, "", "name");
         this.relativePos = JsonHelper.getElement(json, relativePos, Pos2d::ofJson, "pos");
@@ -72,6 +86,9 @@ public abstract class Widget {
 
     //==== Internal methods ====
 
+    /**
+     * Thou shall not call
+     */
     public final void initialize(ModularWindow window, IWidgetParent parent, int layer) {
         if (window == null || parent == null || isInitialised()) {
             throw new IllegalStateException("Illegal initialise call to widget!! " + toString());
@@ -90,11 +107,9 @@ public abstract class Widget {
         }
     }
 
-    @SideOnly(Side.CLIENT)
-    public final void screenUpdateInternal() {
-        onScreenUpdate();
-    }
-
+    /**
+     * Thou shall not call
+     */
     @SideOnly(Side.CLIENT)
     public final void rebuildInternal() {
         if (!isInitialised()) {
@@ -139,10 +154,16 @@ public abstract class Widget {
         return null;
     }
 
+    /**
+     * Called after this widget is rebuild aka size and pos are set.
+     */
     @SideOnly(Side.CLIENT)
     public void onRebuild() {
     }
 
+    /**
+     * Causes the modular ui to re-layout all children next screen update
+     */
     public void checkNeedsRebuild() {
         if (isInitialised()) {
             window.markNeedsRebuild();
@@ -214,6 +235,21 @@ public abstract class Widget {
     public void onRemoveFocus() {
     }
 
+    /**
+     * @return if the modular ui currently has this widget focused
+     */
+    @SideOnly(Side.CLIENT)
+    public boolean isFocused() {
+        return getContext().getScreen().isFocused(this);
+    }
+
+    /**
+     * Removes the focus from this widget. Does nothing if it isn't focused
+     */
+    @SideOnly(Side.CLIENT)
+    public void removeFocus() {
+        getContext().getScreen().removeFocus(this);
+    }
 
     //==== Getter ====
 
@@ -267,9 +303,23 @@ public abstract class Widget {
         return fixedPos != null;
     }
 
+    public boolean isAutoSized() {
+        return autoSized;
+    }
+
+    @Nullable
+    public IDrawable getBackground() {
+        return background;
+    }
+
 
     //==== Setter/Builder ====
 
+    /**
+     * If widgets are NOT enabled, the wont be rendered and they can not be interacted with.
+     *
+     * @param enabled if this widget should be enabled
+     */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
@@ -278,6 +328,11 @@ public abstract class Widget {
         return setSize(new Size(width, height));
     }
 
+    /**
+     * Forces the widget to a size
+     *
+     * @param size size of this widget
+     */
     public Widget setSize(Size size) {
         checkNeedsRebuild();
         this.autoSized = false;
@@ -289,6 +344,11 @@ public abstract class Widget {
         return setPos(new Pos2d(x, y));
     }
 
+    /**
+     * Sets this widget to a pos relative to the parents pos
+     *
+     * @param relativePos relative pos
+     */
     public Widget setPos(Pos2d relativePos) {
         checkNeedsRebuild();
         this.relativePos = relativePos;
@@ -299,15 +359,33 @@ public abstract class Widget {
         return setFixedPos(new Pos2d(x, y));
     }
 
+    /**
+     * Sets the widgets pos to a fixed point. It will never move
+     *
+     * @param pos pos to fix this widget to
+     */
     public Widget setFixedPos(@Nullable Pos2d pos) {
         checkNeedsRebuild();
         this.fixedPos = pos;
         return this;
     }
 
+    /**
+     * Sets the widgets size to it's parent size
+     */
     public Widget fillParent() {
         this.fillParent = true;
         this.autoSized = true;
+        return this;
+    }
+
+    /**
+     * Sets a static background drawable. For more dynamic rendering, the widget should implement {@link IWidgetDrawable}
+     *
+     * @param drawable background to render
+     */
+    public Widget setBackground(@Nullable IDrawable drawable) {
+        this.background = drawable;
         return this;
     }
 

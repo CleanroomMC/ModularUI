@@ -1,5 +1,12 @@
 package com.cleanroommc.modularui.api.math;
 
+import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.common.internal.JsonHelper;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import javax.annotation.Nullable;
+
 public class Color {
 
     /**
@@ -144,6 +151,36 @@ public class Color {
      */
     public static int[] getValues(int rgba) {
         return new int[]{getRed(rgba), getGreen(rgba), getBlue(rgba), getAlpha(rgba)};
+    }
+
+    @Nullable
+    public static Integer ofJson(JsonElement jsonElement) {
+        if (jsonElement.isJsonPrimitive()) {
+            return jsonElement.getAsInt();
+        }
+        if (jsonElement.isJsonArray()) {
+            return null;
+        }
+        if (jsonElement.isJsonObject()) {
+            JsonObject json = jsonElement.getAsJsonObject();
+            int red = JsonHelper.getInt(json, 255, "r", "red");
+            int green = JsonHelper.getInt(json, 255, "g", "green");
+            int blue = JsonHelper.getInt(json, 255, "b", "blue");
+            int alpha = JsonHelper.getInt(json, 255, "a", "alpha");
+            return Color.rgba(red, green, blue, alpha);
+        }
+        String string = jsonElement.getAsString();
+        if (string.startsWith("#")) {
+            string = string.substring(1);
+        } else if (string.startsWith("0x")) {
+            string = string.substring(2);
+        }
+        try {
+            return Integer.parseInt(string, 16);
+        } catch (NumberFormatException e) {
+            ModularUI.LOGGER.error("Error parsing json color {}", jsonElement);
+        }
+        return null;
     }
 
     private Color() {

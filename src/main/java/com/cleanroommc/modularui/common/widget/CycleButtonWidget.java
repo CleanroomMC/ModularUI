@@ -2,11 +2,12 @@ package com.cleanroommc.modularui.common.widget;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ISyncedWidget;
+import com.cleanroommc.modularui.api.IWidgetDrawable;
 import com.cleanroommc.modularui.api.Interactable;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.drawable.UITexture;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
-import com.cleanroommc.modularui.common.drawable.IDrawable;
-import com.cleanroommc.modularui.common.drawable.UITexture;
 import net.minecraft.network.PacketBuffer;
 
 import javax.annotation.Nullable;

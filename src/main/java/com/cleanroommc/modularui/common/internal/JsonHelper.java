@@ -2,7 +2,7 @@ package com.cleanroommc.modularui.common.internal;
 
 import com.cleanroommc.modularui.api.IWidgetBuilder;
 import com.cleanroommc.modularui.common.widget.Widget;
-import com.cleanroommc.modularui.common.widget.WidgetRegistry;
+import com.cleanroommc.modularui.common.widget.WidgetJsonRegistry;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -23,7 +23,7 @@ public class JsonHelper {
                         continue;
                     }
                     type = jsonWidget.get("type").getAsString();
-                    WidgetRegistry.WidgetFactory widgetFactory = WidgetRegistry.getFactory(type);
+                    WidgetJsonRegistry.WidgetFactory widgetFactory = WidgetJsonRegistry.getFactory(type);
                     if (widgetFactory != null) {
                         widget = widgetFactory.create(buildContext.getPlayer());
                     }
