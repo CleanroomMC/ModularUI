@@ -75,6 +75,14 @@ public class GuiHelper {
         if (maxWidth < 0) {
             maxWidth = Integer.MAX_VALUE;
         }
+        RenderTooltipEvent.Pre event = new RenderTooltipEvent.Pre(ItemStack.EMPTY, lines, mousePos.x, mousePos.y, screenSize.width, screenSize.height, maxWidth, TextRenderer.FR);
+        if (MinecraftForge.EVENT_BUS.post(event)) {
+            return;
+        }
+        mousePos = new Pos2d(event.getX(), event.getY());
+        screenSize = new Size(event.getScreenWidth(), event.getScreenHeight());
+        maxWidth = event.getMaxWidth();
+
         int maxTextWidth = maxWidth;
 
         boolean mouseOnRightSide = false;
