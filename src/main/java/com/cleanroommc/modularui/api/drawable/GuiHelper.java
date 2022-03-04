@@ -61,7 +61,7 @@ public class GuiHelper {
             return;
         }
         List<String> lines = textLines.stream().map(Text::getFormatted).collect(Collectors.toList());
-        drawHoveringTextFormatted(lines, mousePos, screenSize, maxWidth);
+        drawHoveringTextFormatted(lines, mousePos, screenSize, maxWidth, scale, forceShadow);
     }
 
     public static void drawHoveringTextFormatted(List<String> lines, Pos2d mousePos, Size screenSize, int maxWidth) {
@@ -78,7 +78,7 @@ public class GuiHelper {
         int maxTextWidth = maxWidth;
 
         boolean mouseOnRightSide = false;
-        int screenSpaceRight = screenSize.width - mousePos.x - 12;
+        int screenSpaceRight = screenSize.width - mousePos.x - 16;
         if (mousePos.x > screenSize.width / 2f) {
             if (maxTextWidth > screenSpaceRight) {
                 mouseOnRightSide = true;
@@ -106,7 +106,7 @@ public class GuiHelper {
 
         renderer.setBreakOnHitRightBorder(false);
         if (mouseOnRightSide && renderer.didHitRightBorder()) {
-            maxTextWidth = Math.min(maxWidth, screenSize.width - (screenSize.width - mousePos.x) - 15);
+            maxTextWidth = Math.min(maxWidth, screenSize.width - (screenSize.width - mousePos.x) - 16);
             renderer.setUp(mousePos, 0, maxTextWidth);
             for (String line : lines) {
                 Size lineSize = renderer.calcSize(line);

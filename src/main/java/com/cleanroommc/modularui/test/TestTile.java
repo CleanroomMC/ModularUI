@@ -25,7 +25,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
         ModularWindow.Builder builder = ModularWindow.builder(new Size(176, 166))
                 .addFromJson("modularui:test", buildContext);
         buildContext.applyToWidget("background", DrawableWidget.class, widget -> {
-            widget.getOrCreateTooltip()
+            widget.getOrCreateTooltip().setScale(0.5f)
                     .addLine("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.")
                     .addLine("Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.")
                     .addLine("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet");
