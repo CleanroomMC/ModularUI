@@ -28,8 +28,8 @@ public abstract class Widget {
     private IWidgetParent parent = null;
 
     // sizing and positioning
-    protected Size size = Size.zero();
-    protected Pos2d relativePos = Pos2d.zero();
+    protected Size size = Size.ZERO;
+    protected Pos2d relativePos = Pos2d.ZERO;
     protected Pos2d pos = null;
     protected Pos2d fixedPos = null;
     private boolean fillParent = false;
@@ -223,7 +223,7 @@ public abstract class Widget {
     //==== focus ====
 
     /**
-     * Called when this widget is clicked.
+     * Called when this widget is clicked. Also acts as a onReceiveFocus method.
      *
      * @return if the ui focus should be set to this widget
      */
@@ -256,6 +256,11 @@ public abstract class Widget {
     }
 
     //==== Getter ====
+
+
+    public String getName() {
+        return name;
+    }
 
     @SideOnly(Side.CLIENT)
     public boolean isUnderMouse() {
@@ -318,6 +323,13 @@ public abstract class Widget {
 
     public TooltipContainer getTooltip() {
         return tooltip;
+    }
+
+    public TooltipContainer getOrCreateTooltip() {
+        if (this.tooltip == null) {
+            setTooltip(new TooltipContainer());
+        }
+        return this.tooltip;
     }
 
     //==== Setter/Builder ====

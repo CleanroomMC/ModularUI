@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.ModContainer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -47,7 +48,7 @@ public class JsonLoader {
 
     public static JsonObject tryExtractFromFile(Path filePath) {
         try (InputStream fileStream = Files.newInputStream(filePath)) {
-            InputStreamReader streamReader = new InputStreamReader(fileStream);
+            InputStreamReader streamReader = new InputStreamReader(fileStream, StandardCharsets.UTF_8);
             return jsonParser.parse(streamReader).getAsJsonObject();
         } catch (IOException exception) {
             ModularUI.LOGGER.error("Failed to read file on path {}", filePath, exception);

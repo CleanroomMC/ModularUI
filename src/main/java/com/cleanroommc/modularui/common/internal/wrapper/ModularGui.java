@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.common.internal.wrapper;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IWidgetDrawable;
 import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.Interactable;
@@ -10,6 +9,7 @@ import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.internal.ModularUIContext;
+import com.cleanroommc.modularui.common.widget.SlotWidget;
 import com.cleanroommc.modularui.common.widget.Widget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -71,7 +71,7 @@ public class ModularGui extends GuiContainer {
         }
     }
 
-    public void setHovered(Widget widget) {
+    private void setHovered(Widget widget) {
         if (hovered != widget) {
             hovered = widget;
             timeHovered = 0;
@@ -82,7 +82,6 @@ public class ModularGui extends GuiContainer {
     public void onResize(Minecraft mc, int w, int h) {
         super.onResize(mc, w, h);
         context.resize(new Size(w, h));
-        ModularUI.LOGGER.info("Resized screen");
     }
 
     @Override
@@ -168,13 +167,14 @@ public class ModularGui extends GuiContainer {
             return false;
         });
 
-        setHovered(context.getTopWidgetAt(getMousePos()));
-        if (hovered != null) {
+        if (hovered != null && !(hovered instanceof SlotWidget)) {
             TooltipContainer tooltipContainer = hovered.getTooltip();
             if (tooltipContainer != null && tooltipContainer.getShowUpDelay() <= timeHovered) {
                 tooltipContainer.draw(context);
             }
         }
+        // draw vanilla item slot tooltip
+        renderHoveredToolTip(mouseX, mouseY);
 
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableLighting();
@@ -218,6 +218,7 @@ public class ModularGui extends GuiContainer {
     public void updateScreen() {
         super.updateScreen();
         context.getCurrentWindow().update();
+        setHovered(context.getTopWidgetAt(getMousePos()));
         if (hovered != null) {
             timeHovered++;
         }
@@ -238,21 +239,18 @@ public class ModularGui extends GuiContainer {
             interactable.onClick(mouseButton, doubleClick);
         }
         Widget widget = context.getTopWidgetAt(mousePos);
-        boolean shouldFocus = false;
         if (widget != null) {
             if (widget instanceof Interactable) {
                 Interactable interactable = (Interactable) widget;
                 doubleClick = focused == interactable && isDoubleClick(lastFocusedClick, time);
                 interactable.onClick(mouseButton, doubleClick);
             }
-            if (focused != null) {
-                if (focused != widget) {
-                    focused.onRemoveFocus();
-                    if (widget.shouldGetFocus()) {
-                        focused = widget;
-                    } else {
-                        focused = null;
-                    }
+            if (focused != null && focused != widget) {
+                focused.onRemoveFocus();
+                if (widget.shouldGetFocus()) {
+                    focused = widget;
+                } else {
+                    focused = null;
                 }
             }
         } else if (focused != null) {

@@ -31,6 +31,9 @@ public class JsonHelper {
                         continue;
                     }
                     widget.readJson(jsonWidget, type);
+                    if (!widget.getName().isEmpty()) {
+                        buildContext.addJsonWidgets(widget.getName(), widget);
+                    }
                     widgetBuilder.widget(widget);
                     if (widget instanceof IWidgetBuilder && jsonWidget.has("widgets")) {
                         parseJson((IWidgetBuilder<?>) widget, jsonWidget, buildContext);

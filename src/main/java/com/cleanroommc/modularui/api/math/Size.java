@@ -10,6 +10,8 @@ import java.util.Objects;
 
 public class Size {
 
+    public static final Size ZERO = zero();
+
     public static Size zero() {
         return new Size(0, 0);
     }

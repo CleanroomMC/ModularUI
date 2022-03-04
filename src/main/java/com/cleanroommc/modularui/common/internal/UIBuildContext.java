@@ -7,6 +7,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class UIBuildContext {
 
@@ -40,5 +41,14 @@ public class UIBuildContext {
             return (T) widget;
         }
         return null;
+    }
+
+    public <T extends Widget> void applyToWidget(String name, Class<T> clazz, Consumer<T> consumer) {
+        T t = getJsonWidget(name, clazz);
+        if (t != null) {
+            consumer.accept(t);
+        } else {
+            ModularUI.LOGGER.error("Expected Widget with name {}, of class {}, but was not found!", name, clazz.getName());
+        }
     }
 }

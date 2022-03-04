@@ -180,7 +180,7 @@ public final class ModularWindow implements IWidgetParent {
     public static class Builder implements IWidgetBuilder<Builder> {
 
         private final List<Widget> widgets = new ArrayList<>();
-        private Size size = Size.zero();
+        private Size size;
         private boolean draggable = false;
 
         private Builder(Size size) {

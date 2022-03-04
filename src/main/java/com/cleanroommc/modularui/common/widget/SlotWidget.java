@@ -1,9 +1,7 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.api.ISyncedWidget;
-import com.cleanroommc.modularui.api.IVanillaSlot;
-import com.cleanroommc.modularui.api.IWidgetDrawable;
-import com.cleanroommc.modularui.api.Interactable;
+import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.*;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
@@ -88,6 +86,12 @@ public class SlotWidget extends Widget implements IVanillaSlot, IWidgetDrawable,
 
     public SlotWidget setTextureSize(Size textureSize) {
         this.textureSize = textureSize;
+        return this;
+    }
+
+    @Override
+    public SlotWidget setTooltip(TooltipContainer tooltip) {
+        ModularUI.LOGGER.warn("ModularUI can not have Tooltip on item slots. They will clash with vanilla tooltips.");
         return this;
     }
 

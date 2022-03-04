@@ -147,6 +147,34 @@ public class Color {
     }
 
     /**
+     * @return the red value
+     */
+    public static float getRedF(int rgba) {
+        return getRed(rgba) / 255f;
+    }
+
+    /**
+     * @return the green value
+     */
+    public static float getGreenF(int rgba) {
+        return getGreen(rgba) / 255f;
+    }
+
+    /**
+     * @return the blue value
+     */
+    public static float getBlueF(int rgba) {
+        return getBlue(rgba) / 255f;
+    }
+
+    /**
+     * @return the alpha value
+     */
+    public static float getAlphaF(int rgba) {
+        return getAlpha(rgba) / 255f;
+    }
+
+    /**
      * @return rgba as an array [red, green, blue, alpha]
      */
     public static int[] getValues(int rgba) {

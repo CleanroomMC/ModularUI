@@ -32,7 +32,7 @@ public class DrawableWidget extends Widget implements IWidgetDrawable {
     @Override
     public void drawInBackground(float partialTicks) {
         if (drawable != null) {
-            drawable.draw(Pos2d.zero(), getSize(), partialTicks);
+            drawable.draw(Pos2d.ZERO, getSize(), partialTicks);
         }
     }
 }

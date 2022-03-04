@@ -56,7 +56,7 @@ public class TextWidget extends Widget implements IWidgetDrawable {
     @Override
     protected Size determineSize() {
         this.localised = Text.getFormatted(text);
-        return TextRenderer.calcTextSize(localised, getWindow().getSize().width, 1);
+        return TextRenderer.calcTextSize(localised, getWindow().getSize().width - getPos().x, 1);
     }
 
     @Override

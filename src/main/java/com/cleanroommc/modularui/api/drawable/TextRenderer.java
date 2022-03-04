@@ -33,7 +33,7 @@ public class TextRenderer {
     }
 
     public static Size calcTextSize(String text, float maxWidth, float textScale) {
-        TextRenderer renderer = new TextRenderer(Pos2d.zero(), DEFAULT_COLOR, maxWidth);
+        TextRenderer renderer = new TextRenderer(Pos2d.ZERO, DEFAULT_COLOR, maxWidth);
         renderer.setScale(textScale);
         return renderer.calcSize(text);
     }
@@ -42,15 +42,19 @@ public class TextRenderer {
         return FORMAT_CHAR + "{#" + Integer.toHexString(color) + "}";
     }
 
-    private final float maxX;
+    private float maxX;
     private int color;
-    private final int defaultColor;
+    private int defaultColor;
     private float scale = 1f;
-    private final Pos2d pos;
+    private Pos2d pos;
     private float currentX, currentY;
     private float currentWidth = 0;
+    private float maxWidth = 0;
     private StringBuilder word;
     private boolean needsNewLine = false;
+    private boolean forceShadow = false;
+    private boolean didHitRightBorder = false;
+    private boolean breakOnHitRightBorder = false;
 
     /**
      * Need to keep track of styles, because mc resets them on each draw call
@@ -67,23 +71,48 @@ public class TextRenderer {
 
     private boolean calcSizeMode = false;
 
+    public TextRenderer() {
+    }
+
     public TextRenderer(Pos2d pos, int color, float maxWidth) {
+        setUp(pos, color, maxWidth);
+    }
+
+    public void setUp(Pos2d pos, int color, float maxWidth) {
         this.maxX = pos.x + maxWidth;
         this.color = color;
         this.defaultColor = color;
         this.pos = pos;
         this.currentX = pos.x;
         this.currentY = pos.y;
+        this.didHitRightBorder = false;
     }
 
     public void setScale(float scale) {
         this.scale = scale;
     }
 
+    public void forceShadow(boolean forceShadow) {
+        this.forceShadow = forceShadow;
+        this.shadowStyle = forceShadow;
+    }
+
+    public void setBreakOnHitRightBorder(boolean breakOnHitRightBorder) {
+        this.breakOnHitRightBorder = breakOnHitRightBorder;
+    }
+
+    public boolean didHitRightBorder() {
+        return didHitRightBorder;
+    }
+
+    public Pos2d getLastPos() {
+        return new Pos2d(currentX, currentY);
+    }
+
     public Size calcSize(String text) {
         calcSizeMode = true;
         draw(text);
-        int sizeX = (int) (currentY > pos.y ? maxX - pos.x : currentX - pos.x);
+        int sizeX = (int) (Math.max(maxWidth, currentX - pos.x));
         int sizeY = (int) (currentY - pos.y + FR.FONT_HEIGHT * scale);
         calcSizeMode = false;
         return new Size(sizeX, sizeY);
@@ -140,6 +169,9 @@ public class TextRenderer {
                     addChar(c);
                 }
             }
+            if (breakOnHitRightBorder && didHitRightBorder) {
+                return;
+            }
         }
         drawWord();
         if (!calcSizeMode) {
@@ -179,11 +211,19 @@ public class TextRenderer {
     private void addChar(char c, boolean addToWidth) {
         if (addToWidth) {
             float charWidth = FR.getCharWidth(c) * scale;
+            // line will is to wide with this character
             if (currentX + currentWidth + charWidth > maxX) {
+                // word occupies the whole width or a new word starts
+                didHitRightBorder = true;
                 if (pos.x == currentX || c == ' ') {
                     needsNewLine = true;
                     drawWord();
+                    if (c == ' ') {
+                        // don't add space to new line
+                        return;
+                    }
                 } else {
+                    // go to next line before drawing the current word
                     newLine();
                 }
             }
@@ -192,7 +232,8 @@ public class TextRenderer {
         word.append(c);
     }
 
-    private void newLine() {
+    public void newLine() {
+        maxWidth = Math.max(currentX - pos.x, maxWidth);
         currentX = pos.x;
         currentY += FR.FONT_HEIGHT * scale;
         needsNewLine = false;
@@ -204,7 +245,7 @@ public class TextRenderer {
         this.italicStyle = false;
         this.underlineStyle = false;
         this.strikethroughStyle = false;
-        this.shadowStyle = false;
+        this.shadowStyle = this.forceShadow;
     }
 
     private boolean checkStyleChar(char c) {

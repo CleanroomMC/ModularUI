@@ -4,16 +4,11 @@ import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.internal.JsonHelper;
-import com.cleanroommc.modularui.common.widget.TextWidget;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -26,7 +21,7 @@ public class Text implements IDrawable {
     @Nullable
     private Supplier<Object[]> localisationData;
     private boolean dynamicLocalisation = false;
-    private int color = 0x212121;
+    private int color = Color.rgba(33, 33, 33, 0);
     private boolean shadow = false;
 
     private Text(String text, Supplier<String> textSupplier) {
@@ -76,6 +71,10 @@ public class Text implements IDrawable {
         return color;
     }
 
+    public boolean hasColor() {
+        return Color.getAlpha(color) > 0;
+    }
+
     public boolean hasShadow() {
         return shadow;
     }
@@ -86,7 +85,9 @@ public class Text implements IDrawable {
 
     @Override
     public void draw(Pos2d pos, Size size, float partialTicks) {
-        TextRenderer.drawString(getFormatted(), pos, color, size.width);
+        if (hasColor()) {
+            TextRenderer.drawString(getFormatted(), pos, color, size.width);
+        }
     }
 
     public String getFormatted() {
@@ -94,7 +95,9 @@ public class Text implements IDrawable {
         if (localisationData != null && FMLCommonHandler.instance().getSide().isClient()) {
             text = I18n.format(text, localisationData.get());
         }
-        text = TextRenderer.getColorFormatString(color) + text;
+        if (hasColor()) {
+            text = TextRenderer.getColorFormatString(color) + text;
+        }
         if (hasShadow()) {
             text += TextRenderer.FORMAT_CHAR + 's';
         }
@@ -127,7 +130,7 @@ public class Text implements IDrawable {
             }
             return text;
         }
-        if (!json.isJsonPrimitive() && !json.isJsonArray()) {
+        if (!json.isJsonArray()) {
             return new Text(json.getAsString());
         }
         return new Text("");
