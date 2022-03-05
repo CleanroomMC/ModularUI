@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.common.widget;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IWidgetDrawable;
 import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.TextRenderer;
@@ -17,6 +18,7 @@ public class TextWidget extends Widget implements IWidgetDrawable {
     private Text[] text = {};
     private int defaultColor = TextRenderer.DEFAULT_COLOR;
     private String localised;
+    private final TextRenderer textRenderer = new TextRenderer(Pos2d.ZERO, 0, 0);
 
     public TextWidget() {
     }
@@ -56,12 +58,16 @@ public class TextWidget extends Widget implements IWidgetDrawable {
     @Override
     protected Size determineSize() {
         this.localised = Text.getFormatted(text);
-        return TextRenderer.calcTextSize(localised, getWindow().getSize().width - getPos().x, 1);
+        textRenderer.setUp(Pos2d.ZERO, 0, getWindow().getSize().width - getPos().x);
+        Size size = textRenderer.calculateSize(localised);
+        ModularUI.LOGGER.info("Determined Size {} of width {} of {}", size, getWindow().getSize().width - getPos().x, localised);
+        return size;
     }
 
     @Override
     public void drawInBackground(float partialTicks) {
-        TextRenderer.drawString(localised, Pos2d.ZERO, defaultColor, getSize().width);
+        textRenderer.setUp(Pos2d.ZERO, defaultColor, getSize().width);
+        textRenderer.draw(localised);
     }
 
     public TextWidget setDefaultColor(int color) {

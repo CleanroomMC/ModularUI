@@ -99,28 +99,27 @@ public class GuiHelper {
         TextRenderer renderer = new TextRenderer(mousePos, 0, maxTextWidth);
         renderer.setScale(scale);
         renderer.forceShadow(forceShadow);
-        renderer.setBreakOnHitRightBorder(mouseOnRightSide);
-        int tooltipTextWidth = 0, tooltipHeight = 0;
+        boolean putOnLeft = false;
+        int tooltipTextWidth = 0, tooltipHeight = 0, lastLineHeight = 0;
         for (String line : lines) {
-            Size lineSize = renderer.calcSize(line);
-            if (mouseOnRightSide && renderer.didHitRightBorder()) {
+            Size lineSize = renderer.calculateSize(line);
+            if (mouseOnRightSide && lineSize.height - lastLineHeight > renderer.getFontHeight()) {
+                putOnLeft = true;
                 break;
             }
+            lastLineHeight = lineSize.height;
             tooltipHeight = lineSize.height;
             tooltipTextWidth = Math.max(tooltipTextWidth, lineSize.width);
-            renderer.newLine();
             renderPos = mousePos.add(12, -12);
         }
 
-        renderer.setBreakOnHitRightBorder(false);
-        if (mouseOnRightSide && renderer.didHitRightBorder()) {
+        if (mouseOnRightSide && putOnLeft) {
             maxTextWidth = Math.min(maxWidth, screenSize.width - (screenSize.width - mousePos.x) - 16);
             renderer.setUp(mousePos, 0, maxTextWidth);
             for (String line : lines) {
-                Size lineSize = renderer.calcSize(line);
+                Size lineSize = renderer.calculateSize(line);
                 tooltipHeight = lineSize.height;
                 tooltipTextWidth = Math.max(tooltipTextWidth, lineSize.width);
-                renderer.newLine();
             }
             renderPos = mousePos.add(-12 - tooltipTextWidth, -12);
         }
@@ -166,9 +165,7 @@ public class GuiHelper {
 
         renderer.setUp(pos, color, maxWidth);
         for (String line : lines) {
-            //renderer.setUp(new Pos2d(pos.x, renderer.getLastPos().y), color, maxWidth);
             renderer.draw(line);
-            renderer.newLine();
         }
 
         MinecraftForge.EVENT_BUS.post(new RenderTooltipEvent.PostText(ItemStack.EMPTY, lines, tooltipX, tooltipY, TextRenderer.FR, tooltipTextWidth, tooltipHeight));

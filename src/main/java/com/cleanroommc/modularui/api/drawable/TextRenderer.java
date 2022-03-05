@@ -3,89 +3,66 @@ package com.cleanroommc.modularui.api.drawable;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.common.internal.mixin.FontRendererMixin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-/**
- * Renders strings with custom formatting into constrained sizes.
- * §{#FFFFFF} will color something white
- * §s will add shadow
- */
-@SideOnly(Side.CLIENT)
 public class TextRenderer {
 
     public static final FontRenderer FR = Minecraft.getMinecraft().fontRenderer;
     public static final char FORMAT_CHAR = '\u00a7';
     public static int DEFAULT_COLOR = 0x212121;
 
-    public static void drawString(String text, Pos2d pos, int color, float maxWidth) {
-        TextRenderer renderer = new TextRenderer(pos, color, maxWidth);
-        renderer.draw(text);
-    }
-
-    public static void drawString(String text, Pos2d pos, int color, float maxWidth, float textScale) {
-        TextRenderer renderer = new TextRenderer(pos, color, maxWidth);
-        renderer.setScale(textScale);
-        renderer.draw(text);
-    }
-
-    public static Size calcTextSize(String text, float maxWidth, float textScale) {
-        TextRenderer renderer = new TextRenderer(Pos2d.ZERO, DEFAULT_COLOR, maxWidth);
-        renderer.setScale(textScale);
-        return renderer.calcSize(text);
-    }
-
     public static String getColorFormatString(int color) {
         return FORMAT_CHAR + "{#" + Integer.toHexString(color) + "}";
     }
 
-    private float maxX;
-    private int color;
-    private int defaultColor;
-    private float scale = 1f;
-    private Pos2d pos;
-    private float currentX, currentY;
-    private float currentWidth = 0;
-    private float maxWidth = 0;
-    private StringBuilder word;
-    private boolean needsNewLine = false;
-    private boolean forceShadow = false;
-    private boolean didHitRightBorder = false;
-    private boolean breakOnHitRightBorder = false;
-
-    /**
-     * Need to keep track of styles, because mc resets them on each draw call
-     */
-    private boolean randomStyle;
-    private boolean boldStyle;
-    private boolean italicStyle;
-    private boolean underlineStyle;
-    private boolean strikethroughStyle;
-    /**
-     * Custom style §s
-     */
-    private boolean shadowStyle;
-
-    private boolean calcSizeMode = false;
-
-    public TextRenderer() {
+    public static void drawString(String text, Pos2d pos, int color, int maxWidth) {
+        TextRenderer renderer = new TextRenderer(pos, color, maxWidth);
+        renderer.draw(text);
     }
 
-    public TextRenderer(Pos2d pos, int color, float maxWidth) {
+    public static void drawString(String text, Pos2d pos, int color, int maxWidth, float textScale) {
+        TextRenderer renderer = new TextRenderer(pos, color, maxWidth);
+        renderer.setScale(textScale);
+        renderer.draw(text);
+    }
+
+    private Pos2d pos;
+    private int defaultColor = DEFAULT_COLOR;
+    private float scale = 1f;
+    private int maxX;
+    private boolean forceShadow = false;
+    private boolean doDraw = true;
+    private Pos2d posToFind = null;
+
+    private int currentX, currentColor, wordWith = 0, totalLength = 0;
+    private StringBuilder currentWord;
+    private int width = 0, height = 0;
+    private int foundIndex = -1;
+
+    private boolean shadowStyle;
+
+    public TextRenderer(Pos2d pos, int color, int maxWidth) {
         setUp(pos, color, maxWidth);
     }
 
-    public void setUp(Pos2d pos, int color, float maxWidth) {
+    public void setUp(Pos2d pos, int color, int maxWidth) {
         this.maxX = pos.x + maxWidth;
-        this.color = color;
+        this.currentColor = color;
         this.defaultColor = color;
         this.pos = pos;
         this.currentX = pos.x;
-        this.currentY = pos.y;
-        this.didHitRightBorder = false;
+        this.totalLength = 0;
+        this.width = 0;
+        this.height = 0;
+        this.foundIndex = -1;
+        this.posToFind = null;
+        this.doDraw = true;
     }
 
     public void setScale(float scale) {
@@ -97,29 +74,43 @@ public class TextRenderer {
         this.shadowStyle = forceShadow;
     }
 
-    public void setBreakOnHitRightBorder(boolean breakOnHitRightBorder) {
-        this.breakOnHitRightBorder = breakOnHitRightBorder;
+    public int getFoundIndex() {
+        return foundIndex;
     }
 
-    public boolean didHitRightBorder() {
-        return didHitRightBorder;
+    public int getWidth() {
+        return width;
     }
 
-    public Pos2d getLastPos() {
-        return new Pos2d(currentX, currentY);
+    public int getHeight() {
+        return height;
     }
 
-    public Size calcSize(String text) {
-        calcSizeMode = true;
+    public void setDoDraw(boolean doDraw) {
+        this.doDraw = doDraw;
+    }
+
+    public int findPos(Pos2d pos, String text) {
+        setDoDraw(false);
+        this.posToFind = pos;
         draw(text);
-        int sizeX = (int) (Math.max(maxWidth, currentX - pos.x));
-        int sizeY = (int) (currentY - pos.y + FR.FONT_HEIGHT * scale);
-        calcSizeMode = false;
-        return new Size(sizeX, sizeY);
+        setDoDraw(true);
+        return foundIndex;
+    }
+
+    public void setPosToFind(Pos2d pos) {
+        this.posToFind = pos;
+    }
+
+    public Size calculateSize(String text) {
+        setDoDraw(false);
+        draw(text);
+        setDoDraw(true);
+        return new Size(width, height);
     }
 
     public void draw(String text) {
-        word = new StringBuilder();
+        currentWord = new StringBuilder();
         resetStyles();
 
         boolean wasFormatChar = false;
@@ -132,14 +123,14 @@ public class TextRenderer {
                     wasFormatChar = false;
                 }
                 addChar(' ');
-                drawWord();
+                newWord();
             } else if (c == '\n') {
                 if (wasFormatChar) {
                     addChar('\u00a7');
                     wasFormatChar = false;
                 }
-                needsNewLine = true;
-                drawWord();
+                newWord();
+                newLine();
             } else if (wasFormatChar) {
                 if (c == '{') {
                     int closing = text.indexOf('}', i + 1);
@@ -148,10 +139,10 @@ public class TextRenderer {
                         addChar('{');
                         break;
                     }
-                    drawWord();
+                    newWord();
                     String color = text.substring(i + 2, closing);
                     try {
-                        this.color = Integer.parseInt(color, 16);
+                        this.currentColor = Integer.parseInt(color, 16);
                     } catch (NumberFormatException e) {
                         ModularUI.LOGGER.throwing(e);
                     }
@@ -169,39 +160,40 @@ public class TextRenderer {
                     addChar(c);
                 }
             }
-            if (breakOnHitRightBorder && didHitRightBorder) {
-                return;
+            if (foundIndex >= 0) {
+                break;
             }
         }
-        drawWord();
-        if (!calcSizeMode) {
+        newWord();
+        newLine();
+        if (doDraw && FMLCommonHandler.instance().getSide().isClient()) {
             GlStateManager.color(1f, 1f, 1f, 1f);
         }
     }
 
+    private void newWord() {
+        if (doDraw && FMLCommonHandler.instance().getSide().isClient()) {
+            drawWord();
+        }
+        this.currentWord = new StringBuilder();
+        currentX += wordWith;
+        wordWith = 0;
+    }
+
+    @SideOnly(Side.CLIENT)
     private void drawWord() {
-        if (!calcSizeMode) {
-            String word = this.word.toString();
-            if (word.isEmpty()) {
-                return;
-            }
-            word = getActiveStyles() + word;
-
-            GlStateManager.disableBlend();
-            GlStateManager.pushMatrix();
-            GlStateManager.scale(scale, scale, 0f);
-            float sf = 1 / scale;
-            FR.drawString(word, currentX * sf, currentY * sf, color, shadowStyle);
-            GlStateManager.popMatrix();
-            GlStateManager.enableBlend();
+        String word = this.currentWord.toString();
+        if (word.isEmpty()) {
+            return;
         }
 
-        this.word = new StringBuilder();
-        currentX += currentWidth;
-        currentWidth = 0;
-        if (needsNewLine) {
-            newLine();
-        }
+        GlStateManager.disableBlend();
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(scale, scale, 0f);
+        float sf = 1 / scale;
+        renderText(word, currentX * sf, (pos.y + height) * sf, currentColor, shadowStyle, false);
+        GlStateManager.popMatrix();
+        GlStateManager.enableBlend();
     }
 
     private void addChar(char c) {
@@ -212,12 +204,13 @@ public class TextRenderer {
         if (addToWidth) {
             float charWidth = FR.getCharWidth(c) * scale;
             // line will is to wide with this character
-            if (currentX + currentWidth + charWidth > maxX) {
+            if (currentX + wordWith + charWidth > maxX) {
                 // word occupies the whole width or a new word starts
-                didHitRightBorder = true;
+                //didHitRightBorder = true;
                 if (pos.x == currentX || c == ' ') {
-                    needsNewLine = true;
-                    drawWord();
+                    //needsNewLine = true;
+                    newWord();
+                    newLine();
                     if (c == ' ') {
                         // don't add space to new line
                         return;
@@ -227,25 +220,28 @@ public class TextRenderer {
                     newLine();
                 }
             }
-            currentWidth += charWidth;
+            if (posToFind != null) {
+                if (pos.y + height <= posToFind.y && pos.y + height + getFontHeight() > posToFind.y &&
+                        currentX + wordWith <= posToFind.x && currentX + wordWith + charWidth > posToFind.x) {
+                    foundIndex = totalLength;
+                }
+            }
+            wordWith += charWidth;
         }
-        word.append(c);
+        currentWord.append(c);
+        totalLength++;
     }
 
     public void newLine() {
-        maxWidth = Math.max(currentX - pos.x, maxWidth);
+        width = Math.max(currentX - pos.x, width);
+        height += getFontHeight();
         currentX = pos.x;
-        currentY += FR.FONT_HEIGHT * scale;
-        needsNewLine = false;
     }
 
     private void resetStyles() {
-        this.randomStyle = false;
-        this.boldStyle = false;
-        this.italicStyle = false;
-        this.underlineStyle = false;
-        this.strikethroughStyle = false;
+        getMixinRenderer().invokeResetStyles();
         this.shadowStyle = this.forceShadow;
+        this.currentColor = this.defaultColor;
     }
 
     private boolean checkStyleChar(char c) {
@@ -254,34 +250,16 @@ public class TextRenderer {
             switch (c) {
                 case 'r':
                 case 'R':
-                    if (this.color != defaultColor) {
-                        drawWord();
-                        this.color = defaultColor;
+                    if (this.currentColor != defaultColor || (shadowStyle && !forceShadow)) {
+                        newWord();
                     }
                     resetStyles();
                     break;
-                case 'k':
-                case 'K':
-                    randomStyle = true;
-                    break;
-                case 'l':
-                case 'L':
-                    boldStyle = true;
-                    break;
-                case 'o':
-                case 'O':
-                    italicStyle = true;
-                    break;
-                case 'n':
-                case 'N':
-                    underlineStyle = true;
-                    break;
-                case 'm':
-                case 'M':
-                    strikethroughStyle = true;
-                    break;
                 case 's':
                 case 'S':
+                    if (!shadowStyle) {
+                        newWord();
+                    }
                     shadowStyle = true;
                     break;
             }
@@ -289,27 +267,8 @@ public class TextRenderer {
         return !(formatSpecial || isFormatColor(c));
     }
 
-    private String getActiveStyles() {
-        StringBuilder builder = new StringBuilder();
-        if (randomStyle) {
-            builder.append(FORMAT_CHAR).append('k');
-        }
-        if (boldStyle) {
-            builder.append(FORMAT_CHAR).append('l');
-        }
-        if (italicStyle) {
-            builder.append(FORMAT_CHAR).append('o');
-        }
-        if (underlineStyle) {
-            builder.append(FORMAT_CHAR).append('n');
-        }
-        if (strikethroughStyle) {
-            builder.append(FORMAT_CHAR).append('m');
-        }
-        if (shadowStyle) {
-            builder.append(FORMAT_CHAR).append('s');
-        }
-        return builder.toString();
+    public float getFontHeight() {
+        return FR.FONT_HEIGHT * scale;
     }
 
     private static boolean isFormatColor(char colorChar) {
@@ -321,5 +280,32 @@ public class TextRenderer {
                 formatChar >= 'K' && formatChar <= 'O' ||
                 formatChar == 'r' || formatChar == 'R' ||
                 formatChar == 's' || formatChar == 'S';
+    }
+
+    /**
+     * A different version of {@link FontRenderer#drawString(String, float, float, int, boolean)}, which optionally calls resetStyles.
+     *
+     * @param resetStyles if styles should be reset before rendering.
+     * @return width
+     */
+    public static int renderText(String text, float x, float y, int color, boolean dropShadow, boolean resetStyles) {
+        FontRendererMixin fr = getMixinRenderer();
+        GlStateManager.enableAlpha();
+        if (resetStyles) {
+            fr.invokeResetStyles();
+        }
+        int i;
+
+        if (dropShadow) {
+            i = fr.invokeRenderString(text, x + 1.0F, y + 1.0F, color, true);
+            i = Math.max(i, fr.invokeRenderString(text, x, y, color, false));
+        } else {
+            i = fr.invokeRenderString(text, x, y, color, false);
+        }
+        return i;
+    }
+
+    private static FontRendererMixin getMixinRenderer() {
+        return (FontRendererMixin) (Object) FR;
     }
 }
