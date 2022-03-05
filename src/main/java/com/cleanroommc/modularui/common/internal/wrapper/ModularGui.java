@@ -234,30 +234,38 @@ public class ModularGui extends GuiContainer {
         long time = Minecraft.getSystemTime();
         boolean doubleClick = isDoubleClick(lastClick, time);
         lastClick = time;
-        Pos2d mousePos = getMousePos();
         for (Interactable interactable : context.getCurrentWindow().getInteractionListeners()) {
             interactable.onClick(mouseButton, doubleClick);
         }
+
+        boolean changedFocus = tryFindFocused();
+
+        if (focused instanceof Interactable) {
+            Interactable interactable = (Interactable) focused;
+            doubleClick = !changedFocus && isDoubleClick(lastFocusedClick, time);
+            interactable.onClick(mouseButton, doubleClick);
+        }
+
+        lastFocusedClick = time;
+    }
+
+    private boolean tryFindFocused() {
         Widget widget = context.getTopWidgetAt(mousePos);
+        boolean changedFocus = false;
         if (widget != null) {
-            if (widget instanceof Interactable) {
-                Interactable interactable = (Interactable) widget;
-                doubleClick = focused == interactable && isDoubleClick(lastFocusedClick, time);
-                interactable.onClick(mouseButton, doubleClick);
-            }
-            if (focused != null && focused != widget) {
-                focused.onRemoveFocus();
-                if (widget.shouldGetFocus()) {
-                    focused = widget;
-                } else {
-                    focused = null;
+            if (focused == null || focused != widget) {
+                if (focused != null) {
+                    focused.onRemoveFocus();
                 }
+                focused = widget.shouldGetFocus() ? widget : null;
+                changedFocus = true;
             }
         } else if (focused != null) {
             focused.onRemoveFocus();
             focused = null;
+            changedFocus = true;
         }
-        lastFocusedClick = time;
+        return changedFocus;
     }
 
     @Override

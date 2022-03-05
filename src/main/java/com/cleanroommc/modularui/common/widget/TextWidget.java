@@ -59,9 +59,7 @@ public class TextWidget extends Widget implements IWidgetDrawable {
     protected Size determineSize() {
         this.localised = Text.getFormatted(text);
         textRenderer.setUp(Pos2d.ZERO, 0, getWindow().getSize().width - getPos().x);
-        Size size = textRenderer.calculateSize(localised);
-        ModularUI.LOGGER.info("Determined Size {} of width {} of {}", size, getWindow().getSize().width - getPos().x, localised);
-        return size;
+        return textRenderer.calculateSize(localised);
     }
 
     @Override

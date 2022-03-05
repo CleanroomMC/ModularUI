@@ -40,8 +40,9 @@ public class TextRenderer {
     private boolean doDraw = true;
     private Pos2d posToFind = null;
 
-    private int currentX, currentColor, wordWith = 0, totalLength = 0;
+    protected int currentX, currentColor, wordWith = 0, currentIndex = 0;
     private StringBuilder currentWord;
+    private boolean breakLine = true;
     private int width = 0, height = 0;
     private int foundIndex = -1;
 
@@ -57,7 +58,7 @@ public class TextRenderer {
         this.defaultColor = color;
         this.pos = pos;
         this.currentX = pos.x;
-        this.totalLength = 0;
+        this.currentIndex = 0;
         this.width = 0;
         this.height = 0;
         this.foundIndex = -1;
@@ -171,17 +172,22 @@ public class TextRenderer {
         }
     }
 
-    private void newWord() {
+    protected void newWord() {
+        newWord(true);
+    }
+
+    protected void newWord(boolean breakLine) {
         if (doDraw && FMLCommonHandler.instance().getSide().isClient()) {
             drawWord();
         }
         this.currentWord = new StringBuilder();
         currentX += wordWith;
         wordWith = 0;
+        this.breakLine = breakLine;
     }
 
     @SideOnly(Side.CLIENT)
-    private void drawWord() {
+    protected void drawWord() {
         String word = this.currentWord.toString();
         if (word.isEmpty()) {
             return;
@@ -191,16 +197,20 @@ public class TextRenderer {
         GlStateManager.pushMatrix();
         GlStateManager.scale(scale, scale, 0f);
         float sf = 1 / scale;
-        renderText(word, currentX * sf, (pos.y + height) * sf, currentColor, shadowStyle, false);
+        renderOther(sf);
+        renderText(word, currentX * sf, getCurrentY() * sf, currentColor, shadowStyle, false);
         GlStateManager.popMatrix();
         GlStateManager.enableBlend();
+    }
+
+    protected void renderOther(float scaleFactor) {
     }
 
     private void addChar(char c) {
         addChar(c, true);
     }
 
-    private void addChar(char c, boolean addToWidth) {
+    protected void addChar(char c, boolean addToWidth) {
         if (addToWidth) {
             float charWidth = FR.getCharWidth(c) * scale;
             // line will is to wide with this character
@@ -216,6 +226,9 @@ public class TextRenderer {
                         return;
                     }
                 } else {
+                    if (!breakLine) {
+                        newWord();
+                    }
                     // go to next line before drawing the current word
                     newLine();
                 }
@@ -223,13 +236,13 @@ public class TextRenderer {
             if (posToFind != null) {
                 if (pos.y + height <= posToFind.y && pos.y + height + getFontHeight() > posToFind.y &&
                         currentX + wordWith <= posToFind.x && currentX + wordWith + charWidth > posToFind.x) {
-                    foundIndex = totalLength;
+                    foundIndex = currentIndex;
                 }
             }
             wordWith += charWidth;
         }
         currentWord.append(c);
-        totalLength++;
+        currentIndex++;
     }
 
     public void newLine() {
@@ -269,6 +282,22 @@ public class TextRenderer {
 
     public float getFontHeight() {
         return FR.FONT_HEIGHT * scale;
+    }
+
+    public static int getDefaultColor() {
+        return DEFAULT_COLOR;
+    }
+
+    public float getScale() {
+        return scale;
+    }
+
+    public int getCurrentIndex() {
+        return currentIndex;
+    }
+
+    public float getCurrentY() {
+        return pos.y + height;
     }
 
     private static boolean isFormatColor(char colorChar) {
