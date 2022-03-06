@@ -9,7 +9,7 @@ import com.cleanroommc.modularui.api.drawable.UITexture;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.google.gson.JsonObject;
 
-public class DrawableWidget extends Widget implements IWidgetDrawable {
+public class DrawableWidget extends Widget {
 
     private IDrawable drawable;
 

@@ -129,13 +129,11 @@ public class ModularGui extends GuiContainer {
                 GlStateManager.pushMatrix();
                 GlStateManager.translate(widget.getAbsolutePos().x, widget.getAbsolutePos().y, 0);
                 GlStateManager.enableBlend();
-                IDrawable background = widget.getBackground();
+                IWidgetDrawable background = widget.getDrawable();
                 if (background != null) {
-                    background.draw(Pos2d.ZERO, widget.getSize(), partialTicks);
+                    background.drawWidgetCustom(widget, partialTicks);
                 }
-                if (widget instanceof IWidgetDrawable) {
-                    ((IWidgetDrawable) widget).drawInBackground(partialTicks);
-                }
+                widget.drawInBackground(partialTicks);
                 GlStateManager.popMatrix();
             }
             return false;
@@ -161,7 +159,7 @@ public class ModularGui extends GuiContainer {
                 GlStateManager.pushMatrix();
                 GlStateManager.translate(widget.getAbsolutePos().x, widget.getAbsolutePos().y, 0);
                 GlStateManager.enableBlend();
-                ((IWidgetDrawable) widget).drawInForeground(partialTicks);
+                widget.drawInForeground(partialTicks);
                 GlStateManager.popMatrix();
             }
             return false;

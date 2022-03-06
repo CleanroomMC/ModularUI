@@ -13,6 +13,8 @@ public class BaseSlot extends SlotItemHandler {
 	protected final boolean output;
 	protected final boolean phantom;
 
+	protected boolean enabled = true;
+
 	public BaseSlot(IItemHandler inventory, int index) {
 		this(inventory, index, false, false);
 	}
@@ -26,6 +28,15 @@ public class BaseSlot extends SlotItemHandler {
 	@Override
 	public boolean isItemValid(ItemStack stack) {
 		return !this.output;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 
 	// handle background by widgets

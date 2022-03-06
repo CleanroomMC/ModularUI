@@ -13,7 +13,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import javax.annotation.Nullable;
 
-public class SlotWidget extends Widget implements IVanillaSlot, IWidgetDrawable, Interactable, ISyncedWidget {
+public class SlotWidget extends Widget implements IVanillaSlot, Interactable, ISyncedWidget {
 
     public static final Size SIZE = new Size(18, 18);
     public static final UITexture TEXTURE = UITexture.fullImage("modularui", "gui/slot/item");
@@ -93,6 +93,12 @@ public class SlotWidget extends Widget implements IVanillaSlot, IWidgetDrawable,
     public SlotWidget setTooltip(TooltipContainer tooltip) {
         ModularUI.LOGGER.warn("ModularUI can not have Tooltip on item slots. They will clash with vanilla tooltips.");
         return this;
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        slot.setEnabled(enabled);
     }
 
     @Override

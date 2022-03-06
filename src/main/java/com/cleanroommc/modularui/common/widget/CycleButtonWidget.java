@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.common.widget;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.ISyncedWidget;
 import com.cleanroommc.modularui.api.IWidgetDrawable;
 import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
@@ -13,7 +12,7 @@ import net.minecraft.network.PacketBuffer;
 import javax.annotation.Nullable;
 import java.util.function.*;
 
-public class CycleButtonWidget extends Widget implements Interactable, ISyncedWidget, IWidgetDrawable {
+public class CycleButtonWidget extends SyncedWidget implements Interactable {
 
     private int state = 0;
     private int length = 1;
@@ -54,7 +53,7 @@ public class CycleButtonWidget extends Widget implements Interactable, ISyncedWi
         }
         this.state = state;
         if (sync) {
-            if (isClient()) {
+            if (isClient() && sendChangesToServer()) {
                 syncToServer(1, buffer -> buffer.writeVarInt(state));
             } else {
                 syncToClient(1, buffer -> buffer.writeVarInt(state));
@@ -82,9 +81,11 @@ public class CycleButtonWidget extends Widget implements Interactable, ISyncedWi
 
     @Override
     public void onServerTick() {
-        int actualValue = getter.getAsInt();
-        if (actualValue != state) {
-            setState(actualValue, true, false);
+        if (detectChangesOnServer()) {
+            int actualValue = getter.getAsInt();
+            if (actualValue != state) {
+                setState(actualValue, true, false);
+            }
         }
     }
 

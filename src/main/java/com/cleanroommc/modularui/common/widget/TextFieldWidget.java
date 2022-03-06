@@ -17,7 +17,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
-public class TextFieldWidget extends Widget implements IWidgetDrawable, Interactable, ISyncedWidget {
+public class TextFieldWidget extends Widget implements Interactable, ISyncedWidget {
 
     // all positive whole numbers
     public static final Pattern NATURAL_NUMS = Pattern.compile("[0-9]*");

@@ -1,13 +1,10 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.api.IWidgetDrawable;
-import com.cleanroommc.modularui.api.IWidgetParent;
-import com.cleanroommc.modularui.api.Interactable;
-import com.cleanroommc.modularui.api.TooltipContainer;
+import com.cleanroommc.modularui.api.*;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.math.GuiArea;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
-import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.common.internal.JsonHelper;
 import com.cleanroommc.modularui.common.internal.ModularUIContext;
 import com.cleanroommc.modularui.common.internal.ModularWindow;
@@ -41,7 +38,7 @@ public abstract class Widget {
 
     // visuals
     @Nullable
-    private IDrawable background;
+    private IWidgetDrawable drawable;
     private TooltipContainer tooltip;
 
     public Widget() {
@@ -84,7 +81,10 @@ public abstract class Widget {
         this.fillParent = JsonHelper.getBoolean(json, false, "fillParent");
         this.enabled = JsonHelper.getBoolean(json, true, "enabled");
         this.autoSized = JsonHelper.getBoolean(json, !json.has("size"), "autoSized");
-        this.background = JsonHelper.getObject(json, null, IDrawable::ofJson, "background");
+        IDrawable drawable = JsonHelper.getObject(json, null, IDrawable::ofJson, "drawable", "background");
+        if (drawable != null) {
+            setBackground(drawable);
+        }
     }
 
 
@@ -192,6 +192,25 @@ public abstract class Widget {
     }
 
 
+    //==== Rendering ====
+
+    /**
+     * Is called before any other draw calls in gui
+     *
+     * @param partialTicks ticks since last draw
+     */
+    public void drawInBackground(float partialTicks) {
+    }
+
+    /**
+     * Is called after most gui draw calls
+     *
+     * @param partialTicks ticks since last draw
+     */
+    public void drawInForeground(float partialTicks) {
+    }
+
+
     //==== Lifecycle ====
 
     /**
@@ -255,8 +274,8 @@ public abstract class Widget {
         getContext().getScreen().removeFocus(this);
     }
 
-    //==== Getter ====
 
+    //==== Getter ====
 
     public String getName() {
         return name;
@@ -317,8 +336,8 @@ public abstract class Widget {
     }
 
     @Nullable
-    public IDrawable getBackground() {
-        return background;
+    public IWidgetDrawable getDrawable() {
+        return drawable;
     }
 
     public TooltipContainer getTooltip() {
@@ -331,6 +350,7 @@ public abstract class Widget {
         }
         return this.tooltip;
     }
+
 
     //==== Setter/Builder ====
 
@@ -403,8 +423,13 @@ public abstract class Widget {
      *
      * @param drawable background to render
      */
-    public Widget setBackground(@Nullable IDrawable drawable) {
-        this.background = drawable;
+    public Widget setBackground(@Nullable IWidgetDrawable drawable) {
+        this.drawable = drawable;
+        return this;
+    }
+
+    public Widget setBackground(IDrawable drawable) {
+        this.drawable = ((widget, partialTicks) -> drawable.draw(Pos2d.ZERO, widget.getSize(), partialTicks));
         return this;
     }
 
@@ -417,6 +442,7 @@ public abstract class Widget {
         this.tooltip = tooltip;
         return this;
     }
+
 
     //==== Utility ====
 

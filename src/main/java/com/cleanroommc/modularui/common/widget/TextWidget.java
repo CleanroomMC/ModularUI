@@ -10,7 +10,7 @@ import com.google.gson.JsonObject;
 
 import javax.annotation.Nullable;
 
-public class TextWidget extends Widget implements IWidgetDrawable {
+public class TextWidget extends Widget {
 
     private final TextSpan text;
     private String localised;
