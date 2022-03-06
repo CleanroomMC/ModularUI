@@ -51,7 +51,8 @@ public interface Interactable {
      * @param character the typed character. Is equal to {@link Character#MIN_VALUE} if it's not a char
      * @param keyCode   code of the typed key. See {@link Keyboard}
      */
-    default void onKeyPressed(char character, int keyCode) {
+    default boolean onKeyPressed(char character, int keyCode) {
+        return false;
     }
 
     /**

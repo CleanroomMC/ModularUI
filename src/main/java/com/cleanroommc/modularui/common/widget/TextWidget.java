@@ -6,10 +6,7 @@ import com.cleanroommc.modularui.api.drawable.TextRenderer;
 import com.cleanroommc.modularui.api.drawable.TextSpan;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 
 import javax.annotation.Nullable;
 
@@ -60,7 +57,7 @@ public class TextWidget extends Widget implements IWidgetDrawable {
 
     @Override
     public void drawInBackground(float partialTicks) {
-        textRenderer.drawAligned(localised, text.getAlignment(), pos, text.getDefaultColor(), size.width);
+        textRenderer.drawAligned(localised, text.getAlignment(), Pos2d.ZERO, text.getDefaultColor(), size.width);
     }
 
     public TextWidget setDefaultColor(int color) {

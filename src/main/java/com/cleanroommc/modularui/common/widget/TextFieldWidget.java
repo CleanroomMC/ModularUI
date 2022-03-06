@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ISyncedWidget;
 import com.cleanroommc.modularui.api.IWidgetDrawable;
 import com.cleanroommc.modularui.api.Interactable;
@@ -9,6 +8,7 @@ import com.cleanroommc.modularui.api.drawable.TextRenderer;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.network.PacketBuffer;
 import org.lwjgl.input.Keyboard;
 
@@ -25,14 +25,18 @@ public class TextFieldWidget extends Widget implements IWidgetDrawable, Interact
     public static final Pattern WHOLE_NUMS = Pattern.compile("-?[0-9]*");
     public static final Pattern DECIMALS = Pattern.compile("[0-9]*(\\.[0-9]*)?");
     public static final Pattern LETTERS = Pattern.compile("[a-zA-Z]*");
+    public static final Pattern ANY = Pattern.compile(".*");
+    private static final Pattern BASE_PATTERN = Pattern.compile("[A-Za-z0-9\\s_+\\-.,!@#$%^&*();\\\\/|<>\"'\\[\\]?=]");
 
     private String text = "";
     private int cursor = 0, cursorEnd = 0;
-    private Pattern pattern = Pattern.compile(".*");
+    private Pattern pattern = ANY;
     private final TextFieldRenderer renderer = new TextFieldRenderer(Pos2d.ZERO, 0, 0);
+    private final TextRenderer helper = new TextRenderer(Pos2d.ZERO, 0, 0);
     private int cursorTimer = 0;
     private int textColor = TextFieldRenderer.DEFAULT_COLOR;
     private Function<String, String> validator = val -> val;
+    private int maxWidth = 80, maxLines = 1;
 
     public void setCursor(int pos) {
         setCursor(pos, true);
@@ -66,10 +70,11 @@ public class TextFieldWidget extends Widget implements IWidgetDrawable, Interact
     public void insert(String string) {
         String part1 = text.substring(0, Math.min(cursor, cursorEnd));
         String part2 = text.substring(Math.max(cursor, cursorEnd));
-        if (!pattern.matcher(part1 + string + part2).matches()) {
+        String newText = part1 + string + part2;
+        if (!pattern.matcher(newText).matches() || !canFit(newText)) {
             return;
         }
-        text = part1 + string + part2;
+        text = newText;
         setCursor(part1.length() + string.length());
     }
 
@@ -102,41 +107,86 @@ public class TextFieldWidget extends Widget implements IWidgetDrawable, Interact
 
     @Override
     public void drawInBackground(float partialTicks) {
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0.5f, 0.5f, 0);
         renderer.setUp(Pos2d.ZERO, textColor, getSize().width);
         renderer.draw(text);
+        GlStateManager.popMatrix();
     }
 
     @Override
-    public void onKeyPressed(char character, int keyCode) {
+    public boolean onKeyPressed(char character, int keyCode) {
         if (character == Character.MIN_VALUE) {
             switch (keyCode) {
                 case Keyboard.KEY_ESCAPE:
                 case Keyboard.KEY_INSERT:
                     removeFocus();
                     break;
-                case Keyboard.KEY_LEFT:
-                    setCursor(cursor - 1);
+                case Keyboard.KEY_LEFT: {
+                    int newCursor = cursor - 1;
+                    if (Interactable.hasControlDown()) {
+                        newCursor = text.lastIndexOf(" ", newCursor);
+                        if (newCursor < 0) {
+                            newCursor = 0;
+                        }
+                    }
+                    setCursor(newCursor, !Interactable.hasShiftDown());
                     break;
-                case Keyboard.KEY_RIGHT:
-                    setCursor(cursor + 1);
+                }
+                case Keyboard.KEY_RIGHT: {
+                    int newCursor = cursor + 1;
+                    if (Interactable.hasControlDown()) {
+                        newCursor = text.indexOf(" ", newCursor);
+                        if (newCursor < 0) {
+                            newCursor = text.length();
+                        }
+                    }
+                    setCursor(newCursor, !Interactable.hasShiftDown());
                     break;
+                }
+
                 case Keyboard.KEY_DELETE:
                     delete(true);
                     break;
                 case Keyboard.KEY_BACK:
                     delete(false);
                     break;
+                default:
+                    return false;
             }
-        } else if (keyCode == Keyboard.KEY_BACK) {
-            // backspace char is not equal to Character.MIN_VALUE
-            delete(false);
-        } else {
-            if (GuiScreen.isKeyComboCtrlC(keyCode)) {
-                GuiScreen.setClipboardString(getSelectedText());
-            } else if (!Interactable.hasControlDown() && !Interactable.hasAltDown() && canFitChar(character)) {
-                insert(String.valueOf(character));
-            }
+            return true;
         }
+        if (keyCode == Keyboard.KEY_BACK) {
+            // backspace char is not equal to Character.MIN_VALUE
+            int oldLength = text.length();
+            delete(false);
+            return oldLength != text.length();
+        }
+
+        if (GuiScreen.isKeyComboCtrlC(keyCode)) {
+            // copy marked text
+            GuiScreen.setClipboardString(getSelectedText());
+            return true;
+        } else if (GuiScreen.isKeyComboCtrlV(keyCode)) {
+            // paste copied text in marked text
+            insert(GuiScreen.getClipboardString());
+            return true;
+        } else if (GuiScreen.isKeyComboCtrlX(keyCode) && hasTextSelected()) {
+            // copy and delete copied text
+            GuiScreen.setClipboardString(getSelectedText());
+            delete(false);
+            return true;
+        } else if (GuiScreen.isKeyComboCtrlA(keyCode)) {
+            // mark whole text
+            setCursor(0);
+            setCursor(text.length(), false);
+            return true;
+        } else if (BASE_PATTERN.matcher(String.valueOf(character)).matches()) {
+            // insert typed char
+            insert(String.valueOf(character));
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -149,8 +199,11 @@ public class TextFieldWidget extends Widget implements IWidgetDrawable, Interact
         setCursor(getTextIndexUnderMouse(), false);
     }
 
-    private boolean canFitChar(char c) {
-        return true;
+    private boolean canFit(String string) {
+        helper.setUp(Pos2d.ZERO, 0, size.width);
+        helper.setDoDraw(false);
+        helper.draw(string);
+        return helper.getHeight() <= size.height;
     }
 
     private int getTextIndexUnderMouse() {
@@ -161,17 +214,17 @@ public class TextFieldWidget extends Widget implements IWidgetDrawable, Interact
         if (text.isEmpty()) {
             return 0;
         }
-        TextRenderer renderer = new TextRenderer(Pos2d.ZERO, 0, getSize().width);
-        renderer.setPosToFind(pos2d);
-        renderer.setDoDraw(false);
-        renderer.draw(text);
-        if (renderer.getFoundIndex() < 0) {
-            if (pos2d.x > renderer.getWidth()) {
+        helper.setUp(Pos2d.ZERO, 0, size.width);
+        helper.setPosToFind(pos2d);
+        helper.setDoDraw(false);
+        helper.draw(text);
+        if (helper.getFoundIndex() < 0) {
+            if (pos2d.x > helper.getWidth() || (pos2d.y >= helper.getHeight() - helper.getFontHeight() && pos2d.y <= helper.getHeight())) {
                 return text.length();
             }
             return 0;
         }
-        return renderer.getFoundIndex();
+        return helper.getFoundIndex();
     }
 
     @Override
@@ -191,7 +244,13 @@ public class TextFieldWidget extends Widget implements IWidgetDrawable, Interact
     @Nullable
     @Override
     protected Size determineSize() {
-        return new Size(getWindow().getSize().width, (int) (renderer.getFontHeight() + 1));
+        if (maxWidth < 0) {
+            maxWidth = 80;
+        }
+        if (maxLines <= 0) {
+            maxLines = 1;
+        }
+        return new Size(maxWidth - 1, (int) (renderer.getFontHeight() * maxLines + 0.5));
     }
 
     @Override
@@ -216,6 +275,27 @@ public class TextFieldWidget extends Widget implements IWidgetDrawable, Interact
 
     public TextFieldWidget setMarkedColor(int color) {
         renderer.setMarkedColor(color);
+        return this;
+    }
+
+    public TextFieldWidget setMaxLines(int maxLines) {
+        this.maxLines = maxLines;
+        return this;
+    }
+
+    public TextFieldWidget setMaxWidth(int maxWidth) {
+        this.maxWidth = maxWidth;
+        return this;
+    }
+
+    public TextFieldWidget setBounds(int maxWidth, int maxLines) {
+        setMaxWidth(maxWidth);
+        return setMaxLines(maxLines);
+    }
+
+    public TextFieldWidget setScale(float scale) {
+        renderer.setScale(scale);
+        helper.setScale(scale);
         return this;
     }
 

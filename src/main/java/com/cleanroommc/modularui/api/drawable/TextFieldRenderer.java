@@ -40,10 +40,10 @@ public class TextFieldRenderer extends TextRenderer {
 
     @Override
     public void draw(String text) {
-        drawingMarked = false;
+        drawingMarked = cursor == 0 ^ cursorEnd == 0;
         if (text.isEmpty() || cursor == 0) {
             if (renderCursor) {
-                drawCursor(currentX, getCurrentY());
+                drawCursor();
             }
             if (text.isEmpty()) {
                 return;
@@ -58,7 +58,7 @@ public class TextFieldRenderer extends TextRenderer {
         if (currentIndex == cursor) {
             if (renderCursor) {
                 newWord(false);
-                drawCursor(currentX, getCurrentY());
+                drawCursor();
             }
             if (drawingMarked) {
                 if (wordWith > 0) {
@@ -78,19 +78,30 @@ public class TextFieldRenderer extends TextRenderer {
     }
 
     @Override
-    protected void renderOther(float scaleFactor) {
-        super.renderOther(scaleFactor);
-        if (drawingMarked) {
-            drawSelectionBox(currentX * scaleFactor, getCurrentY() * scaleFactor, wordWith - 1);
+    protected void drawWord() {
+        String word = this.currentWord.toString();
+        if (word.isEmpty()) {
+            return;
         }
+
+        GlStateManager.disableBlend();
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(getScale(), getScale(), 0f);
+        float sf = 1 / getScale();
+        if (drawingMarked) {
+            drawSelectionBox(getRenderX(sf), getCurrentY() * sf, (wordWith - 1) * sf);
+            renderText(word, getRenderX(sf), getCurrentY() * sf, Color.invert(currentColor), isShadowStyle(), false);
+        } else {
+            renderText(word, getRenderX(sf), getCurrentY() * sf, currentColor, isShadowStyle(), false);
+        }
+        GlStateManager.popMatrix();
+        GlStateManager.enableBlend();
     }
 
     @SideOnly(Side.CLIENT)
-    private void drawCursor(float x, float y) {
-        x -= 0.8f;
-        y -= 1;
-        x *= (1 / getScale());
-        y *= (1 / getScale());
+    private void drawCursor() {
+        float sf = 1 / getScale();
+        float x = (currentX + lineXOffset - 0.8f) * sf, y = (getCurrentY() - 1) * sf;
         float endX = x + 0.6f /* * (1 / getScale())*/;
         float endY = y + 9;
         float red = Color.getRedF(getDefaultColor());

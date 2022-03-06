@@ -41,15 +41,16 @@ public class TextRenderer {
     private boolean doDraw = true;
     private Pos2d posToFind = null;
 
-    protected int currentX, currentColor, wordWith = 0, currentIndex = 0;
+    protected float currentX, wordWith = 0;
+    protected int currentColor, currentIndex = 0;
     protected StringBuilder currentWord;
     private boolean breakLine = true;
     private int width = 0, height = 0;
     private int foundIndex = -1;
     private int[] lineWidths = null;
     private int alignment = -1; // -1 = left, 0 = center, +1 = right
-    private int lineXOffset = 0;
-    private int currentLine = 0;
+    protected int lineXOffset = 0;
+    protected int currentLine = 0;
 
     private boolean shadowStyle;
 
@@ -215,9 +216,9 @@ public class TextRenderer {
     }
 
     public void newLine() {
-        width = Math.max(currentX - pos.x, width);
+        width = (int) Math.max(currentX - pos.x, width);
         if (!doDraw && lineWidths != null) {
-            lineWidths = ArrayUtils.add(lineWidths, currentX - pos.x);
+            lineWidths = ArrayUtils.add(lineWidths, (int) (currentX - pos.x));
         }
         height += getFontHeight();
         currentX = pos.x;
@@ -250,7 +251,7 @@ public class TextRenderer {
         GlStateManager.pushMatrix();
         GlStateManager.scale(scale, scale, 0f);
         float sf = 1 / scale;
-        renderText(word, (lineXOffset + currentX) * sf, getCurrentY() * sf, currentColor, shadowStyle, false);
+        renderText(word, getRenderX(sf), getCurrentY() * sf, currentColor, shadowStyle, false);
         GlStateManager.popMatrix();
         GlStateManager.enableBlend();
     }
@@ -357,6 +358,10 @@ public class TextRenderer {
 
     public float getCurrentY() {
         return pos.y + height;
+    }
+
+    public float getRenderX(float scaleFactor) {
+        return (currentX + lineXOffset) * scaleFactor;
     }
 
     private static boolean isFormatColor(char colorChar) {

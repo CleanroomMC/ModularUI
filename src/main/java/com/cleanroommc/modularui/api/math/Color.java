@@ -181,6 +181,14 @@ public class Color {
         return new int[]{getRed(rgba), getGreen(rgba), getBlue(rgba), getAlpha(rgba)};
     }
 
+    public static int invert(int rgb) {
+        int alpha = Color.getAlpha(rgb);
+        if (alpha == 0) {
+            alpha = 255;
+        }
+        return Color.rgba(255 - getRed(rgb), 255 - getGreen(rgb), 255 - getBlue(rgb), alpha);
+    }
+
     @Nullable
     public static Integer ofJson(JsonElement jsonElement) {
         if (jsonElement.isJsonPrimitive()) {
