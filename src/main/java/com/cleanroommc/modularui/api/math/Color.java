@@ -1,0 +1,224 @@
+package com.cleanroommc.modularui.api.math;
+
+import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.common.internal.JsonHelper;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import javax.annotation.Nullable;
+
+public class Color {
+
+    /**
+     * Creates a color int. All values should be 0 - 255
+     */
+    public static int rgb(int red, int green, int blue) {
+        return rgba(red, green, blue, 255);
+    }
+
+    /**
+     * Creates a color int. All values should be 0 - 255
+     */
+    public static int rgba(int red, int green, int blue, int alpha) {
+        return ((alpha & 0xFF) << 24) | ((red & 0xFF) << 16) | ((green & 0xFF) << 8) | ((blue & 0xFF));
+    }
+
+    /**
+     * Creates a color int. All values should be 0 - 1
+     */
+    public static int rgba(float red, float green, float blue, float alpha) {
+        return rgba((int) (red * 255), (int) (green * 255), (int) (blue * 255), (int) (alpha * 255));
+    }
+
+    /**
+     * Creates a color int. All values should be 0 - 1
+     */
+    public static int rgb(float red, float green, float blue) {
+        return rgba(red, green, blue, 1f);
+    }
+
+    /**
+     * Converts a HSV color to rgba
+     *
+     * @param hue        value from 0 to 360
+     * @param saturation value from 0 to 1
+     * @param value      value from 0 to 1
+     * @param alpha      value from 0 to 1
+     * @return the color
+     */
+    public static int ofHSV(int hue, float saturation, float value, float alpha) {
+        hue = Math.max(0, Math.min(hue, 360));
+
+        float c = value * saturation;
+        float x = c * (1 - (((hue / 60f) % 2) - 1));
+        x = Math.max(x, -x);
+        float m = value - c;
+        float r, g, b;
+        if (hue < 60) {
+            r = c;
+            g = x;
+            b = 0;
+        } else if (hue < 120) {
+            r = x;
+            g = c;
+            b = 0;
+        } else if (hue < 180) {
+            r = 0;
+            g = c;
+            b = x;
+        } else if (hue < 240) {
+            r = 0;
+            g = x;
+            b = c;
+        } else if (hue < 300) {
+            r = x;
+            g = 0;
+            b = c;
+        } else {
+            r = c;
+            g = 0;
+            b = x;
+        }
+        return rgba(r + m, g + m, b + m, alpha);
+    }
+
+    public static int withRed(int color, int red) {
+        color &= ~(0xFF << 16);
+        return color | red << 16;
+    }
+
+    public static int withGreen(int color, int green) {
+        color &= ~(0xFF << 8);
+        return color | green << 8;
+    }
+
+    public static int withBlue(int color, int blue) {
+        color &= ~0xFF;
+        return color | blue;
+    }
+
+    public static int withAlpha(int color, int alpha) {
+        color &= ~(0xFF << 24);
+        return color | alpha << 24;
+    }
+
+    public static int withRed(int color, float red) {
+        return withRed(color, (int) (red * 255));
+    }
+
+    public static int withGreen(int color, float green) {
+        return withGreen(color, (int) (green * 255));
+    }
+
+    public static int withBlue(int color, float blue) {
+        return withBlue(color, (int) (blue * 255));
+    }
+
+    public static int withAlpha(int color, float alpha) {
+        return withAlpha(color, (int) (alpha * 255));
+    }
+
+    /**
+     * @return the red value
+     */
+    public static int getRed(int rgba) {
+        return rgba >> 16 & 255;
+    }
+
+    /**
+     * @return the green value
+     */
+    public static int getGreen(int rgba) {
+        return rgba >> 8 & 255;
+    }
+
+    /**
+     * @return the blue value
+     */
+    public static int getBlue(int rgba) {
+        return rgba & 255;
+    }
+
+    /**
+     * @return the alpha value
+     */
+    public static int getAlpha(int rgba) {
+        return rgba >> 24 & 255;
+    }
+
+    /**
+     * @return the red value
+     */
+    public static float getRedF(int rgba) {
+        return getRed(rgba) / 255f;
+    }
+
+    /**
+     * @return the green value
+     */
+    public static float getGreenF(int rgba) {
+        return getGreen(rgba) / 255f;
+    }
+
+    /**
+     * @return the blue value
+     */
+    public static float getBlueF(int rgba) {
+        return getBlue(rgba) / 255f;
+    }
+
+    /**
+     * @return the alpha value
+     */
+    public static float getAlphaF(int rgba) {
+        return getAlpha(rgba) / 255f;
+    }
+
+    /**
+     * @return rgba as an array [red, green, blue, alpha]
+     */
+    public static int[] getValues(int rgba) {
+        return new int[]{getRed(rgba), getGreen(rgba), getBlue(rgba), getAlpha(rgba)};
+    }
+
+    public static int invert(int rgb) {
+        int alpha = Color.getAlpha(rgb);
+        if (alpha == 0) {
+            alpha = 255;
+        }
+        return Color.rgba(255 - getRed(rgb), 255 - getGreen(rgb), 255 - getBlue(rgb), alpha);
+    }
+
+    @Nullable
+    public static Integer ofJson(JsonElement jsonElement) {
+        if (jsonElement.isJsonPrimitive()) {
+            return jsonElement.getAsInt();
+        }
+        if (jsonElement.isJsonArray()) {
+            return null;
+        }
+        if (jsonElement.isJsonObject()) {
+            JsonObject json = jsonElement.getAsJsonObject();
+            int red = JsonHelper.getInt(json, 255, "r", "red");
+            int green = JsonHelper.getInt(json, 255, "g", "green");
+            int blue = JsonHelper.getInt(json, 255, "b", "blue");
+            int alpha = JsonHelper.getInt(json, 255, "a", "alpha");
+            return Color.rgba(red, green, blue, alpha);
+        }
+        String string = jsonElement.getAsString();
+        if (string.startsWith("#")) {
+            string = string.substring(1);
+        } else if (string.startsWith("0x")) {
+            string = string.substring(2);
+        }
+        try {
+            return Integer.parseInt(string, 16);
+        } catch (NumberFormatException e) {
+            ModularUI.LOGGER.error("Error parsing json color {}", jsonElement);
+        }
+        return null;
+    }
+
+    private Color() {
+    }
+}
