@@ -2,6 +2,8 @@ package com.cleanroommc.modularui.common.widget;
 
 import com.cleanroommc.modularui.api.*;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.drawable.Text;
+import com.cleanroommc.modularui.api.drawable.TextSpan;
 import com.cleanroommc.modularui.api.math.GuiArea;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
@@ -13,6 +15,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class depicts a functional element of a ModularUI
@@ -39,7 +43,8 @@ public abstract class Widget {
     // visuals
     @Nullable
     private IWidgetDrawable drawable;
-    private TooltipContainer tooltip;
+    private final List<TextSpan> additionalTooltip = new ArrayList<>();
+    private int tooltipShowUpDelay = 0;
 
     public Widget() {
     }
@@ -199,6 +204,7 @@ public abstract class Widget {
      *
      * @param partialTicks ticks since last draw
      */
+    @SideOnly(Side.CLIENT)
     public void drawInBackground(float partialTicks) {
     }
 
@@ -207,7 +213,19 @@ public abstract class Widget {
      *
      * @param partialTicks ticks since last draw
      */
+    @SideOnly(Side.CLIENT)
     public void drawInForeground(float partialTicks) {
+    }
+
+    /**
+     * Called every render tick when this widget is the highest under the mouse
+     *
+     * @return tooltip container which contains data for rendering
+     */
+    @Nullable
+    @SideOnly(Side.CLIENT)
+    public TooltipContainer getHoverText() {
+        return null;
     }
 
 
@@ -340,17 +358,13 @@ public abstract class Widget {
         return drawable;
     }
 
-    public TooltipContainer getTooltip() {
-        return tooltip;
+    public List<TextSpan> getTooltip() {
+        return additionalTooltip;
     }
 
-    public TooltipContainer getOrCreateTooltip() {
-        if (this.tooltip == null) {
-            setTooltip(new TooltipContainer());
-        }
-        return this.tooltip;
+    public int getTooltipShowUpDelay() {
+        return tooltipShowUpDelay;
     }
-
 
     //==== Setter/Builder ====
 
@@ -428,18 +442,47 @@ public abstract class Widget {
         return this;
     }
 
-    public Widget setBackground(IDrawable drawable) {
-        this.drawable = ((widget, partialTicks) -> drawable.draw(Pos2d.ZERO, widget.getSize(), partialTicks));
+    public Widget setBackground(IDrawable... drawables) {
+        this.drawable = ((widget, partialTicks) -> {
+            for (IDrawable drawable : drawables) {
+                drawable.draw(Pos2d.ZERO, widget.getSize(), partialTicks);
+            }
+        });
         return this;
     }
 
     /**
-     * Sets the tooltip container
-     *
-     * @param tooltip tooltip to render
+     * Adds a line to the tooltip
      */
-    public Widget setTooltip(TooltipContainer tooltip) {
-        this.tooltip = tooltip;
+    public Widget addTooltip(TextSpan tooltip) {
+        this.additionalTooltip.add(tooltip);
+        return this;
+    }
+
+    /**
+     * Adds a line to the tooltip
+     */
+    public Widget addTooltip(int index, TextSpan tooltip) {
+        this.additionalTooltip.add(index, tooltip);
+        return this;
+    }
+
+    /**
+     * Adds a line to the tooltip
+     */
+    public Widget addTooltip(Text... tooltip) {
+        return addTooltip(new TextSpan(tooltip));
+    }
+
+    /**
+     * Adds a line to the tooltip
+     */
+    public Widget addTooltip(String tooltip) {
+        return addTooltip(new Text(tooltip));
+    }
+
+    public Widget setTooltipShowUpDelay(int tooltipShowUpDelay) {
+        this.tooltipShowUpDelay = tooltipShowUpDelay;
         return this;
     }
 

@@ -13,15 +13,14 @@ import java.util.List;
 
 public class TooltipContainer implements IDrawable {
 
-    private final List<Text[]> lines = new ArrayList<>();
-    private int showUpDelay = 0;
+
+    private final List<TextSpan> lines = new ArrayList<>();
     private int maxBoxWidth = Integer.MAX_VALUE;
     private boolean forceShadow = true;
     private float scale = 1f;
 
     public TooltipContainer addLine(Text... line) {
-        this.lines.add(line);
-        return this;
+        return addLine(new TextSpan(line));
     }
 
     public TooltipContainer addLine(String line) {
@@ -29,12 +28,12 @@ public class TooltipContainer implements IDrawable {
     }
 
     public TooltipContainer addLine(TextSpan line) {
-        return addLine(line.getTexts());
+        this.lines.add(line);
+        return this;
     }
 
     public TooltipContainer addLine(int index, Text... line) {
-        this.lines.add(index, line);
-        return this;
+        return addLine(index, new TextSpan(line));
     }
 
     public TooltipContainer addLine(int index, String line) {
@@ -42,16 +41,12 @@ public class TooltipContainer implements IDrawable {
     }
 
     public TooltipContainer addLine(int index, TextSpan line) {
-        return addLine(index, line.getTexts());
+        this.lines.add(index, line);
+        return this;
     }
 
     public TooltipContainer setMaxBoxWidth(int maxBoxWidth) {
         this.maxBoxWidth = maxBoxWidth;
-        return this;
-    }
-
-    public TooltipContainer setShowUpDelay(int showUpDelay) {
-        this.showUpDelay = showUpDelay;
         return this;
     }
 
@@ -65,8 +60,14 @@ public class TooltipContainer implements IDrawable {
         return this;
     }
 
-    public int getShowUpDelay() {
-        return showUpDelay;
+    public TooltipContainer with(List<TextSpan> lines) {
+        TooltipContainer tooltipContainer = new TooltipContainer();
+        tooltipContainer.lines.addAll(this.lines);
+        tooltipContainer.maxBoxWidth = maxBoxWidth;
+        tooltipContainer.forceShadow = forceShadow;
+        tooltipContainer.scale = scale;
+        tooltipContainer.lines.addAll(lines);
+        return tooltipContainer;
     }
 
     public float getScale() {
@@ -80,13 +81,13 @@ public class TooltipContainer implements IDrawable {
     @Override
     public void draw(Pos2d pos, Size size, float partialTicks) {
         if (!lines.isEmpty() && GuiHelper.hasScreen()) {
-            GuiHelper.drawHoveringText(lines, GuiHelper.getCurrentMousePos(), GuiHelper.getScreenSize(), maxBoxWidth, scale, forceShadow);
+            GuiHelper.drawHoveringTextSpans(lines, GuiHelper.getCurrentMousePos(), GuiHelper.getScreenSize(), maxBoxWidth, scale, forceShadow);
         }
     }
 
     public void draw(ModularUIContext uiContext) {
         if (!lines.isEmpty()) {
-            GuiHelper.drawHoveringText(lines, uiContext.getMousePos(), uiContext.getScaledScreenSize(), maxBoxWidth, scale, forceShadow);
+            GuiHelper.drawHoveringTextSpans(lines, uiContext.getMousePos(), uiContext.getScaledScreenSize(), maxBoxWidth, scale, forceShadow);
         }
     }
 }

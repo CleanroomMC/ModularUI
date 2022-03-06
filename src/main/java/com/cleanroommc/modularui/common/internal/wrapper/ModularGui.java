@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.common.internal.wrapper;
 import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.api.TooltipContainer;
+import com.cleanroommc.modularui.api.drawable.TextSpan;
 import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
@@ -22,6 +23,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 @SideOnly(Side.CLIENT)
@@ -140,8 +143,15 @@ public class ModularGui extends GuiContainer {
         context.getCurrentWindow().drawWidgetsForeGround(Minecraft.getMinecraft().getTickLength());
 
         if (hovered != null && !(hovered instanceof SlotWidget)) {
-            TooltipContainer tooltipContainer = hovered.getTooltip();
-            if (tooltipContainer != null && tooltipContainer.getShowUpDelay() <= timeHovered) {
+            if (hovered.getTooltipShowUpDelay() <= timeHovered) {
+                TooltipContainer tooltipContainer = hovered.getHoverText();
+                List<TextSpan> additional = hovered.getTooltip();
+                if (tooltipContainer == null) {
+                    tooltipContainer = new TooltipContainer();
+                }
+                if (!additional.isEmpty()) {
+                    tooltipContainer = tooltipContainer.with(additional);
+                }
                 tooltipContainer.draw(context);
             }
         }

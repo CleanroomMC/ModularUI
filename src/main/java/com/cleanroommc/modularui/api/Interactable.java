@@ -1,6 +1,9 @@
 package com.cleanroommc.modularui.api;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.init.SoundEvents;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
@@ -85,5 +88,13 @@ public interface Interactable {
     @SideOnly(Side.CLIENT)
     static boolean isKeyPressed(int key) {
         return Keyboard.isKeyDown(key);
+    }
+
+    /**
+     * Plays the default button click sound
+     */
+    @SideOnly(Side.CLIENT)
+    static void playButtonClickSound() {
+        Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
     }
 }

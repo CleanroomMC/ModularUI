@@ -33,6 +33,10 @@ public class Text implements IDrawable {
         return new Text(null, Objects.requireNonNull(textSupplier, "TextSupplier can't be null!"));
     }
 
+    public static Text localised(String key, Object... data) {
+        return new Text(key).localise(data);
+    }
+
     public Text(String text) {
         this(Objects.requireNonNull(text, "String in Text can't be null!"), null);
     }

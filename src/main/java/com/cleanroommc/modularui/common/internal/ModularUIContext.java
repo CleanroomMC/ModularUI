@@ -16,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
@@ -133,6 +134,19 @@ public class ModularUIContext {
 
     public EntityPlayer getPlayer() {
         return player;
+    }
+
+    public ItemStack getCursorStack() {
+        return player.inventory.getItemStack();
+    }
+
+    public void setCursorStack(ItemStack stack) {
+        if (stack != null) {
+            player.inventory.setItemStack(stack);
+            if (!isClient()) {
+                player.inventoryContainer.detectAndSendChanges();
+            }
+        }
     }
 
     public ModularUIContainer getContainer() {
