@@ -9,9 +9,9 @@ public class Interpolator {
     private final int duration;
     private final IEase ease;
     private final Consumer<Number> interpolate;
-    private final Consumer<Number> callback;
+    private Consumer<Number> callback;
 
-    private int runs;
+    private int runs = 0;
     private int progress = 0;
 
     public Interpolator(float from, float to, int duration, IEase ease, Consumer<Number> interpolate) {
@@ -24,6 +24,14 @@ public class Interpolator {
         this.duration = duration;
         this.ease = ease;
         this.interpolate = interpolate;
+        this.callback = callback;
+    }
+
+    public Interpolator getReversed(int duration, IEase ease) {
+        return new Interpolator(to, from, duration, ease, interpolate, callback);
+    }
+
+    public void setCallback(Consumer<Number> callback) {
         this.callback = callback;
     }
 

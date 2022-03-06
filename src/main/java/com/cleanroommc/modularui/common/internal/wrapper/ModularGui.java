@@ -1,10 +1,8 @@
 package com.cleanroommc.modularui.common.internal.wrapper;
 
-import com.cleanroommc.modularui.api.IWidgetDrawable;
 import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.api.TooltipContainer;
-import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
@@ -32,7 +30,6 @@ public class ModularGui extends GuiContainer {
     private final ModularUIContext context;
     private Pos2d mousePos = Pos2d.ZERO;
 
-    //private final ModularUI gui;
     private long lastClick = -1;
     private long lastFocusedClick = -1;
     private Widget focused;
@@ -50,6 +47,7 @@ public class ModularGui extends GuiContainer {
         ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
         this.context.resize(new Size(scaledResolution.getScaledWidth(), scaledResolution.getScaledHeight()));
         this.context.buildWindowOnStart();
+        this.context.getCurrentWindow().onOpen();
     }
 
     public ModularUIContext getContext() {
@@ -115,7 +113,7 @@ public class ModularGui extends GuiContainer {
             }
             drawCalls++;
         }
-
+        context.getCurrentWindow().frameUpdate(partialTicks);
         drawDefaultBackground();
 
         GlStateManager.disableRescaleNormal();
@@ -123,21 +121,7 @@ public class ModularGui extends GuiContainer {
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
 
-        IWidgetParent.forEachByLayer(context.getCurrentWindow(), widget -> {
-            widget.onFrameUpdate();
-            if (widget.isEnabled()) {
-                GlStateManager.pushMatrix();
-                GlStateManager.translate(widget.getAbsolutePos().x, widget.getAbsolutePos().y, 0);
-                GlStateManager.enableBlend();
-                IWidgetDrawable background = widget.getDrawable();
-                if (background != null) {
-                    background.drawWidgetCustom(widget, partialTicks);
-                }
-                widget.drawInBackground(partialTicks);
-                GlStateManager.popMatrix();
-            }
-            return false;
-        });
+        context.getCurrentWindow().drawWidgetsBackGround(partialTicks);
 
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableLighting();
@@ -153,17 +137,7 @@ public class ModularGui extends GuiContainer {
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
 
-        float partialTicks = Minecraft.getMinecraft().getTickLength();
-        IWidgetParent.forEachByLayer(context.getCurrentWindow(), widget -> {
-            if (widget.isEnabled() && widget instanceof IWidgetDrawable) {
-                GlStateManager.pushMatrix();
-                GlStateManager.translate(widget.getAbsolutePos().x, widget.getAbsolutePos().y, 0);
-                GlStateManager.enableBlend();
-                widget.drawInForeground(partialTicks);
-                GlStateManager.popMatrix();
-            }
-            return false;
-        });
+        context.getCurrentWindow().drawWidgetsForeGround(Minecraft.getMinecraft().getTickLength());
 
         if (hovered != null && !(hovered instanceof SlotWidget)) {
             TooltipContainer tooltipContainer = hovered.getTooltip();
@@ -290,7 +264,6 @@ public class ModularGui extends GuiContainer {
 
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
-        super.keyTyped(typedChar, keyCode);
         // debug mode C + CTRL + SHIFT + ALT
         if (keyCode == 46 && isCtrlKeyDown() && isShiftKeyDown() && isAltKeyDown()) {
             this.debugMode = !this.debugMode;
@@ -299,7 +272,21 @@ public class ModularGui extends GuiContainer {
             interactable.onKeyPressed(typedChar, keyCode);
         }
         if (isFocusedValid() && focused instanceof Interactable) {
-            ((Interactable) focused).onKeyPressed(typedChar, keyCode);
+            if (!((Interactable) focused).onKeyPressed(typedChar, keyCode)) {
+                keyTypedSuper(typedChar, keyCode);
+            }
+        } else {
+            keyTypedSuper(typedChar, keyCode);
+        }
+    }
+
+    private void keyTypedSuper(char typedChar, int keyCode) throws IOException {
+        if (keyCode == 1 || this.mc.gameSettings.keyBindInventory.isActiveAndMatches(keyCode)) {
+            if (context.getMainWindow().onTryClose()) {
+                this.mc.player.closeScreen();
+            }
+        } else {
+            super.keyTyped(typedChar, keyCode);
         }
     }
 

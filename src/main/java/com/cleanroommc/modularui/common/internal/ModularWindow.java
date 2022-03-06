@@ -1,14 +1,15 @@
 package com.cleanroommc.modularui.common.internal;
 
-import com.cleanroommc.modularui.api.ISyncedWidget;
-import com.cleanroommc.modularui.api.IWidgetBuilder;
-import com.cleanroommc.modularui.api.IWidgetParent;
-import com.cleanroommc.modularui.api.Interactable;
+import com.cleanroommc.modularui.api.*;
+import com.cleanroommc.modularui.api.animation.Eases;
+import com.cleanroommc.modularui.api.animation.Interpolator;
 import com.cleanroommc.modularui.api.math.Alignment;
+import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.widget.Widget;
 import com.google.common.collect.ImmutableBiMap;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -21,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * A window in a modular gui. Only the "main" window can exist on both, server and client.
  * All other only exist and needs to be opened on client.
  */
-public final class ModularWindow implements IWidgetParent {
+public class ModularWindow implements IWidgetParent {
 
     public static Builder builder(Size size) {
         return new Builder(size);
@@ -38,6 +39,9 @@ public final class ModularWindow implements IWidgetParent {
     private boolean draggable = false;
     private boolean active;
     private boolean needsRebuild = false;
+    private int color = 0xFFFFFFFF;
+
+    private Interpolator openAnimation, closeAnimation;
 
     public ModularWindow(Size size, List<Widget> children) {
         this.size = size;
@@ -66,16 +70,56 @@ public final class ModularWindow implements IWidgetParent {
         markNeedsRebuild();
     }
 
+    /**
+     * The final call after the window is initialized & positioned
+     */
+    public void onOpen() {
+        final int startY = context.getScaledScreenSize().height, endY = pos.y;
+        openAnimation = new Interpolator(0, 1, 250, Eases.EaseQuadOut, value -> {
+            float val = (float) value;
+            color = Color.withAlpha(color, val);
+            int y = (int) ((endY - startY) * val + startY);
+            setPos(new Pos2d(pos.x, y));
+            markNeedsRebuild();
+        });
+        closeAnimation = openAnimation.getReversed(250, Eases.EaseQuadIn);
+        openAnimation.forward();
+        closeAnimation.setCallback(val -> context.close());
+        this.pos = new Pos2d(pos.x, getContext().getScaledScreenSize().height);
+    }
+
+    /**
+     * Called when the player tries to close the ui
+     *
+     * @return if the ui should be closed
+     */
+    public boolean onTryClose() {
+        if (closeAnimation == null) {
+            return true;
+        }
+        closeAnimation.forward();
+        return false;
+    }
+
     protected void setActive(boolean active) {
         this.active = active;
     }
 
     public void update() {
+        IWidgetParent.forEachByLayer(this, Widget::onScreenUpdate);
+    }
+
+    public void frameUpdate(float partialTicks) {
+        if (openAnimation != null) {
+            openAnimation.update(partialTicks);
+        }
+        if (closeAnimation != null) {
+            closeAnimation.update(partialTicks);
+        }
         if (needsRebuild) {
             rebuild();
             needsRebuild = false;
         }
-        IWidgetParent.forEachByLayer(this, Widget::onScreenUpdate);
     }
 
     public void serverUpdate() {
@@ -114,6 +158,40 @@ public final class ModularWindow implements IWidgetParent {
         });
     }
 
+    public void drawWidgetsBackGround(float partialTicks) {
+        GlStateManager.color(Color.getRedF(color), Color.getGreenF(color), Color.getBlueF(color), Color.getAlphaF(color));
+        IWidgetParent.forEachByLayer(this, widget -> {
+            widget.onFrameUpdate();
+            if (widget.isEnabled()) {
+                GlStateManager.pushMatrix();
+                GlStateManager.translate(widget.getAbsolutePos().x, widget.getAbsolutePos().y, 0);
+                GlStateManager.color(Color.getRedF(color), Color.getGreenF(color), Color.getBlueF(color), Color.getAlphaF(color));
+                GlStateManager.enableBlend();
+                IWidgetDrawable background = widget.getDrawable();
+                if (background != null) {
+                    background.drawWidgetCustom(widget, partialTicks);
+                }
+                widget.drawInBackground(partialTicks);
+                GlStateManager.popMatrix();
+            }
+            return false;
+        });
+        GlStateManager.color(1, 1, 1, 1);
+    }
+
+    public void drawWidgetsForeGround(float partialTicks) {
+        IWidgetParent.forEachByLayer(this, widget -> {
+            if (widget.isEnabled()) {
+                GlStateManager.pushMatrix();
+                GlStateManager.translate(widget.getAbsolutePos().x, widget.getAbsolutePos().y, 0);
+                GlStateManager.enableBlend();
+                widget.drawInForeground(partialTicks);
+                GlStateManager.popMatrix();
+            }
+            return false;
+        });
+    }
+
     @Override
     public Size getSize() {
         return size;
@@ -148,6 +226,10 @@ public final class ModularWindow implements IWidgetParent {
 
     public void markNeedsRebuild() {
         this.needsRebuild = true;
+    }
+
+    public void setPos(Pos2d pos) {
+        this.pos = pos;
     }
 
     /**

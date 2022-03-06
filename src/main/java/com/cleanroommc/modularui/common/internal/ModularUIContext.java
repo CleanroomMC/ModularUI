@@ -73,7 +73,12 @@ public class ModularUIContext {
     }
 
     public void openWindow(IWindowCreator windowCreator) {
-        pushWindow(windowCreator.create(player));
+        ModularWindow window = windowCreator.create(player);
+        pushWindow(window);
+        if (isClient()) {
+            window.onResize(screenSize);
+            window.onOpen();
+        }
     }
 
     private void pushWindow(ModularWindow window) {
@@ -95,6 +100,20 @@ public class ModularUIContext {
 
     public ModularWindow getCurrentWindow() {
         return windows.peek();
+    }
+
+    public ModularWindow getMainWindow() {
+        return mainWindow;
+    }
+
+    public void tryClose() {
+        if (mainWindow.onTryClose()) {
+            close();
+        }
+    }
+
+    public void close() {
+        player.closeScreen();
     }
 
     public void popAllButLast() {

@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.api;
 
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.common.internal.ModularUIContext;
 import com.cleanroommc.modularui.common.widget.Widget;
 
 import java.util.LinkedList;
@@ -18,6 +19,8 @@ public interface IWidgetParent {
     Pos2d getPos();
 
     List<Widget> getChildren();
+
+    ModularUIContext getContext();
 
     static boolean forEachByLayer(List<Widget> parent, Function<Widget, Boolean> consumer) {
         return forEachByLayer(new Wrapper(parent), consumer);
@@ -72,6 +75,11 @@ public interface IWidgetParent {
         @Override
         public List<Widget> getChildren() {
             return children;
+        }
+
+        @Override
+        public ModularUIContext getContext() {
+            throw new UnsupportedOperationException();
         }
     }
 }
