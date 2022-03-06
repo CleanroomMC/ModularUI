@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.commons.lang3.ArrayUtils;
 
 public class TextRenderer {
 
@@ -41,12 +42,20 @@ public class TextRenderer {
     private Pos2d posToFind = null;
 
     protected int currentX, currentColor, wordWith = 0, currentIndex = 0;
-    private StringBuilder currentWord;
+    protected StringBuilder currentWord;
     private boolean breakLine = true;
     private int width = 0, height = 0;
     private int foundIndex = -1;
+    private int[] lineWidths = null;
+    private int alignment = -1; // -1 = left, 0 = center, +1 = right
+    private int lineXOffset = 0;
+    private int currentLine = 0;
 
     private boolean shadowStyle;
+
+    public TextRenderer() {
+        this(Pos2d.ZERO, 0, 0);
+    }
 
     public TextRenderer(Pos2d pos, int color, int maxWidth) {
         setUp(pos, color, maxWidth);
@@ -64,6 +73,7 @@ public class TextRenderer {
         this.foundIndex = -1;
         this.posToFind = null;
         this.doDraw = true;
+        this.currentLine = 0;
     }
 
     public void setScale(float scale) {
@@ -110,9 +120,41 @@ public class TextRenderer {
         return new Size(width, height);
     }
 
+    public void draw(String text, Pos2d pos, int color, int maxWidth) {
+        setUp(pos, color, maxWidth);
+        this.alignment = -1;
+        this.lineWidths = null;
+        draw(text);
+    }
+
+    public void drawAligned(String text, int alignment, Pos2d pos, int color, int maxWidth) {
+        if (alignment < 0) {
+            // Left align doesn't require calculations
+            setUp(pos, color, maxWidth);
+            draw(text);
+            return;
+        }
+        // first simulate rendering and collect widths of all lines
+        setUp(pos, color, maxWidth);
+        setDoDraw(false);
+        this.alignment = alignment;
+        this.lineWidths = new int[0];
+        draw(text);
+        setDoDraw(true);
+        // now render offset according to the line widths
+        setUp(pos, color, maxWidth);
+        draw(text);
+        this.lineWidths = null;
+        this.alignment = -1;
+    }
+
     public void draw(String text) {
+        if (maxX - pos.x <= 0) {
+            return;
+        }
         currentWord = new StringBuilder();
         resetStyles();
+        applyAlignment();
 
         boolean wasFormatChar = false;
         for (int i = 0; i < text.length(); i++) {
@@ -172,6 +214,17 @@ public class TextRenderer {
         }
     }
 
+    public void newLine() {
+        width = Math.max(currentX - pos.x, width);
+        if (!doDraw && lineWidths != null) {
+            lineWidths = ArrayUtils.add(lineWidths, currentX - pos.x);
+        }
+        height += getFontHeight();
+        currentX = pos.x;
+        currentLine++;
+        applyAlignment();
+    }
+
     protected void newWord() {
         newWord(true);
     }
@@ -197,13 +250,9 @@ public class TextRenderer {
         GlStateManager.pushMatrix();
         GlStateManager.scale(scale, scale, 0f);
         float sf = 1 / scale;
-        renderOther(sf);
-        renderText(word, currentX * sf, getCurrentY() * sf, currentColor, shadowStyle, false);
+        renderText(word, (lineXOffset + currentX) * sf, getCurrentY() * sf, currentColor, shadowStyle, false);
         GlStateManager.popMatrix();
         GlStateManager.enableBlend();
-    }
-
-    protected void renderOther(float scaleFactor) {
     }
 
     private void addChar(char c) {
@@ -245,10 +294,16 @@ public class TextRenderer {
         currentIndex++;
     }
 
-    public void newLine() {
-        width = Math.max(currentX - pos.x, width);
-        height += getFontHeight();
-        currentX = pos.x;
+    protected void applyAlignment() {
+        if (doDraw && lineWidths != null && lineWidths.length > currentLine) {
+            if (alignment == 0) {
+                lineXOffset = (int) ((maxX - pos.x) / 2f - lineWidths[currentLine] / 2f);
+            } else {
+                lineXOffset = maxX - pos.x - lineWidths[currentLine];
+            }
+        } else {
+            lineXOffset = 0;
+        }
     }
 
     private void resetStyles() {
@@ -290,6 +345,10 @@ public class TextRenderer {
 
     public float getScale() {
         return scale;
+    }
+
+    public boolean isShadowStyle() {
+        return shadowStyle;
     }
 
     public int getCurrentIndex() {
