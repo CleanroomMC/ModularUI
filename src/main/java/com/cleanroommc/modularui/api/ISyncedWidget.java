@@ -15,9 +15,9 @@ import java.util.function.Consumer;
 public interface ISyncedWidget {
 
     @SideOnly(Side.CLIENT)
-    void readServerData(int id, PacketBuffer buf);
+    void readOnClient(int id, PacketBuffer buf);
 
-    void readClientData(int id, PacketBuffer buf);
+    void readOnServer(int id, PacketBuffer buf);
 
     /**
      * Called each tick on server. Use it to detect and sync changes
@@ -26,7 +26,7 @@ public interface ISyncedWidget {
     }
 
     /**
-     * Sends the written data to {@link #readClientData(int, PacketBuffer)}
+     * Sends the written data to {@link #readOnServer(int, PacketBuffer)}
      *
      * @param id         helper to determine the type
      * @param bufBuilder data builder
@@ -40,7 +40,7 @@ public interface ISyncedWidget {
     }
 
     /**
-     * Sends the written data to {@link #readServerData(int, PacketBuffer)}
+     * Sends the written data to {@link #readOnClient(int, PacketBuffer)}
      *
      * @param id         helper to determine the type
      * @param bufBuilder data builder

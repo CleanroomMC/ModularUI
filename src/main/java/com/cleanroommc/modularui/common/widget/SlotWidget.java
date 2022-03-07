@@ -73,12 +73,12 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     }
 
     @Override
-    public void readServerData(int id, PacketBuffer buf) {
+    public void readOnClient(int id, PacketBuffer buf) {
 
     }
 
     @Override
-    public void readClientData(int id, PacketBuffer buf) {
+    public void readOnServer(int id, PacketBuffer buf) {
         if (id == 1) {
             slot.xPos = buf.readVarInt();
             slot.yPos = buf.readVarInt();

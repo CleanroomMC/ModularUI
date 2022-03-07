@@ -23,6 +23,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.List;
 import java.util.Stack;
 import java.util.function.Consumer;
@@ -140,9 +141,12 @@ public class ModularUIContext {
         return player.inventory.getItemStack();
     }
 
-    public void setCursorStack(ItemStack stack) {
+    public void setCursorStack(ItemStack stack, boolean sync) {
         if (stack != null) {
             player.inventory.setItemStack(stack);
+            if (sync && !isClient()) {
+                sendServerPacket(1, null, mainWindow, buffer -> buffer.writeItemStack(stack));
+            }
         }
     }
 
@@ -178,15 +182,26 @@ public class ModularUIContext {
         return screenSize;
     }
 
-    public void readClientPacket(PacketBuffer buf, int widgetId) {
-        ISyncedWidget syncedWidget = mainWindow.getSyncedWidget(widgetId);
-        syncedWidget.readClientData(buf.readVarInt(), buf);
+    public void readClientPacket(PacketBuffer buf, int widgetId) throws IOException {
+        if (widgetId == -1) {
+
+        } else {
+            ISyncedWidget syncedWidget = mainWindow.getSyncedWidget(widgetId);
+            syncedWidget.readOnServer(buf.readVarInt(), buf);
+        }
     }
 
     @SideOnly(Side.CLIENT)
-    public void readServerPacket(PacketBuffer buf, int widgetId) {
-        ISyncedWidget syncedWidget = mainWindow.getSyncedWidget(widgetId);
-        syncedWidget.readServerData(buf.readVarInt(), buf);
+    public void readServerPacket(PacketBuffer buf, int widgetId) throws IOException {
+        int id = buf.readVarInt();
+        if (widgetId == -1) {
+            if (id == 1) {
+                player.inventory.setItemStack(buf.readItemStack());
+            }
+        } else {
+            ISyncedWidget syncedWidget = mainWindow.getSyncedWidget(widgetId);
+            syncedWidget.readOnClient(id, buf);
+        }
     }
 
     @SideOnly(Side.CLIENT)
@@ -195,7 +210,7 @@ public class ModularUIContext {
             ModularUI.LOGGER.error("Tried syncing from non main window");
             return;
         }
-        int syncId = window.getSyncedWidgetId(syncedWidget);
+        int syncId = syncedWidget == null ? -1 : window.getSyncedWidgetId(syncedWidget);
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         buffer.writeVarInt(discriminator);
         bufferConsumer.accept(buffer);
@@ -205,7 +220,7 @@ public class ModularUIContext {
 
     public void sendServerPacket(int discriminator, ISyncedWidget syncedWidget, ModularWindow window, Consumer<PacketBuffer> bufferConsumer) {
         if (player instanceof EntityPlayerMP) {
-            int syncId = window.getSyncedWidgetId(syncedWidget);
+            int syncId = syncedWidget == null ? -1 : window.getSyncedWidgetId(syncedWidget);
             PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
             buffer.writeVarInt(discriminator);
             bufferConsumer.accept(buffer);

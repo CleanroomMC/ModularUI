@@ -254,12 +254,12 @@ public class TextFieldWidget extends Widget implements Interactable, ISyncedWidg
     }
 
     @Override
-    public void readServerData(int id, PacketBuffer buf) {
+    public void readOnClient(int id, PacketBuffer buf) {
 
     }
 
     @Override
-    public void readClientData(int id, PacketBuffer buf) {
+    public void readOnServer(int id, PacketBuffer buf) {
 
     }
 

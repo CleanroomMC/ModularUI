@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.common.internal.network;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.common.internal.ModularUIContext;
 import com.cleanroommc.modularui.common.internal.NetworkUtils;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularUIContainer;
@@ -40,7 +41,12 @@ public class CWidgetUpdate implements Packet<NetHandlerPlayServer> {
         Container container = handler.player.openContainer;
         if (container instanceof ModularUIContainer) {
             ModularUIContext context = ((ModularUIContainer) container).getContext();
-            context.readClientPacket(packet, widgetId);
+            try {
+                context.readClientPacket(packet, widgetId);
+            } catch (IOException e) {
+                ModularUI.LOGGER.error("Error reading client packet: ");
+                e.printStackTrace();
+            }
         }
     }
 }

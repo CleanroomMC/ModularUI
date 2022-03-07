@@ -95,14 +95,14 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
     }
 
     @Override
-    public void readServerData(int id, PacketBuffer buf) {
+    public void readOnClient(int id, PacketBuffer buf) {
         if (id == 1) {
             setState(buf.readVarInt(), false, true);
         }
     }
 
     @Override
-    public void readClientData(int id, PacketBuffer buf) {
+    public void readOnServer(int id, PacketBuffer buf) {
         if (id == 1) {
             setState(buf.readVarInt(), false, true);
         }
