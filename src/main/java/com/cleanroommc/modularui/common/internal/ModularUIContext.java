@@ -143,9 +143,6 @@ public class ModularUIContext {
     public void setCursorStack(ItemStack stack) {
         if (stack != null) {
             player.inventory.setItemStack(stack);
-            if (!isClient()) {
-                player.inventoryContainer.detectAndSendChanges();
-            }
         }
     }
 

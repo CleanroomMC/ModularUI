@@ -53,6 +53,7 @@ public class TextRenderer {
     protected int currentLine = 0;
 
     private boolean shadowStyle;
+    private String colorStyle = null;
 
     public TextRenderer() {
         this(Pos2d.ZERO, 0, 0);
@@ -246,6 +247,9 @@ public class TextRenderer {
         if (word.isEmpty()) {
             return;
         }
+        if (colorStyle != null) {
+            word = FORMAT_CHAR + colorStyle + word;
+        }
 
         GlStateManager.disableBlend();
         GlStateManager.pushMatrix();
@@ -266,9 +270,7 @@ public class TextRenderer {
             // line will is to wide with this character
             if (currentX + wordWith + charWidth > maxX) {
                 // word occupies the whole width or a new word starts
-                //didHitRightBorder = true;
                 if (pos.x == currentX || c == ' ') {
-                    //needsNewLine = true;
                     newWord();
                     newLine();
                     if (c == ' ') {
@@ -311,6 +313,7 @@ public class TextRenderer {
         getMixinRenderer().invokeResetStyles();
         this.shadowStyle = this.forceShadow;
         this.currentColor = this.defaultColor;
+        this.colorStyle = null;
     }
 
     private boolean checkStyleChar(char c) {
@@ -333,7 +336,11 @@ public class TextRenderer {
                     break;
             }
         }
-        return !(formatSpecial || isFormatColor(c));
+        boolean color = isFormatColor(c);
+        if (color) {
+            colorStyle = String.valueOf(c);
+        }
+        return !(formatSpecial || color);
     }
 
     public float getFontHeight() {

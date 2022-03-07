@@ -148,13 +148,21 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
                 return;
             }
             this.cachedFluid = FluidStack.loadFluidStackFromNBT(fluidStackTag);
+        } else if (id == 4) {
+            ItemStack currentStack = getContext().getCursorStack();
+            int newStackSize = buf.readVarInt();
+            currentStack.setCount(newStackSize);
+            getContext().setCursorStack(currentStack);
         }
     }
 
     @Override
     public void readClientData(int id, PacketBuffer buf) {
         if (id == 1) {
-            tryClickContainer(buf.readVarInt(), buf.readBoolean());
+            int clickResult = tryClickContainer(buf.readVarInt(), buf.readBoolean());
+            if (clickResult >= 0) {
+                syncToClient(4, buffer -> buffer.writeVarInt(clickResult));
+            }
         }
     }
 
