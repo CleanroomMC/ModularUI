@@ -292,6 +292,14 @@ public abstract class Widget {
         getContext().getScreen().removeFocus(this);
     }
 
+    /**
+     * @return if this is currently the top most widget under the mouse
+     */
+    @SideOnly(Side.CLIENT)
+    public boolean isHovering() {
+        return getContext().getScreen().isHovering(this);
+    }
+
 
     //==== Getter ====
 

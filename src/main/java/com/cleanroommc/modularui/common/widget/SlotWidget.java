@@ -6,9 +6,18 @@ import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.api.drawable.UITexture;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.common.internal.mixin.GuiContainerMixin;
+import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
 import com.cleanroommc.modularui.integration.vanilla.slot.BaseSlot;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.text.TextFormatting;
 
 import javax.annotation.Nullable;
 
@@ -40,6 +49,19 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     @Override
     protected Size determineSize() {
         return SIZE;
+    }
+
+    @Override
+    public void drawInBackground(float partialTicks) {
+        RenderHelper.enableGUIStandardItemLighting();
+        drawSlot(slot);
+        RenderHelper.enableStandardItemLighting();
+        GlStateManager.disableLighting();
+        if (isHovering()) {
+            GlStateManager.colorMask(true, true, true, false);
+            ModularGui.drawSolidRect(1, 1, 16, 16, -2130706433);
+            GlStateManager.colorMask(true, true, true, true);
+        }
     }
 
     @Override
@@ -83,5 +105,69 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
             slot.xPos = buf.readVarInt();
             slot.yPos = buf.readVarInt();
         }
+    }
+
+    private GuiContainerMixin getGuiAccessor() {
+        return getContext().getScreen().getAccessor();
+    }
+
+    private ModularGui getScreen() {
+        return getContext().getScreen();
+    }
+
+    /**
+     * Copied from {@link net.minecraft.client.gui.inventory.GuiContainer} and removed the bad parts
+     */
+    private void drawSlot(Slot slotIn) {
+        int x = slotIn.xPos;
+        int y = slotIn.yPos;
+        ItemStack itemstack = slotIn.getStack();
+        boolean flag = false;
+        boolean flag1 = slotIn == getGuiAccessor().getClickedSlot() && !getGuiAccessor().getDraggedStack().isEmpty() && !getGuiAccessor().getIsRightMouseClick();
+        ItemStack itemstack1 = getScreen().mc.player.inventory.getItemStack();
+        String s = null;
+
+        if (slotIn == this.getGuiAccessor().getClickedSlot() && !getGuiAccessor().getDraggedStack().isEmpty() && getGuiAccessor().getIsRightMouseClick() && !itemstack.isEmpty()) {
+            itemstack = itemstack.copy();
+            itemstack.setCount(itemstack.getCount() / 2);
+        } else if (getScreen().isDragSplitting() && getScreen().getDragSlots().contains(slotIn) && !itemstack1.isEmpty()) {
+            if (getScreen().getDragSlots().size() == 1) {
+                return;
+            }
+
+            if (Container.canAddItemToSlot(slotIn, itemstack1, true) && getScreen().inventorySlots.canDragIntoSlot(slotIn)) {
+                itemstack = itemstack1.copy();
+                flag = true;
+                Container.computeStackSize(getScreen().getDragSlots(), getGuiAccessor().getDragSplittingLimit(), itemstack, slotIn.getStack().isEmpty() ? 0 : slotIn.getStack().getCount());
+                int k = Math.min(itemstack.getMaxStackSize(), slotIn.getItemStackLimit(itemstack));
+
+                if (itemstack.getCount() > k) {
+                    s = TextFormatting.YELLOW.toString() + k;
+                    itemstack.setCount(k);
+                }
+            } else {
+                getScreen().getDragSlots().remove(slotIn);
+                getGuiAccessor().invokeUpdateDragSplitting();
+            }
+        }
+
+        getScreen().setZ(100f);
+        getScreen().getItemRenderer().zLevel = 100.0F;
+
+        if (!flag1) {
+            if (flag) {
+                ModularGui.drawSolidRect(1, 1, 16, 16, -2130706433);
+            }
+
+            if (!itemstack.isEmpty()) {
+                GlStateManager.enableDepth();
+                getScreen().getItemRenderer().renderItemAndEffectIntoGUI(getScreen().mc.player, itemstack, 1, 1);
+                getScreen().getItemRenderer().renderItemOverlayIntoGUI(getScreen().getFontRenderer(), itemstack, 1, 1, s);
+                GlStateManager.disableDepth();
+            }
+        }
+
+        getScreen().getItemRenderer().zLevel = 0.0F;
+        getScreen().setZ(0f);
     }
 }

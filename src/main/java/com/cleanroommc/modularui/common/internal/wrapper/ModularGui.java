@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.common.internal.wrapper;
 
+import com.cleanroommc.modularui.api.IVanillaSlot;
 import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.api.TooltipContainer;
@@ -8,23 +9,26 @@ import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.internal.ModularUIContext;
+import com.cleanroommc.modularui.common.internal.mixin.GuiContainerMixin;
 import com.cleanroommc.modularui.common.widget.SlotWidget;
 import com.cleanroommc.modularui.common.widget.Widget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 @SideOnly(Side.CLIENT)
@@ -72,6 +76,10 @@ public class ModularGui extends GuiContainer {
         }
     }
 
+    public boolean isHovering(Widget widget) {
+        return hovered != null && hovered == widget;
+    }
+
     private void setHovered(Widget widget) {
         if (hovered != widget) {
             hovered = widget;
@@ -85,24 +93,92 @@ public class ModularGui extends GuiContainer {
         context.resize(new Size(w, h));
     }
 
+    public GuiContainerMixin getAccessor() {
+        return (GuiContainerMixin) this;
+    }
+
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         mousePos = new Pos2d(mouseX, mouseY);
 
-        super.drawScreen(mouseX, mouseY, partialTicks);
+        int i = this.guiLeft;
+        int j = this.guiTop;
+        this.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
+        GlStateManager.disableLighting();
+        GlStateManager.disableDepth();
+        GlStateManager.pushMatrix();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.enableRescaleNormal();
+        getAccessor().setHoveredSlot(null);
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderHelper.disableStandardItemLighting();
+        this.drawGuiContainerForegroundLayer(mouseX, mouseY);
+        RenderHelper.enableGUIStandardItemLighting();
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.GuiContainerEvent.DrawForeground(this, mouseX, mouseY));
+        InventoryPlayer inventoryplayer = this.mc.player.inventory;
+        ItemStack itemstack = getAccessor().getDraggedStack().isEmpty() ? inventoryplayer.getItemStack() : getAccessor().getDraggedStack();
+        GlStateManager.translate((float) i, (float) j, 0.0F);
+        if (!itemstack.isEmpty()) {
+            int j2 = 8;
+            int k2 = getAccessor().getDraggedStack().isEmpty() ? 8 : 16;
+            String s = null;
+
+            if (!getAccessor().getDraggedStack().isEmpty() && getAccessor().getIsRightMouseClick()) {
+                itemstack = itemstack.copy();
+                itemstack.setCount(MathHelper.ceil((float) itemstack.getCount() / 2.0F));
+            } else if (this.dragSplitting && this.dragSplittingSlots.size() > 1) {
+                itemstack = itemstack.copy();
+                itemstack.setCount(getAccessor().getDragSplittingRemnant());
+
+                if (itemstack.isEmpty()) {
+                    s = "" + TextFormatting.YELLOW + "0";
+                }
+            }
+
+            this.drawItemStack(itemstack, mouseX - i - 8, mouseY - j - k2, s);
+        }
+
+        if (!getAccessor().getReturningStack().isEmpty()) {
+            float f = (float) (Minecraft.getSystemTime() - getAccessor().getReturningStackTime()) / 100.0F;
+
+            if (f >= 1.0F) {
+                f = 1.0F;
+                getAccessor().setReturningStack(ItemStack.EMPTY);
+            }
+
+            int l2 = getAccessor().getReturningStackDestSlot().xPos - getAccessor().getTouchUpX();
+            int i3 = getAccessor().getReturningStackDestSlot().yPos - getAccessor().getTouchUpY();
+            int l1 = getAccessor().getTouchUpX() + (int) ((float) l2 * f);
+            int i2 = getAccessor().getTouchUpY() + (int) ((float) i3 * f);
+            this.drawItemStack(getAccessor().getReturningStack(), l1, i2, null);
+        }
+
+        GlStateManager.popMatrix();
+
         if (debugMode) {
-            GlStateManager.disableRescaleNormal();
-            RenderHelper.disableStandardItemLighting();
-            GlStateManager.disableLighting();
             GlStateManager.disableDepth();
+            GlStateManager.disableLighting();
             GlStateManager.enableBlend();
             drawDebugScreen();
             GlStateManager.color(1f, 1f, 1f, 1f);
-            GlStateManager.enableLighting();
-            GlStateManager.enableDepth();
-            GlStateManager.enableRescaleNormal();
-            RenderHelper.enableStandardItemLighting();
         }
+        GlStateManager.enableLighting();
+        GlStateManager.enableDepth();
+        GlStateManager.enableRescaleNormal();
+        RenderHelper.enableStandardItemLighting();
+    }
+
+    private void drawItemStack(ItemStack stack, int x, int y, String altText) {
+        GlStateManager.translate(0.0F, 0.0F, 32.0F);
+        this.zLevel = 200.0F;
+        this.itemRender.zLevel = 200.0F;
+        FontRenderer font = stack.getItem().getFontRenderer(stack);
+        if (font == null) font = fontRenderer;
+        this.itemRender.renderItemAndEffectIntoGUI(stack, x, y);
+        this.itemRender.renderItemOverlayIntoGUI(font, stack, x, y - (getAccessor().getDraggedStack().isEmpty() ? 0 : 8), altText);
+        this.zLevel = 0.0F;
+        this.itemRender.zLevel = 0.0F;
     }
 
     @Override
@@ -134,7 +210,7 @@ public class ModularGui extends GuiContainer {
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         GlStateManager.pushMatrix();
-        GlStateManager.translate(-this.guiLeft, -this.guiTop, 0);
+        //GlStateManager.translate(-this.guiLeft, -this.guiTop, 0);
         GlStateManager.disableRescaleNormal();
         RenderHelper.disableStandardItemLighting();
         GlStateManager.disableLighting();
@@ -202,6 +278,9 @@ public class ModularGui extends GuiContainer {
         context.getCurrentWindow().update();
         setHovered(context.getTopWidgetAt(getMousePos()));
         if (hovered != null) {
+            if (hovered instanceof IVanillaSlot) {
+                getAccessor().setHoveredSlot(((IVanillaSlot) hovered).getMcSlot());
+            }
             timeHovered++;
         }
     }
@@ -302,6 +381,30 @@ public class ModularGui extends GuiContainer {
 
     public boolean isFocusedValid() {
         return focused != null && focused.isEnabled();
+    }
+
+    public boolean isDragSplitting() {
+        return dragSplitting;
+    }
+
+    public Set<Slot> getDragSlots() {
+        return dragSplittingSlots;
+    }
+
+    public RenderItem getItemRenderer() {
+        return itemRender;
+    }
+
+    public float getZ() {
+        return zLevel;
+    }
+
+    public void setZ(float z) {
+        this.zLevel = z;
+    }
+
+    public FontRenderer getFontRenderer() {
+        return fontRenderer;
     }
 
     @SideOnly(Side.CLIENT)

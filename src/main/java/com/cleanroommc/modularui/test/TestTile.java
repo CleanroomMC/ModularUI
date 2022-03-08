@@ -28,11 +28,11 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
         Text[] TEXT = {new Text("Blue \u00a7nUnderlined\u00a7rBlue ").color(0x3058B8), new Text("Mint").color(0x469E8F)};
         ModularWindow.Builder builder = ModularWindow.builder(new Size(176, 166))
                 .addFromJson("modularui:test", buildContext);
-        buildContext.applyToWidget("background", DrawableWidget.class, widget -> {
+        /*buildContext.applyToWidget("background", DrawableWidget.class, widget -> {
             widget.addTooltip("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.")
                     .addTooltip("Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.")
                     .addTooltip("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet");
-        });
+        });*/
         return builder.widget(new CycleButtonWidget()
                 .setLength(3)
                 .setGetter(() -> serverValue)
