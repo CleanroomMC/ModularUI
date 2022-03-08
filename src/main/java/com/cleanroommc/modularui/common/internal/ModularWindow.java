@@ -40,6 +40,8 @@ public class ModularWindow implements IWidgetParent {
     private boolean active;
     private boolean needsRebuild = false;
     private int color = 0xFFFFFFFF;
+    private float scale = 1f;
+    private float rotation = 0;
 
     private Interpolator openAnimation, closeAnimation;
 
@@ -78,14 +80,21 @@ public class ModularWindow implements IWidgetParent {
         openAnimation = new Interpolator(0, 1, 250, Eases.EaseQuadOut, value -> {
             float val = (float) value;
             color = Color.withAlpha(color, val);
-            int y = (int) ((endY - startY) * val + startY);
-            setPos(new Pos2d(pos.x, y));
-            markNeedsRebuild();
+            //int y = (int) ((endY - startY) * val + startY);
+            //setPos(new Pos2d(pos.x, y));
+            //markNeedsRebuild();
+            scale = val;
+            //rotation = val * 360;
+        }, val -> {
+            color = Color.withAlpha(color, 255);
+            //setPos(new Pos2d(pos.x, endY));
+            scale = 1f;
+            rotation = 360;
         });
         closeAnimation = openAnimation.getReversed(250, Eases.EaseQuadIn);
         openAnimation.forward();
         closeAnimation.setCallback(val -> context.close());
-        this.pos = new Pos2d(pos.x, getContext().getScaledScreenSize().height);
+        //this.pos = new Pos2d(pos.x, getContext().getScaledScreenSize().height);
     }
 
     /**
@@ -97,7 +106,9 @@ public class ModularWindow implements IWidgetParent {
         if (closeAnimation == null) {
             return true;
         }
-        closeAnimation.forward();
+        if (!closeAnimation.isRunning()) {
+            closeAnimation.forward();
+        }
         return false;
     }
 
@@ -159,12 +170,22 @@ public class ModularWindow implements IWidgetParent {
     }
 
     public void drawWidgetsBackGround(float partialTicks) {
+        GlStateManager.pushMatrix();
+        // rotate around center
+        //GlStateManager.translate(pos.x + size.width / 2f, pos.y + size.height / 2f, 0);
+        //GlStateManager.rotate(rotation, 0, 0, 1);
+        //GlStateManager.translate(-(pos.x + size.width / 2f), -(pos.y + size.height / 2f), 0);
+        final float sf = 1 / scale;
+        GlStateManager.scale(scale, scale, 1);
         GlStateManager.color(Color.getRedF(color), Color.getGreenF(color), Color.getBlueF(color), Color.getAlphaF(color));
         IWidgetParent.forEachByLayer(this, widget -> {
             widget.onFrameUpdate();
             if (widget.isEnabled()) {
                 GlStateManager.pushMatrix();
-                GlStateManager.translate(widget.getAbsolutePos().x, widget.getAbsolutePos().y, 0);
+                // translate to center according to scale
+                float x = (pos.x + size.width / 2f * (1 - scale) + (widget.getAbsolutePos().x - pos.x) * scale) * sf;
+                float y = (pos.y + size.height / 2f * (1 - scale) + (widget.getAbsolutePos().y - pos.y) * scale) * sf;
+                GlStateManager.translate(x, y, 0);
                 GlStateManager.color(Color.getRedF(color), Color.getGreenF(color), Color.getBlueF(color), Color.getAlphaF(color));
                 GlStateManager.enableBlend();
                 IWidgetDrawable background = widget.getDrawable();
@@ -177,6 +198,7 @@ public class ModularWindow implements IWidgetParent {
             return false;
         });
         GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.popMatrix();
     }
 
     public void drawWidgetsForeGround(float partialTicks) {

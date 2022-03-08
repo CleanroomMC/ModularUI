@@ -58,6 +58,10 @@ public class Interpolator {
         return progress >= duration;
     }
 
+    public boolean isRunning() {
+        return runs != 0 && progress > 0 && progress < duration;
+    }
+
     public void update(float partialTicks) {
         if (runs != 0) {
             if (runs == -1 && progress <= 0) {
