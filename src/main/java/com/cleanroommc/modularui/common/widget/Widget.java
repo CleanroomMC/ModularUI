@@ -11,6 +11,7 @@ import com.cleanroommc.modularui.common.internal.JsonHelper;
 import com.cleanroommc.modularui.common.internal.ModularUIContext;
 import com.cleanroommc.modularui.common.internal.ModularWindow;
 import com.google.gson.JsonObject;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -502,5 +503,38 @@ public abstract class Widget {
                 mouse.x <= areaTopLeft.x + areaSize.width &&
                 mouse.y >= areaTopLeft.y &&
                 mouse.y <= areaTopLeft.y + areaSize.height;
+    }
+
+    public static class ClickData {
+        public final int mouseButton;
+        public final boolean doubleClick;
+        public final boolean shift;
+        public final boolean ctrl;
+        public final boolean alt;
+
+        public ClickData(int mouseButton, boolean doubleClick, boolean shift, boolean ctrl, boolean alt) {
+            this.mouseButton = mouseButton;
+            this.doubleClick = doubleClick;
+            this.shift = shift;
+            this.ctrl = ctrl;
+            this.alt = alt;
+        }
+
+        public void writeToPacket(PacketBuffer buffer) {
+            buffer.writeByte(mouseButton);
+            buffer.writeBoolean(doubleClick);
+            buffer.writeBoolean(shift);
+            buffer.writeBoolean(ctrl);
+            buffer.writeBoolean(alt);
+        }
+
+        public static ClickData readPacket(PacketBuffer buffer) {
+            return new ClickData(buffer.readByte(), buffer.readBoolean(), buffer.readBoolean(), buffer.readBoolean(), buffer.readBoolean());
+        }
+
+        @SideOnly(Side.CLIENT)
+        public static ClickData create(int mouse, boolean doubleClick) {
+            return new ClickData(mouse, doubleClick, Interactable.hasShiftDown(), Interactable.hasControlDown(), Interactable.hasAltDown());
+        }
     }
 }

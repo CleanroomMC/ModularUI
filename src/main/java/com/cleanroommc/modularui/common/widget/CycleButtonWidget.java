@@ -1,12 +1,15 @@
 package com.cleanroommc.modularui.common.widget;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.IWidgetDrawable;
 import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.UITexture;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.common.internal.JsonHelper;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.minecraft.network.PacketBuffer;
 
 import javax.annotation.Nullable;
@@ -22,6 +25,38 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
     private IDrawable texture = IDrawable.EMPTY;
 
     public CycleButtonWidget() {
+    }
+
+    @Override
+    public void readJson(JsonObject json, String type) {
+        super.readJson(json, type);
+        this.length = JsonHelper.getInt(json, 1, "length", "size");
+        this.state = JsonHelper.getInt(json, 0, "defaultState");
+        if (json.has("texture")) {
+            JsonElement element = json.get("texture");
+            if (element.isJsonArray()) {
+                JsonArray array = element.getAsJsonArray();
+                this.length = array.size();
+                IDrawable[] textures = new IDrawable[this.length];
+                for (int i = 0; i < array.size(); i++) {
+                    JsonElement element1 = array.get(i);
+                    if (element1.isJsonObject()) {
+                        textures[i] = IDrawable.ofJson(element1.getAsJsonObject());
+                    } else {
+                        textures[i] = IDrawable.EMPTY;
+                        ModularUI.LOGGER.error("Texture needs to be a json object");
+                    }
+                }
+                this.textureGetter = val -> textures[val];
+            } else if (element.isJsonObject()) {
+                IDrawable drawable = IDrawable.ofJson(element.getAsJsonObject());
+                if (drawable instanceof UITexture) {
+                    setTexture((UITexture) drawable);
+                } else {
+                    this.textureGetter = val -> drawable;
+                }
+            }
+        }
     }
 
     @Override
@@ -53,7 +88,7 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
         }
         this.state = state;
         if (sync) {
-            if (isClient() && sendChangesToServer()) {
+            if (isClient() && handlesClient()) {
                 syncToServer(1, buffer -> buffer.writeVarInt(state));
             } else {
                 syncToClient(1, buffer -> buffer.writeVarInt(state));
@@ -72,16 +107,18 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
         switch (buttonId) {
             case 0:
                 next();
+                Interactable.playButtonClickSound();
                 break;
             case 1:
                 prev();
+                Interactable.playButtonClickSound();
                 break;
         }
     }
 
     @Override
     public void onServerTick() {
-        if (detectChangesOnServer()) {
+        if (handlesServer()) {
             int actualValue = getter.getAsInt();
             if (actualValue != state) {
                 setState(actualValue, true, false);

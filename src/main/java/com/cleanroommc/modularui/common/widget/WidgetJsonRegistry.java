@@ -5,10 +5,7 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.UITexture;
 import com.cleanroommc.modularui.api.math.Pos2d;
-import com.cleanroommc.modularui.common.internal.JsonHelper;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -23,13 +20,7 @@ public class WidgetJsonRegistry {
         registerWidget("cycle_button", CycleButtonWidget::new);
         registerWidgetSpecial("player_inventory", player -> SlotGroup.playerInventoryGroup(player, Pos2d.ZERO));
 
-        IDrawable.JSON_DRAWABLE_MAP.put("text", json -> {
-            String text = JsonHelper.getString(json, "E:404", "text");
-            if (FMLCommonHandler.instance().getSide().isClient() && JsonHelper.getBoolean(json, false, "localised")) {
-                text = I18n.format(text);
-            }
-            return new Text(text);
-        });
+        IDrawable.JSON_DRAWABLE_MAP.put("text", Text::ofJson);
         IDrawable.JSON_DRAWABLE_MAP.put("image", UITexture::ofJson);
     }
 

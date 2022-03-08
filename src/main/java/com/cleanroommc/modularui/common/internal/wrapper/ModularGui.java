@@ -241,31 +241,15 @@ public class ModularGui extends GuiContainer {
     }
 
     public void drawDebugScreen() {
-        AtomicReference<Widget> topWidget = new AtomicReference<>();
-
-        IWidgetParent.forEachByLayer(context.getCurrentWindow(), widget -> {
-            if (!widget.isUnderMouse()) {
-                return;
-            }
-            if (topWidget.get() == null) {
-                topWidget.set(widget);
-                return;
-            }
-            if (widget.getLayer() >= topWidget.get().getLayer()) {
-                topWidget.set(widget);
-            }
-        });
-
         int color = Color.rgb(180, 40, 115);
-        Widget widget = topWidget.get();
-        if (widget != null) {
-            Size size = widget.getSize();
-            Pos2d pos = widget.getAbsolutePos();
+        if (hovered != null) {
+            Size size = hovered.getSize();
+            Pos2d pos = hovered.getAbsolutePos();
 
             drawBorder(pos.x, pos.y, size.width, size.height, color, 1f);
-            drawText("Class: " + widget.getClass().getSimpleName(), pos.x, pos.y - 18, 0.5f, color, false);
+            drawText("Class: " + hovered.getClass().getSimpleName(), pos.x, pos.y - 18, 0.5f, color, false);
             drawText("Size: " + size, pos.x, pos.y - 12, 0.5f, color, false);
-            drawText("Pos: " + widget.getPos(), pos.x, pos.y - 6, 0.5f, color, false);
+            drawText("Pos: " + hovered.getPos(), pos.x, pos.y - 6, 0.5f, color, false);
         }
 
         drawString(fontRenderer, "FPS: " + fps, 5, (int) (context.getScaledScreenSize().height - 24), color);
