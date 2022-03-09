@@ -22,6 +22,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
     private int serverValue = 0;
     private int time = 0;
     private FluidTank fluidTank = new FluidTank(10000);
+    private String textFieldValue = "";
     private static final AdaptableUITexture DISPLAY = AdaptableUITexture.of("modularui:gui/background/display", 143, 75, 2);
 
     @Override
@@ -34,17 +35,20 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                     .addTooltip("Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.")
                     .addTooltip("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet");
         });*/
-        return builder.widget(new CycleButtonWidget()
-                .setLength(3)
-                .setGetter(() -> serverValue)
-                .setSetter(val -> this.serverValue = val)
-                .setTexture(UITexture.fullImage("modularui", "gui/widgets/cycle_button_demo"))
-                .setPos(new Pos2d(78, 20))
-                .addTooltip("Test Tooltip")
-                .setTooltipShowUpDelay(10))
+        return builder
+                .widget(new CycleButtonWidget()
+                        .setLength(3)
+                        .setGetter(() -> serverValue)
+                        .setSetter(val -> this.serverValue = val)
+                        .setTexture(UITexture.fullImage("modularui", "gui/widgets/cycle_button_demo"))
+                        .setPos(new Pos2d(78, 20))
+                        .addTooltip("Test Tooltip")
+                        .setTooltipShowUpDelay(10))
                 .widget(new TextFieldWidget()
                         .setMaxLines(2)
                         .setScale(1f)
+                        .setGetter(() -> textFieldValue)
+                        .setSetter(val -> textFieldValue = val)
                         .setTextColor(Color.rgb(220, 220, 220))
                         .setBackground(DISPLAY.withOffset(-2, -2, 4, 4))
                         .setPos(20, 45))

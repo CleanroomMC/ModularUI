@@ -1,22 +1,24 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.api.ISyncedWidget;
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.api.drawable.TextFieldRenderer;
 import com.cleanroommc.modularui.api.drawable.TextRenderer;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.common.internal.network.NetworkUtils;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.network.PacketBuffer;
 import org.lwjgl.input.Keyboard;
 
 import javax.annotation.Nullable;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
-public class TextFieldWidget extends Widget implements Interactable, ISyncedWidget {
+public class TextFieldWidget extends SyncedWidget implements Interactable {
 
     // all positive whole numbers
     public static final Pattern NATURAL_NUMS = Pattern.compile("[0-9]*");
@@ -32,6 +34,8 @@ public class TextFieldWidget extends Widget implements Interactable, ISyncedWidg
     private Pattern pattern = ANY;
     private final TextFieldRenderer renderer = new TextFieldRenderer(Pos2d.ZERO, 0, 0);
     private final TextRenderer helper = new TextRenderer(Pos2d.ZERO, 0, 0);
+    private Supplier<String> getter;
+    private Consumer<String> setter;
     private int cursorTimer = 0;
     private int textColor = TextFieldRenderer.DEFAULT_COLOR;
     private Function<String, String> validator = val -> val;
@@ -238,6 +242,9 @@ public class TextFieldWidget extends Widget implements Interactable, ISyncedWidg
         cursorTimer = 0;
         setCursorEnd(cursor);
         text = validator.apply(text);
+        if (handlesClient()) {
+            syncToServer(1, buffer -> NetworkUtils.writeStringSafe(buffer, text));
+        }
     }
 
     @Nullable
@@ -253,13 +260,82 @@ public class TextFieldWidget extends Widget implements Interactable, ISyncedWidg
     }
 
     @Override
-    public void readOnClient(int id, PacketBuffer buf) {
+    public void onServerTick() {
+        if (handlesServer() && getter != null) {
+            String val = getter.get();
+            if (!text.equals(val)) {
+                text = val;
+                syncToClient(1, buffer -> NetworkUtils.writeStringSafe(buffer, text));
+            }
+        }
+    }
 
+    @Override
+    public void readOnClient(int id, PacketBuffer buf) {
+        if (id == 1) {
+            if (!isFocused()) {
+                this.text = buf.readString(Short.MAX_VALUE);
+                if (this.setter != null) {
+                    this.setter.accept(this.text);
+                }
+            }
+        }
     }
 
     @Override
     public void readOnServer(int id, PacketBuffer buf) {
+        if (id == 1) {
+            this.text = buf.readString(Short.MAX_VALUE);
+            if (this.setter != null) {
+                this.setter.accept(this.text);
+            }
+        }
+    }
 
+    public TextFieldWidget setSetter(Consumer<String> setter) {
+        this.setter = setter;
+        return this;
+    }
+
+    public TextFieldWidget setSetterLong(Consumer<Long> setter) {
+        this.setter = val -> {
+            if (!val.isEmpty()) {
+                try {
+                    setter.accept(Long.parseLong(val));
+                } catch (NumberFormatException e) {
+                    ModularUI.LOGGER.warn("Error parsing text field value to long: {}", val);
+                }
+            }
+        };
+        return this;
+    }
+
+    public TextFieldWidget setSetterInt(Consumer<Integer> setter) {
+        this.setter = val -> {
+            if (!val.isEmpty()) {
+                try {
+                    setter.accept(Integer.parseInt(val));
+                } catch (NumberFormatException e) {
+                    ModularUI.LOGGER.warn("Error parsing text field value to int: {}", val);
+                }
+            }
+        };
+        return this;
+    }
+
+    public TextFieldWidget setGetter(Supplier<String> getter) {
+        this.getter = getter;
+        return this;
+    }
+
+    public TextFieldWidget setGetterLong(Supplier<Long> getter) {
+        this.getter = () -> String.valueOf(getter.get());
+        return this;
+    }
+
+    public TextFieldWidget setGetterInt(Supplier<Integer> getter) {
+        this.getter = () -> String.valueOf(getter.get());
+        return this;
     }
 
     public TextFieldWidget setPattern(Pattern pattern) {

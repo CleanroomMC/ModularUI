@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.common.internal.network;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.common.internal.ModularUIContext;
-import com.cleanroommc.modularui.common.internal.NetworkUtils;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -48,6 +47,8 @@ public class SWidgetUpdate implements Packet<INetHandlerPlayClient> {
                 ModularUI.LOGGER.error("Error reading server packet: ");
                 e.printStackTrace();
             }
+        } else {
+            ModularUI.LOGGER.error("Expected ModularGui screen on client, but got {}", screen);
         }
     }
 }

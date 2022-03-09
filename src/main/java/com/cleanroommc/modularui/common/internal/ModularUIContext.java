@@ -7,6 +7,7 @@ import com.cleanroommc.modularui.api.IWindowCreator;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.internal.network.CWidgetUpdate;
+import com.cleanroommc.modularui.common.internal.network.NetworkUtils;
 import com.cleanroommc.modularui.common.internal.network.SWidgetUpdate;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularUIContainer;
@@ -38,6 +39,7 @@ public class ModularUIContext {
     private ModularGui screen;
     private ModularUIContainer container;
     private final EntityPlayer player;
+    private boolean initialized = false;
 
     @SideOnly(Side.CLIENT)
     private Size screenSize = new Size(MC.displayWidth, MC.displayHeight);
@@ -54,6 +56,11 @@ public class ModularUIContext {
         this.container = container;
         this.mainWindow = mainWindow;
         pushWindow(mainWindow);
+        if (isClient()) {
+            // if on client, notify the server that the client initialized, to allow syncing to client
+            this.initialized = true;
+            sendClientPacket(DataCodes.SYNC_INIT, null, mainWindow, NetworkUtils.EMPTY_PACKET);
+        }
     }
 
     @SideOnly(Side.CLIENT)
@@ -124,6 +131,10 @@ public class ModularUIContext {
         }
     }
 
+    public boolean isInitialized() {
+        return initialized;
+    }
+
     @SideOnly(Side.CLIENT)
     public Pos2d getMousePos() {
         return screen.getMousePos();
@@ -145,7 +156,7 @@ public class ModularUIContext {
         if (stack != null) {
             player.inventory.setItemStack(stack);
             if (sync && !isClient()) {
-                sendServerPacket(1, null, mainWindow, buffer -> buffer.writeItemStack(stack));
+                sendServerPacket(DataCodes.SYNC_CURSOR_STACK, null, mainWindow, buffer -> buffer.writeItemStack(stack));
             }
         }
     }
@@ -183,19 +194,22 @@ public class ModularUIContext {
     }
 
     public void readClientPacket(PacketBuffer buf, int widgetId) throws IOException {
-        if (widgetId == -1) {
-
+        int id = buf.readVarInt();
+        if (widgetId == DataCodes.INTERNAL_SYNC) {
+            if (id == DataCodes.SYNC_INIT) {
+                this.initialized = true;
+            }
         } else {
             ISyncedWidget syncedWidget = mainWindow.getSyncedWidget(widgetId);
-            syncedWidget.readOnServer(buf.readVarInt(), buf);
+            syncedWidget.readOnServer(id, buf);
         }
     }
 
     @SideOnly(Side.CLIENT)
     public void readServerPacket(PacketBuffer buf, int widgetId) throws IOException {
         int id = buf.readVarInt();
-        if (widgetId == -1) {
-            if (id == 1) {
+        if (widgetId == DataCodes.INTERNAL_SYNC) {
+            if (id == DataCodes.SYNC_CURSOR_STACK) {
                 player.inventory.setItemStack(buf.readItemStack());
             }
         } else {
@@ -210,7 +224,7 @@ public class ModularUIContext {
             ModularUI.LOGGER.error("Tried syncing from non main window");
             return;
         }
-        int syncId = syncedWidget == null ? -1 : window.getSyncedWidgetId(syncedWidget);
+        int syncId = syncedWidget == null ? DataCodes.INTERNAL_SYNC : window.getSyncedWidgetId(syncedWidget);
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         buffer.writeVarInt(discriminator);
         bufferConsumer.accept(buffer);
@@ -220,12 +234,18 @@ public class ModularUIContext {
 
     public void sendServerPacket(int discriminator, ISyncedWidget syncedWidget, ModularWindow window, Consumer<PacketBuffer> bufferConsumer) {
         if (player instanceof EntityPlayerMP) {
-            int syncId = syncedWidget == null ? -1 : window.getSyncedWidgetId(syncedWidget);
+            int syncId = syncedWidget == null ? DataCodes.INTERNAL_SYNC : window.getSyncedWidgetId(syncedWidget);
             PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
             buffer.writeVarInt(discriminator);
             bufferConsumer.accept(buffer);
             SWidgetUpdate packet = new SWidgetUpdate(buffer, syncId);
             ((EntityPlayerMP) player).connection.sendPacket(packet);
         }
+    }
+
+    private static class DataCodes {
+        static final int INTERNAL_SYNC = -1;
+        static final int SYNC_CURSOR_STACK = 1;
+        static final int SYNC_INIT = 2;
     }
 }

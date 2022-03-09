@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.common.internal.network;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.common.internal.ModularUIContext;
-import com.cleanroommc.modularui.common.internal.NetworkUtils;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularUIContainer;
 import net.minecraft.inventory.Container;
 import net.minecraft.network.NetHandlerPlayServer;
@@ -47,6 +46,8 @@ public class CWidgetUpdate implements Packet<NetHandlerPlayServer> {
                 ModularUI.LOGGER.error("Error reading client packet: ");
                 e.printStackTrace();
             }
+        } else {
+            ModularUI.LOGGER.error("Expected ModularUIContainer on server, but got {}", container);
         }
     }
 }
