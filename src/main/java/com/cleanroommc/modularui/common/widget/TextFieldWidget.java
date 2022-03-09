@@ -4,9 +4,12 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.api.drawable.TextFieldRenderer;
 import com.cleanroommc.modularui.api.drawable.TextRenderer;
+import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.common.internal.JsonHelper;
 import com.cleanroommc.modularui.common.internal.network.NetworkUtils;
+import com.google.gson.JsonObject;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.network.PacketBuffer;
@@ -40,6 +43,23 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
     private int textColor = TextFieldRenderer.DEFAULT_COLOR;
     private Function<String, String> validator = val -> val;
     private int maxWidth = 80, maxLines = 1;
+
+    @Override
+    public void readJson(JsonObject json, String type) {
+        super.readJson(json, type);
+        setMaxWidth(JsonHelper.getInt(json, 80, "maxWidth"));
+        setMaxLines(JsonHelper.getInt(json, 1, "maxLines"));
+        Integer color = JsonHelper.getElement(json, null, Color::ofJson, "textColor", "color");
+        if (color != null) {
+            setTextColor(color);
+        }
+        color = JsonHelper.getElement(json, null, Color::ofJson, "markedColor");
+        if (color != null) {
+            setMarkedColor(color);
+        }
+        setPattern(Pattern.compile(JsonHelper.getString(json, ".*", "pattern")));
+        setScale(JsonHelper.getFloat(json, 1f, "scale"));
+    }
 
     public void setCursor(int pos) {
         setCursor(pos, true);

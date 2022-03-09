@@ -18,6 +18,8 @@ public class WidgetJsonRegistry {
         registerWidget("text", TextWidget::new);
         registerWidget("image", DrawableWidget::new);
         registerWidget("cycle_button", CycleButtonWidget::new);
+        registerWidget("button", ButtonWidget::new);
+        registerWidget("textfield", TextFieldWidget::new);
         registerWidgetSpecial("player_inventory", player -> SlotGroup.playerInventoryGroup(player, Pos2d.ZERO));
 
         IDrawable.JSON_DRAWABLE_MAP.put("text", Text::ofJson);

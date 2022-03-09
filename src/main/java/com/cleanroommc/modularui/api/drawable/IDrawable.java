@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.api.drawable;
 
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.common.internal.JsonHelper;
 import com.cleanroommc.modularui.common.widget.DrawableWidget;
 import com.google.gson.JsonObject;
 
@@ -81,12 +82,23 @@ public interface IDrawable {
     static final Map<String, Function<JsonObject, IDrawable>> JSON_DRAWABLE_MAP = new HashMap<>();
 
     static IDrawable ofJson(JsonObject json) {
+        IDrawable drawable = EMPTY;
         if (json.has("type")) {
             Function<JsonObject, IDrawable> function = JSON_DRAWABLE_MAP.get(json.get("type").getAsString());
             if (function != null) {
-                return function.apply(json);
+                drawable = function.apply(json);
             }
         }
-        return EMPTY;
+        Pos2d offset = JsonHelper.getElement(json, Pos2d.ZERO, Pos2d::ofJson, "offset");
+        Size offsetSize = JsonHelper.getElement(json, Size.ZERO, Size::ofJson, "offsetSize");
+        Size fixedSize = JsonHelper.getElement(json, Size.ZERO, Size::ofJson, "fixedSize");
+        if (!fixedSize.isZero()) {
+            return drawable.withFixedSize(fixedSize.width, fixedSize.height, offset.x, offset.y);
+        }
+        if (!offset.isZero() || !offsetSize.isZero()) {
+            return drawable.withOffset(offset.x, offset.y, offsetSize.width, offsetSize.height);
+        }
+
+        return drawable;
     }
 }
