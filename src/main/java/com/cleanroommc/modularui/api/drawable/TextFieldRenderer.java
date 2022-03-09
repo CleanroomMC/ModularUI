@@ -25,6 +25,10 @@ public class TextFieldRenderer extends TextRenderer {
         this.markedColor = markedColor;
     }
 
+    public void setTextColor(int color) {
+        this.currentColor = color;
+    }
+
     public void setCursor(int cursor, int cursorEnd) {
         this.cursor = cursor;
         this.cursorEnd = cursorEnd;
@@ -104,10 +108,10 @@ public class TextFieldRenderer extends TextRenderer {
         float x = (currentX + lineXOffset - 0.8f) * sf, y = (getCurrentY() - 1) * sf;
         float endX = x + 0.6f /* * (1 / getScale())*/;
         float endY = y + 9;
-        float red = Color.getRedF(getDefaultColor());
-        float green = Color.getGreenF(getDefaultColor());
-        float blue = Color.getBlueF(getDefaultColor());
-        float alpha = Color.getAlphaF(getDefaultColor());
+        float red = Color.getRedF(currentColor);
+        float green = Color.getGreenF(currentColor);
+        float blue = Color.getBlueF(currentColor);
+        float alpha = Color.getAlphaF(currentColor);
         if (alpha == 0)
             alpha = 1f;
         Tessellator tessellator = Tessellator.getInstance();

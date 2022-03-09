@@ -1,15 +1,15 @@
 package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.api.ITileWithModularUI;
-import com.cleanroommc.modularui.api.TooltipContainer;
+import com.cleanroommc.modularui.api.drawable.AdaptableUITexture;
 import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.UITexture;
+import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.internal.ModularWindow;
 import com.cleanroommc.modularui.common.internal.UIBuildContext;
 import com.cleanroommc.modularui.common.widget.CycleButtonWidget;
-import com.cleanroommc.modularui.common.widget.DrawableWidget;
 import com.cleanroommc.modularui.common.widget.FluidSlotWidget;
 import com.cleanroommc.modularui.common.widget.TextFieldWidget;
 import net.minecraft.nbt.NBTTagCompound;
@@ -22,6 +22,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
     private int serverValue = 0;
     private int time = 0;
     private FluidTank fluidTank = new FluidTank(10000);
+    private static final AdaptableUITexture DISPLAY = AdaptableUITexture.of("modularui:gui/background/display", 143, 75, 2);
 
     @Override
     public ModularWindow createWindow(UIBuildContext buildContext) {
@@ -43,7 +44,9 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                 .setTooltipShowUpDelay(10))
                 .widget(new TextFieldWidget()
                         .setMaxLines(2)
-                        .setScale(0.5f)
+                        .setScale(1f)
+                        .setTextColor(Color.rgb(220, 220, 220))
+                        .setBackground(DISPLAY.withOffset(-2, -2, 4, 4))
                         .setPos(20, 45))
                 .widget(new FluidSlotWidget(fluidTank).setPos(20, 65))
                 .build();

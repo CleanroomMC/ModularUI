@@ -4,8 +4,6 @@ import com.cleanroommc.modularui.api.drawable.GuiHelper;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.TextSpan;
-import com.cleanroommc.modularui.api.math.Pos2d;
-import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.internal.ModularUIContext;
 
 import java.util.ArrayList;
@@ -79,7 +77,7 @@ public class TooltipContainer implements IDrawable {
     }
 
     @Override
-    public void draw(Pos2d pos, Size size, float partialTicks) {
+    public void draw(float x, float y, float width, float height, float partialTicks) {
         if (!lines.isEmpty() && GuiHelper.hasScreen()) {
             GuiHelper.drawHoveringTextSpans(lines, GuiHelper.getCurrentMousePos(), GuiHelper.getScreenSize(), maxBoxWidth, scale, forceShadow);
         }

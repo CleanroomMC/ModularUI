@@ -73,6 +73,15 @@ public class UITexture implements IDrawable {
         return getSubArea(pos.x, pos.y, pos.x + size.width, pos.y + size.height);
     }
 
+    /**
+     * Returns a texture with a sub area relative to this area texture
+     *
+     * @param u0 x offset of the image (0-1)
+     * @param v0 y offset of the image (0-1)
+     * @param u1 x end offset of the image (0-1)
+     * @param v1 y end offset of the image (0-1)
+     * @return relative sub area
+     */
     public UITexture getSubArea(float u0, float v0, float u1, float v1) {
         return new UITexture(location, calcUV0(this.u0, u0), calcUV0(this.v0, v0), this.u1 * u1, this.v1 * v1);
     }
@@ -82,20 +91,32 @@ public class UITexture implements IDrawable {
     }
 
     private float calcUV0(float oldV, float newV) {
-        return oldV == 0.0F ? oldV + newV : oldV + oldV * newV;
+        return oldV == 0.0F ? newV : oldV + oldV * newV;
     }
 
     @Override
-    public void draw(Pos2d pos, Size size, float partialTicks) {
-        float x0 = pos.x, y0 = pos.y, x1 = x0 + size.width, y1 = y0 + size.height;
+    public void draw(float x, float y, float width, float height, float partialTicks) {
+        draw(x, y, width, height);
+    }
+
+    public void draw(float x, float y, float width, float height) {
+        draw(location, x, y, width, height, u0, v0, u1, v1);
+    }
+
+    public void drawSubArea(float x, float y, float width, float height, float uStart, float vStart, float uEnd, float vEnd) {
+        draw(location, x, y, width, height, calcUV0(this.u0, uStart), calcUV0(this.v0, vStart), this.u1 * uEnd, this.v1 * vEnd);
+    }
+
+    public static void draw(ResourceLocation location, float x0, float y0, float width, float height, float u0, float v0, float u1, float v1) {
+        float x1 = x0 + width, y1 = y0 + height;
         Minecraft.getMinecraft().renderEngine.bindTexture(location);
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
         bufferbuilder.pos(x0, y1, 0.0f).tex(u0, v1).endVertex();
-        bufferbuilder.pos(x1, y1, 0.0D).tex(u1, v1).endVertex();
-        bufferbuilder.pos(x1, y0, 0.0D).tex(u1, v0).endVertex();
-        bufferbuilder.pos(x0, y0, 0.0D).tex(u0, v0).endVertex();
+        bufferbuilder.pos(x1, y1, 0.0f).tex(u1, v1).endVertex();
+        bufferbuilder.pos(x1, y0, 0.0f).tex(u1, v0).endVertex();
+        bufferbuilder.pos(x0, y0, 0.0f).tex(u0, v0).endVertex();
         tessellator.draw();
     }
 

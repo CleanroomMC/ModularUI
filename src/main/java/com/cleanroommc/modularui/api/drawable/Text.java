@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.api.drawable;
 
 import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
-import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.internal.JsonHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -88,9 +87,10 @@ public class Text implements IDrawable {
     }
 
     @Override
-    public void draw(Pos2d pos, Size size, float partialTicks) {
+    public void draw(float x, float y, float width, float height, float partialTicks) {
         if (hasColor()) {
-            TextRenderer.drawString(getFormatted(), pos, color, size.width);
+            // TODO: use float pos for text rendering instead of Pos2d object
+            TextRenderer.drawString(getFormatted(), new Pos2d(x, y), color, (int) width);
         }
     }
 

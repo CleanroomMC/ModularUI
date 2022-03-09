@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.common.widget;
 
 import com.cleanroommc.modularui.api.ISyncedWidget;
-import com.cleanroommc.modularui.api.IWidgetDrawable;
 import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.api.drawable.TextFieldRenderer;
 import com.cleanroommc.modularui.api.drawable.TextRenderer;
@@ -270,6 +269,7 @@ public class TextFieldWidget extends Widget implements Interactable, ISyncedWidg
 
     public TextFieldWidget setTextColor(int textColor) {
         this.textColor = textColor;
+        this.renderer.setTextColor(textColor);
         return this;
     }
 
