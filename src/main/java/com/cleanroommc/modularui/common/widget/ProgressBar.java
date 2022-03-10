@@ -46,6 +46,7 @@ public class ProgressBar extends Widget {
                         height *= progress;
                         y = size.height - height;
                 }
+                // TODO circular
                 fullTexture.drawSubArea(x, y, width, height, u0, v0, u1, v1);
             }
         }

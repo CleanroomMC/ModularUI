@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.common.internal.wrapper;
 
 import com.cleanroommc.modularui.api.IVanillaSlot;
-import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.api.TooltipContainer;
 import com.cleanroommc.modularui.api.drawable.TextSpan;
@@ -14,7 +13,6 @@ import com.cleanroommc.modularui.common.widget.SlotWidget;
 import com.cleanroommc.modularui.common.widget.Widget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -29,7 +27,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 
 @SideOnly(Side.CLIENT)
 public class ModularGui extends GuiContainer {
@@ -51,10 +48,6 @@ public class ModularGui extends GuiContainer {
         super(container);
         this.context = container.getContext();
         this.context.initializeClient(this);
-        ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
-        this.context.resize(new Size(scaledResolution.getScaledWidth(), scaledResolution.getScaledHeight()));
-        this.context.buildWindowOnStart();
-        this.context.getCurrentWindow().onOpen();
     }
 
     public ModularUIContext getContext() {
@@ -91,6 +84,19 @@ public class ModularGui extends GuiContainer {
     public void onResize(Minecraft mc, int w, int h) {
         super.onResize(mc, w, h);
         context.resize(new Size(w, h));
+    }
+
+    public void setMainWindowPos(Pos2d pos) {
+        this.guiLeft = pos.x;
+        this.guiTop = pos.y;
+    }
+
+    @Override
+    public void initGui() {
+        super.initGui();
+        context.resize(new Size(width, height));
+        this.context.buildWindowOnStart();
+        this.context.getCurrentWindow().onOpen();
     }
 
     public GuiContainerMixin getAccessor() {

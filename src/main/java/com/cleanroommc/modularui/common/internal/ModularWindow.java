@@ -69,6 +69,7 @@ public class ModularWindow implements IWidgetParent {
 
     public void onResize(Size screenSize) {
         this.pos = alignment.getAlignedPos(screenSize, size);
+        context.getScreen().setMainWindowPos(pos);
         markNeedsRebuild();
     }
 
@@ -76,24 +77,26 @@ public class ModularWindow implements IWidgetParent {
      * The final call after the window is initialized & positioned
      */
     public void onOpen() {
-        final int startY = context.getScaledScreenSize().height, endY = pos.y;
-        openAnimation = new Interpolator(0, 1, 250, Eases.EaseQuadOut, value -> {
-            float val = (float) value;
-            color = Color.withAlpha(color, val);
-            //int y = (int) ((endY - startY) * val + startY);
-            //setPos(new Pos2d(pos.x, y));
-            //markNeedsRebuild();
-            scale = val;
-            //rotation = val * 360;
-        }, val -> {
-            color = Color.withAlpha(color, 255);
-            //setPos(new Pos2d(pos.x, endY));
-            scale = 1f;
-            rotation = 360;
-        });
-        closeAnimation = openAnimation.getReversed(250, Eases.EaseQuadIn);
-        openAnimation.forward();
-        closeAnimation.setCallback(val -> context.close());
+        if (openAnimation == null) {
+            final int startY = context.getScaledScreenSize().height, endY = pos.y;
+            openAnimation = new Interpolator(0, 1, 250, Eases.EaseQuadOut, value -> {
+                float val = (float) value;
+                color = Color.withAlpha(color, val);
+                //int y = (int) ((endY - startY) * val + startY);
+                //setPos(new Pos2d(pos.x, y));
+                //markNeedsRebuild();
+                scale = val;
+                //rotation = val * 360;
+            }, val -> {
+                color = Color.withAlpha(color, 255);
+                //setPos(new Pos2d(pos.x, endY));
+                scale = 1f;
+                rotation = 360;
+            });
+            closeAnimation = openAnimation.getReversed(250, Eases.EaseQuadIn);
+            openAnimation.forward();
+            closeAnimation.setCallback(val -> context.close());
+        }
         //this.pos = new Pos2d(pos.x, getContext().getScaledScreenSize().height);
     }
 
@@ -129,7 +132,6 @@ public class ModularWindow implements IWidgetParent {
         }
         if (needsRebuild) {
             rebuild();
-            needsRebuild = false;
         }
     }
 
@@ -144,6 +146,7 @@ public class ModularWindow implements IWidgetParent {
         for (Widget child : getChildren()) {
             child.rebuildInternal();
         }
+        needsRebuild = false;
     }
 
     public void pauseWindow() {
