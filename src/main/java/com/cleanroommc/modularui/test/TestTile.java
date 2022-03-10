@@ -11,6 +11,7 @@ import com.cleanroommc.modularui.common.internal.ModularWindow;
 import com.cleanroommc.modularui.common.internal.UIBuildContext;
 import com.cleanroommc.modularui.common.widget.CycleButtonWidget;
 import com.cleanroommc.modularui.common.widget.FluidSlotWidget;
+import com.cleanroommc.modularui.common.widget.ProgressBar;
 import com.cleanroommc.modularui.common.widget.TextFieldWidget;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
@@ -23,7 +24,10 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
     private int time = 0;
     private FluidTank fluidTank = new FluidTank(10000);
     private String textFieldValue = "";
+    private int duration = 60;
+    private int progress = 0;
     private static final AdaptableUITexture DISPLAY = AdaptableUITexture.of("modularui:gui/background/display", 143, 75, 2);
+    private static final UITexture PROGRESS_BAR = UITexture.fullImage("modularui", "gui/widgets/progress_bar_arrow");
 
     @Override
     public ModularWindow createWindow(UIBuildContext buildContext) {
@@ -52,6 +56,10 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                         .setTextColor(Color.rgb(220, 220, 220))
                         .setBackground(DISPLAY.withOffset(-2, -2, 4, 4))
                         .setPos(20, 45))
+                .widget(new ProgressBar()
+                        .setProgress(() -> progress * 1f / duration)
+                        .setTexture(PROGRESS_BAR)
+                        .setPos(5, 5))
                 .widget(new FluidSlotWidget(fluidTank).setPos(20, 65))
                 .build();
     }
@@ -92,6 +100,10 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                 if (++serverValue == 3) {
                     serverValue = 0;
                 }
+            }
+        } else {
+            if (++progress == duration) {
+                progress = 0;
             }
         }
     }

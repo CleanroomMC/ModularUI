@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class MultiChildWidget extends Widget implements IWidgetParent {
+public class MultiChildWidget extends Widget implements IWidgetParent {
 
     private final List<Widget> children = new ArrayList<>();
 

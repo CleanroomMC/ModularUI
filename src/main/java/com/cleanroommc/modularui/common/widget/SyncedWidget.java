@@ -38,7 +38,7 @@ public abstract class SyncedWidget extends Widget implements ISyncedWidget {
     /**
      * Determines how this widget should sync values
      *
-     * @param handlesClient   if this widget should sync changes to the server
+     * @param handlesClient if this widget should sync changes to the server
      * @param handlesServer if this widget should detect changes on server and sync them to client
      */
     public SyncedWidget setSynced(boolean handlesClient, boolean handlesServer) {

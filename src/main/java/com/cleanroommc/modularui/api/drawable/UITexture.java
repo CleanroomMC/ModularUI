@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.api.drawable;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.math.GuiArea;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
@@ -11,7 +12,12 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class UITexture implements IDrawable {
+
+    public static final Map<ResourceLocation, UITexture> JSON_TEXTURES = new HashMap<>();
 
     public static final UITexture DEFAULT = fullImage("gui/options_background");
 
@@ -86,11 +92,21 @@ public class UITexture implements IDrawable {
         return new UITexture(location, calcUV0(this.u0, u0), calcUV0(this.v0, v0), this.u1 * u1, this.v1 * v1);
     }
 
+    public UITexture exposeToJson() {
+        if (JSON_TEXTURES.containsKey(location)) {
+            UITexture texture = JSON_TEXTURES.get(location);
+            ModularUI.LOGGER.error("{} '{}' is already exposed to json with uv {}, {}, {}, {}!", texture.getClass().getSimpleName(), location, texture.u0, texture.v0, texture.u1, texture.v1);
+        } else {
+            JSON_TEXTURES.put(location, this);
+        }
+        return this;
+    }
+
     public ResourceLocation getLocation() {
         return location;
     }
 
-    private float calcUV0(float oldV, float newV) {
+    protected final float calcUV0(float oldV, float newV) {
         return oldV == 0.0F ? newV : oldV + oldV * newV;
     }
 
@@ -125,10 +141,16 @@ public class UITexture implements IDrawable {
             return DEFAULT;
         }
         ResourceLocation rl = new ResourceLocation(json.get("src").getAsString());
-        return new UITexture(rl,
-                JsonHelper.getFloat(json, 0, "u", "u0"),
-                JsonHelper.getFloat(json, 0, "v", "v0"),
-                JsonHelper.getFloat(json, 1, "u1"),
-                JsonHelper.getFloat(json, 1, "v1"));
+        if (JSON_TEXTURES.containsKey(rl)) {
+            return JSON_TEXTURES.get(rl);
+        }
+        float u0 = JsonHelper.getFloat(json, 0, "u", "u0"), v0 = JsonHelper.getFloat(json, 0, "v", "v0");
+        float u1 = JsonHelper.getFloat(json, 1, "u1"), v1 = JsonHelper.getFloat(json, 1, "v1");
+        Size imageSize = JsonHelper.getElement(json, Size.ZERO, Size::ofJson, "imageSize");
+        int borderWidth = JsonHelper.getInt(json, -1, "borderWidth");
+        if (imageSize.width > 0 && imageSize.height > 0 && borderWidth >= 0) {
+            return AdaptableUITexture.of(rl, imageSize.width, imageSize.height, borderWidth).getSubArea(u0, v0, u1, v1);
+        }
+        return new UITexture(rl, u0, v0, u1, v1);
     }
 }

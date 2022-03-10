@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class SingleChildWidget extends Widget implements IWidgetParent {
+public class SingleChildWidget extends Widget implements IWidgetParent {
 
     private Widget child;
 

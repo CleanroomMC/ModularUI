@@ -161,7 +161,7 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
         return this;
     }
 
-    public <T extends Enum<?>> CycleButtonWidget setForEnum(Class<T> clazz, Consumer<T> setter, Supplier<T> getter) {
+    public <T extends Enum<T>> CycleButtonWidget setForEnum(Class<T> clazz, Consumer<T> setter, Supplier<T> getter) {
         setSetter(val -> setter.accept(clazz.getEnumConstants()[val]));
         setGetter(() -> getter.get().ordinal());
         setLength(clazz.getEnumConstants().length);

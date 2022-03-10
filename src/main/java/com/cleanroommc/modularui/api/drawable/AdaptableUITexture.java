@@ -6,12 +6,20 @@ public class AdaptableUITexture extends UITexture {
 
     private final int imageWidth, imageHeight, borderWidthU, borderWidthV;
 
-    public AdaptableUITexture(ResourceLocation location, int imageWidth, int imageHeight, int borderWidthU, int borderWidthV) {
-        super(location, 0, 0, 1, 1);
+    public AdaptableUITexture(ResourceLocation location, float u0, float v0, float u1, float v1, int imageWidth, int imageHeight, int borderWidthU, int borderWidthV) {
+        super(location, u0, v0, u1, v1);
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;
         this.borderWidthU = borderWidthU;
         this.borderWidthV = borderWidthV;
+    }
+
+    public AdaptableUITexture(ResourceLocation location, int imageWidth, int imageHeight, int borderWidthU, int borderWidthV) {
+        this(location, 0, 0, 1, 1, imageWidth, imageHeight, borderWidthU, borderWidthV);
+    }
+
+    public static AdaptableUITexture of(ResourceLocation location, int imageWidth, int imageHeight, int borderWidthU, int borderWidthV) {
+        return new AdaptableUITexture(location, imageWidth, imageHeight, borderWidthU, borderWidthV);
     }
 
     public static AdaptableUITexture of(ResourceLocation location, int imageWidth, int imageHeight, int borderWidthPixel) {
@@ -24,6 +32,16 @@ public class AdaptableUITexture extends UITexture {
 
     public static AdaptableUITexture of(String mod, String location, int imageWidth, int imageHeight, int borderWidthPixel) {
         return new AdaptableUITexture(new ResourceLocation(mod, location), imageWidth, imageHeight, borderWidthPixel, borderWidthPixel);
+    }
+
+    @Override
+    public AdaptableUITexture getSubArea(float u0, float v0, float u1, float v1) {
+        return new AdaptableUITexture(location, calcUV0(this.u0, u0), calcUV0(this.v0, v0), this.u1 * u1, this.v1 * v1, imageWidth, imageHeight, borderWidthU, borderWidthV);
+    }
+
+    @Override
+    public AdaptableUITexture exposeToJson() {
+        return (AdaptableUITexture) super.exposeToJson();
     }
 
     @Override
