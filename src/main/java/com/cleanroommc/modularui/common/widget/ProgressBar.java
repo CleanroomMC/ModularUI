@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.drawable.UITexture;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
@@ -14,6 +14,14 @@ public class ProgressBar extends Widget {
     private UITexture emptyTexture;
     private UITexture fullTexture;
     private Direction direction = Direction.RIGHT;
+    private int imageSize = -1;
+
+    @Override
+    public void onRebuild() {
+        if (imageSize < 0) {
+            imageSize = size.width;
+        }
+    }
 
     @Override
     public void drawInBackground(float partialTicks) {
@@ -27,6 +35,7 @@ public class ProgressBar extends Widget {
             } else {
                 float u0 = 0, v0 = 0, u1 = 1, v1 = 1;
                 float x = 0, y = 0, width = size.width, height = size.height;
+                progress = getProgressUV(progress);
                 switch (direction) {
                     case RIGHT:
                         u1 = progress;
@@ -52,6 +61,13 @@ public class ProgressBar extends Widget {
         }
     }
 
+    public float getProgressUV(float uv) {
+        if (ModularUIConfig.smoothProgressbar) {
+            return uv;
+        }
+        return (float) (Math.floor(uv * imageSize) / imageSize);
+    }
+
     @Nullable
     @Override
     protected Size determineSize() {
@@ -68,14 +84,25 @@ public class ProgressBar extends Widget {
         return this;
     }
 
-    public ProgressBar setTexture(UITexture emptyTexture, UITexture fullTexture) {
+    /**
+     * Sets the texture to render
+     *
+     * @param emptyTexture empty bar, always rendered
+     * @param fullTexture  full bar, partly rendered, based on progress
+     * @param imageSize    image size in direction of progress. used for non smooth rendering
+     */
+    public ProgressBar setTexture(UITexture emptyTexture, UITexture fullTexture, int imageSize) {
         this.emptyTexture = emptyTexture;
         this.fullTexture = fullTexture;
+        this.imageSize = imageSize;
         return this;
     }
 
-    public ProgressBar setTexture(UITexture texture) {
-        return setTexture(texture.getSubArea(0, 0, 1, 0.5f), texture.getSubArea(0, 0.5f, 1, 1));
+    /**
+     * @param texture a texture where the empty and full bar are stacked on top of each other
+     */
+    public ProgressBar setTexture(UITexture texture, int imageSize) {
+        return setTexture(texture.getSubArea(0, 0, 1, 0.5f), texture.getSubArea(0, 0.5f, 1, 1), imageSize);
     }
 
     public ProgressBar setDirection(Direction direction) {

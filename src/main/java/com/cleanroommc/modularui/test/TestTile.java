@@ -57,7 +57,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                         .setPos(20, 45))
                 .widget(new ProgressBar()
                         .setProgress(() -> progress * 1f / duration)
-                        .setTexture(PROGRESS_BAR)
+                        .setTexture(PROGRESS_BAR, 20)
                         .setPos(5, 5))
                 .widget(new FluidSlotWidget(fluidTank).setPos(20, 65))
                 .widget(new ButtonWidget()
