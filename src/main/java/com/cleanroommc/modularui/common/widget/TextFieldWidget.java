@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.api.drawable.TextFieldRenderer;
 import com.cleanroommc.modularui.api.drawable.TextRenderer;
+import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
@@ -42,7 +43,8 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
     private int cursorTimer = 0;
     private int textColor = TextFieldRenderer.DEFAULT_COLOR;
     private Function<String, String> validator = val -> val;
-    private int maxWidth = 80, maxLines = 1;
+    private int maxWidth = 80, maxLines = -1;
+    private Alignment textAlignment = Alignment.TopLeft;
 
     @Override
     public void readJson(JsonObject json, String type) {
@@ -59,6 +61,13 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
         }
         setPattern(Pattern.compile(JsonHelper.getString(json, ".*", "pattern")));
         setScale(JsonHelper.getFloat(json, 1f, "scale"));
+    }
+
+    @Override
+    public void onRebuild() {
+        if (maxLines < 0) {
+            maxLines = (int) (size.height / renderer.getFontHeight());
+        }
     }
 
     public void setCursor(int pos) {
@@ -132,8 +141,7 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
     public void drawInBackground(float partialTicks) {
         GlStateManager.pushMatrix();
         GlStateManager.translate(0.5f, 0.5f, 0);
-        renderer.setUp(Pos2d.ZERO, textColor, getSize().width);
-        renderer.draw(text);
+        renderer.drawAligned(text, 0, 0, size.width, size.height, textColor, textAlignment.x, textAlignment.y);
         GlStateManager.popMatrix();
     }
 
@@ -226,7 +234,7 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
         helper.setUp(Pos2d.ZERO, 0, size.width);
         helper.setDoDraw(false);
         helper.draw(string);
-        return helper.getHeight() <= size.height;
+        return helper.getHeight() <= renderer.getFontHeight() * maxLines;
     }
 
     private int getTextIndexUnderMouse() {
@@ -237,10 +245,9 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
         if (text.isEmpty()) {
             return 0;
         }
-        helper.setUp(Pos2d.ZERO, 0, size.width);
         helper.setPosToFind(pos2d);
-        helper.setDoDraw(false);
-        helper.draw(text);
+        helper.drawAligned(text, 0, 0, size.width, size.height, 0, textAlignment.x, textAlignment.y);
+        helper.setPosToFind(null);
         if (helper.getFoundIndex() < 0) {
             if (pos2d.x > helper.getWidth() || (pos2d.y >= helper.getHeight() - helper.getFontHeight() && pos2d.y <= helper.getHeight())) {
                 return text.length();
@@ -462,5 +469,10 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
 
     public TextFieldWidget setNumbers(int min, int max) {
         return setNumbers(val -> Math.min(max, Math.max(min, val)));
+    }
+
+    public TextFieldWidget setTextAlignment(Alignment textAlignment) {
+        this.textAlignment = textAlignment;
+        return this;
     }
 }

@@ -1,12 +1,12 @@
 package com.cleanroommc.modularui.api.drawable;
 
 import com.cleanroommc.modularui.api.math.Color;
-import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.common.internal.JsonHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import javax.annotation.Nullable;
@@ -17,6 +17,7 @@ public class Text implements IDrawable {
 
     private final Supplier<String> textSupplier;
     private final String text;
+    private String formatting = "";
     @Nullable
     private Supplier<Object[]> localisationData;
     private boolean dynamicLocalisation = false;
@@ -45,7 +46,12 @@ public class Text implements IDrawable {
     }
 
     public Text color(int color) {
-        this.color = color;
+        this.color = Color.withAlpha(color, 255);
+        return this;
+    }
+
+    public Text format(TextFormatting color) {
+        this.formatting = color.toString() + this.formatting;
         return this;
     }
 
@@ -88,16 +94,17 @@ public class Text implements IDrawable {
 
     @Override
     public void draw(float x, float y, float width, float height, float partialTicks) {
-        if (hasColor()) {
-            // TODO: use float pos for text rendering instead of Pos2d object
-            TextRenderer.drawString(getFormatted(), new Pos2d(x, y), color, (int) width);
-        }
+        int color = hasColor() ? this.color : TextRenderer.DEFAULT_COLOR;
+        new TextRenderer().drawAligned(getFormatted(), x, y, width, height, color, 0, 0);
     }
 
     public String getFormatted() {
         String text = getRawText();
         if (localisationData != null && FMLCommonHandler.instance().getSide().isClient()) {
             text = I18n.format(text, localisationData.get());
+        }
+        if (!this.formatting.isEmpty()) {
+            text = formatting + text;
         }
         if (hasColor()) {
             text = TextRenderer.getColorFormatString(color) + text;

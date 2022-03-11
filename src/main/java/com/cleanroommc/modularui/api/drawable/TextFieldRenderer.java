@@ -46,8 +46,17 @@ public class TextFieldRenderer extends TextRenderer {
     public void draw(String text) {
         drawingMarked = cursor == 0 ^ cursorEnd == 0;
         if (text.isEmpty() || cursor == 0) {
-            if (renderCursor) {
-                drawCursor();
+            if (doDraw && renderCursor) {
+                float x = 0;
+                if (lineWidths != null) {
+                    int w = lineWidths.length > 0 ? lineWidths[0] : 0;
+                    if (alignment == 0) {
+                        x = (maxX - this.x) / 2f - (w / 2f);
+                    } else {
+                        x = (maxX - this.x) - w;
+                    }
+                }
+                drawCursor(currentX + lineXOffset + x, getCurrentY());
             }
             if (text.isEmpty()) {
                 return;
@@ -60,9 +69,9 @@ public class TextFieldRenderer extends TextRenderer {
     protected void addChar(char c, boolean addToWidth) {
         super.addChar(c, addToWidth);
         if (currentIndex == cursor) {
-            if (renderCursor) {
+            if (doDraw && renderCursor) {
                 newWord(false);
-                drawCursor();
+                drawCursor(currentX + lineXOffset, getCurrentY());
             }
             if (drawingMarked) {
                 if (wordWith > 0) {
@@ -103,9 +112,10 @@ public class TextFieldRenderer extends TextRenderer {
     }
 
     @SideOnly(Side.CLIENT)
-    private void drawCursor() {
+    private void drawCursor(float x, float y) {
         float sf = 1 / getScale();
-        float x = (currentX + lineXOffset - 0.8f) * sf, y = (getCurrentY() - 1) * sf;
+        x = (x - 0.8f) * sf;
+        y = (y - 1) * sf;
         float endX = x + 0.6f /* * (1 / getScale())*/;
         float endY = y + 9;
         float red = Color.getRedF(currentColor);

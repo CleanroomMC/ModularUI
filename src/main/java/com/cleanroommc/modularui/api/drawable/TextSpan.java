@@ -59,7 +59,7 @@ public class TextSpan implements IDrawable {
 
     @Override
     public void draw(float x, float y, float width, float height, float partialTicks) {
-        renderer.drawAligned(Text.getFormatted(texts), alignment, new Pos2d(x, y), defaultColor, (int) width);
+        renderer.drawAligned(Text.getFormatted(texts), x, y, width, height, defaultColor, alignment, 0);
     }
 
     public Text[] getTexts() {

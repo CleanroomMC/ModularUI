@@ -1,9 +1,9 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.api.IWidgetDrawable;
 import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.TextRenderer;
 import com.cleanroommc.modularui.api.drawable.TextSpan;
+import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.google.gson.JsonObject;
@@ -15,6 +15,7 @@ public class TextWidget extends Widget {
     private final TextSpan text;
     private String localised;
     private int maxWidth = -1;
+    private Alignment textAlignment = Alignment.TopLeft;
     private final TextRenderer textRenderer = new TextRenderer(Pos2d.ZERO, 0, 0);
 
     public TextWidget() {
@@ -57,7 +58,7 @@ public class TextWidget extends Widget {
 
     @Override
     public void drawInBackground(float partialTicks) {
-        textRenderer.drawAligned(localised, text.getAlignment(), Pos2d.ZERO, text.getDefaultColor(), size.width);
+        textRenderer.drawAligned(localised, 0, 0, size.width, size.height, text.getDefaultColor(), textAlignment.x, textAlignment.y);
     }
 
     public TextWidget setDefaultColor(int color) {
@@ -77,6 +78,11 @@ public class TextWidget extends Widget {
 
     public TextWidget setMaxWidth(int maxWidth) {
         this.maxWidth = maxWidth;
+        return this;
+    }
+
+    public TextWidget setTextAlignment(Alignment textAlignment) {
+        this.textAlignment = textAlignment;
         return this;
     }
 }

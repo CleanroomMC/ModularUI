@@ -2,7 +2,7 @@ package com.cleanroommc.modularui.api.math;
 
 public class Alignment {
 
-    public final float x, y;
+    public final int x, y;
 
     public static final Alignment TopLeft       = new Alignment(-1, -1);
     public static final Alignment TopCenter     = new Alignment(0, -1);
@@ -25,15 +25,13 @@ public class Alignment {
             BottomLeft, BottomRight
     };
 
-    public Alignment(float x, float y) {
+    public Alignment(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
     public Pos2d getAlignedPos(Size parent, Size child) {
-        //if(parent.width < child.width || parent.height < child.height)
-        //    throw new IllegalArgumentException("Parent size can't be smaller than child size");
-        float x = (this.x + 1) / 2, y = (this.y + 1) / 2;
+        float x = (this.x + 1) * 1f / 2, y = (this.y + 1) * 1f / 2;
         return new Pos2d(parent.width * x - child.width * x, parent.height * y - child.height * y);
     }
 

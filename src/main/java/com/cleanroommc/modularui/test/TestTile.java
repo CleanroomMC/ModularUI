@@ -4,15 +4,13 @@ import com.cleanroommc.modularui.api.ITileWithModularUI;
 import com.cleanroommc.modularui.api.drawable.AdaptableUITexture;
 import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.UITexture;
+import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.internal.ModularWindow;
 import com.cleanroommc.modularui.common.internal.UIBuildContext;
-import com.cleanroommc.modularui.common.widget.CycleButtonWidget;
-import com.cleanroommc.modularui.common.widget.FluidSlotWidget;
-import com.cleanroommc.modularui.common.widget.ProgressBar;
-import com.cleanroommc.modularui.common.widget.TextFieldWidget;
+import com.cleanroommc.modularui.common.widget.*;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ITickable;
@@ -49,18 +47,29 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                         .addTooltip("Test Tooltip")
                         .setTooltipShowUpDelay(10))
                 .widget(new TextFieldWidget()
-                        .setMaxLines(2)
                         .setScale(1f)
                         .setGetter(() -> textFieldValue)
                         .setSetter(val -> textFieldValue = val)
                         .setTextColor(Color.rgb(220, 220, 220))
+                        .setTextAlignment(Alignment.Center)
                         .setBackground(DISPLAY.withOffset(-2, -2, 4, 4))
+                        .setSize(92, 20)
                         .setPos(20, 45))
                 .widget(new ProgressBar()
                         .setProgress(() -> progress * 1f / duration)
                         .setTexture(PROGRESS_BAR)
                         .setPos(5, 5))
                 .widget(new FluidSlotWidget(fluidTank).setPos(20, 65))
+                .widget(new ButtonWidget()
+                        .setOnClick((clickData, widget) -> {
+                            if (++serverValue == 3) {
+                                serverValue = 0;
+                            }
+                        })
+                        .setSynced(true, false)
+                        .setBackground(DISPLAY, new Text("jTest Textg"))
+                        .setSize(80, 20)
+                        .setPos(10, 80))
                 .build();
     }
 
@@ -95,12 +104,12 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
     @Override
     public void update() {
         if (!world.isRemote) {
-            if (++time == 20) {
+            /*if (++time == 20) {
                 time = 0;
                 if (++serverValue == 3) {
                     serverValue = 0;
                 }
-            }
+            }*/
         } else {
             if (++progress == duration) {
                 progress = 0;
