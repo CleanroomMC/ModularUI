@@ -92,6 +92,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                         .setBackground(DISPLAY, new Text("jTest Textg"))
                         .setSize(80, 20)
                         .setPos(10, 80))
+                .widget(new TextWidget(new Text("modularui.test").localise()).setPos(10, 130))
                 .build();
     }
 

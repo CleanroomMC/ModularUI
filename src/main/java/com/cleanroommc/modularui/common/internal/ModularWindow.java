@@ -24,6 +24,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ModularWindow implements IWidgetParent {
 
+    public static Builder builder(int width, int height) {
+        return new Builder(new Size(width, height));
+    }
+
     public static Builder builder(Size size) {
         return new Builder(size);
     }

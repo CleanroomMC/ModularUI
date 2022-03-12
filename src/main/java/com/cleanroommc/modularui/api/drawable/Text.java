@@ -101,7 +101,7 @@ public class Text implements IDrawable {
     public String getFormatted() {
         String text = getRawText();
         if (localisationData != null && FMLCommonHandler.instance().getSide().isClient()) {
-            text = I18n.format(text, localisationData.get());
+            text = I18n.format(text, localisationData.get()).replaceAll("\\\\n", "\n");
         }
         if (!this.formatting.isEmpty()) {
             text = formatting + text;
