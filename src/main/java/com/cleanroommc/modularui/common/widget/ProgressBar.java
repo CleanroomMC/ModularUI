@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.drawable.UITexture;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import net.minecraft.util.math.MathHelper;
 
 import javax.annotation.Nullable;
 import java.util.function.Supplier;
@@ -12,9 +13,20 @@ public class ProgressBar extends Widget {
 
     private Supplier<Float> progress;
     private UITexture emptyTexture;
-    private UITexture fullTexture;
+    private final UITexture fullTexture[] = new UITexture[4];
     private Direction direction = Direction.RIGHT;
     private int imageSize = -1;
+
+    @Override
+    public void onInit() {
+        if (direction == Direction.CIRCULAR_CW && fullTexture[0] != null) {
+            UITexture base = fullTexture[0];
+            fullTexture[0] = base.getSubArea(0f, 0.5f, 0.5f, 1f);
+            fullTexture[1] = base.getSubArea(0f, 0f, 0.5f, 0.5f);
+            fullTexture[2] = base.getSubArea(0.5f, 0f, 1f, 0.5f);
+            fullTexture[3] = base.getSubArea(0.5f, 0.5f, 1f, 1f);
+        }
+    }
 
     @Override
     public void onRebuild() {
@@ -29,13 +41,17 @@ public class ProgressBar extends Widget {
             emptyTexture.draw(Pos2d.ZERO, getSize(), partialTicks);
         }
         float progress = this.progress.get();
-        if (fullTexture != null && progress > 0) {
+        if (fullTexture[0] != null && progress > 0) {
+            if (direction == Direction.CIRCULAR_CW) {
+                drawCircular(progress);
+                return;
+            }
             if (progress >= 1) {
-                fullTexture.draw(Pos2d.ZERO, getSize(), partialTicks);
+                fullTexture[0].draw(Pos2d.ZERO, getSize(), partialTicks);
             } else {
+                progress = getProgressUV(progress);
                 float u0 = 0, v0 = 0, u1 = 1, v1 = 1;
                 float x = 0, y = 0, width = size.width, height = size.height;
-                progress = getProgressUV(progress);
                 switch (direction) {
                     case RIGHT:
                         u1 = progress;
@@ -54,9 +70,9 @@ public class ProgressBar extends Widget {
                         v0 = 1 - progress;
                         height *= progress;
                         y = size.height - height;
+                        break;
                 }
-                // TODO circular
-                fullTexture.drawSubArea(x, y, width, height, u0, v0, u1, v1);
+                fullTexture[0].drawSubArea(x, y, width, height, u0, v0, u1, v1);
             }
         }
     }
@@ -66,6 +82,49 @@ public class ProgressBar extends Widget {
             return uv;
         }
         return (float) (Math.floor(uv * imageSize) / imageSize);
+    }
+
+    private void drawCircular(float progress) {
+        float[] subAreas = {
+                getProgressUV(MathHelper.clamp(progress / 0.25f, 0, 1)),
+                getProgressUV(MathHelper.clamp((progress - 0.25f) / 0.25f, 0, 1)),
+                getProgressUV(MathHelper.clamp((progress - 0.5f) / 0.25f, 0, 1)),
+                getProgressUV(MathHelper.clamp((progress - 0.75f) / 0.25f, 0, 1))
+        };
+        float halfWidth = size.width / 2f;
+        float halfHeight = size.height / 2f;
+
+        float progressScaled = subAreas[0] * halfHeight;
+        fullTexture[0].drawSubArea(
+                0, size.height - progressScaled,
+                halfWidth, progressScaled,
+                0.0f, 1.0f - progressScaled / halfHeight,
+                1.0f, 1.0f
+        ); // BL, draw UP
+
+        progressScaled = subAreas[1] * halfWidth;
+        fullTexture[1].drawSubArea(
+                0, 0,
+                progressScaled, halfHeight,
+                0.0f, 0.0f,
+                progressScaled / (halfWidth), 1.0f
+        ); // TL, draw RIGHT
+
+        progressScaled = subAreas[2] * halfHeight;
+        fullTexture[2].drawSubArea(
+                halfWidth, 0,
+                halfWidth, progressScaled,
+                0.0f, 0.0f,
+                1.0f, progressScaled / halfHeight
+        ); // TR, draw DOWN
+
+        progressScaled = subAreas[3] * halfWidth;
+        fullTexture[3].drawSubArea(
+                size.width - progressScaled, halfHeight,
+                progressScaled, halfHeight,
+                1.0f - progressScaled / halfWidth, 0.0f,
+                1.0f, 1.0f
+        ); // BR, draw LEFT
     }
 
     @Nullable
@@ -93,7 +152,7 @@ public class ProgressBar extends Widget {
      */
     public ProgressBar setTexture(UITexture emptyTexture, UITexture fullTexture, int imageSize) {
         this.emptyTexture = emptyTexture;
-        this.fullTexture = fullTexture;
+        this.fullTexture[0] = fullTexture;
         this.imageSize = imageSize;
         return this;
     }
@@ -111,6 +170,6 @@ public class ProgressBar extends Widget {
     }
 
     public enum Direction {
-        LEFT, RIGHT, UP, DOWN;
+        LEFT, RIGHT, UP, DOWN, CIRCULAR_CW;
     }
 }

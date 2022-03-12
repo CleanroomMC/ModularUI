@@ -26,6 +26,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
     private int progress = 0;
     private static final AdaptableUITexture DISPLAY = AdaptableUITexture.of("modularui:gui/background/display", 143, 75, 2);
     private static final UITexture PROGRESS_BAR = UITexture.fullImage("modularui", "gui/widgets/progress_bar_arrow");
+    private static final UITexture PROGRESS_BAR_MIXER = UITexture.fullImage("modularui", "gui/widgets/progress_bar_mixer");
 
     @Override
     public ModularWindow createWindow(UIBuildContext buildContext) {
@@ -57,8 +58,29 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                         .setPos(20, 45))
                 .widget(new ProgressBar()
                         .setProgress(() -> progress * 1f / duration)
-                        .setTexture(PROGRESS_BAR, 20)
-                        .setPos(5, 5))
+                        .setDirection(ProgressBar.Direction.LEFT)
+                        .setTexture(PROGRESS_BAR_MIXER, 20)
+                        .setPos(7, 105))
+                .widget(new ProgressBar()
+                        .setProgress(() -> progress * 1f / duration)
+                        .setDirection(ProgressBar.Direction.RIGHT)
+                        .setTexture(PROGRESS_BAR_MIXER, 20)
+                        .setPos(30, 105))
+                .widget(new ProgressBar()
+                        .setProgress(() -> progress * 1f / duration)
+                        .setDirection(ProgressBar.Direction.UP)
+                        .setTexture(PROGRESS_BAR_MIXER, 20)
+                        .setPos(53, 105))
+                .widget(new ProgressBar()
+                        .setProgress(() -> progress * 1f / duration)
+                        .setDirection(ProgressBar.Direction.DOWN)
+                        .setTexture(PROGRESS_BAR_MIXER, 20)
+                        .setPos(76, 105))
+                .widget(new ProgressBar()
+                        .setProgress(() -> progress * 1f / duration)
+                        .setDirection(ProgressBar.Direction.CIRCULAR_CW)
+                        .setTexture(PROGRESS_BAR_MIXER, 20)
+                        .setPos(99, 105))
                 .widget(new FluidSlotWidget(fluidTank).setPos(20, 65))
                 .widget(new ButtonWidget()
                         .setOnClick((clickData, widget) -> {

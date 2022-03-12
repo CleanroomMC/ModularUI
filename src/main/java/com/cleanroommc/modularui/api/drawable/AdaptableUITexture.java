@@ -35,8 +35,8 @@ public class AdaptableUITexture extends UITexture {
     }
 
     @Override
-    public AdaptableUITexture getSubArea(float u0, float v0, float u1, float v1) {
-        return new AdaptableUITexture(location, calcUV0(this.u0, u0), calcUV0(this.v0, v0), this.u1 * u1, this.v1 * v1, imageWidth, imageHeight, borderWidthU, borderWidthV);
+    public AdaptableUITexture getSubArea(float uStart, float vStart, float uEnd, float vEnd) {
+        return new AdaptableUITexture(location, calcU(uStart), calcV(vStart), calcU(uEnd), calcV(vEnd), imageWidth, imageHeight, borderWidthU, borderWidthV);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class AdaptableUITexture extends UITexture {
 
     @Override
     public void draw(float x, float y, float width, float height) {
-        float borderU =  borderWidthU * 1f / imageWidth;
+        float borderU = borderWidthU * 1f / imageWidth;
         float borderV = borderWidthV * 1f / imageHeight;
         // draw corners
         draw(location, x, y, borderWidthU, borderWidthV, u0, v0, borderU, borderV); // x0 y0

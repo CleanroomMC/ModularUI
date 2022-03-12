@@ -82,14 +82,14 @@ public class UITexture implements IDrawable {
     /**
      * Returns a texture with a sub area relative to this area texture
      *
-     * @param u0 x offset of the image (0-1)
-     * @param v0 y offset of the image (0-1)
-     * @param u1 x end offset of the image (0-1)
-     * @param v1 y end offset of the image (0-1)
+     * @param uStart x offset of the image (0-1)
+     * @param vStart y offset of the image (0-1)
+     * @param uEnd   x end offset of the image (0-1)
+     * @param vEnd   y end offset of the image (0-1)
      * @return relative sub area
      */
-    public UITexture getSubArea(float u0, float v0, float u1, float v1) {
-        return new UITexture(location, calcUV0(this.u0, u0), calcUV0(this.v0, v0), this.u1 * u1, this.v1 * v1);
+    public UITexture getSubArea(float uStart, float vStart, float uEnd, float vEnd) {
+        return new UITexture(location, calcU(uStart), calcV(vStart), calcU(uEnd), calcV(vEnd));
     }
 
     public UITexture exposeToJson() {
@@ -106,8 +106,12 @@ public class UITexture implements IDrawable {
         return location;
     }
 
-    protected final float calcUV0(float oldV, float newV) {
-        return oldV == 0.0F ? newV : oldV + oldV * newV;
+    protected final float calcU(float uNew) {
+        return (u1 - u0) * uNew + u0;
+    }
+
+    protected final float calcV(float vNew) {
+        return (v1 - v0) * vNew + v0;
     }
 
     @Override
@@ -120,7 +124,7 @@ public class UITexture implements IDrawable {
     }
 
     public void drawSubArea(float x, float y, float width, float height, float uStart, float vStart, float uEnd, float vEnd) {
-        draw(location, x, y, width, height, calcUV0(this.u0, uStart), calcUV0(this.v0, vStart), this.u1 * uEnd, this.v1 * vEnd);
+        draw(location, x, y, width, height, calcU(uStart), calcV(vStart), calcU(uEnd), calcV(vEnd));
     }
 
     public static void draw(ResourceLocation location, float x0, float y0, float width, float height, float u0, float v0, float u1, float v1) {
