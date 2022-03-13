@@ -5,55 +5,71 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
+import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 
 import javax.annotation.Nullable;
 
 public class BaseSlot extends SlotItemHandler {
 
-	protected final boolean output;
-	protected final boolean phantom;
+    protected final boolean output;
+    protected final boolean phantom;
 
-	protected boolean enabled = true;
+    protected boolean enabled = true;
+    // lower priority means it gets targeted first
+    // hotbar 20, player inventory 40, machine input 0
+    private int shiftClickPriority = 0;
 
-	public BaseSlot(IItemHandler inventory, int index) {
-		this(inventory, index, false, false);
-	}
+    public BaseSlot(IItemHandler inventory, int index) {
+        this(inventory, index, false, false);
+    }
 
-	public BaseSlot(IItemHandler inventory, int index, boolean output, boolean phantom) {
-		super(inventory, index, 0, 0);
-		this.output = output;
-		this.phantom = phantom;
-	}
+    public BaseSlot(IItemHandler inventory, int index, boolean output, boolean phantom) {
+        super(inventory, index, 0, 0);
+        this.output = output;
+        this.phantom = phantom;
+        if (inventory instanceof PlayerMainInvWrapper) {
+            setShiftClickPriority(index > 8 ? 40 : 20);
+        }
+    }
 
-	@Override
-	public boolean isItemValid(ItemStack stack) {
-		return !this.output;
-	}
+    public BaseSlot setShiftClickPriority(int shiftClickPriority) {
+        this.shiftClickPriority = shiftClickPriority;
+        return this;
+    }
 
-	@Override
-	public boolean isEnabled() {
-		return enabled;
-	}
+    @Override
+    public boolean isItemValid(ItemStack stack) {
+        return !this.output;
+    }
 
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
 
-	// handle background by widgets
-	@Override
-	public ResourceLocation getBackgroundLocation() {
-		return null;
-	}
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
-	@Nullable
-	@Override
-	public String getSlotTexture() {
-		return null;
-	}
+    public int getShiftClickPriority() {
+        return shiftClickPriority;
+    }
 
-	@Nullable
-	@Override
-	public TextureAtlasSprite getBackgroundSprite() {
-		return null;
-	}
+    // handle background by widgets
+    @Override
+    public ResourceLocation getBackgroundLocation() {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public String getSlotTexture() {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public TextureAtlasSprite getBackgroundSprite() {
+        return null;
+    }
 }

@@ -86,9 +86,11 @@ public class ModularGui extends GuiContainer {
         context.resize(new Size(w, h));
     }
 
-    public void setMainWindowPos(Pos2d pos) {
+    public void setMainWindowArea(Pos2d pos, Size size) {
         this.guiLeft = pos.x;
         this.guiTop = pos.y;
+        this.xSize = size.width;
+        this.ySize = size.height;
     }
 
     @Override

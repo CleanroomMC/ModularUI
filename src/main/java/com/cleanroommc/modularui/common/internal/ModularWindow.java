@@ -73,7 +73,7 @@ public class ModularWindow implements IWidgetParent {
 
     public void onResize(Size screenSize) {
         this.pos = alignment.getAlignedPos(screenSize, size);
-        context.getScreen().setMainWindowPos(pos);
+        context.getScreen().setMainWindowArea(pos, size);
         markNeedsRebuild();
     }
 
@@ -301,6 +301,10 @@ public class ModularWindow implements IWidgetParent {
         public Builder setSize(Size size) {
             this.size = size;
             return this;
+        }
+
+        public Builder setSize(int width, int height) {
+            return setSize(new Size(width, height));
         }
 
         public Builder setDraggable(boolean draggable) {

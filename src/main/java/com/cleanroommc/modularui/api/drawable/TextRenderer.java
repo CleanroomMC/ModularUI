@@ -17,7 +17,7 @@ public class TextRenderer {
 
     public static final FontRenderer FR = Minecraft.getMinecraft().fontRenderer;
     public static final char FORMAT_CHAR = '\u00a7';
-    public static int DEFAULT_COLOR = 0x212121;
+    public static int DEFAULT_COLOR = 0x404040;
 
     public static String getColorFormatString(int color) {
         return FORMAT_CHAR + "{#" + Integer.toHexString(color & 0xFFFFFF) + "}";
