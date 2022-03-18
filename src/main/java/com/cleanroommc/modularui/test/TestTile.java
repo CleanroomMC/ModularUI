@@ -4,10 +4,7 @@ import com.cleanroommc.modularui.api.ITileWithModularUI;
 import com.cleanroommc.modularui.api.drawable.AdaptableUITexture;
 import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.UITexture;
-import com.cleanroommc.modularui.api.math.Alignment;
-import com.cleanroommc.modularui.api.math.Color;
-import com.cleanroommc.modularui.api.math.Pos2d;
-import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.api.math.*;
 import com.cleanroommc.modularui.common.internal.ModularWindow;
 import com.cleanroommc.modularui.common.internal.UIBuildContext;
 import com.cleanroommc.modularui.common.widget.*;
@@ -93,6 +90,13 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                         .setSize(80, 20)
                         .setPos(10, 80))
                 .widget(new TextWidget(new Text("modularui.test").localise()).setPos(10, 130))
+                .widget(new Row()
+                        .setAlignment(MainAxisAlignment.SPACE_BETWEEN, CrossAxisAlignment.CENTER)
+                        .widget(new TextWidget(new Text("Some Text")))
+                        .widget(new ButtonWidget().setBackground(DISPLAY))
+                        .widget(new TextWidget(new Text("More Text")))
+                        .setMaxWidth(156)
+                        .setPos(10, 150))
                 .build();
     }
 

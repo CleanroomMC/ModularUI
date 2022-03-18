@@ -127,9 +127,8 @@ public class ProgressBar extends Widget {
         ); // BR, draw LEFT
     }
 
-    @Nullable
     @Override
-    protected Size determineSize() {
+    protected Size getDefaultSize() {
         return new Size(20, 20);
     }
 

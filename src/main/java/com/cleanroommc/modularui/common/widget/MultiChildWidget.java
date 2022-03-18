@@ -33,17 +33,26 @@ public class MultiChildWidget extends Widget implements IWidgetParent {
 
     @Nullable
     @Override
-    protected Size determineSize() {
+    public Size determineSize() {
         if (!getChildren().isEmpty()) {
-            int x0 = Integer.MAX_VALUE, x1 = 0, y0 = Integer.MAX_VALUE, y1 = 0;
-            for (Widget widget : getChildren()) {
-                x0 = Math.min(x0, widget.getPos().x);
-                x1 = Math.max(x1, widget.getPos().x + widget.getSize().width);
-                y0 = Math.min(y0, widget.getPos().y);
-                y1 = Math.max(y1, widget.getPos().y + widget.getSize().height);
-            }
-            return new Size(x1 - x0, y1 - y0);
+            return getSizeOf(getChildren());
         }
         return null;
+    }
+
+    @Override
+    protected Size getDefaultSize() {
+        return getParent().getSize();
+    }
+
+    public static Size getSizeOf(List<Widget> widgets) {
+        int x0 = Integer.MAX_VALUE, x1 = 0, y0 = Integer.MAX_VALUE, y1 = 0;
+        for (Widget widget : widgets) {
+            x0 = Math.min(x0, widget.getPos().x);
+            x1 = Math.max(x1, widget.getPos().x + widget.getSize().width);
+            y0 = Math.min(y0, widget.getPos().y);
+            y1 = Math.max(y1, widget.getPos().y + widget.getSize().height);
+        }
+        return new Size(x1 - x0, y1 - y0);
     }
 }

@@ -46,7 +46,12 @@ public class SingleChildWidget extends Widget implements IWidgetParent {
 
     @Nullable
     @Override
-    protected Size determineSize() {
+    public Size determineSize() {
         return child.getSize();
+    }
+
+    @Override
+    protected Size getDefaultSize() {
+        return child.getDefaultSize();
     }
 }

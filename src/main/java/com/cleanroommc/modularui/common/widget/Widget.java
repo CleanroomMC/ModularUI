@@ -36,6 +36,7 @@ public abstract class Widget {
     protected Pos2d fixedPos = null;
     private boolean fillParent = false;
     private boolean autoSized = true;
+    private boolean autoPositioned = true;
 
     // flags and stuff
     protected boolean enabled = true;
@@ -125,29 +126,38 @@ public abstract class Widget {
         if (!isInitialised()) {
             return;
         }
-        if (fillParent) {
-            this.size = parent.getSize();
+
+        if (this instanceof IWidgetParent) {
+            // check auto sized children
+            for (Widget widget : ((IWidgetParent) this).getChildren()) {
+                checkAutoSize(widget, (IWidgetParent) this);
+            }
+
+            // layout children and resize if needed
+            ((IWidgetParent) this).layoutChildren();
+            if (!fillParent && isAutoSized()) {
+                Size determinedSize = ((IWidgetParent) this).determineSize();
+                if (determinedSize != null) {
+                    size = determinedSize;
+                }
+            }
         }
 
-        if (isFixed()) {
+        // calculate positions
+        if (isFixed() && !isAutoPositioned()) {
             relativePos = fixedPos.subtract(parent.getAbsolutePos());
             pos = fixedPos;
         } else {
             pos = parent.getAbsolutePos().add(relativePos);
         }
 
+        // finally rebuild children
         if (this instanceof IWidgetParent) {
             for (Widget child : ((IWidgetParent) this).getChildren()) {
                 child.rebuildInternal();
             }
         }
 
-        if (!fillParent && autoSized) {
-            Size determinedSize = determineSize();
-            if (determinedSize != null) {
-                size = determinedSize;
-            }
-        }
         onRebuild();
     }
 
@@ -155,13 +165,12 @@ public abstract class Widget {
     //==== Sizing & Positioning ====
 
     /**
-     * If autoSized is true, this method is called after all children are build.
+     * Called during rebuild
      *
-     * @return the desired size for this widget. Null will do nothing
+     * @return the preferred default size
      */
-    @Nullable
-    protected Size determineSize() {
-        return null;
+    protected Size getDefaultSize() {
+        return getParent().getSize();
     }
 
     /**
@@ -210,7 +219,7 @@ public abstract class Widget {
     }
 
     /**
-     * Is called after most gui draw calls
+     * Is called after all widgets in the current layer are drawn in background
      *
      * @param partialTicks ticks since last draw
      */
@@ -362,6 +371,14 @@ public abstract class Widget {
         return autoSized;
     }
 
+    public boolean isAutoPositioned() {
+        return autoPositioned;
+    }
+
+    public boolean isFillParent() {
+        return fillParent;
+    }
+
     @Nullable
     public IWidgetDrawable getDrawable() {
         return drawable;
@@ -413,6 +430,7 @@ public abstract class Widget {
      */
     public Widget setPos(Pos2d relativePos) {
         checkNeedsRebuild();
+        this.autoPositioned = false;
         this.relativePos = relativePos;
         return this;
     }
@@ -428,6 +446,7 @@ public abstract class Widget {
      */
     public Widget setFixedPos(@Nullable Pos2d pos) {
         checkNeedsRebuild();
+        this.autoPositioned = false;
         this.fixedPos = pos;
         return this;
     }
@@ -438,6 +457,7 @@ public abstract class Widget {
     public Widget fillParent() {
         this.fillParent = true;
         this.autoSized = true;
+        this.autoPositioned = false;
         return this;
     }
 
@@ -503,6 +523,19 @@ public abstract class Widget {
                 mouse.x <= areaTopLeft.x + areaSize.width &&
                 mouse.y >= areaTopLeft.y &&
                 mouse.y <= areaTopLeft.y + areaSize.height;
+    }
+
+    /**
+     * Only called internally
+     */
+    public static void checkAutoSize(Widget widget, IWidgetParent parent) {
+        if (widget.isAutoSized()) {
+            if (widget.isFillParent()) {
+                widget.size = parent.getSize();
+            } else {
+                widget.size = widget.getDefaultSize();
+            }
+        }
     }
 
     public static class ClickData {

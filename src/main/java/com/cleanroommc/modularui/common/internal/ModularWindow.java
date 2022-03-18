@@ -147,6 +147,9 @@ public class ModularWindow implements IWidgetParent {
 
     @SideOnly(Side.CLIENT)
     protected void rebuild() {
+        for (Widget widget : getChildren()) {
+            Widget.checkAutoSize(widget, this);
+        }
         for (Widget child : getChildren()) {
             child.rebuildInternal();
         }

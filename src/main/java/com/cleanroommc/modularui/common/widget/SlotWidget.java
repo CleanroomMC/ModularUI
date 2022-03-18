@@ -17,8 +17,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.TextFormatting;
 
-import javax.annotation.Nullable;
-
 public class SlotWidget extends Widget implements IVanillaSlot, Interactable, ISyncedWidget {
 
     public static final Size SIZE = new Size(18, 18);
@@ -43,9 +41,8 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
         return slot;
     }
 
-    @Nullable
     @Override
-    protected Size determineSize() {
+    protected Size getDefaultSize() {
         return SIZE;
     }
 

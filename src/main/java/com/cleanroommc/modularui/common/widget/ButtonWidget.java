@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.common.widget;
 
 import com.cleanroommc.modularui.api.Interactable;
+import com.cleanroommc.modularui.api.math.Size;
 import net.minecraft.network.PacketBuffer;
 
 import java.util.function.BiConsumer;
@@ -12,6 +13,11 @@ public class ButtonWidget extends SyncedWidget implements Interactable {
     public ButtonWidget setOnClick(BiConsumer<ClickData, Widget> clickAction) {
         this.clickAction = clickAction;
         return this;
+    }
+
+    @Override
+    protected Size getDefaultSize() {
+        return new Size(20, 20);
     }
 
     @Override

@@ -68,6 +68,11 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
         setState(getter.getAsInt(), false, false);
     }
 
+    @Override
+    protected Size getDefaultSize() {
+        return new Size(20, 20);
+    }
+
     public void next() {
         if (++state == length) {
             state = 0;
@@ -143,12 +148,6 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
         if (id == 1) {
             setState(buf.readVarInt(), false, true);
         }
-    }
-
-    @Nullable
-    @Override
-    protected Size determineSize() {
-        return new Size(20, 20);
     }
 
     public CycleButtonWidget setSetter(IntConsumer setter) {

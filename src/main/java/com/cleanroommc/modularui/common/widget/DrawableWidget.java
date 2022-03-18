@@ -30,6 +30,11 @@ public class DrawableWidget extends Widget {
     }
 
     @Override
+    public void onScreenUpdate() {
+        drawable.tick();
+    }
+
+    @Override
     public void drawInBackground(float partialTicks) {
         if (drawable != null) {
             drawable.draw(Pos2d.ZERO, getSize(), partialTicks);

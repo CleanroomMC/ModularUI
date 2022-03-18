@@ -37,6 +37,14 @@ public class TextWidget extends Widget {
     }
 
     @Override
+    protected Size getDefaultSize() {
+        this.localised = text.getFormatted();
+        int width = maxWidth > 0 ? maxWidth : getWindow().getSize().width - getPos().x;
+        textRenderer.setUp(Pos2d.ZERO, 0, width);
+        return textRenderer.calculateSize(localised);
+    }
+
+    @Override
     public void onScreenUpdate() {
         if (isAutoSized()) {
             String l = text.getFormatted();
@@ -45,15 +53,6 @@ public class TextWidget extends Widget {
                 localised = l;
             }
         }
-    }
-
-    @Nullable
-    @Override
-    protected Size determineSize() {
-        this.localised = text.getFormatted();
-        int width = maxWidth > 0 ? maxWidth : getWindow().getSize().width - getPos().x;
-        textRenderer.setUp(Pos2d.ZERO, 0, width);
-        return textRenderer.calculateSize(localised);
     }
 
     @Override

@@ -274,9 +274,8 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
         }
     }
 
-    @Nullable
     @Override
-    protected Size determineSize() {
+    protected Size getDefaultSize() {
         if (maxWidth < 0) {
             maxWidth = 80;
         }

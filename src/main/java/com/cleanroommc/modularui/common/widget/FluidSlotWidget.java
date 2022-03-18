@@ -54,6 +54,11 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
         }
     }
 
+    @Override
+    protected Size getDefaultSize() {
+        return SIZE;
+    }
+
     @Nullable
     @Override
     public TooltipContainer getHoverText() {
@@ -108,12 +113,6 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
         if (overlayTexture != null) {
             overlayTexture.draw(Pos2d.ZERO, size, partialTicks);
         }
-    }
-
-    @Nullable
-    @Override
-    protected Size determineSize() {
-        return SIZE;
     }
 
     @Override
