@@ -208,7 +208,7 @@ public class ModularGui extends GuiContainer {
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
 
-        context.getCurrentWindow().drawWidgetsBackGround(partialTicks);
+        context.getCurrentWindow().drawWidgets(partialTicks);
 
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableLighting();
@@ -218,16 +218,15 @@ public class ModularGui extends GuiContainer {
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         GlStateManager.pushMatrix();
-        //GlStateManager.translate(-this.guiLeft, -this.guiTop, 0);
         GlStateManager.disableRescaleNormal();
         RenderHelper.disableStandardItemLighting();
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
 
-        context.getCurrentWindow().drawWidgetsForeGround(Minecraft.getMinecraft().getTickLength());
-
-        if (hovered != null && !(hovered instanceof SlotWidget)) {
-            if (hovered.getTooltipShowUpDelay() <= timeHovered) {
+        if (hovered != null) {
+            if (hovered instanceof IVanillaSlot && context.getPlayer().inventory.getItemStack().isEmpty() && ((IVanillaSlot) hovered).getMcSlot().getHasStack()) {
+                renderToolTip(((IVanillaSlot) hovered).getMcSlot().getStack(), mouseX, mouseY);
+            } else if (hovered.getTooltipShowUpDelay() <= timeHovered) {
                 TooltipContainer tooltipContainer = hovered.getHoverText();
                 List<TextSpan> additional = hovered.getTooltip();
                 if (tooltipContainer == null) {
@@ -239,8 +238,6 @@ public class ModularGui extends GuiContainer {
                 tooltipContainer.draw(context);
             }
         }
-        // draw vanilla item slot tooltip
-        renderHoveredToolTip(mouseX, mouseY);
 
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableLighting();
@@ -250,18 +247,22 @@ public class ModularGui extends GuiContainer {
 
     public void drawDebugScreen() {
         int color = Color.rgb(180, 40, 115);
+        int lineY = context.getScaledScreenSize().height - 13;
+        drawString(fontRenderer, "Mouse Pos: " + getMousePos(), 5, lineY, color);
+        lineY -= 11;
+        drawString(fontRenderer, "FPS: " + fps, 5, context.getScaledScreenSize().height - 24, color);
+        lineY -= 11;
         if (hovered != null) {
             Size size = hovered.getSize();
             Pos2d pos = hovered.getAbsolutePos();
 
             drawBorder(pos.x, pos.y, size.width, size.height, color, 1f);
-            drawText("Class: " + hovered.getClass().getSimpleName(), pos.x, pos.y - 18, 0.5f, color, false);
-            drawText("Size: " + size, pos.x, pos.y - 12, 0.5f, color, false);
-            drawText("Pos: " + hovered.getPos(), pos.x, pos.y - 6, 0.5f, color, false);
+            drawText("Pos: " + hovered.getPos(), 5, lineY, 1, color, false);
+            lineY -= 11;
+            drawText("Size: " + size, 5, lineY, 1, color, false);
+            lineY -= 11;
+            drawText("Class: " + hovered.getClass().getSimpleName(), 5, lineY, 1, color, false);
         }
-
-        drawString(fontRenderer, "FPS: " + fps, 5, (int) (context.getScaledScreenSize().height - 24), color);
-        drawString(fontRenderer, "Mouse Pos: " + getMousePos(), 5, (int) (context.getScaledScreenSize().height - 13), color);
     }
 
     @Override

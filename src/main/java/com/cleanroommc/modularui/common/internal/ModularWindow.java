@@ -176,7 +176,7 @@ public class ModularWindow implements IWidgetParent {
         });
     }
 
-    public void drawWidgetsBackGround(float partialTicks) {
+    public void drawWidgets(float partialTicks) {
         GlStateManager.pushMatrix();
         // rotate around center
         //GlStateManager.translate(pos.x + size.width / 2f, pos.y + size.height / 2f, 0);
@@ -185,7 +185,16 @@ public class ModularWindow implements IWidgetParent {
         final float sf = 1 / scale;
         GlStateManager.scale(scale, scale, 1);
         GlStateManager.color(Color.getRedF(color), Color.getGreenF(color), Color.getBlueF(color), Color.getAlphaF(color));
-        IWidgetParent.forEachByLayer(this, widget -> {
+        drawWidgets(partialTicks, children);
+        GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.popMatrix();
+    }
+
+    private void drawWidgets(float partialTicks, List<Widget> widgets) {
+        List<Widget> children = new ArrayList<>();
+        // draw background
+        final float sf = 1 / scale;
+        for (Widget widget : widgets) {
             widget.onFrameUpdate();
             if (widget.isEnabled()) {
                 GlStateManager.pushMatrix();
@@ -201,15 +210,15 @@ public class ModularWindow implements IWidgetParent {
                 }
                 widget.drawInBackground(partialTicks);
                 GlStateManager.popMatrix();
+                if (widget instanceof IWidgetParent) {
+                    children.addAll(((IWidgetParent) widget).getChildren());
+                }
             }
-            return false;
-        });
-        GlStateManager.color(1, 1, 1, 1);
-        GlStateManager.popMatrix();
-    }
+        }
 
-    public void drawWidgetsForeGround(float partialTicks) {
-        IWidgetParent.forEachByLayer(this, widget -> {
+        // draw foreground
+        for (Widget widget : widgets) {
+            widget.onFrameUpdate();
             if (widget.isEnabled()) {
                 GlStateManager.pushMatrix();
                 GlStateManager.translate(widget.getAbsolutePos().x, widget.getAbsolutePos().y, 0);
@@ -217,8 +226,11 @@ public class ModularWindow implements IWidgetParent {
                 widget.drawInForeground(partialTicks);
                 GlStateManager.popMatrix();
             }
-            return false;
-        });
+        }
+        // draw all children off layer
+        if (!children.isEmpty()) {
+            drawWidgets(partialTicks, children);
+        }
     }
 
     @Override
@@ -259,6 +271,10 @@ public class ModularWindow implements IWidgetParent {
 
     public void setPos(Pos2d pos) {
         this.pos = pos;
+    }
+
+    public boolean doesNeedRebuild() {
+        return needsRebuild;
     }
 
     /**
