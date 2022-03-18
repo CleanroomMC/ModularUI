@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.common.internal;
 
+import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.*;
 import com.cleanroommc.modularui.api.animation.Eases;
 import com.cleanroommc.modularui.api.animation.Interpolator;
@@ -46,6 +47,7 @@ public class ModularWindow implements IWidgetParent {
     private int color = 0xFFFFFFFF;
     private float scale = 1f;
     private float rotation = 0;
+    private float translateX = 0, translateY = 0;
 
     private Interpolator openAnimation, closeAnimation;
 
@@ -82,18 +84,25 @@ public class ModularWindow implements IWidgetParent {
      */
     public void onOpen() {
         if (openAnimation == null) {
-            final int startY = context.getScaledScreenSize().height, endY = pos.y;
+            final int startY = context.getScaledScreenSize().height - pos.y;
             openAnimation = new Interpolator(0, 1, 250, Eases.EaseQuadOut, value -> {
                 float val = (float) value;
-                color = Color.withAlpha(color, val);
-                //int y = (int) ((endY - startY) * val + startY);
-                //setPos(new Pos2d(pos.x, y));
-                //markNeedsRebuild();
-                scale = val;
-                //rotation = val * 360;
+                if (ModularUIConfig.animations.openCloseFade) {
+                    color = Color.withAlpha(color, val);
+                }
+                if (ModularUIConfig.animations.openCloseTranslateFromBottom) {
+                    translateY = startY * (1 - val);
+                }
+                if (ModularUIConfig.animations.openCloseScale) {
+                    scale = val;
+                }
+                if (ModularUIConfig.animations.openCloseRotateFast) {
+                    rotation = val * 360;
+                }
             }, val -> {
                 color = Color.withAlpha(color, 255);
-                //setPos(new Pos2d(pos.x, endY));
+                translateX = 0;
+                translateY = 0;
                 scale = 1f;
                 rotation = 360;
             });
@@ -182,9 +191,12 @@ public class ModularWindow implements IWidgetParent {
     public void drawWidgets(float partialTicks) {
         GlStateManager.pushMatrix();
         // rotate around center
-        //GlStateManager.translate(pos.x + size.width / 2f, pos.y + size.height / 2f, 0);
-        //GlStateManager.rotate(rotation, 0, 0, 1);
-        //GlStateManager.translate(-(pos.x + size.width / 2f), -(pos.y + size.height / 2f), 0);
+        if (ModularUIConfig.animations.openCloseRotateFast) {
+            GlStateManager.translate(pos.x + size.width / 2f, pos.y + size.height / 2f, 0);
+            GlStateManager.rotate(rotation, 0, 0, 1);
+            GlStateManager.translate(-(pos.x + size.width / 2f), -(pos.y + size.height / 2f), 0);
+        }
+        GlStateManager.translate(translateX, translateY, 0);
         final float sf = 1 / scale;
         GlStateManager.scale(scale, scale, 1);
         GlStateManager.color(Color.getRedF(color), Color.getGreenF(color), Color.getBlueF(color), Color.getAlphaF(color));

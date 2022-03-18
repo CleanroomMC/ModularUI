@@ -1,8 +1,5 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.api.IWidgetDrawable;
-import com.cleanroommc.modularui.api.drawable.IDrawable;
-import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 
 import javax.annotation.Nullable;
