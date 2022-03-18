@@ -104,6 +104,8 @@ public abstract class Widget {
         if (window == null || parent == null || isInitialised()) {
             throw new IllegalStateException("Illegal initialise call to widget!! " + toString());
         }
+        initChildren();
+
         this.window = window;
         this.parent = parent;
         this.layer = layer;
@@ -240,6 +242,12 @@ public abstract class Widget {
 
 
     //==== Lifecycle ====
+
+    /**
+     * Called right before {@link #onInit()}. Last chance to add sub widgets
+     */
+    public void initChildren() {
+    }
 
     /**
      * Called once when the window opens

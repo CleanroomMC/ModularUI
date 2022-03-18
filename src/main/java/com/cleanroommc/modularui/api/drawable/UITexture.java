@@ -75,10 +75,6 @@ public class UITexture implements IDrawable {
         return getSubArea(bounds.x0, bounds.y0, bounds.x1, bounds.y1);
     }
 
-    public UITexture getSubArea(Pos2d pos, Size size) {
-        return getSubArea(pos.x, pos.y, pos.x + size.width, pos.y + size.height);
-    }
-
     /**
      * Returns a texture with a sub area relative to this area texture
      *

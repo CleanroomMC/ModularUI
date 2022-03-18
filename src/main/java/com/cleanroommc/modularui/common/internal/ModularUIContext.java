@@ -177,12 +177,14 @@ public class ModularUIContext {
     private Widget getTopWidgetAt(Pos2d pos, List<Widget> widgets) {
         Widget widgetUnderMouse = null;
         for (Widget widget : widgets) {
-            if (Widget.isUnderMouse(pos, widget.getAbsolutePos(), widget.getSize())) {
-                if (widget instanceof IWidgetParent) {
-                    Widget childUnderMouse = getTopWidgetAt(pos, ((IWidgetParent) widget).getChildren());
-                    return childUnderMouse == null ? widget : childUnderMouse;
-                }
+            if ((widgetUnderMouse == null || widgetUnderMouse.getLayer() <= widget.getLayer()) && Widget.isUnderMouse(pos, widget.getAbsolutePos(), widget.getSize())) {
                 widgetUnderMouse = widget;
+            }
+            if (widget instanceof IWidgetParent) {
+                Widget childUnderMouse = getTopWidgetAt(pos, ((IWidgetParent) widget).getChildren());
+                if(childUnderMouse != null && (widgetUnderMouse == null || widgetUnderMouse.getLayer() <= childUnderMouse.getLayer())) {
+                    widgetUnderMouse = childUnderMouse;
+                }
             }
         }
         return widgetUnderMouse;

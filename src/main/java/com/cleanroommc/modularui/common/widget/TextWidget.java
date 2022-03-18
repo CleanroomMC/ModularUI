@@ -7,8 +7,7 @@ import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.google.gson.JsonObject;
-
-import javax.annotation.Nullable;
+import net.minecraft.util.text.ITextComponent;
 
 public class TextWidget extends Widget {
 
@@ -28,6 +27,14 @@ public class TextWidget extends Widget {
 
     public TextWidget(Text... texts) {
         this(new TextSpan().addText(texts));
+    }
+
+    public TextWidget(String text) {
+        this(new TextSpan().addText(text));
+    }
+
+    public TextWidget(ITextComponent text) {
+        this(new TextSpan().addText(text));
     }
 
     @Override

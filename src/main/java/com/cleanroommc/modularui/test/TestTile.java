@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.api.ITileWithModularUI;
+import com.cleanroommc.modularui.api.ModularUITextures;
 import com.cleanroommc.modularui.api.drawable.AdaptableUITexture;
 import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.UITexture;
@@ -22,21 +23,43 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
     private int duration = 60;
     private int progress = 0;
     private static final AdaptableUITexture DISPLAY = AdaptableUITexture.of("modularui:gui/background/display", 143, 75, 2);
+    private static final AdaptableUITexture BACKGROUND = AdaptableUITexture.of("modularui:gui/background/background", 176, 166, 3);
     private static final UITexture PROGRESS_BAR = UITexture.fullImage("modularui", "gui/widgets/progress_bar_arrow");
     private static final UITexture PROGRESS_BAR_MIXER = UITexture.fullImage("modularui", "gui/widgets/progress_bar_mixer");
 
     @Override
     public ModularWindow createWindow(UIBuildContext buildContext) {
         Text[] TEXT = {new Text("Blue \u00a7nUnderlined\u00a7rBlue ").color(0x3058B8), new Text("Mint").color(0x469E8F)};
-        ModularWindow.Builder builder = ModularWindow.builder(new Size(176, 272))
-                .addFromJson("modularui:test", buildContext);
+        ModularWindow.Builder builder = ModularWindow.builder(new Size(176, 272));
+        //.addFromJson("modularui:test", buildContext);
         /*buildContext.applyToWidget("background", DrawableWidget.class, widget -> {
             widget.addTooltip("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.")
                     .addTooltip("Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.")
                     .addTooltip("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet");
         });*/
+        builder.widget(ModularUITextures.VANILLA_BACKGROUND.asWidget().fillParent())
+                .widget(SlotGroup.playerInventoryGroup(buildContext.getPlayer(), new Pos2d(7, 190)));
         return builder
-                .widget(new CycleButtonWidget()
+                .widget(new TabContainer()
+                        .setButtonSize(new Size(28, 32))
+                        .addTabButton(new TabButton(0)
+                                .setBackground(false, ModularUITextures.VANILLA_TAB_TOP_START.getSubArea(0, 0, 1f, 0.5f))
+                                .setBackground(true, ModularUITextures.VANILLA_TAB_TOP_START.getSubArea(0, 0.5f, 1f, 1f))
+                                .setPos(0, -28))
+                        .addTabButton(new TabButton(1)
+                                .setBackground(false, ModularUITextures.VANILLA_TAB_TOP_MIDDLE.getSubArea(0, 0, 1f, 0.5f))
+                                .setBackground(true, ModularUITextures.VANILLA_TAB_TOP_MIDDLE.getSubArea(0, 0.5f, 1f, 1f))
+                                .setPos(28, -28))
+                        .addTabButton(new TabButton(2)
+                                .setBackground(false, ModularUITextures.VANILLA_TAB_TOP_MIDDLE.getSubArea(0, 0, 1f, 0.5f))
+                                .setBackground(true, ModularUITextures.VANILLA_TAB_TOP_MIDDLE.getSubArea(0, 0.5f, 1f, 1f))
+                                .setPos(56, -28))
+                        .addPage(new MultiChildWidget()
+                                .addChild(new TextWidget("Page 1"))
+                                .setPos(10, 10))
+                        .addPage(new TextWidget("Page 2").setPos(10, 10))
+                        .addPage(new TextWidget("Page 3").setPos(10, 10)))
+                /*.widget(new CycleButtonWidget()
                         .setLength(3)
                         .setGetter(() -> serverValue)
                         .setSetter(val -> this.serverValue = val)
@@ -96,7 +119,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                         .widget(new ButtonWidget().setBackground(DISPLAY))
                         .widget(new TextWidget(new Text("More Text")))
                         .setMaxWidth(156)
-                        .setPos(10, 150))
+                        .setPos(10, 150))*/
                 .build();
     }
 
