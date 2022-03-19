@@ -66,12 +66,12 @@ public class ModularUIContainer extends Container {
     @Override
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
         Slot slot = this.inventorySlots.get(index);
-        if (slot instanceof BaseSlot) {
+        if (slot instanceof BaseSlot && !((BaseSlot) slot).isPhantom()) {
             ItemStack stack = slot.getStack();
             if (!stack.isEmpty()) {
                 ItemStack remainder = transferItem((BaseSlot) slot, stack.copy());
                 stack.setCount(remainder.getCount());
-                return remainder;
+                return ItemStack.EMPTY;
             }
         }
         return ItemStack.EMPTY;
@@ -83,24 +83,31 @@ public class ModularUIContainer extends Container {
                 continue;
             }
             BaseSlot slot = (BaseSlot) slot1;
-            if (fromSlot.getShiftClickPriority() != slot.getShiftClickPriority() && slot.isEnabled() && slot.isItemValid(stack)) {
+            if (fromSlot.getShiftClickPriority() != slot.getShiftClickPriority() && slot.isEnabled() && slot.isItemValidPhantom(stack)) {
                 ItemStack itemstack = slot.getStack();
-                if (ItemHandlerHelper.canItemStacksStackRelaxed(stack, itemstack)) {
-                    int j = itemstack.getCount() + stack.getCount();
-                    int maxSize = Math.min(slot.getSlotStackLimit(), stack.getMaxStackSize());
-
-                    if (j <= maxSize) {
-                        stack.setCount(0);
-                        itemstack.setCount(j);
-                        slot.onSlotChanged();
-                    } else if (itemstack.getCount() < maxSize) {
-                        stack.shrink(maxSize - itemstack.getCount());
-                        itemstack.setCount(maxSize);
-                        slot.onSlotChanged();
-                    }
-
-                    if (stack.isEmpty()) {
+                if (slot.isPhantom()) {
+                    if (itemstack.isEmpty() || (ItemHandlerHelper.canItemStacksStackRelaxed(stack, itemstack) && itemstack.getCount() < slot.getItemStackLimit(itemstack))) {
+                        slot.putStack(stack.copy());
                         return stack;
+                    }
+                } else {
+                    if (ItemHandlerHelper.canItemStacksStackRelaxed(stack, itemstack)) {
+                        int j = itemstack.getCount() + stack.getCount();
+                        int maxSize = Math.min(slot.getSlotStackLimit(), stack.getMaxStackSize());
+
+                        if (j <= maxSize) {
+                            stack.setCount(0);
+                            itemstack.setCount(j);
+                            slot.onSlotChanged();
+                        } else if (itemstack.getCount() < maxSize) {
+                            stack.shrink(maxSize - itemstack.getCount());
+                            itemstack.setCount(maxSize);
+                            slot.onSlotChanged();
+                        }
+
+                        if (stack.isEmpty()) {
+                            return stack;
+                        }
                     }
                 }
             }

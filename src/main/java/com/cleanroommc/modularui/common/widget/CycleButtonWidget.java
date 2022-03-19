@@ -12,7 +12,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.network.PacketBuffer;
 
-import javax.annotation.Nullable;
 import java.util.function.*;
 
 public class CycleButtonWidget extends SyncedWidget implements Interactable {
@@ -108,17 +107,18 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
     }
 
     @Override
-    public void onClick(int buttonId, boolean doubleClick) {
+    public boolean onClick(int buttonId, boolean doubleClick) {
         switch (buttonId) {
             case 0:
                 next();
                 Interactable.playButtonClickSound();
-                break;
+                return true;
             case 1:
                 prev();
                 Interactable.playButtonClickSound();
-                break;
+                return true;
         }
+        return false;
     }
 
     @Override

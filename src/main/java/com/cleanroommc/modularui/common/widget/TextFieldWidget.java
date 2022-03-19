@@ -221,8 +221,9 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
     }
 
     @Override
-    public void onClick(int buttonId, boolean doubleClick) {
+    public boolean onClick(int buttonId, boolean doubleClick) {
         setCursor(getTextIndexUnderMouse());
+        return true;
     }
 
     @Override

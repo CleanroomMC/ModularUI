@@ -104,8 +104,6 @@ public abstract class Widget {
         if (window == null || parent == null || isInitialised()) {
             throw new IllegalStateException("Illegal initialise call to widget!! " + toString());
         }
-        initChildren();
-
         this.window = window;
         this.parent = parent;
         this.layer = layer;
@@ -527,6 +525,15 @@ public abstract class Widget {
     //==== Utility ====
 
     public static boolean isUnderMouse(Pos2d mouse, Pos2d areaTopLeft, Size areaSize) {
+        if (mouse == null) {
+            throw new NullPointerException("Mouse pos is null");
+        }
+        if (areaTopLeft == null) {
+            throw new NullPointerException("Widget pos is null");
+        }
+        if (areaSize == null) {
+            throw new NullPointerException("Widget size is null");
+        }
         return mouse.x >= areaTopLeft.x &&
                 mouse.x <= areaTopLeft.x + areaSize.width &&
                 mouse.y >= areaTopLeft.y &&

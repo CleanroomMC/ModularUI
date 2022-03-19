@@ -15,7 +15,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
-import net.minecraftforge.fluids.*;
+import net.minecraftforge.fluids.FluidActionResult;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
@@ -116,9 +119,9 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
     }
 
     @Override
-    public void onClick(int buttonId, boolean doubleClick) {
+    public boolean onClick(int buttonId, boolean doubleClick) {
         if (!allowManualEmptying && !allowManualFilling) {
-            return;
+            return false;
         }
         ItemStack cursorStack = getContext().getCursorStack();
         if (!cursorStack.isEmpty() && cursorStack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)) {
@@ -127,7 +130,9 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
                 buffer.writeBoolean(Interactable.hasShiftDown());
             });
             Interactable.playButtonClickSound();
+            return true;
         }
+        return false;
     }
 
     @Override

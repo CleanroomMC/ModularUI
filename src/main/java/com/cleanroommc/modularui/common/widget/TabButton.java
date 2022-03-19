@@ -18,10 +18,12 @@ public class TabButton extends Widget implements Interactable {
     }
 
     @Override
-    public void onClick(int buttonId, boolean doubleClick) {
+    public boolean onClick(int buttonId, boolean doubleClick) {
         if (page != tabController.getCurrentPage()) {
             tabController.setActivePage(page);
+            return true;
         }
+        return false;
     }
 
     protected void setTabController(TabContainer tabController) {

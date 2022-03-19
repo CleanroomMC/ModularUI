@@ -21,7 +21,7 @@ public class ButtonWidget extends SyncedWidget implements Interactable {
     }
 
     @Override
-    public void onClick(int buttonId, boolean doubleClick) {
+    public boolean onClick(int buttonId, boolean doubleClick) {
         if (clickAction != null) {
             ClickData clickData = ClickData.create(buttonId, doubleClick);
             clickAction.accept(clickData, this);
@@ -29,7 +29,9 @@ public class ButtonWidget extends SyncedWidget implements Interactable {
                 syncToServer(1, clickData::writeToPacket);
             }
             Interactable.playButtonClickSound();
+            return true;
         }
+        return false;
     }
 
     @Override

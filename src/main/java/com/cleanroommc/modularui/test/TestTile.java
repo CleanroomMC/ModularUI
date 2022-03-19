@@ -5,7 +5,8 @@ import com.cleanroommc.modularui.api.ModularUITextures;
 import com.cleanroommc.modularui.api.drawable.AdaptableUITexture;
 import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.UITexture;
-import com.cleanroommc.modularui.api.math.*;
+import com.cleanroommc.modularui.api.math.Pos2d;
+import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.internal.ModularWindow;
 import com.cleanroommc.modularui.common.internal.UIBuildContext;
 import com.cleanroommc.modularui.common.widget.*;
@@ -13,12 +14,14 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.items.ItemStackHandler;
 
 public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI, ITickable {
 
     private int serverValue = 0;
     private int time = 0;
     private FluidTank fluidTank = new FluidTank(10000);
+    private final ItemStackHandler phantomInventory = new ItemStackHandler(2);
     private String textFieldValue = "";
     private int duration = 60;
     private int progress = 0;
@@ -56,6 +59,12 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                                 .setPos(56, -28))
                         .addPage(new MultiChildWidget()
                                 .addChild(new TextWidget("Page 1"))
+                                .addChild(new SlotWidget(phantomInventory, 0)
+                                        .setShiftClickPrio(0)
+                                        .setPos(10, 30))
+                                .addChild(SlotWidget.phantom(phantomInventory, 1)
+                                        .setShiftClickPrio(1)
+                                        .setPos(28, 30))
                                 .setPos(10, 10))
                         .addPage(new TextWidget("Page 2").setPos(10, 10))
                         .addPage(new TextWidget("Page 3").setPos(10, 10)))

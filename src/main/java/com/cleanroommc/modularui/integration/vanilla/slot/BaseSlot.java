@@ -1,9 +1,11 @@
 package com.cleanroommc.modularui.integration.vanilla.slot;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 
@@ -18,6 +20,14 @@ public class BaseSlot extends SlotItemHandler {
     // lower priority means it gets targeted first
     // hotbar 20, player inventory 40, machine input 0
     private int shiftClickPriority = 0;
+
+    public static BaseSlot phantom() {
+        return phantom(new ItemStackHandler(), 0, false);
+    }
+
+    public static BaseSlot phantom(IItemHandler handler, int index, boolean output) {
+        return new BaseSlot(handler, index, output, true);
+    }
 
     public BaseSlot(IItemHandler inventory, int index) {
         this(inventory, index, false, false);
@@ -39,12 +49,29 @@ public class BaseSlot extends SlotItemHandler {
 
     @Override
     public boolean isItemValid(ItemStack stack) {
-        return !this.output;
+        return !this.phantom && isItemValidPhantom(stack);
+    }
+
+    public boolean isItemValidPhantom(ItemStack stack) {
+        return !this.output && getItemHandler().isItemValid(getSlotIndex(), stack);
+    }
+
+    @Override
+    public boolean canTakeStack(EntityPlayer playerIn) {
+        return !this.phantom && super.canTakeStack(playerIn);
     }
 
     @Override
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public boolean isOutput() {
+        return output;
+    }
+
+    public boolean isPhantom() {
+        return phantom;
     }
 
     public void setEnabled(boolean enabled) {

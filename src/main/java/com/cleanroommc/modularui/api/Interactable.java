@@ -18,24 +18,28 @@ public interface Interactable {
     /**
      * called when clicked on the Interactable
      *
-     * @param buttonId the button id (Left == 1, right == 2)
+     * @param buttonId    the button id (Left == 0, right == 1)
      * @param doubleClick if it is the second click within 400ms
+     * @return if further operations should abort
      */
-    default void onClick(int buttonId, boolean doubleClick) {
+    default boolean onClick(int buttonId, boolean doubleClick) {
+        return false;
     }
 
     /**
      * called when released a click on the Interactable
      *
-     * @param buttonId the button id (Left == 1, right == 2)
+     * @param buttonId the button id (Left == 0, right == 1)
+     * @return if further operations should abort
      */
-    default void onClickReleased(int buttonId) {
+    default boolean onClickReleased(int buttonId) {
+        return false;
     }
 
     /**
      * called when the interactable is focused and the mouse gets dragged
      *
-     * @param buttonId  the button id (Left == 1, right == 2)
+     * @param buttonId  the button id (Left == 0, right == 1)
      * @param deltaTime milliseconds since last mouse event
      */
     default void onMouseDragged(int buttonId, long deltaTime) {
@@ -53,6 +57,7 @@ public interface Interactable {
      *
      * @param character the typed character. Is equal to {@link Character#MIN_VALUE} if it's not a char
      * @param keyCode   code of the typed key. See {@link Keyboard}
+     * @return if further operations should abort
      */
     default boolean onKeyPressed(char character, int keyCode) {
         return false;
@@ -61,6 +66,7 @@ public interface Interactable {
     /**
      * @return if left or right ctrl/cmd is pressed
      */
+    @SideOnly(Side.CLIENT)
     static boolean hasControlDown() {
         return GuiScreen.isCtrlKeyDown();
     }

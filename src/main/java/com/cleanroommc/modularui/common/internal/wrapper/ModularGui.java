@@ -9,7 +9,6 @@ import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.internal.ModularUIContext;
 import com.cleanroommc.modularui.common.internal.mixin.GuiContainerMixin;
-import com.cleanroommc.modularui.common.widget.SlotWidget;
 import com.cleanroommc.modularui.common.widget.Widget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -284,7 +283,6 @@ public class ModularGui extends GuiContainer {
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-        super.mouseClicked(mouseX, mouseY, mouseButton);
         long time = Minecraft.getSystemTime();
         boolean doubleClick = isDoubleClick(lastClick, time);
         lastClick = time;
@@ -297,7 +295,11 @@ public class ModularGui extends GuiContainer {
         if (focused instanceof Interactable) {
             Interactable interactable = (Interactable) focused;
             doubleClick = !changedFocus && isDoubleClick(lastFocusedClick, time);
-            interactable.onClick(mouseButton, doubleClick);
+            if (!interactable.onClick(mouseButton, doubleClick)) {
+                super.mouseClicked(mouseX, mouseY, mouseButton);
+            }
+        } else {
+            super.mouseClicked(mouseX, mouseY, mouseButton);
         }
 
         lastFocusedClick = time;
@@ -324,12 +326,15 @@ public class ModularGui extends GuiContainer {
 
     @Override
     protected void mouseReleased(int mouseX, int mouseY, int mouseButton) {
-        super.mouseReleased(mouseX, mouseY, mouseButton);
         for (Interactable interactable : context.getCurrentWindow().getInteractionListeners()) {
             interactable.onClickReleased(mouseButton);
         }
         if (isFocusedValid() && focused instanceof Interactable) {
-            ((Interactable) focused).onClickReleased(mouseButton);
+            if (!((Interactable) focused).onClickReleased(mouseButton)) {
+                super.mouseReleased(mouseX, mouseY, mouseButton);
+            }
+        } else {
+            super.mouseReleased(mouseX, mouseY, mouseButton);
         }
     }
 
