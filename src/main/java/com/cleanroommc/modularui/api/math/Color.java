@@ -13,28 +13,28 @@ public class Color {
      * Creates a color int. All values should be 0 - 255
      */
     public static int rgb(int red, int green, int blue) {
-        return rgba(red, green, blue, 255);
+        return argb(red, green, blue, 255);
     }
 
     /**
      * Creates a color int. All values should be 0 - 255
      */
-    public static int rgba(int red, int green, int blue, int alpha) {
+    public static int argb(int red, int green, int blue, int alpha) {
         return ((alpha & 0xFF) << 24) | ((red & 0xFF) << 16) | ((green & 0xFF) << 8) | ((blue & 0xFF));
     }
 
     /**
      * Creates a color int. All values should be 0 - 1
      */
-    public static int rgba(float red, float green, float blue, float alpha) {
-        return rgba((int) (red * 255), (int) (green * 255), (int) (blue * 255), (int) (alpha * 255));
+    public static int argb(float red, float green, float blue, float alpha) {
+        return argb((int) (red * 255), (int) (green * 255), (int) (blue * 255), (int) (alpha * 255));
     }
 
     /**
      * Creates a color int. All values should be 0 - 1
      */
     public static int rgb(float red, float green, float blue) {
-        return rgba(red, green, blue, 1f);
+        return argb(red, green, blue, 1f);
     }
 
     /**
@@ -79,7 +79,7 @@ public class Color {
             g = 0;
             b = x;
         }
-        return rgba(r + m, g + m, b + m, alpha);
+        return argb(r + m, g + m, b + m, alpha);
     }
 
     public static int withRed(int color, int red) {
@@ -186,7 +186,7 @@ public class Color {
         if (alpha == 0) {
             alpha = 255;
         }
-        return Color.rgba(255 - getRed(rgb), 255 - getGreen(rgb), 255 - getBlue(rgb), alpha);
+        return Color.argb(255 - getRed(rgb), 255 - getGreen(rgb), 255 - getBlue(rgb), alpha);
     }
 
     @Nullable
@@ -203,7 +203,7 @@ public class Color {
             int green = JsonHelper.getInt(json, 255, "g", "green");
             int blue = JsonHelper.getInt(json, 255, "b", "blue");
             int alpha = JsonHelper.getInt(json, 255, "a", "alpha");
-            return Color.rgba(red, green, blue, alpha);
+            return Color.argb(red, green, blue, alpha);
         }
         String string = jsonElement.getAsString();
         if (string.startsWith("#")) {

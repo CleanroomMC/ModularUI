@@ -21,7 +21,7 @@ public class Text implements IDrawable {
     @Nullable
     private Supplier<Object[]> localisationData;
     private boolean dynamicLocalisation = false;
-    private int color = Color.rgba(33, 33, 33, 0);
+    private int color = Color.argb(33, 33, 33, 0);
     private boolean shadow = false;
 
     private Text(String text, Supplier<String> textSupplier) {

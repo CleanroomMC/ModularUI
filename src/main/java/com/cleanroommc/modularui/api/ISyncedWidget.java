@@ -6,6 +6,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.io.IOException;
 import java.util.function.Consumer;
 
 /**
@@ -15,9 +16,9 @@ import java.util.function.Consumer;
 public interface ISyncedWidget {
 
     @SideOnly(Side.CLIENT)
-    void readOnClient(int id, PacketBuffer buf);
+    void readOnClient(int id, PacketBuffer buf) throws IOException;
 
-    void readOnServer(int id, PacketBuffer buf);
+    void readOnServer(int id, PacketBuffer buf) throws IOException;
 
     /**
      * Called each tick on server. Use it to detect and sync changes

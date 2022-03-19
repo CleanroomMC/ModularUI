@@ -160,10 +160,17 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
         return this;
     }
 
-    public <T extends Enum<T>> CycleButtonWidget setForEnum(Class<T> clazz, Consumer<T> setter, Supplier<T> getter) {
+    public <T extends Enum<T>> CycleButtonWidget setForEnum(Class<T> clazz, Supplier<T> getter, Consumer<T> setter) {
         setSetter(val -> setter.accept(clazz.getEnumConstants()[val]));
         setGetter(() -> getter.get().ordinal());
         setLength(clazz.getEnumConstants().length);
+        return this;
+    }
+
+    public CycleButtonWidget setToggle(BooleanSupplier getter, Consumer<Boolean> setter) {
+        setSetter(val -> setter.accept(val == 1));
+        setGetter(() -> getter.getAsBoolean() ? 1 : 0);
+        setLength(2);
         return this;
     }
 
