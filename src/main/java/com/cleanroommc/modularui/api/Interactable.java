@@ -64,6 +64,14 @@ public interface Interactable {
     }
 
     /**
+     * Called the mouse wheel moved
+     *
+     * @param direction -1 for down, 1 for up
+     */
+    default void onMouseScroll(int direction) {
+    }
+
+    /**
      * @return if left or right ctrl/cmd is pressed
      */
     @SideOnly(Side.CLIENT)

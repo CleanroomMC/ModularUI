@@ -367,6 +367,15 @@ public class ModularGui extends GuiContainer {
         }
     }
 
+    public void mouseScroll(int direction) {
+        for (Interactable interactable : context.getCurrentWindow().getInteractionListeners()) {
+            interactable.onMouseScroll(direction);
+        }
+        if (hovered instanceof Interactable) {
+            ((Interactable) hovered).onMouseScroll(direction);
+        }
+    }
+
     private void keyTypedSuper(char typedChar, int keyCode) throws IOException {
         if (keyCode == 1 || this.mc.gameSettings.keyBindInventory.isActiveAndMatches(keyCode)) {
             if (context.getMainWindow().onTryClose()) {

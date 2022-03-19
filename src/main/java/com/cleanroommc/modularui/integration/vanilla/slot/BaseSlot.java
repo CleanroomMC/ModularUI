@@ -99,4 +99,17 @@ public class BaseSlot extends SlotItemHandler {
     public TextureAtlasSprite getBackgroundSprite() {
         return null;
     }
+
+    public void incrementStackCount(int amount) {
+        ItemStack stack = getStack();
+        if (stack.isEmpty()) {
+            return;
+        }
+        if (amount < 0) {
+            amount = Math.max(0, stack.getCount() + amount);
+        } else {
+            amount = Math.min(stack.getCount() + amount, getItemStackLimit(stack));
+        }
+        stack.setCount(amount);
+    }
 }

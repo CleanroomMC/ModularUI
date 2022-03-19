@@ -127,6 +127,8 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
             slot.yPos = buf.readVarInt();
         } else if (id == 2) {
             phantomClick(ClickData.readPacket(buf));
+        } else if (id == 3) {
+            phantomScroll(buf.readVarInt());
         }
     }
 
@@ -137,6 +139,13 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onMouseScroll(int direction) {
+        if (isPhantom()) {
+            syncToServer(3, buffer -> buffer.writeVarInt(direction));
+        }
     }
 
     protected void phantomClick(ClickData clickData) {
@@ -156,12 +165,16 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
                 if (clickData.shift) {
                     slot.putStack(ItemStack.EMPTY);
                 } else {
-                    slotStack.shrink(1);
+                    slot.incrementStackCount(-1);
                 }
             } else if (clickData.mouseButton == 1) {
-                slotStack.grow(1);
+                slot.incrementStackCount(1);
             }
         }
+    }
+
+    protected void phantomScroll(int direction) {
+        slot.incrementStackCount(direction);
     }
 
     private GuiContainerMixin getGuiAccessor() {
