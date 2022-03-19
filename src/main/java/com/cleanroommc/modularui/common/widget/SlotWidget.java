@@ -109,6 +109,11 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
         return this;
     }
 
+    public SlotWidget setChangeListener(Runnable runnable) {
+        slot.setChangeListener(runnable);
+        return this;
+    }
+
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);

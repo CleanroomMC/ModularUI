@@ -32,7 +32,7 @@ public abstract class Widget {
     // sizing and positioning
     protected Size size = Size.ZERO;
     protected Pos2d relativePos = Pos2d.ZERO;
-    protected Pos2d pos = null;
+    protected Pos2d pos = Pos2d.ZERO;
     protected Pos2d fixedPos = null;
     private boolean fillParent = false;
     private boolean autoSized = true;

@@ -44,6 +44,13 @@ public class TextWidget extends Widget {
     }
 
     @Override
+    public void onRebuild() {
+        if (localised == null) {
+            this.localised = text.getFormatted();
+        }
+    }
+
+    @Override
     protected Size getDefaultSize() {
         this.localised = text.getFormatted();
         int width = maxWidth > 0 ? maxWidth : getWindow().getSize().width - getPos().x;

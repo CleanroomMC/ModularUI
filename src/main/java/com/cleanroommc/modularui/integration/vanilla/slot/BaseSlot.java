@@ -20,6 +20,7 @@ public class BaseSlot extends SlotItemHandler {
     // lower priority means it gets targeted first
     // hotbar 20, player inventory 40, machine input 0
     private int shiftClickPriority = 0;
+    private Runnable changeListener;
 
     public static BaseSlot phantom() {
         return phantom(new ItemStackHandler(), 0, false);
@@ -80,6 +81,17 @@ public class BaseSlot extends SlotItemHandler {
 
     public int getShiftClickPriority() {
         return shiftClickPriority;
+    }
+
+    public void setChangeListener(Runnable changeListener) {
+        this.changeListener = changeListener;
+    }
+
+    @Override
+    public void onSlotChanged() {
+        if (this.changeListener != null) {
+            this.changeListener.run();
+        }
     }
 
     // handle background by widgets
