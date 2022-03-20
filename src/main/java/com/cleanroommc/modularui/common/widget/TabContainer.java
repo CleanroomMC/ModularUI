@@ -34,12 +34,6 @@ public class TabContainer extends PageControlWidget {
         }
     }
 
-    @Nullable
-    @Override
-    public Size determineSize() {
-        return MultiChildWidget.getSizeOf(getPages());
-    }
-
     @Override
     public List<Widget> getChildren() {
         return allChildren;

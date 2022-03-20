@@ -29,7 +29,7 @@ public class PageControlWidget extends Widget implements IWidgetParent {
     @Nullable
     @Override
     public Size determineSize() {
-        return MultiChildWidget.getSizeOf(pages);
+        return pages.isEmpty() ? null : MultiChildWidget.getSizeOf(pages);
     }
 
     protected List<Widget> getPages() {

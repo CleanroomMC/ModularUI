@@ -11,9 +11,13 @@ import java.util.List;
 
 public class MultiChildWidget extends Widget implements IWidgetParent {
 
-    private final List<Widget> children = new ArrayList<>();
+    protected final List<Widget> children = new ArrayList<>();
 
     public MultiChildWidget addChild(Widget widget) {
+        if (widget == null) {
+            ModularUI.LOGGER.throwing(new NullPointerException("Tried adding null widget to " + getClass().getSimpleName()));
+            return this;
+        }
         if (widget == this) {
             ModularUI.LOGGER.error("Can't add self!");
             return this;
@@ -46,13 +50,11 @@ public class MultiChildWidget extends Widget implements IWidgetParent {
     }
 
     public static Size getSizeOf(List<Widget> widgets) {
-        int x0 = Integer.MAX_VALUE, x1 = 0, y0 = Integer.MAX_VALUE, y1 = 0;
+        int x1 = Integer.MIN_VALUE, y1 = Integer.MIN_VALUE;
         for (Widget widget : widgets) {
-            x0 = Math.min(x0, widget.getPos().x);
             x1 = Math.max(x1, widget.getPos().x + widget.getSize().width);
-            y0 = Math.min(y0, widget.getPos().y);
             y1 = Math.max(y1, widget.getPos().y + widget.getSize().height);
         }
-        return new Size(x1 - x0, y1 - y0);
+        return new Size(x1, y1);
     }
 }

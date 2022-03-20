@@ -14,14 +14,16 @@ import com.google.gson.JsonObject;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * This class depicts a functional element of a ModularUI
  */
+@ApiStatus.Experimental
 public abstract class Widget {
 
     // gui
@@ -47,6 +49,8 @@ public abstract class Widget {
     private IWidgetDrawable drawable;
     private final List<TextSpan> additionalTooltip = new ArrayList<>();
     private int tooltipShowUpDelay = 0;
+    @Nullable
+    private String debugLabel;
 
     public Widget() {
     }
@@ -100,6 +104,7 @@ public abstract class Widget {
     /**
      * Thou shall not call
      */
+    @ApiStatus.Internal
     public final void initialize(ModularWindow window, IWidgetParent parent, int layer) {
         if (window == null || parent == null || isInitialised()) {
             throw new IllegalStateException("Illegal initialise call to widget!! " + toString());
@@ -118,31 +123,45 @@ public abstract class Widget {
         }
     }
 
+    @SideOnly(Side.CLIENT)
+    @ApiStatus.Internal
+    public final void checkSizeInternal() {
+        if (!isInitialised()) {
+            return;
+        }
+        if (this instanceof IWidgetParent) {
+            IWidgetParent parentThis = (IWidgetParent) this;
+            for (Widget widget : parentThis.getChildren()) {
+                widget.checkSizeInternal();
+            }
+            parentThis.layoutChildren();
+        }
+        if (isAutoSized()) {
+            if (isFillParent()) {
+                size = parent.getSize();
+            } else {
+                if (this instanceof IWidgetParent) {
+                    IWidgetParent parentThis = (IWidgetParent) this;
+                    Size size = parentThis.determineSize();
+                    if (size != null) {
+                        this.size = size;
+                        return;
+                    }
+                }
+                size = getDefaultSize();
+            }
+        }
+    }
+
     /**
      * Thou shall not call
      */
     @SideOnly(Side.CLIENT)
-    public final void rebuildInternal() {
+    @ApiStatus.Internal
+    public final void checkPosInternal() {
         if (!isInitialised()) {
             return;
         }
-
-        if (this instanceof IWidgetParent) {
-            // check auto sized children
-            for (Widget widget : ((IWidgetParent) this).getChildren()) {
-                checkAutoSize(widget, (IWidgetParent) this);
-            }
-
-            // layout children and resize if needed
-            ((IWidgetParent) this).layoutChildren();
-            if (!fillParent && isAutoSized()) {
-                Size determinedSize = ((IWidgetParent) this).determineSize();
-                if (determinedSize != null) {
-                    size = determinedSize;
-                }
-            }
-        }
-
         // calculate positions
         if (isFixed() && !isAutoPositioned()) {
             relativePos = fixedPos.subtract(parent.getAbsolutePos());
@@ -151,10 +170,11 @@ public abstract class Widget {
             pos = parent.getAbsolutePos().add(relativePos);
         }
 
-        // finally rebuild children
         if (this instanceof IWidgetParent) {
-            for (Widget child : ((IWidgetParent) this).getChildren()) {
-                child.rebuildInternal();
+            IWidgetParent parentThis = (IWidgetParent) this;
+            // rebuild children
+            for (Widget child : parentThis.getChildren()) {
+                child.checkPosInternal();
             }
         }
 
@@ -314,6 +334,20 @@ public abstract class Widget {
     @SideOnly(Side.CLIENT)
     public boolean isHovering() {
         return getContext().getScreen().isHovering(this);
+    }
+
+
+    //==== Debug ====
+
+    @Override
+    public String toString() {
+        if (debugLabel == null && name.isEmpty()) {
+            return getClass().getSimpleName();
+        }
+        if (debugLabel == null) {
+            return getClass().getSimpleName() + "#" + name;
+        }
+        return getClass().getSimpleName() + "#" + name + "#" + debugLabel;
     }
 
 
@@ -521,6 +555,11 @@ public abstract class Widget {
         return this;
     }
 
+    public Widget setDebugLabel(String debugLabel) {
+        this.debugLabel = debugLabel;
+        return this;
+    }
+
 
     //==== Utility ====
 
@@ -538,19 +577,6 @@ public abstract class Widget {
                 mouse.x <= areaTopLeft.x + areaSize.width &&
                 mouse.y >= areaTopLeft.y &&
                 mouse.y <= areaTopLeft.y + areaSize.height;
-    }
-
-    /**
-     * Only called internally
-     */
-    public static void checkAutoSize(Widget widget, IWidgetParent parent) {
-        if (widget.isAutoSized()) {
-            if (widget.isFillParent()) {
-                widget.size = parent.getSize();
-            } else {
-                widget.size = widget.getDefaultSize();
-            }
-        }
     }
 
     public static class ClickData {

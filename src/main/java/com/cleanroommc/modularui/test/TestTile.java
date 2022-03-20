@@ -1,6 +1,8 @@
 package com.cleanroommc.modularui.test;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITileWithModularUI;
+import com.cleanroommc.modularui.api.IWidgetBuilder;
 import com.cleanroommc.modularui.api.ModularUITextures;
 import com.cleanroommc.modularui.api.drawable.AdaptableUITexture;
 import com.cleanroommc.modularui.api.drawable.Text;
@@ -42,6 +44,8 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
         });*/
         builder.widget(ModularUITextures.VANILLA_BACKGROUND.asWidget().fillParent())
                 .widget(SlotGroup.playerInventoryGroup(buildContext.getPlayer(), new Pos2d(7, 190)));
+        Column column = new Column();
+        addInfo(column);
         return builder
                 .widget(new TabContainer()
                         .setButtonSize(new Size(28, 32))
@@ -65,8 +69,13 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                                 .addChild(SlotWidget.phantom(phantomInventory, 1)
                                         .setShiftClickPrio(1)
                                         .setPos(28, 30))
-                                .setPos(10, 10))
-                        .addPage(new TextWidget("Page 2").setPos(10, 10))
+                                .setPos(10, 10)
+                                .setDebugLabel("Page1"))
+                        .addPage(new MultiChildWidget()
+                                .addChild(new TextWidget("Page2")
+                                        .setPos(10, 10))
+                                .addChild(column.setPos(7, 19))
+                                .setDebugLabel("Page2"))
                         .addPage(new TextWidget("Page 3").setPos(10, 10)))
                 /*.widget(new CycleButtonWidget()
                         .setLength(3)
@@ -130,6 +139,21 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                         .setMaxWidth(156)
                         .setPos(10, 150))*/
                 .build();
+    }
+
+    public <T extends Widget & IWidgetBuilder<T>> void addInfo(T builder) {
+        builder.widget(new TextWidget("Probably a Machine Name"))
+                .widget(new TextWidget("Invalid Structure or whatever")
+                        .addTooltip("This has a tooltip"));
+        if (true) {
+            builder.widget(new TextWidget("Maintanance Problems"));
+        }
+        builder.widget(new Row()
+                .widget(new TextWidget("Here you can click a button"))
+                .widget(new ButtonWidget()
+                        .setOnClick(((clickData, widget) -> ModularUI.LOGGER.info("Clicked Button")))
+                        .setSize(20, 9)
+                        .setBackground(new Text("[O]"))));
     }
 
     @Override
