@@ -81,11 +81,18 @@ public class ModularWindow implements IWidgetParent {
         markNeedsRebuild();
     }
 
+    public static boolean anyAnimation() {
+        return ModularUIConfig.animations.openCloseFade ||
+                ModularUIConfig.animations.openCloseTranslateFromBottom ||
+                ModularUIConfig.animations.openCloseScale ||
+                ModularUIConfig.animations.openCloseRotateFast;
+    }
+
     /**
      * The final call after the window is initialized & positioned
      */
     public void onOpen() {
-        if (openAnimation == null) {
+        if (openAnimation == null && anyAnimation()) {
             final int startY = context.getScaledScreenSize().height - pos.y;
             openAnimation = new Interpolator(0, 1, 250, Eases.EaseQuadOut, value -> {
                 float val = (float) value;

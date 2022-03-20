@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.common.internal.wrapper;
 
 import com.cleanroommc.modularui.api.IVanillaSlot;
+import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.api.TooltipContainer;
 import com.cleanroommc.modularui.api.drawable.TextSpan;
@@ -8,6 +9,7 @@ import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.internal.ModularUIContext;
+import com.cleanroommc.modularui.common.internal.ModularWindow;
 import com.cleanroommc.modularui.common.internal.mixin.GuiContainerMixin;
 import com.cleanroommc.modularui.common.widget.Widget;
 import net.minecraft.client.Minecraft;
@@ -254,13 +256,17 @@ public class ModularGui extends GuiContainer {
         if (hovered != null) {
             Size size = hovered.getSize();
             Pos2d pos = hovered.getAbsolutePos();
+            IWidgetParent parent = hovered.getParent();
 
             drawBorder(pos.x, pos.y, size.width, size.height, color, 1f);
+            drawBorder(parent.getAbsolutePos().x, parent.getAbsolutePos().y, parent.getSize().width, parent.getSize().height, Color.withAlpha(color, 0.3f), 1f);
             drawText("Pos: " + hovered.getPos(), 5, lineY, 1, color, false);
             lineY -= 11;
             drawText("Size: " + size, 5, lineY, 1, color, false);
             lineY -= 11;
-            drawText("Class: " + hovered.getClass().getSimpleName(), 5, lineY, 1, color, false);
+            drawText("Parent: " + (parent instanceof ModularWindow ? "ModularWindow" : parent.toString()), 5, lineY, 1, color, false);
+            lineY -= 11;
+            drawText("Class: " + hovered.toString(), 5, lineY, 1, color, false);
         }
     }
 
