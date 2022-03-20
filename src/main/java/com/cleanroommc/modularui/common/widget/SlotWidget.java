@@ -17,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.items.IItemHandler;
+import org.jetbrains.annotations.NotNull;
 
 public class SlotWidget extends Widget implements IVanillaSlot, Interactable, ISyncedWidget {
 
@@ -59,7 +60,7 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     }
 
     @Override
-    protected Size getDefaultSize() {
+    protected @NotNull Size determineSize(int maxWidth, int maxHeight) {
         return SIZE;
     }
 

@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.google.gson.JsonObject;
 import net.minecraft.util.text.ITextComponent;
+import org.jetbrains.annotations.NotNull;
 
 public class TextWidget extends Widget {
 
@@ -51,9 +52,9 @@ public class TextWidget extends Widget {
     }
 
     @Override
-    protected Size getDefaultSize() {
+    protected @NotNull Size determineSize(int maxWidth, int maxHeight) {
         this.localised = text.getFormatted();
-        int width = maxWidth > 0 ? maxWidth : getWindow().getSize().width - getPos().x;
+        int width = this.maxWidth > 0 ? this.maxWidth : maxWidth - getPos().x;
         textRenderer.setUp(Pos2d.ZERO, 0, width);
         return textRenderer.calculateSize(localised);
     }

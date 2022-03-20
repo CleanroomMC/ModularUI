@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.common.widget;
 import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.api.math.Size;
 import net.minecraft.network.PacketBuffer;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BiConsumer;
 
@@ -16,7 +17,7 @@ public class ButtonWidget extends SyncedWidget implements Interactable {
     }
 
     @Override
-    protected Size getDefaultSize() {
+    protected @NotNull Size determineSize(int maxWidth, int maxHeight) {
         return new Size(20, 20);
     }
 

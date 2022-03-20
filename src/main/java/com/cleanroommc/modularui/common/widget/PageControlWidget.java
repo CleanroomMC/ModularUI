@@ -3,8 +3,8 @@ package com.cleanroommc.modularui.common.widget;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.math.Size;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,10 +26,9 @@ public class PageControlWidget extends Widget implements IWidgetParent {
         }
     }
 
-    @Nullable
     @Override
-    public Size determineSize() {
-        return pages.isEmpty() ? null : MultiChildWidget.getSizeOf(pages);
+    protected @NotNull Size determineSize(int maxWidth, int maxHeight) {
+        return pages.isEmpty() ? super.determineSize(maxWidth, maxHeight) : MultiChildWidget.getSizeOf(pages);
     }
 
     protected List<Widget> getPages() {

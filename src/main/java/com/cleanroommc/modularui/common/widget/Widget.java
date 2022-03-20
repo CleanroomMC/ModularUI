@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.api.IWidgetDrawable;
 import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.api.TooltipContainer;
@@ -20,8 +19,10 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -130,31 +131,21 @@ public abstract class Widget {
 
     @SideOnly(Side.CLIENT)
     @ApiStatus.Internal
-    public final void checkSizeInternal() {
+    public final void buildTopToBottom(Dimension constraints) {
         if (!isInitialised()) {
             return;
         }
+        int cw = constraints.width, ch = constraints.height;
         if (this instanceof IWidgetParent) {
+            modifyConstraints(constraints);
             IWidgetParent parentThis = (IWidgetParent) this;
             for (Widget widget : parentThis.getChildren()) {
-                widget.checkSizeInternal();
+                widget.buildTopToBottom(constraints);
             }
-            parentThis.layoutChildren();
+            parentThis.layoutChildren(cw, ch);
         }
-        if (isAutoSized()) {
-            if (isFillParent()) {
-                size = parent.getSize();
-            } else {
-                if (this instanceof IWidgetParent) {
-                    IWidgetParent parentThis = (IWidgetParent) this;
-                    Size size = parentThis.determineSize();
-                    if (size != null) {
-                        this.size = size;
-                        return;
-                    }
-                }
-                size = getDefaultSize();
-            }
+        if (isAutoSized() && !isFillParent()) {
+            this.size = determineSize(cw, ch);
         }
     }
 
@@ -163,10 +154,14 @@ public abstract class Widget {
      */
     @SideOnly(Side.CLIENT)
     @ApiStatus.Internal
-    public final void checkPosInternal() {
+    public final void buildBottomToTop() {
         if (!isInitialised()) {
             return;
         }
+        if (isAutoSized() && isFillParent()) {
+            this.size = parent.getSize();
+        }
+
         // calculate positions
         if (isFixed() && !isAutoPositioned()) {
             relativePos = fixedPos.subtract(parent.getAbsolutePos());
@@ -179,7 +174,7 @@ public abstract class Widget {
             IWidgetParent parentThis = (IWidgetParent) this;
             // rebuild children
             for (Widget child : parentThis.getChildren()) {
-                child.checkPosInternal();
+                child.buildBottomToTop();
             }
         }
 
@@ -220,12 +215,22 @@ public abstract class Widget {
     //==== Sizing & Positioning ====
 
     /**
+     * Called before this widget ask for the children Size.
+     *
+     * @param constraints constraints to modify
+     */
+    protected void modifyConstraints(Dimension constraints) {
+    }
+
+    /**
      * Called during rebuild
      *
-     * @return the preferred default size
+     * @param maxWidth  maximum width to fit in parent
+     * @param maxHeight maximum height to fit in parent
+     * @return the preferred size
      */
-    protected Size getDefaultSize() {
-        return getParent().getSize();
+    protected @NotNull Size determineSize(int maxWidth, int maxHeight) {
+        return new Size(maxWidth, maxHeight);
     }
 
     /**

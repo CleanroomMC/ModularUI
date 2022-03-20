@@ -21,6 +21,7 @@ import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -58,7 +59,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
     }
 
     @Override
-    protected Size getDefaultSize() {
+    protected @NotNull Size determineSize(int maxWidth, int maxHeight) {
         return SIZE;
     }
 

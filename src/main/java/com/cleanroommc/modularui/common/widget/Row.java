@@ -5,12 +5,13 @@ import com.cleanroommc.modularui.api.math.CrossAxisAlignment;
 import com.cleanroommc.modularui.api.math.MainAxisAlignment;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import org.jetbrains.annotations.NotNull;
 
 public class Row extends MultiChildWidget implements IWidgetBuilder<Row> {
 
     private MainAxisAlignment maa = MainAxisAlignment.START;
     private CrossAxisAlignment caa = CrossAxisAlignment.START;
-    private int maxWidth = -1;
+    private int maxWidth = -1, maxHeight = 0;
 
     @Override
     public void addWidgetInternal(Widget widget) {
@@ -18,16 +19,24 @@ public class Row extends MultiChildWidget implements IWidgetBuilder<Row> {
     }
 
     @Override
-    protected Size getDefaultSize() {
-        if (maxWidth > 0) {
-            return new Size(maxWidth, getParent().getSize().height);
+    protected @NotNull Size determineSize(int maxWidth, int maxHeight) {
+        if (maa == MainAxisAlignment.START) {
+            return getSizeOf(children);
         }
-        return super.getDefaultSize();
+        return new Size(this.maxWidth, this.maxHeight);
     }
 
     @Override
-    public void layoutChildren() {
-        int maxHeight = 0;
+    public void layoutChildren(int maxWidthC, int maxHeightC) {
+        if (maxWidth < 0 && maa != MainAxisAlignment.START) {
+            if (isAutoSized()) {
+                maxWidth = maxWidthC - getPos().x;
+            } else {
+                maxWidth = getSize().width;
+            }
+        }
+
+        this.maxHeight = 0;
         int totalWidth = 0;
 
         for (Widget widget : getChildren()) {
@@ -37,22 +46,22 @@ public class Row extends MultiChildWidget implements IWidgetBuilder<Row> {
 
         int lastX = 0;
         if (maa == MainAxisAlignment.CENTER) {
-            lastX = (int) (getSize().width / 2f - totalWidth / 2f);
+            lastX = (int) (maxWidth / 2f - totalWidth / 2f);
         } else if (maa == MainAxisAlignment.END) {
-            lastX = getSize().width - totalWidth;
+            lastX = maxWidth - totalWidth;
         }
 
         for (Widget widget : getChildren()) {
             int y = 0;
             if (caa == CrossAxisAlignment.CENTER) {
                 y = (int) (maxHeight / 2f - widget.getSize().height / 2f);
-            } else if(caa == CrossAxisAlignment.END) {
+            } else if (caa == CrossAxisAlignment.END) {
                 y = maxHeight - widget.getSize().height;
             }
             widget.relativePos = new Pos2d(lastX, y);
             lastX += widget.getSize().width;
             if (maa == MainAxisAlignment.SPACE_BETWEEN) {
-                lastX += (getSize().width - totalWidth) / (getChildren().size() - 1);
+                lastX += (maxWidth - totalWidth) / (getChildren().size() - 1);
             }
         }
     }

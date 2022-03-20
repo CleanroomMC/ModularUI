@@ -4,8 +4,8 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
@@ -44,14 +44,8 @@ public class SingleChildWidget extends Widget implements IWidgetParent {
         return child;
     }
 
-    @Nullable
     @Override
-    public Size determineSize() {
+    protected @NotNull Size determineSize(int maxWidth, int maxHeight) {
         return child.getSize();
-    }
-
-    @Override
-    protected Size getDefaultSize() {
-        return child.getDefaultSize();
     }
 }

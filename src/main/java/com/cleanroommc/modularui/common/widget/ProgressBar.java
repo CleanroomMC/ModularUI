@@ -5,8 +5,8 @@ import com.cleanroommc.modularui.api.drawable.UITexture;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
 public class ProgressBar extends Widget {
@@ -128,7 +128,7 @@ public class ProgressBar extends Widget {
     }
 
     @Override
-    protected Size getDefaultSize() {
+    protected @NotNull Size determineSize(int maxWidth, int maxHeight) {
         return new Size(20, 20);
     }
 

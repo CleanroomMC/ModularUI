@@ -3,8 +3,8 @@ package com.cleanroommc.modularui.common.widget;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.math.Size;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,18 +35,12 @@ public class MultiChildWidget extends Widget implements IWidgetParent {
         return Collections.unmodifiableList(children);
     }
 
-    @Nullable
     @Override
-    public Size determineSize() {
+    protected @NotNull Size determineSize(int maxWidth, int maxHeight) {
         if (!getChildren().isEmpty()) {
             return getSizeOf(getChildren());
         }
-        return null;
-    }
-
-    @Override
-    protected Size getDefaultSize() {
-        return getParent().getSize();
+        return new Size(maxWidth, maxHeight);
     }
 
     public static Size getSizeOf(List<Widget> widgets) {

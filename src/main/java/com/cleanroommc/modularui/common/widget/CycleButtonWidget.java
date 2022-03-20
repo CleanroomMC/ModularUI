@@ -11,6 +11,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.network.PacketBuffer;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.*;
 
@@ -68,7 +69,7 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
     }
 
     @Override
-    protected Size getDefaultSize() {
+    protected @NotNull Size determineSize(int maxWidth, int maxHeight) {
         return new Size(20, 20);
     }
 

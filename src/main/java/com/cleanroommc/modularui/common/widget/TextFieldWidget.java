@@ -14,9 +14,9 @@ import com.google.gson.JsonObject;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.network.PacketBuffer;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 
-import javax.annotation.Nullable;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -276,14 +276,14 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
     }
 
     @Override
-    protected Size getDefaultSize() {
-        if (maxWidth < 0) {
-            maxWidth = 80;
+    protected @NotNull Size determineSize(int maxWidth, int maxHeight) {
+        if (this.maxWidth < 0) {
+            this.maxWidth = maxWidth - getPos().x;
         }
         if (maxLines <= 0) {
             maxLines = 1;
         }
-        return new Size(maxWidth - 1, (int) (renderer.getFontHeight() * maxLines + 0.5));
+        return new Size(this.maxWidth - 1, (int) (renderer.getFontHeight() * maxLines + 0.5));
     }
 
     @Override

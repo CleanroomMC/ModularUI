@@ -7,7 +7,6 @@ import com.cleanroommc.modularui.common.widget.Widget;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import javax.annotation.Nullable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -26,20 +25,10 @@ public interface IWidgetParent {
     ModularUIContext getContext();
 
     /**
-     * If autoSized is true, this method is called after all children are build.
-     *
-     * @return the desired size for this widget. Null will do nothing
-     */
-    @Nullable
-    default Size determineSize() {
-        return null;
-    }
-
-    /**
      * Called during rebuild.
      * {@link Widget#isAutoPositioned()} must be checked for each child!!!
      */
-    default void layoutChildren() {
+    default void layoutChildren(int maxWidth, int maxHeight) {
     }
 
     @SideOnly(Side.CLIENT)

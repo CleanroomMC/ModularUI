@@ -1,7 +1,10 @@
 package com.cleanroommc.modularui.common.internal;
 
 import com.cleanroommc.modularui.ModularUIConfig;
-import com.cleanroommc.modularui.api.*;
+import com.cleanroommc.modularui.api.ISyncedWidget;
+import com.cleanroommc.modularui.api.IWidgetBuilder;
+import com.cleanroommc.modularui.api.IWidgetParent;
+import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.api.animation.Eases;
 import com.cleanroommc.modularui.api.animation.Interpolator;
 import com.cleanroommc.modularui.api.math.Alignment;
@@ -167,11 +170,11 @@ public class ModularWindow implements IWidgetParent {
     protected void rebuild() {
         // check auto size of each child from top to bottom
         for (Widget child : getChildren()) {
-            child.checkSizeInternal();
+            child.buildTopToBottom(size.asDimension());
         }
         // position widgets from bottom to top
         for (Widget child : getChildren()) {
-            child.checkPosInternal();
+            child.buildBottomToTop();
         }
         needsRebuild = false;
     }

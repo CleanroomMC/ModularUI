@@ -11,6 +11,7 @@ import com.cleanroommc.modularui.api.math.Size;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ExpandTab extends MultiChildWidget implements Interactable, IWidgetBuilder<ExpandTab> {
@@ -58,14 +59,8 @@ public class ExpandTab extends MultiChildWidget implements Interactable, IWidget
         }
     }
 
-    @javax.annotation.Nullable
     @Override
-    public Size determineSize() {
-        return null;
-    }
-
-    @Override
-    protected Size getDefaultSize() {
+    protected @NotNull Size determineSize(int maxWidth, int maxHeight) {
         return new Size(20, 20);
     }
 
