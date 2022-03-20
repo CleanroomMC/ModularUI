@@ -64,7 +64,7 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     }
 
     @Override
-    public void drawInBackground(float partialTicks) {
+    public void draw(float partialTicks) {
         RenderHelper.enableGUIStandardItemLighting();
         drawSlot(slot);
         RenderHelper.enableStandardItemLighting();
@@ -147,7 +147,7 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     }
 
     @Override
-    public void onMouseScroll(int direction) {
+    public void onHoverMouseScroll(int direction) {
         if (isPhantom()) {
             syncToServer(3, buffer -> buffer.writeVarInt(direction));
         }

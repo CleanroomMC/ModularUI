@@ -132,7 +132,7 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
     }
 
     @Override
-    public void drawInBackground(float partialTicks) {
+    public void draw(float partialTicks) {
         texture.draw(Pos2d.ZERO, getSize(), partialTicks);
     }
 

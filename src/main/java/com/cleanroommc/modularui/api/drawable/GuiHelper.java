@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.api.math.Size;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
@@ -15,6 +16,7 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.Fluid;
@@ -25,10 +27,13 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 @SideOnly(Side.CLIENT)
 public class GuiHelper {
+
+    //==== Screen helpers ====
 
     public static boolean hasScreen() {
         return Minecraft.getMinecraft().currentScreen != null;
@@ -57,6 +62,9 @@ public class GuiHelper {
         }
         return Pos2d.ZERO;
     }
+
+
+    //==== Tooltip helpers ====
 
     public static void drawHoveringText(List<Text[]> textLines, Pos2d mousePos, Size screenSize, int maxWidth) {
         drawHoveringText(textLines, mousePos, screenSize, maxWidth, 1f, false);
@@ -190,6 +198,9 @@ public class GuiHelper {
         GlStateManager.enableRescaleNormal();
     }
 
+
+    //==== Draw helpers ====
+
     public static void drawGradientRect(float zLevel, float left, float top, float right, float bottom, int startColor, int endColor) {
         float startAlpha = (float) (startColor >> 24 & 255) / 255.0F;
         float startRed = (float) (startColor >> 16 & 255) / 255.0F;
@@ -247,64 +258,83 @@ public class GuiHelper {
         GlStateManager.disableBlend();
     }
 
-    /*public static void drawFluidForGui(FluidStack contents, int tankCapacity, int startX, int startY, int widthT, int heightT) {
-        widthT--;
-        heightT--;
-        Fluid fluid = contents.getFluid();
-        ResourceLocation fluidStill = fluid.getStill(contents);
-        TextureAtlasSprite fluidStillSprite = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(fluidStill.toString());
-        int fluidColor = fluid.getColor(contents);
-        int scaledAmount = contents.amount * heightT / tankCapacity;
-        if (contents.amount > 0 && scaledAmount < 1) {
-            scaledAmount = 1;
+
+    //==== Scissor helpers ====
+
+    private static final Stack<int[]> scissorFrameStack = new Stack<>();
+
+    public static void useScissor(int x, int y, int width, int height, Runnable codeBlock) {
+        pushScissorFrame(x, y, width, height);
+        try {
+            codeBlock.run();
+        } finally {
+            popScissorFrame();
         }
-        if (scaledAmount > heightT || contents.amount == tankCapacity) {
-            scaledAmount = heightT;
-        }
-        GlStateManager.enableBlend();
-        Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-        // fluid is RGBA for GT guis, despite MC's fluids being ARGB
-        setGlColorFromInt(fluidColor, 0xFF);
-
-        final int xTileCount = widthT / 16;
-        final int xRemainder = widthT - xTileCount * 16;
-        final int yTileCount = scaledAmount / 16;
-        final int yRemainder = scaledAmount - yTileCount * 16;
-
-        final int yStart = startY + heightT;
-
-        for (int xTile = 0; xTile <= xTileCount; xTile++) {
-            for (int yTile = 0; yTile <= yTileCount; yTile++) {
-                int width = xTile == xTileCount ? xRemainder : 16;
-                int height = yTile == yTileCount ? yRemainder : 16;
-                int x = startX + xTile * 16;
-                int y = yStart - (yTile + 1) * 16;
-                if (width > 0 && height > 0) {
-                    int maskTop = 16 - height;
-                    int maskRight = 16 - width;
-
-                    drawFluidTexture(x, y, fluidStillSprite, maskTop, maskRight, 0.0);
-                }
-            }
-        }
-        GlStateManager.disableBlend();
     }
 
-    public static void drawFluidTexture(double xCoord, double yCoord, TextureAtlasSprite textureSprite, int maskTop, int maskRight, double zLevel) {
-        double uMin = textureSprite.getMinU();
-        double uMax = textureSprite.getMaxU();
-        double vMin = textureSprite.getMinV();
-        double vMax = textureSprite.getMaxV();
-        uMax = uMax - maskRight / 16.0 * (uMax - uMin);
-        vMax = vMax - maskTop / 16.0 * (vMax - vMin);
+    private static int[] peekFirstScissorOrFullScreen() {
+        int[] currentTopFrame = scissorFrameStack.isEmpty() ? null : scissorFrameStack.peek();
+        if (currentTopFrame == null) {
+            Minecraft minecraft = Minecraft.getMinecraft();
+            return new int[]{0, 0, minecraft.displayWidth, minecraft.displayHeight};
+        }
+        return currentTopFrame;
+    }
 
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(7, DefaultVertexFormats.POSITION_TEX);
-        buffer.pos(xCoord, yCoord + 16, zLevel).tex(uMin, vMax).endVertex();
-        buffer.pos(xCoord + 16 - maskRight, yCoord + 16, zLevel).tex(uMax, vMax).endVertex();
-        buffer.pos(xCoord + 16 - maskRight, yCoord + maskTop, zLevel).tex(uMax, vMin).endVertex();
-        buffer.pos(xCoord, yCoord + maskTop, zLevel).tex(uMin, vMin).endVertex();
-        tessellator.draw();
-    }*/
+    public static void pushScissorFrame(int x, int y, int width, int height) {
+        int[] parentScissor = peekFirstScissorOrFullScreen();
+        int parentX = parentScissor[0];
+        int parentY = parentScissor[1];
+        int parentWidth = parentScissor[2];
+        int parentHeight = parentScissor[3];
+
+        boolean pushedFrame = false;
+        if (x <= parentX + parentWidth && y <= parentY + parentHeight) {
+            int newX = Math.max(x, parentX);
+            int newY = Math.max(y, parentY);
+            int newWidth = width - (newX - x);
+            int newHeight = height - (newY - y);
+            if (newWidth > 0 && newHeight > 0) {
+                int maxWidth = parentWidth - (x - parentX);
+                int maxHeight = parentHeight - (y - parentY);
+                newWidth = Math.min(maxWidth, newWidth);
+                newHeight = Math.min(maxHeight, newHeight);
+                applyScissor(newX, newY, newWidth, newHeight);
+                //finally, push applied scissor on top of scissor stack
+                if (scissorFrameStack.isEmpty()) {
+                    GL11.glEnable(GL11.GL_SCISSOR_TEST);
+                }
+                scissorFrameStack.push(new int[]{newX, newY, newWidth, newHeight});
+                pushedFrame = true;
+            }
+        }
+        if (!pushedFrame) {
+            if (scissorFrameStack.isEmpty()) {
+                GL11.glEnable(GL11.GL_SCISSOR_TEST);
+            }
+            scissorFrameStack.push(new int[]{parentX, parentY, parentWidth, parentHeight});
+        }
+    }
+
+    public static void popScissorFrame() {
+        scissorFrameStack.pop();
+        int[] parentScissor = peekFirstScissorOrFullScreen();
+        int parentX = parentScissor[0];
+        int parentY = parentScissor[1];
+        int parentWidth = parentScissor[2];
+        int parentHeight = parentScissor[3];
+        applyScissor(parentX, parentY, parentWidth, parentHeight);
+        if (scissorFrameStack.isEmpty()) {
+            GL11.glDisable(GL11.GL_SCISSOR_TEST);
+        }
+    }
+
+    //applies scissor with gui-space coordinates and sizes
+    private static void applyScissor(int x, int y, int w, int h) {
+        //translate upper-left to bottom-left
+        ScaledResolution r = ((GuiIngameForge) Minecraft.getMinecraft().ingameGUI).getResolution();
+        int s = r == null ? 1 : r.getScaleFactor();
+        int translatedY = r == null ? 0 : (r.getScaledHeight() - y - h);
+        GL11.glScissor(x * s, translatedY * s, w * s, h * s);
+    }
 }

@@ -122,7 +122,7 @@ public class ModularGui extends GuiContainer {
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         RenderHelper.disableStandardItemLighting();
-        this.drawGuiContainerForegroundLayer(mouseX, mouseY);
+        this.drawGuiContainerForegroundLayer(partialTicks, mouseX, mouseY);
         RenderHelper.enableGUIStandardItemLighting();
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.GuiContainerEvent.DrawForeground(this, mouseX, mouseY));
         InventoryPlayer inventoryplayer = this.mc.player.inventory;
@@ -209,15 +209,14 @@ public class ModularGui extends GuiContainer {
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
 
-        context.getCurrentWindow().drawWidgets(partialTicks);
+        context.getCurrentWindow().drawWidgets(partialTicks, false);
 
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableLighting();
         RenderHelper.enableStandardItemLighting();
     }
 
-    @Override
-    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+    protected void drawGuiContainerForegroundLayer(float partialTicks, int mouseX, int mouseY) {
         GlStateManager.pushMatrix();
         GlStateManager.disableRescaleNormal();
         RenderHelper.disableStandardItemLighting();
@@ -239,6 +238,8 @@ public class ModularGui extends GuiContainer {
                 tooltipContainer.draw(context);
             }
         }
+
+        context.getCurrentWindow().drawWidgets(partialTicks, true);
 
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableLighting();
@@ -375,10 +376,10 @@ public class ModularGui extends GuiContainer {
 
     public void mouseScroll(int direction) {
         for (Interactable interactable : context.getCurrentWindow().getInteractionListeners()) {
-            interactable.onMouseScroll(direction);
+            interactable.onHoverMouseScroll(direction);
         }
         if (hovered instanceof Interactable) {
-            ((Interactable) hovered).onMouseScroll(direction);
+            ((Interactable) hovered).onHoverMouseScroll(direction);
         }
     }
 

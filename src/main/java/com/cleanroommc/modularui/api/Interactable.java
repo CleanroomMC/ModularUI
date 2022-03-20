@@ -68,7 +68,7 @@ public interface Interactable {
      *
      * @param direction -1 for down, 1 for up
      */
-    default void onMouseScroll(int direction) {
+    default void onHoverMouseScroll(int direction) {
     }
 
     /**

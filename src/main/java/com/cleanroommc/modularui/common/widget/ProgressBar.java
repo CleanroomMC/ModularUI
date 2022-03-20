@@ -36,7 +36,7 @@ public class ProgressBar extends Widget {
     }
 
     @Override
-    public void drawInBackground(float partialTicks) {
+    public void draw(float partialTicks) {
         if (emptyTexture != null) {
             emptyTexture.draw(Pos2d.ZERO, getSize(), partialTicks);
         }

@@ -35,8 +35,8 @@ public class NetworkUtils {
             ModularUI.LOGGER.warn("Warning! Synced string exceeds max length!");
         } else {
             bytes = bytesTest;
-            buffer.writeVarInt(bytes.length);
-            buffer.writeBytes(bytes);
         }
+        buffer.writeVarInt(bytes.length);
+        buffer.writeBytes(bytes);
     }
 }

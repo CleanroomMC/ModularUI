@@ -138,7 +138,7 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
     }
 
     @Override
-    public void drawInBackground(float partialTicks) {
+    public void draw(float partialTicks) {
         GlStateManager.pushMatrix();
         GlStateManager.translate(0.5f, 0.5f, 0);
         renderer.drawAligned(text, 0, 0, size.width, size.height, textColor, textAlignment.x, textAlignment.y);

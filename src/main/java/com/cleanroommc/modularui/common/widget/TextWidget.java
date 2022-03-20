@@ -70,7 +70,7 @@ public class TextWidget extends Widget {
     }
 
     @Override
-    public void drawInBackground(float partialTicks) {
+    public void draw(float partialTicks) {
         textRenderer.drawAligned(localised, 0, 0, size.width, size.height, text.getDefaultColor(), textAlignment.x, textAlignment.y);
     }
 

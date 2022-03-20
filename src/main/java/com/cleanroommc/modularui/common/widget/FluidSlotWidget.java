@@ -101,7 +101,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
     }
 
     @Override
-    public void drawInBackground(float partialTicks) {
+    public void draw(float partialTicks) {
         FluidStack content = cachedFluid;
         if (content != null) {
             float y = contentOffset.y;

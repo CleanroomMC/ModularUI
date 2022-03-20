@@ -199,63 +199,28 @@ public class ModularWindow implements IWidgetParent {
         });
     }
 
-    public void drawWidgets(float partialTicks) {
-        GlStateManager.pushMatrix();
-        // rotate around center
-        if (ModularUIConfig.animations.openCloseRotateFast) {
-            GlStateManager.translate(pos.x + size.width / 2f, pos.y + size.height / 2f, 0);
-            GlStateManager.rotate(rotation, 0, 0, 1);
-            GlStateManager.translate(-(pos.x + size.width / 2f), -(pos.y + size.height / 2f), 0);
-        }
-        GlStateManager.translate(translateX, translateY, 0);
-        final float sf = 1 / scale;
-        GlStateManager.scale(scale, scale, 1);
-        GlStateManager.color(Color.getRedF(color), Color.getGreenF(color), Color.getBlueF(color), Color.getAlphaF(color));
-        drawWidgets(partialTicks, children);
-        GlStateManager.color(1, 1, 1, 1);
-        GlStateManager.popMatrix();
-    }
-
-    private void drawWidgets(float partialTicks, List<Widget> widgets) {
-        List<Widget> children = new ArrayList<>();
-        // draw background
-        final float sf = 1 / scale;
-        for (Widget widget : widgets) {
-            widget.onFrameUpdate();
-            if (widget.isEnabled()) {
-                GlStateManager.pushMatrix();
-                // translate to center according to scale
-                float x = (pos.x + size.width / 2f * (1 - scale) + (widget.getAbsolutePos().x - pos.x) * scale) * sf;
-                float y = (pos.y + size.height / 2f * (1 - scale) + (widget.getAbsolutePos().y - pos.y) * scale) * sf;
-                GlStateManager.translate(x, y, 0);
-                GlStateManager.color(Color.getRedF(color), Color.getGreenF(color), Color.getBlueF(color), Color.getAlphaF(color));
-                GlStateManager.enableBlend();
-                IWidgetDrawable background = widget.getDrawable();
-                if (background != null) {
-                    background.drawWidgetCustom(widget, partialTicks);
-                }
-                widget.drawInBackground(partialTicks);
-                GlStateManager.popMatrix();
-                if (widget instanceof IWidgetParent) {
-                    children.addAll(((IWidgetParent) widget).getChildren());
-                }
-            }
-        }
-
-        // draw foreground
-        for (Widget widget : widgets) {
-            widget.onFrameUpdate();
-            if (widget.isEnabled()) {
-                GlStateManager.pushMatrix();
-                GlStateManager.translate(widget.getAbsolutePos().x, widget.getAbsolutePos().y, 0);
-                GlStateManager.enableBlend();
+    public void drawWidgets(float partialTicks, boolean foreground) {
+        if (foreground) {
+            IWidgetParent.forEachByLayer(this, widget -> {
                 widget.drawInForeground(partialTicks);
-                GlStateManager.popMatrix();
+                return false;
+            });
+        } else {
+            GlStateManager.pushMatrix();
+            // rotate around center
+            if (ModularUIConfig.animations.openCloseRotateFast) {
+                GlStateManager.translate(pos.x + size.width / 2f, pos.y + size.height / 2f, 0);
+                GlStateManager.rotate(rotation, 0, 0, 1);
+                GlStateManager.translate(-(pos.x + size.width / 2f), -(pos.y + size.height / 2f), 0);
             }
-        }
-        // draw all children off layer
-        if (!children.isEmpty()) {
-            drawWidgets(partialTicks, children);
+            GlStateManager.translate(translateX, translateY, 0);
+            GlStateManager.scale(scale, scale, 1);
+            GlStateManager.color(Color.getRedF(color), Color.getGreenF(color), Color.getBlueF(color), Color.getAlphaF(color));
+            for (Widget widget : getChildren()) {
+                widget.drawInternal(partialTicks);
+            }
+            GlStateManager.color(1, 1, 1, 1);
+            GlStateManager.popMatrix();
         }
     }
 
@@ -301,6 +266,14 @@ public class ModularWindow implements IWidgetParent {
 
     public boolean doesNeedRebuild() {
         return needsRebuild;
+    }
+
+    public float getScale() {
+        return scale;
+    }
+
+    public int getColor() {
+        return color;
     }
 
     /**

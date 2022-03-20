@@ -15,30 +15,19 @@ import java.util.function.Supplier;
 
 public class Text implements IDrawable {
 
-    private final Supplier<String> textSupplier;
     private final String text;
     private String formatting = "";
     @Nullable
     private Supplier<Object[]> localisationData;
-    private boolean dynamicLocalisation = false;
     private int color = Color.argb(33, 33, 33, 0);
     private boolean shadow = false;
 
-    private Text(String text, Supplier<String> textSupplier) {
-        this.text = text;
-        this.textSupplier = textSupplier;
-    }
-
-    public static Text dynamic(Supplier<String> textSupplier) {
-        return new Text(null, Objects.requireNonNull(textSupplier, "TextSupplier can't be null!"));
+    public Text(String text) {
+        this.text = Objects.requireNonNull(text, "String in Text can't be null!");
     }
 
     public static Text localised(String key, Object... data) {
         return new Text(key).localise(data);
-    }
-
-    public Text(String text) {
-        this(Objects.requireNonNull(text, "String in Text can't be null!"), null);
     }
 
     public static Text of(ITextComponent textComponent) {
@@ -62,13 +51,11 @@ public class Text implements IDrawable {
 
     public Text localise(Supplier<Object[]> localisationData) {
         this.localisationData = localisationData;
-        this.dynamicLocalisation = true;
         return this;
     }
 
     public Text localise(Object... localisationData) {
         localise(() -> localisationData);
-        this.dynamicLocalisation = false;
         return this;
     }
 
@@ -89,7 +76,7 @@ public class Text implements IDrawable {
     }
 
     public String getRawText() {
-        return textSupplier == null ? text : textSupplier.get();
+        return text;
     }
 
     @Override
@@ -121,10 +108,6 @@ public class Text implements IDrawable {
             builder.append(text.getFormatted());
         }
         return builder.toString();
-    }
-
-    public boolean isDynamic() {
-        return textSupplier != null || dynamicLocalisation;
     }
 
     public static Text ofJson(JsonElement json) {

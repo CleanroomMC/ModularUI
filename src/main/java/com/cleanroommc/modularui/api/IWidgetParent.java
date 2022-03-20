@@ -4,6 +4,8 @@ import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.internal.ModularUIContext;
 import com.cleanroommc.modularui.common.widget.Widget;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 import java.util.LinkedList;
@@ -38,6 +40,13 @@ public interface IWidgetParent {
      * {@link Widget#isAutoPositioned()} must be checked for each child!!!
      */
     default void layoutChildren() {
+    }
+
+    @SideOnly(Side.CLIENT)
+    default void drawChildren(float partialTicks) {
+        for (Widget child : getChildren()) {
+            child.drawInternal(partialTicks);
+        }
     }
 
     static boolean forEachByLayer(List<Widget> parent, Function<Widget, Boolean> consumer) {

@@ -1,9 +1,13 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.api.*;
+import com.cleanroommc.modularui.api.IWidgetDrawable;
+import com.cleanroommc.modularui.api.IWidgetParent;
+import com.cleanroommc.modularui.api.Interactable;
+import com.cleanroommc.modularui.api.TooltipContainer;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.TextSpan;
+import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.GuiArea;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
@@ -11,6 +15,7 @@ import com.cleanroommc.modularui.common.internal.JsonHelper;
 import com.cleanroommc.modularui.common.internal.ModularUIContext;
 import com.cleanroommc.modularui.common.internal.ModularWindow;
 import com.google.gson.JsonObject;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -181,6 +186,39 @@ public abstract class Widget {
         onRebuild();
     }
 
+    /**
+     * Thou shall not call
+     */
+    @SideOnly(Side.CLIENT)
+    @ApiStatus.Internal
+    public final void drawInternal(float partialTicks) {
+        onFrameUpdate();
+        if (isEnabled()) {
+            GlStateManager.pushMatrix();
+            Pos2d windowPos = getWindow().getPos();
+            Size windowSize = getWindow().getSize();
+            int color = getWindow().getColor();
+            float scale = getWindow().getScale();
+            float sf = 1 / scale;
+            // translate to center according to scale
+            float x = (windowPos.x + windowSize.width / 2f * (1 - scale) + (pos.x - windowPos.x) * scale) * sf;
+            float y = (windowPos.y + windowSize.height / 2f * (1 - scale) + (pos.y - windowPos.y) * scale) * sf;
+            GlStateManager.translate(x, y, 0);
+            GlStateManager.color(Color.getRedF(color), Color.getGreenF(color), Color.getBlueF(color), Color.getAlphaF(color));
+            GlStateManager.enableBlend();
+            IWidgetDrawable background = getDrawable();
+            if (background != null) {
+                background.drawWidgetCustom(this, partialTicks);
+            }
+            draw(partialTicks);
+            GlStateManager.popMatrix();
+
+            if (this instanceof IWidgetParent) {
+                ((IWidgetParent) this).drawChildren(partialTicks);
+            }
+        }
+    }
+
 
     //==== Sizing & Positioning ====
 
@@ -230,16 +268,16 @@ public abstract class Widget {
     //==== Rendering ====
 
     /**
-     * Is called before any other draw calls in gui
+     * Draw the widget here
      *
      * @param partialTicks ticks since last draw
      */
     @SideOnly(Side.CLIENT)
-    public void drawInBackground(float partialTicks) {
+    public void draw(float partialTicks) {
     }
 
     /**
-     * Is called after all widgets in the current layer are drawn in background
+     * Is called after all widgets of the window are drawn. Can be used for special tooltip rendering.
      *
      * @param partialTicks ticks since last draw
      */
