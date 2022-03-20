@@ -2,7 +2,9 @@ package com.cleanroommc.modularui.api;
 
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.common.widget.Widget;
+import org.jetbrains.annotations.ApiStatus;
 
+@ApiStatus.Experimental
 public interface Draggable extends Interactable {
 
     /**

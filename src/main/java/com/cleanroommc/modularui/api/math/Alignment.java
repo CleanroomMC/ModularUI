@@ -34,23 +34,4 @@ public class Alignment {
         float x = (this.x + 1) * 1f / 2, y = (this.y + 1) * 1f / 2;
         return new Pos2d(parent.width * x - child.width * x, parent.height * y - child.height * y);
     }
-
-    public Pos2d getAlignedPos(Size parent, Size child, EdgeOffset edgeOffset) {
-        Pos2d pos = getAlignedPos(parent, child);
-        float spaceH = parent.width - child.width, spaceV = parent.height - child.height;
-        if(edgeOffset.left + edgeOffset.right > spaceH)
-            edgeOffset = new EdgeOffset(spaceH / 2, edgeOffset.top, spaceH / 2, edgeOffset.bottom);
-        if(edgeOffset.top + edgeOffset.bottom > spaceV)
-            edgeOffset = new EdgeOffset(edgeOffset.left, spaceV / 2, edgeOffset.right, spaceV / 2);
-        float x = pos.x, y = pos.y;
-        if(x < edgeOffset.left)
-            x = edgeOffset.left;
-        else if(parent.width - (x + child.width) < edgeOffset.right)
-            x = parent.width - child.width - edgeOffset.right;
-        if(y < edgeOffset.top)
-            y = edgeOffset.top;
-        else if(parent.height - (y + child.height) < edgeOffset.bottom)
-            y = parent.height - child.height - edgeOffset.bottom;
-        return new Pos2d(x, y);
-    }
 }
