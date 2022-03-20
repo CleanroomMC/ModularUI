@@ -51,7 +51,7 @@ public abstract class Widget {
 
     // visuals
     @Nullable
-    private IWidgetDrawable drawable;
+    private IDrawable[] background;
     private final List<TextSpan> additionalTooltip = new ArrayList<>();
     private int tooltipShowUpDelay = 0;
     @Nullable
@@ -206,10 +206,7 @@ public abstract class Widget {
             GlStateManager.translate(x, y, 0);
             GlStateManager.color(Color.getRedF(color), Color.getGreenF(color), Color.getBlueF(color), Color.getAlphaF(color));
             GlStateManager.enableBlend();
-            IWidgetDrawable background = getDrawable();
-            if (background != null) {
-                background.drawWidgetCustom(this, partialTicks);
-            }
+            drawBackground(partialTicks);
             draw(partialTicks);
             GlStateManager.popMatrix();
 
@@ -266,6 +263,18 @@ public abstract class Widget {
 
 
     //==== Rendering ====
+
+    @SideOnly(Side.CLIENT)
+    public void drawBackground(float partialTicks) {
+        IDrawable[] background = getBackground();
+        if (background != null) {
+            for (IDrawable drawable : background) {
+                if (drawable != null) {
+                    drawable.draw(Pos2d.ZERO, getSize(), partialTicks);
+                }
+            }
+        }
+    }
 
     /**
      * Draw the widget here
@@ -458,8 +467,8 @@ public abstract class Widget {
     }
 
     @Nullable
-    public IWidgetDrawable getDrawable() {
-        return drawable;
+    public IDrawable[] getBackground() {
+        return background;
     }
 
     public List<TextSpan> getTooltip() {
@@ -540,21 +549,12 @@ public abstract class Widget {
     }
 
     /**
-     * Sets a static background drawable. For more dynamic rendering, the widget should implement {@link IWidgetDrawable}
+     * Sets a static background drawable.
      *
-     * @param drawable background to render
+     * @param drawables background to render
      */
-    public Widget setBackground(@Nullable IWidgetDrawable drawable) {
-        this.drawable = drawable;
-        return this;
-    }
-
     public Widget setBackground(IDrawable... drawables) {
-        this.drawable = ((widget, partialTicks) -> {
-            for (IDrawable drawable : drawables) {
-                drawable.draw(Pos2d.ZERO, widget.getSize(), partialTicks);
-            }
-        });
+        this.background = drawables;
         return this;
     }
 

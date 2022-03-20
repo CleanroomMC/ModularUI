@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.api.drawable.UITexture;
 
 public class ModularUITextures {
 
+    public static final UITexture ICON_INFO = UITexture.fullImage(ModularUI.ID, "gui/widgets/information");
     public static final UITexture VANILLA_BACKGROUND = AdaptableUITexture.of(ModularUI.ID, "gui/background/vanilla_background", 195, 136, 4);
 
     public static final UITexture VANILLA_TAB_TOP = UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_top");

@@ -1,9 +1,7 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.api.IWidgetDrawable;
 import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
-import com.cleanroommc.modularui.api.math.Pos2d;
 
 import javax.annotation.Nullable;
 
@@ -11,7 +9,7 @@ public class TabButton extends Widget implements Interactable {
 
     private final int page;
     private TabContainer tabController;
-    private IWidgetDrawable activeBackground;
+    private IDrawable[] activeBackground;
 
     public TabButton(int page) {
         this.page = page;
@@ -36,11 +34,11 @@ public class TabButton extends Widget implements Interactable {
 
     @Nullable
     @Override
-    public IWidgetDrawable getDrawable() {
+    public IDrawable[] getBackground() {
         if (isSelected() && activeBackground != null) {
             return activeBackground;
         }
-        return super.getDrawable();
+        return super.getBackground();
     }
 
     public boolean isSelected() {
@@ -48,18 +46,10 @@ public class TabButton extends Widget implements Interactable {
     }
 
     public TabButton setBackground(boolean active, IDrawable... drawables) {
-        return setBackground(active, ((widget, partialTicks) -> {
-            for (IDrawable drawable : drawables) {
-                drawable.draw(Pos2d.ZERO, widget.getSize(), partialTicks);
-            }
-        }));
-    }
-
-    public TabButton setBackground(boolean active, @Nullable IWidgetDrawable drawable) {
         if (active) {
-            this.activeBackground = drawable;
+            this.activeBackground = drawables;
         } else {
-            super.setBackground(drawable);
+            setBackground(drawables);
         }
         return this;
     }

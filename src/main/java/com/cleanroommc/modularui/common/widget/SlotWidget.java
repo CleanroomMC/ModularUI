@@ -48,7 +48,7 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     @Override
     public void onInit() {
         getContext().getContainer().addSlotToContainer(slot);
-        if (getDrawable() == null) {
+        if (getBackground() == null) {
             setBackground(TEXTURE);
         }
     }

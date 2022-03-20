@@ -52,7 +52,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
 
     @Override
     public void onInit() {
-        if (getDrawable() == null) {
+        if (getBackground() == null) {
             setBackground(TEXTURE);
         }
     }
