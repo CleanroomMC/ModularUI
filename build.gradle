@@ -63,6 +63,7 @@ repositories {
 }
 
 dependencies {
+    compile 'org.jetbrains:annotations:23.0.0'
 
     if (project.use_assetmover) {
         //deobfCompile 'com.cleanroommc:assetmover:0.2'
