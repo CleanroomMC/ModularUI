@@ -16,8 +16,10 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Predicate;
 
 public class SlotWidget extends Widget implements IVanillaSlot, Interactable, ISyncedWidget {
 
@@ -30,19 +32,19 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
         this.slot = slot;
     }
 
-    public SlotWidget(IItemHandler handler, int index) {
+    public SlotWidget(IItemHandlerModifiable handler, int index) {
         this(handler, index, false);
     }
 
-    public SlotWidget(IItemHandler handler, int index, boolean output) {
+    public SlotWidget(IItemHandlerModifiable handler, int index, boolean output) {
         this(new BaseSlot(handler, index, output, false));
     }
 
-    public static SlotWidget phantom(IItemHandler handler, int index) {
+    public static SlotWidget phantom(IItemHandlerModifiable handler, int index) {
         return phantom(handler, index, false);
     }
 
-    public static SlotWidget phantom(IItemHandler handler, int index, boolean output) {
+    public static SlotWidget phantom(IItemHandlerModifiable handler, int index, boolean output) {
         return new SlotWidget(BaseSlot.phantom(handler, index, output));
     }
 
@@ -112,6 +114,11 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
 
     public SlotWidget setChangeListener(Runnable runnable) {
         slot.setChangeListener(runnable);
+        return this;
+    }
+
+    public SlotWidget setFilter(Predicate<ItemStack> filter) {
+        slot.setFilter(filter);
         return this;
     }
 

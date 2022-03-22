@@ -3,7 +3,7 @@ package com.cleanroommc.modularui.common.widget;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.integration.vanilla.slot.BaseSlot;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 
 public class SlotGroup extends MultiChildWidget {
@@ -29,11 +29,11 @@ public class SlotGroup extends MultiChildWidget {
         return slotGroup;
     }
 
-    public static SlotGroup ofItemHandler(IItemHandler itemHandler, int slotsWidth, int shiftClickPriority) {
+    public static SlotGroup ofItemHandler(IItemHandlerModifiable itemHandler, int slotsWidth, int shiftClickPriority) {
         return ofItemHandler(itemHandler, slotsWidth, shiftClickPriority, 0, itemHandler.getSlots() - 1);
     }
 
-    public static SlotGroup ofItemHandler(IItemHandler itemHandler, int slotsWidth, int shiftClickPriority, int startFromSlot, int endAtSlot) {
+    public static SlotGroup ofItemHandler(IItemHandlerModifiable itemHandler, int slotsWidth, int shiftClickPriority, int startFromSlot, int endAtSlot) {
         SlotGroup slotGroup = new SlotGroup();
         if (itemHandler.getSlots() >= endAtSlot) {
             endAtSlot = itemHandler.getSlots() - 1;

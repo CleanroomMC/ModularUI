@@ -1,16 +1,16 @@
 package com.cleanroommc.modularui.integration.vanilla.slot;
 
-import com.cleanroommc.modularui.ModularUI;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 
 import javax.annotation.Nullable;
+import java.util.function.Predicate;
 
 public class BaseSlot extends SlotItemHandler {
 
@@ -22,20 +22,21 @@ public class BaseSlot extends SlotItemHandler {
     // hotbar 20, player inventory 40, machine input 0
     private int shiftClickPriority = 0;
     private Runnable changeListener;
+    private Predicate<ItemStack> filter;
 
     public static BaseSlot phantom() {
         return phantom(new ItemStackHandler(), 0, false);
     }
 
-    public static BaseSlot phantom(IItemHandler handler, int index, boolean output) {
+    public static BaseSlot phantom(IItemHandlerModifiable handler, int index, boolean output) {
         return new BaseSlot(handler, index, output, true);
     }
 
-    public BaseSlot(IItemHandler inventory, int index) {
+    public BaseSlot(IItemHandlerModifiable inventory, int index) {
         this(inventory, index, false, false);
     }
 
-    public BaseSlot(IItemHandler inventory, int index, boolean output, boolean phantom) {
+    public BaseSlot(IItemHandlerModifiable inventory, int index, boolean output, boolean phantom) {
         super(inventory, index, 0, 0);
         this.output = output;
         this.phantom = phantom;
@@ -55,7 +56,7 @@ public class BaseSlot extends SlotItemHandler {
     }
 
     public boolean isItemValidPhantom(ItemStack stack) {
-        return !this.output && getItemHandler().isItemValid(getSlotIndex(), stack);
+        return !this.output && (filter == null || filter.test(stack)) && getItemHandler().isItemValid(getSlotIndex(), stack);
     }
 
     @Override
@@ -88,9 +89,12 @@ public class BaseSlot extends SlotItemHandler {
         this.changeListener = changeListener;
     }
 
+    public void setFilter(Predicate<ItemStack> filter) {
+        this.filter = filter;
+    }
+
     @Override
     public void onSlotChanged() {
-        ModularUI.LOGGER.info("Slot changed");
         if (this.changeListener != null) {
             this.changeListener.run();
         }
