@@ -10,10 +10,12 @@ import com.google.gson.JsonObject;
 import net.minecraft.util.text.ITextComponent;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Supplier;
+
 public class TextWidget extends Widget {
 
     private final TextSpan text;
-    private String localised;
+    protected String localised;
     private int maxWidth = -1;
     private Alignment textAlignment = Alignment.TopLeft;
     private final TextRenderer textRenderer = new TextRenderer(Pos2d.ZERO, 0, 0);
@@ -38,22 +40,42 @@ public class TextWidget extends Widget {
         this(new TextSpan().addText(text));
     }
 
+    public static DynamicTextWidget dynamicSpan(Supplier<TextSpan> supplier) {
+        return new DynamicTextWidget(supplier);
+    }
+
+    public static DynamicTextWidget dynamicTexts(Supplier<Text[]> supplier) {
+        return new DynamicTextWidget(() -> new TextSpan(supplier.get()));
+    }
+
+    public static DynamicTextWidget dynamicText(Supplier<Text> supplier) {
+        return new DynamicTextWidget(() -> new TextSpan(supplier.get()));
+    }
+
+    public static DynamicTextWidget dynamicString(Supplier<String> supplier) {
+        return new DynamicTextWidget(() -> new TextSpan().addText(supplier.get()));
+    }
+
+    public static DynamicTextWidget dynamicTextComponent(Supplier<ITextComponent> supplier) {
+        return new DynamicTextWidget(() -> new TextSpan().addText(supplier.get()));
+    }
+
     @Override
     public void readJson(JsonObject json, String type) {
         super.readJson(json, type);
-        text.readJson(json);
+        getText().readJson(json);
     }
 
     @Override
     public void onRebuild() {
         if (localised == null) {
-            this.localised = text.getFormatted();
+            this.localised = getText().getFormatted();
         }
     }
 
     @Override
     protected @NotNull Size determineSize(int maxWidth, int maxHeight) {
-        this.localised = text.getFormatted();
+        this.localised = getText().getFormatted();
         int width = this.maxWidth > 0 ? this.maxWidth : maxWidth - getPos().x;
         textRenderer.setUp(Pos2d.ZERO, 0, width);
         return textRenderer.calculateSize(localised);
@@ -62,7 +84,7 @@ public class TextWidget extends Widget {
     @Override
     public void onScreenUpdate() {
         if (isAutoSized()) {
-            String l = text.getFormatted();
+            String l = getText().getFormatted();
             if (!l.equals(localised)) {
                 checkNeedsRebuild();
                 localised = l;
@@ -73,6 +95,10 @@ public class TextWidget extends Widget {
     @Override
     public void draw(float partialTicks) {
         textRenderer.drawAligned(localised, 0, 0, size.width, size.height, text.getDefaultColor(), textAlignment.x, textAlignment.y);
+    }
+
+    public TextSpan getText() {
+        return text;
     }
 
     public TextWidget setDefaultColor(int color) {
