@@ -270,7 +270,7 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
         cursorTimer = 0;
         setCursorEnd(cursor);
         text = validator.apply(text);
-        if (handlesClient()) {
+        if (syncsToServer()) {
             syncToServer(1, buffer -> NetworkUtils.writeStringSafe(buffer, text));
         }
     }
@@ -288,7 +288,7 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
 
     @Override
     public void onServerTick() {
-        if (handlesServer() && getter != null) {
+        if (syncsToClient() && getter != null) {
             String val = getter.get();
             if (!text.equals(val)) {
                 text = val;

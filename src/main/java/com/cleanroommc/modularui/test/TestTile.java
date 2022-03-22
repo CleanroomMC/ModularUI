@@ -11,21 +11,24 @@ import com.cleanroommc.modularui.api.math.*;
 import com.cleanroommc.modularui.common.internal.ModularWindow;
 import com.cleanroommc.modularui.common.internal.UIBuildContext;
 import com.cleanroommc.modularui.common.widget.*;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.items.ItemStackHandler;
 
 public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI, ITickable {
 
     private int serverValue = 0;
-    private int time = 0;
     private FluidTank fluidTank = new FluidTank(10000);
     private final ItemStackHandler phantomInventory = new ItemStackHandler(2);
     private String textFieldValue = "";
-    private int duration = 60;
+    private final int duration = 60;
     private int progress = 0;
+    private int ticks = 0;
+    private int serverCounter = 0;
     private static final AdaptableUITexture DISPLAY = AdaptableUITexture.of("modularui:gui/background/display", 143, 75, 2);
     private static final AdaptableUITexture BACKGROUND = AdaptableUITexture.of("modularui:gui/background/background", 176, 166, 3);
     private static final UITexture PROGRESS_BAR = UITexture.fullImage("modularui", "gui/widgets/progress_bar_arrow");
@@ -45,6 +48,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                 .widget(SlotGroup.playerInventoryGroup(buildContext.getPlayer(), new Pos2d(7, 190)));
         Column column = new Column();
         addInfo(column);
+        ChangeableWidget changeableWidget = new ChangeableWidget(this::dynamicWidget);
         return builder
                 .widget(new TabContainer()
                         .setButtonSize(new Size(28, 32))
@@ -63,11 +67,16 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                         .addPage(new MultiChildWidget()
                                 .addChild(new TextWidget("Page 1"))
                                 .addChild(new SlotWidget(phantomInventory, 0)
-                                        .setShiftClickPrio(0)
+                                        .setChangeListener(() -> {
+                                            serverCounter = 0;
+                                            changeableWidget.notifyChangeServer();
+                                        }).setShiftClickPrio(0)
                                         .setPos(10, 30))
                                 .addChild(SlotWidget.phantom(phantomInventory, 1)
                                         .setShiftClickPrio(1)
                                         .setPos(28, 30))
+                                .addChild(changeableWidget
+                                        .setPos(12, 55))
                                 .setPos(10, 10)
                                 .setDebugLabel("Page1"))
                         .addPage(new MultiChildWidget()
@@ -175,6 +184,23 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                         .setBackground(new Text("[O]"))));
     }
 
+    public Widget dynamicWidget() {
+        ItemStack stack = phantomInventory.getStackInSlot(0);
+        if (stack.isEmpty()) {
+            return null;
+        }
+        MultiChildWidget widget = new MultiChildWidget();
+        widget.addChild(new TextWidget(new Text("Item: ").format(TextFormatting.BLUE), new Text(stack.getDisplayName())))
+                .addChild(new CycleButtonWidget()
+                        .setGetter(() -> serverCounter)
+                        .setSetter(value -> serverCounter = value)
+                        .setLength(10)
+                        .setTextureGetter(value -> new Text(value + ""))
+                        .setPos(5, 11));
+
+        return widget;
+    }
+
     @Override
     public void writeInitialSyncData(PacketBuffer buf) {
         buf.writeVarInt(serverValue);
@@ -206,12 +232,12 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
     @Override
     public void update() {
         if (!world.isRemote) {
-            /*if (++time == 20) {
-                time = 0;
-                if (++serverValue == 3) {
-                    serverValue = 0;
+            ticks++;
+            if (ticks % 20 == 0) {
+                if (++serverCounter == 10) {
+                    serverCounter = 0;
                 }
-            }*/
+            }
         } else {
             if (++progress == duration) {
                 progress = 0;

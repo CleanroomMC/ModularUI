@@ -244,7 +244,7 @@ public abstract class Widget {
      * Causes the modular ui to re-layout all children next screen update
      */
     public void checkNeedsRebuild() {
-        if (isInitialised()) {
+        if (isInitialised() && isClient()) {
             window.markNeedsRebuild();
         }
     }

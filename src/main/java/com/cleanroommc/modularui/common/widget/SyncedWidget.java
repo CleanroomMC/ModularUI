@@ -9,41 +9,41 @@ import com.google.gson.JsonObject;
  */
 public abstract class SyncedWidget extends Widget implements ISyncedWidget {
 
-    private boolean handlesServer = true;
-    private boolean handlesClient = true;
+    private boolean syncsToServer = true;
+    private boolean syncsToClient = true;
 
     @Override
     public void readJson(JsonObject json, String type) {
         super.readJson(json, type);
-        this.handlesServer = JsonHelper.getBoolean(json, true, "syncToClient", "handlesServer");
-        this.handlesClient = JsonHelper.getBoolean(json, true, "syncToServer", "handlesClient");
+        this.syncsToServer = JsonHelper.getBoolean(json, true, "syncToClient", "handlesServer");
+        this.syncsToClient = JsonHelper.getBoolean(json, true, "syncToServer", "handlesClient");
     }
 
     /**
      * @return if this widget should operate on the sever side.
      * For example detecting and sending changes to client.
      */
-    public boolean handlesServer() {
-        return handlesClient;
+    public boolean syncsToClient() {
+        return syncsToClient;
     }
 
     /**
      * @return if this widget should operate on the client side.
      * For example, sending a changed value to the server.
      */
-    public boolean handlesClient() {
-        return handlesServer;
+    public boolean syncsToServer() {
+        return syncsToServer;
     }
 
     /**
      * Determines how this widget should sync values
      *
-     * @param handlesClient if this widget should sync changes to the server
-     * @param handlesServer if this widget should detect changes on server and sync them to client
+     * @param syncsToClient if this widget should sync changes to the server
+     * @param syncsToServer if this widget should detect changes on server and sync them to client
      */
-    public SyncedWidget setSynced(boolean handlesClient, boolean handlesServer) {
-        this.handlesClient = handlesClient;
-        this.handlesServer = handlesServer;
+    public SyncedWidget setSynced(boolean syncsToClient, boolean syncsToServer) {
+        this.syncsToClient = syncsToClient;
+        this.syncsToServer = syncsToServer;
         return this;
     }
 }

@@ -26,7 +26,7 @@ public class ButtonWidget extends SyncedWidget implements Interactable {
         if (clickAction != null) {
             ClickData clickData = ClickData.create(buttonId, doubleClick);
             clickAction.accept(clickData, this);
-            if (handlesClient()) {
+            if (syncsToServer()) {
                 syncToServer(1, clickData::writeToPacket);
             }
             Interactable.playButtonClickSound();

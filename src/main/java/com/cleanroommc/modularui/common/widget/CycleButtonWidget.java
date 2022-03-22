@@ -93,8 +93,10 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
         }
         this.state = state;
         if (sync) {
-            if (isClient() && handlesClient()) {
-                syncToServer(1, buffer -> buffer.writeVarInt(state));
+            if (isClient()) {
+                if (syncsToServer()) {
+                    syncToServer(1, buffer -> buffer.writeVarInt(state));
+                }
             } else {
                 syncToClient(1, buffer -> buffer.writeVarInt(state));
             }
@@ -124,7 +126,7 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
 
     @Override
     public void onServerTick() {
-        if (handlesServer()) {
+        if (syncsToClient()) {
             int actualValue = getter.getAsInt();
             if (actualValue != state) {
                 setState(actualValue, true, false);

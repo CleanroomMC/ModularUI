@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.common.internal;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.ISyncedWidget;
 import com.cleanroommc.modularui.api.IWidgetBuilder;
@@ -12,6 +13,8 @@ import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.widget.Widget;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableBiMap;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.relauncher.Side;
@@ -39,6 +42,7 @@ public class ModularWindow implements IWidgetParent {
     private ModularUIContext context;
     private final List<Widget> children;
     public final ImmutableBiMap<Integer, ISyncedWidget> syncedWidgets;
+    private final BiMap<Integer, ISyncedWidget> dynamicSyncedWidgets = HashBiMap.create();
     private final List<Interactable> interactionListeners = new ArrayList<>();
 
     private final Size size;
@@ -65,6 +69,9 @@ public class ModularWindow implements IWidgetParent {
         IWidgetParent.forEachByLayer(this, widget -> {
             if (widget instanceof ISyncedWidget) {
                 syncedWidgetBuilder.put(i.getAndIncrement(), (ISyncedWidget) widget);
+            }
+            if (i.get() == 32767) {
+                throw new IndexOutOfBoundsException("Too many synced widgets!");
             }
             return false;
         });
@@ -162,6 +169,9 @@ public class ModularWindow implements IWidgetParent {
 
     public void serverUpdate() {
         for (ISyncedWidget syncedWidget : syncedWidgets.values()) {
+            syncedWidget.onServerTick();
+        }
+        for (ISyncedWidget syncedWidget : dynamicSyncedWidgets.values()) {
             syncedWidget.onServerTick();
         }
     }
@@ -290,10 +300,43 @@ public class ModularWindow implements IWidgetParent {
         return interactionListeners;
     }
 
+    /**
+     * Adds a dynamic synced widget.
+     *
+     * @param id           a id for the synced widget. Must be 32768 > id > 0
+     * @param syncedWidget dynamic synced widget
+     * @param parent       the synced widget that added the dynamic widget
+     * @throws IllegalArgumentException if id is > 32767 or < 1
+     * @throws NullPointerException     if dynamic widget or parent is null
+     * @throws IllegalStateException    if parent is a dynamic widget
+     */
+    public void addDynamicSyncedWidget(int id, ISyncedWidget syncedWidget, ISyncedWidget parent) {
+        if (id <= 0 || id > 32767) {
+            throw new IllegalArgumentException("Dynamic Synced widget id must be greater than 0 and smaller than 32768");
+        }
+        if (syncedWidget == null || parent == null) {
+            throw new NullPointerException("Can't add dynamic null widget or with null parent!");
+        }
+        if (dynamicSyncedWidgets.containsValue(syncedWidget)) {
+            dynamicSyncedWidgets.inverse().remove(syncedWidget);
+        }
+        int parentId = getSyncedWidgetId(parent);
+        if ((parentId & ~0xFFFF) != 0) {
+            throw new IllegalStateException("Dynamic synced widgets can't have other dynamic widgets as parent! It's possible with some trickery tho.");
+        }
+        // generate unique id
+        // first 2 bytes is passed id, last 2 bytes is parent id
+        id = ((id << 16) & ~0xFFFF) | parentId;
+        dynamicSyncedWidgets.put(id, syncedWidget);
+    }
+
     public int getSyncedWidgetId(ISyncedWidget syncedWidget) {
         Integer id = syncedWidgets.inverse().get(syncedWidget);
         if (id == null) {
-            throw new NoSuchElementException("Can't find id for ISyncedWidget " + syncedWidget);
+            id = dynamicSyncedWidgets.inverse().get(syncedWidget);
+            if (id == null) {
+                throw new NoSuchElementException("Can't find id for ISyncedWidget " + syncedWidget);
+            }
         }
         return id;
     }
@@ -301,7 +344,10 @@ public class ModularWindow implements IWidgetParent {
     public ISyncedWidget getSyncedWidget(int id) {
         ISyncedWidget syncedWidget = syncedWidgets.get(id);
         if (syncedWidget == null) {
-            throw new NoSuchElementException("Can't find ISyncedWidget for id " + id);
+            syncedWidget = dynamicSyncedWidgets.get(id);
+            if (syncedWidget == null) {
+                throw new NoSuchElementException("Can't find ISyncedWidget for id " + id);
+            }
         }
         return syncedWidget;
     }

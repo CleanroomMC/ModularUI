@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.integration.vanilla.slot;
 
+import com.cleanroommc.modularui.ModularUI;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -89,6 +90,7 @@ public class BaseSlot extends SlotItemHandler {
 
     @Override
     public void onSlotChanged() {
+        ModularUI.LOGGER.info("Slot changed");
         if (this.changeListener != null) {
             this.changeListener.run();
         }
