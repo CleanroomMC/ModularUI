@@ -23,6 +23,10 @@ public class Size {
         this.height = Math.max(0, height);
     }
 
+    public Size(double width, double height) {
+        this((int) width, (int) height);
+    }
+
     public static Size ofDimension(Dimension dimension) {
         return new Size(dimension.width, dimension.height);
     }
@@ -83,7 +87,7 @@ public class Size {
                     if (!parts[0].isEmpty()) {
                         width = Integer.parseInt(parts[0]);
                     }
-                    if(parts.length > 1 && !parts[1].isEmpty()) {
+                    if (parts.length > 1 && !parts[1].isEmpty()) {
                         height = Integer.parseInt(parts[1]);
                     }
                 } catch (NumberFormatException e) {

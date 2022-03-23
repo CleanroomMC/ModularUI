@@ -30,7 +30,7 @@ public class ChangeableWidget extends Widget implements ISyncedWidget, IWidgetPa
     }
 
     @Override
-    public void onInit() {
+    public void onPostInit() {
         notifyChange(false, false);
     }
 
@@ -82,9 +82,9 @@ public class ChangeableWidget extends Widget implements ISyncedWidget, IWidgetPa
         removeCurrentChild();
         Widget widget = widgetSupplier.get();
         if (widget != null) {
-            widget.initChildren();
-            AtomicInteger syncId = new AtomicInteger(1);
             if (widget instanceof IWidgetParent) {
+                IWidgetParent.forEachByLayer((IWidgetParent) widget, Widget::initChildren);
+                AtomicInteger syncId = new AtomicInteger(1);
                 IWidgetParent.forEachByLayer((IWidgetParent) widget, widget1 -> {
                     if (widget1 instanceof ISyncedWidget) {
                         getWindow().addDynamicSyncedWidget(syncId.getAndIncrement(), (ISyncedWidget) widget1, this);

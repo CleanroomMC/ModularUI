@@ -78,7 +78,10 @@ public class TextWidget extends Widget {
         this.localised = getText().getFormatted();
         int width = this.maxWidth > 0 ? this.maxWidth : maxWidth - getPos().x;
         textRenderer.setUp(Pos2d.ZERO, 0, width);
-        return textRenderer.calculateSize(localised);
+        textRenderer.setDoDraw(false);
+        textRenderer.draw(localised);
+        textRenderer.setDoDraw(true);
+        return new Size(textRenderer.getWidth() + 1, textRenderer.getHeight() + 1);
     }
 
     @Override
@@ -123,6 +126,11 @@ public class TextWidget extends Widget {
 
     public TextWidget setTextAlignment(Alignment textAlignment) {
         this.textAlignment = textAlignment;
+        return this;
+    }
+
+    public TextWidget setScale(float scale) {
+        this.textRenderer.setScale(scale);
         return this;
     }
 }

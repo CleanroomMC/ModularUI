@@ -29,7 +29,6 @@ import java.util.List;
 /**
  * This class depicts a functional element of a ModularUI
  */
-@ApiStatus.Experimental
 public abstract class Widget {
 
     // gui
@@ -127,6 +126,8 @@ public abstract class Widget {
                 widget.initialize(this.window, (IWidgetParent) this, nextLayer);
             }
         }
+
+        onPostInit();
     }
 
     @SideOnly(Side.CLIENT)
@@ -320,9 +321,15 @@ public abstract class Widget {
     }
 
     /**
-     * Called once when the window opens
+     * Called once when the window opens, before children get initialised.
      */
     public void onInit() {
+    }
+
+    /**
+     * Called once when the window opens, after children get initialised.
+     */
+    public void onPostInit() {
     }
 
     /**

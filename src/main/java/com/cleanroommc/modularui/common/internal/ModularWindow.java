@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.common.internal;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.ISyncedWidget;
 import com.cleanroommc.modularui.api.IWidgetBuilder;
@@ -8,10 +7,12 @@ import com.cleanroommc.modularui.api.IWidgetParent;
 import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.api.animation.Eases;
 import com.cleanroommc.modularui.api.animation.Interpolator;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.common.widget.DrawableWidget;
 import com.cleanroommc.modularui.common.widget.Widget;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -58,7 +59,8 @@ public class ModularWindow implements IWidgetParent {
 
     private Interpolator openAnimation, closeAnimation;
 
-    public ModularWindow(Size size, List<Widget> children) {
+    public ModularWindow(Size size, List<Widget> children, IDrawable... background) {
+        children.add(0, new DrawableWidget().setSize(size).setBackground(background));
         this.size = size;
         this.children = children;
         // latest point at which synced widgets can be added
@@ -152,7 +154,17 @@ public class ModularWindow implements IWidgetParent {
     }
 
     public void update() {
-        IWidgetParent.forEachByLayer(this, Widget::onScreenUpdate);
+        IWidgetParent.forEachByLayer(this, widget -> {
+            widget.onScreenUpdate();
+            IDrawable[] background = widget.getBackground();
+            if (background != null) {
+                for (IDrawable drawable : background) {
+                    if (drawable != null) {
+                        drawable.tick();
+                    }
+                }
+            }
+        });
     }
 
     public void frameUpdate(float partialTicks) {
@@ -355,11 +367,17 @@ public class ModularWindow implements IWidgetParent {
     public static class Builder implements IWidgetBuilder<Builder> {
 
         private final List<Widget> widgets = new ArrayList<>();
+        private IDrawable[] background = {};
         private Size size;
         private boolean draggable = false;
 
         private Builder(Size size) {
             this.size = size;
+        }
+
+        public Builder setBackground(IDrawable... background) {
+            this.background = background;
+            return this;
         }
 
         public Builder setSize(Size size) {
@@ -382,7 +400,7 @@ public class ModularWindow implements IWidgetParent {
         }
 
         public ModularWindow build() {
-            ModularWindow window = new ModularWindow(size, widgets);
+            ModularWindow window = new ModularWindow(size, widgets, background);
             window.draggable = draggable;
             return window;
         }

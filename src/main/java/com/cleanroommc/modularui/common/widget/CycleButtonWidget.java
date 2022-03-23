@@ -65,6 +65,10 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
             ModularUI.LOGGER.error("{} was not properly initialised!", this);
             return;
         }
+        if (textureGetter == null) {
+            ModularUI.LOGGER.warn("Texture Getter of {} was not set!", this);
+            textureGetter = val -> IDrawable.EMPTY;
+        }
         setState(getter.getAsInt(), false, false);
     }
 

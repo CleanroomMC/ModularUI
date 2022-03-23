@@ -239,6 +239,12 @@ public class TextRenderer {
         if (doDraw && FMLCommonHandler.instance().getSide().isClient()) {
             GlStateManager.color(1f, 1f, 1f, 1f);
         }
+        if (height > scale) {
+            height -= scale;
+        }
+        if (width > scale) {
+            width -= scale;
+        }
     }
 
     public void newLine() {
