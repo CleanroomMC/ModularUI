@@ -21,9 +21,9 @@ public interface ISyncedWidget {
     void readOnServer(int id, PacketBuffer buf) throws IOException;
 
     /**
-     * Called each tick on server. Use it to detect and sync changes
+     * Called AT LEAST each tick on server. Use it to detect and sync changes
      */
-    default void onServerTick() {
+    default void detectAndSendChanges() {
     }
 
     /**

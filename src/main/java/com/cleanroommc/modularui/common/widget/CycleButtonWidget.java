@@ -129,7 +129,7 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
     }
 
     @Override
-    public void onServerTick() {
+    public void detectAndSendChanges() {
         if (syncsToClient()) {
             int actualValue = getter.getAsInt();
             if (actualValue != state) {

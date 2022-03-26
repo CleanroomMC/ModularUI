@@ -8,7 +8,7 @@ import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.internal.mixin.GuiContainerMixin;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
-import com.cleanroommc.modularui.integration.vanilla.slot.BaseSlot;
+import com.cleanroommc.modularui.common.internal.wrapper.BaseSlot;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Container;
@@ -27,6 +27,7 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     public static final UITexture TEXTURE = UITexture.fullImage("modularui", "gui/slot/item");
 
     private final BaseSlot slot;
+    private ItemStack cachedServerItem = null;
 
     public SlotWidget(BaseSlot slot) {
         this.slot = slot;
@@ -50,15 +51,20 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
 
     @Override
     public void onInit() {
-        getContext().getContainer().addSlotToContainer(slot);
+        getContext().getContainer().addSlotToContainer(this.slot);
         if (getBackground() == null) {
             setBackground(TEXTURE);
         }
     }
 
     @Override
+    public void onDestroy() {
+        getContext().getContainer().removeSlot(this.slot);
+    }
+
+    @Override
     public Slot getMcSlot() {
-        return slot;
+        return this.slot;
     }
 
     @Override
@@ -69,7 +75,7 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     @Override
     public void draw(float partialTicks) {
         RenderHelper.enableGUIStandardItemLighting();
-        drawSlot(slot);
+        drawSlot(this.slot);
         RenderHelper.enableStandardItemLighting();
         GlStateManager.disableLighting();
         if (isHovering()) {
@@ -82,9 +88,9 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     @Override
     public void onRebuild() {
         Pos2d pos = getAbsolutePos().subtract(getWindow().getPos()).add(1, 1);
-        if (slot.xPos != pos.x || slot.yPos != pos.y) {
-            slot.xPos = pos.x;
-            slot.yPos = pos.y;
+        if (this.slot.xPos != pos.x || this.slot.yPos != pos.y) {
+            this.slot.xPos = pos.x;
+            this.slot.yPos = pos.y;
             // widgets are only rebuild on client and mc requires the slot pos on server
             syncToServer(1, buffer -> {
                 buffer.writeVarInt(pos.x);
@@ -93,8 +99,17 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
         }
     }
 
+    @Override
+    public void detectAndSendChanges() {
+        ItemStack slotItem = this.slot.getStack();
+        if (this.cachedServerItem == null || !ItemStack.areItemStacksEqual(slotItem, this.cachedServerItem)) {
+            this.cachedServerItem = slotItem.copy();
+            getContext().syncSlotContent(this.slot);
+        }
+    }
+
     public boolean isPhantom() {
-        return slot.isPhantom();
+        return this.slot.isPhantom();
     }
 
     @Override
@@ -108,17 +123,17 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     }
 
     public SlotWidget setShiftClickPrio(int prio) {
-        slot.setShiftClickPriority(prio);
+        this.slot.setShiftClickPriority(prio);
         return this;
     }
 
     public SlotWidget setChangeListener(Runnable runnable) {
-        slot.setChangeListener(runnable);
+        this.slot.setChangeListener(runnable);
         return this;
     }
 
     public SlotWidget setFilter(Predicate<ItemStack> filter) {
-        slot.setFilter(filter);
+        this.slot.setFilter(filter);
         return this;
     }
 
@@ -136,8 +151,8 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     @Override
     public void readOnServer(int id, PacketBuffer buf) {
         if (id == 1) {
-            slot.xPos = buf.readVarInt();
-            slot.yPos = buf.readVarInt();
+            this.slot.xPos = buf.readVarInt();
+            this.slot.yPos = buf.readVarInt();
         } else if (id == 2) {
             phantomClick(ClickData.readPacket(buf));
         } else if (id == 3) {
@@ -176,18 +191,18 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
         } else {
             if (clickData.mouseButton == 0) {
                 if (clickData.shift) {
-                    slot.putStack(ItemStack.EMPTY);
+                    this.slot.putStack(ItemStack.EMPTY);
                 } else {
-                    slot.incrementStackCount(-1);
+                    this.slot.incrementStackCount(-1);
                 }
             } else if (clickData.mouseButton == 1) {
-                slot.incrementStackCount(1);
+                this.slot.incrementStackCount(1);
             }
         }
     }
 
     protected void phantomScroll(int direction) {
-        slot.incrementStackCount(direction);
+        this.slot.incrementStackCount(direction);
     }
 
     private GuiContainerMixin getGuiAccessor() {

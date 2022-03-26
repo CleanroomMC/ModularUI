@@ -287,7 +287,7 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
     }
 
     @Override
-    public void onServerTick() {
+    public void detectAndSendChanges() {
         if (syncsToClient() && getter != null) {
             String val = getter.get();
             if (!text.equals(val)) {

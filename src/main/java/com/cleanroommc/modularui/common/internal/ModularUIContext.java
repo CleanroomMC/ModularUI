@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.internal.network.CWidgetUpdate;
 import com.cleanroommc.modularui.common.internal.network.NetworkUtils;
 import com.cleanroommc.modularui.common.internal.network.SWidgetUpdate;
+import com.cleanroommc.modularui.common.internal.wrapper.BaseSlot;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularUIContainer;
 import com.cleanroommc.modularui.common.widget.Widget;
@@ -196,6 +197,13 @@ public class ModularUIContext {
     @SideOnly(Side.CLIENT)
     public Size getScaledScreenSize() {
         return screenSize;
+    }
+
+    public void syncSlotContent(BaseSlot slot) {
+        if (slot != getContainer().inventorySlots.get(slot.slotNumber)) {
+            throw new IllegalStateException("Slot does not have the same index in the container!");
+        }
+        getContainer().sendSlotChange(slot.getStack(), slot.slotNumber);
     }
 
     public void readClientPacket(PacketBuffer buf, int widgetId) throws IOException {

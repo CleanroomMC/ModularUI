@@ -8,10 +8,10 @@ import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.UITexture;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.common.internal.network.NetworkUtils;
 import com.cleanroommc.modularui.common.internal.wrapper.FluidTankHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
@@ -22,9 +22,8 @@ import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.IOException;
 
 public class FluidSlotWidget extends SyncedWidget implements Interactable {
@@ -36,6 +35,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
     private IDrawable overlayTexture;
     private final IFluidTank fluidTank;
     private final IFluidHandler tankHandler;
+    @Nullable
     private FluidStack cachedFluid;
     private Pos2d contentOffset = new Pos2d(1, 1);
     private boolean alwaysShowFull = true;
@@ -98,7 +98,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
      * @param tooltipContainer add lines here
      * @param fluid            the nonnull fluid
      */
-    public void addAdditionalFluidInfo(TooltipContainer tooltipContainer, @Nonnull FluidStack fluid) {
+    public void addAdditionalFluidInfo(TooltipContainer tooltipContainer, @NotNull FluidStack fluid) {
     }
 
     @Override
@@ -137,33 +137,17 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
     }
 
     @Override
-    public void onServerTick() {
-        FluidStack currentFluid = fluidTank.getFluid();
-        if (currentFluid == null && cachedFluid != null) {
-            this.cachedFluid = null;
-            syncToClient(1, buffer -> {
-            });
-        } else if (currentFluid != null) {
-            if (!currentFluid.isFluidEqual(cachedFluid) || currentFluid.amount != cachedFluid.amount) {
-                this.cachedFluid = currentFluid.copy();
-                NBTTagCompound fluidStackTag = currentFluid.writeToNBT(new NBTTagCompound());
-                syncToClient(2, buffer -> buffer.writeCompoundTag(fluidStackTag));
-            }
+    public void detectAndSendChanges() {
+        FluidStack currentFluid = this.fluidTank.getFluid();
+        if (currentFluid == null ^ this.cachedFluid == null || (currentFluid != null && (!currentFluid.isFluidEqual(cachedFluid) || currentFluid.amount != cachedFluid.amount))) {
+            syncToClient(1, buffer -> NetworkUtils.writeFluidStack(buffer, currentFluid));
         }
     }
 
     @Override
-    public void readOnClient(int id, PacketBuffer buf) {
+    public void readOnClient(int id, PacketBuffer buf) throws IOException {
         if (id == 1) {
-            cachedFluid = null;
-        } else if (id == 2) {
-            NBTTagCompound fluidStackTag;
-            try {
-                fluidStackTag = buf.readCompoundTag();
-            } catch (IOException ignored) {
-                return;
-            }
-            this.cachedFluid = FluidStack.loadFluidStackFromNBT(fluidStackTag);
+            this.cachedFluid = NetworkUtils.readFluidStack(buf);
         }
     }
 

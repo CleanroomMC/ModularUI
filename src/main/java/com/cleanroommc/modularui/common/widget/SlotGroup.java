@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.common.widget;
 
 import com.cleanroommc.modularui.api.math.Pos2d;
-import com.cleanroommc.modularui.integration.vanilla.slot.BaseSlot;
+import com.cleanroommc.modularui.common.internal.wrapper.BaseSlot;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;

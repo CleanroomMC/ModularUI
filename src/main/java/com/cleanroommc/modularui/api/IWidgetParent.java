@@ -42,6 +42,13 @@ public interface IWidgetParent {
         return forEachByLayer(new Wrapper(parent), consumer);
     }
 
+    static boolean forEachByLayer(Widget parent, Function<Widget, Boolean> consumer) {
+        if (parent instanceof IWidgetParent) {
+            return forEachByLayer((IWidgetParent) parent, consumer);
+        }
+        return consumer.apply(parent);
+    }
+
     static boolean forEachByLayer(IWidgetParent parent, Function<Widget, Boolean> consumer) {
         LinkedList<IWidgetParent> stack = new LinkedList<>();
         stack.addLast(parent);
@@ -57,6 +64,25 @@ public interface IWidgetParent {
             }
         }
         return true;
+    }
+
+    static boolean forEachByBranch(IWidgetParent parent, Function<Widget, Boolean> consumer) {
+        for (Widget widget : parent.getChildren()) {
+            if (consumer.apply(widget)) {
+                return false;
+            }
+            if (widget instanceof IWidgetParent) {
+                forEachByBranch((IWidgetParent) widget, consumer);
+            }
+        }
+        return true;
+    }
+
+    static boolean forEachByLayer(Widget parent, Consumer<Widget> consumer) {
+        return forEachByLayer(parent, widget -> {
+            consumer.accept(widget);
+            return false;
+        });
     }
 
     static boolean forEachByLayer(IWidgetParent parent, Consumer<Widget> consumer) {

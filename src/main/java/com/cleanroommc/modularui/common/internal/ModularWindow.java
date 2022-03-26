@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.common.internal;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.ISyncedWidget;
 import com.cleanroommc.modularui.api.IWidgetBuilder;
@@ -72,7 +73,7 @@ public class ModularWindow implements IWidgetParent {
             if (widget instanceof ISyncedWidget) {
                 syncedWidgetBuilder.put(i.getAndIncrement(), (ISyncedWidget) widget);
             }
-            if (i.get() == 32767) {
+            if (i.get() == 0x10000) {
                 throw new IndexOutOfBoundsException("Too many synced widgets!");
             }
             return false;
@@ -181,10 +182,7 @@ public class ModularWindow implements IWidgetParent {
 
     public void serverUpdate() {
         for (ISyncedWidget syncedWidget : syncedWidgets.values()) {
-            syncedWidget.onServerTick();
-        }
-        for (ISyncedWidget syncedWidget : dynamicSyncedWidgets.values()) {
-            syncedWidget.onServerTick();
+            syncedWidget.detectAndSendChanges();
         }
     }
 
@@ -323,8 +321,8 @@ public class ModularWindow implements IWidgetParent {
      * @throws IllegalStateException    if parent is a dynamic widget
      */
     public void addDynamicSyncedWidget(int id, ISyncedWidget syncedWidget, ISyncedWidget parent) {
-        if (id <= 0 || id > 32767) {
-            throw new IllegalArgumentException("Dynamic Synced widget id must be greater than 0 and smaller than 32768");
+        if (id <= 0 || id > 0xFFFF) {
+            throw new IllegalArgumentException("Dynamic Synced widget id must be greater than 0 and smaller than 65535 (0xFFFF)");
         }
         if (syncedWidget == null || parent == null) {
             throw new NullPointerException("Can't add dynamic null widget or with null parent!");

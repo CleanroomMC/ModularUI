@@ -2,42 +2,33 @@ package com.cleanroommc.modularui.common.internal.wrapper;
 
 import com.cleanroommc.modularui.common.internal.ModularUIContext;
 import com.cleanroommc.modularui.common.internal.ModularWindow;
-import com.cleanroommc.modularui.integration.vanilla.slot.BaseSlot;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
 import net.minecraftforge.items.ItemHandlerHelper;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public class ModularUIContainer extends Container {
 
     private final ModularUIContext context;
+    private boolean initialisedContainer = false;
+    private final List<BaseSlot> sortedShiftClickSlots = new ArrayList<>();
 
     public ModularUIContainer(ModularUIContext context, ModularWindow mainWindow) {
         this.context = context;
         this.context.initialize(this, mainWindow);
+        checkSlotIds();
         sortSlots();
+        initialisedContainer = true;
     }
 
     public void sortSlots() {
-        this.inventorySlots.sort((slot, slot1) -> {
-            if (slot instanceof BaseSlot) {
-                if (slot1 instanceof BaseSlot) {
-                    return Integer.compare(((BaseSlot) slot).getShiftClickPriority(), ((BaseSlot) slot1).getShiftClickPriority());
-                }
-                return 1;
-            } else if (slot1 instanceof BaseSlot) {
-                return -1;
-            }
-            return 0;
-        });
-        this.inventoryItemStacks = NonNullList.create();
-        for (int i = 0; i < this.inventorySlots.size(); i++) {
-            Slot slot = this.inventorySlots.get(i);
-            slot.slotNumber = i;
-            this.inventoryItemStacks.add(ItemStack.EMPTY);
-        }
+        this.sortedShiftClickSlots.sort(Comparator.comparingInt(BaseSlot::getShiftClickPriority));
     }
 
     public ModularUIContext getContext() {
@@ -49,17 +40,48 @@ public class ModularUIContainer extends Container {
         return playerIn.isEntityAlive();
     }
 
+    private void checkSlotIds() {
+        for (int i = 0; i < inventorySlots.size(); i++) {
+            inventorySlots.get(i).slotNumber = i;
+        }
+    }
+
     @Override
     public Slot addSlotToContainer(Slot slotIn) {
-        return super.addSlotToContainer(slotIn);
+        if (slotIn instanceof BaseSlot && ((BaseSlot) slotIn).getShiftClickPriority() > Integer.MIN_VALUE) {
+            sortedShiftClickSlots.add((BaseSlot) slotIn);
+        }
+        slotIn = super.addSlotToContainer(slotIn);
+
+        if (initialisedContainer) {
+            sortSlots();
+        }
+        return slotIn;
+    }
+
+    public void removeSlot(Slot slot) {
+        if (slot != inventorySlots.get(slot.slotNumber)) {
+            throw new IllegalStateException("Could not find slot in container!");
+        }
+        inventorySlots.remove(slot.slotNumber);
+        if (slot instanceof BaseSlot && sortedShiftClickSlots.remove(slot) && initialisedContainer) {
+            sortSlots();
+        }
+        checkSlotIds();
     }
 
     @Override
     public void detectAndSendChanges() {
-        super.detectAndSendChanges();
-        if (context.isInitialized()) {
+        if (this.context.isInitialized()) {
             // do not allow syncing before the client is initialized
-            context.getCurrentWindow().serverUpdate();
+            this.context.getCurrentWindow().serverUpdate();
+        }
+    }
+
+    public void sendSlotChange(ItemStack stack, int index) {
+        this.inventoryItemStacks.set(index, stack);
+        for (IContainerListener listener : this.listeners) {
+            listener.sendSlotContents(this, index, stack);
         }
     }
 
@@ -78,11 +100,7 @@ public class ModularUIContainer extends Container {
     }
 
     protected ItemStack transferItem(BaseSlot fromSlot, ItemStack stack) {
-        for (Slot slot1 : this.inventorySlots) {
-            if (!(slot1 instanceof BaseSlot)) {
-                continue;
-            }
-            BaseSlot slot = (BaseSlot) slot1;
+        for (BaseSlot slot : this.sortedShiftClickSlots) {
             if (fromSlot.getShiftClickPriority() != slot.getShiftClickPriority() && slot.isEnabled() && slot.isItemValidPhantom(stack)) {
                 ItemStack itemstack = slot.getStack();
                 if (slot.isPhantom()) {
@@ -112,7 +130,7 @@ public class ModularUIContainer extends Container {
                 }
             }
         }
-        for (Slot slot1 : this.inventorySlots) {
+        for (Slot slot1 : this.sortedShiftClickSlots) {
             if (!(slot1 instanceof BaseSlot)) {
                 continue;
             }

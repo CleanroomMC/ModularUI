@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.integration.vanilla.slot;
+package com.cleanroommc.modularui.common.internal.wrapper;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.player.EntityPlayer;
@@ -42,6 +42,9 @@ public class BaseSlot extends SlotItemHandler {
         this.phantom = phantom;
         if (inventory instanceof PlayerMainInvWrapper) {
             setShiftClickPriority(index > 8 ? 40 : 20);
+        }
+        if (this.phantom) {
+            this.shiftClickPriority += 10;
         }
     }
 

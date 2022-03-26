@@ -3,8 +3,12 @@ package com.cleanroommc.modularui.common.internal.network;
 import com.cleanroommc.modularui.ModularUI;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fluids.FluidStack;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
@@ -23,6 +27,24 @@ public class NetworkUtils {
         ByteBuf copiedDataBuffer = Unpooled.copiedBuffer(directSliceBuffer);
         directSliceBuffer.release();
         return new PacketBuffer(copiedDataBuffer);
+    }
+
+    public static void writeFluidStack(PacketBuffer buffer, @Nullable FluidStack fluidStack) {
+        if (fluidStack == null) {
+            buffer.writeBoolean(true);
+        } else {
+            buffer.writeBoolean(false);
+            NBTTagCompound fluidStackTag = fluidStack.writeToNBT(new NBTTagCompound());
+            buffer.writeCompoundTag(fluidStackTag);
+        }
+    }
+
+    @Nullable
+    public static FluidStack readFluidStack(PacketBuffer buffer) throws IOException {
+        if (buffer.readBoolean()) {
+            return null;
+        }
+        return FluidStack.loadFluidStackFromNBT(buffer.readCompoundTag());
     }
 
     public static void writeStringSafe(PacketBuffer buffer, String string) {
