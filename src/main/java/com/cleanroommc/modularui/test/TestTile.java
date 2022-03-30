@@ -22,7 +22,8 @@ import net.minecraftforge.items.ItemStackHandler;
 public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI, ITickable {
 
     private int serverValue = 0;
-    private FluidTank fluidTank = new FluidTank(10000);
+    private final FluidTank fluidTank1 = new FluidTank(10000);
+    private final FluidTank fluidTank2 = new FluidTank(10000);
     private final ItemStackHandler phantomInventory = new ItemStackHandler(2);
     private String textFieldValue = "";
     private final int duration = 60;
@@ -128,7 +129,8 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                                         .setDirection(ProgressBar.Direction.CIRCULAR_CW)
                                         .setTexture(PROGRESS_BAR_MIXER, 20)
                                         .setPos(99, 85))
-                                .addChild(new FluidSlotWidget(fluidTank).setPos(20, 45))
+                                .addChild(FluidSlotWidget.phantom(fluidTank2, false).setPos(38, 47))
+                                .addChild(new FluidSlotWidget(fluidTank1).setPos(20, 47))
                                 .addChild(new ButtonWidget()
                                         .setOnClick((clickData, widget) -> {
                                             if (++serverValue == 3) {
@@ -138,7 +140,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                                         .setSynced(true, false)
                                         .setBackground(DISPLAY, new Text("jTest Textg"))
                                         .setSize(80, 20)
-                                        .setPos(10, 60))
+                                        .setPos(10, 65))
                                 .addChild(new TextWidget(new Text("modularui.test").localise()).setPos(10, 110))
                                 .addChild(new Row()
                                         .setAlignment(MainAxisAlignment.SPACE_BETWEEN, CrossAxisAlignment.CENTER)

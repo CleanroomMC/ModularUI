@@ -21,6 +21,7 @@ import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,18 +38,28 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
     private final IFluidHandler tankHandler;
     @Nullable
     private FluidStack cachedFluid;
+    private FluidStack lastStoredPhantomFluid;
     private Pos2d contentOffset = new Pos2d(1, 1);
     private boolean alwaysShowFull = true;
     private boolean allowManualFilling = true;
     private boolean allowManualEmptying = true;
+    private boolean phantom = false;
+    private boolean controlsAmount = true;
 
     public FluidSlotWidget(IFluidTank fluidTank) {
         this.fluidTank = fluidTank;
         this.tankHandler = FluidTankHandler.getTankFluidHandler(fluidTank);
     }
 
+    public static FluidSlotWidget phantom(IFluidTank fluidTank, boolean controlsAmount) {
+        FluidSlotWidget slot = new FluidSlotWidget(fluidTank);
+        slot.phantom = true;
+        slot.controlsAmount = controlsAmount;
+        return slot;
+    }
+
     public FluidStack getContent() {
-        return fluidTank.getFluid();
+        return this.fluidTank.getFluid();
     }
 
     @Override
@@ -121,11 +132,11 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
 
     @Override
     public boolean onClick(int buttonId, boolean doubleClick) {
-        if (!allowManualEmptying && !allowManualFilling) {
+        if (!this.allowManualEmptying && !this.allowManualFilling) {
             return false;
         }
         ItemStack cursorStack = getContext().getCursorStack();
-        if (!cursorStack.isEmpty() && cursorStack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)) {
+        if (this.phantom || (!cursorStack.isEmpty() && cursorStack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null))) {
             syncToServer(1, buffer -> {
                 buffer.writeVarInt(buttonId);
                 buffer.writeBoolean(Interactable.hasShiftDown());
@@ -137,9 +148,24 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
     }
 
     @Override
+    public void onHoverMouseScroll(int direction) {
+        if (this.phantom) {
+            if (Interactable.hasShiftDown()) {
+                direction *= 10;
+            }
+            if (Interactable.hasControlDown()) {
+                direction *= 100;
+            }
+            final int finalDirection = direction;
+            syncToServer(2, buffer -> buffer.writeVarInt(finalDirection));
+        }
+    }
+
+    @Override
     public void detectAndSendChanges() {
         FluidStack currentFluid = this.fluidTank.getFluid();
         if (currentFluid == null ^ this.cachedFluid == null || (currentFluid != null && (!currentFluid.isFluidEqual(cachedFluid) || currentFluid.amount != cachedFluid.amount))) {
+            this.cachedFluid = currentFluid == null ? null : currentFluid.copy();
             syncToClient(1, buffer -> NetworkUtils.writeFluidStack(buffer, currentFluid));
         }
     }
@@ -154,7 +180,15 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
     @Override
     public void readOnServer(int id, PacketBuffer buf) {
         if (id == 1) {
-            tryClickContainer(buf.readVarInt(), buf.readBoolean());
+            if (this.phantom) {
+                tryClickPhantom(buf.readVarInt(), buf.readBoolean());
+            } else {
+                tryClickContainer(buf.readVarInt(), buf.readBoolean());
+            }
+        } else if (id == 2) {
+            if (this.phantom) {
+                tryScrollPhantom(buf.readVarInt());
+            }
         }
     }
 
@@ -188,8 +222,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
             }
             FluidStack fluid = fluidTank.getFluid();
             if (performedTransfer && fluid != null) {
-                SoundEvent soundevent = fluid.getFluid().getFillSound(fluid);
-                player.world.playSound(null, player.posX, player.posY + 0.5, player.posZ, soundevent, SoundCategory.BLOCKS, 1.0F, 1.0F);
+                playSound(fluid, false);
                 getContext().setCursorStack(currentStack, true);
             }
             return;
@@ -216,11 +249,72 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
                 }
             }
             if (performedTransfer) {
-                SoundEvent soundevent = currentFluid.getFluid().getFillSound(currentFluid);
-                player.world.playSound(null, player.posX, player.posY + 0.5, player.posZ, soundevent, SoundCategory.BLOCKS, 1.0F, 1.0F);
+                playSound(currentFluid, true);
                 getContext().setCursorStack(currentStack, true);
             }
         }
+    }
+
+    public void tryClickPhantom(int mouseButton, boolean isShiftKeyDown) {
+        EntityPlayer player = getContext().getPlayer();
+        ItemStack currentStack = getContext().getCursorStack();
+        FluidStack currentFluid = this.fluidTank.getFluid();
+        IFluidHandlerItem fluidHandlerItem = currentStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null);
+
+        if (mouseButton == 0) {
+            if (currentStack.isEmpty() || fluidHandlerItem == null) {
+                this.fluidTank.drain(isShiftKeyDown ? Integer.MAX_VALUE : 1000, true);
+            } else {
+                FluidStack cellFluid = fluidHandlerItem.drain(Integer.MAX_VALUE, false);
+                if ((this.controlsAmount || currentFluid == null) && cellFluid != null) {
+                    if (this.controlsAmount) {
+                        cellFluid.amount = 1;
+                    }
+                    if (this.fluidTank.fill(cellFluid, true) > 0) {
+                        this.lastStoredPhantomFluid = cellFluid.copy();
+                    }
+                } else {
+                    fluidTank.drain(isShiftKeyDown ? Integer.MAX_VALUE : 1000, true);
+                }
+            }
+        } else if (mouseButton == 1) {
+            if (currentFluid != null) {
+                if (this.controlsAmount) {
+                    FluidStack toFill = currentFluid.copy();
+                    toFill.amount = 1000;
+                    this.fluidTank.fill(toFill, true);
+                }
+            } else if (lastStoredPhantomFluid != null) {
+                FluidStack toFill = this.lastStoredPhantomFluid.copy();
+                toFill.amount = this.controlsAmount ? 1000 : 1;
+                this.fluidTank.fill(toFill, true);
+            }
+        }
+    }
+
+    public void tryScrollPhantom(int direction) {
+        FluidStack currentFluid = this.fluidTank.getFluid();
+        if (currentFluid == null) {
+            if (direction > 0 && this.lastStoredPhantomFluid != null) {
+                FluidStack toFill = this.lastStoredPhantomFluid.copy();
+                toFill.amount = this.controlsAmount ? direction : 1;
+                this.fluidTank.fill(toFill, true);
+            }
+            return;
+        }
+        if (direction > 0 && this.controlsAmount) {
+            FluidStack toFill = currentFluid.copy();
+            toFill.amount = direction;
+            this.fluidTank.fill(toFill, true);
+        } else if (direction < 0) {
+            this.fluidTank.drain(-direction, true);
+        }
+    }
+
+    private void playSound(FluidStack fluid, boolean fill) {
+        EntityPlayer player = getContext().getPlayer();
+        SoundEvent soundevent = fill ? fluid.getFluid().getFillSound(fluid) : fluid.getFluid().getEmptySound(fluid);
+        player.world.playSound(null, player.posX, player.posY + 0.5, player.posZ, soundevent, SoundCategory.BLOCKS, 1.0F, 1.0F);
     }
 
     public boolean allowManualEmptying() {

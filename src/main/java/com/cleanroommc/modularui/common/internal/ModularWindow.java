@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.common.internal;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.ISyncedWidget;
 import com.cleanroommc.modularui.api.IWidgetBuilder;
@@ -19,6 +18,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableBiMap;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -390,6 +390,14 @@ public class ModularWindow implements IWidgetParent {
         public Builder setDraggable(boolean draggable) {
             this.draggable = draggable;
             return this;
+        }
+
+        public Builder bindPlayerInventory(EntityPlayer player, int marginBottom) {
+            return bindPlayerInventory(player, new Pos2d(size.width / 2 - 81, size.height - marginBottom - 76));
+        }
+
+        public Builder bindPlayerInventory(EntityPlayer player) {
+            return bindPlayerInventory(player, 7);
         }
 
         @Override

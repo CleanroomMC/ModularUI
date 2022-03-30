@@ -7,8 +7,8 @@ import com.cleanroommc.modularui.api.drawable.UITexture;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.internal.mixin.GuiContainerMixin;
-import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
 import com.cleanroommc.modularui.common.internal.wrapper.BaseSlot;
+import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Container;
@@ -28,6 +28,7 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
 
     private final BaseSlot slot;
     private ItemStack cachedServerItem = null;
+    private ItemStack lastStoredPhantomItem = ItemStack.EMPTY;
 
     public SlotWidget(BaseSlot slot) {
         this.slot = slot;
@@ -139,8 +140,13 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
 
     @Override
     public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-        slot.setEnabled(enabled);
+        if (enabled != isEnabled()) {
+            super.setEnabled(enabled);
+            slot.setEnabled(enabled);
+            if (isClient()) {
+                syncToServer(4, buffer -> buffer.writeBoolean(enabled));
+            }
+        }
     }
 
     @Override
@@ -157,6 +163,8 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
             phantomClick(ClickData.readPacket(buf));
         } else if (id == 3) {
             phantomScroll(buf.readVarInt());
+        } else if (id == 4) {
+            setEnabled(buf.readBoolean());
         }
     }
 
@@ -172,22 +180,33 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     @Override
     public void onHoverMouseScroll(int direction) {
         if (isPhantom()) {
-            syncToServer(3, buffer -> buffer.writeVarInt(direction));
+            if (Interactable.hasShiftDown()) {
+                direction *= 8;
+            }
+            final int finalDirection = direction;
+            syncToServer(3, buffer -> buffer.writeVarInt(finalDirection));
         }
     }
 
     protected void phantomClick(ClickData clickData) {
         ItemStack cursorStack = getContext().getCursorStack();
         ItemStack slotStack = getMcSlot().getStack();
+        ItemStack stackToPut;
         if (slotStack.isEmpty()) {
             if (cursorStack.isEmpty()) {
-                return;
+                if (clickData.mouseButton == 1 && !this.lastStoredPhantomItem.isEmpty()) {
+                    stackToPut = this.lastStoredPhantomItem.copy();
+                } else {
+                    return;
+                }
+            } else {
+                stackToPut = cursorStack.copy();
             }
-            ItemStack stackToPut = cursorStack.copy();
             if (clickData.mouseButton == 1) {
                 stackToPut.setCount(1);
             }
             slot.putStack(stackToPut);
+            this.lastStoredPhantomItem = stackToPut.copy();
         } else {
             if (clickData.mouseButton == 0) {
                 if (clickData.shift) {
@@ -202,7 +221,14 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     }
 
     protected void phantomScroll(int direction) {
-        this.slot.incrementStackCount(direction);
+        ItemStack currentItem = this.slot.getStack();
+        if (direction > 0 && currentItem.isEmpty() && !lastStoredPhantomItem.isEmpty()) {
+            ItemStack stackToPut = this.lastStoredPhantomItem.copy();
+            stackToPut.setCount(direction);
+            this.slot.putStack(stackToPut);
+        } else {
+            this.slot.incrementStackCount(direction);
+        }
     }
 
     private GuiContainerMixin getGuiAccessor() {
