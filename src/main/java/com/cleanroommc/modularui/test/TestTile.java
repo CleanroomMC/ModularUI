@@ -23,7 +23,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
 
     private int serverValue = 0;
     private final FluidTank fluidTank1 = new FluidTank(10000);
-    private final FluidTank fluidTank2 = new FluidTank(10000);
+    private final FluidTank fluidTank2 = new FluidTank(Integer.MAX_VALUE);
     private final ItemStackHandler phantomInventory = new ItemStackHandler(2);
     private String textFieldValue = "";
     private final int duration = 60;
@@ -46,7 +46,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                     .addTooltip("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet");
         });*/
         builder.widget(ModularUITextures.VANILLA_BACKGROUND.asWidget().fillParent())
-                .widget(SlotGroup.playerInventoryGroup(buildContext.getPlayer(), new Pos2d(7, 190)));
+                .bindPlayerInventory(buildContext.getPlayer());
         Column column = new Column();
         addInfo(column);
         ChangeableWidget changeableWidget = new ChangeableWidget(this::dynamicWidget);
@@ -129,7 +129,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                                         .setDirection(ProgressBar.Direction.CIRCULAR_CW)
                                         .setTexture(PROGRESS_BAR_MIXER, 20)
                                         .setPos(99, 85))
-                                .addChild(FluidSlotWidget.phantom(fluidTank2, false).setPos(38, 47))
+                                .addChild(FluidSlotWidget.phantom(fluidTank2, true).setPos(38, 47))
                                 .addChild(new FluidSlotWidget(fluidTank1).setPos(20, 47))
                                 .addChild(new ButtonWidget()
                                         .setOnClick((clickData, widget) -> {

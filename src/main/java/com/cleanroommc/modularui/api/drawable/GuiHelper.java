@@ -188,6 +188,7 @@ public class GuiHelper {
         renderer.setUp(pos, color, maxWidth);
         for (String line : lines) {
             renderer.draw(line);
+            renderer.addY(renderer.scale);
         }
 
         MinecraftForge.EVENT_BUS.post(new RenderTooltipEvent.PostText(ItemStack.EMPTY, lines, tooltipX, tooltipY, TextRenderer.FR, tooltipTextWidth, tooltipHeight));

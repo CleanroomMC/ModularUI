@@ -402,6 +402,10 @@ public class TextRenderer {
         return (currentX + lineXOffset) * scaleFactor;
     }
 
+    public void addY(float y) {
+        this.y += y;
+    }
+
     private static boolean isFormatColor(char colorChar) {
         return colorChar >= '0' && colorChar <= '9' || colorChar >= 'a' && colorChar <= 'f' || colorChar >= 'A' && colorChar <= 'F';
     }

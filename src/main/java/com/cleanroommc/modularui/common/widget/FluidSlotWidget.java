@@ -1,11 +1,9 @@
 package com.cleanroommc.modularui.common.widget;
 
 import com.cleanroommc.modularui.api.Interactable;
+import com.cleanroommc.modularui.api.NumberFormat;
 import com.cleanroommc.modularui.api.TooltipContainer;
-import com.cleanroommc.modularui.api.drawable.GuiHelper;
-import com.cleanroommc.modularui.api.drawable.IDrawable;
-import com.cleanroommc.modularui.api.drawable.Text;
-import com.cleanroommc.modularui.api.drawable.UITexture;
+import com.cleanroommc.modularui.api.drawable.*;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.internal.network.NetworkUtils;
@@ -35,6 +33,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
 
     @Nullable
     private IDrawable overlayTexture;
+    private final TextRenderer textRenderer = new TextRenderer();
     private final IFluidTank fluidTank;
     private final IFluidHandler tankHandler;
     @Nullable
@@ -50,6 +49,8 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
     public FluidSlotWidget(IFluidTank fluidTank) {
         this.fluidTank = fluidTank;
         this.tankHandler = FluidTankHandler.getTankFluidHandler(fluidTank);
+        this.textRenderer.forceShadow(true);
+        this.textRenderer.setScale(0.5f);
     }
 
     public static FluidSlotWidget phantom(IFluidTank fluidTank, boolean controlsAmount) {
@@ -97,7 +98,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
             if (fluid != null) {
                 tooltip.addLine(fluid.getLocalizedName());
                 if (controlsAmount) {
-                    tooltip.addLine(Text.localised("modularui.fluid.phantom.amount"));
+                    tooltip.addLine(Text.localised("modularui.fluid.phantom.amount", fluid.amount));
                 }
             } else {
                 tooltip.addLine(Text.localised("modularui.fluid.empty"));
@@ -157,6 +158,10 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
         if (overlayTexture != null) {
             overlayTexture.draw(Pos2d.ZERO, size, partialTicks);
         }
+        if (content != null && this.controlsAmount) {
+            String s = NumberFormat.format(content.amount, 4) + "L";
+            textRenderer.drawAligned(s, contentOffset.x + 0.5f, size.height - 5.5f, size.width - contentOffset.x - 1f, 0xFFFFFF, 1);
+        }
     }
 
     @Override
@@ -179,7 +184,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
     @Override
     public void onHoverMouseScroll(int direction) {
         if (this.phantom) {
-            if ((direction > 0 && !canFillSlot) || (direction < 0 && !canDrainSlot)) {
+            if (!this.controlsAmount || (direction > 0 && !this.canFillSlot) || (direction < 0 && !this.canDrainSlot)) {
                 return;
             }
             if (Interactable.hasShiftDown()) {
@@ -238,7 +243,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
             return;
         }
         int maxAttempts = isShiftKeyDown ? currentStack.getCount() : 1;
-        if (mouseButton == 0 && canDrainSlot) {
+        if (mouseButton == 0 && canFillSlot) {
             boolean performedTransfer = false;
             for (int i = 0; i < maxAttempts; i++) {
                 FluidActionResult result = FluidUtil.tryEmptyContainer(currentStack, tankHandler, Integer.MAX_VALUE, null, false);
@@ -267,7 +272,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
             return;
         }
         FluidStack currentFluid = fluidTank.getFluid();
-        if (mouseButton == 1 && canFillSlot && currentFluid != null && currentFluid.amount > 0) {
+        if (mouseButton == 1 && canDrainSlot && currentFluid != null && currentFluid.amount > 0) {
             boolean performedTransfer = false;
             for (int i = 0; i < maxAttempts; i++) {
                 FluidActionResult result = FluidUtil.tryFillContainer(currentStack, tankHandler, Integer.MAX_VALUE, null, false);
@@ -302,13 +307,13 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
 
         if (mouseButton == 0) {
             if (currentStack.isEmpty() || fluidHandlerItem == null) {
-                if (canFillSlot) {
+                if (canDrainSlot) {
                     this.fluidTank.drain(isShiftKeyDown ? Integer.MAX_VALUE : 1000, true);
                 }
             } else {
                 FluidStack cellFluid = fluidHandlerItem.drain(Integer.MAX_VALUE, false);
                 if ((this.controlsAmount || currentFluid == null) && cellFluid != null) {
-                    if (canDrainSlot) {
+                    if (canFillSlot) {
                         if (this.controlsAmount) {
                             cellFluid.amount = 1;
                         }
@@ -317,13 +322,13 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
                         }
                     }
                 } else {
-                    if (canFillSlot) {
+                    if (canDrainSlot) {
                         fluidTank.drain(isShiftKeyDown ? Integer.MAX_VALUE : 1000, true);
                     }
                 }
             }
         } else if (mouseButton == 1) {
-            if (canDrainSlot) {
+            if (canFillSlot) {
                 if (currentFluid != null) {
                     if (this.controlsAmount) {
                         FluidStack toFill = currentFluid.copy();
@@ -336,7 +341,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
                     this.fluidTank.fill(toFill, true);
                 }
             }
-        } else if (mouseButton == 3 && currentFluid != null && canFillSlot) {
+        } else if (mouseButton == 2 && currentFluid != null && canDrainSlot) {
             this.fluidTank.drain(isShiftKeyDown ? Integer.MAX_VALUE : 1000, true);
         }
     }

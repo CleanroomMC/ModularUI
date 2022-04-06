@@ -4,7 +4,6 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.UITexture;
-import com.cleanroommc.modularui.api.math.Pos2d;
 import net.minecraft.entity.player.EntityPlayer;
 
 import javax.annotation.Nullable;
@@ -20,7 +19,7 @@ public class WidgetJsonRegistry {
         registerWidget("cycle_button", CycleButtonWidget::new);
         registerWidget("button", ButtonWidget::new);
         registerWidget("textfield", TextFieldWidget::new);
-        registerWidgetSpecial("player_inventory", player -> SlotGroup.playerInventoryGroup(player, Pos2d.ZERO));
+        registerWidgetSpecial("player_inventory", SlotGroup::playerInventoryGroup);
 
         IDrawable.JSON_DRAWABLE_MAP.put("text", Text::ofJson);
         IDrawable.JSON_DRAWABLE_MAP.put("image", UITexture::ofJson);
