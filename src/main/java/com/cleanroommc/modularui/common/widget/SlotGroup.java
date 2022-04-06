@@ -1,19 +1,29 @@
 package com.cleanroommc.modularui.common.widget;
 
+import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.math.Pos2d;
+import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.internal.wrapper.BaseSlot;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 public class SlotGroup extends MultiChildWidget {
 
     public static final int PLAYER_INVENTORY_HEIGHT = 76;
 
-    public static SlotGroup playerInventoryGroup(EntityPlayer player, Pos2d pos) {
+    public static SlotGroup playerInventoryGroup(EntityPlayer player) {
         PlayerMainInvWrapper wrapper = new PlayerMainInvWrapper(player.inventory);
         SlotGroup slotGroup = new SlotGroup();
-        slotGroup.setPos(pos);
 
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
@@ -58,5 +68,87 @@ public class SlotGroup extends MultiChildWidget {
     public SlotGroup addSlot(SlotWidget slotWidget) {
         addChild(slotWidget);
         return this;
+    }
+
+    public static class Builder {
+        private final List<String> rows = new ArrayList<>();
+        private final Map<Character, Function<Integer, Widget>> widgetCreatorMap = new HashMap<>();
+        private Size cellSize = new Size(18, 18);
+        private Size totalSize;
+        private Alignment alignment = Alignment.TopLeft;
+
+        public Builder setCellSize(Size cellSize) {
+            this.cellSize = cellSize;
+            return this;
+        }
+
+        public Builder setSize(Size totalSize, Alignment contentAlignment) {
+            this.totalSize = totalSize;
+            this.alignment = contentAlignment;
+            return this;
+        }
+
+        public Builder setSize(Size totalSize) {
+            return setSize(totalSize, this.alignment);
+        }
+
+        public Builder row(String row) {
+            this.rows.add(row);
+            return this;
+        }
+
+        public Builder where(char c, Function<Integer, Widget> widgetCreator) {
+            this.widgetCreatorMap.put(c, widgetCreator);
+            return this;
+        }
+
+        public Builder where(char c, IItemHandlerModifiable inventory) {
+            this.widgetCreatorMap.put(c, i -> new SlotWidget(inventory, i));
+            return this;
+        }
+
+        public Builder where(char c, IFluidTank[] inventory) {
+            this.widgetCreatorMap.put(c, i -> new FluidSlotWidget(inventory[i]));
+            return this;
+        }
+
+        public Builder where(char c, List<IFluidTank> inventory) {
+            this.widgetCreatorMap.put(c, i -> new FluidSlotWidget(inventory.get(i)));
+            return this;
+        }
+
+        public SlotGroup build() {
+            int maxRowWith = 0;
+            for (String row : rows) {
+                maxRowWith = Math.max(maxRowWith, row.length());
+            }
+            Size contentSize = new Size(maxRowWith * cellSize.width, rows.size() * cellSize.height);
+            Pos2d offsetPos = Pos2d.ZERO;
+            if (totalSize != null) {
+                offsetPos = alignment.getAlignedPos(totalSize, contentSize);
+            }
+            Map<Character, AtomicInteger> charCount = new HashMap<>();
+            SlotGroup slotGroup = new SlotGroup();
+
+            for (int i = 0; i < rows.size(); i++) {
+                String row = rows.get(i);
+                for (int j = 0; j < row.length(); j++) {
+                    char c = row.charAt(j);
+                    if (c == ' ') {
+                        continue;
+                    }
+                    Function<Integer, Widget> widgetCreator = this.widgetCreatorMap.get(c);
+                    if (widgetCreator == null) {
+                        ModularUI.LOGGER.warn("Key {} was not found in Slot group.", c);
+                        continue;
+                    }
+                    Widget widget = widgetCreator.apply(charCount.computeIfAbsent(c, key -> new AtomicInteger()).getAndIncrement());
+                    if (widget != null) {
+                        slotGroup.addChild(widget.setPos(offsetPos.add(j * cellSize.width, i * cellSize.height)));
+                    }
+                }
+            }
+            return slotGroup;
+        }
     }
 }

@@ -45,7 +45,11 @@ public interface IWidgetBuilder<T extends IWidgetBuilder<T>> {
     }
 
     default T bindPlayerInventory(EntityPlayer player, Pos2d pos) {
-        return widget(SlotGroup.playerInventoryGroup(player, pos));
+        return widget(SlotGroup.playerInventoryGroup(player).setPos(pos));
+    }
+
+    default T bindPlayerInventory(EntityPlayer player, int x, int y) {
+        return widget(SlotGroup.playerInventoryGroup(player).setPos(new Pos2d(x, y)));
     }
 
     default T addFromJson(String mod, String location, UIBuildContext buildContext) {
