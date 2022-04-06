@@ -50,7 +50,7 @@ public class ModularUIContext {
     }
 
     public boolean isClient() {
-        return FMLCommonHandler.instance().getSide() == Side.CLIENT && player instanceof EntityPlayerSP;
+        return player.world != null ? player.world.isRemote : player instanceof EntityPlayerSP;
     }
 
     public void initialize(ModularUIContainer container, ModularWindow mainWindow) {

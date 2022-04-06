@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class FluidSlotWidget extends SyncedWidget implements Interactable {
 
@@ -41,8 +42,8 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
     private FluidStack lastStoredPhantomFluid;
     private Pos2d contentOffset = new Pos2d(1, 1);
     private boolean alwaysShowFull = true;
-    private boolean allowManualFilling = true;
-    private boolean allowManualEmptying = true;
+    private boolean canDrainSlot = true;
+    private boolean canFillSlot = true;
     private boolean phantom = false;
     private boolean controlsAmount = true;
 
@@ -74,32 +75,60 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
         return SIZE;
     }
 
+    public void setControlsAmount(boolean controlsAmount, boolean sync) {
+        if (this.controlsAmount != controlsAmount) {
+            this.controlsAmount = controlsAmount;
+            if (sync) {
+                if (isClient()) {
+                    syncToServer(3, buffer -> buffer.writeBoolean(controlsAmount));
+                } else {
+                    syncToClient(3, buffer -> buffer.writeBoolean(controlsAmount));
+                }
+            }
+        }
+    }
+
     @Nullable
     @Override
     public TooltipContainer getHoverText() {
         TooltipContainer tooltip = new TooltipContainer();
         FluidStack fluid = cachedFluid;
-        if (fluid != null) {
-            tooltip.addLine(fluid.getLocalizedName());
-            tooltip.addLine(Text.localised("modularui.fluid.amount", fluid.amount, fluidTank.getCapacity()));
-            addAdditionalFluidInfo(tooltip, fluid);
-        } else {
-            tooltip.addLine(Text.localised("modularui.fluid.empty"));
-        }
-        if (allowManualEmptying || allowManualFilling) {
-            tooltip.addLine(); // Add an empty line to separate from the bottom material tooltips
-            if (Interactable.hasShiftDown()) {
-                if (allowManualEmptying && allowManualFilling) {
-                    tooltip.addLine(Text.localised("modularui.fluid.click_combined"));
-                } else if (allowManualFilling) {
-                    tooltip.addLine(Text.localised("modularui.fluid.click_to_fill"));
-                } else if (allowManualEmptying) {
-                    tooltip.addLine(Text.localised("modularui.fluid.click_to_empty"));
+        if (phantom) {
+            if (fluid != null) {
+                tooltip.addLine(fluid.getLocalizedName());
+                if (controlsAmount) {
+                    tooltip.addLine(Text.localised("modularui.fluid.phantom.amount"));
                 }
             } else {
-                tooltip.addLine(Text.localised("modularui.tooltip.shift"));
+                tooltip.addLine(Text.localised("modularui.fluid.empty"));
+            }
+            if (controlsAmount) {
+                tooltip.addLine(Text.localised("modularui.fluid.phantom.control"));
+            }
+        } else {
+            if (fluid != null) {
+                tooltip.addLine(fluid.getLocalizedName());
+                tooltip.addLine(Text.localised("modularui.fluid.amount", fluid.amount, fluidTank.getCapacity()));
+                addAdditionalFluidInfo(tooltip, fluid);
+            } else {
+                tooltip.addLine(Text.localised("modularui.fluid.empty"));
+            }
+            if (canFillSlot || canDrainSlot) {
+                tooltip.addLine(); // Add an empty line to separate from the bottom material tooltips
+                if (Interactable.hasShiftDown()) {
+                    if (canFillSlot && canDrainSlot) {
+                        tooltip.addLine(Text.localised("modularui.fluid.click_combined"));
+                    } else if (canDrainSlot) {
+                        tooltip.addLine(Text.localised("modularui.fluid.click_to_fill"));
+                    } else if (canFillSlot) {
+                        tooltip.addLine(Text.localised("modularui.fluid.click_to_empty"));
+                    }
+                } else {
+                    tooltip.addLine(Text.localised("modularui.tooltip.shift"));
+                }
             }
         }
+
         return tooltip;
     }
 
@@ -132,7 +161,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
 
     @Override
     public boolean onClick(int buttonId, boolean doubleClick) {
-        if (!this.allowManualEmptying && !this.allowManualFilling) {
+        if (!this.canFillSlot && !this.canDrainSlot) {
             return false;
         }
         ItemStack cursorStack = getContext().getCursorStack();
@@ -150,6 +179,9 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
     @Override
     public void onHoverMouseScroll(int direction) {
         if (this.phantom) {
+            if ((direction > 0 && !canFillSlot) || (direction < 0 && !canDrainSlot)) {
+                return;
+            }
             if (Interactable.hasShiftDown()) {
                 direction *= 10;
             }
@@ -174,6 +206,8 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
     public void readOnClient(int id, PacketBuffer buf) throws IOException {
         if (id == 1) {
             this.cachedFluid = NetworkUtils.readFluidStack(buf);
+        } else if (id == 3) {
+            this.controlsAmount = buf.readBoolean();
         }
     }
 
@@ -189,6 +223,11 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
             if (this.phantom) {
                 tryScrollPhantom(buf.readVarInt());
             }
+        } else if (id == 3) {
+            this.controlsAmount = buf.readBoolean();
+            if (this.controlsAmount && this.fluidTank.getFluidAmount() > 1) {
+                Objects.requireNonNull(this.fluidTank.getFluid()).amount = 1;
+            }
         }
     }
 
@@ -199,7 +238,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
             return;
         }
         int maxAttempts = isShiftKeyDown ? currentStack.getCount() : 1;
-        if (mouseButton == 0 && allowManualFilling) {
+        if (mouseButton == 0 && canDrainSlot) {
             boolean performedTransfer = false;
             for (int i = 0; i < maxAttempts; i++) {
                 FluidActionResult result = FluidUtil.tryEmptyContainer(currentStack, tankHandler, Integer.MAX_VALUE, null, false);
@@ -228,7 +267,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
             return;
         }
         FluidStack currentFluid = fluidTank.getFluid();
-        if (mouseButton == 1 && allowManualEmptying && currentFluid != null && currentFluid.amount > 0) {
+        if (mouseButton == 1 && canFillSlot && currentFluid != null && currentFluid.amount > 0) {
             boolean performedTransfer = false;
             for (int i = 0; i < maxAttempts; i++) {
                 FluidActionResult result = FluidUtil.tryFillContainer(currentStack, tankHandler, Integer.MAX_VALUE, null, false);
@@ -263,32 +302,42 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
 
         if (mouseButton == 0) {
             if (currentStack.isEmpty() || fluidHandlerItem == null) {
-                this.fluidTank.drain(isShiftKeyDown ? Integer.MAX_VALUE : 1000, true);
+                if (canFillSlot) {
+                    this.fluidTank.drain(isShiftKeyDown ? Integer.MAX_VALUE : 1000, true);
+                }
             } else {
                 FluidStack cellFluid = fluidHandlerItem.drain(Integer.MAX_VALUE, false);
                 if ((this.controlsAmount || currentFluid == null) && cellFluid != null) {
-                    if (this.controlsAmount) {
-                        cellFluid.amount = 1;
-                    }
-                    if (this.fluidTank.fill(cellFluid, true) > 0) {
-                        this.lastStoredPhantomFluid = cellFluid.copy();
+                    if (canDrainSlot) {
+                        if (this.controlsAmount) {
+                            cellFluid.amount = 1;
+                        }
+                        if (this.fluidTank.fill(cellFluid, true) > 0) {
+                            this.lastStoredPhantomFluid = cellFluid.copy();
+                        }
                     }
                 } else {
-                    fluidTank.drain(isShiftKeyDown ? Integer.MAX_VALUE : 1000, true);
+                    if (canFillSlot) {
+                        fluidTank.drain(isShiftKeyDown ? Integer.MAX_VALUE : 1000, true);
+                    }
                 }
             }
         } else if (mouseButton == 1) {
-            if (currentFluid != null) {
-                if (this.controlsAmount) {
-                    FluidStack toFill = currentFluid.copy();
-                    toFill.amount = 1000;
+            if (canDrainSlot) {
+                if (currentFluid != null) {
+                    if (this.controlsAmount) {
+                        FluidStack toFill = currentFluid.copy();
+                        toFill.amount = 1000;
+                        this.fluidTank.fill(toFill, true);
+                    }
+                } else if (lastStoredPhantomFluid != null) {
+                    FluidStack toFill = this.lastStoredPhantomFluid.copy();
+                    toFill.amount = this.controlsAmount ? 1000 : 1;
                     this.fluidTank.fill(toFill, true);
                 }
-            } else if (lastStoredPhantomFluid != null) {
-                FluidStack toFill = this.lastStoredPhantomFluid.copy();
-                toFill.amount = this.controlsAmount ? 1000 : 1;
-                this.fluidTank.fill(toFill, true);
             }
+        } else if (mouseButton == 3 && currentFluid != null && canFillSlot) {
+            this.fluidTank.drain(isShiftKeyDown ? Integer.MAX_VALUE : 1000, true);
         }
     }
 
@@ -318,11 +367,11 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
     }
 
     public boolean allowManualEmptying() {
-        return allowManualEmptying;
+        return canFillSlot;
     }
 
     public boolean allowManualFilling() {
-        return allowManualFilling;
+        return canDrainSlot;
     }
 
     public boolean alwaysShowFull() {
@@ -338,9 +387,9 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
         return overlayTexture;
     }
 
-    public FluidSlotWidget setInteraction(boolean fillable, boolean drainable) {
-        this.allowManualFilling = fillable;
-        this.allowManualEmptying = drainable;
+    public FluidSlotWidget setInteraction(boolean canDrainSlot, boolean canFillSlot) {
+        this.canDrainSlot = canDrainSlot;
+        this.canFillSlot = canFillSlot;
         return this;
     }
 

@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * This class depicts a functional element of a ModularUI
@@ -56,6 +57,9 @@ public abstract class Widget {
     private int tooltipShowUpDelay = 0;
     @Nullable
     private String debugLabel;
+
+    @Nullable
+    private Consumer<Widget> ticker;
 
     public Widget() {
     }
@@ -491,6 +495,11 @@ public abstract class Widget {
         return tooltipShowUpDelay;
     }
 
+    @Nullable
+    public Consumer<Widget> getTicker() {
+        return ticker;
+    }
+
     //==== Setter/Builder ====
 
     /**
@@ -610,6 +619,15 @@ public abstract class Widget {
         return this;
     }
 
+    /**
+     * Applies this action each tick on client. Can be used to dynamically enable/disable the widget
+     *
+     * @param ticker tick function
+     */
+    public Widget setTicker(@Nullable Consumer<Widget> ticker) {
+        this.ticker = ticker;
+        return this;
+    }
 
     //==== Utility ====
 

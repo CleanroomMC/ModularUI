@@ -130,7 +130,7 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
 
     @Override
     public void detectAndSendChanges() {
-        if (syncsToClient()) {
+        if (isInitialised() && syncsToClient()) {
             int actualValue = getter.getAsInt();
             if (actualValue != state) {
                 setState(actualValue, true, false);

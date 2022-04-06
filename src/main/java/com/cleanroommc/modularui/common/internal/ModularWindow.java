@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 /**
  * A window in a modular gui. Only the "main" window can exist on both, server and client.
@@ -157,6 +158,10 @@ public class ModularWindow implements IWidgetParent {
     public void update() {
         IWidgetParent.forEachByLayer(this, widget -> {
             widget.onScreenUpdate();
+            Consumer<Widget> ticker = widget.getTicker();
+            if (ticker != null) {
+                ticker.accept(widget);
+            }
             IDrawable[] background = widget.getBackground();
             if (background != null) {
                 for (IDrawable drawable : background) {

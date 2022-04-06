@@ -150,7 +150,6 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
         if (character == Character.MIN_VALUE) {
             switch (keyCode) {
                 case Keyboard.KEY_ESCAPE:
-                case Keyboard.KEY_INSERT:
                     removeFocus();
                     break;
                 case Keyboard.KEY_LEFT: {
@@ -185,6 +184,10 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
                 default:
                     return false;
             }
+            return true;
+        }
+        if (keyCode == Keyboard.KEY_INSERT) {
+            removeFocus();
             return true;
         }
         if (keyCode == Keyboard.KEY_BACK) {
