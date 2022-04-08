@@ -1,40 +1,42 @@
 package com.cleanroommc.modularui.api;
 
-import java.text.CharacterIterator;
-import java.text.StringCharacterIterator;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
+import java.text.DecimalFormat;
 
 public class NumberFormat {
 
-    private static final NavigableMap<Long, String> suffixes = new TreeMap<>();
+    // kilo, Mega, Giga, Tera, Peta, Exa, Zetta, Yotta
+    private static final String ABOVE_1_PREFIX = "kMGTPEZY";
+    // millie, micro, nano, pico, femto, atto, zepto, yocto
+    private static final String BELOW_1_PREFIX = "munpfazy";
 
-    static {
-        suffixes.put(1_000L, "k");
-        suffixes.put(1_000_000L, "M");
-        suffixes.put(1_000_000_000L, "G");
-        suffixes.put(1_000_000_000_000L, "T");
-        suffixes.put(1_000_000_000_000_000L, "P");
-        suffixes.put(1_000_000_000_000_000_000L, "E");
-    }
+    public static final DecimalFormat FORMAT_0 = new DecimalFormat("0.");
+    public static final DecimalFormat FORMAT_1 = new DecimalFormat("0.#");
+    public static final DecimalFormat FORMAT_2 = new DecimalFormat("0.##");
+    public static final DecimalFormat FORMAT_3 = new DecimalFormat("0.###");
 
-    public static String format(long value, int precision) {
-        //Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
-        if (value == Long.MIN_VALUE) return format(Long.MIN_VALUE + 1, precision);
-        if (value < 0) return "-" + format(-value, precision);
-        if (value < Math.pow(10, precision)) return Long.toString(value); //deal with easy case
-
-        Map.Entry<Long, String> e = suffixes.floorEntry(value);
-        Long divideBy = e.getKey();
-        String suffix = e.getValue();
-
-        long truncated = value / (divideBy / 10); //the number part of the output times 10
-        boolean hasDecimal = truncated < 100 && (truncated / 10d) != (truncated / 10);
-        return hasDecimal ? (truncated / 10d) + suffix : (truncated / 10) + suffix;
-    }
-
-    public static String format(long value) {
-        return format(value, 3);
+    public static String format(double num, java.text.NumberFormat format) {
+        if (num == 0) {
+            return "0";
+        }
+        if ((1 <= num && num < 1000)) {
+            return format.format(num);
+        }
+        int index = 0;
+        if ((num < 1 && num > 0) || (num < 0 && num > -1)) {
+            while ((num > 0 && num <= 0.00095) || (num < 0 && num >= -0.00095)) {
+                num *= 1000;
+                if (++index == 7) {
+                    break;
+                }
+            }
+            return format.format(num * 1000) + BELOW_1_PREFIX.charAt(index);
+        }
+        while (num <= -999_950 || num >= 999_950) {
+            num /= 1000;
+            if (++index == 7) {
+                break;
+            }
+        }
+        return format.format(num / 1000) + ABOVE_1_PREFIX.charAt(index);
     }
 }

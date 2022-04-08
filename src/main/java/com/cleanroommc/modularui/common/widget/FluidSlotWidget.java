@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.Objects;
 
 public class FluidSlotWidget extends SyncedWidget implements Interactable {
 
@@ -159,7 +158,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
             overlayTexture.draw(Pos2d.ZERO, size, partialTicks);
         }
         if (content != null && this.controlsAmount) {
-            String s = NumberFormat.format(content.amount, 4) + "L";
+            String s = NumberFormat.format(content.amount, NumberFormat.FORMAT_1);
             textRenderer.drawAligned(s, contentOffset.x + 0.5f, size.height - 5.5f, size.width - contentOffset.x - 1f, 0xFFFFFF, 1);
         }
     }
@@ -184,7 +183,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
     @Override
     public void onHoverMouseScroll(int direction) {
         if (this.phantom) {
-            if (!this.controlsAmount || (direction > 0 && !this.canFillSlot) || (direction < 0 && !this.canDrainSlot)) {
+            if ((direction > 0 && !this.canFillSlot) || (direction < 0 && !this.canDrainSlot)) {
                 return;
             }
             if (Interactable.hasShiftDown()) {
@@ -230,9 +229,6 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
             }
         } else if (id == 3) {
             this.controlsAmount = buf.readBoolean();
-            if (this.controlsAmount && this.fluidTank.getFluidAmount() > 1) {
-                Objects.requireNonNull(this.fluidTank.getFluid()).amount = 1;
-            }
         }
     }
 
@@ -314,7 +310,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
                 FluidStack cellFluid = fluidHandlerItem.drain(Integer.MAX_VALUE, false);
                 if ((this.controlsAmount || currentFluid == null) && cellFluid != null) {
                     if (canFillSlot) {
-                        if (this.controlsAmount) {
+                        if (!this.controlsAmount) {
                             cellFluid.amount = 1;
                         }
                         if (this.fluidTank.fill(cellFluid, true) > 0) {
@@ -371,11 +367,11 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
         player.world.playSound(null, player.posX, player.posY + 0.5, player.posZ, soundevent, SoundCategory.BLOCKS, 1.0F, 1.0F);
     }
 
-    public boolean allowManualEmptying() {
+    public boolean canFillSlot() {
         return canFillSlot;
     }
 
-    public boolean allowManualFilling() {
+    public boolean canDrainSlot() {
         return canDrainSlot;
     }
 
@@ -385,6 +381,14 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
 
     public Pos2d getContentOffset() {
         return contentOffset;
+    }
+
+    public boolean controlsAmount() {
+        return controlsAmount;
+    }
+
+    public boolean isPhantom() {
+        return phantom;
     }
 
     @Nullable

@@ -305,7 +305,7 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
         if (id == 1) {
             if (!isFocused()) {
                 this.text = buf.readString(Short.MAX_VALUE);
-                if (this.setter != null) {
+                if (this.setter != null && (this.getter == null || !this.text.equals(this.getter.get()))) {
                     this.setter.accept(this.text);
                 }
             }
