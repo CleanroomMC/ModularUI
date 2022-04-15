@@ -1,7 +1,6 @@
-package com.cleanroommc.modularui.api;
+package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.api.math.Pos2d;
-import com.cleanroommc.modularui.common.widget.Widget;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Experimental

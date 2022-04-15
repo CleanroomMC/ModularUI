@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.common.widget;
 
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.api.widget.Widget;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 

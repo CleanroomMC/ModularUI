@@ -1,11 +1,12 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.api.ISyncedWidget;
-import com.cleanroommc.modularui.api.IVanillaSlot;
-import com.cleanroommc.modularui.api.Interactable;
+import com.cleanroommc.modularui.api.widget.ISyncedWidget;
+import com.cleanroommc.modularui.api.widget.IVanillaSlot;
+import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.drawable.UITexture;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.api.widget.Widget;
 import com.cleanroommc.modularui.common.internal.mixin.GuiContainerMixin;
 import com.cleanroommc.modularui.common.internal.wrapper.BaseSlot;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;

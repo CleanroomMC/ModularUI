@@ -1,16 +1,11 @@
-package com.cleanroommc.modularui.api;
+package com.cleanroommc.modularui.api.drawable;
 
-import com.cleanroommc.modularui.api.drawable.GuiHelper;
-import com.cleanroommc.modularui.api.drawable.IDrawable;
-import com.cleanroommc.modularui.api.drawable.Text;
-import com.cleanroommc.modularui.api.drawable.TextSpan;
-import com.cleanroommc.modularui.common.internal.ModularUIContext;
+import com.cleanroommc.modularui.api.screen.ModularUIContext;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TooltipContainer implements IDrawable {
-
 
     private final List<TextSpan> lines = new ArrayList<>();
     private int maxBoxWidth = Integer.MAX_VALUE;

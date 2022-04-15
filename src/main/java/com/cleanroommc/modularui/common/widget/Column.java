@@ -1,10 +1,11 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.api.IWidgetBuilder;
+import com.cleanroommc.modularui.api.widget.IWidgetBuilder;
 import com.cleanroommc.modularui.api.math.CrossAxisAlignment;
 import com.cleanroommc.modularui.api.math.MainAxisAlignment;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.api.widget.Widget;
 import org.jetbrains.annotations.NotNull;
 
 public class Column extends MultiChildWidget implements IWidgetBuilder<Column> {
@@ -58,7 +59,7 @@ public class Column extends MultiChildWidget implements IWidgetBuilder<Column> {
             } else if (caa == CrossAxisAlignment.END) {
                 x = maxWidth - widget.getSize().width;
             }
-            widget.relativePos = new Pos2d(x, lastY);
+            widget.setPosSilent(new Pos2d(x, lastY));
             lastY += widget.getSize().height;
             if (maa == MainAxisAlignment.SPACE_BETWEEN) {
                 lastY += (maxHeight - totalHeight) / (getChildren().size() - 1);

@@ -1,9 +1,8 @@
-package com.cleanroommc.modularui.common.internal;
+package com.cleanroommc.modularui.api.screen;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.ISyncedWidget;
-import com.cleanroommc.modularui.api.IWidgetParent;
-import com.cleanroommc.modularui.api.IWindowCreator;
+import com.cleanroommc.modularui.api.widget.ISyncedWidget;
+import com.cleanroommc.modularui.api.widget.IWidgetParent;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.internal.network.CWidgetUpdate;
@@ -12,7 +11,7 @@ import com.cleanroommc.modularui.common.internal.network.SWidgetUpdate;
 import com.cleanroommc.modularui.common.internal.wrapper.BaseSlot;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularUIContainer;
-import com.cleanroommc.modularui.common.widget.Widget;
+import com.cleanroommc.modularui.api.widget.Widget;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -20,7 +19,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 

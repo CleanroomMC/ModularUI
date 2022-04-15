@@ -1,8 +1,9 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.api.ISyncedWidget;
-import com.cleanroommc.modularui.api.IWidgetParent;
+import com.cleanroommc.modularui.api.widget.ISyncedWidget;
+import com.cleanroommc.modularui.api.widget.IWidgetParent;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.api.widget.Widget;
 import com.cleanroommc.modularui.common.internal.network.NetworkUtils;
 import net.minecraft.network.PacketBuffer;
 import org.jetbrains.annotations.NotNull;

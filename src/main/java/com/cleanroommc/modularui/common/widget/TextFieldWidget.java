@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.common.widget;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.Interactable;
+import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.drawable.TextFieldRenderer;
 import com.cleanroommc.modularui.api.drawable.TextRenderer;
 import com.cleanroommc.modularui.api.math.Alignment;
@@ -149,6 +149,7 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
     public boolean onKeyPressed(char character, int keyCode) {
         if (character == Character.MIN_VALUE) {
             switch (keyCode) {
+                case Keyboard.KEY_RETURN:
                 case Keyboard.KEY_ESCAPE:
                     removeFocus();
                     break;
@@ -184,10 +185,6 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
                 default:
                     return false;
             }
-            return true;
-        }
-        if (keyCode == Keyboard.KEY_INSERT) {
-            removeFocus();
             return true;
         }
         if (keyCode == Keyboard.KEY_BACK) {

@@ -1,9 +1,8 @@
-package com.cleanroommc.modularui.api;
+package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
-import com.cleanroommc.modularui.common.internal.ModularUIContext;
-import com.cleanroommc.modularui.common.widget.Widget;
+import com.cleanroommc.modularui.api.screen.ModularUIContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 

@@ -1,18 +1,16 @@
-package com.cleanroommc.modularui.common.widget;
+package com.cleanroommc.modularui.api.widget;
 
-import com.cleanroommc.modularui.api.IWidgetParent;
-import com.cleanroommc.modularui.api.Interactable;
-import com.cleanroommc.modularui.api.TooltipContainer;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.TextSpan;
+import com.cleanroommc.modularui.api.drawable.TooltipContainer;
 import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.GuiArea;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.api.screen.ModularUIContext;
+import com.cleanroommc.modularui.api.screen.ModularWindow;
 import com.cleanroommc.modularui.common.internal.JsonHelper;
-import com.cleanroommc.modularui.common.internal.ModularUIContext;
-import com.cleanroommc.modularui.common.internal.ModularWindow;
 import com.google.gson.JsonObject;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.network.PacketBuffer;
@@ -319,7 +317,7 @@ public abstract class Widget {
     //==== Lifecycle ====
 
     /**
-     * Called right before {@link #onInit()}. Last chance to add sub widgets
+     * Called right after the ui is created and right before synced widgets are registered. Last chance to add sub widgets
      */
     public void initChildren() {
     }
@@ -500,6 +498,7 @@ public abstract class Widget {
         return ticker;
     }
 
+
     //==== Setter/Builder ====
 
     /**
@@ -521,10 +520,13 @@ public abstract class Widget {
      * @param size size of this widget
      */
     public Widget setSize(Size size) {
-        checkNeedsRebuild();
         this.autoSized = false;
         this.size = size;
         return this;
+    }
+
+    public void setSizeSilent(Size size) {
+        this.size = size;
     }
 
     public Widget setPos(int x, int y) {
@@ -537,10 +539,13 @@ public abstract class Widget {
      * @param relativePos relative pos
      */
     public Widget setPos(Pos2d relativePos) {
-        checkNeedsRebuild();
         this.autoPositioned = false;
         this.relativePos = relativePos;
         return this;
+    }
+
+    public void setPosSilent(Pos2d relativePos) {
+        this.relativePos = relativePos;
     }
 
     public Widget setFixedPos(int x, int y) {
@@ -553,7 +558,6 @@ public abstract class Widget {
      * @param pos pos to fix this widget to
      */
     public Widget setFixedPos(@Nullable Pos2d pos) {
-        checkNeedsRebuild();
         this.autoPositioned = false;
         this.fixedPos = pos;
         return this;
@@ -628,6 +632,7 @@ public abstract class Widget {
         this.ticker = ticker;
         return this;
     }
+
 
     //==== Utility ====
 

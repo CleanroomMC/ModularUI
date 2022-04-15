@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.common.internal.network;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.common.internal.ModularUIContext;
+import com.cleanroommc.modularui.api.screen.ModularUIContext;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;

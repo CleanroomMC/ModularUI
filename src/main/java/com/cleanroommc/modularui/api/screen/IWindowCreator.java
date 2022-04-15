@@ -1,6 +1,5 @@
-package com.cleanroommc.modularui.api;
+package com.cleanroommc.modularui.api.screen;
 
-import com.cleanroommc.modularui.common.internal.ModularWindow;
 import net.minecraft.entity.player.EntityPlayer;
 
 public interface IWindowCreator {

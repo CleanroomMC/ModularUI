@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.api.drawable.TextSpan;
 import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.api.widget.Widget;
 import com.google.gson.JsonObject;
 import net.minecraft.util.text.ITextComponent;
 import org.jetbrains.annotations.NotNull;

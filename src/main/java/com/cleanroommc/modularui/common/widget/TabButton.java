@@ -1,7 +1,8 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.api.Interactable;
+import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.widget.Widget;
 
 import javax.annotation.Nullable;
 

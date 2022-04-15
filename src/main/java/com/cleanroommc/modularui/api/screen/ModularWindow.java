@@ -1,10 +1,10 @@
-package com.cleanroommc.modularui.common.internal;
+package com.cleanroommc.modularui.api.screen;
 
 import com.cleanroommc.modularui.ModularUIConfig;
-import com.cleanroommc.modularui.api.ISyncedWidget;
-import com.cleanroommc.modularui.api.IWidgetBuilder;
-import com.cleanroommc.modularui.api.IWidgetParent;
-import com.cleanroommc.modularui.api.Interactable;
+import com.cleanroommc.modularui.api.widget.ISyncedWidget;
+import com.cleanroommc.modularui.api.widget.IWidgetBuilder;
+import com.cleanroommc.modularui.api.widget.IWidgetParent;
+import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.animation.Eases;
 import com.cleanroommc.modularui.api.animation.Interpolator;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
@@ -13,7 +13,7 @@ import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.widget.DrawableWidget;
-import com.cleanroommc.modularui.common.widget.Widget;
+import com.cleanroommc.modularui.api.widget.Widget;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableBiMap;

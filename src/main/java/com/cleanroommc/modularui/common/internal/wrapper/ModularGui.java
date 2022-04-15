@@ -1,17 +1,17 @@
 package com.cleanroommc.modularui.common.internal.wrapper;
 
-import com.cleanroommc.modularui.api.IVanillaSlot;
-import com.cleanroommc.modularui.api.IWidgetParent;
-import com.cleanroommc.modularui.api.Interactable;
-import com.cleanroommc.modularui.api.TooltipContainer;
+import com.cleanroommc.modularui.api.widget.IVanillaSlot;
+import com.cleanroommc.modularui.api.widget.IWidgetParent;
+import com.cleanroommc.modularui.api.widget.Interactable;
+import com.cleanroommc.modularui.api.drawable.TooltipContainer;
 import com.cleanroommc.modularui.api.drawable.TextSpan;
 import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
-import com.cleanroommc.modularui.common.internal.ModularUIContext;
-import com.cleanroommc.modularui.common.internal.ModularWindow;
+import com.cleanroommc.modularui.api.screen.ModularUIContext;
+import com.cleanroommc.modularui.api.screen.ModularWindow;
 import com.cleanroommc.modularui.common.internal.mixin.GuiContainerMixin;
-import com.cleanroommc.modularui.common.widget.Widget;
+import com.cleanroommc.modularui.api.widget.Widget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;

@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.UITexture;
+import com.cleanroommc.modularui.api.widget.Widget;
 import net.minecraft.entity.player.EntityPlayer;
 
 import javax.annotation.Nullable;

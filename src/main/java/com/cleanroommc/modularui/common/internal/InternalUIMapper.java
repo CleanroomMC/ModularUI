@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.common.internal;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.IContainerCreator;
-import com.cleanroommc.modularui.api.IGuiCreator;
+import com.cleanroommc.modularui.api.screen.IContainerCreator;
+import com.cleanroommc.modularui.api.screen.IGuiCreator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;

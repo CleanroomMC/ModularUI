@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.common.builder;
 
-import com.cleanroommc.modularui.api.IContainerCreator;
-import com.cleanroommc.modularui.api.IGuiCreator;
+import com.cleanroommc.modularui.api.screen.IContainerCreator;
+import com.cleanroommc.modularui.api.screen.IGuiCreator;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.inventory.Container;
 

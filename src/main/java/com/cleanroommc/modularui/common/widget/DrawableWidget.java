@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.TextSpan;
 import com.cleanroommc.modularui.api.drawable.UITexture;
 import com.cleanroommc.modularui.api.math.Pos2d;
+import com.cleanroommc.modularui.api.widget.Widget;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Nullable;
 

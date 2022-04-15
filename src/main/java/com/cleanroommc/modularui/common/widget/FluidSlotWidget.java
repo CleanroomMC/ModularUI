@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.api.Interactable;
+import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.NumberFormat;
-import com.cleanroommc.modularui.api.TooltipContainer;
+import com.cleanroommc.modularui.api.drawable.TooltipContainer;
 import com.cleanroommc.modularui.api.drawable.*;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;

@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.api.ISyncedWidget;
+import com.cleanroommc.modularui.api.widget.ISyncedWidget;
+import com.cleanroommc.modularui.api.widget.Widget;
 import com.cleanroommc.modularui.common.internal.JsonHelper;
 import com.google.gson.JsonObject;
 

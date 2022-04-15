@@ -1,6 +1,4 @@
-package com.cleanroommc.modularui.api;
-
-import com.cleanroommc.modularui.common.widget.Widget;
+package com.cleanroommc.modularui.api.widget;
 
 @FunctionalInterface
 public interface IWidgetDrawable {

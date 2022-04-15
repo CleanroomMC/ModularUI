@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.common.internal.wrapper;
 
-import com.cleanroommc.modularui.common.internal.ModularUIContext;
-import com.cleanroommc.modularui.common.internal.ModularWindow;
+import com.cleanroommc.modularui.api.screen.ModularUIContext;
+import com.cleanroommc.modularui.api.screen.ModularWindow;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IContainerListener;

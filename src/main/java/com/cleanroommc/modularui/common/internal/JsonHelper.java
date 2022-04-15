@@ -1,7 +1,8 @@
 package com.cleanroommc.modularui.common.internal;
 
-import com.cleanroommc.modularui.api.IWidgetBuilder;
-import com.cleanroommc.modularui.common.widget.Widget;
+import com.cleanroommc.modularui.api.screen.UIBuildContext;
+import com.cleanroommc.modularui.api.widget.IWidgetBuilder;
+import com.cleanroommc.modularui.api.widget.Widget;
 import com.cleanroommc.modularui.common.widget.WidgetJsonRegistry;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

@@ -1,7 +1,6 @@
-package com.cleanroommc.modularui.api;
+package com.cleanroommc.modularui.api.widget;
 
-import com.cleanroommc.modularui.common.internal.ModularWindow;
-import com.cleanroommc.modularui.common.widget.Widget;
+import com.cleanroommc.modularui.api.screen.ModularWindow;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
