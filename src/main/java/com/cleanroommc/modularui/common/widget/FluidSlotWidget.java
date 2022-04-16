@@ -168,7 +168,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
         if (!this.canFillSlot && !this.canDrainSlot) {
             return false;
         }
-        ItemStack cursorStack = getContext().getCursorStack();
+        ItemStack cursorStack = getContext().getCursor().getItemStack();
         if (this.phantom || (!cursorStack.isEmpty() && cursorStack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null))) {
             syncToServer(1, buffer -> {
                 buffer.writeVarInt(buttonId);
@@ -234,7 +234,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
 
     private void tryClickContainer(int mouseButton, boolean isShiftKeyDown) {
         EntityPlayer player = getContext().getPlayer();
-        ItemStack currentStack = getContext().getCursorStack();
+        ItemStack currentStack = getContext().getCursor().getItemStack();
         if (!currentStack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)) {
             return;
         }
@@ -263,7 +263,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
             FluidStack fluid = fluidTank.getFluid();
             if (performedTransfer && fluid != null) {
                 playSound(fluid, false);
-                getContext().setCursorStack(currentStack, true);
+                getContext().getCursor().setItemStack(currentStack, true);
             }
             return;
         }
@@ -290,14 +290,14 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
             }
             if (performedTransfer) {
                 playSound(currentFluid, true);
-                getContext().setCursorStack(currentStack, true);
+                getContext().getCursor().setItemStack(currentStack, true);
             }
         }
     }
 
     public void tryClickPhantom(int mouseButton, boolean isShiftKeyDown) {
         EntityPlayer player = getContext().getPlayer();
-        ItemStack currentStack = getContext().getCursorStack();
+        ItemStack currentStack = getContext().getCursor().getItemStack();
         FluidStack currentFluid = this.fluidTank.getFluid();
         IFluidHandlerItem fluidHandlerItem = currentStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null);
 

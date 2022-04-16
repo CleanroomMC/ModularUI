@@ -24,7 +24,13 @@ public class ModularUIHandler implements IAdvancedGuiHandler<ModularGui> {
         List<Rectangle> areas = new ArrayList<>();
         ModularUIContext ui = guiContainer.getContext();
         for (ModularWindow window : ui.getOpenWindows()) {
-            areas.add(new Rectangle(window.getPos().x, window.getPos().y, window.getSize().width, window.getSize().height));
+            if (window.isEnabled()) {
+                areas.add(new Rectangle(window.getPos().x, window.getPos().y, window.getSize().width, window.getSize().height));
+            }
+        }
+        Rectangle draggableRectangle = guiContainer.getContext().getCursor().getDraggableArea();
+        if (draggableRectangle != null) {
+            areas.add(draggableRectangle);
         }
         return areas;
     }

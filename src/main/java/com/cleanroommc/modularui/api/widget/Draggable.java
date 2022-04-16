@@ -1,21 +1,21 @@
 package com.cleanroommc.modularui.api.widget;
 
-import com.cleanroommc.modularui.api.math.Pos2d;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
+
+import java.awt.*;
 
 @ApiStatus.Experimental
 public interface Draggable extends Interactable {
 
     /**
      * Get's called from the cursor
-     * Usually you just call {@link Widget#render(MatrixStack, Pos2d, float)}
+     * Usually you just call {@link Widget#drawInternal(float)}
      * No need to translate
      *
-     * @param matrices matrix stack
-     * @param mousePos current mouse pos
-     * @param delta    difference from last from
+     * @param partialTicks difference from last from
      */
-    void renderMovingState(Pos2d mousePos, float delta);
+    void renderMovingState(float partialTicks);
 
     /**
      * @param button the mouse button that's holding down
@@ -34,32 +34,24 @@ public interface Draggable extends Interactable {
      * Gets called when the mouse is released
      *
      * @param widget     current top most widget below the mouse
-     * @param mousePos   current mousePos
      * @param isInBounds if the mouse is in the gui bounds
      * @return if the location is valid
      */
-    default boolean canDropHere(Widget widget, Pos2d mousePos, boolean isInBounds) {
+    default boolean canDropHere(@Nullable Widget widget, boolean isInBounds) {
         return isInBounds;
     }
+
+    /**
+     * @return the size and pos during move
+     */
+    @Nullable
+    Rectangle getArea();
 
     default boolean shouldRenderChildren() {
         return true;
     }
 
-    State getState();
+    boolean isMoving();
 
-    void setState(State state);
-
-    default boolean isIdle() {
-        return getState() == State.IDLE;
-    }
-
-    default boolean isMoving() {
-        return getState() == State.MOVING;
-    }
-
-    enum State {
-        IDLE,
-        MOVING
-    }
+    void setMoving(boolean moving);
 }

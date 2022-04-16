@@ -9,7 +9,6 @@ import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.*;
-import com.cleanroommc.modularui.common.widget.DrawableWidget;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableBiMap;
@@ -49,8 +48,10 @@ public class ModularWindow implements IWidgetParent {
     private final Size size;
     private Pos2d pos = Pos2d.ZERO;
     private final Alignment alignment = Alignment.Center;
-    private boolean draggable = false;
+    private final IDrawable[] background;
+    protected boolean draggable;
     private boolean active;
+    private boolean enabled = true;
     private boolean needsRebuild = false;
     private int color = 0xFFFFFFFF;
     private float scale = 1f;
@@ -60,9 +61,9 @@ public class ModularWindow implements IWidgetParent {
     private Interpolator openAnimation, closeAnimation;
 
     public ModularWindow(Size size, List<Widget> children, IDrawable... background) {
-        children.add(0, new DrawableWidget().setSize(size).setBackground(background));
         this.size = size;
         this.children = children;
+        this.background = background;
         // latest point at which synced widgets can be added
         IWidgetParent.forEachByLayer(this, Widget::initChildren);
 
@@ -89,7 +90,6 @@ public class ModularWindow implements IWidgetParent {
 
     public void onResize(Size screenSize) {
         this.pos = alignment.getAlignedPos(screenSize, size);
-        context.getScreen().setMainWindowArea(pos, size);
         markNeedsRebuild();
     }
 
@@ -154,6 +154,9 @@ public class ModularWindow implements IWidgetParent {
     }
 
     public void update() {
+        for (IDrawable drawable : background) {
+            drawable.tick();
+        }
         IWidgetParent.forEachByLayer(this, widget -> {
             widget.onScreenUpdate();
             Consumer<Widget> ticker = widget.getTicker();
@@ -169,6 +172,9 @@ public class ModularWindow implements IWidgetParent {
                 }
             }
         });
+        if (needsRebuild) {
+            rebuild();
+        }
     }
 
     public void frameUpdate(float partialTicks) {
@@ -177,9 +183,6 @@ public class ModularWindow implements IWidgetParent {
         }
         if (closeAnimation != null) {
             closeAnimation.update(partialTicks);
-        }
-        if (needsRebuild) {
-            rebuild();
         }
     }
 
@@ -217,6 +220,13 @@ public class ModularWindow implements IWidgetParent {
     }
 
     public void closeWindow() {
+        if(onTryClose()) {
+
+        }
+        context.closeWindow(this);
+    }
+
+    protected void destroyWindow() {
         IWidgetParent.forEachByLayer(this, widget -> {
             if (isActive()) {
                 widget.onPause();
@@ -226,11 +236,15 @@ public class ModularWindow implements IWidgetParent {
     }
 
     public void drawWidgets(float partialTicks, boolean foreground) {
+        if (!isEnabled()) {
+            return;
+        }
         if (foreground) {
             IWidgetParent.forEachByLayer(this, widget -> {
                 widget.drawInForeground(partialTicks);
                 return false;
             });
+
         } else {
             GlStateManager.pushMatrix();
             // rotate around center
@@ -241,6 +255,14 @@ public class ModularWindow implements IWidgetParent {
             }
             GlStateManager.translate(translateX, translateY, 0);
             GlStateManager.scale(scale, scale, 1);
+
+            GlStateManager.translate(pos.x, pos.y, 0);
+            for (IDrawable drawable : background) {
+                GlStateManager.color(Color.getRedF(color), Color.getGreenF(color), Color.getBlueF(color), Color.getAlphaF(color));
+                drawable.draw(Pos2d.ZERO, size, partialTicks);
+            }
+            GlStateManager.translate(-pos.x, -pos.y, 0);
+
             GlStateManager.color(Color.getRedF(color), Color.getGreenF(color), Color.getBlueF(color), Color.getAlphaF(color));
             for (Widget widget : getChildren()) {
                 widget.drawInternal(partialTicks);
@@ -304,6 +326,14 @@ public class ModularWindow implements IWidgetParent {
 
     public boolean isInitialized() {
         return initialized;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     /**
@@ -374,7 +404,7 @@ public class ModularWindow implements IWidgetParent {
         private final List<Widget> widgets = new ArrayList<>();
         private IDrawable[] background = {};
         private Size size;
-        private boolean draggable = false;
+        private boolean draggable = true;
 
         private Builder(Size size) {
             this.size = size;

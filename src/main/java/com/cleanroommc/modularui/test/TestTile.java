@@ -1,17 +1,18 @@
 package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.screen.ITileWithModularUI;
-import com.cleanroommc.modularui.api.widget.IWidgetBuilder;
 import com.cleanroommc.modularui.api.ModularUITextures;
 import com.cleanroommc.modularui.api.drawable.AdaptableUITexture;
 import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.UITexture;
 import com.cleanroommc.modularui.api.math.*;
+import com.cleanroommc.modularui.api.screen.ITileWithModularUI;
 import com.cleanroommc.modularui.api.screen.ModularWindow;
 import com.cleanroommc.modularui.api.screen.UIBuildContext;
+import com.cleanroommc.modularui.api.widget.IWidgetBuilder;
 import com.cleanroommc.modularui.api.widget.Widget;
 import com.cleanroommc.modularui.common.widget.*;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
@@ -46,11 +47,12 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                     .addTooltip("Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.")
                     .addTooltip("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet");
         });*/
-        builder.widget(ModularUITextures.VANILLA_BACKGROUND.asWidget().fillParent())
+        builder.setBackground(ModularUITextures.VANILLA_BACKGROUND)
                 .bindPlayerInventory(buildContext.getPlayer());
         Column column = new Column();
         addInfo(column);
         ChangeableWidget changeableWidget = new ChangeableWidget(this::dynamicWidget);
+        buildContext.addSyncedWindow(1, this::createAnotherWindow);
         return builder
                 .widget(new TabContainer()
                         .setButtonSize(new Size(28, 32))
@@ -85,6 +87,14 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                                 .addChild(new TextWidget("Page 2")
                                         .setPos(10, 10))
                                 .addChild(column.setPos(7, 19))
+                                .addChild(new ButtonWidget()
+                                        .setOnClick((clickData, widget) -> {
+                                            if (!widget.isClient())
+                                                widget.getContext().openSyncedWindow(1);
+                                        })
+                                        .setBackground(ModularUITextures.VANILLA_BACKGROUND, new Text("Window"))
+                                        .setSize(80, 20)
+                                        .setPos(20, 100))
                                 .setDebugLabel("Page2"))
                         .addPage(new MultiChildWidget()
                                 .addChild(new TextWidget("Page 3"))
@@ -169,6 +179,23 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                         .setBackground(BACKGROUND)
                         .setSize(20, 20)
                         .setPos(177, 5))
+                .build();
+    }
+
+    public ModularWindow createAnotherWindow(EntityPlayer player) {
+        return ModularWindow.builder(100, 100)
+                .setBackground(ModularUITextures.VANILLA_BACKGROUND)
+                .widget(new ButtonWidget()
+                        .setOnClick((clickData, widget) -> {
+                            if (!widget.isClient())
+                                widget.getWindow().closeWindow();
+                        })
+                        .setBackground(ModularUITextures.VANILLA_BACKGROUND, new Text("x"))
+                        .setSize(12, 12)
+                        .setPos(85, 5))
+                .widget(new SlotWidget(phantomInventory, 0)
+                        .setShiftClickPrio(0)
+                        .setPos(30, 30))
                 .build();
     }
 

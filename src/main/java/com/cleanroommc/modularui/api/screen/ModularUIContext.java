@@ -4,8 +4,6 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.ISyncedWidget;
-import com.cleanroommc.modularui.api.widget.IWidgetParent;
-import com.cleanroommc.modularui.api.widget.Widget;
 import com.cleanroommc.modularui.common.internal.network.CWidgetUpdate;
 import com.cleanroommc.modularui.common.internal.network.NetworkUtils;
 import com.cleanroommc.modularui.common.internal.network.SWidgetUpdate;
@@ -20,16 +18,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.function.Consumer;
 
 public class ModularUIContext {
@@ -44,6 +39,7 @@ public class ModularUIContext {
     private ModularGui screen;
     private ModularUIContainer container;
     private final EntityPlayer player;
+    private final Cursor cursor;
 
     private boolean oneSided = true;
 
@@ -53,6 +49,7 @@ public class ModularUIContext {
     public ModularUIContext(UIBuildContext context) {
         this.player = context.player;
         this.syncedWindowsCreators = context.syncedWindows.build();
+        cursor = new Cursor(this);
     }
 
     public boolean isClient() {
@@ -64,6 +61,7 @@ public class ModularUIContext {
         this.mainWindow = mainWindow;
         pushWindow(mainWindow);
         this.syncedWindows.put(0, mainWindow);
+        mainWindow.draggable = false;
         if (isClient()) {
             // if on client, notify the server that the client initialized, to allow syncing to client
             mainWindow.initialized = true;
@@ -84,23 +82,26 @@ public class ModularUIContext {
     @SideOnly(Side.CLIENT)
     public void resize(Size scaledSize) {
         this.screenSize = scaledSize;
-        for (ModularWindow window : windows) {
+        for (ModularWindow window : this.windows) {
             window.onResize(scaledSize);
+            if (window == this.mainWindow) {
+                getScreen().setMainWindowArea(window.getPos(), window.getSize());
+            }
         }
     }
 
     public void openSyncedWindow(int id) {
+        if (isClient()) {
+            ModularUI.LOGGER.error("Synced windows must be opened on server!");
+            return;
+        }
+        if (syncedWindows.containsKey(id)) {
+            return;
+        }
         if (syncedWindowsCreators.containsKey(id)) {
-            if (isClient()) {
-                sendClientPacket(DataCodes.OPEN_WINDOW, null, mainWindow, buf -> buf.writeVarInt(id));
-            } else {
-                sendServerPacket(DataCodes.OPEN_WINDOW, null, mainWindow, buf -> buf.writeVarInt(id));
-            }
+            sendServerPacket(DataCodes.OPEN_WINDOW, null, mainWindow, buf -> buf.writeVarInt(id));
             ModularWindow window = openWindow(syncedWindowsCreators.get(id));
             syncedWindows.put(id, window);
-            if (isClient()) {
-                window.initialized = true;
-            }
         } else {
             ModularUI.LOGGER.error("Could not find window with id {}", id);
         }
@@ -111,6 +112,7 @@ public class ModularUIContext {
         pushWindow(window);
         if (isClient()) {
             window.onResize(screenSize);
+            window.rebuild();
             window.onOpen();
         }
         return window;
@@ -129,7 +131,7 @@ public class ModularUIContext {
             return;
         }
         if (windows.removeLastOccurrence(window)) {
-            window.closeWindow();
+            window.destroyWindow();
         }
         if (syncedWindows.containsValue(window)) {
             syncedWindows.inverse().remove(window);
@@ -147,11 +149,11 @@ public class ModularUIContext {
         if (hasWindows()) {
             getCurrentWindow().pauseWindow();
         }
-        windows.push(window);
+        windows.offerLast(window);
     }
 
     public void popWindow() {
-        getCurrentWindow().closeWindow();
+        getCurrentWindow().destroyWindow();
         windows.pop();
         if (hasWindows()) {
             getCurrentWindow().resumeWindow();
@@ -159,7 +161,7 @@ public class ModularUIContext {
     }
 
     public ModularWindow getCurrentWindow() {
-        return windows.peek();
+        return windows.peekLast();
     }
 
     public ModularWindow getMainWindow() {
@@ -184,7 +186,7 @@ public class ModularUIContext {
 
     @SideOnly(Side.CLIENT)
     public Pos2d getMousePos() {
-        return screen.getMousePos();
+        return cursor.getPos();
     }
 
     public boolean hasWindows() {
@@ -193,19 +195,6 @@ public class ModularUIContext {
 
     public EntityPlayer getPlayer() {
         return player;
-    }
-
-    public ItemStack getCursorStack() {
-        return player.inventory.getItemStack();
-    }
-
-    public void setCursorStack(ItemStack stack, boolean sync) {
-        if (stack != null) {
-            player.inventory.setItemStack(stack);
-            if (sync && !isClient()) {
-                sendServerPacket(DataCodes.SYNC_CURSOR_STACK, null, mainWindow, buffer -> buffer.writeItemStack(stack));
-            }
-        }
     }
 
     public ModularUIContainer getContainer() {
@@ -220,28 +209,16 @@ public class ModularUIContext {
         return oneSided;
     }
 
-    @Nullable
-    public Widget getTopWidgetAt(Pos2d pos) {
-        return getTopWidgetAt(pos, getCurrentWindow().getChildren());
+    public Cursor getCursor() {
+        return cursor;
     }
 
-    private Widget getTopWidgetAt(Pos2d pos, List<Widget> widgets) {
-        Widget widgetUnderMouse = null;
-        for (Widget widget : widgets) {
-            if (!widget.isEnabled()) {
-                continue;
-            }
-            if ((widgetUnderMouse == null || widgetUnderMouse.getLayer() <= widget.getLayer()) && Widget.isUnderMouse(pos, widget.getAbsolutePos(), widget.getSize())) {
-                widgetUnderMouse = widget;
-            }
-            if (widget instanceof IWidgetParent) {
-                Widget childUnderMouse = getTopWidgetAt(pos, ((IWidgetParent) widget).getChildren());
-                if (childUnderMouse != null && (widgetUnderMouse == null || widgetUnderMouse.getLayer() <= childUnderMouse.getLayer())) {
-                    widgetUnderMouse = childUnderMouse;
-                }
-            }
-        }
-        return widgetUnderMouse;
+    public Iterable<ModularWindow> getOpenWindows() {
+        return windows::descendingIterator;
+    }
+
+    public Iterable<ModularWindow> getOpenWindowsReversed() {
+        return windows;
     }
 
     @SideOnly(Side.CLIENT)
@@ -264,15 +241,11 @@ public class ModularUIContext {
             if (id == DataCodes.SYNC_INIT) {
                 mainWindow.initialized = true;
                 this.mainWindow.clientOnly = false;
-            } else if (id == DataCodes.OPEN_WINDOW) {
-                pushWindow(syncedWindows.get(buf.readVarInt()));
-                ModularWindow newWindow = openWindow(syncedWindowsCreators.get(id));
-                syncedWindows.put(id, newWindow);
             } else if (id == DataCodes.INIT_WINDOW) {
                 window.initialized = true;
             } else if (id == DataCodes.CLOSE_WINDOW) {
                 if (windows.removeLastOccurrence(window)) {
-                    window.closeWindow();
+                    window.destroyWindow();
                 }
                 syncedWindows.inverse().remove(window);
             }
@@ -298,7 +271,7 @@ public class ModularUIContext {
                 sendClientPacket(DataCodes.INIT_WINDOW, null, window, NetworkUtils.EMPTY_PACKET);
             } else if (id == DataCodes.CLOSE_WINDOW) {
                 if (windows.removeLastOccurrence(window)) {
-                    window.closeWindow();
+                    window.destroyWindow();
                 }
                 syncedWindows.inverse().remove(window);
             }
@@ -341,7 +314,7 @@ public class ModularUIContext {
         }
     }
 
-    private static class DataCodes {
+    protected static class DataCodes {
         static final int INTERNAL_SYNC = -1;
         static final int SYNC_CURSOR_STACK = 1;
         static final int SYNC_INIT = 2;

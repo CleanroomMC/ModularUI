@@ -190,7 +190,7 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     }
 
     protected void phantomClick(ClickData clickData) {
-        ItemStack cursorStack = getContext().getCursorStack();
+        ItemStack cursorStack = getContext().getCursor().getItemStack();
         ItemStack slotStack = getMcSlot().getStack();
         ItemStack stackToPut;
         if (slotStack.isEmpty()) {

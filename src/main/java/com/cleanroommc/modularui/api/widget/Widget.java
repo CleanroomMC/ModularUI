@@ -389,12 +389,17 @@ public abstract class Widget {
         getContext().getScreen().removeFocus(this);
     }
 
+    @SideOnly(Side.CLIENT)
+    public boolean canHover() {
+        return !(this instanceof IWidgetParent) || (this.background != null && this.background.length > 0);
+    }
+
     /**
      * @return if this is currently the top most widget under the mouse
      */
     @SideOnly(Side.CLIENT)
     public boolean isHovering() {
-        return getContext().getScreen().isHovering(this);
+        return getContext().getCursor().isHovering(this);
     }
 
 

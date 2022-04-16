@@ -63,7 +63,7 @@ public class ModularUIContainer extends Container {
         if (slot != inventorySlots.get(slot.slotNumber)) {
             throw new IllegalStateException("Could not find slot in container!");
         }
-        inventorySlots.remove(slot.slotNumber);
+        inventorySlots.remove(slot);
         if (slot instanceof BaseSlot && sortedShiftClickSlots.remove(slot) && initialisedContainer) {
             sortSlots();
         }

@@ -1,29 +1,32 @@
 package com.cleanroommc.modularui.common.internal.wrapper;
 
-import com.cleanroommc.modularui.api.widget.IVanillaSlot;
-import com.cleanroommc.modularui.api.widget.IWidgetParent;
-import com.cleanroommc.modularui.api.widget.Interactable;
-import com.cleanroommc.modularui.api.drawable.TooltipContainer;
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.TextSpan;
+import com.cleanroommc.modularui.api.drawable.TooltipContainer;
 import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.screen.ModularUIContext;
 import com.cleanroommc.modularui.api.screen.ModularWindow;
-import com.cleanroommc.modularui.common.internal.mixin.GuiContainerMixin;
+import com.cleanroommc.modularui.api.widget.IVanillaSlot;
+import com.cleanroommc.modularui.api.widget.IWidgetParent;
+import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.widget.Widget;
+import com.cleanroommc.modularui.common.internal.mixin.GuiContainerMixin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.List;
@@ -38,8 +41,6 @@ public class ModularGui extends GuiContainer {
     private long lastClick = -1;
     private long lastFocusedClick = -1;
     private Widget focused;
-    private Widget hovered = null;
-    private int timeHovered = 0;
     public boolean debugMode = true;
     private int drawCalls = 0;
     private long drawTime = 0;
@@ -67,17 +68,6 @@ public class ModularGui extends GuiContainer {
         if (isFocused(widget)) {
             focused.onRemoveFocus();
             focused = null;
-        }
-    }
-
-    public boolean isHovering(Widget widget) {
-        return hovered != null && hovered == widget;
-    }
-
-    private void setHovered(Widget widget) {
-        if (hovered != widget) {
-            hovered = widget;
-            timeHovered = 0;
         }
     }
 
@@ -209,7 +199,9 @@ public class ModularGui extends GuiContainer {
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
 
-        context.getCurrentWindow().drawWidgets(partialTicks, false);
+        for (ModularWindow window : context.getOpenWindowsReversed()) {
+            window.drawWidgets(partialTicks, false);
+        }
 
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableLighting();
@@ -223,10 +215,11 @@ public class ModularGui extends GuiContainer {
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
 
+        Widget hovered = context.getCursor().getHovered();
         if (hovered != null) {
             if (hovered instanceof IVanillaSlot && context.getPlayer().inventory.getItemStack().isEmpty() && ((IVanillaSlot) hovered).getMcSlot().getHasStack()) {
                 renderToolTip(((IVanillaSlot) hovered).getMcSlot().getStack(), mouseX, mouseY);
-            } else if (hovered.getTooltipShowUpDelay() <= timeHovered) {
+            } else if (hovered.getTooltipShowUpDelay() <= context.getCursor().getTimeHovered()) {
                 TooltipContainer tooltipContainer = hovered.getHoverText();
                 List<TextSpan> additional = hovered.getTooltip();
                 if (tooltipContainer == null) {
@@ -240,6 +233,7 @@ public class ModularGui extends GuiContainer {
         }
 
         context.getCurrentWindow().drawWidgets(partialTicks, true);
+        context.getCursor().draw(partialTicks);
 
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableLighting();
@@ -254,6 +248,7 @@ public class ModularGui extends GuiContainer {
         lineY -= 11;
         drawString(fontRenderer, "FPS: " + fps, 5, context.getScaledScreenSize().height - 24, color);
         lineY -= 11;
+        Widget hovered = context.getCursor().findHoveredWidget(true);
         if (hovered != null) {
             Size size = hovered.getSize();
             Pos2d pos = hovered.getAbsolutePos();
@@ -267,21 +262,18 @@ public class ModularGui extends GuiContainer {
             lineY -= 11;
             drawText("Parent: " + (parent instanceof ModularWindow ? "ModularWindow" : parent.toString()), 5, lineY, 1, color, false);
             lineY -= 11;
-            drawText("Class: " + hovered.toString(), 5, lineY, 1, color, false);
+            drawText("Class: " + hovered, 5, lineY, 1, color, false);
         }
     }
 
     @Override
     public void updateScreen() {
         super.updateScreen();
-        context.getCurrentWindow().update();
-        setHovered(context.getTopWidgetAt(getMousePos()));
-        if (hovered != null) {
-            if (hovered instanceof IVanillaSlot) {
-                getAccessor().setHoveredSlot(((IVanillaSlot) hovered).getMcSlot());
-            }
-            timeHovered++;
+        for (ModularWindow window : context.getOpenWindowsReversed()) {
+            window.update();
         }
+        context.getCursor().updateHovered();
+        context.getCursor().onScreenUpdate();
     }
 
     private boolean isDoubleClick(long lastClick, long currentClick) {
@@ -299,21 +291,40 @@ public class ModularGui extends GuiContainer {
 
         boolean changedFocus = tryFindFocused();
 
+        if (context.getCursor().hasDraggable()) {
+            if (!context.getCursor().onMouseClick(mouseButton)) {
+                ModularUI.LOGGER.info("Super click");
+                super.mouseClicked(mouseX, mouseY, mouseButton);
+            }
+            lastFocusedClick = time;
+            return;
+        }
+
         if (focused instanceof Interactable) {
             Interactable interactable = (Interactable) focused;
             doubleClick = !changedFocus && isDoubleClick(lastFocusedClick, time);
-            if (!interactable.onClick(mouseButton, doubleClick)) {
+            if (!interactable.onClick(mouseButton, doubleClick) && !context.getCursor().onMouseClick(mouseButton)) {
+                ModularUI.LOGGER.info("Super click2");
                 super.mouseClicked(mouseX, mouseY, mouseButton);
             }
         } else {
-            super.mouseClicked(mouseX, mouseY, mouseButton);
+            if (!context.getCursor().onMouseClick(mouseButton)) {
+                ModularUI.LOGGER.info("Super click3");
+                super.mouseClicked(mouseX, mouseY, mouseButton);
+            }
         }
 
         lastFocusedClick = time;
     }
 
+    @Override
+    protected void handleMouseClick(@NotNull Slot slotIn, int slotId, int mouseButton, ClickType type) {
+        ModularUI.LOGGER.info("Clicked slot {}, type {}", slotId, type.name());
+        super.handleMouseClick(slotIn, slotId, mouseButton, type);
+    }
+
     private boolean tryFindFocused() {
-        Widget widget = context.getTopWidgetAt(mousePos);
+        Widget widget = context.getCursor().getHovered();
         boolean changedFocus = false;
         if (widget != null) {
             if (focused == null || focused != widget) {
@@ -337,11 +348,13 @@ public class ModularGui extends GuiContainer {
             interactable.onClickReleased(mouseButton);
         }
         if (isFocusedValid() && focused instanceof Interactable) {
-            if (!((Interactable) focused).onClickReleased(mouseButton)) {
+            if (!((Interactable) focused).onClickReleased(mouseButton) && !context.getCursor().onMouseRelease()) {
                 super.mouseReleased(mouseX, mouseY, mouseButton);
             }
         } else {
-            super.mouseReleased(mouseX, mouseY, mouseButton);
+            if (!context.getCursor().onMouseRelease()) {
+                super.mouseReleased(mouseX, mouseY, mouseButton);
+            }
         }
     }
 
@@ -378,6 +391,7 @@ public class ModularGui extends GuiContainer {
         for (Interactable interactable : context.getCurrentWindow().getInteractionListeners()) {
             interactable.onHoverMouseScroll(direction);
         }
+        Widget hovered = context.getCursor().getHovered();
         if (hovered instanceof Interactable) {
             ((Interactable) hovered).onHoverMouseScroll(direction);
         }
