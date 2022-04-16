@@ -60,14 +60,17 @@ repositories {
     maven {
         url = 'https://repo.spongepowered.org/maven'
     }
+    maven {
+        url 'https://cursemaven.com'
+    }
+    maven {
+        url 'https://dvs1.progwml6.com/files/maven/'
+    }
 }
 
 dependencies {
     compile 'org.jetbrains:annotations:23.0.0'
 
-    if (project.use_assetmover) {
-        //deobfCompile 'com.cleanroommc:assetmover:0.2'
-    }
     if (project.use_mixins) {
         embed ('org.spongepowered:mixin:0.8.3') {
             exclude module: 'asm-commons'
@@ -80,6 +83,8 @@ dependencies {
         }
         annotationProcessor 'org.spongepowered:mixin:0.8.3:processor'
     }
+
+    compile 'mezz.jei:jei_1.12.2:4.15.0.293'
 }
 
 sourceSets {
