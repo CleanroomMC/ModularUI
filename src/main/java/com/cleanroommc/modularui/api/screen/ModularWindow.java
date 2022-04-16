@@ -1,10 +1,6 @@
 package com.cleanroommc.modularui.api.screen;
 
 import com.cleanroommc.modularui.ModularUIConfig;
-import com.cleanroommc.modularui.api.widget.ISyncedWidget;
-import com.cleanroommc.modularui.api.widget.IWidgetBuilder;
-import com.cleanroommc.modularui.api.widget.IWidgetParent;
-import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.animation.Eases;
 import com.cleanroommc.modularui.api.animation.Interpolator;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
@@ -12,8 +8,8 @@ import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.common.widget.DrawableWidget;
-import com.cleanroommc.modularui.api.widget.Widget;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableBiMap;
@@ -47,6 +43,8 @@ public class ModularWindow implements IWidgetParent {
     public final ImmutableBiMap<Integer, ISyncedWidget> syncedWidgets;
     private final BiMap<Integer, ISyncedWidget> dynamicSyncedWidgets = HashBiMap.create();
     private final List<Interactable> interactionListeners = new ArrayList<>();
+    protected boolean initialized = false;
+    protected boolean clientOnly = true;
 
     private final Size size;
     private Pos2d pos = Pos2d.ZERO;
@@ -302,6 +300,10 @@ public class ModularWindow implements IWidgetParent {
 
     public int getColor() {
         return color;
+    }
+
+    public boolean isInitialized() {
+        return initialized;
     }
 
     /**

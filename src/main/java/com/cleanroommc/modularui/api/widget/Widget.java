@@ -520,6 +520,7 @@ public abstract class Widget {
      * @param size size of this widget
      */
     public Widget setSize(Size size) {
+        checkNeedsRebuild();
         this.autoSized = false;
         this.size = size;
         return this;
@@ -539,6 +540,7 @@ public abstract class Widget {
      * @param relativePos relative pos
      */
     public Widget setPos(Pos2d relativePos) {
+        checkNeedsRebuild();
         this.autoPositioned = false;
         this.relativePos = relativePos;
         return this;
@@ -546,6 +548,9 @@ public abstract class Widget {
 
     public void setPosSilent(Pos2d relativePos) {
         this.relativePos = relativePos;
+        if (isInitialised()) {
+            this.pos = parent.getPos().add(this.relativePos);
+        }
     }
 
     public Widget setFixedPos(int x, int y) {
@@ -558,6 +563,7 @@ public abstract class Widget {
      * @param pos pos to fix this widget to
      */
     public Widget setFixedPos(@Nullable Pos2d pos) {
+        checkNeedsRebuild();
         this.autoPositioned = false;
         this.fixedPos = pos;
         return this;
@@ -668,15 +674,17 @@ public abstract class Widget {
         }
 
         public void writeToPacket(PacketBuffer buffer) {
-            buffer.writeByte(mouseButton);
-            buffer.writeBoolean(doubleClick);
-            buffer.writeBoolean(shift);
-            buffer.writeBoolean(ctrl);
-            buffer.writeBoolean(alt);
+            short data = (short) (mouseButton & 0xFF);
+            if (doubleClick) data |= 1 << 8;
+            if (shift) data |= 1 << 9;
+            if (ctrl) data |= 1 << 10;
+            if (alt) data |= 1 << 11;
+            buffer.writeShort(data);
         }
 
         public static ClickData readPacket(PacketBuffer buffer) {
-            return new ClickData(buffer.readByte(), buffer.readBoolean(), buffer.readBoolean(), buffer.readBoolean(), buffer.readBoolean());
+            short data = buffer.readShort();
+            return new ClickData(data & 0xFF, (data & 1 << 8) > 0, (data & 1 << 9) > 0, (data & 1 << 10) > 0, (data & 1 << 11) > 0);
         }
 
         @SideOnly(Side.CLIENT)

@@ -1,17 +1,20 @@
 package com.cleanroommc.modularui.api.screen;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.widget.ISyncedWidget;
-import com.cleanroommc.modularui.api.widget.IWidgetParent;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.api.widget.ISyncedWidget;
+import com.cleanroommc.modularui.api.widget.IWidgetParent;
+import com.cleanroommc.modularui.api.widget.Widget;
 import com.cleanroommc.modularui.common.internal.network.CWidgetUpdate;
 import com.cleanroommc.modularui.common.internal.network.NetworkUtils;
 import com.cleanroommc.modularui.common.internal.network.SWidgetUpdate;
 import com.cleanroommc.modularui.common.internal.wrapper.BaseSlot;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularUIContainer;
-import com.cleanroommc.modularui.api.widget.Widget;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableMap;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -24,27 +27,32 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 import java.util.function.Consumer;
 
 public class ModularUIContext {
 
     public static final Minecraft MC = Minecraft.getMinecraft();
 
-    private final Stack<ModularWindow> windows = new Stack<>();
+    private final ImmutableMap<Integer, IWindowCreator> syncedWindowsCreators;
+    private final Deque<ModularWindow> windows = new LinkedList<>();
+    private final BiMap<Integer, ModularWindow> syncedWindows = HashBiMap.create(4);
     private ModularWindow mainWindow;
     @SideOnly(Side.CLIENT)
     private ModularGui screen;
     private ModularUIContainer container;
     private final EntityPlayer player;
-    private boolean initialized = false;
+
+    private boolean oneSided = true;
 
     @SideOnly(Side.CLIENT)
     private Size screenSize = new Size(MC.displayWidth, MC.displayHeight);
 
     public ModularUIContext(UIBuildContext context) {
         this.player = context.player;
+        this.syncedWindowsCreators = context.syncedWindows.build();
     }
 
     public boolean isClient() {
@@ -55,9 +63,10 @@ public class ModularUIContext {
         this.container = container;
         this.mainWindow = mainWindow;
         pushWindow(mainWindow);
+        this.syncedWindows.put(0, mainWindow);
         if (isClient()) {
             // if on client, notify the server that the client initialized, to allow syncing to client
-            this.initialized = true;
+            mainWindow.initialized = true;
             sendClientPacket(DataCodes.SYNC_INIT, null, mainWindow, NetworkUtils.EMPTY_PACKET);
         }
     }
@@ -80,12 +89,55 @@ public class ModularUIContext {
         }
     }
 
-    public void openWindow(IWindowCreator windowCreator) {
+    public void openSyncedWindow(int id) {
+        if (syncedWindowsCreators.containsKey(id)) {
+            if (isClient()) {
+                sendClientPacket(DataCodes.OPEN_WINDOW, null, mainWindow, buf -> buf.writeVarInt(id));
+            } else {
+                sendServerPacket(DataCodes.OPEN_WINDOW, null, mainWindow, buf -> buf.writeVarInt(id));
+            }
+            ModularWindow window = openWindow(syncedWindowsCreators.get(id));
+            syncedWindows.put(id, window);
+            if (isClient()) {
+                window.initialized = true;
+            }
+        } else {
+            ModularUI.LOGGER.error("Could not find window with id {}", id);
+        }
+    }
+
+    public ModularWindow openWindow(IWindowCreator windowCreator) {
         ModularWindow window = windowCreator.create(player);
         pushWindow(window);
         if (isClient()) {
             window.onResize(screenSize);
             window.onOpen();
+        }
+        return window;
+    }
+
+    public void closeWindow(int id) {
+        if (syncedWindows.containsKey(id)) {
+            closeWindow(syncedWindows.get(id));
+        } else {
+            ModularUI.LOGGER.error("Could not close window with id {}", id);
+        }
+    }
+
+    public void closeWindow(ModularWindow window) {
+        if (window == null) {
+            return;
+        }
+        if (windows.removeLastOccurrence(window)) {
+            window.closeWindow();
+        }
+        if (syncedWindows.containsValue(window)) {
+            syncedWindows.inverse().remove(window);
+        }
+        if (isClient()) {
+            sendClientPacket(DataCodes.CLOSE_WINDOW, null, window, NetworkUtils.EMPTY_PACKET);
+        } else {
+            sendServerPacket(DataCodes.CLOSE_WINDOW, null, window, NetworkUtils.EMPTY_PACKET);
         }
     }
 
@@ -130,10 +182,6 @@ public class ModularUIContext {
         }
     }
 
-    public boolean isInitialized() {
-        return initialized;
-    }
-
     @SideOnly(Side.CLIENT)
     public Pos2d getMousePos() {
         return screen.getMousePos();
@@ -166,6 +214,10 @@ public class ModularUIContext {
 
     public ModularGui getScreen() {
         return screen;
+    }
+
+    public boolean isOneSided() {
+        return oneSided;
     }
 
     @Nullable
@@ -205,49 +257,84 @@ public class ModularUIContext {
     }
 
     public void readClientPacket(PacketBuffer buf, int widgetId) throws IOException {
+        this.oneSided = false;
         int id = buf.readVarInt();
+        ModularWindow window = syncedWindows.get(buf.readVarInt());
         if (widgetId == DataCodes.INTERNAL_SYNC) {
             if (id == DataCodes.SYNC_INIT) {
-                this.initialized = true;
+                mainWindow.initialized = true;
+                this.mainWindow.clientOnly = false;
+            } else if (id == DataCodes.OPEN_WINDOW) {
+                pushWindow(syncedWindows.get(buf.readVarInt()));
+                ModularWindow newWindow = openWindow(syncedWindowsCreators.get(id));
+                syncedWindows.put(id, newWindow);
+            } else if (id == DataCodes.INIT_WINDOW) {
+                window.initialized = true;
+            } else if (id == DataCodes.CLOSE_WINDOW) {
+                if (windows.removeLastOccurrence(window)) {
+                    window.closeWindow();
+                }
+                syncedWindows.inverse().remove(window);
             }
-        } else {
-            ISyncedWidget syncedWidget = mainWindow.getSyncedWidget(widgetId);
+        } else if (window != null) {
+            ISyncedWidget syncedWidget = window.getSyncedWidget(widgetId);
             syncedWidget.readOnServer(id, buf);
         }
     }
 
     @SideOnly(Side.CLIENT)
     public void readServerPacket(PacketBuffer buf, int widgetId) throws IOException {
+        this.oneSided = false;
         int id = buf.readVarInt();
+        ModularWindow window = syncedWindows.get(buf.readVarInt());
         if (widgetId == DataCodes.INTERNAL_SYNC) {
             if (id == DataCodes.SYNC_CURSOR_STACK) {
                 player.inventory.setItemStack(buf.readItemStack());
+            } else if (id == DataCodes.OPEN_WINDOW) {
+                int windowId = buf.readVarInt();
+                ModularWindow newWindow = openWindow(syncedWindowsCreators.get(windowId));
+                syncedWindows.put(windowId, newWindow);
+                newWindow.initialized = true;
+                sendClientPacket(DataCodes.INIT_WINDOW, null, window, NetworkUtils.EMPTY_PACKET);
+            } else if (id == DataCodes.CLOSE_WINDOW) {
+                if (windows.removeLastOccurrence(window)) {
+                    window.closeWindow();
+                }
+                syncedWindows.inverse().remove(window);
             }
-        } else {
-            ISyncedWidget syncedWidget = mainWindow.getSyncedWidget(widgetId);
+        } else if (window != null) {
+            ISyncedWidget syncedWidget = window.getSyncedWidget(widgetId);
             syncedWidget.readOnClient(id, buf);
         }
     }
 
     @SideOnly(Side.CLIENT)
     public void sendClientPacket(int discriminator, ISyncedWidget syncedWidget, ModularWindow window, Consumer<PacketBuffer> bufferConsumer) {
-        if (window != mainWindow) {
-            ModularUI.LOGGER.error("Tried syncing from non main window");
-            return;
-        }
-        int syncId = syncedWidget == null ? DataCodes.INTERNAL_SYNC : window.getSyncedWidgetId(syncedWidget);
-        PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
-        buffer.writeVarInt(discriminator);
-        bufferConsumer.accept(buffer);
-        CWidgetUpdate packet = new CWidgetUpdate(buffer, syncId);
-        Minecraft.getMinecraft().player.connection.sendPacket(packet);
-    }
-
-    public void sendServerPacket(int discriminator, ISyncedWidget syncedWidget, ModularWindow window, Consumer<PacketBuffer> bufferConsumer) {
-        if (player instanceof EntityPlayerMP) {
+        if (isClient()) {
+            if (!syncedWindows.containsValue(window)) {
+                ModularUI.LOGGER.error("Window is not synced!");
+                return;
+            }
             int syncId = syncedWidget == null ? DataCodes.INTERNAL_SYNC : window.getSyncedWidgetId(syncedWidget);
             PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
             buffer.writeVarInt(discriminator);
+            buffer.writeVarInt(syncedWindows.inverse().get(window));
+            bufferConsumer.accept(buffer);
+            CWidgetUpdate packet = new CWidgetUpdate(buffer, syncId);
+            Minecraft.getMinecraft().player.connection.sendPacket(packet);
+        }
+    }
+
+    public void sendServerPacket(int discriminator, ISyncedWidget syncedWidget, ModularWindow window, Consumer<PacketBuffer> bufferConsumer) {
+        if (!isClient()) {
+            if (!syncedWindows.containsValue(window)) {
+                ModularUI.LOGGER.error("Window is not synced!");
+                return;
+            }
+            int syncId = syncedWidget == null ? DataCodes.INTERNAL_SYNC : window.getSyncedWidgetId(syncedWidget);
+            PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
+            buffer.writeVarInt(discriminator);
+            buffer.writeVarInt(syncedWindows.inverse().get(window));
             bufferConsumer.accept(buffer);
             SWidgetUpdate packet = new SWidgetUpdate(buffer, syncId);
             ((EntityPlayerMP) player).connection.sendPacket(packet);
@@ -258,5 +345,8 @@ public class ModularUIContext {
         static final int INTERNAL_SYNC = -1;
         static final int SYNC_CURSOR_STACK = 1;
         static final int SYNC_INIT = 2;
+        static final int OPEN_WINDOW = 3;
+        static final int INIT_WINDOW = 4;
+        static final int CLOSE_WINDOW = 5;
     }
 }

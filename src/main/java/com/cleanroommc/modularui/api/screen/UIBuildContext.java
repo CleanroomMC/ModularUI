@@ -2,17 +2,20 @@ package com.cleanroommc.modularui.api.screen;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.widget.Widget;
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.entity.player.EntityPlayer;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class UIBuildContext {
 
     protected final EntityPlayer player;
     private final Map<String, Widget> jsonWidgets = new HashMap<>();
+    protected final ImmutableMap.Builder<Integer, IWindowCreator> syncedWindows = new ImmutableMap.Builder<>();
 
     public UIBuildContext(EntityPlayer player) {
         this.player = player;
@@ -50,5 +53,13 @@ public class UIBuildContext {
         } else {
             ModularUI.LOGGER.error("Expected Widget with name {}, of class {}, but was not found!", name, clazz.getName());
         }
+    }
+
+    public void addSyncedWindow(int id, IWindowCreator windowCreator) {
+        if (id <= 0) {
+            ModularUI.LOGGER.error("Window id must be > 0");
+            return;
+        }
+        syncedWindows.put(id, Objects.requireNonNull(windowCreator));
     }
 }

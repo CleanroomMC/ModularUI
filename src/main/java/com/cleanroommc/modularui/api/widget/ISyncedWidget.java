@@ -28,7 +28,7 @@ public interface ISyncedWidget {
     /**
      * Sends the written data to {@link #readOnServer(int, PacketBuffer)}
      *
-     * @param id         helper to determine the type
+     * @param id         helper to determine the type. Must not be -1!
      * @param bufBuilder data builder
      */
     @SideOnly(Side.CLIENT)
@@ -36,18 +36,24 @@ public interface ISyncedWidget {
         if (!(this instanceof Widget)) {
             throw new IllegalStateException("Tried syncing a non Widget ISyncedWidget");
         }
+        if (id == -1) {
+            throw new IllegalArgumentException("Id -1 is already reserved for syncing!");
+        }
         getWindow().getContext().sendClientPacket(id, this, getWindow(), bufBuilder);
     }
 
     /**
      * Sends the written data to {@link #readOnClient(int, PacketBuffer)}
      *
-     * @param id         helper to determine the type
+     * @param id         helper to determine the type. Must not be -1!
      * @param bufBuilder data builder
      */
     default void syncToClient(int id, Consumer<PacketBuffer> bufBuilder) {
         if (!(this instanceof Widget)) {
             throw new IllegalStateException("Tried syncing a non Widget ISyncedWidget");
+        }
+        if (id == -1) {
+            throw new IllegalArgumentException("Id -1 is already reserved for syncing!");
         }
         getWindow().getContext().sendServerPacket(id, this, getWindow(), bufBuilder);
     }
