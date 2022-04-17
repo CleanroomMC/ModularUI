@@ -2,6 +2,8 @@ package com.cleanroommc.modularui.integration.jei;
 
 import com.cleanroommc.modularui.api.screen.ModularUIContext;
 import com.cleanroommc.modularui.api.screen.ModularWindow;
+import com.cleanroommc.modularui.api.widget.IIngredientProvider;
+import com.cleanroommc.modularui.api.widget.Widget;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
 import mezz.jei.api.gui.IAdvancedGuiHandler;
 import org.jetbrains.annotations.NotNull;
@@ -38,6 +40,7 @@ public class ModularUIHandler implements IAdvancedGuiHandler<ModularGui> {
     @Nullable
     @Override
     public Object getIngredientUnderMouse(@NotNull ModularGui guiContainer, int mouseX, int mouseY) {
-        return null;
+        Widget hovered = guiContainer.getContext().getCursor().getHovered();
+        return hovered instanceof IIngredientProvider ? ((IIngredientProvider) hovered).getIngredient() : null;
     }
 }

@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.common.widget;
 
+import com.cleanroommc.modularui.api.widget.IIngredientProvider;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.NumberFormat;
 import com.cleanroommc.modularui.api.drawable.TooltipContainer;
@@ -25,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
-public class FluidSlotWidget extends SyncedWidget implements Interactable {
+public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngredientProvider {
 
     public static final Size SIZE = new Size(18, 18);
     public static final UITexture TEXTURE = UITexture.fullImage("modularui", "gui/slot/fluid");
@@ -161,6 +162,11 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable {
             String s = NumberFormat.format(content.amount, NumberFormat.FORMAT_1);
             textRenderer.drawAligned(s, contentOffset.x + 0.5f, size.height - 5.5f, size.width - contentOffset.x - 1f, 0xFFFFFF, 1);
         }
+    }
+
+    @Override
+    public Object getIngredient() {
+        return cachedFluid;
     }
 
     @Override

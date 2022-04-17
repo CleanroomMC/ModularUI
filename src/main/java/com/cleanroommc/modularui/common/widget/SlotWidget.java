@@ -1,12 +1,9 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.api.widget.ISyncedWidget;
-import com.cleanroommc.modularui.api.widget.IVanillaSlot;
-import com.cleanroommc.modularui.api.widget.Interactable;
+import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.api.drawable.UITexture;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
-import com.cleanroommc.modularui.api.widget.Widget;
 import com.cleanroommc.modularui.common.internal.mixin.GuiContainerMixin;
 import com.cleanroommc.modularui.common.internal.wrapper.BaseSlot;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
@@ -22,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Predicate;
 
-public class SlotWidget extends Widget implements IVanillaSlot, Interactable, ISyncedWidget {
+public class SlotWidget extends Widget implements IVanillaSlot, Interactable, ISyncedWidget, IIngredientProvider {
 
     public static final Size SIZE = new Size(18, 18);
     public static final UITexture TEXTURE = UITexture.fullImage("modularui", "gui/slot/item");
@@ -89,15 +86,10 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
 
     @Override
     public void onRebuild() {
-        Pos2d pos = getAbsolutePos().subtract(getWindow().getPos()).add(1, 1);
+        Pos2d pos = getAbsolutePos().subtract(getContext().getMainWindow().getPos()).add(1, 1);
         if (this.slot.xPos != pos.x || this.slot.yPos != pos.y) {
             this.slot.xPos = pos.x;
             this.slot.yPos = pos.y;
-            // widgets are only rebuild on client and mc requires the slot pos on server
-            syncToServer(1, buffer -> {
-                buffer.writeVarInt(pos.x);
-                buffer.writeVarInt(pos.y);
-            });
         }
     }
 
@@ -112,6 +104,11 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
 
     public boolean isPhantom() {
         return this.slot.isPhantom();
+    }
+
+    @Override
+    public Object getIngredient() {
+        return slot.getStack();
     }
 
     @Override
