@@ -133,13 +133,15 @@ public class ModularUIContext {
         if (windows.removeLastOccurrence(window)) {
             window.destroyWindow();
         }
-        if (syncedWindows.containsValue(window)) {
-            syncedWindows.inverse().remove(window);
-        }
         if (isClient()) {
-            sendClientPacket(DataCodes.CLOSE_WINDOW, null, window, NetworkUtils.EMPTY_PACKET);
+            if (!hasWindows() || window == mainWindow) {
+                close();
+            }
         } else {
             sendServerPacket(DataCodes.CLOSE_WINDOW, null, window, NetworkUtils.EMPTY_PACKET);
+        }
+        if (syncedWindows.containsValue(window)) {
+            syncedWindows.inverse().remove(window);
         }
     }
 
@@ -157,11 +159,13 @@ public class ModularUIContext {
         windows.pop();
         if (hasWindows()) {
             getCurrentWindow().resumeWindow();
+        } else {
+            tryClose();
         }
     }
 
     public ModularWindow getCurrentWindow() {
-        return windows.peekLast();
+        return windows.isEmpty() ? mainWindow : windows.peekLast();
     }
 
     public ModularWindow getMainWindow() {
@@ -270,10 +274,9 @@ public class ModularUIContext {
                 newWindow.initialized = true;
                 sendClientPacket(DataCodes.INIT_WINDOW, null, window, NetworkUtils.EMPTY_PACKET);
             } else if (id == DataCodes.CLOSE_WINDOW) {
-                if (windows.removeLastOccurrence(window)) {
-                    window.destroyWindow();
+                if (window.onTryClose()) {
+                    window.closeWindow();
                 }
-                syncedWindows.inverse().remove(window);
             }
         } else if (window != null) {
             ISyncedWidget syncedWidget = window.getSyncedWidget(widgetId);
@@ -285,7 +288,7 @@ public class ModularUIContext {
     public void sendClientPacket(int discriminator, ISyncedWidget syncedWidget, ModularWindow window, Consumer<PacketBuffer> bufferConsumer) {
         if (isClient()) {
             if (!syncedWindows.containsValue(window)) {
-                ModularUI.LOGGER.error("Window is not synced!");
+                ModularUI.LOGGER.throwing(new IllegalStateException("Window is not synced!"));
                 return;
             }
             int syncId = syncedWidget == null ? DataCodes.INTERNAL_SYNC : window.getSyncedWidgetId(syncedWidget);
@@ -301,7 +304,7 @@ public class ModularUIContext {
     public void sendServerPacket(int discriminator, ISyncedWidget syncedWidget, ModularWindow window, Consumer<PacketBuffer> bufferConsumer) {
         if (!isClient()) {
             if (!syncedWindows.containsValue(window)) {
-                ModularUI.LOGGER.error("Window is not synced!");
+                ModularUI.LOGGER.throwing(new IllegalStateException("Window is not synced!"));
                 return;
             }
             int syncId = syncedWidget == null ? DataCodes.INTERNAL_SYNC : window.getSyncedWidgetId(syncedWidget);

@@ -27,6 +27,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
 import java.util.List;
@@ -191,7 +192,10 @@ public class ModularGui extends GuiContainer {
             }
             drawCalls++;
         }
-        context.getCurrentWindow().frameUpdate(partialTicks);
+        context.getMainWindow().frameUpdate(partialTicks);
+        if (context.getMainWindow() != context.getCurrentWindow()) {
+            context.getCurrentWindow().frameUpdate(partialTicks);
+        }
         drawDefaultBackground();
 
         GlStateManager.disableRescaleNormal();
@@ -200,7 +204,9 @@ public class ModularGui extends GuiContainer {
         GlStateManager.disableDepth();
 
         for (ModularWindow window : context.getOpenWindowsReversed()) {
-            window.drawWidgets(partialTicks, false);
+            if (window.isEnabled()) {
+                window.drawWidgets(partialTicks, false);
+            }
         }
 
         GlStateManager.enableRescaleNormal();
@@ -216,8 +222,8 @@ public class ModularGui extends GuiContainer {
         GlStateManager.disableDepth();
 
         Widget hovered = context.getCursor().getHovered();
-        if (hovered != null) {
-            if (hovered instanceof IVanillaSlot && context.getPlayer().inventory.getItemStack().isEmpty() && ((IVanillaSlot) hovered).getMcSlot().getHasStack()) {
+        if (hovered != null && !context.getCursor().isHoldingSomething()) {
+            if (hovered instanceof IVanillaSlot && ((IVanillaSlot) hovered).getMcSlot().getHasStack()) {
                 renderToolTip(((IVanillaSlot) hovered).getMcSlot().getStack(), mouseX, mouseY);
             } else if (hovered.getTooltipShowUpDelay() <= context.getCursor().getTimeHovered()) {
                 TooltipContainer tooltipContainer = hovered.getHoverText();
@@ -232,7 +238,9 @@ public class ModularGui extends GuiContainer {
             }
         }
 
-        context.getCurrentWindow().drawWidgets(partialTicks, true);
+        if (context.getCurrentWindow().isEnabled()) {
+            context.getCurrentWindow().drawWidgets(partialTicks, true);
+        }
         context.getCursor().draw(partialTicks);
 
         GlStateManager.enableRescaleNormal();
@@ -289,29 +297,22 @@ public class ModularGui extends GuiContainer {
             interactable.onClick(mouseButton, doubleClick);
         }
 
-        boolean changedFocus = tryFindFocused();
-
-        if (context.getCursor().hasDraggable()) {
-            if (!context.getCursor().onMouseClick(mouseButton)) {
-                ModularUI.LOGGER.info("Super click");
-                super.mouseClicked(mouseX, mouseY, mouseButton);
-            }
+        if (context.getCursor().onMouseClick(mouseButton)) {
             lastFocusedClick = time;
             return;
         }
 
+        boolean changedFocus = tryFindFocused();
         if (focused instanceof Interactable) {
             Interactable interactable = (Interactable) focused;
             doubleClick = !changedFocus && isDoubleClick(lastFocusedClick, time);
-            if (!interactable.onClick(mouseButton, doubleClick) && !context.getCursor().onMouseClick(mouseButton)) {
+            if (!interactable.onClick(mouseButton, doubleClick)) {
                 ModularUI.LOGGER.info("Super click2");
                 super.mouseClicked(mouseX, mouseY, mouseButton);
             }
         } else {
-            if (!context.getCursor().onMouseClick(mouseButton)) {
-                ModularUI.LOGGER.info("Super click3");
-                super.mouseClicked(mouseX, mouseY, mouseButton);
-            }
+            ModularUI.LOGGER.info("Super click3");
+            super.mouseClicked(mouseX, mouseY, mouseButton);
         }
 
         lastFocusedClick = time;
@@ -372,6 +373,7 @@ public class ModularGui extends GuiContainer {
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
         // debug mode C + CTRL + SHIFT + ALT
+        ModularUI.LOGGER.info("Typed {}, {}", typedChar, keyCode);
         if (keyCode == 46 && isCtrlKeyDown() && isShiftKeyDown() && isAltKeyDown()) {
             this.debugMode = !this.debugMode;
         }
@@ -387,6 +389,17 @@ public class ModularGui extends GuiContainer {
         }
     }
 
+    private void keyTypedSuper(char typedChar, int keyCode) throws IOException {
+        if (keyCode == Keyboard.KEY_ESCAPE || this.mc.gameSettings.keyBindInventory.isActiveAndMatches(keyCode)) {
+            ModularUI.LOGGER.info("Try closing ui");
+            if (context.getMainWindow().onTryClose()) {
+                this.mc.player.closeScreen();
+            }
+        } else {
+            super.keyTyped(typedChar, keyCode);
+        }
+    }
+
     public void mouseScroll(int direction) {
         for (Interactable interactable : context.getCurrentWindow().getInteractionListeners()) {
             interactable.onHoverMouseScroll(direction);
@@ -394,16 +407,6 @@ public class ModularGui extends GuiContainer {
         Widget hovered = context.getCursor().getHovered();
         if (hovered instanceof Interactable) {
             ((Interactable) hovered).onHoverMouseScroll(direction);
-        }
-    }
-
-    private void keyTypedSuper(char typedChar, int keyCode) throws IOException {
-        if (keyCode == 1 || this.mc.gameSettings.keyBindInventory.isActiveAndMatches(keyCode)) {
-            if (context.getMainWindow().onTryClose()) {
-                this.mc.player.closeScreen();
-            }
-        } else {
-            super.keyTyped(typedChar, keyCode);
         }
     }
 

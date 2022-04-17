@@ -72,9 +72,11 @@ public class ModularUIContainer extends Container {
 
     @Override
     public void detectAndSendChanges() {
-        if (this.context.getCurrentWindow().isInitialized()) {
-            // do not allow syncing before the client is initialized
-            this.context.getCurrentWindow().serverUpdate();
+        for (ModularWindow window : this.context.getOpenWindows()) {
+            if (window.isInitialized()) {
+                // do not allow syncing before the client is initialized
+                window.serverUpdate();
+            }
         }
     }
 

@@ -78,8 +78,8 @@ public class Cursor {
         for (ModularWindow window : uiContext.getOpenWindows()) {
             if (!window.isEnabled()) continue;
             AtomicReference<Widget> hovered = new AtomicReference<>();
-            IWidgetParent.forEachByLayer(window, widget -> {
-                if ((hovered.get() == null || widget.getLayer() > hovered.get().getLayer()) && widget.isEnabled() && isAbove(widget) && widget.canHover()) {
+            IWidgetParent.forEachByLayer(window, true, widget -> {
+                if ((hovered.get() == null || widget.getLayer() > hovered.get().getLayer()) && isAbove(widget) && widget.canHover()) {
                     hovered.set(widget);
                 }
                 return false;
@@ -149,6 +149,10 @@ public class Cursor {
 
     public boolean hasDraggable() {
         return this.cursorDraggable != null;
+    }
+
+    public boolean isHoldingSomething() {
+        return hasDraggable() || !getItemStack().isEmpty();
     }
 
     @Nullable

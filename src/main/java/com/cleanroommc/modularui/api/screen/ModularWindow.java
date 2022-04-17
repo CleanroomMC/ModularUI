@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.api.screen;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.animation.Eases;
 import com.cleanroommc.modularui.api.animation.Interpolator;
@@ -129,7 +130,7 @@ public class ModularWindow implements IWidgetParent {
             });
             closeAnimation = openAnimation.getReversed(250, Eases.EaseQuadIn);
             openAnimation.forward();
-            closeAnimation.setCallback(val -> context.close());
+            closeAnimation.setCallback(val -> closeWindow());
         }
         //this.pos = new Pos2d(pos.x, getContext().getScaledScreenSize().height);
     }
@@ -141,9 +142,11 @@ public class ModularWindow implements IWidgetParent {
      */
     public boolean onTryClose() {
         if (closeAnimation == null) {
+            ModularUI.LOGGER.info("Closing ui");
             return true;
         }
         if (!closeAnimation.isRunning()) {
+            ModularUI.LOGGER.info("Start closing ui");
             closeAnimation.forward();
         }
         return false;
@@ -220,9 +223,7 @@ public class ModularWindow implements IWidgetParent {
     }
 
     public void closeWindow() {
-        if(onTryClose()) {
-
-        }
+        ModularUI.LOGGER.info("Closing ui 2");
         context.closeWindow(this);
     }
 
@@ -236,9 +237,6 @@ public class ModularWindow implements IWidgetParent {
     }
 
     public void drawWidgets(float partialTicks, boolean foreground) {
-        if (!isEnabled()) {
-            return;
-        }
         if (foreground) {
             IWidgetParent.forEachByLayer(this, widget -> {
                 widget.drawInForeground(partialTicks);
