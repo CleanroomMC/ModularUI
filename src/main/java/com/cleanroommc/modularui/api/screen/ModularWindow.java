@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.api.screen;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.animation.Eases;
 import com.cleanroommc.modularui.api.animation.Interpolator;
@@ -51,7 +50,6 @@ public class ModularWindow implements IWidgetParent {
     private final Alignment alignment = Alignment.Center;
     private final IDrawable[] background;
     protected boolean draggable;
-    private boolean active;
     private boolean enabled = true;
     private boolean needsRebuild = false;
     private int color = 0xFFFFFFFF;
@@ -136,24 +134,14 @@ public class ModularWindow implements IWidgetParent {
     }
 
     /**
-     * Called when the player tries to close the ui
-     *
-     * @return if the ui should be closed
+     * Called when the player tries to close the ui. Starts animation or closes directly.
      */
-    public boolean onTryClose() {
+    public void tryClose() {
         if (closeAnimation == null) {
-            ModularUI.LOGGER.info("Closing ui");
-            return true;
-        }
-        if (!closeAnimation.isRunning()) {
-            ModularUI.LOGGER.info("Start closing ui");
+            closeWindow();
+        } else if (!closeAnimation.isRunning()) {
             closeAnimation.forward();
         }
-        return false;
-    }
-
-    protected void setActive(boolean active) {
-        this.active = active;
     }
 
     public void update() {
@@ -208,28 +196,13 @@ public class ModularWindow implements IWidgetParent {
         needsRebuild = false;
     }
 
-    public void pauseWindow() {
-        if (isActive()) {
-            setActive(false);
-            IWidgetParent.forEachByLayer(this, Widget::onPause);
-        }
-    }
-
-    public void resumeWindow() {
-        if (!isActive()) {
-            setActive(true);
-            IWidgetParent.forEachByLayer(this, Widget::onResume);
-        }
-    }
-
     public void closeWindow() {
-        ModularUI.LOGGER.info("Closing ui 2");
         context.closeWindow(this);
     }
 
     protected void destroyWindow() {
         IWidgetParent.forEachByLayer(this, widget -> {
-            if (isActive()) {
+            if (isEnabled()) {
                 widget.onPause();
             }
             widget.onDestroy();
@@ -290,10 +263,6 @@ public class ModularWindow implements IWidgetParent {
         return children;
     }
 
-    public boolean isActive() {
-        return active;
-    }
-
     public boolean isDraggable() {
         return draggable;
     }
@@ -331,7 +300,14 @@ public class ModularWindow implements IWidgetParent {
     }
 
     public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+        if (this.enabled != enabled) {
+            this.enabled = enabled;
+            if (this.enabled) {
+                IWidgetParent.forEachByLayer(this, Widget::onResume);
+            } else {
+                IWidgetParent.forEachByLayer(this, Widget::onPause);
+            }
+        }
     }
 
     /**

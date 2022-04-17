@@ -1,8 +1,7 @@
 package com.cleanroommc.modularui.api.screen;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.math.Pos2d;
-import com.cleanroommc.modularui.api.widget.Draggable;
+import com.cleanroommc.modularui.api.widget.IDraggable;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.IWidgetParent;
 import com.cleanroommc.modularui.api.widget.Widget;
@@ -18,7 +17,7 @@ public class Cursor {
 
     private final ModularUIContext uiContext;
     @Nullable
-    private Draggable cursorDraggable;
+    private IDraggable cursorDraggable;
     @Nullable
     private Widget hovered;
     private int timeHovered;
@@ -188,13 +187,12 @@ public class Cursor {
 
     @ApiStatus.Internal
     public boolean onMouseClick(int button) {
-        ModularUI.LOGGER.info("Cursor click");
         if (getItemStack().isEmpty()) {
             if (this.cursorDraggable == null) {
-                Draggable draggable = null;
+                IDraggable draggable = null;
                 Object hovered = findHovered();
-                if (hovered instanceof Draggable) {
-                    draggable = (Draggable) hovered;
+                if (hovered instanceof IDraggable) {
+                    draggable = (IDraggable) hovered;
                 } else if (hovered instanceof ModularWindow) {
                     ModularWindow window = (ModularWindow) hovered;
                     if (window.isDraggable()) {

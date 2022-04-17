@@ -1,14 +1,14 @@
 package com.cleanroommc.modularui.api.screen;
 
 import com.cleanroommc.modularui.api.math.Pos2d;
-import com.cleanroommc.modularui.api.widget.Draggable;
+import com.cleanroommc.modularui.api.widget.IDraggable;
 import com.cleanroommc.modularui.api.widget.Widget;
 import net.minecraft.client.renderer.GlStateManager;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 
-public class DraggableWindowWrapper implements Draggable {
+public class DraggableWindowWrapper implements IDraggable {
 
     private final ModularWindow window;
     private final Pos2d relativeClickPos;

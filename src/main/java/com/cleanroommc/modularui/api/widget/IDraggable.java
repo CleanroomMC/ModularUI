@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 
 @ApiStatus.Experimental
-public interface Draggable extends Interactable {
+public interface IDraggable {
 
     /**
      * Get's called from the cursor

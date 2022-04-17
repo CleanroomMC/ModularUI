@@ -76,7 +76,9 @@ public class ModularUIContext {
 
     @SideOnly(Side.CLIENT)
     public void buildWindowOnStart() {
-        getCurrentWindow().rebuild();
+        for (ModularWindow window : windows) {
+            window.rebuild();
+        }
     }
 
     @SideOnly(Side.CLIENT)
@@ -146,21 +148,10 @@ public class ModularUIContext {
     }
 
     private void pushWindow(ModularWindow window) {
-        window.initialize(this);
-        window.setActive(true);
-        if (hasWindows()) {
-            getCurrentWindow().pauseWindow();
-        }
-        windows.offerLast(window);
-    }
-
-    public void popWindow() {
-        getCurrentWindow().destroyWindow();
-        windows.pop();
-        if (hasWindows()) {
-            getCurrentWindow().resumeWindow();
+        if (windows.offerLast(window)) {
+            window.initialize(this);
         } else {
-            tryClose();
+            ModularUI.LOGGER.error("Failed opening window");
         }
     }
 
@@ -173,18 +164,18 @@ public class ModularUIContext {
     }
 
     public void tryClose() {
-        if (mainWindow.onTryClose()) {
-            close();
-        }
+        mainWindow.tryClose();
     }
 
     public void close() {
         player.closeScreen();
     }
 
-    public void popAllButLast() {
-        while (windows.size() >= 2) {
-            popWindow();
+    public void closeAllButMain() {
+        for (ModularWindow window : getOpenWindows()) {
+            if (window != mainWindow) {
+                window.tryClose();
+            }
         }
     }
 
@@ -274,9 +265,7 @@ public class ModularUIContext {
                 newWindow.initialized = true;
                 sendClientPacket(DataCodes.INIT_WINDOW, null, window, NetworkUtils.EMPTY_PACKET);
             } else if (id == DataCodes.CLOSE_WINDOW) {
-                if (window.onTryClose()) {
-                    window.closeWindow();
-                }
+                window.tryClose();
             }
         } else if (window != null) {
             ISyncedWidget syncedWidget = window.getSyncedWidget(widgetId);

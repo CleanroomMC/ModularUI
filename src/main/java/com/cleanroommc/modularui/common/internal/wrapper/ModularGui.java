@@ -391,10 +391,7 @@ public class ModularGui extends GuiContainer {
 
     private void keyTypedSuper(char typedChar, int keyCode) throws IOException {
         if (keyCode == Keyboard.KEY_ESCAPE || this.mc.gameSettings.keyBindInventory.isActiveAndMatches(keyCode)) {
-            ModularUI.LOGGER.info("Try closing ui");
-            if (context.getMainWindow().onTryClose()) {
-                this.mc.player.closeScreen();
-            }
+            context.getMainWindow().tryClose();
         } else {
             super.keyTyped(typedChar, keyCode);
         }
