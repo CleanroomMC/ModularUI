@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.common.widget;
 
+import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.widget.IIngredientProvider;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.NumberFormat;
@@ -49,7 +50,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngr
     public FluidSlotWidget(IFluidTank fluidTank) {
         this.fluidTank = fluidTank;
         this.tankHandler = FluidTankHandler.getTankFluidHandler(fluidTank);
-        this.textRenderer.forceShadow(true);
+        this.textRenderer.setShadow(true);
         this.textRenderer.setScale(0.5f);
     }
 
@@ -160,7 +161,10 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngr
         }
         if (content != null && this.controlsAmount) {
             String s = NumberFormat.format(content.amount, NumberFormat.FORMAT_1);
-            textRenderer.drawAligned(s, contentOffset.x + 0.5f, size.height - 5.5f, size.width - contentOffset.x - 1f, 0xFFFFFF, 1);
+            textRenderer.setAlignment(Alignment.CenterRight, size.width - contentOffset.x - 1f);
+            textRenderer.setPos(contentOffset.x + 0.5f, size.height - 5.5f);
+            textRenderer.draw(s);
+            //textRenderer.drawAligned(s, contentOffset.x + 0.5f, size.height - 5.5f, size.width - contentOffset.x - 1f, 0xFFFFFF, 1);
         }
     }
 

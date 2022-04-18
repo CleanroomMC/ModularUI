@@ -97,7 +97,7 @@ public class GuiHelper {
         if (maxWidth < 0) {
             maxWidth = Integer.MAX_VALUE;
         }
-        RenderTooltipEvent.Pre event = new RenderTooltipEvent.Pre(ItemStack.EMPTY, lines, mousePos.x, mousePos.y, screenSize.width, screenSize.height, maxWidth, TextRenderer.FR);
+        RenderTooltipEvent.Pre event = new RenderTooltipEvent.Pre(ItemStack.EMPTY, lines, mousePos.x, mousePos.y, screenSize.width, screenSize.height, maxWidth, TextRendererOld.FR);
         if (MinecraftForge.EVENT_BUS.post(event)) {
             return;
         }
@@ -118,7 +118,7 @@ public class GuiHelper {
             maxTextWidth = screenSpaceRight;
         }
         Pos2d renderPos = Pos2d.ZERO;
-        TextRenderer renderer = new TextRenderer(mousePos, 0, maxTextWidth);
+        TextRendererOld renderer = new TextRendererOld(mousePos, 0, maxTextWidth);
         renderer.setScale(scale);
         renderer.forceShadow(forceShadow);
         boolean putOnLeft = false;
@@ -153,7 +153,7 @@ public class GuiHelper {
      * Copied from {@link net.minecraftforge.fml.client.config.GuiUtils#drawHoveringText(ItemStack, List, int, int, int, int, int, FontRenderer)}
      * and adjusted for custom text renderer.
      */
-    private static void drawHoveringTextBase(List<String> lines, Pos2d pos, Size screenSize, int tooltipTextWidth, int tooltipHeight, int maxWidth, TextRenderer renderer) {
+    private static void drawHoveringTextBase(List<String> lines, Pos2d pos, Size screenSize, int tooltipTextWidth, int tooltipHeight, int maxWidth, TextRendererOld renderer) {
         GlStateManager.disableRescaleNormal();
         RenderHelper.disableStandardItemLighting();
         GlStateManager.disableLighting();
@@ -168,7 +168,7 @@ public class GuiHelper {
         int backgroundColor = 0xF0100010;
         int borderColorStart = 0x505000FF;
         int borderColorEnd = (borderColorStart & 0xFEFEFE) >> 1 | borderColorStart & 0xFF000000;
-        RenderTooltipEvent.Color colorEvent = new RenderTooltipEvent.Color(ItemStack.EMPTY, lines, tooltipX, tooltipY, TextRenderer.FR, backgroundColor, borderColorStart, borderColorEnd);
+        RenderTooltipEvent.Color colorEvent = new RenderTooltipEvent.Color(ItemStack.EMPTY, lines, tooltipX, tooltipY, TextRendererOld.FR, backgroundColor, borderColorStart, borderColorEnd);
         MinecraftForge.EVENT_BUS.post(colorEvent);
         backgroundColor = colorEvent.getBackground();
         borderColorStart = colorEvent.getBorderStart();
@@ -183,7 +183,7 @@ public class GuiHelper {
         drawGradientRect(zLevel, tooltipX - 3, tooltipY - 3, tooltipX + tooltipTextWidth + 3, tooltipY - 3 + 1, borderColorStart, borderColorStart);
         drawGradientRect(zLevel, tooltipX - 3, tooltipY + tooltipHeight + 2, tooltipX + tooltipTextWidth + 3, tooltipY + tooltipHeight + 3, borderColorEnd, borderColorEnd);
 
-        MinecraftForge.EVENT_BUS.post(new RenderTooltipEvent.PostBackground(ItemStack.EMPTY, lines, tooltipX, tooltipY, TextRenderer.FR, tooltipTextWidth, tooltipHeight));
+        MinecraftForge.EVENT_BUS.post(new RenderTooltipEvent.PostBackground(ItemStack.EMPTY, lines, tooltipX, tooltipY, TextRendererOld.FR, tooltipTextWidth, tooltipHeight));
 
         renderer.setUp(pos, color, maxWidth);
         for (String line : lines) {
@@ -191,7 +191,7 @@ public class GuiHelper {
             renderer.addY(renderer.scale);
         }
 
-        MinecraftForge.EVENT_BUS.post(new RenderTooltipEvent.PostText(ItemStack.EMPTY, lines, tooltipX, tooltipY, TextRenderer.FR, tooltipTextWidth, tooltipHeight));
+        MinecraftForge.EVENT_BUS.post(new RenderTooltipEvent.PostText(ItemStack.EMPTY, lines, tooltipX, tooltipY, TextRendererOld.FR, tooltipTextWidth, tooltipHeight));
 
         GlStateManager.enableLighting();
         GlStateManager.enableDepth();

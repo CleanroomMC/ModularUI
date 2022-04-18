@@ -4,7 +4,6 @@ import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.TextRenderer;
 import com.cleanroommc.modularui.api.drawable.TextSpan;
 import com.cleanroommc.modularui.api.math.Alignment;
-import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.Widget;
 import com.google.gson.JsonObject;
@@ -19,7 +18,7 @@ public class TextWidget extends Widget {
     protected String localised;
     private int maxWidth = -1;
     private Alignment textAlignment = Alignment.TopLeft;
-    private final TextRenderer textRenderer = new TextRenderer(Pos2d.ZERO, 0, 0);
+    private final TextRenderer textRenderer = new TextRenderer();
 
     public TextWidget() {
         this(new TextSpan());
@@ -78,11 +77,11 @@ public class TextWidget extends Widget {
     protected @NotNull Size determineSize(int maxWidth, int maxHeight) {
         this.localised = getText().getFormatted();
         int width = this.maxWidth > 0 ? this.maxWidth : maxWidth - getPos().x;
-        textRenderer.setUp(Pos2d.ZERO, 0, width);
-        textRenderer.setDoDraw(false);
-        textRenderer.draw(localised);
-        textRenderer.setDoDraw(true);
-        return new Size(textRenderer.getWidth() + 1, textRenderer.getHeight() + 1);
+        textRenderer.setSimulate(true);
+        textRenderer.setAlignment(textAlignment, width, maxHeight);
+        Size size = textRenderer.draw(localised);
+        textRenderer.setSimulate(false);
+        return size;
     }
 
     @Override
@@ -101,7 +100,9 @@ public class TextWidget extends Widget {
         if (localised == null) {
             localised = text.getFormatted();
         }
-        textRenderer.drawAligned(localised, 0, 0, size.width, size.height, text.getDefaultColor(), textAlignment.x, textAlignment.y);
+        textRenderer.setAlignment(textAlignment, size.width, size.height);
+        textRenderer.setColor(text.getDefaultColor());
+        textRenderer.draw(localised);
     }
 
     public TextSpan getText() {

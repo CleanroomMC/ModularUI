@@ -1,13 +1,13 @@
 package com.cleanroommc.modularui.common.widget;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.widget.Interactable;
-import com.cleanroommc.modularui.api.drawable.TextFieldRenderer;
-import com.cleanroommc.modularui.api.drawable.TextRenderer;
+import com.cleanroommc.modularui.api.drawable.TextFieldRendererOld;
+import com.cleanroommc.modularui.api.drawable.TextRendererOld;
 import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.common.internal.JsonHelper;
 import com.cleanroommc.modularui.common.internal.network.NetworkUtils;
 import com.google.gson.JsonObject;
@@ -36,15 +36,16 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
     private String text = "";
     private int cursor = 0, cursorEnd = 0;
     private Pattern pattern = ANY;
-    private final TextFieldRenderer renderer = new TextFieldRenderer(Pos2d.ZERO, 0, 0);
-    private final TextRenderer helper = new TextRenderer(Pos2d.ZERO, 0, 0);
+    protected TextFieldRendererOld renderer = new TextFieldRendererOld(Pos2d.ZERO, 0, 0);
+    protected TextRendererOld helper = new TextRendererOld(Pos2d.ZERO, 0, 0);
     private Supplier<String> getter;
     private Consumer<String> setter;
     private int cursorTimer = 0;
-    private int textColor = TextFieldRenderer.DEFAULT_COLOR;
+    private int textColor = TextFieldRendererOld.DEFAULT_COLOR;
     private Function<String, String> validator = val -> val;
     private int maxWidth = 80, maxLines = -1;
     private Alignment textAlignment = Alignment.TopLeft;
+    private boolean newLineOnEnter = false;
 
     @Override
     public void readJson(JsonObject json, String type) {
@@ -151,7 +152,11 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
             switch (keyCode) {
                 case Keyboard.KEY_RETURN:
                 case Keyboard.KEY_ESCAPE:
-                    removeFocus();
+                    if (newLineOnEnter) {
+                        insert("\n");
+                    } else {
+                        removeFocus();
+                    }
                     break;
                 case Keyboard.KEY_LEFT: {
                     int newCursor = cursor - 1;

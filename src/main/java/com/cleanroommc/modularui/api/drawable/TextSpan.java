@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.api.drawable;
 
-import com.cleanroommc.modularui.api.math.Pos2d;
+import com.cleanroommc.modularui.api.math.Alignment;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -12,8 +12,8 @@ public class TextSpan implements IDrawable {
 
     private Text[] texts;
     private int alignment = -1;
-    private int defaultColor = TextRenderer.DEFAULT_COLOR;
-    private final TextRenderer renderer = new TextRenderer(Pos2d.ZERO, 0, 0);
+    private int defaultColor = TextRendererOld.DEFAULT_COLOR;
+    private final TextRenderer renderer = new TextRenderer();
 
     public TextSpan(Text... texts) {
         this.texts = texts;
@@ -59,7 +59,10 @@ public class TextSpan implements IDrawable {
 
     @Override
     public void draw(float x, float y, float width, float height, float partialTicks) {
-        renderer.drawAligned(Text.getFormatted(texts), x, y, width, height, defaultColor, alignment, 0);
+        renderer.setColor(defaultColor);
+        renderer.setPos(x, y);
+        renderer.setAlignment(Alignment.Center, width, height);
+        renderer.draw(Text.getFormatted(texts));
     }
 
     public Text[] getTexts() {

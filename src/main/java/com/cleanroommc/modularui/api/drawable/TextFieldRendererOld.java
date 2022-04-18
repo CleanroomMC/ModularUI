@@ -10,14 +10,14 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class TextFieldRenderer extends TextRenderer {
+public class TextFieldRendererOld extends TextRendererOld {
 
     private int cursor, cursorEnd;
     private int markedColor = 0x2F72A8;
     private boolean drawingMarked = false;
     private boolean renderCursor = false;
 
-    public TextFieldRenderer(Pos2d pos, int color, int maxWidth) {
+    public TextFieldRendererOld(Pos2d pos, int color, int maxWidth) {
         super(pos, color, maxWidth);
     }
 

@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.api.drawable;
 
+import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.common.internal.JsonHelper;
 import com.google.gson.JsonElement;
@@ -15,6 +16,7 @@ import java.util.function.Supplier;
 
 public class Text implements IDrawable {
 
+    private static final TextRenderer renderer = new TextRenderer();
     private final String text;
     private String formatting = "";
     @Nullable
@@ -81,8 +83,13 @@ public class Text implements IDrawable {
 
     @Override
     public void draw(float x, float y, float width, float height, float partialTicks) {
-        int color = hasColor() ? this.color : TextRenderer.DEFAULT_COLOR;
-        new TextRenderer().drawAligned(getFormatted(), x, y, width, height, color, 0, 0);
+        //int color = hasColor() ? this.color : TextRendererOld.DEFAULT_COLOR;
+        renderer.setPos(x, y);
+        renderer.setShadow(shadow);
+        renderer.setAlignment(Alignment.Center, width, height);
+        renderer.setColor(hasColor() ? this.color : TextRendererOld.DEFAULT_COLOR);
+        renderer.draw(text);
+        //new TextRendererOld().drawAligned(getFormatted(), x, y, width, height, color, 0, 0);
     }
 
     public String getFormatted() {
@@ -94,10 +101,10 @@ public class Text implements IDrawable {
             text = formatting + text;
         }
         if (hasColor()) {
-            text = TextRenderer.getColorFormatString(color) + text;
+            text = TextRendererOld.getColorFormatString(color) + text;
         }
         if (hasShadow()) {
-            text += TextRenderer.FORMAT_CHAR + 's';
+            text += TextRendererOld.FORMAT_CHAR + 's';
         }
         return text;
     }
