@@ -37,6 +37,10 @@ public class ModularWindow implements IWidgetParent {
         return new Builder(size);
     }
 
+    public static Builder builderFullScreen() {
+        return new Builder(Size.ZERO);
+    }
+
     private ModularUIContext context;
     private final List<Widget> children;
     public final ImmutableBiMap<Integer, ISyncedWidget> syncedWidgets;
@@ -45,7 +49,8 @@ public class ModularWindow implements IWidgetParent {
     protected boolean initialized = false;
     protected boolean clientOnly = true;
 
-    private final Size size;
+    private final boolean fullScreen;
+    private Size size;
     private Pos2d pos = Pos2d.ZERO;
     private final Alignment alignment = Alignment.Center;
     private final IDrawable[] background;
@@ -60,6 +65,7 @@ public class ModularWindow implements IWidgetParent {
     private Interpolator openAnimation, closeAnimation;
 
     public ModularWindow(Size size, List<Widget> children, IDrawable... background) {
+        this.fullScreen = size.isZero();
         this.size = size;
         this.children = children;
         this.background = background;
@@ -88,7 +94,12 @@ public class ModularWindow implements IWidgetParent {
     }
 
     public void onResize(Size screenSize) {
-        this.pos = alignment.getAlignedPos(screenSize, size);
+        if (this.fullScreen) {
+            this.size = screenSize;
+            this.pos = Pos2d.ZERO;
+        } else {
+            this.pos = alignment.getAlignedPos(screenSize, size);
+        }
         markNeedsRebuild();
     }
 
