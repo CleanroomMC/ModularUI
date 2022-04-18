@@ -27,6 +27,18 @@ public class Size {
         this((int) width, (int) height);
     }
 
+    public Size(Size widthComponent, Size heightComponent) {
+        this(widthComponent.width, heightComponent.height);
+    }
+
+    public Size(int width, Size heightComponent) {
+        this(width, heightComponent.height);
+    }
+
+    public Size(Size widthComponent, int height) {
+        this(widthComponent.width, height);
+    }
+
     public static Size ofDimension(Dimension dimension) {
         return new Size(dimension.width, dimension.height);
     }
@@ -39,12 +51,20 @@ public class Size {
         return width > size.width && height > size.height;
     }
 
-    /**
-     * @param size to center
-     * @return the point of the top left corner
-     */
-    public Pos2d getCenteringPointForChild(Size size) {
-        return new Pos2d((width - size.width) / 2, (height - size.height) / 2);
+    public Size shrink(int width, int height) {
+        return new Size(this.width - width, this.height - height);
+    }
+
+    public Size grow(int width, int height) {
+        return new Size(this.width + width, this.height + height);
+    }
+
+    public Size scale(float widthScale, float heightScale) {
+        return new Size(this.width * widthScale, this.height * heightScale);
+    }
+
+    public Size scale(float scale) {
+        return scale(scale, scale);
     }
 
     public boolean isZero() {

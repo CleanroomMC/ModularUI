@@ -40,6 +40,10 @@ public abstract class Widget {
     protected Pos2d relativePos = Pos2d.ZERO;
     protected Pos2d pos = Pos2d.ZERO;
     protected Pos2d fixedPos = null;
+    @Nullable
+    private SizeProvider sizeProvider;
+    @Nullable
+    private PosProvider posProvider;
     private boolean fillParent = false;
     private boolean autoSized = true;
     private boolean autoPositioned = true;
@@ -163,14 +167,18 @@ public abstract class Widget {
         }
         if (isAutoSized() && isFillParent()) {
             this.size = parent.getSize();
+        } else if (this.sizeProvider != null) {
+            this.size = this.sizeProvider.getSize(getContext().getScaledScreenSize(), getWindow(), this.parent);
         }
-
         // calculate positions
         if (isFixed() && !isAutoPositioned()) {
             relativePos = fixedPos.subtract(parent.getAbsolutePos());
             pos = fixedPos;
         } else {
-            pos = parent.getAbsolutePos().add(relativePos);
+            if (this.posProvider != null) {
+                this.relativePos = this.posProvider.getPos(getContext().getScaledScreenSize(), getWindow(), this.parent);
+            }
+            this.pos = this.parent.getAbsolutePos().add(this.relativePos);
         }
 
         if (this instanceof IWidgetParent) {
@@ -527,7 +535,15 @@ public abstract class Widget {
     public Widget setSize(Size size) {
         checkNeedsRebuild();
         this.autoSized = false;
+        this.fillParent = false;
         this.size = size;
+        return this;
+    }
+
+    public Widget setSizeProvider(SizeProvider sizeProvider) {
+        this.autoSized = false;
+        this.fillParent = false;
+        this.sizeProvider = sizeProvider;
         return this;
     }
 
@@ -548,6 +564,7 @@ public abstract class Widget {
         checkNeedsRebuild();
         this.autoPositioned = false;
         this.relativePos = relativePos;
+        this.fixedPos = null;
         return this;
     }
 
@@ -571,6 +588,13 @@ public abstract class Widget {
         checkNeedsRebuild();
         this.autoPositioned = false;
         this.fixedPos = pos;
+        return this;
+    }
+
+    public Widget setPosProvider(PosProvider posProvider) {
+        this.autoPositioned = false;
+        this.posProvider = posProvider;
+        this.fixedPos = null;
         return this;
     }
 
@@ -661,6 +685,14 @@ public abstract class Widget {
                 mouse.x <= areaTopLeft.x + areaSize.width &&
                 mouse.y >= areaTopLeft.y &&
                 mouse.y <= areaTopLeft.y + areaSize.height;
+    }
+
+    public interface SizeProvider {
+        Size getSize(Size screenSize, ModularWindow window, IWidgetParent parent);
+    }
+
+    public interface PosProvider {
+        Pos2d getPos(Size screenSize, ModularWindow window, IWidgetParent parent);
     }
 
     public static class ClickData {
