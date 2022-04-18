@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.common.internal.JsonHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.util.math.MathHelper;
 
 import javax.annotation.Nullable;
 
@@ -28,6 +29,20 @@ public class Color {
      */
     public static int argb(float red, float green, float blue, float alpha) {
         return argb((int) (red * 255), (int) (green * 255), (int) (blue * 255), (int) (alpha * 255));
+    }
+
+    /**
+     * Creates a color int. All values should be 0 - 255
+     */
+    public static int rgba(int red, int green, int blue, int alpha) {
+        return ((red & 0xFF) << 24) | ((green & 0xFF) << 16) | ((blue & 0xFF) << 8) | (alpha & 0xFF);
+    }
+
+    /**
+     * Creates a color int. All values should be 0 - 1
+     */
+    public static int rgba(float red, float green, float blue, float alpha) {
+        return rgba((int) (red * 255), (int) (green * 255), (int) (blue * 255), (int) (alpha * 255));
     }
 
     /**
@@ -187,6 +202,26 @@ public class Color {
             alpha = 255;
         }
         return Color.argb(255 - getRed(rgb), 255 - getGreen(rgb), 255 - getBlue(rgb), alpha);
+    }
+
+    public static int average(int... colors) {
+        int r = 0, g = 0, b = 0, a = 0;
+        for (int color : colors) {
+            r += getRed(color);
+            g += getGreen(color);
+            b += getBlue(color);
+            a += getAlpha(color);
+        }
+        return argb(r / colors.length, g / colors.length, b / colors.length, a / colors.length);
+    }
+
+    public static int interpolate(int color1, int color2, double value) {
+        value = MathHelper.clamp(value, 0, 1);
+        int r = (int) ((Color.getRed(color2) - Color.getRed(color1)) * value + Color.getRed(color1));
+        int g = (int) ((Color.getGreen(color2) - Color.getGreen(color1)) * value + Color.getGreen(color1));
+        int b = (int) ((Color.getBlue(color2) - Color.getBlue(color1)) * value + Color.getBlue(color1));
+        int a = (int) ((Color.getAlpha(color2) - Color.getAlpha(color1)) * value + Color.getAlpha(color1));
+        return Color.argb(r, g, b, a);
     }
 
     @Nullable
