@@ -24,6 +24,12 @@ public interface IWidgetParent {
     ModularUIContext getContext();
 
     /**
+     * Called right after the ui is created and right before synced widgets are registered. Last chance to add sub widgets
+     */
+    default void initChildren() {
+    }
+
+    /**
      * Called during rebuild.
      * {@link Widget#isAutoPositioned()} must be checked for each child!!!
      */

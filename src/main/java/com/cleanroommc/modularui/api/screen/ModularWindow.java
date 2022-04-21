@@ -70,7 +70,11 @@ public class ModularWindow implements IWidgetParent {
         this.children = children;
         this.background = background;
         // latest point at which synced widgets can be added
-        IWidgetParent.forEachByLayer(this, Widget::initChildren);
+        IWidgetParent.forEachByLayer(this, widget -> {
+            if (widget instanceof IWidgetParent) {
+                ((IWidgetParent) widget).initChildren();
+            }
+        });
 
         ImmutableBiMap.Builder<Integer, ISyncedWidget> syncedWidgetBuilder = ImmutableBiMap.builder();
         AtomicInteger i = new AtomicInteger();

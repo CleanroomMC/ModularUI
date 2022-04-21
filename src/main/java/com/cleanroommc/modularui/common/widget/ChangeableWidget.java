@@ -66,7 +66,11 @@ public class ChangeableWidget extends Widget implements ISyncedWidget, IWidgetPa
 
     private void initQueuedChild() {
         if (this.queuedChild != null) {
-            IWidgetParent.forEachByLayer(this.queuedChild, Widget::initChildren);
+            IWidgetParent.forEachByLayer(this.queuedChild, widget -> {
+                if (widget instanceof IWidgetParent) {
+                    ((IWidgetParent) widget).initChildren();
+                }
+            });
             AtomicInteger syncId = new AtomicInteger(1);
             IWidgetParent.forEachByLayer(this.queuedChild, widget1 -> {
                 if (widget1 instanceof ISyncedWidget) {

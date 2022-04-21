@@ -199,6 +199,14 @@ public class Color implements Iterable<Integer> {
         return new int[]{getRed(rgba), getGreen(rgba), getBlue(rgba), getAlpha(rgba)};
     }
 
+    public static int rgbaToArgb(int rgba) {
+        return Color.argb(getAlpha(rgba), getRed(rgba), getGreen(rgba), getBlue(rgba));
+    }
+
+    public static int argbToRgba(int argb) {
+        return Color.rgba(getRed(argb), getGreen(argb), getBlue(argb), getAlpha(argb));
+    }
+
     public static int invert(int rgb) {
         int alpha = Color.getAlpha(rgb);
         if (alpha == 0) {
@@ -396,8 +404,8 @@ public class Color implements Iterable<Integer> {
             all[index++] = shadeBright[i];
         }
         all[index++] = normal;
-        for (int i = 0; i < shadeDark.length; i++) {
-            all[index++] = shadeDark[i];
+        for (int shade : shadeDark) {
+            all[index++] = shade;
         }
     }
 

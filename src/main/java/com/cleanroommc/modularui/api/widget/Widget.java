@@ -325,12 +325,6 @@ public abstract class Widget {
     //==== Lifecycle ====
 
     /**
-     * Called right after the ui is created and right before synced widgets are registered. Last chance to add sub widgets
-     */
-    public void initChildren() {
-    }
-
-    /**
      * Called once when the window opens, before children get initialised.
      */
     public void onInit() {
