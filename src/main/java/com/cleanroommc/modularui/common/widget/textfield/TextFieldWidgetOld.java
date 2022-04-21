@@ -1,8 +1,8 @@
-package com.cleanroommc.modularui.common.widget;
+package com.cleanroommc.modularui.common.widget.textfield;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.drawable.TextFieldRenderer;
 import com.cleanroommc.modularui.api.drawable.TextFieldRendererOld;
-import com.cleanroommc.modularui.api.drawable.TextRendererOld;
 import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
@@ -10,6 +10,7 @@ import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.common.internal.JsonHelper;
 import com.cleanroommc.modularui.common.internal.network.NetworkUtils;
+import com.cleanroommc.modularui.common.widget.SyncedWidget;
 import com.google.gson.JsonObject;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
@@ -17,12 +18,15 @@ import net.minecraft.network.PacketBuffer;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 
+import java.awt.*;
+import java.util.Collections;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
-public class TextFieldWidget extends SyncedWidget implements Interactable {
+@Deprecated
+public class TextFieldWidgetOld extends SyncedWidget implements Interactable {
 
     // all positive whole numbers
     public static final Pattern NATURAL_NUMS = Pattern.compile("[0-9]*");
@@ -35,9 +39,12 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
 
     private String text = "";
     private int cursor = 0, cursorEnd = 0;
+    private final Point cursorWrapper = new Point(), cursorEndWrapper = new Point();
     private Pattern pattern = ANY;
-    protected TextFieldRendererOld renderer = new TextFieldRendererOld(Pos2d.ZERO, 0, 0);
-    protected TextRendererOld helper = new TextRendererOld(Pos2d.ZERO, 0, 0);
+    //protected TextFieldRendererOld renderer = new TextFieldRendererOld(Pos2d.ZERO, 0, 0);
+    //protected TextRendererOld helper = new TextRendererOld(Pos2d.ZERO, 0, 0);
+    protected TextFieldHandler handler = new TextFieldHandler();
+    protected TextFieldRenderer helper = new TextFieldRenderer(handler);
     private Supplier<String> getter;
     private Consumer<String> setter;
     private int cursorTimer = 0;
@@ -67,7 +74,7 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
     @Override
     public void onRebuild() {
         if (maxLines < 0) {
-            maxLines = (int) (size.height / renderer.getFontHeight());
+            maxLines = (int) (size.height / helper.getFontHeight());
         }
     }
 
@@ -77,15 +84,16 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
 
     public void setCursor(int pos, boolean setEnd) {
         this.cursor = Math.max(0, Math.min(text.length(), pos));
+        this.cursorWrapper.x = this.cursor;
         if (setEnd) {
             this.cursorEnd = cursor;
+            this.cursorEndWrapper.x = this.cursorEnd;
         }
-        this.renderer.setCursor(cursor, cursorEnd);
     }
 
     public void setCursorEnd(int pos) {
         this.cursorEnd = Math.max(0, Math.min(text.length(), pos));
-        this.renderer.setCursor(cursor, cursorEnd);
+        this.cursorEndWrapper.x = this.cursorEnd;
     }
 
     public void incrementCursor(int amount) {
@@ -133,7 +141,7 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
     @Override
     public void onScreenUpdate() {
         if (isFocused() && ++cursorTimer == 10) {
-            renderer.toggleRenderCursor();
+            helper.toggleCursor();
             cursorTimer = 0;
         }
     }
@@ -142,7 +150,9 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
     public void draw(float partialTicks) {
         GlStateManager.pushMatrix();
         GlStateManager.translate(0.5f, 0.5f, 0);
-        renderer.drawAligned(text, 0, 0, size.width, size.height, textColor, textAlignment.x, textAlignment.y);
+        helper.setAlignment(textAlignment, size.width, size.height);
+        helper.draw(text);
+        //renderer.drawAligned(text, 0, 0, size.width, size.height, textColor, textAlignment.x, textAlignment.y);
         GlStateManager.popMatrix();
     }
 
@@ -237,10 +247,10 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
     }
 
     private boolean canFit(String string) {
-        helper.setUp(Pos2d.ZERO, 0, size.width);
-        helper.setDoDraw(false);
+        helper.setSimulate(true);
         helper.draw(string);
-        return helper.getHeight() <= renderer.getFontHeight() * maxLines;
+        helper.setSimulate(false);
+        return helper.getLastHeight() <= helper.getFontHeight() * maxLines;
     }
 
     private int getTextIndexUnderMouse() {
@@ -251,7 +261,9 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
         if (text.isEmpty()) {
             return 0;
         }
-        helper.setPosToFind(pos2d);
+        helper.setAlignment(textAlignment, size.width, size.height);
+        return helper.getCursorPos(Collections.singletonList(text), pos2d.x, pos2d.y).x;
+        /*helper.setPosToFind(pos2d);
         helper.drawAligned(text, 0, 0, size.width, size.height, 0, textAlignment.x, textAlignment.y);
         helper.setPosToFind(null);
         if (helper.getFoundIndex() < 0) {
@@ -260,7 +272,7 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
             }
             return 0;
         }
-        return helper.getFoundIndex();
+        return helper.getFoundIndex();*/
     }
 
     @Override
@@ -271,7 +283,7 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
     @Override
     public void onRemoveFocus() {
         super.onRemoveFocus();
-        renderer.setRenderCursor(false);
+        helper.setCursor(false);
         cursorTimer = 0;
         setCursorEnd(cursor);
         text = validator.apply(text);
@@ -288,7 +300,7 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
         if (maxLines <= 0) {
             maxLines = 1;
         }
-        return new Size(this.maxWidth - 1, (int) (renderer.getFontHeight() * maxLines + 0.5));
+        return new Size(this.maxWidth - 1, (int) (helper.getFontHeight() * maxLines + 0.5));
     }
 
     @Override
@@ -324,12 +336,12 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
         }
     }
 
-    public TextFieldWidget setSetter(Consumer<String> setter) {
+    public TextFieldWidgetOld setSetter(Consumer<String> setter) {
         this.setter = setter;
         return this;
     }
 
-    public TextFieldWidget setSetterLong(Consumer<Long> setter) {
+    public TextFieldWidgetOld setSetterLong(Consumer<Long> setter) {
         this.setter = val -> {
             if (!val.isEmpty()) {
                 try {
@@ -342,7 +354,7 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
         return this;
     }
 
-    public TextFieldWidget setSetterInt(Consumer<Integer> setter) {
+    public TextFieldWidgetOld setSetterInt(Consumer<Integer> setter) {
         this.setter = val -> {
             if (!val.isEmpty()) {
                 try {
@@ -355,64 +367,63 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
         return this;
     }
 
-    public TextFieldWidget setGetter(Supplier<String> getter) {
+    public TextFieldWidgetOld setGetter(Supplier<String> getter) {
         this.getter = getter;
         return this;
     }
 
-    public TextFieldWidget setGetterLong(Supplier<Long> getter) {
+    public TextFieldWidgetOld setGetterLong(Supplier<Long> getter) {
         this.getter = () -> String.valueOf(getter.get());
         return this;
     }
 
-    public TextFieldWidget setGetterInt(Supplier<Integer> getter) {
+    public TextFieldWidgetOld setGetterInt(Supplier<Integer> getter) {
         this.getter = () -> String.valueOf(getter.get());
         return this;
     }
 
-    public TextFieldWidget setPattern(Pattern pattern) {
+    public TextFieldWidgetOld setPattern(Pattern pattern) {
         this.pattern = pattern;
         return this;
     }
 
-    public TextFieldWidget setTextColor(int textColor) {
+    public TextFieldWidgetOld setTextColor(int textColor) {
         this.textColor = textColor;
-        this.renderer.setTextColor(textColor);
+        this.helper.setColor(textColor);
         return this;
     }
 
-    public TextFieldWidget setMarkedColor(int color) {
-        renderer.setMarkedColor(color);
+    public TextFieldWidgetOld setMarkedColor(int color) {
+        this.helper.setMarkedColor(color);
         return this;
     }
 
-    public TextFieldWidget setMaxLines(int maxLines) {
+    public TextFieldWidgetOld setMaxLines(int maxLines) {
         this.maxLines = maxLines;
         return this;
     }
 
-    public TextFieldWidget setMaxWidth(int maxWidth) {
+    public TextFieldWidgetOld setMaxWidth(int maxWidth) {
         this.maxWidth = maxWidth;
         return this;
     }
 
-    public TextFieldWidget setBounds(int maxWidth, int maxLines) {
+    public TextFieldWidgetOld setBounds(int maxWidth, int maxLines) {
         setMaxWidth(maxWidth);
         return setMaxLines(maxLines);
     }
 
-    public TextFieldWidget setScale(float scale) {
-        renderer.setScale(scale);
-        helper.setScale(scale);
+    public TextFieldWidgetOld setScale(float scale) {
+        this.helper.setScale(scale);
         return this;
     }
 
-    public TextFieldWidget setValidator(Function<String, String> validator) {
+    public TextFieldWidgetOld setValidator(Function<String, String> validator) {
         this.validator = validator;
         return this;
     }
 
-    public TextFieldWidget setNumbersLong(Function<Long, Long> validator) {
+    public TextFieldWidgetOld setNumbersLong(Function<Long, Long> validator) {
         setPattern(WHOLE_NUMS);
         setValidator(val -> {
             long num;
@@ -430,7 +441,7 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
         return this;
     }
 
-    public TextFieldWidget setNumbers(Function<Integer, Integer> validator) {
+    public TextFieldWidgetOld setNumbers(Function<Integer, Integer> validator) {
         setPattern(WHOLE_NUMS);
         return setValidator(val -> {
             int num;
@@ -447,7 +458,7 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
         });
     }
 
-    public TextFieldWidget setNumbersDouble(Function<Double, Double> validator) {
+    public TextFieldWidgetOld setNumbersDouble(Function<Double, Double> validator) {
         setPattern(DECIMALS);
         return setValidator(val -> {
             double num;
@@ -464,19 +475,19 @@ public class TextFieldWidget extends SyncedWidget implements Interactable {
         });
     }
 
-    public TextFieldWidget setNumbers(Supplier<Integer> min, Supplier<Integer> max) {
+    public TextFieldWidgetOld setNumbers(Supplier<Integer> min, Supplier<Integer> max) {
         return setNumbers(val -> Math.min(max.get(), Math.max(min.get(), val)));
     }
 
-    public TextFieldWidget setNumbersLong(Supplier<Long> min, Supplier<Long> max) {
+    public TextFieldWidgetOld setNumbersLong(Supplier<Long> min, Supplier<Long> max) {
         return setNumbersLong(val -> Math.min(max.get(), Math.max(min.get(), val)));
     }
 
-    public TextFieldWidget setNumbers(int min, int max) {
+    public TextFieldWidgetOld setNumbers(int min, int max) {
         return setNumbers(val -> Math.min(max, Math.max(min, val)));
     }
 
-    public TextFieldWidget setTextAlignment(Alignment textAlignment) {
+    public TextFieldWidgetOld setTextAlignment(Alignment textAlignment) {
         this.textAlignment = textAlignment;
         return this;
     }

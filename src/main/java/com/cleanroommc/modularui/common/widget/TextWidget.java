@@ -79,9 +79,9 @@ public class TextWidget extends Widget {
         int width = this.maxWidth > 0 ? this.maxWidth : maxWidth - getPos().x;
         textRenderer.setSimulate(true);
         textRenderer.setAlignment(textAlignment, width, maxHeight);
-        Size size = textRenderer.draw(localised);
+        textRenderer.draw(localised);
         textRenderer.setSimulate(false);
-        return size;
+        return textRenderer.getLastSize();
     }
 
     @Override

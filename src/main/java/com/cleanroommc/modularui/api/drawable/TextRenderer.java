@@ -16,13 +16,14 @@ import java.util.List;
 public class TextRenderer {
 
     public static final FontRenderer FR = Minecraft.getMinecraft().fontRenderer;
-    private float maxWidth = -1, maxHeight = -1;
-    private float x = 0, y = 0;
-    private Alignment alignment = Alignment.TopLeft;
-    private float scale = 1f;
-    private boolean shadow = false;
-    private int color = 0x404040;
-    private boolean simulate;
+    protected float maxWidth = -1, maxHeight = -1;
+    protected float x = 0, y = 0;
+    protected Alignment alignment = Alignment.TopLeft;
+    protected float scale = 1f;
+    protected boolean shadow = false;
+    protected int color = 0x404040;
+    protected boolean simulate;
+    protected float lastWidth = 0, lastHeight = 0;
 
     public void setAlignment(Alignment alignment, float maxWidth) {
         setAlignment(alignment, maxWidth, -1);
@@ -59,62 +60,74 @@ public class TextRenderer {
         this.simulate = simulate;
     }
 
-    public Size draw(String text) {
-        return draw(Collections.singletonList(text));
+    public void draw(String text) {
+        draw(Collections.singletonList(text));
     }
 
-    public Size draw(List<String> lines) {
-        if ((alignment.x >= 0 && maxWidth > 0) || (alignment.y >= 0 && maxHeight > 0)) {
-            return drawAligned(lines);
-        }
-        float y0 = y;
-        float maxW = 0;
-        for (String line : lines) {
-            List<String> subLines = maxWidth > 0 ? FR.listFormattedStringToWidth(line, (int) (maxWidth / scale)) : Arrays.asList(line.split("\n"));
-            for (String subLine : subLines) {
-                maxW = Math.max(draw(subLine, x, y0), maxW);
-                y0 += FR.FONT_HEIGHT * scale;
-            }
-        }
-        return new Size(maxWidth > 0 ? Math.min(maxW, maxWidth) : maxW, y0 - y);
+    public void draw(List<String> lines) {
+        drawMeasuredLines(measureLines(lines));
     }
 
-    public Size drawAligned(List<String> lines) {
+    protected void drawMeasuredLines(List<Pair<String, Float>> measuredLines) {
         float maxW = 0;
+        float y0 = getStartY(measuredLines.size());
+        for (Pair<String, Float> measuredLine : measuredLines) {
+            float x0 = getStartX(measuredLine.getRight());
+            maxW = Math.max(draw(measuredLine.getLeft(), x0, y0), maxW);
+            y0 += FR.FONT_HEIGHT * scale;
+        }
+        this.lastWidth = maxWidth > 0 ? Math.min(maxW, maxWidth) : maxW;
+        this.lastHeight = measuredLines.size() * FR.FONT_HEIGHT * scale;
+    }
+
+    protected List<Pair<String, Float>> measureLines(List<String> lines) {
         List<Pair<String, Float>> measuredLines = new ArrayList<>();
         for (String line : lines) {
             List<String> subLines = maxWidth > 0 ? FR.listFormattedStringToWidth(line, (int) (maxWidth / scale)) : Arrays.asList(line.split("\n"));
             for (String subLine : subLines) {
                 float width = FR.getStringWidth(subLine) * scale;
                 measuredLines.add(Pair.of(subLine, width));
-                maxW = Math.max(width, maxW);
             }
         }
-        float y0 = y;
-        if (alignment.y >= 0 && maxHeight > 0) {
-            float height = measuredLines.size() * FR.FONT_HEIGHT * scale;
-            if (alignment.y > 0) {
-                y0 = y + maxHeight - height;
-            } else {
-                y0 = y + (maxHeight - height) / 2f;
-            }
-        }
-        for (Pair<String, Float> measuredLine : measuredLines) {
-            float x0 = x;
-            if (maxWidth > 0 && alignment.x >= 0) {
-                if (alignment.x > 0) {
-                    x0 = x + maxWidth - measuredLine.getValue();
-                } else {
-                    x0 = x + (maxWidth - measuredLine.getValue()) / 2f;
-                }
-            }
-            draw(measuredLine.getKey(), x0, y0);
-            y0 += FR.FONT_HEIGHT * scale;
-        }
-        return new Size(maxWidth > 0 ? Math.min(maxW, maxWidth) : maxW, measuredLines.size() * FR.FONT_HEIGHT * scale);
+        return measuredLines;
     }
 
-    private float draw(String text, float x, float y) {
+    public int getMaxWidth(List<String> lines) {
+        if (lines.isEmpty()) {
+            return 0;
+        }
+        List<Pair<String, Float>> measuredLines = measureLines(lines);
+        float w = 0;
+        for (Pair<String, Float> measuredLine : measuredLines) {
+            w = Math.max(w, measuredLine.getRight());
+        }
+        return (int) Math.ceil(w);
+    }
+
+    protected float getStartY(int lines) {
+        if (alignment.y >= 0 && maxHeight > 0) {
+            float height = lines * FR.FONT_HEIGHT * scale;
+            if (alignment.y > 0) {
+                return y + maxHeight - height;
+            } else {
+                return y + (maxHeight - height) / 2f;
+            }
+        }
+        return y;
+    }
+
+    protected float getStartX(float lineWidth) {
+        if (maxWidth > 0 && alignment.x >= 0) {
+            if (alignment.x > 0) {
+                return x + maxWidth - lineWidth;
+            } else {
+                return x + (maxWidth - lineWidth) / 2f;
+            }
+        }
+        return x;
+    }
+
+    protected float draw(String text, float x, float y) {
         if (simulate) {
             return FR.getStringWidth(text);
         }
@@ -125,5 +138,21 @@ public class TextRenderer {
         GlStateManager.popMatrix();
         GlStateManager.enableBlend();
         return width * scale;
+    }
+
+    public float getFontHeight() {
+        return FR.FONT_HEIGHT * scale;
+    }
+
+    public float getLastHeight() {
+        return lastHeight;
+    }
+
+    public float getLastWidth() {
+        return lastWidth;
+    }
+
+    public Size getLastSize() {
+        return new Size(lastWidth, lastHeight);
     }
 }

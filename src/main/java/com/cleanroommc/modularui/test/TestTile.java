@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.ModularUITextures;
 import com.cleanroommc.modularui.api.drawable.AdaptableUITexture;
 import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.UITexture;
+import com.cleanroommc.modularui.api.drawable.shapes.Rectangle;
 import com.cleanroommc.modularui.api.math.*;
 import com.cleanroommc.modularui.api.screen.ITileWithModularUI;
 import com.cleanroommc.modularui.api.screen.ModularWindow;
@@ -12,6 +13,7 @@ import com.cleanroommc.modularui.api.screen.UIBuildContext;
 import com.cleanroommc.modularui.api.widget.IWidgetBuilder;
 import com.cleanroommc.modularui.api.widget.Widget;
 import com.cleanroommc.modularui.common.widget.*;
+import com.cleanroommc.modularui.common.widget.textfield.TextFieldWidget;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -107,11 +109,11 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                                         .addTooltip("Test Tooltip")
                                         .setTooltipShowUpDelay(10))
                                 .addChild(new TextFieldWidget()
-                                        .setScale(1f)
                                         .setGetter(() -> textFieldValue)
                                         .setSetter(val -> textFieldValue = val)
-                                        .setTextColor(Color.rgb(220, 220, 220))
-                                        .setTextAlignment(Alignment.Center)
+                                        .setTextColor(Color.WHITE.dark(1))
+                                        .setTextAlignment(Alignment.CenterLeft)
+                                        .setScrollBar(new ScrollBar().setBarTexture(new Rectangle().setColor(Color.WHITE.normal).setCornerRadius(1)))
                                         .setBackground(DISPLAY.withOffset(-2, -2, 4, 4))
                                         .setSize(92, 20)
                                         .setPos(20, 25))

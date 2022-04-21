@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.UITexture;
 import com.cleanroommc.modularui.api.widget.Widget;
+import com.cleanroommc.modularui.common.widget.textfield.TextFieldWidgetOld;
 import net.minecraft.entity.player.EntityPlayer;
 
 import javax.annotation.Nullable;
@@ -19,7 +20,7 @@ public class WidgetJsonRegistry {
         registerWidget("image", DrawableWidget::new);
         registerWidget("cycle_button", CycleButtonWidget::new);
         registerWidget("button", ButtonWidget::new);
-        registerWidget("textfield", TextFieldWidget::new);
+        registerWidget("textfield", TextFieldWidgetOld::new);
         registerWidgetSpecial("player_inventory", SlotGroup::playerInventoryGroup);
 
         IDrawable.JSON_DRAWABLE_MAP.put("text", Text::ofJson);
