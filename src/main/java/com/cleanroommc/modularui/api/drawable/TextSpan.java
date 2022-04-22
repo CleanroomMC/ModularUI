@@ -12,7 +12,7 @@ public class TextSpan implements IDrawable {
 
     private Text[] texts;
     private int alignment = -1;
-    private int defaultColor = TextRendererOld.DEFAULT_COLOR;
+    private int defaultColor = TextRenderer.DEFAULT_COLOR;
     private final TextRenderer renderer = new TextRenderer();
 
     public TextSpan(Text... texts) {

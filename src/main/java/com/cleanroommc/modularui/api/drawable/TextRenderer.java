@@ -15,6 +15,7 @@ import java.util.List;
 public class TextRenderer {
 
     public static final FontRenderer FR = Minecraft.getMinecraft().fontRenderer;
+    public static final int DEFAULT_COLOR = 0x404040;
     protected float maxWidth = -1, maxHeight = -1;
     protected float x = 0, y = 0;
     protected Alignment alignment = Alignment.TopLeft;

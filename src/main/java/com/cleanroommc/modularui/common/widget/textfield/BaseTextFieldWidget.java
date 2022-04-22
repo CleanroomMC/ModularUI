@@ -210,4 +210,9 @@ public class BaseTextFieldWidget extends Widget implements IWidgetParent, Intera
         }
         return this;
     }
+
+    public BaseTextFieldWidget setTextColor(int color) {
+        this.renderer.setColor(color);
+        return this;
+    }
 }
