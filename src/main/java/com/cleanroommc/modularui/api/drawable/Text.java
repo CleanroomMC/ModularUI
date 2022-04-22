@@ -21,7 +21,7 @@ public class Text implements IDrawable {
     private String formatting = "";
     @Nullable
     private Supplier<Object[]> localisationData;
-    private int color = Color.argb(33, 33, 33, 0);
+    private int color = TextRenderer.DEFAULT_COLOR;
     private boolean shadow = false;
 
     public Text(String text) {

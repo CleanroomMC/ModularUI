@@ -615,7 +615,7 @@ public abstract class Widget {
      * Adds a line to the tooltip
      */
     public Widget addTooltip(Text tooltip) {
-        this.addTooltip(tooltip);
+        this.additionalTooltip.add(tooltip);
         return this;
     }
 

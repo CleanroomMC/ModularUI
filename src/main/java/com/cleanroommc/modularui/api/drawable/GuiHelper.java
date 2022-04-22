@@ -71,7 +71,7 @@ public class GuiHelper {
         if (textLines.isEmpty()) {
             return;
         }
-        List<String> lines = textLines.stream().map(Text::getFormatted).collect(Collectors.toList());
+        List<String> lines = textLines.stream().map(line -> line.getFormatted()).collect(Collectors.toList());
         drawHoveringTextFormatted(lines, mousePos, screenSize, maxWidth, scale, forceShadow, alignment);
     }
 
@@ -168,7 +168,7 @@ public class GuiHelper {
 
         renderer.setSimulate(false);
         renderer.setPos(renderPos);
-        renderer.setAlignment(Alignment.TopLeft, maxWidth);
+        renderer.setAlignment(alignment, maxTextWidth);
         renderer.setColor(color);
         renderer.drawMeasuredLines(measuredLines);
 

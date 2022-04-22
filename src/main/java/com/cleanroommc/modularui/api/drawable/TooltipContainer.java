@@ -12,6 +12,7 @@ public class TooltipContainer implements IDrawable {
     private final List<Text> lines = new ArrayList<>();
     private int maxBoxWidth = Integer.MAX_VALUE;
     private boolean forceShadow = true;
+    private Alignment alignment = Alignment.TopLeft;
     private float scale = 1f;
 
     public TooltipContainer addLine(Text... line) {
@@ -47,6 +48,11 @@ public class TooltipContainer implements IDrawable {
         return this;
     }
 
+    public TooltipContainer setAlignment(Alignment alignment) {
+        this.alignment = alignment;
+        return this;
+    }
+
     public TooltipContainer with(List<Text> lines) {
         TooltipContainer tooltipContainer = new TooltipContainer();
         tooltipContainer.lines.addAll(this.lines);
@@ -68,13 +74,13 @@ public class TooltipContainer implements IDrawable {
     @Override
     public void draw(float x, float y, float width, float height, float partialTicks) {
         if (!lines.isEmpty() && GuiHelper.hasScreen()) {
-            GuiHelper.drawHoveringText(lines, GuiHelper.getCurrentMousePos(), GuiHelper.getScreenSize(), maxBoxWidth, scale, forceShadow, Alignment.TopLeft);
+            GuiHelper.drawHoveringText(lines, GuiHelper.getCurrentMousePos(), GuiHelper.getScreenSize(), maxBoxWidth, scale, forceShadow, alignment);
         }
     }
 
     public void draw(ModularUIContext uiContext) {
         if (!lines.isEmpty()) {
-            GuiHelper.drawHoveringText(lines, uiContext.getMousePos(), uiContext.getScaledScreenSize(), maxBoxWidth, scale, forceShadow, Alignment.TopLeft);
+            GuiHelper.drawHoveringText(lines, uiContext.getMousePos(), uiContext.getScaledScreenSize(), maxBoxWidth, scale, forceShadow, alignment);
         }
     }
 }
