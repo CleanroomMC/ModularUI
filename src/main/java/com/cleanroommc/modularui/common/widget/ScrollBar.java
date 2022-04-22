@@ -18,8 +18,7 @@ public class ScrollBar extends Widget implements Interactable {
     private IVerticalScrollable verticalScrollable;
     private IHorizontalScrollable horizontalScrollable;
     private IDrawable barTexture = IDrawable.EMPTY;
-    private int actualSize = 0;
-    private boolean dragHandle = false;
+    private int handleClickOffset = -1;
 
     public void setScrollType(ScrollType scrollType, @Nullable IHorizontalScrollable horizontalScrollable, @Nullable IVerticalScrollable verticalScrollable) {
         this.scrollType = scrollType;
@@ -64,16 +63,6 @@ public class ScrollBar extends Widget implements Interactable {
         return super.determineSize(maxWidth, maxHeight);
     }
 
-    @Override
-    public void onScreenUpdate() {
-        super.onScreenUpdate();
-        if (scrollType == ScrollType.HORIZONTAL) {
-            this.actualSize = horizontalScrollable.getActualWidth();
-        } else if (scrollType == ScrollType.VERTICAL) {
-            this.actualSize = verticalScrollable.getActualHeight();
-        }
-    }
-
     public int getVisibleSize() {
         if (scrollType == ScrollType.HORIZONTAL) {
             return horizontalScrollable.getVisibleWidth();
@@ -83,8 +72,18 @@ public class ScrollBar extends Widget implements Interactable {
         return 0;
     }
 
+    public int getActualSize() {
+        if (scrollType == ScrollType.HORIZONTAL) {
+            return horizontalScrollable.getActualWidth();
+        } else if (scrollType == ScrollType.VERTICAL) {
+            return verticalScrollable.getActualHeight();
+        }
+        return 0;
+    }
+
     public boolean isActive() {
-        return this.actualSize > 0 && this.actualSize > getVisibleSize();
+        int actualSize = getActualSize();
+        return actualSize > 0 && actualSize > getVisibleSize();
     }
 
     @Override
@@ -92,25 +91,35 @@ public class ScrollBar extends Widget implements Interactable {
         if (isActive() && this.barTexture != null) {
             int size = calculateMainAxisSize();
             if (scrollType == ScrollType.HORIZONTAL) {
-                float offset = horizontalScrollable.getHorizontalScrollOffset() / (float) (this.actualSize);
+                float offset = horizontalScrollable.getHorizontalScrollOffset() / (float) (horizontalScrollable.getActualWidth());
                 this.barTexture.draw(horizontalScrollable.getVisibleWidth() * offset, 0, size, horizontalScrollable.getHorizontalBarHeight(), partialTicks);
             } else if (scrollType == ScrollType.VERTICAL) {
-                float offset = verticalScrollable.getVerticalScrollOffset() / (float) (this.actualSize);
+                float offset = verticalScrollable.getVerticalScrollOffset() / (float) (verticalScrollable.getActualHeight());
                 this.barTexture.draw(0, verticalScrollable.getVisibleHeight() * offset, verticalScrollable.getVerticalBarWidth(), size, partialTicks);
             }
         }
     }
 
     public int calculateMainAxisSize() {
-        if (this.actualSize == 0) {
+        int actualSize = getActualSize();
+        if (actualSize == 0) {
             return 1;
         }
         int size = getVisibleSize();
-        return Math.max(size / this.actualSize * size, 6);
+        return (int) Math.max(size / (double) actualSize * size, 6);
+    }
+
+    public void clampScrollOffset() {
+        setScrollOffset(getScrollOffset());
+    }
+
+    public void setScrollOffsetOfCursor(float x) {
+        int visible = getVisibleSize();
+        setScrollOffset((int) (x - visible / 2f));
     }
 
     public void setScrollOffset(int offset) {
-        offset = MathHelper.clamp(offset, 0, this.actualSize);
+        offset = MathHelper.clamp(offset, 0, getActualSize() - getVisibleSize());
         if (scrollType == ScrollType.HORIZONTAL) {
             horizontalScrollable.setHorizontalScrollOffset(offset);
         } else if (scrollType == ScrollType.VERTICAL) {
@@ -140,21 +149,22 @@ public class ScrollBar extends Widget implements Interactable {
     public boolean onClick(int buttonId, boolean doubleClick) {
         Pos2d relative = getContext().getCursor().getPos().subtract(getAbsolutePos());
         int barSize = calculateMainAxisSize();
+        int actualSize = getActualSize();
         if (scrollType == ScrollType.HORIZONTAL) {
-            float offset = horizontalScrollable.getHorizontalScrollOffset() / (float) (this.actualSize) * horizontalScrollable.getVisibleWidth();
-            if (relative.x >= offset && relative.x <= offset + calculateMainAxisSize()) {
-                this.dragHandle = true;
+            float offset = horizontalScrollable.getHorizontalScrollOffset() / (float) (actualSize) * horizontalScrollable.getVisibleWidth();
+            if (relative.x >= offset && relative.x <= offset + barSize) {
+                this.handleClickOffset = (int) (relative.x - offset);
             } else {
-                float newOffset = Math.max(0, relative.x / (float) horizontalScrollable.getVisibleWidth() - barSize / 2f);
-                setScrollOffset((int) (newOffset * this.actualSize));
+                float newOffset = Math.max(0, (relative.x - barSize / 2f) / (float) horizontalScrollable.getVisibleWidth());
+                setScrollOffset((int) (newOffset * actualSize));
             }
         } else if (scrollType == ScrollType.VERTICAL) {
-            float offset = verticalScrollable.getVerticalScrollOffset() / (float) (this.actualSize) * verticalScrollable.getVisibleHeight();
-            if (relative.y >= offset && relative.y <= offset + calculateMainAxisSize()) {
-                this.dragHandle = true;
+            float offset = verticalScrollable.getVerticalScrollOffset() / (float) (actualSize) * verticalScrollable.getVisibleHeight();
+            if (relative.y >= offset && relative.y <= offset + barSize) {
+                this.handleClickOffset = (int) (relative.y - offset);
             } else {
-                float newOffset = Math.max(0, relative.y / (float) verticalScrollable.getVisibleHeight() - barSize / 2f);
-                setScrollOffset((int) (newOffset * this.actualSize));
+                float newOffset = Math.max(0, (relative.y - barSize / 2f) / (float) verticalScrollable.getVisibleHeight());
+                setScrollOffset((int) (newOffset * actualSize));
             }
         }
         return true;
@@ -162,31 +172,32 @@ public class ScrollBar extends Widget implements Interactable {
 
     @Override
     public void onMouseDragged(int buttonId, long deltaTime) {
-        if (this.dragHandle) {
-
+        if (this.handleClickOffset >= 0) {
+            int actualSize = getActualSize();
+            if (scrollType == ScrollType.HORIZONTAL) {
+                int offset = getContext().getCursor().getX() - pos.x - this.handleClickOffset;
+                float newOffset = Math.max(0, offset / (float) horizontalScrollable.getVisibleWidth());
+                setScrollOffset((int) (newOffset * actualSize));
+            } else if (scrollType == ScrollType.VERTICAL) {
+                int offset = getContext().getCursor().getY() - pos.y - this.handleClickOffset;
+                float newOffset = Math.max(0, offset / (float) verticalScrollable.getVisibleHeight());
+                setScrollOffset((int) (newOffset * actualSize));
+            }
         }
     }
 
     @Override
     public boolean onClickReleased(int buttonId) {
-        if (this.dragHandle) {
-            this.dragHandle = false;
+        if (this.handleClickOffset >= 0) {
+            this.handleClickOffset = -1;
             return true;
         }
         return false;
     }
 
-    public void setOffsetOf(Pos2d clickPos) {
-        if (scrollType == ScrollType.HORIZONTAL) {
-
-        } else if (scrollType == ScrollType.VERTICAL) {
-
-        }
-    }
-
     @Override
     public void onHoverMouseScroll(int direction) {
-        setScrollOffset(getScrollOffset() + direction);
+        setScrollOffset(getScrollOffset() + direction * 3);
     }
 
     public ScrollBar setBarTexture(IDrawable barTexture) {

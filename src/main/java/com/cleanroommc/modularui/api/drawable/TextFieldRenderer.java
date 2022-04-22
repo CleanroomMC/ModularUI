@@ -95,7 +95,7 @@ public class TextFieldRenderer extends TextRenderer {
             char c = line.getKey().charAt(i);
             currentX += FR.getCharWidth(c) * scale;
             if (currentX >= x) {
-                return new Point(i + 1, index);
+                return new Point(i, index);
             }
         }
         return new Point();
@@ -106,13 +106,13 @@ public class TextFieldRenderer extends TextRenderer {
             return new Point2D.Float(getStartX(0), getStartY(1));
         }
         Pair<String, Float> line = measuredLines.get(cursorPos.y);
-        String sub = line.getKey().substring(0, cursorPos.x);
+        String sub = line.getKey().substring(0, Math.min(line.getKey().length(), cursorPos.x));
         return new Point2D.Float(getStartX(line.getRight()) + FR.getStringWidth(sub) * scale, getStartY(measuredLines.size()));
     }
 
     @SideOnly(Side.CLIENT)
     public void drawMarked(float y0, float x0, float x1) {
-        //y0 -= 1;
+        y0 -= 1;
         float y1 = y0 + FR.FONT_HEIGHT * scale;
         float red = Color.getRedF(markedColor);
         float green = Color.getGreenF(markedColor);

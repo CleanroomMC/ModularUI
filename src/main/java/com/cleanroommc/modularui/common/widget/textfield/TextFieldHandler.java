@@ -1,25 +1,37 @@
 package com.cleanroommc.modularui.common.widget.textfield;
 
-import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.drawable.TextFieldRenderer;
+import com.cleanroommc.modularui.common.widget.ScrollBar;
 import com.google.common.base.Joiner;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class TextFieldHandler {
 
     private static final Joiner JOINER = Joiner.on('\n');
+
     private final List<String> text = new ArrayList<>();
     private final Point cursor = new Point(), cursorEnd = new Point();
+    private TextFieldRenderer renderer;
+    @Nullable
+    private ScrollBar scrollBar;
     private boolean mainCursorStart = true;
     private int maxLines = 1;
 
+    public void setScrollBar(@Nullable ScrollBar scrollBar) {
+        this.scrollBar = scrollBar;
+    }
+
+    public void setRenderer(TextFieldRenderer renderer) {
+        this.renderer = renderer;
+    }
+
     public void switchCursors() {
-        //int x = cursor.x, y = cursor.y;
-        //cursor.setLocation(cursorEnd);
-        //cursorEnd.setLocation(x, y);
         this.mainCursorStart = !this.mainCursorStart;
     }
 
@@ -54,7 +66,18 @@ public class TextFieldHandler {
     }
 
     public void setMainCursor(int linePos, int charPos) {
-        getMainCursor().setLocation(charPos, linePos);
+        Point main = getMainCursor();
+        if (main.x != charPos || main.y != linePos) {
+            main.setLocation(charPos, linePos);
+            if (!this.text.isEmpty() && this.renderer != null && this.scrollBar != null && this.scrollBar.isActive()) {
+                // update actual width
+                this.renderer.setSimulate(true);
+                this.renderer.draw(this.text);
+                this.renderer.setSimulate(false);
+                String line = this.text.get(main.y);
+                this.scrollBar.setScrollOffsetOfCursor(this.renderer.getPosOf(this.renderer.measureLines(Collections.singletonList(line)), main).x);
+            }
+        }
     }
 
     public void setCursor(int linePos, int charPos) {
@@ -63,11 +86,11 @@ public class TextFieldHandler {
     }
 
     public void setOffsetCursor(Point cursor) {
-        getOffsetCursor().setLocation(cursor);
+        setOffsetCursor(cursor.y, cursor.x);
     }
 
     public void setMainCursor(Point cursor) {
-        getMainCursor().setLocation(cursor);
+        setMainCursor(cursor.y, cursor.x);
     }
 
     public void setCursor(Point cursor) {
@@ -126,13 +149,13 @@ public class TextFieldHandler {
         if (main.y < this.text.size() - 1) {
             setCursor(main.y + 1, main.x);
         } else {
-            setCursor(main.y, this.text.get(main.y).length() - 1);
+            setCursor(main.y, this.text.get(main.y).length());
         }
     }
 
     public void markAll() {
         setOffsetCursor(0, 0);
-        setMainCursor(this.text.size() - 1, this.text.get(this.text.size() - 1).length() - 1);
+        setMainCursor(this.text.size() - 1, this.text.get(this.text.size() - 1).length());
     }
 
     public String getTextAsString() {
@@ -175,14 +198,15 @@ public class TextFieldHandler {
         if (text.isEmpty()) return;
         if (this.text.isEmpty()) {
             this.text.addAll(text);
+            setCursor(this.text.size() - 1, this.text.get(this.text.size() - 1).length());
             return;
         }
         String lineStart = this.text.get(cursor.y).substring(0, cursor.x);
         String lineEnd = this.text.get(cursor.y).substring(cursor.x);
         this.text.set(cursor.y, lineStart + text.get(0));
-        setCursor(cursor.y, cursor.x + text.get(0).length());
         if (text.size() == 1) {
             this.text.set(cursor.y, this.text.get(cursor.y) + lineEnd);
+            setCursor(cursor.y, cursor.x + text.get(0).length());
         } else {
             if (text.size() > 1) {
                 this.text.add(cursor.y + 1, text.get(text.size() - 1) + lineEnd);
@@ -236,19 +260,22 @@ public class TextFieldHandler {
                     line = line.substring(0, cursor.x) + line.substring(cursor.x + 1);
                     this.text.set(cursor.y, line);
                 }
-                return;
-            }
-            if (cursor.x == 0) {
-                if (cursor.y > 0) {
-                    this.text.set(cursor.y - 1, this.text.get(cursor.y - 1) + line);
-                    this.text.remove(cursor.y);
-                    setCursor(cursor.y - 1, cursor.x);
-                }
             } else {
-                line = line.substring(0, cursor.x - 1) + line.substring(cursor.x);
-                this.text.set(cursor.y, line);
-                setCursor(cursor.y, cursor.x - 1);
+                if (cursor.x == 0) {
+                    if (cursor.y > 0) {
+                        this.text.set(cursor.y - 1, this.text.get(cursor.y - 1) + line);
+                        this.text.remove(cursor.y);
+                        setCursor(cursor.y - 1, cursor.x);
+                    }
+                } else {
+                    line = line.substring(0, cursor.x - 1) + line.substring(cursor.x);
+                    this.text.set(cursor.y, line);
+                    setCursor(cursor.y, cursor.x - 1);
+                }
             }
+        }
+        if (this.scrollBar != null) {
+            scrollBar.clampScrollOffset();
         }
     }
 

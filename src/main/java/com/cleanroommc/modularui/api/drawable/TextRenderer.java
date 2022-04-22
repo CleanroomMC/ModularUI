@@ -9,7 +9,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -80,10 +79,10 @@ public class TextRenderer {
         this.lastHeight = measuredLines.size() * FR.FONT_HEIGHT * scale;
     }
 
-    protected List<Pair<String, Float>> measureLines(List<String> lines) {
+    public List<Pair<String, Float>> measureLines(List<String> lines) {
         List<Pair<String, Float>> measuredLines = new ArrayList<>();
         for (String line : lines) {
-            List<String> subLines = maxWidth > 0 ? FR.listFormattedStringToWidth(line, (int) (maxWidth / scale)) : Arrays.asList(line.split("\n"));
+            List<String> subLines = maxWidth > 0 ? FR.listFormattedStringToWidth(line, (int) (maxWidth / scale)) : Collections.singletonList(line);
             for (String subLine : subLines) {
                 float width = FR.getStringWidth(subLine) * scale;
                 measuredLines.add(Pair.of(subLine, width));

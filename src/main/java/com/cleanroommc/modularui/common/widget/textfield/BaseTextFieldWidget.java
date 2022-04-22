@@ -40,6 +40,10 @@ public class BaseTextFieldWidget extends Widget implements IWidgetParent, Intera
 
     protected ScrollBar scrollBar;
 
+    public BaseTextFieldWidget() {
+        this.handler.setRenderer(renderer);
+    }
+
     @Override
     public List<Widget> getChildren() {
         return scrollBar == null ? Collections.emptyList() : Collections.singletonList(scrollBar);
@@ -68,13 +72,20 @@ public class BaseTextFieldWidget extends Widget implements IWidgetParent, Intera
 
     @Override
     public boolean onClick(int buttonId, boolean doubleClick) {
-        handler.setCursor(renderer.getCursorPos(handler.getText(), getContext().getCursor().getX() - pos.x, getContext().getCursor().getY() - pos.y));
+        handler.setCursor(renderer.getCursorPos(handler.getText(), getContext().getCursor().getX() - pos.x + scrollOffset, getContext().getCursor().getY() - pos.y));
         return true;
     }
 
     @Override
     public void onMouseDragged(int buttonId, long deltaTime) {
-        handler.setMainCursor(renderer.getCursorPos(handler.getText(), getContext().getCursor().getX() - pos.x, getContext().getCursor().getY() - pos.y));
+        handler.setMainCursor(renderer.getCursorPos(handler.getText(), getContext().getCursor().getX() - pos.x + scrollOffset, getContext().getCursor().getY() - pos.y));
+    }
+
+    @Override
+    public void onHoverMouseScroll(int direction) {
+        if (this.scrollBar != null) {
+            this.scrollBar.onHoverMouseScroll(direction);
+        }
     }
 
     @Override
@@ -155,7 +166,11 @@ public class BaseTextFieldWidget extends Widget implements IWidgetParent, Intera
 
     @Override
     public void setHorizontalScrollOffset(int offset) {
-        this.scrollOffset = offset;
+        if (this.scrollBar != null && this.scrollBar.isActive()) {
+            this.scrollOffset = offset;
+        } else {
+            this.scrollOffset = 0;
+        }
     }
 
     @Override
@@ -170,7 +185,7 @@ public class BaseTextFieldWidget extends Widget implements IWidgetParent, Intera
 
     @Override
     public int getActualWidth() {
-        return renderer.getMaxWidth(handler.getText());
+        return (int) Math.ceil(renderer.getLastWidth());
     }
 
     public int getMaxLines() {
@@ -189,6 +204,7 @@ public class BaseTextFieldWidget extends Widget implements IWidgetParent, Intera
 
     public BaseTextFieldWidget setScrollBar(@Nullable ScrollBar scrollBar) {
         this.scrollBar = scrollBar;
+        this.handler.setScrollBar(scrollBar);
         if (this.scrollBar != null) {
             this.scrollBar.setScrollType(ScrollType.HORIZONTAL, this, null);
         }

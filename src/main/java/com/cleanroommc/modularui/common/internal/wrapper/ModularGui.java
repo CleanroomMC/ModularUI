@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.common.internal.wrapper;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.TextSpan;
 import com.cleanroommc.modularui.api.drawable.TooltipContainer;
 import com.cleanroommc.modularui.api.math.Color;
@@ -19,14 +18,12 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
@@ -307,21 +304,13 @@ public class ModularGui extends GuiContainer {
             Interactable interactable = (Interactable) focused;
             doubleClick = !changedFocus && isDoubleClick(lastFocusedClick, time);
             if (!interactable.onClick(mouseButton, doubleClick)) {
-                ModularUI.LOGGER.info("Super click2");
                 super.mouseClicked(mouseX, mouseY, mouseButton);
             }
         } else {
-            ModularUI.LOGGER.info("Super click3");
             super.mouseClicked(mouseX, mouseY, mouseButton);
         }
 
         lastFocusedClick = time;
-    }
-
-    @Override
-    protected void handleMouseClick(@NotNull Slot slotIn, int slotId, int mouseButton, ClickType type) {
-        ModularUI.LOGGER.info("Clicked slot {}, type {}", slotId, type.name());
-        super.handleMouseClick(slotIn, slotId, mouseButton, type);
     }
 
     private boolean tryFindFocused() {
@@ -373,7 +362,6 @@ public class ModularGui extends GuiContainer {
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
         // debug mode C + CTRL + SHIFT + ALT
-        ModularUI.LOGGER.info("Typed {}, {}", typedChar, keyCode);
         if (keyCode == 46 && isCtrlKeyDown() && isShiftKeyDown() && isAltKeyDown()) {
             this.debugMode = !this.debugMode;
         }
