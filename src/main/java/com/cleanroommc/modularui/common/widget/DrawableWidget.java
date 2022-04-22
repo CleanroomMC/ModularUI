@@ -3,7 +3,6 @@ package com.cleanroommc.modularui.common.widget;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.Text;
-import com.cleanroommc.modularui.api.drawable.TextSpan;
 import com.cleanroommc.modularui.api.drawable.UITexture;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.widget.Widget;
@@ -43,7 +42,7 @@ public class DrawableWidget extends Widget {
     }
 
     public DrawableWidget setDrawable(IDrawable drawable) {
-        if (drawable instanceof Text || drawable instanceof TextSpan) {
+        if (drawable instanceof Text) {
             ModularUI.LOGGER.warn("Please use TextWidget for Text");
         }
         this.drawable = drawable;

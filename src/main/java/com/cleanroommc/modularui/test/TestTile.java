@@ -223,7 +223,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
             return null;
         }
         MultiChildWidget widget = new MultiChildWidget();
-        widget.addChild(new TextWidget(new Text("Item: ").format(TextFormatting.BLUE), new Text(stack.getDisplayName())))
+        widget.addChild(new TextWidget(new Text("Item: " + stack.getDisplayName()).format(TextFormatting.BLUE)))
                 .addChild(new CycleButtonWidget()
                         .setGetter(() -> serverCounter)
                         .setSetter(value -> serverCounter = value)

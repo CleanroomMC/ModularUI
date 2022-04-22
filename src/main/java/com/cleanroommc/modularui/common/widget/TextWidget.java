@@ -2,68 +2,54 @@ package com.cleanroommc.modularui.common.widget;
 
 import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.TextRenderer;
-import com.cleanroommc.modularui.api.drawable.TextSpan;
 import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.Widget;
 import com.google.gson.JsonObject;
-import net.minecraft.util.text.ITextComponent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
 public class TextWidget extends Widget {
 
-    private final TextSpan text;
+    private final Text text;
     protected String localised;
     private int maxWidth = -1;
     private Alignment textAlignment = Alignment.TopLeft;
     private final TextRenderer textRenderer = new TextRenderer();
 
     public TextWidget() {
-        this(new TextSpan());
+        this(new Text(""));
     }
 
-    public TextWidget(TextSpan text) {
+    public TextWidget(Text text) {
         this.text = text;
     }
 
-    public TextWidget(Text... texts) {
-        this(new TextSpan().addText(texts));
-    }
-
     public TextWidget(String text) {
-        this(new TextSpan().addText(text));
+        this(new Text(text));
     }
 
-    public TextWidget(ITextComponent text) {
+    /*public TextWidget(ITextComponent text) {
         this(new TextSpan().addText(text));
-    }
+    }*/
 
-    public static DynamicTextWidget dynamicSpan(Supplier<TextSpan> supplier) {
+    public static DynamicTextWidget dynamicText(Supplier<Text> supplier) {
         return new DynamicTextWidget(supplier);
     }
 
-    public static DynamicTextWidget dynamicTexts(Supplier<Text[]> supplier) {
-        return new DynamicTextWidget(() -> new TextSpan(supplier.get()));
-    }
-
-    public static DynamicTextWidget dynamicText(Supplier<Text> supplier) {
-        return new DynamicTextWidget(() -> new TextSpan(supplier.get()));
-    }
-
     public static DynamicTextWidget dynamicString(Supplier<String> supplier) {
-        return new DynamicTextWidget(() -> new TextSpan().addText(supplier.get()));
+        return new DynamicTextWidget(() -> new Text(supplier.get()));
     }
 
-    public static DynamicTextWidget dynamicTextComponent(Supplier<ITextComponent> supplier) {
+    /*public static DynamicTextWidget dynamicTextComponent(Supplier<ITextComponent> supplier) {
         return new DynamicTextWidget(() -> new TextSpan().addText(supplier.get()));
-    }
+    }*/
 
     @Override
     public void readJson(JsonObject json, String type) {
         super.readJson(json, type);
-        getText().readJson(json);
+        //getText().readJson(json);
     }
 
     @Override
@@ -101,26 +87,16 @@ public class TextWidget extends Widget {
             localised = text.getFormatted();
         }
         textRenderer.setAlignment(textAlignment, size.width, size.height);
-        textRenderer.setColor(text.getDefaultColor());
+        textRenderer.setColor(text.getColor());
         textRenderer.draw(localised);
     }
 
-    public TextSpan getText() {
+    public Text getText() {
         return text;
     }
 
     public TextWidget setDefaultColor(int color) {
-        this.text.setDefaultColor(color);
-        return this;
-    }
-
-    public TextWidget addText(Text... text) {
-        this.text.addText(text);
-        return this;
-    }
-
-    public TextWidget setText(Text... text) {
-        this.text.setText(text);
+        this.text.color(color);
         return this;
     }
 

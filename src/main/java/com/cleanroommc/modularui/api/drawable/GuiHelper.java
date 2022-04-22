@@ -67,24 +67,12 @@ public class GuiHelper {
 
     //==== Tooltip helpers ====
 
-    public static void drawHoveringText(List<Text[]> textLines, Pos2d mousePos, Size screenSize, int maxWidth) {
-        drawHoveringText(textLines, mousePos, screenSize, maxWidth, 1f, false);
-    }
-
-    public static void drawHoveringTextSpans(List<TextSpan> textLines, Pos2d mousePos, Size screenSize, int maxWidth, float scale, boolean forceShadow) {
-        if (textLines.isEmpty()) {
-            return;
-        }
-        List<String> lines = textLines.stream().map(span -> Text.getFormatted(span.getTexts())).collect(Collectors.toList());
-        drawHoveringTextFormatted(lines, mousePos, screenSize, maxWidth, scale, forceShadow, Alignment.TopLeft);
-    }
-
-    public static void drawHoveringText(List<Text[]> textLines, Pos2d mousePos, Size screenSize, int maxWidth, float scale, boolean forceShadow) {
+    public static void drawHoveringText(List<Text> textLines, Pos2d mousePos, Size screenSize, int maxWidth, float scale, boolean forceShadow, Alignment alignment) {
         if (textLines.isEmpty()) {
             return;
         }
         List<String> lines = textLines.stream().map(Text::getFormatted).collect(Collectors.toList());
-        drawHoveringTextFormatted(lines, mousePos, screenSize, maxWidth, scale, forceShadow, Alignment.TopLeft);
+        drawHoveringTextFormatted(lines, mousePos, screenSize, maxWidth, scale, forceShadow, alignment);
     }
 
     public static void drawHoveringTextFormatted(List<String> lines, Pos2d mousePos, Size screenSize, int maxWidth) {

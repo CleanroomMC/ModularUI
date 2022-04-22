@@ -1,14 +1,14 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.api.drawable.TextSpan;
+import com.cleanroommc.modularui.api.drawable.Text;
 
 import java.util.function.Supplier;
 
 public class DynamicTextWidget extends TextWidget {
 
-    private final Supplier<TextSpan> textSupplier;
+    private final Supplier<Text> textSupplier;
 
-    public DynamicTextWidget(Supplier<TextSpan> text) {
+    public DynamicTextWidget(Supplier<Text> text) {
         this.textSupplier = text;
     }
 
@@ -22,7 +22,7 @@ public class DynamicTextWidget extends TextWidget {
     }
 
     @Override
-    public TextSpan getText() {
+    public Text getText() {
         return textSupplier.get();
     }
 }

@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.Text;
-import com.cleanroommc.modularui.api.drawable.TextSpan;
 import com.cleanroommc.modularui.api.drawable.TooltipContainer;
 import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.GuiArea;
@@ -55,7 +54,7 @@ public abstract class Widget {
     // visuals
     @Nullable
     private IDrawable[] background;
-    private final List<TextSpan> additionalTooltip = new ArrayList<>();
+    private final List<Text> additionalTooltip = new ArrayList<>();
     private int tooltipShowUpDelay = 0;
     @Nullable
     private String debugLabel;
@@ -492,7 +491,7 @@ public abstract class Widget {
         return background;
     }
 
-    public List<TextSpan> getTooltip() {
+    public List<Text> getTooltip() {
         return additionalTooltip;
     }
 
@@ -615,24 +614,9 @@ public abstract class Widget {
     /**
      * Adds a line to the tooltip
      */
-    public Widget addTooltip(TextSpan tooltip) {
-        this.additionalTooltip.add(tooltip);
+    public Widget addTooltip(Text tooltip) {
+        this.addTooltip(tooltip);
         return this;
-    }
-
-    /**
-     * Adds a line to the tooltip
-     */
-    public Widget addTooltip(int index, TextSpan tooltip) {
-        this.additionalTooltip.add(index, tooltip);
-        return this;
-    }
-
-    /**
-     * Adds a line to the tooltip
-     */
-    public Widget addTooltip(Text... tooltip) {
-        return addTooltip(new TextSpan(tooltip));
     }
 
     /**
