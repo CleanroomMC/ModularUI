@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class TextFieldHandler {
 
@@ -22,6 +23,17 @@ public class TextFieldHandler {
     private ScrollBar scrollBar;
     private boolean mainCursorStart = true;
     private int maxLines = 1;
+    @Nullable
+    private Pattern pattern;
+    private int maxCharacters = -1;
+
+    public void setPattern(@Nullable Pattern pattern) {
+        this.pattern = pattern;
+    }
+
+    public void setMaxCharacters(int maxCharacters) {
+        this.maxCharacters = maxCharacters;
+    }
 
     public void setScrollBar(@Nullable ScrollBar scrollBar) {
         this.scrollBar = scrollBar;
@@ -184,6 +196,10 @@ public class TextFieldHandler {
         return builder.toString();
     }
 
+    public boolean test(String text) {
+        return maxLines > 1 || ((pattern == null || pattern.matcher(text).matches()) && (maxCharacters < 0 || maxCharacters >= text.length()));
+    }
+
     public void insert(String text) {
         insert(Arrays.asList(text.split("\n")));
     }
@@ -197,14 +213,23 @@ public class TextFieldHandler {
         }
         if (text.isEmpty()) return;
         if (this.text.isEmpty()) {
+            if (text.size() == 1 && !test(text.get(0))) {
+                return;
+            }
             this.text.addAll(text);
             setCursor(this.text.size() - 1, this.text.get(this.text.size() - 1).length());
             return;
         }
         String lineStart = this.text.get(cursor.y).substring(0, cursor.x);
         String lineEnd = this.text.get(cursor.y).substring(cursor.x);
+        if (text.size() == 1 && this.text.size() == 1 && !test(lineStart + text.get(0) + lineEnd)) {
+            return;
+        }
         this.text.set(cursor.y, lineStart + text.get(0));
         if (text.size() == 1) {
+            if (!test(text.get(0))) {
+                return;
+            }
             this.text.set(cursor.y, this.text.get(cursor.y) + lineEnd);
             setCursor(cursor.y, cursor.x + text.get(0).length());
         } else {

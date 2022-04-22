@@ -2,7 +2,9 @@ package com.cleanroommc.modularui.common.widget.textfield;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.widget.ISyncedWidget;
+import com.cleanroommc.modularui.common.internal.network.NetworkUtils;
 import net.minecraft.network.PacketBuffer;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -15,16 +17,105 @@ public class TextFieldWidget extends BaseTextFieldWidget implements ISyncedWidge
     private Supplier<String> getter;
     private Consumer<String> setter;
     private Function<String, String> validator = val -> val;
-    private Pattern pattern = ANY;
+    private boolean syncsToServer = true;
+    private boolean syncsToClient = true;
+
+    @NotNull
+    public String getText() {
+        if (handler.getText().isEmpty()) {
+            return "";
+        }
+        if (handler.getText().size() > 1) {
+            throw new IllegalStateException("TextFieldWidget can only have one line!");
+        }
+        return handler.getText().get(0);
+    }
+
+    public void setText(@NotNull String text) {
+        if (handler.getText().isEmpty()) {
+            handler.getText().add(text);
+        } else {
+            handler.getText().set(0, text);
+        }
+    }
+
+    @Override
+    public void onRemoveFocus() {
+        super.onRemoveFocus();
+        if (handler.getText().isEmpty()) {
+            handler.getText().set(0, validator.apply(""));
+        } else if (handler.getText().size() == 1) {
+            handler.getText().set(0, validator.apply(handler.getText().get(0)));
+        } else {
+            throw new IllegalStateException("TextFieldWidget can only have one line!");
+        }
+        if (syncsToServer()) {
+            syncToServer(1, buffer -> NetworkUtils.writeStringSafe(buffer, getText()));
+        }
+    }
+
+    @Override
+    public void detectAndSendChanges() {
+        if (syncsToClient() && getter != null) {
+            String val = getter.get();
+            if (!getText().equals(val)) {
+                setText(val);
+                syncToClient(1, buffer -> NetworkUtils.writeStringSafe(buffer, getText()));
+            }
+        }
+    }
 
     @Override
     public void readOnClient(int id, PacketBuffer buf) throws IOException {
-
+        if (id == 1) {
+            if (!isFocused()) {
+                setText(buf.readString(Short.MAX_VALUE));
+                if (this.setter != null && (this.getter == null || !getText().equals(this.getter.get()))) {
+                    this.setter.accept(getText());
+                }
+            }
+        }
     }
 
     @Override
     public void readOnServer(int id, PacketBuffer buf) throws IOException {
+        setText(buf.readString(Short.MAX_VALUE));
+        if (this.setter != null) {
+            this.setter.accept(getText());
+        }
+    }
 
+    /**
+     * @return if this widget should operate on the sever side.
+     * For example detecting and sending changes to client.
+     */
+    public boolean syncsToClient() {
+        return syncsToClient;
+    }
+
+    /**
+     * @return if this widget should operate on the client side.
+     * For example, sending a changed value to the server.
+     */
+    public boolean syncsToServer() {
+        return syncsToServer;
+    }
+
+    /**
+     * Determines how this widget should sync values
+     *
+     * @param syncsToClient if this widget should sync changes to the server
+     * @param syncsToServer if this widget should detect changes on server and sync them to client
+     */
+    public TextFieldWidget setSynced(boolean syncsToClient, boolean syncsToServer) {
+        this.syncsToClient = syncsToClient;
+        this.syncsToServer = syncsToServer;
+        return this;
+    }
+
+    public TextFieldWidget setMaxLength(int maxLength) {
+        this.handler.setMaxCharacters(maxLength);
+        return this;
     }
 
     public TextFieldWidget setSetter(Consumer<String> setter) {
@@ -74,7 +165,7 @@ public class TextFieldWidget extends BaseTextFieldWidget implements ISyncedWidge
     }
 
     public TextFieldWidget setPattern(Pattern pattern) {
-        this.pattern = pattern;
+        handler.setPattern(pattern);
         return this;
     }
 
