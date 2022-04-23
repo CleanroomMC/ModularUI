@@ -96,8 +96,14 @@ public class TextFieldHandler {
     }
 
     public void setCursor(int linePos, int charPos) {
+        setCursor(linePos, charPos, true);
+    }
+
+    public void setCursor(int linePos, int charPos, boolean applyToOffset) {
         setMainCursor(linePos, charPos);
-        setOffsetCursor(linePos, charPos);
+        if (applyToOffset) {
+            setOffsetCursor(linePos, charPos);
+        }
     }
 
     public void setOffsetCursor(Point cursor) {
@@ -130,9 +136,25 @@ public class TextFieldHandler {
         Point main = getMainCursor();
         if (main.x == 0) {
             if (main.y == 0) return;
-            setCursor(main.y - 1, this.text.get(main.y - 1).length() - 1);
+            setCursor(main.y - 1, this.text.get(main.y - 1).length(), !shift);
         } else {
-            setCursor(main.y, main.x - 1);
+            int newPos = main.x - 1;
+            if (ctrl) {
+                String line = this.text.get(main.y);
+                boolean found = false;
+                for (int i = main.x - 1; i >= 0; i--) {
+                    char c = line.charAt(i);
+                    if (!Character.isLetter(c) && !Character.isDigit(c)) {
+                        newPos = i + 1;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    newPos = 0;
+                }
+            }
+            setCursor(main.y, newPos, !shift);
         }
     }
 
@@ -142,9 +164,24 @@ public class TextFieldHandler {
         String line = this.text.get(main.y);
         if (main.x == line.length()) {
             if (main.y == this.text.size() - 1) return;
-            setCursor(main.y + 1, 0);
+            setCursor(main.y + 1, 0, !shift);
         } else {
-            setCursor(main.y, main.x + 1);
+            int newPos = main.x + 1;
+            if (ctrl) {
+                boolean found = false;
+                for (int i = main.x + 1; i < line.length(); i++) {
+                    char c = line.charAt(i);
+                    if (!Character.isLetter(c) && !Character.isDigit(c)) {
+                        newPos = i;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    newPos = line.length();
+                }
+            }
+            setCursor(main.y, newPos, !shift);
         }
     }
 
@@ -152,9 +189,9 @@ public class TextFieldHandler {
         if (this.text.isEmpty()) return;
         Point main = getMainCursor();
         if (main.y > 0) {
-            setCursor(main.y - 1, main.x);
+            setCursor(main.y - 1, main.x, !shift);
         } else {
-            setCursor(main.y, 0);
+            setCursor(main.y, 0, !shift);
         }
     }
 
@@ -162,9 +199,9 @@ public class TextFieldHandler {
         if (this.text.isEmpty()) return;
         Point main = getMainCursor();
         if (main.y < this.text.size() - 1) {
-            setCursor(main.y + 1, main.x);
+            setCursor(main.y + 1, main.x, !shift);
         } else {
-            setCursor(main.y, this.text.get(main.y).length());
+            setCursor(main.y, this.text.get(main.y).length(), !shift);
         }
     }
 

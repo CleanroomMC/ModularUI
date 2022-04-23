@@ -197,7 +197,7 @@ public class ScrollBar extends Widget implements Interactable {
 
     @Override
     public void onHoverMouseScroll(int direction) {
-        setScrollOffset(getScrollOffset() + direction * 3);
+        setScrollOffset(getScrollOffset() + direction * 6);
     }
 
     public ScrollBar setBarTexture(IDrawable barTexture) {
