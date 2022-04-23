@@ -12,6 +12,9 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
+/**
+ * Text input widget with one line only. Can be synced between client and server. Can handle text validation.
+ */
 public class TextFieldWidget extends BaseTextFieldWidget implements ISyncedWidget {
 
     private Supplier<String> getter;
@@ -43,7 +46,7 @@ public class TextFieldWidget extends BaseTextFieldWidget implements ISyncedWidge
     public void onRemoveFocus() {
         super.onRemoveFocus();
         if (handler.getText().isEmpty()) {
-            handler.getText().set(0, validator.apply(""));
+            handler.getText().add(validator.apply(""));
         } else if (handler.getText().size() == 1) {
             handler.getText().set(0, validator.apply(handler.getText().get(0)));
         } else {

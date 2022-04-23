@@ -20,6 +20,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
+/**
+ * The base of a text input widget. Handles mouse/keyboard input and rendering.
+ */
 public class BaseTextFieldWidget extends Widget implements IWidgetParent, Interactable, IHorizontalScrollable {
 
     // all positive whole numbers
@@ -71,6 +74,18 @@ public class BaseTextFieldWidget extends Widget implements IWidgetParent, Intera
     }
 
     @Override
+    public boolean shouldGetFocus() {
+        this.cursorTimer = 0;
+        this.renderer.setCursor(true);
+        return true;
+    }
+
+    @Override
+    public boolean canHover() {
+        return true;
+    }
+
+    @Override
     public boolean onClick(int buttonId, boolean doubleClick) {
         handler.setCursor(renderer.getCursorPos(handler.getText(), getContext().getCursor().getX() - pos.x + scrollOffset, getContext().getCursor().getY() - pos.y));
         return true;
@@ -92,12 +107,14 @@ public class BaseTextFieldWidget extends Widget implements IWidgetParent, Intera
     public boolean onKeyPressed(char character, int keyCode) {
         switch (keyCode) {
             case Keyboard.KEY_RETURN:
-            case Keyboard.KEY_ESCAPE:
                 if (getMaxLines() > 1) {
                     handler.newLine();
                 } else {
                     removeFocus();
                 }
+                return true;
+            case Keyboard.KEY_ESCAPE:
+                removeFocus();
                 return true;
             case Keyboard.KEY_LEFT: {
                 handler.moveCursorLeft(Interactable.hasControlDown(), Interactable.hasShiftDown());

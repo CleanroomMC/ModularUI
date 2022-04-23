@@ -12,6 +12,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
+/**
+ * Handles the text itself like inserting and deleting text. Also handles the cursor and marking text.
+ */
 public class TextFieldHandler {
 
     private static final Joiner JOINER = Joiner.on('\n');
@@ -266,11 +269,11 @@ public class TextFieldHandler {
             if (min.y == max.y) {
                 this.text.set(min.y, minLine.substring(0, min.x) + minLine.substring(max.x));
             } else {
-                this.text.set(min.y, minLine.substring(0, min.x));
-                if (max.y > min.y + 2) {
-                    this.text.subList(min.y, max.y - 1).clear();
+                String maxLine = this.text.get(max.y);
+                this.text.set(min.y, minLine.substring(0, min.x) + maxLine.substring(max.x));
+                if (max.y > min.y + 1) {
+                    this.text.subList(min.y + 1, max.y + 1).clear();
                 }
-                this.text.set(min.y, minLine.substring(max.x));
             }
             setCursor(min.y, min.x);
         } else {
@@ -288,9 +291,10 @@ public class TextFieldHandler {
             } else {
                 if (cursor.x == 0) {
                     if (cursor.y > 0) {
-                        this.text.set(cursor.y - 1, this.text.get(cursor.y - 1) + line);
+                        String lineAbove = this.text.get(cursor.y - 1);
+                        this.text.set(cursor.y - 1, lineAbove + line);
                         this.text.remove(cursor.y);
-                        setCursor(cursor.y - 1, cursor.x);
+                        setCursor(cursor.y - 1, lineAbove.length());
                     }
                 } else {
                     line = line.substring(0, cursor.x - 1) + line.substring(cursor.x);

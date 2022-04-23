@@ -53,13 +53,13 @@ public class TextFieldRenderer extends TextRenderer {
                     Pair<String, Float> line = measuredLines.get(min);
                     float startX = getStartX(line.getValue());
                     drawMarked(start.y, start.x, startX + line.getValue());
-                    start.y += FR.FONT_HEIGHT * scale;
+                    start.y += getFontHeight();
                     if (max - min > 1) {
-                        for (int i = min + 1; i < max - 1; i++) {
+                        for (int i = min + 1; i < max; i++) {
                             line = measuredLines.get(i);
                             startX = getStartX(line.getValue());
                             drawMarked(start.y, startX, startX + line.getValue());
-                            start.y += FR.FONT_HEIGHT * scale;
+                            start.y += getFontHeight();
                         }
                     }
                     line = measuredLines.get(max);
@@ -107,13 +107,13 @@ public class TextFieldRenderer extends TextRenderer {
         }
         Pair<String, Float> line = measuredLines.get(cursorPos.y);
         String sub = line.getKey().substring(0, Math.min(line.getKey().length(), cursorPos.x));
-        return new Point2D.Float(getStartX(line.getRight()) + FR.getStringWidth(sub) * scale, getStartY(measuredLines.size()));
+        return new Point2D.Float(getStartX(line.getRight()) + FR.getStringWidth(sub) * scale, getStartY(measuredLines.size()) + cursorPos.y * getFontHeight());
     }
 
     @SideOnly(Side.CLIENT)
     public void drawMarked(float y0, float x0, float x1) {
         y0 -= 1;
-        float y1 = y0 + FR.FONT_HEIGHT * scale;
+        float y1 = y0 + getFontHeight();
         float red = Color.getRedF(markedColor);
         float green = Color.getGreenF(markedColor);
         float blue = Color.getBlueF(markedColor);
