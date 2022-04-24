@@ -26,16 +26,16 @@ import java.util.regex.Pattern;
 public class BaseTextFieldWidget extends Widget implements IWidgetParent, Interactable, IHorizontalScrollable {
 
     // all positive whole numbers
-    public static final Pattern NATURAL_NUMS = Pattern.compile("[0-9]*");
+    public static final Pattern NATURAL_NUMS = Pattern.compile("[0-9]*([+\\-*/^][0-9]*)*");
     // all positive and negative numbers
-    public static final Pattern WHOLE_NUMS = Pattern.compile("-?[0-9]*");
+    public static final Pattern WHOLE_NUMS = Pattern.compile("-?[0-9]*([+\\-*/^][0-9]*)*");
     public static final Pattern DECIMALS = Pattern.compile("[0-9]*(\\.[0-9]*)?");
     public static final Pattern LETTERS = Pattern.compile("[a-zA-Z]*");
     public static final Pattern ANY = Pattern.compile(".*");
     private static final Pattern BASE_PATTERN = Pattern.compile("[A-Za-z0-9\\s_+\\-.,!@#$%^&*();\\\\/|<>\"'\\[\\]?=]");
 
-    protected final TextFieldHandler handler = new TextFieldHandler();
-    protected final TextFieldRenderer renderer = new TextFieldRenderer(handler);
+    protected TextFieldHandler handler = new TextFieldHandler();
+    protected TextFieldRenderer renderer = new TextFieldRenderer(handler);
     protected Alignment textAlignment = Alignment.TopLeft;
     protected int scrollOffset = 0;
     protected float scale = 1f;

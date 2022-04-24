@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.common.widget.textfield;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.math.MathExpression;
 import com.cleanroommc.modularui.api.widget.ISyncedWidget;
 import com.cleanroommc.modularui.common.internal.network.NetworkUtils;
 import net.minecraft.network.PacketBuffer;
@@ -194,11 +195,7 @@ public class TextFieldWidget extends BaseTextFieldWidget implements ISyncedWidge
             if (val.isEmpty()) {
                 num = 0;
             } else {
-                try {
-                    num = Long.parseLong(val);
-                } catch (NumberFormatException e) {
-                    num = 0;
-                }
+                num = (long) MathExpression.parseMathExpression(val);
             }
             return String.valueOf(validator.apply(num));
         });
@@ -212,11 +209,7 @@ public class TextFieldWidget extends BaseTextFieldWidget implements ISyncedWidge
             if (val.isEmpty()) {
                 num = 0;
             } else {
-                try {
-                    num = Integer.parseInt(val);
-                } catch (NumberFormatException e) {
-                    num = 0;
-                }
+                num = (int) MathExpression.parseMathExpression(val);
             }
             return String.valueOf(validator.apply(num));
         });
@@ -250,4 +243,5 @@ public class TextFieldWidget extends BaseTextFieldWidget implements ISyncedWidge
     public TextFieldWidget setNumbers(int min, int max) {
         return setNumbers(val -> Math.min(max, Math.max(min, val)));
     }
+
 }
