@@ -66,6 +66,16 @@ public class MathExpression {
                     i--;
                     continue;
                 }
+                if (obj == Operator.MOD) {
+                    Double newNum = lastNum % (Double) parsed.get(i + 1);
+                    parsed.remove(i - 1);
+                    parsed.remove(i - 1);
+                    parsed.remove(i - 1);
+                    parsed.add(i - 1, newNum);
+                    lastNum = newNum;
+                    i--;
+                    continue;
+                }
                 lastNum = null;
             }
             if (lastNum != null) {
@@ -146,6 +156,14 @@ public class MathExpression {
                     parsed.add(Operator.DIVIDE);
                     break;
                 }
+                case '%': {
+                    if (builder.length() > 0) {
+                        parsed.add(Double.parseDouble(builder.toString()));
+                        builder.delete(0, builder.length());
+                    }
+                    parsed.add(Operator.MOD);
+                    break;
+                }
                 case '^': {
                     if (builder.length() > 0) {
                         parsed.add(Double.parseDouble(builder.toString()));
@@ -186,7 +204,7 @@ public class MathExpression {
 
     public enum Operator {
 
-        PLUS("+"), MINUS("-"), MULTIPLY("*"), DIVIDE("/"), POWER("^");
+        PLUS("+"), MINUS("-"), MULTIPLY("*"), DIVIDE("/"), MOD("%"), POWER("^");
         public final String sign;
 
         Operator(String sign) {
