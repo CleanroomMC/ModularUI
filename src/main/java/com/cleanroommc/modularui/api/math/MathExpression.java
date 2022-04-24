@@ -1,7 +1,5 @@
 package com.cleanroommc.modularui.api.math;
 
-import com.cleanroommc.modularui.ModularUI;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -41,7 +39,6 @@ public class MathExpression {
         if (lastNum != null) {
             lastNum = null;
         }
-        ModularUI.LOGGER.info("Parsed after pow {}", parsed);
         if (parsed.size() > 1) {
             for (int i = 0; i < parsed.size(); i++) {
                 Object obj = parsed.get(i);
@@ -75,7 +72,6 @@ public class MathExpression {
                 lastNum = null;
             }
         }
-        ModularUI.LOGGER.info("Parsed after dot {}", parsed);
         if (parsed.size() > 1) {
             for (int i = 0; i < parsed.size(); i++) {
                 Object obj = parsed.get(i);
@@ -106,7 +102,6 @@ public class MathExpression {
                 lastNum = null;
             }
         }
-        ModularUI.LOGGER.info("Parsed after line {}", parsed);
         if (parsed.size() != 1) {
             throw new IllegalStateException("Calculated expr has more than 1 result. " + parsed);
         }
@@ -166,6 +161,9 @@ public class MathExpression {
         if (builder.length() > 0) {
             parsed.add(Double.parseDouble(builder.toString()));
         }
+        if (parsed.size() >= 2 && parsed.get(0) == Operator.MINUS && parsed.get(1) instanceof Double) {
+            parsed.add(0, 0.0);
+        }
         boolean shouldBeOperator = false;
         for (Object object : parsed) {
             if (shouldBeOperator) {
@@ -183,7 +181,6 @@ public class MathExpression {
         while (parsed.get(parsed.size() - 1) instanceof Operator) {
             parsed.remove(parsed.size() - 1);
         }
-        ModularUI.LOGGER.info("Parsed expr {}", parsed);
         return parsed;
     }
 
