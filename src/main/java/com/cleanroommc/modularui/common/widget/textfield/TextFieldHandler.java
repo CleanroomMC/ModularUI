@@ -218,6 +218,9 @@ public class TextFieldHandler {
         return this.text;
     }
 
+    public void onChanged() {
+    }
+
     public String getSelectedText() {
         if (!hasTextMarked()) return "";
         Point min = getStartCursor();
@@ -258,6 +261,7 @@ public class TextFieldHandler {
             }
             this.text.addAll(text);
             setCursor(this.text.size() - 1, this.text.get(this.text.size() - 1).length());
+            onChanged();
             return;
         }
         String lineStart = this.text.get(cursor.y).substring(0, cursor.x);
@@ -282,6 +286,7 @@ public class TextFieldHandler {
                 setCursor(cursor.y + text.size() - 1, text.get(text.size() - 1).length());
             }
         }
+        onChanged();
     }
 
     public void newLine() {
@@ -343,6 +348,7 @@ public class TextFieldHandler {
         if (this.scrollBar != null) {
             scrollBar.clampScrollOffset();
         }
+        onChanged();
     }
 
     public void setMaxLines(int maxLines) {

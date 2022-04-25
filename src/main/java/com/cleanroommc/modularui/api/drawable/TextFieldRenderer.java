@@ -16,9 +16,9 @@ import java.util.List;
 
 public class TextFieldRenderer extends TextRenderer {
 
-    private final TextFieldHandler handler;
-    private int markedColor = 0x2F72A8;
-    private boolean renderCursor = false;
+    protected final TextFieldHandler handler;
+    protected int markedColor = 0x2F72A8;
+    protected boolean renderCursor = false;
 
     public TextFieldRenderer(TextFieldHandler handler) {
         this.handler = handler;
@@ -38,6 +38,11 @@ public class TextFieldRenderer extends TextRenderer {
 
     @Override
     protected void drawMeasuredLines(List<Pair<String, Float>> measuredLines) {
+        drawCursors(measuredLines);
+        super.drawMeasuredLines(measuredLines);
+    }
+
+    protected void drawCursors(List<Pair<String, Float>> measuredLines) {
         if (!simulate) {
             Point2D.Float start;
             if (handler.hasTextMarked()) {
@@ -73,7 +78,6 @@ public class TextFieldRenderer extends TextRenderer {
                 drawCursor(start.x, start.y);
             }
         }
-        super.drawMeasuredLines(measuredLines);
     }
 
     public Point getCursorPos(List<String> lines, int x, int y) {
@@ -139,7 +143,7 @@ public class TextFieldRenderer extends TextRenderer {
     private void drawCursor(float x0, float y0) {
         x0 = (x0 - 0.8f) / scale;
         y0 = (y0 - 1) / scale;
-        float x1 = x0 + 0.6f /* * (1 / getScale())*/;
+        float x1 = x0 + 0.6f;
         float y1 = y0 + 9;
         float red = Color.getRedF(color);
         float green = Color.getGreenF(color);
