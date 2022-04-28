@@ -1,11 +1,11 @@
 package com.cleanroommc.modularui.common.widget;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.UITexture;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.common.internal.JsonHelper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -114,18 +114,18 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
     }
 
     @Override
-    public boolean onClick(int buttonId, boolean doubleClick) {
+    public ClickResult onClick(int buttonId, boolean doubleClick) {
         switch (buttonId) {
             case 0:
                 next();
                 Interactable.playButtonClickSound();
-                return true;
+                return ClickResult.ACCEPT;
             case 1:
                 prev();
                 Interactable.playButtonClickSound();
-                return true;
+                return ClickResult.ACCEPT;
         }
-        return false;
+        return ClickResult.ACKNOWLEDGED;
     }
 
     @Override

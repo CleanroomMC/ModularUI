@@ -146,7 +146,7 @@ public class ScrollBar extends Widget implements Interactable {
     }
 
     @Override
-    public boolean onClick(int buttonId, boolean doubleClick) {
+    public ClickResult onClick(int buttonId, boolean doubleClick) {
         Pos2d relative = getContext().getCursor().getPos().subtract(getAbsolutePos());
         int barSize = calculateMainAxisSize();
         int actualSize = getActualSize();
@@ -167,7 +167,7 @@ public class ScrollBar extends Widget implements Interactable {
                 setScrollOffset((int) (newOffset * actualSize));
             }
         }
-        return true;
+        return ClickResult.ACCEPT;
     }
 
     @Override
@@ -196,8 +196,9 @@ public class ScrollBar extends Widget implements Interactable {
     }
 
     @Override
-    public void onHoverMouseScroll(int direction) {
+    public boolean onMouseScroll(int direction) {
         setScrollOffset(getScrollOffset() + direction * 6);
+        return true;
     }
 
     public ScrollBar setBarTexture(IDrawable barTexture) {

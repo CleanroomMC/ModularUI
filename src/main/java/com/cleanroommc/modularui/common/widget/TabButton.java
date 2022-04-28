@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.widget.Widget;
 
 import javax.annotation.Nullable;
@@ -17,12 +17,11 @@ public class TabButton extends Widget implements Interactable {
     }
 
     @Override
-    public boolean onClick(int buttonId, boolean doubleClick) {
+    public ClickResult onClick(int buttonId, boolean doubleClick) {
         if (page != tabController.getCurrentPage()) {
             tabController.setActivePage(page);
-            return true;
         }
-        return false;
+        return ClickResult.ACCEPT;
     }
 
     protected void setTabController(TabContainer tabController) {

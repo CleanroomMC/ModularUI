@@ -1,13 +1,13 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.api.widget.IWidgetBuilder;
-import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.animation.Eases;
 import com.cleanroommc.modularui.api.animation.Interpolator;
 import com.cleanroommc.modularui.api.drawable.GuiHelper;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.api.widget.IWidgetBuilder;
+import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.widget.Widget;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
@@ -138,12 +138,12 @@ public class ExpandTab extends MultiChildWidget implements Interactable, IWidget
     }
 
     @Override
-    public boolean onClick(int buttonId, boolean doubleClick) {
+    public ClickResult onClick(int buttonId, boolean doubleClick) {
         if (buttonId == 0) {
             setExpanded(!isExpanded());
-            return true;
+            return ClickResult.ACCEPT;
         }
-        return false;
+        return ClickResult.ACKNOWLEDGED;
     }
 
     public void setExpanded(boolean expanded) {

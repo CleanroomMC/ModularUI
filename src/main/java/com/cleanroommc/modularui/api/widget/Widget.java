@@ -379,7 +379,7 @@ public abstract class Widget {
      */
     @SideOnly(Side.CLIENT)
     public boolean isFocused() {
-        return getContext().getScreen().isFocused(this);
+        return getContext().getCursor().isFocused(this);
     }
 
     /**
@@ -387,7 +387,7 @@ public abstract class Widget {
      */
     @SideOnly(Side.CLIENT)
     public void removeFocus() {
-        getContext().getScreen().removeFocus(this);
+        getContext().getCursor().removeFocus(this);
     }
 
     @SideOnly(Side.CLIENT)
@@ -401,6 +401,11 @@ public abstract class Widget {
     @SideOnly(Side.CLIENT)
     public boolean isHovering() {
         return getContext().getCursor().isHovering(this);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public boolean isRightBelowMouse() {
+        return getContext().getCursor().isRightBelow(this);
     }
 
 

@@ -1,9 +1,9 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.api.drawable.UITexture;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.common.internal.mixin.GuiContainerMixin;
 import com.cleanroommc.modularui.common.internal.wrapper.BaseSlot;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
@@ -167,23 +167,25 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     }
 
     @Override
-    public boolean onClick(int buttonId, boolean doubleClick) {
+    public ClickResult onClick(int buttonId, boolean doubleClick) {
         if (isPhantom()) {
             syncToServer(2, buffer -> ClickData.create(buttonId, doubleClick).writeToPacket(buffer));
-            return true;
+            return ClickResult.ACCEPT;
         }
-        return false;
+        return ClickResult.REJECT;
     }
 
     @Override
-    public void onHoverMouseScroll(int direction) {
+    public boolean onMouseScroll(int direction) {
         if (isPhantom()) {
             if (Interactable.hasShiftDown()) {
                 direction *= 8;
             }
             final int finalDirection = direction;
             syncToServer(3, buffer -> buffer.writeVarInt(finalDirection));
+            return true;
         }
+        return false;
     }
 
     protected void phantomClick(ClickData clickData) {

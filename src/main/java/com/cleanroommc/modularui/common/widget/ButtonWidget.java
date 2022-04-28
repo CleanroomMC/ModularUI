@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.widget.Widget;
 import net.minecraft.network.PacketBuffer;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +23,10 @@ public class ButtonWidget extends SyncedWidget implements Interactable {
     }
 
     @Override
-    public boolean onClick(int buttonId, boolean doubleClick) {
+    public ClickResult onClick(int buttonId, boolean doubleClick) {
+        if (!isRightBelowMouse()) {
+            return ClickResult.IGNORE;
+        }
         if (clickAction != null) {
             ClickData clickData = ClickData.create(buttonId, doubleClick);
             clickAction.accept(clickData, this);
@@ -31,9 +34,9 @@ public class ButtonWidget extends SyncedWidget implements Interactable {
                 syncToServer(1, clickData::writeToPacket);
             }
             Interactable.playButtonClickSound();
-            return true;
+            return ClickResult.ACCEPT;
         }
-        return false;
+        return ClickResult.ACKNOWLEDGED;
     }
 
     @Override

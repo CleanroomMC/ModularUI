@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.drawable.TooltipContainer;
 import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.api.screen.Cursor;
 import com.cleanroommc.modularui.api.screen.ModularUIContext;
 import com.cleanroommc.modularui.api.screen.ModularWindow;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
@@ -24,6 +25,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
@@ -36,9 +38,10 @@ public class ModularGui extends GuiContainer {
     private final ModularUIContext context;
     private Pos2d mousePos = Pos2d.ZERO;
 
+    @Nullable
+    private Interactable lastClicked;
     private long lastClick = -1;
     private long lastFocusedClick = -1;
-    private Widget focused;
     public boolean debugMode = true;
     private int drawCalls = 0;
     private long drawTime = 0;
@@ -54,19 +57,12 @@ public class ModularGui extends GuiContainer {
         return context;
     }
 
+    public Cursor getCursor() {
+        return context.getCursor();
+    }
+
     public Pos2d getMousePos() {
         return mousePos;
-    }
-
-    public boolean isFocused(Widget widget) {
-        return focused != null && focused == widget;
-    }
-
-    public void removeFocus(Widget widget) {
-        if (isFocused(widget)) {
-            focused.onRemoveFocus();
-            focused = null;
-        }
     }
 
     @Override
@@ -299,37 +295,43 @@ public class ModularGui extends GuiContainer {
             return;
         }
 
-        boolean changedFocus = tryFindFocused();
-        if (focused instanceof Interactable) {
-            Interactable interactable = (Interactable) focused;
-            doubleClick = !changedFocus && isDoubleClick(lastFocusedClick, time);
-            if (!interactable.onClick(mouseButton, doubleClick)) {
-                super.mouseClicked(mouseX, mouseY, mouseButton);
+
+        Interactable probablyClicked = null;
+        boolean wasSuccess = false;
+        doubleClick = isDoubleClick(lastFocusedClick, time);
+        loop:
+        for (Interactable interactable : getCursor().getAllHovered()) {
+            Interactable.ClickResult result = interactable.onClick(mouseButton, doubleClick && lastClicked == interactable);
+            switch (result) {
+                case IGNORE:
+                    continue;
+                case ACKNOWLEDGED:
+                    if (probablyClicked == null) {
+                        probablyClicked = interactable;
+                    }
+                    continue;
+                case REJECT:
+                    probablyClicked = null;
+                    break loop;
+                case ACCEPT:
+                    probablyClicked = interactable;
+                    break loop;
+                case SUCCESS:
+                    probablyClicked = interactable;
+                    wasSuccess = true;
+                    getCursor().updateFocused((Widget) interactable);
+                    break loop;
             }
-        } else {
+        }
+        this.lastClicked = probablyClicked;
+        if (!wasSuccess) {
+            getCursor().updateFocused(null);
+        }
+        if (probablyClicked == null) {
             super.mouseClicked(mouseX, mouseY, mouseButton);
         }
 
         lastFocusedClick = time;
-    }
-
-    private boolean tryFindFocused() {
-        Widget widget = context.getCursor().getHovered();
-        boolean changedFocus = false;
-        if (widget != null) {
-            if (focused == null || focused != widget) {
-                if (focused != null) {
-                    focused.onRemoveFocus();
-                }
-                focused = widget.shouldGetFocus() ? widget : null;
-                changedFocus = true;
-            }
-        } else if (focused != null) {
-            focused.onRemoveFocus();
-            focused = null;
-            changedFocus = true;
-        }
-        return changedFocus;
     }
 
     @Override
@@ -337,14 +339,8 @@ public class ModularGui extends GuiContainer {
         for (Interactable interactable : context.getCurrentWindow().getInteractionListeners()) {
             interactable.onClickReleased(mouseButton);
         }
-        if (isFocusedValid() && focused instanceof Interactable) {
-            if (!((Interactable) focused).onClickReleased(mouseButton) && !context.getCursor().onMouseRelease()) {
-                super.mouseReleased(mouseX, mouseY, mouseButton);
-            }
-        } else {
-            if (!context.getCursor().onMouseRelease()) {
-                super.mouseReleased(mouseX, mouseY, mouseButton);
-            }
+        if ((lastClicked == null || !lastClicked.onClickReleased(mouseButton)) && !context.getCursor().onMouseRelease()) {
+            super.mouseReleased(mouseX, mouseY, mouseButton);
         }
     }
 
@@ -354,8 +350,8 @@ public class ModularGui extends GuiContainer {
         for (Interactable interactable : context.getCurrentWindow().getInteractionListeners()) {
             interactable.onMouseDragged(mouseButton, timeSinceLastClick);
         }
-        if (isFocusedValid() && focused instanceof Interactable) {
-            ((Interactable) focused).onMouseDragged(mouseButton, timeSinceLastClick);
+        if (lastClicked != null) {
+            lastClicked.onMouseDragged(mouseButton, timeSinceLastClick);
         }
     }
 
@@ -368,13 +364,13 @@ public class ModularGui extends GuiContainer {
         for (Interactable interactable : context.getCurrentWindow().getInteractionListeners()) {
             interactable.onKeyPressed(typedChar, keyCode);
         }
-        if (isFocusedValid() && focused instanceof Interactable) {
-            if (!((Interactable) focused).onKeyPressed(typedChar, keyCode)) {
-                keyTypedSuper(typedChar, keyCode);
+
+        for (Interactable interactable : getCursor().getAllHovered()) {
+            if (interactable.onKeyPressed(typedChar, keyCode)) {
+                return;
             }
-        } else {
-            keyTypedSuper(typedChar, keyCode);
         }
+        keyTypedSuper(typedChar, keyCode);
     }
 
     private void keyTypedSuper(char typedChar, int keyCode) throws IOException {
@@ -387,16 +383,13 @@ public class ModularGui extends GuiContainer {
 
     public void mouseScroll(int direction) {
         for (Interactable interactable : context.getCurrentWindow().getInteractionListeners()) {
-            interactable.onHoverMouseScroll(direction);
+            interactable.onMouseScroll(direction);
         }
-        Widget hovered = context.getCursor().getHovered();
-        if (hovered instanceof Interactable) {
-            ((Interactable) hovered).onHoverMouseScroll(direction);
+        for (Interactable interactable : getCursor().getAllHovered()) {
+            if (interactable.onMouseScroll(direction)) {
+                return;
+            }
         }
-    }
-
-    public boolean isFocusedValid() {
-        return focused != null && focused.isEnabled();
     }
 
     public boolean isDragSplitting() {

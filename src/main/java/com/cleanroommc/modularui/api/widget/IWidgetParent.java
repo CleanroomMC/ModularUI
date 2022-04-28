@@ -43,6 +43,10 @@ public interface IWidgetParent {
         }
     }
 
+    default boolean childrenMustBeInBounds() {
+        return false;
+    }
+
     static boolean forEachByLayer(List<Widget> parent, Function<Widget, Boolean> consumer) {
         return forEachByLayer(new Wrapper(parent), consumer);
     }
@@ -67,11 +71,11 @@ public interface IWidgetParent {
                 if (onlyEnabled && !child.isEnabled()) {
                     continue;
                 }
-                if (child instanceof IWidgetParent) {
-                    stack.addLast((IWidgetParent) child);
-                }
                 if (consumer.apply(child)) {
                     return false;
+                }
+                if (child instanceof IWidgetParent) {
+                    stack.addLast((IWidgetParent) child);
                 }
             }
         }

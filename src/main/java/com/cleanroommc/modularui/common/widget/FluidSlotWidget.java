@@ -1,13 +1,12 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.api.math.Alignment;
-import com.cleanroommc.modularui.api.widget.IIngredientProvider;
-import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.NumberFormat;
-import com.cleanroommc.modularui.api.drawable.TooltipContainer;
 import com.cleanroommc.modularui.api.drawable.*;
+import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.api.widget.IIngredientProvider;
+import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.common.internal.network.NetworkUtils;
 import com.cleanroommc.modularui.common.internal.wrapper.FluidTankHandler;
 import net.minecraft.entity.player.EntityPlayer;
@@ -174,9 +173,9 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngr
     }
 
     @Override
-    public boolean onClick(int buttonId, boolean doubleClick) {
+    public ClickResult onClick(int buttonId, boolean doubleClick) {
         if (!this.canFillSlot && !this.canDrainSlot) {
-            return false;
+            return ClickResult.ACKNOWLEDGED;
         }
         ItemStack cursorStack = getContext().getCursor().getItemStack();
         if (this.phantom || (!cursorStack.isEmpty() && cursorStack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null))) {
@@ -185,16 +184,16 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngr
                 buffer.writeBoolean(Interactable.hasShiftDown());
             });
             Interactable.playButtonClickSound();
-            return true;
+            return ClickResult.ACCEPT;
         }
-        return false;
+        return ClickResult.ACKNOWLEDGED;
     }
 
     @Override
-    public void onHoverMouseScroll(int direction) {
+    public boolean onMouseScroll(int direction) {
         if (this.phantom) {
             if ((direction > 0 && !this.canFillSlot) || (direction < 0 && !this.canDrainSlot)) {
-                return;
+                return false;
             }
             if (Interactable.hasShiftDown()) {
                 direction *= 10;
@@ -204,7 +203,9 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngr
             }
             final int finalDirection = direction;
             syncToServer(2, buffer -> buffer.writeVarInt(finalDirection));
+            return true;
         }
+        return false;
     }
 
     @Override

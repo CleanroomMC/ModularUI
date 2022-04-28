@@ -22,8 +22,8 @@ public interface Interactable {
      * @param doubleClick if it is the second click within 400ms
      * @return if further operations should abort
      */
-    default boolean onClick(int buttonId, boolean doubleClick) {
-        return false;
+    default ClickResult onClick(int buttonId, boolean doubleClick) {
+        return ClickResult.IGNORE;
     }
 
     /**
@@ -68,7 +68,8 @@ public interface Interactable {
      *
      * @param direction -1 for down, 1 for up
      */
-    default void onHoverMouseScroll(int direction) {
+    default boolean onMouseScroll(int direction) {
+        return false;
     }
 
     /**
@@ -110,5 +111,28 @@ public interface Interactable {
     @SideOnly(Side.CLIENT)
     static void playButtonClickSound() {
         Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+    }
+
+    enum ClickResult {
+        /**
+         * Nothing happened on this click
+         */
+        IGNORE,
+        /**
+         * Nothing happened, but it was clicked
+         */
+        ACKNOWLEDGED,
+        /**
+         * Nothing happened and no other hovered should get interacted
+         */
+        REJECT,
+        /**
+         * Success, but don't try to get focus
+         */
+        ACCEPT,
+        /**
+         * Successfully clicked. Should be returned if it should try to receive focus
+         */
+        SUCCESS
     }
 }
