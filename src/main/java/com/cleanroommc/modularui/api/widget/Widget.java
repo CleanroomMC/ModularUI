@@ -509,6 +509,13 @@ public abstract class Widget {
         return ticker;
     }
 
+    public boolean intersects(Widget widget) {
+        return !(widget.getPos().x > getPos().x + getSize().width ||
+                widget.getPos().x + widget.getSize().width < getPos().x ||
+                widget.getPos().y > getPos().y + getSize().height ||
+                widget.getPos().y + widget.getSize().height < getPos().y);
+    }
+
 
     //==== Setter/Builder ====
 
@@ -569,7 +576,12 @@ public abstract class Widget {
     public void setPosSilent(Pos2d relativePos) {
         this.relativePos = relativePos;
         if (isInitialised()) {
-            this.pos = parent.getPos().add(this.relativePos);
+            this.pos = parent.getAbsolutePos().add(this.relativePos);
+            if (this instanceof IWidgetParent) {
+                for (Widget child : ((IWidgetParent) this).getChildren()) {
+                    child.setPosSilent(child.getPos());
+                }
+            }
         }
     }
 

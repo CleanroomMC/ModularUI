@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.api.screen;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.widget.*;
 import net.minecraft.item.ItemStack;
@@ -9,7 +8,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Cursor {
@@ -21,7 +22,7 @@ public class Cursor {
     private Widget hovered;
     @Nullable
     private Widget focused;
-    private final LinkedList<Interactable> hoveredWidgets = new LinkedList<>();
+    private final List<Interactable> hoveredWidgets = new ArrayList<>();
 
     private int timeHovered;
 
@@ -90,11 +91,11 @@ public class Cursor {
     }
 
     public boolean isRightBelow(Widget widget) {
-        return this.hoveredWidgets.peek() == widget;
+        return !this.hoveredWidgets.isEmpty() && this.hoveredWidgets.get(0) == widget;
     }
 
-    public Iterable<Interactable> getAllHovered() {
-        return hoveredWidgets::descendingIterator;
+    public List<Interactable> getAllHovered() {
+        return hoveredWidgets;
     }
 
     @ApiStatus.Internal
@@ -161,7 +162,6 @@ public class Cursor {
 
     @ApiStatus.Internal
     public boolean onMouseClick(int button) {
-        ModularUI.LOGGER.info("Mouse click. Hovereds: {}", hoveredWidgets.size());
         if (getItemStack().isEmpty()) {
             if (this.cursorDraggable == null) {
                 IDraggable draggable = null;
@@ -266,40 +266,30 @@ public class Cursor {
     private Widget findHoveredWidgets() {
         this.hoveredWidgets.clear();
         AtomicReference<Widget> hovered = new AtomicReference<>();
+        LinkedList<IWidgetParent> stack = new LinkedList<>();
         for (ModularWindow window : uiContext.getOpenWindows()) {
             if (!window.isEnabled()) continue;
-            IWidgetParent.forEachByLayer(window, widget -> {
-                if (widget.isEnabled() && isAbove(widget) && widget.canHover()) {
-                    if (widget instanceof Interactable) {
-                        hoveredWidgets.add((Interactable) widget);
+            stack.clear();
+            stack.addLast(window);
+            while (!stack.isEmpty()) {
+                IWidgetParent parent1 = stack.pollFirst();
+                for (Widget child : parent1.getChildren()) {
+                    if (!child.isEnabled()) continue;
+                    boolean above = isAbove(child);
+                    if (above) {
+                        if (child instanceof Interactable) {
+                            hoveredWidgets.add(0, (Interactable) child);
+                        }
+                        if (hovered.get() == null || child.getLayer() > hovered.get().getLayer()) {
+                            hovered.set(child);
+                        }
                     }
-                    if (hovered.get() == null || widget.getLayer() > hovered.get().getLayer()) {
-                        hovered.set(widget);
+                    if (child instanceof IWidgetParent && (!((IWidgetParent) child).childrenMustBeInBounds() || above)) {
+                        stack.addLast((IWidgetParent) child);
                     }
                 }
-                return false;
-            });
+            }
         }
         return hovered.get();
-    }
-
-    @ApiStatus.Internal
-    public boolean tryFindFocused() {
-        Widget widget = getHovered();
-        boolean changedFocus = false;
-        if (widget != null) {
-            if (focused == null || focused != widget) {
-                if (focused != null) {
-                    focused.onRemoveFocus();
-                }
-                focused = widget.shouldGetFocus() ? widget : null;
-                changedFocus = true;
-            }
-        } else if (focused != null) {
-            focused.onRemoveFocus();
-            focused = null;
-            changedFocus = true;
-        }
-        return changedFocus;
     }
 }

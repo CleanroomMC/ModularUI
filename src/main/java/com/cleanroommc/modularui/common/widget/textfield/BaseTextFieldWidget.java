@@ -173,8 +173,9 @@ public class BaseTextFieldWidget extends Widget implements IWidgetParent, Intera
     @Override
     public void onRemoveFocus() {
         super.onRemoveFocus();
-        renderer.setCursor(false);
-        cursorTimer = 0;
+        this.renderer.setCursor(false);
+        this.cursorTimer = 0;
+        this.scrollOffset = 0;
     }
 
     @Override

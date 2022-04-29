@@ -295,7 +295,6 @@ public class ModularGui extends GuiContainer {
             return;
         }
 
-
         Interactable probablyClicked = null;
         boolean wasSuccess = false;
         doubleClick = isDoubleClick(lastFocusedClick, time);
@@ -365,8 +364,12 @@ public class ModularGui extends GuiContainer {
             interactable.onKeyPressed(typedChar, keyCode);
         }
 
+        Widget focused = getCursor().getFocused();
+        if (focused instanceof Interactable && ((Interactable) focused).onKeyPressed(typedChar, keyCode)) {
+            return;
+        }
         for (Interactable interactable : getCursor().getAllHovered()) {
-            if (interactable.onKeyPressed(typedChar, keyCode)) {
+            if (focused != interactable && interactable.onKeyPressed(typedChar, keyCode)) {
                 return;
             }
         }
@@ -385,8 +388,12 @@ public class ModularGui extends GuiContainer {
         for (Interactable interactable : context.getCurrentWindow().getInteractionListeners()) {
             interactable.onMouseScroll(direction);
         }
+        Widget focused = getCursor().getFocused();
+        if (focused instanceof Interactable && ((Interactable) focused).onMouseScroll(direction)) {
+            return;
+        }
         for (Interactable interactable : getCursor().getAllHovered()) {
-            if (interactable.onMouseScroll(direction)) {
+            if (focused != interactable && interactable.onMouseScroll(direction)) {
                 return;
             }
         }
