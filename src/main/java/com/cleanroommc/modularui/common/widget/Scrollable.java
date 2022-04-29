@@ -23,6 +23,7 @@ public class Scrollable extends Widget implements IWidgetBuilder<Scrollable>, IW
     private final List<Widget> children = new ArrayList<>();
     private final List<Widget> allChildren = new ArrayList<>();
     private Size actualSize = Size.ZERO;
+    private int grabScrollX = -1, grabScrollY = -1;
     @UnknownNullability
     private ScrollBar horizontalScrollBar, verticalScrollBar;
 
@@ -132,6 +133,39 @@ public class Scrollable extends Widget implements IWidgetBuilder<Scrollable>, IW
         GuiHelper.useScissor(pos.x, pos.y, size.width, size.height, () -> {
             IWidgetParent.super.drawChildren(partialTicks);
         });
+    }
+
+    @Override
+    public ClickResult onClick(int buttonId, boolean doubleClick) {
+        this.grabScrollX = getContext().getMousePos().x;
+        this.grabScrollY = getContext().getMousePos().y;
+        return ClickResult.ACCEPT;
+    }
+
+    @Override
+    public boolean onClickReleased(int buttonId) {
+        if (this.grabScrollX >= 0 || this.grabScrollY >= 0) {
+            this.grabScrollX = -1;
+            this.grabScrollY = -1;
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onMouseDragged(int buttonId, long deltaTime) {
+        if (this.grabScrollX >= 0 && this.grabScrollY >= 0) {
+            int dif = getContext().getMousePos().x - grabScrollX;
+            if (dif != 0) {
+                horizontalScrollBar.setScrollOffset(xScroll - dif);
+                grabScrollX = getContext().getMousePos().x;
+            }
+            dif = getContext().getMousePos().y - grabScrollY;
+            if (dif != 0) {
+                verticalScrollBar.setScrollOffset(yScroll - dif);
+                grabScrollY = getContext().getMousePos().y;
+            }
+        }
     }
 
     @Override

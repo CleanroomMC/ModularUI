@@ -181,7 +181,7 @@ public class ModularUIContext {
 
     @SideOnly(Side.CLIENT)
     public Pos2d getMousePos() {
-        return cursor.getPos();
+        return screen.getMousePos();
     }
 
     public boolean hasWindows() {
