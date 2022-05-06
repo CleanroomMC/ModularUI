@@ -87,7 +87,7 @@ public class Text implements IDrawable {
         renderer.setShadow(shadow);
         renderer.setAlignment(Alignment.Center, width, height);
         renderer.setColor(hasColor() ? this.color : TextRenderer.DEFAULT_COLOR);
-        renderer.draw(text);
+        renderer.draw(getFormatted());
     }
 
     public String getFormatted() {

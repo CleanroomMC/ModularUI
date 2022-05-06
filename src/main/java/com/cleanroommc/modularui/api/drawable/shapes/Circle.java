@@ -11,7 +11,6 @@ import org.lwjgl.opengl.GL11;
 
 public class Circle implements IDrawable {
 
-    public static final double PI_2 = Math.PI / 2;
     public static final double PI2 = Math.PI * 2;
 
     private int colorInner, colorOuter, segments;

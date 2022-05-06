@@ -143,7 +143,11 @@ public class ModularWindow implements IWidgetParent {
             });
             closeAnimation = openAnimation.getReversed(250, Eases.EaseQuadIn);
             openAnimation.forward();
-            closeAnimation.setCallback(val -> closeWindow());
+            closeAnimation.setCallback(val -> {
+                closeWindow();
+                openAnimation = null;
+                closeAnimation = null;
+            });
         }
         //this.pos = new Pos2d(pos.x, getContext().getScaledScreenSize().height);
     }
@@ -242,12 +246,15 @@ public class ModularWindow implements IWidgetParent {
             GlStateManager.translate(translateX, translateY, 0);
             GlStateManager.scale(scale, scale, 1);
 
-            GlStateManager.translate(pos.x, pos.y, 0);
+            GlStateManager.pushMatrix();
+            float x = (pos.x + size.width / 2f * (1 - scale)) / scale;
+            float y = (pos.y + size.height / 2f * (1 - scale)) / scale;
+            GlStateManager.translate(x, y, 0);
             for (IDrawable drawable : background) {
                 GlStateManager.color(Color.getRedF(color), Color.getGreenF(color), Color.getBlueF(color), Color.getAlphaF(color));
                 drawable.draw(Pos2d.ZERO, size, partialTicks);
             }
-            GlStateManager.translate(-pos.x, -pos.y, 0);
+            GlStateManager.popMatrix();
 
             GlStateManager.color(Color.getRedF(color), Color.getGreenF(color), Color.getBlueF(color), Color.getAlphaF(color));
             for (Widget widget : getChildren()) {
