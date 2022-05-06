@@ -93,6 +93,10 @@ public class Size {
         return new Dimension(width, height);
     }
 
+    public Rectangle asRectangle() {
+        return new Rectangle(width, height);
+    }
+
     public static Size ofJson(JsonElement jsonElement) {
         int width = 0, height = 0;
         if (jsonElement.isJsonObject()) {

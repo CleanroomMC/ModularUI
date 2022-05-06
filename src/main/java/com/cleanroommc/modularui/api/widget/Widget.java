@@ -50,6 +50,7 @@ public abstract class Widget {
     // flags and stuff
     protected boolean enabled = true;
     private int layer = -1;
+    private boolean respectJeiArea = false;
 
     // visuals
     @Nullable
@@ -122,6 +123,10 @@ public abstract class Widget {
         this.window = window;
         this.parent = parent;
         this.layer = layer;
+
+        if (this.respectJeiArea) {
+            getContext().registerExclusionZone(this);
+        }
 
         onInit();
 
@@ -516,6 +521,10 @@ public abstract class Widget {
                 widget.getPos().y + widget.getSize().height < getPos().y);
     }
 
+    public Rectangle getRectangle() {
+        return new Rectangle(pos.x, pos.y, size.width, size.height);
+    }
+
 
     //==== Setter/Builder ====
 
@@ -660,6 +669,16 @@ public abstract class Widget {
      */
     public Widget setTicker(@Nullable Consumer<Widget> ticker) {
         this.ticker = ticker;
+        return this;
+    }
+
+    public Widget respectAreaInJei() {
+        if (!this.respectJeiArea) {
+            this.respectJeiArea = true;
+            if (isInitialised()) {
+                getContext().registerExclusionZone(this);
+            }
+        }
         return this;
     }
 

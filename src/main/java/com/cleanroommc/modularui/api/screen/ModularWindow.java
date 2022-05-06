@@ -17,6 +17,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -330,6 +331,10 @@ public class ModularWindow implements IWidgetParent {
                 IWidgetParent.forEachByLayer(this, Widget::onPause);
             }
         }
+    }
+
+    public Rectangle getRectangle() {
+        return new Rectangle(pos.x, pos.y, size.width, size.height);
     }
 
     /**

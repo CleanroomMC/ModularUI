@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.ISyncedWidget;
+import com.cleanroommc.modularui.api.widget.Widget;
 import com.cleanroommc.modularui.common.internal.network.CWidgetUpdate;
 import com.cleanroommc.modularui.common.internal.network.NetworkUtils;
 import com.cleanroommc.modularui.common.internal.network.SWidgetUpdate;
@@ -22,9 +23,12 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.awt.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class ModularUIContext {
@@ -37,14 +41,16 @@ public class ModularUIContext {
     private ModularWindow mainWindow;
     @SideOnly(Side.CLIENT)
     private ModularGui screen;
-    private ModularUIContainer container;
     private final EntityPlayer player;
     private final Cursor cursor;
+    private final List<Widget> jeiExclusionZone = new ArrayList<>();
 
     private boolean oneSided = true;
 
     @SideOnly(Side.CLIENT)
     private Size screenSize = new Size(MC.displayWidth, MC.displayHeight);
+
+    private ModularUIContainer container;
 
     public ModularUIContext(UIBuildContext context) {
         this.player = context.player;
@@ -219,6 +225,21 @@ public class ModularUIContext {
     @SideOnly(Side.CLIENT)
     public Size getScaledScreenSize() {
         return screenSize;
+    }
+
+    public void registerExclusionZone(Widget widget) {
+        this.jeiExclusionZone.add(widget);
+    }
+
+    public List<Rectangle> getJeiExclusionZones() {
+        List<Rectangle> zones = new ArrayList<>();
+        for (ModularWindow window : getOpenWindows()) {
+            zones.add(window.getRectangle());
+        }
+        for (Widget widget : jeiExclusionZone) {
+            zones.add(widget.getRectangle());
+        }
+        return zones;
     }
 
     public void syncSlotContent(BaseSlot slot) {

@@ -217,7 +217,8 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                         .setExpandedSize(60, 160)
                         .setBackground(BACKGROUND)
                         .setSize(20, 20)
-                        .setPos(177, 5))
+                        .setPos(177, 5)
+                        .respectAreaInJei())
                 .build();
     }
 
