@@ -280,7 +280,7 @@ public class Cursor {
                         if (child instanceof Interactable) {
                             hoveredWidgets.add(0, (Interactable) child);
                         }
-                        if (hovered.get() == null || child.getLayer() > hovered.get().getLayer()) {
+                        if ((child instanceof Interactable || child.hasTooltip()) && (hovered.get() == null || child.getLayer() > hovered.get().getLayer())) {
                             hovered.set(child);
                         }
                     }

@@ -1,7 +1,8 @@
 package com.cleanroommc.modularui.common.internal.wrapper;
 
+import com.cleanroommc.modularui.api.drawable.GuiHelper;
 import com.cleanroommc.modularui.api.drawable.Text;
-import com.cleanroommc.modularui.api.drawable.TooltipContainer;
+import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
@@ -219,15 +220,10 @@ public class ModularGui extends GuiContainer {
             if (hovered instanceof IVanillaSlot && ((IVanillaSlot) hovered).getMcSlot().getHasStack()) {
                 renderToolTip(((IVanillaSlot) hovered).getMcSlot().getStack(), mouseX, mouseY);
             } else if (hovered.getTooltipShowUpDelay() <= context.getCursor().getTimeHovered()) {
-                TooltipContainer tooltipContainer = hovered.getHoverText();
-                List<Text> additional = hovered.getTooltip();
-                if (tooltipContainer == null) {
-                    tooltipContainer = new TooltipContainer();
+                List<Text> tooltip = hovered.getTooltip();
+                if (!tooltip.isEmpty()) {
+                    GuiHelper.drawHoveringText(tooltip, context.getMousePos(), context.getScaledScreenSize(), 400, 1, false, Alignment.CenterLeft);
                 }
-                if (!additional.isEmpty()) {
-                    tooltipContainer = tooltipContainer.with(additional);
-                }
-                tooltipContainer.draw(context);
             }
         }
 

@@ -16,6 +16,8 @@ import java.util.function.Supplier;
 
 public class Text implements IDrawable {
 
+    public static final Text EMPTY = new Text("");
+
     private static final TextRenderer renderer = new TextRenderer();
     private final String text;
     private String formatting = "";
