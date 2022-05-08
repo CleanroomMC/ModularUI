@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.common.internal;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.math.Color;
+import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.jetbrains.annotations.Nullable;
@@ -20,12 +21,12 @@ public class Theme {
     private final Object2IntMap<String> colors = new Object2IntArrayMap<>(32);
 
     private Theme() {
-        registerThemeColor(KEY_BACKGROUND, Color.LIGHT_BLUE.bright(0));
-        registerThemeColor(KEY_BUTTON, Color.GREEN.normal);
+        registerThemeColor(KEY_BACKGROUND);
+        registerThemeColor(KEY_BUTTON);
         registerThemeColor(KEY_TEXT, 0x404040);
         registerThemeColor(KEY_ITEM_SLOT);
         registerThemeColor(KEY_FLUID_SLOT);
-        registerThemeColor(KEY_SLOT_HIGHLIGHT, 0x80ffffff);
+        registerThemeColor(KEY_SLOT_HIGHLIGHT, Color.withAlpha(Color.WHITE.normal, 0x80));
     }
 
     public void registerThemeColor(String name) {
@@ -66,5 +67,16 @@ public class Theme {
 
     public int getSlotHighlight() {
         return getColor(KEY_SLOT_HIGHLIGHT);
+    }
+
+    public JsonObject readTheme(JsonObject json) {
+        for (String key : colors.keySet()) {
+            if (json.has(key)) {
+                colors.put(key, json.get(key).getAsInt());
+            } else {
+                json.addProperty(key, colors.get(key));
+            }
+        }
+        return json;
     }
 }
