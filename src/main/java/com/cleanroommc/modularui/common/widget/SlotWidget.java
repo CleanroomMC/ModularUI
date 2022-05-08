@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.api.drawable.UITexture;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.*;
+import com.cleanroommc.modularui.common.internal.Theme;
 import com.cleanroommc.modularui.common.internal.mixin.GuiContainerMixin;
 import com.cleanroommc.modularui.common.internal.wrapper.BaseSlot;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
@@ -16,6 +17,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
 
@@ -72,6 +74,11 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     }
 
     @Override
+    public @Nullable String getBackgroundColorKey() {
+        return Theme.KEY_ITEM_SLOT;
+    }
+
+    @Override
     public void draw(float partialTicks) {
         RenderHelper.enableGUIStandardItemLighting();
         drawSlot(this.slot);
@@ -79,7 +86,7 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
         GlStateManager.disableLighting();
         if (isHovering()) {
             GlStateManager.colorMask(true, true, true, false);
-            ModularGui.drawSolidRect(1, 1, 16, 16, 0x80ffffff);
+            ModularGui.drawSolidRect(1, 1, 16, 16, Theme.INSTANCE.getSlotHighlight());
             GlStateManager.colorMask(true, true, true, true);
         }
     }

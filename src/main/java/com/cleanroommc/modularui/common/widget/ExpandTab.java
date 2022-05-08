@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.IWidgetBuilder;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.widget.Widget;
+import com.cleanroommc.modularui.common.internal.Theme;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -104,8 +105,10 @@ public class ExpandTab extends MultiChildWidget implements Interactable, IWidget
     public void drawBackground(float partialTicks) {
         IDrawable[] background = getBackground();
         if (background != null) {
+            int themeColor = Theme.INSTANCE.getColor(getBackgroundColorKey());
             for (IDrawable drawable : background) {
                 if (drawable != null) {
+                    drawable.applyThemeColor(themeColor);
                     drawable.draw(animateX - getPos().x, animateY - getPos().y, animateWidth, animateHeight, partialTicks);
                 }
             }

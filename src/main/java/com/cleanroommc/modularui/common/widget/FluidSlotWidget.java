@@ -7,8 +7,11 @@ import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.IIngredientProvider;
 import com.cleanroommc.modularui.api.widget.Interactable;
+import com.cleanroommc.modularui.common.internal.Theme;
 import com.cleanroommc.modularui.common.internal.network.NetworkUtils;
 import com.cleanroommc.modularui.common.internal.wrapper.FluidTankHandler;
+import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -141,6 +144,11 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngr
     }
 
     @Override
+    public @Nullable String getBackgroundColorKey() {
+        return Theme.KEY_FLUID_SLOT;
+    }
+
+    @Override
     public void draw(float partialTicks) {
         FluidStack content = cachedFluid;
         if (content != null) {
@@ -161,7 +169,13 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngr
             textRenderer.setAlignment(Alignment.CenterRight, size.width - contentOffset.x - 1f);
             textRenderer.setPos(contentOffset.x + 0.5f, size.height - 5.5f);
             textRenderer.draw(s);
-            //textRenderer.drawAligned(s, contentOffset.x + 0.5f, size.height - 5.5f, size.width - contentOffset.x - 1f, 0xFFFFFF, 1);
+        }
+        if (isHovering()) {
+            if (isHovering()) {
+                GlStateManager.colorMask(true, true, true, false);
+                ModularGui.drawSolidRect(1, 1, 16, 16, Theme.INSTANCE.getSlotHighlight());
+                GlStateManager.colorMask(true, true, true, true);
+            }
         }
     }
 

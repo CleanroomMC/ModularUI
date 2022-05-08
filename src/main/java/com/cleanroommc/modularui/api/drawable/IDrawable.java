@@ -1,10 +1,14 @@
 package com.cleanroommc.modularui.api.drawable;
 
+import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.common.internal.JsonHelper;
 import com.cleanroommc.modularui.common.widget.DrawableWidget;
 import com.google.gson.JsonObject;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,13 +32,20 @@ public interface IDrawable {
      * @param height       height of the drawable
      * @param partialTicks ticks since last render
      */
+    @SideOnly(Side.CLIENT)
     void draw(float x, float y, float width, float height, float partialTicks);
 
+    @SideOnly(Side.CLIENT)
     default void draw(Pos2d pos, Size size, float partialTicks) {
         draw(pos.x, pos.y, size.width, size.height, partialTicks);
     }
 
     default void tick() {
+    }
+
+    @SideOnly(Side.CLIENT)
+    default void applyThemeColor(int color) {
+        GlStateManager.color(Color.getRedF(color), Color.getGreenF(color), Color.getBlueF(color), Color.getAlphaF(color));
     }
 
     /**

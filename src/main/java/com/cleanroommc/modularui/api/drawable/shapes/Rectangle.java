@@ -16,10 +16,10 @@ public class Rectangle implements IDrawable {
 
     public Rectangle() {
         this.cornerRadius = 0;
-        this.colorTL = 0xFFFFFFFF;
-        this.colorTR = 0xFFFFFFFF;
-        this.colorBL = 0xFFFFFFFF;
-        this.colorBR = 0xFFFFFFFF;
+        this.colorTL = 0;
+        this.colorTR = 0;
+        this.colorBL = 0;
+        this.colorBR = 0;
         this.cornerSegments = 6;
     }
 
@@ -51,6 +51,13 @@ public class Rectangle implements IDrawable {
     public Rectangle setCornerSegments(int cornerSegments) {
         this.cornerSegments = cornerSegments;
         return this;
+    }
+
+    @Override
+    public void applyThemeColor(int color) {
+        if (colorTL == 0 && colorBL == 0 && colorBR == 0 && colorTR == 0) {
+            IDrawable.super.applyThemeColor(color == 0 ? 0xFFFFFFFF : color);
+        }
     }
 
     @Override

@@ -16,8 +16,8 @@ public class Circle implements IDrawable {
     private int colorInner, colorOuter, segments;
 
     public Circle() {
-        this.colorInner = 0xFFFFFFFF;
-        this.colorOuter = 0xFFFFFFFF;
+        this.colorInner = 0;
+        this.colorOuter = 0;
         this.segments = 40;
     }
 
@@ -41,6 +41,13 @@ public class Circle implements IDrawable {
     public Circle setSegments(int segments) {
         this.segments = segments;
         return this;
+    }
+
+    @Override
+    public void applyThemeColor(int color) {
+        if (colorInner == 0 && colorOuter == 0) {
+            IDrawable.super.applyThemeColor(color == 0 ? 0xFFFFFFFF : color);
+        }
     }
 
     @Override

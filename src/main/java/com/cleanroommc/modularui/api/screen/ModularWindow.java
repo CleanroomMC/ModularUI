@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.*;
+import com.cleanroommc.modularui.common.internal.Theme;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableBiMap;
@@ -58,7 +59,7 @@ public class ModularWindow implements IWidgetParent {
     protected boolean draggable;
     private boolean enabled = true;
     private boolean needsRebuild = false;
-    private int color = 0xFFFFFFFF;
+    private int alpha = Color.getAlpha(Theme.INSTANCE.getBackground());
     private float scale = 1f;
     private float rotation = 0;
     private float translateX = 0, translateY = 0;
@@ -124,7 +125,7 @@ public class ModularWindow implements IWidgetParent {
             openAnimation = new Interpolator(0, 1, 250, Eases.EaseQuadOut, value -> {
                 float val = (float) value;
                 if (ModularUIConfig.animations.openCloseFade) {
-                    color = Color.withAlpha(color, val);
+                    alpha = (int) (val * Color.getAlpha(Theme.INSTANCE.getBackground()));
                 }
                 if (ModularUIConfig.animations.openCloseTranslateFromBottom) {
                     translateY = startY * (1 - val);
@@ -136,7 +137,7 @@ public class ModularWindow implements IWidgetParent {
                     rotation = val * 360;
                 }
             }, val -> {
-                color = Color.withAlpha(color, 255);
+                alpha = Color.getAlpha(Theme.INSTANCE.getBackground());
                 translateX = 0;
                 translateY = 0;
                 scale = 1f;
@@ -251,13 +252,13 @@ public class ModularWindow implements IWidgetParent {
             float x = (pos.x + size.width / 2f * (1 - scale)) / scale;
             float y = (pos.y + size.height / 2f * (1 - scale)) / scale;
             GlStateManager.translate(x, y, 0);
+            int color = Color.withAlpha(Theme.INSTANCE.getBackground(), alpha);
             for (IDrawable drawable : background) {
-                GlStateManager.color(Color.getRedF(color), Color.getGreenF(color), Color.getBlueF(color), Color.getAlphaF(color));
+                drawable.applyThemeColor(color);
                 drawable.draw(Pos2d.ZERO, size, partialTicks);
             }
             GlStateManager.popMatrix();
 
-            GlStateManager.color(Color.getRedF(color), Color.getGreenF(color), Color.getBlueF(color), Color.getAlphaF(color));
             for (Widget widget : getChildren()) {
                 widget.drawInternal(partialTicks);
             }
@@ -310,8 +311,8 @@ public class ModularWindow implements IWidgetParent {
         return scale;
     }
 
-    public int getColor() {
-        return color;
+    public int getAlpha() {
+        return alpha;
     }
 
     public boolean isInitialized() {

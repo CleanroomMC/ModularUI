@@ -7,11 +7,13 @@ import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.common.internal.JsonHelper;
+import com.cleanroommc.modularui.common.internal.Theme;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.network.PacketBuffer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.*;
 
@@ -75,6 +77,11 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
     @Override
     protected @NotNull Size determineSize(int maxWidth, int maxHeight) {
         return new Size(20, 20);
+    }
+
+    @Override
+    public @Nullable String getBackgroundColorKey() {
+        return Theme.KEY_BUTTON;
     }
 
     public void next() {

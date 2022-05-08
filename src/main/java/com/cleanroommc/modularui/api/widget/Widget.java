@@ -2,13 +2,13 @@ package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.Text;
-import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.GuiArea;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.screen.ModularUIContext;
 import com.cleanroommc.modularui.api.screen.ModularWindow;
 import com.cleanroommc.modularui.common.internal.JsonHelper;
+import com.cleanroommc.modularui.common.internal.Theme;
 import com.google.gson.JsonObject;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.network.PacketBuffer;
@@ -209,14 +209,14 @@ public abstract class Widget {
             GlStateManager.pushMatrix();
             Pos2d windowPos = getWindow().getPos();
             Size windowSize = getWindow().getSize();
-            int color = getWindow().getColor();
+            int alpha = getWindow().getAlpha();
             float scale = getWindow().getScale();
             float sf = 1 / scale;
             // translate to center according to scale
             float x = (windowPos.x + windowSize.width / 2f * (1 - scale) + (pos.x - windowPos.x) * scale) * sf;
             float y = (windowPos.y + windowSize.height / 2f * (1 - scale) + (pos.y - windowPos.y) * scale) * sf;
             GlStateManager.translate(x, y, 0);
-            GlStateManager.color(Color.getRedF(color), Color.getGreenF(color), Color.getBlueF(color), Color.getAlphaF(color));
+            GlStateManager.color(1, 1, 1, alpha);
             GlStateManager.enableBlend();
             drawBackground(partialTicks);
             draw(partialTicks);
@@ -293,8 +293,10 @@ public abstract class Widget {
     public void drawBackground(float partialTicks) {
         IDrawable[] background = getBackground();
         if (background != null) {
+            int themeColor = Theme.INSTANCE.getColor(getBackgroundColorKey());
             for (IDrawable drawable : background) {
                 if (drawable != null) {
+                    drawable.applyThemeColor(themeColor);
                     drawable.draw(Pos2d.ZERO, getSize(), partialTicks);
                 }
             }
@@ -329,6 +331,16 @@ public abstract class Widget {
     @ApiStatus.OverrideOnly
     @SideOnly(Side.CLIENT)
     public void buildTooltip(List<Text> tooltip) {
+    }
+
+    /**
+     * @return the color key for the background
+     * @see Theme
+     */
+    @SideOnly(Side.CLIENT)
+    @Nullable
+    public String getBackgroundColorKey() {
+        return Theme.KEY_BACKGROUND;
     }
 
 

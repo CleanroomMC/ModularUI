@@ -3,8 +3,10 @@ package com.cleanroommc.modularui.common.widget;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.widget.Widget;
+import com.cleanroommc.modularui.common.internal.Theme;
 import net.minecraft.network.PacketBuffer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
 
@@ -20,6 +22,11 @@ public class ButtonWidget extends SyncedWidget implements Interactable {
     @Override
     protected @NotNull Size determineSize(int maxWidth, int maxHeight) {
         return new Size(20, 20);
+    }
+
+    @Override
+    public @Nullable String getBackgroundColorKey() {
+        return Theme.KEY_BUTTON;
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.drawable.TextRenderer;
 import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.Widget;
+import com.cleanroommc.modularui.common.internal.Theme;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.NotNull;
 
@@ -87,7 +88,7 @@ public class TextWidget extends Widget {
             localised = text.getFormatted();
         }
         textRenderer.setAlignment(textAlignment, size.width, size.height);
-        textRenderer.setColor(text.getColor());
+        textRenderer.setColor(text.hasColor() ? text.getColor() : Theme.INSTANCE.getText());
         textRenderer.draw(localised);
     }
 
