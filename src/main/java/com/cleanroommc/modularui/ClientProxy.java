@@ -34,7 +34,6 @@ public class ClientProxy extends CommonProxy {
             int wheel = MathHelper.clamp(w, -1, 1);
             if (wheel != 0) {
                 ((ModularGui) event.getGui()).mouseScroll(wheel);
-                event.setCanceled(true);
             }
         }
     }
