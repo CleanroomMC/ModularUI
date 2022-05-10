@@ -16,7 +16,7 @@ public class TextWidget extends Widget {
     private final Text text;
     protected String localised;
     private int maxWidth = -1;
-    private Alignment textAlignment = Alignment.TopLeft;
+    private Alignment textAlignment = Alignment.Center;
     private final TextRenderer textRenderer = new TextRenderer();
 
     public TextWidget() {
@@ -68,7 +68,7 @@ public class TextWidget extends Widget {
         textRenderer.setAlignment(textAlignment, width, maxHeight);
         textRenderer.draw(localised);
         textRenderer.setSimulate(false);
-        return textRenderer.getLastSize();
+        return textRenderer.getLastSize().grow(1, 1);
     }
 
     @Override
@@ -87,6 +87,7 @@ public class TextWidget extends Widget {
         if (localised == null) {
             localised = text.getFormatted();
         }
+        textRenderer.setPos(0, 0);
         textRenderer.setAlignment(textAlignment, size.width, size.height);
         textRenderer.setColor(text.hasColor() ? text.getColor() : Theme.INSTANCE.getText());
         textRenderer.draw(localised);

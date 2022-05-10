@@ -14,6 +14,8 @@ import com.cleanroommc.modularui.api.widget.IWidgetBuilder;
 import com.cleanroommc.modularui.api.widget.Widget;
 import com.cleanroommc.modularui.common.widget.*;
 import com.cleanroommc.modularui.common.widget.textfield.TextFieldWidget;
+import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.gui.inventory.GuiCrafting;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -74,6 +76,10 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                                 .setBackground(false, ModularUITextures.VANILLA_TAB_TOP_MIDDLE.getSubArea(0, 0, 1f, 0.5f))
                                 .setBackground(true, ModularUITextures.VANILLA_TAB_TOP_MIDDLE.getSubArea(0, 0.5f, 1f, 1f))
                                 .setPos(84, -28))
+                        /*.addTabButton(new TabButton(4)
+                                .setBackground(false, ModularUITextures.VANILLA_TAB_TOP_MIDDLE.getSubArea(0, 0, 1f, 0.5f))
+                                .setBackground(true, ModularUITextures.VANILLA_TAB_TOP_MIDDLE.getSubArea(0, 0.5f, 1f, 1f))
+                                .setPos(112, -28))*/
                         .addPage(new MultiChildWidget()
                                 .addChild(new TextWidget("Page 1"))
                                 .addChild(new SlotWidget(phantomInventory, 0)
@@ -118,7 +124,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                                         .setSetter(val -> textFieldValue = val)
                                         .setNumbers(val -> val)
                                         .setTextColor(Color.WHITE.dark(1))
-                                        .setTextAlignment(Alignment.CenterLeft)
+                                        .setTextAlignment(Alignment.Center)
                                         .setScrollBar(new ScrollBar().setBarTexture(new Rectangle().setColor(Color.WHITE.normal).setCornerRadius(1)))
                                         .setBackground(DISPLAY.withOffset(-2, -2, 4, 4))
                                         .setSize(92, 20)
@@ -199,7 +205,10 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                                                 .setSize(92, 20)
                                                 .setPos(20, 25))
                                         .setSize(156, 150))
-                                .setPos(10, 10)))
+                                .setPos(10, 10))
+                        /*.addPage(new GuiScreenWidget(() -> new GuiCrafting(buildContext.getPlayer().inventory, buildContext.getPlayer().world))
+                                .setPos(10, 10)
+                                .setSize(150, 100))*/)
                 .widget(new ExpandTab()
                         .setNormalTexture(ModularUITextures.ICON_INFO.withFixedSize(14, 14, 3, 3))
                         .widget(new DrawableWidget()

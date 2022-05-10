@@ -17,7 +17,7 @@ public class TextRenderer {
     public static final FontRenderer FR = Minecraft.getMinecraft().fontRenderer;
     public static final int DEFAULT_COLOR = 0x404040;
     protected float maxWidth = -1, maxHeight = -1;
-    protected float x = 0, y = 0;
+    protected int x = 0, y = 0;
     protected Alignment alignment = Alignment.TopLeft;
     protected float scale = 1f;
     protected boolean shadow = false;
@@ -43,7 +43,7 @@ public class TextRenderer {
         this.scale = scale;
     }
 
-    public void setPos(float x, float y) {
+    public void setPos(int x, int y) {
         this.x = x;
         this.y = y;
     }
@@ -70,14 +70,16 @@ public class TextRenderer {
 
     protected void drawMeasuredLines(List<Pair<String, Float>> measuredLines) {
         float maxW = 0;
-        float y0 = getStartY(measuredLines.size());
+        int y0 = getStartY(measuredLines.size());
         for (Pair<String, Float> measuredLine : measuredLines) {
-            float x0 = getStartX(measuredLine.getRight());
+            int x0 = getStartX(measuredLine.getRight());
             maxW = Math.max(draw(measuredLine.getLeft(), x0, y0), maxW);
             y0 += FR.FONT_HEIGHT * scale;
         }
         this.lastWidth = maxWidth > 0 ? Math.min(maxW, maxWidth) : maxW;
         this.lastHeight = measuredLines.size() * FR.FONT_HEIGHT * scale;
+        this.lastWidth = Math.max(0, this.lastWidth - 1);
+        this.lastHeight = Math.max(0, this.lastHeight - 1);
     }
 
     public List<Pair<String, Float>> measureLines(List<String> lines) {
@@ -104,24 +106,24 @@ public class TextRenderer {
         return (int) Math.ceil(w);
     }
 
-    protected float getStartY(int lines) {
+    protected int getStartY(int lines) {
         if (alignment.y >= 0 && maxHeight > 0) {
             float height = lines * FR.FONT_HEIGHT * scale;
             if (alignment.y > 0) {
-                return y + maxHeight - height;
+                return (int) (y + maxHeight - height);
             } else {
-                return y + (maxHeight - height) / 2f;
+                return (int) (y + (maxHeight - height) / 2f);
             }
         }
         return y;
     }
 
-    protected float getStartX(float lineWidth) {
+    protected int getStartX(float lineWidth) {
         if (maxWidth > 0 && alignment.x >= 0) {
             if (alignment.x > 0) {
-                return x + maxWidth - lineWidth;
+                return (int) (x + maxWidth - lineWidth);
             } else {
-                return x + (maxWidth - lineWidth) / 2f;
+                return (int) (x + (maxWidth - lineWidth) / 2f);
             }
         }
         return x;

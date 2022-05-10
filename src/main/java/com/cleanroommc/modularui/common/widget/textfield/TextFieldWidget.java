@@ -1,9 +1,11 @@
 package com.cleanroommc.modularui.common.widget.textfield;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.drawable.GuiHelper;
 import com.cleanroommc.modularui.api.math.MathExpression;
 import com.cleanroommc.modularui.api.widget.ISyncedWidget;
 import com.cleanroommc.modularui.common.internal.network.NetworkUtils;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.network.PacketBuffer;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,6 +25,19 @@ public class TextFieldWidget extends BaseTextFieldWidget implements ISyncedWidge
     private Function<String, String> validator = val -> val;
     private boolean syncsToServer = true;
     private boolean syncsToClient = true;
+
+    @Override
+    public void draw(float partialTicks) {
+        GuiHelper.useScissor(pos.x, pos.y, size.width, size.height, () -> {
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(0.5f - scrollOffset, 0.5f, 0);
+            renderer.setSimulate(false);
+            renderer.setScale(scale);
+            renderer.setAlignment(textAlignment, size.width - 1, size.height);
+            renderer.draw(handler.getText());
+            GlStateManager.popMatrix();
+        });
+    }
 
     @NotNull
     public String getText() {

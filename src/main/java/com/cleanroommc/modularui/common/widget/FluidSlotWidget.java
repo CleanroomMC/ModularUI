@@ -167,7 +167,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngr
         if (content != null && this.controlsAmount) {
             String s = NumberFormat.format(content.amount, NumberFormat.FORMAT_1);
             textRenderer.setAlignment(Alignment.CenterRight, size.width - contentOffset.x - 1f);
-            textRenderer.setPos(contentOffset.x + 0.5f, size.height - 5.5f);
+            textRenderer.setPos((int) (contentOffset.x + 0.5f), (int) (size.height - 5.5f));
             textRenderer.draw(s);
         }
         if (isHovering()) {
