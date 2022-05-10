@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.common.widget;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.UITexture;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
@@ -15,6 +16,8 @@ import net.minecraft.network.PacketBuffer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.*;
 
 public class CycleButtonWidget extends SyncedWidget implements Interactable {
@@ -25,6 +28,7 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
     private IntSupplier getter;
     private Function<Integer, IDrawable> textureGetter;
     private IDrawable texture = IDrawable.EMPTY;
+    private List<List<Text>> stateTooltip = new ArrayList<>();
 
     public CycleButtonWidget() {
     }
@@ -164,6 +168,16 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
         }
     }
 
+    @Override
+    public List<Text> getTooltip() {
+        List<Text> texts = super.getTooltip();
+        if (texts.isEmpty()) {
+            return this.stateTooltip.get(this.state);
+        }
+        texts.addAll(this.stateTooltip.get(this.state));
+        return texts;
+    }
+
     public CycleButtonWidget setSetter(IntConsumer setter) {
         this.setter = setter;
         return this;
@@ -200,8 +214,32 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
         });
     }
 
+    /**
+     * Adds a line to the tooltip
+     */
+    public CycleButtonWidget addTooltip(int state, Text tooltip) {
+        if (state >= this.stateTooltip.size() || state < 0) {
+            throw new IndexOutOfBoundsException();
+        }
+        this.stateTooltip.get(state).add(tooltip);
+        return this;
+    }
+
+    /**
+     * Adds a line to the tooltip
+     */
+    public CycleButtonWidget addTooltip(int state, String tooltip) {
+        return addTooltip(state, new Text(tooltip));
+    }
+
     public CycleButtonWidget setLength(int length) {
         this.length = length;
+        while (this.stateTooltip.size() < this.length) {
+            this.stateTooltip.add(new ArrayList<>());
+        }
+        while (this.stateTooltip.size() > this.length) {
+            this.stateTooltip.remove(this.stateTooltip.size() - 1);
+        }
         return this;
     }
 }
