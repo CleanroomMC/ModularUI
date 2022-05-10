@@ -7,7 +7,9 @@ import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.common.internal.Theme;
 import com.cleanroommc.modularui.common.internal.mixin.GuiContainerMixin;
 import com.cleanroommc.modularui.common.internal.wrapper.BaseSlot;
+import com.cleanroommc.modularui.common.internal.wrapper.GhostIngredientWrapper;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
+import mezz.jei.api.gui.IGhostIngredientHandler;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Container;
@@ -19,9 +21,10 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.function.Predicate;
 
-public class SlotWidget extends Widget implements IVanillaSlot, Interactable, ISyncedWidget, IIngredientProvider {
+public class SlotWidget extends Widget implements IVanillaSlot, Interactable, ISyncedWidget, IIngredientProvider, IGhostIngredientTarget<ItemStack> {
 
     public static final Size SIZE = new Size(18, 18);
     public static final UITexture TEXTURE = UITexture.fullImage("modularui", "gui/slot/item");
@@ -160,7 +163,7 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     }
 
     @Override
-    public void readOnServer(int id, PacketBuffer buf) {
+    public void readOnServer(int id, PacketBuffer buf) throws IOException {
         if (id == 1) {
             this.slot.xPos = buf.readVarInt();
             this.slot.yPos = buf.readVarInt();
@@ -170,6 +173,8 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
             phantomScroll(buf.readVarInt());
         } else if (id == 4) {
             setEnabled(buf.readBoolean());
+        } else if (id == 5) {
+            this.slot.putStack(buf.readItemStack());
         }
     }
 
@@ -236,6 +241,19 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
         } else {
             this.slot.incrementStackCount(direction);
         }
+    }
+
+    @Override
+    public IGhostIngredientHandler.@Nullable Target<ItemStack> getTarget(@NotNull Object ingredient) {
+        if (!isPhantom() || !(ingredient instanceof ItemStack) || ((ItemStack) ingredient).isEmpty()) {
+            return null;
+        }
+        return new GhostIngredientWrapper<>(this);
+    }
+
+    @Override
+    public void accept(@NotNull ItemStack ingredient) {
+        syncToServer(5, buffer -> buffer.writeItemStack(ingredient));
     }
 
     private GuiContainerMixin getGuiAccessor() {

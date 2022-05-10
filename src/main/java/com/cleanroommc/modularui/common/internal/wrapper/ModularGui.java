@@ -24,6 +24,8 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.client.event.GuiContainerEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.Nullable;
@@ -109,7 +111,14 @@ public class ModularGui extends GuiContainer {
         RenderHelper.disableStandardItemLighting();
         this.drawGuiContainerForegroundLayer(partialTicks, mouseX, mouseY);
         RenderHelper.enableGUIStandardItemLighting();
-        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.GuiContainerEvent.DrawForeground(this, mouseX, mouseY));
+
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.enableBlend();
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(i, j, 0);
+        MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.DrawForeground(this, mouseX, mouseY));
+        GlStateManager.popMatrix();
+
         InventoryPlayer inventoryplayer = this.mc.player.inventory;
         ItemStack itemstack = getAccessor().getDraggedStack().isEmpty() ? inventoryplayer.getItemStack() : getAccessor().getDraggedStack();
         GlStateManager.translate((float) i, (float) j, 0.0F);

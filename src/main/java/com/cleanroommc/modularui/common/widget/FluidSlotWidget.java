@@ -5,22 +5,22 @@ import com.cleanroommc.modularui.api.drawable.*;
 import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.api.widget.IGhostIngredientTarget;
 import com.cleanroommc.modularui.api.widget.IIngredientProvider;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.common.internal.Theme;
 import com.cleanroommc.modularui.common.internal.network.NetworkUtils;
 import com.cleanroommc.modularui.common.internal.wrapper.FluidTankHandler;
+import com.cleanroommc.modularui.common.internal.wrapper.GhostIngredientWrapper;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
+import mezz.jei.api.gui.IGhostIngredientHandler;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
-import net.minecraftforge.fluids.FluidActionResult;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.IFluidTank;
+import net.minecraftforge.fluids.*;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.List;
 
-public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngredientProvider {
+public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngredientProvider, IGhostIngredientTarget<FluidStack> {
 
     public static final Size SIZE = new Size(18, 18);
     public static final UITexture TEXTURE = UITexture.fullImage("modularui", "gui/slot/fluid");
@@ -63,6 +63,10 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngr
         slot.phantom = true;
         slot.controlsAmount = controlsAmount;
         return slot;
+    }
+
+    public static FluidSlotWidget phantom(int capacity) {
+        return phantom(new FluidTank(capacity > 0 ? capacity : 1), capacity > 1);
     }
 
     public FluidStack getContent() {
@@ -248,7 +252,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngr
     }
 
     @Override
-    public void readOnServer(int id, PacketBuffer buf) {
+    public void readOnServer(int id, PacketBuffer buf) throws IOException {
         if (id == 1) {
             if (this.phantom) {
                 tryClickPhantom(buf.readVarInt(), buf.readBoolean());
@@ -261,6 +265,9 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngr
             }
         } else if (id == 3) {
             this.controlsAmount = buf.readBoolean();
+        } else if (id == 4) {
+            this.fluidTank.drain(Integer.MAX_VALUE, true);
+            this.fluidTank.fill(NetworkUtils.readFluidStack(buf), true);
         }
     }
 
@@ -397,6 +404,19 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngr
         EntityPlayer player = getContext().getPlayer();
         SoundEvent soundevent = fill ? fluid.getFluid().getFillSound(fluid) : fluid.getFluid().getEmptySound(fluid);
         player.world.playSound(null, player.posX, player.posY + 0.5, player.posZ, soundevent, SoundCategory.BLOCKS, 1.0F, 1.0F);
+    }
+
+    @Override
+    public IGhostIngredientHandler.@Nullable Target<FluidStack> getTarget(@NotNull Object ingredient) {
+        if (!isPhantom() || !(ingredient instanceof FluidStack) || ((FluidStack) ingredient).amount <= 0) {
+            return null;
+        }
+        return new GhostIngredientWrapper<>(this);
+    }
+
+    @Override
+    public void accept(@NotNull FluidStack ingredient) {
+        syncToServer(4, buffer -> NetworkUtils.writeFluidStack(buffer, ingredient));
     }
 
     public boolean canFillSlot() {
