@@ -1,9 +1,13 @@
 package com.cleanroommc.modularui;
 
 import net.minecraftforge.common.config.Config;
+import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 
 @Config(modid = ModularUI.ID)
 public class ModularUIConfig {
+
+    @Config.Name("Enable Debug information")
+    public static boolean debug = FMLLaunchHandler.isDeobfuscatedEnvironment();
 
     @Config.Name("Smooth progress bars")
     public static boolean smoothProgressbar = true;

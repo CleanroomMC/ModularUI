@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.common.internal.wrapper;
 
+import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.drawable.GuiHelper;
 import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.math.Alignment;
@@ -45,7 +46,7 @@ public class ModularGui extends GuiContainer {
     private Interactable lastClicked;
     private long lastClick = -1;
     private long lastFocusedClick = -1;
-    public boolean debugMode = true;
+    public boolean debugMode = ModularUIConfig.debug;
     private int drawCalls = 0;
     private long drawTime = 0;
     private int fps = 0;
