@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.common.widget.textfield;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.GuiHelper;
 import com.cleanroommc.modularui.api.math.MathExpression;
 import com.cleanroommc.modularui.api.widget.ISyncedWidget;
@@ -10,6 +9,7 @@ import net.minecraft.network.PacketBuffer;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -26,14 +26,23 @@ public class TextFieldWidget extends BaseTextFieldWidget implements ISyncedWidge
     private boolean syncsToServer = true;
     private boolean syncsToClient = true;
 
+    public static Number parse(String num) {
+        try {
+            return format.parse(num);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     @Override
     public void draw(float partialTicks) {
         GuiHelper.useScissor(pos.x, pos.y, size.width, size.height, () -> {
             GlStateManager.pushMatrix();
-            GlStateManager.translate(0.5f - scrollOffset, 0.5f, 0);
+            GlStateManager.translate(1 - scrollOffset, 1, 0);
             renderer.setSimulate(false);
             renderer.setScale(scale);
-            renderer.setAlignment(textAlignment, size.width - 1, size.height);
+            renderer.setAlignment(textAlignment, size.width - 2, size.height);
             renderer.draw(handler.getText());
             GlStateManager.popMatrix();
         });
@@ -145,11 +154,7 @@ public class TextFieldWidget extends BaseTextFieldWidget implements ISyncedWidge
     public TextFieldWidget setSetterLong(Consumer<Long> setter) {
         this.setter = val -> {
             if (!val.isEmpty()) {
-                try {
-                    setter.accept(Long.parseLong(val));
-                } catch (NumberFormatException e) {
-                    ModularUI.LOGGER.warn("Error parsing text field value to long: {}", val);
-                }
+                setter.accept(parse(val).longValue());
             }
         };
         return this;
@@ -158,11 +163,7 @@ public class TextFieldWidget extends BaseTextFieldWidget implements ISyncedWidge
     public TextFieldWidget setSetterInt(Consumer<Integer> setter) {
         this.setter = val -> {
             if (!val.isEmpty()) {
-                try {
-                    setter.accept(Integer.parseInt(val));
-                } catch (NumberFormatException e) {
-                    ModularUI.LOGGER.warn("Error parsing text field value to int: {}", val);
-                }
+                setter.accept(parse(val).intValue());
             }
         };
         return this;
@@ -212,7 +213,7 @@ public class TextFieldWidget extends BaseTextFieldWidget implements ISyncedWidge
             } else {
                 num = (long) MathExpression.parseMathExpression(val);
             }
-            return String.valueOf(validator.apply(num));
+            return format.format(validator.apply(num));
         });
         return this;
     }
@@ -226,7 +227,7 @@ public class TextFieldWidget extends BaseTextFieldWidget implements ISyncedWidge
             } else {
                 num = (int) MathExpression.parseMathExpression(val);
             }
-            return String.valueOf(validator.apply(num));
+            return format.format(validator.apply(num));
         });
     }
 
@@ -237,13 +238,9 @@ public class TextFieldWidget extends BaseTextFieldWidget implements ISyncedWidge
             if (val.isEmpty()) {
                 num = 0;
             } else {
-                try {
-                    num = Double.parseDouble(val);
-                } catch (NumberFormatException e) {
-                    num = 0;
-                }
+                num = MathExpression.parseMathExpression(val);
             }
-            return String.valueOf(validator.apply(num));
+            return format.format(validator.apply(num));
         });
     }
 

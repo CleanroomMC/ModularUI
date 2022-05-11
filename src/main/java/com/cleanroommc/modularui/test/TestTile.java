@@ -120,7 +120,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                                         .addChild(new TextFieldWidget()
                                                 .setGetter(() -> textFieldValue)
                                                 .setSetter(val -> textFieldValue = val)
-                                                .setNumbers(val -> val)
+                                                .setNumbersDouble(val -> val)
                                                 .setTextColor(Color.WHITE.dark(1))
                                                 .setTextAlignment(Alignment.Center)
                                                 .setScrollBar(new ScrollBar().setBarTexture(new Rectangle().setColor(Color.WHITE.normal).setCornerRadius(1)))

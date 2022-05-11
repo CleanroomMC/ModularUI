@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.common.widget.textfield;
 
 import com.cleanroommc.modularui.api.drawable.GuiHelper;
-import com.cleanroommc.modularui.api.drawable.TextFieldRenderer;
 import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.IWidgetParent;
@@ -16,6 +15,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -25,11 +26,12 @@ import java.util.regex.Pattern;
  */
 public class BaseTextFieldWidget extends Widget implements IWidgetParent, Interactable, IHorizontalScrollable {
 
+    public static final DecimalFormat format = (DecimalFormat) NumberFormat.getInstance();
     // all positive whole numbers
     public static final Pattern NATURAL_NUMS = Pattern.compile("[0-9]*([+\\-*/%^][0-9]*)*");
     // all positive and negative numbers
     public static final Pattern WHOLE_NUMS = Pattern.compile("-?[0-9]*([+\\-*/%^][0-9]*)*");
-    public static final Pattern DECIMALS = Pattern.compile("[0-9]*(\\.[0-9]*)?");
+    public static final Pattern DECIMALS = Pattern.compile("[0-9]*(" + getDecimalSeparator() + "[0-9]*)?([+\\-*/%^][0-9]*(" + getDecimalSeparator() + "[0-9]*)?)*");
     public static final Pattern LETTERS = Pattern.compile("[a-zA-Z]*");
     public static final Pattern ANY = Pattern.compile(".*");
     private static final Pattern BASE_PATTERN = Pattern.compile("[A-Za-z0-9\\s_+\\-.,!@#$%^&*();\\\\/|<>\"'\\[\\]?=]");
@@ -233,5 +235,13 @@ public class BaseTextFieldWidget extends Widget implements IWidgetParent, Intera
     public BaseTextFieldWidget setTextColor(int color) {
         this.renderer.setColor(color);
         return this;
+    }
+
+    public static char getDecimalSeparator() {
+        return format.getDecimalFormatSymbols().getDecimalSeparator();
+    }
+
+    public static char getGroupSeparator() {
+        return format.getDecimalFormatSymbols().getGroupingSeparator();
     }
 }

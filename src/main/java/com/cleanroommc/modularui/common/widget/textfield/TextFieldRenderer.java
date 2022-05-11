@@ -1,7 +1,7 @@
-package com.cleanroommc.modularui.api.drawable;
+package com.cleanroommc.modularui.common.widget.textfield;
 
+import com.cleanroommc.modularui.api.drawable.TextRenderer;
 import com.cleanroommc.modularui.api.math.Color;
-import com.cleanroommc.modularui.common.widget.textfield.TextFieldHandler;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -56,7 +56,7 @@ public class TextFieldRenderer extends TextRenderer {
                     int min = handler.getStartCursor().y;
                     int max = handler.getEndCursor().y;
                     Pair<String, Float> line = measuredLines.get(min);
-                    float startX = getStartX(line.getValue());
+                    int startX = getStartX(line.getValue());
                     drawMarked(start.y, start.x, startX + line.getValue());
                     start.y += getFontHeight();
                     if (max - min > 1) {

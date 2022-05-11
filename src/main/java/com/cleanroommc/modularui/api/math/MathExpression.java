@@ -1,5 +1,8 @@
 package com.cleanroommc.modularui.api.math;
 
+import com.cleanroommc.modularui.common.widget.textfield.TextFieldWidget;
+
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -126,7 +129,7 @@ public class MathExpression {
             switch (c) {
                 case '+': {
                     if (builder.length() > 0) {
-                        parsed.add(Double.parseDouble(builder.toString()));
+                        parsed.add(parse(builder.toString()));
                         builder.delete(0, builder.length());
                     }
                     parsed.add(Operator.PLUS);
@@ -134,7 +137,7 @@ public class MathExpression {
                 }
                 case '-': {
                     if (builder.length() > 0) {
-                        parsed.add(Double.parseDouble(builder.toString()));
+                        parsed.add(parse(builder.toString()));
                         builder.delete(0, builder.length());
                     }
                     parsed.add(Operator.MINUS);
@@ -142,7 +145,7 @@ public class MathExpression {
                 }
                 case '*': {
                     if (builder.length() > 0) {
-                        parsed.add(Double.parseDouble(builder.toString()));
+                        parsed.add(parse(builder.toString()));
                         builder.delete(0, builder.length());
                     }
                     parsed.add(Operator.MULTIPLY);
@@ -150,7 +153,7 @@ public class MathExpression {
                 }
                 case '/': {
                     if (builder.length() > 0) {
-                        parsed.add(Double.parseDouble(builder.toString()));
+                        parsed.add(parse(builder.toString()));
                         builder.delete(0, builder.length());
                     }
                     parsed.add(Operator.DIVIDE);
@@ -158,7 +161,7 @@ public class MathExpression {
                 }
                 case '%': {
                     if (builder.length() > 0) {
-                        parsed.add(Double.parseDouble(builder.toString()));
+                        parsed.add(parse(builder.toString()));
                         builder.delete(0, builder.length());
                     }
                     parsed.add(Operator.MOD);
@@ -166,7 +169,7 @@ public class MathExpression {
                 }
                 case '^': {
                     if (builder.length() > 0) {
-                        parsed.add(Double.parseDouble(builder.toString()));
+                        parsed.add(parse(builder.toString()));
                         builder.delete(0, builder.length());
                     }
                     parsed.add(Operator.POWER);
@@ -177,7 +180,7 @@ public class MathExpression {
             }
         }
         if (builder.length() > 0) {
-            parsed.add(Double.parseDouble(builder.toString()));
+            parsed.add(parse(builder.toString()));
         }
         if (parsed.size() >= 2 && parsed.get(0) == Operator.MINUS && parsed.get(1) instanceof Double) {
             parsed.add(0, 0.0);
@@ -200,6 +203,15 @@ public class MathExpression {
             parsed.remove(parsed.size() - 1);
         }
         return parsed;
+    }
+
+    public static double parse(String num) {
+        try {
+            return TextFieldWidget.format.parse(num).doubleValue();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     public enum Operator {

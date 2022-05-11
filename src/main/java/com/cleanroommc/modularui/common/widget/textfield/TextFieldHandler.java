@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.common.widget.textfield;
 
-import com.cleanroommc.modularui.api.drawable.TextFieldRenderer;
 import com.cleanroommc.modularui.common.widget.ScrollBar;
 import com.google.common.base.Joiner;
 import org.jetbrains.annotations.Nullable;
@@ -311,7 +310,7 @@ public class TextFieldHandler {
             if (min.y == max.y) {
                 this.text.set(min.y, minLine.substring(0, min.x) + minLine.substring(max.x));
             } else {
-                String maxLine = this.text.get(max.y);
+                String maxLine = this.text.get(Math.min(this.text.size() - 1, max.y));
                 this.text.set(min.y, minLine.substring(0, min.x) + maxLine.substring(max.x));
                 if (max.y > min.y + 1) {
                     this.text.subList(min.y + 1, max.y + 1).clear();
