@@ -121,6 +121,7 @@ jar {
         if (project.use_mixins) {
             attribute_map['TweakClass'] = 'org.spongepowered.asm.launch.MixinTweaker'
         }
+        attribute_map['ForceLoadAsMod'] = true
         attributes(attribute_map)
     }
     if (project.use_mixins && project.pack_mixins_in_jar) {

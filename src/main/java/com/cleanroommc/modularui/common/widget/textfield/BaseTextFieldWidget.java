@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.common.widget.textfield;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.GuiHelper;
 import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.math.Size;
@@ -9,6 +10,7 @@ import com.cleanroommc.modularui.api.widget.Widget;
 import com.cleanroommc.modularui.api.widget.scroll.IHorizontalScrollable;
 import com.cleanroommc.modularui.api.widget.scroll.ScrollType;
 import com.cleanroommc.modularui.common.widget.ScrollBar;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +21,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 /**
@@ -27,6 +30,7 @@ import java.util.regex.Pattern;
 public class BaseTextFieldWidget extends Widget implements IWidgetParent, Interactable, IHorizontalScrollable {
 
     public static final DecimalFormat format = (DecimalFormat) NumberFormat.getInstance();
+
     // all positive whole numbers
     public static final Pattern NATURAL_NUMS = Pattern.compile("[0-9]*([+\\-*/%^][0-9]*)*");
     // all positive and negative numbers
@@ -66,10 +70,10 @@ public class BaseTextFieldWidget extends Widget implements IWidgetParent, Intera
     public void draw(float partialTicks) {
         GuiHelper.useScissor(pos.x, pos.y, size.width, size.height, () -> {
             GlStateManager.pushMatrix();
-            GlStateManager.translate(0.5f - scrollOffset, 0.5f, 0);
+            GlStateManager.translate(1 - scrollOffset, 1, 0);
             renderer.setSimulate(false);
             renderer.setScale(scale);
-            renderer.setAlignment(textAlignment, -1, size.height);
+            renderer.setAlignment(textAlignment, -2, size.height);
             renderer.draw(handler.getText());
             GlStateManager.popMatrix();
         });
