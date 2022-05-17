@@ -147,7 +147,7 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     }
 
     @Override
-    public void setEnabled(boolean enabled) {
+    public SlotWidget setEnabled(boolean enabled) {
         if (enabled != isEnabled()) {
             super.setEnabled(enabled);
             slot.setEnabled(enabled);
@@ -155,6 +155,7 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
                 syncToServer(4, buffer -> buffer.writeBoolean(enabled));
             }
         }
+        return this;
     }
 
     @Override

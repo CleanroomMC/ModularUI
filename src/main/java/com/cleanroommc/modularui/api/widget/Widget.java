@@ -580,8 +580,9 @@ public abstract class Widget {
      *
      * @param enabled if this widget should be enabled
      */
-    public void setEnabled(boolean enabled) {
+    public Widget setEnabled(boolean enabled) {
         this.enabled = enabled;
+        return this;
     }
 
     public Widget setSize(int width, int height) {
