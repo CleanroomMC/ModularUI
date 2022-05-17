@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.common.internal.mixin.GuiContainerMixin;
 import com.cleanroommc.modularui.common.internal.wrapper.BaseSlot;
 import com.cleanroommc.modularui.common.internal.wrapper.GhostIngredientWrapper;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
+import invtweaks.api.container.ContainerSection;
 import mezz.jei.api.gui.IGhostIngredientHandler;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
@@ -32,7 +33,8 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     private final BaseSlot slot;
     private ItemStack cachedServerItem = null;
     private ItemStack lastStoredPhantomItem = ItemStack.EMPTY;
-    private boolean sorted = false;
+    @Nullable
+    private ContainerSection sortingSection = null;
 
     public SlotWidget(BaseSlot slot) {
         this.slot = slot;
@@ -57,8 +59,8 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     @Override
     public void onInit() {
         getContext().getContainer().addSlotToContainer(this.slot);
-        if (this.sorted) {
-            getContext().getContainer().setSlotSortable(this.slot);
+        if (this.sortingSection != null) {
+            getContext().getContainer().setSlotSortable(this.slot, this.sortingSection);
         }
         if (getBackground() == null) {
             setBackground(TEXTURE);
@@ -150,8 +152,10 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
         return this;
     }
 
-    public void setSorted(boolean sorted) {
-        this.sorted = true;
+    public void setSorted(ContainerSection sortingSection) {
+        if (this.sortingSection == null ^ sortingSection == null) {
+            this.sortingSection = sortingSection;
+        }
     }
 
     @Override

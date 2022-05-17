@@ -5,15 +5,13 @@ import com.cleanroommc.modularui.api.ModularUITextures;
 import com.cleanroommc.modularui.api.drawable.AdaptableUITexture;
 import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.UITexture;
-import com.cleanroommc.modularui.api.drawable.shapes.Rectangle;
-import com.cleanroommc.modularui.api.math.*;
+import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.screen.ITileWithModularUI;
 import com.cleanroommc.modularui.api.screen.ModularWindow;
 import com.cleanroommc.modularui.api.screen.UIBuildContext;
 import com.cleanroommc.modularui.api.widget.IWidgetBuilder;
 import com.cleanroommc.modularui.api.widget.Widget;
 import com.cleanroommc.modularui.common.widget.*;
-import com.cleanroommc.modularui.common.widget.textfield.TextFieldWidget;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -233,7 +231,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                 .bindPlayerInventory(buildContext.getPlayer(), new Pos2d(width / 2 - 81, 21 + slotsHeight))
                 .widget(new TextWidget(new Text("ModularUI Chest").localise())
                         .setPos(8, 6))
-                .widget(SlotGroup.ofItemHandler(chestInventory, slotsPerRow, 0)
+                .widget(SlotGroup.ofItemHandler(chestInventory, slotsPerRow, 0, true)
                         .setPos(7, 16));
         return builder.build();
     }

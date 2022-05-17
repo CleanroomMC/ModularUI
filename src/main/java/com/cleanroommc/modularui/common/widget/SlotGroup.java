@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.Widget;
 import com.cleanroommc.modularui.common.internal.wrapper.BaseSlot;
+import invtweaks.api.container.ContainerSection;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -28,23 +29,27 @@ public class SlotGroup extends MultiChildWidget {
 
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                slotGroup.addSlot(new SlotWidget(new BaseSlot(wrapper, col + (row + 1) * 9))
-                        .setPos(new Pos2d(col * 18, row * 18)));
+                SlotWidget slot = new SlotWidget(new BaseSlot(wrapper, col + (row + 1) * 9))
+                        .setPos(new Pos2d(col * 18, row * 18));
+                slot.setSorted(ContainerSection.INVENTORY_NOT_HOTBAR);
+                slotGroup.addSlot(slot);
             }
         }
 
         for (int i = 0; i < 9; i++) {
-            slotGroup.addSlot(new SlotWidget(new BaseSlot(wrapper, i))
-                    .setPos(new Pos2d(i * 18, 58)));
+            SlotWidget slot = new SlotWidget(new BaseSlot(wrapper, i))
+                    .setPos(new Pos2d(i * 18, 58));
+            slot.setSorted(ContainerSection.INVENTORY_HOTBAR);
+            slotGroup.addSlot(slot);
         }
         return slotGroup;
     }
 
-    public static SlotGroup ofItemHandler(IItemHandlerModifiable itemHandler, int slotsWidth, int shiftClickPriority) {
-        return ofItemHandler(itemHandler, slotsWidth, shiftClickPriority, 0, itemHandler.getSlots() - 1);
+    public static SlotGroup ofItemHandler(IItemHandlerModifiable itemHandler, int slotsWidth, int shiftClickPriority, boolean sortable) {
+        return ofItemHandler(itemHandler, slotsWidth, shiftClickPriority, 0, itemHandler.getSlots() - 1, sortable);
     }
 
-    public static SlotGroup ofItemHandler(IItemHandlerModifiable itemHandler, int slotsWidth, int shiftClickPriority, int startFromSlot, int endAtSlot) {
+    public static SlotGroup ofItemHandler(IItemHandlerModifiable itemHandler, int slotsWidth, int shiftClickPriority, int startFromSlot, int endAtSlot, boolean sortable) {
         SlotGroup slotGroup = new SlotGroup();
         if (itemHandler.getSlots() >= endAtSlot) {
             endAtSlot = itemHandler.getSlots() - 1;
@@ -63,22 +68,24 @@ public class SlotGroup extends MultiChildWidget {
                 y++;
             }
         }
-        slotGroup.sortable = true;
-        slotGroup.slotsPerRow = slotsWidth;
+        if (sortable) {
+            slotGroup.section = ContainerSection.CHEST;
+            slotGroup.slotsPerRow = slotsWidth;
+        }
         return slotGroup;
     }
 
-    private boolean sortable = false;
+    private ContainerSection section = null;
     private int slotsPerRow = 1;
     private boolean vertical = false;
 
     @Override
     public void onInit() {
-        if (this.sortable) {
+        if (this.section != null) {
             getContext().getContainer().setSorted(slotsPerRow, vertical);
             for (Widget widget : getChildren()) {
                 if (widget instanceof SlotWidget) {
-                    ((SlotWidget) widget).setSorted(true);
+                    ((SlotWidget) widget).setSorted(this.section);
                 }
             }
         }
@@ -90,11 +97,11 @@ public class SlotGroup extends MultiChildWidget {
     }
 
     public SlotGroup setInvTweaksCompat(int slotsPerRow) {
-        return setInvTweaksCompat(slotsPerRow, false);
+        return setInvTweaksCompat(ContainerSection.CHEST, slotsPerRow, false);
     }
 
-    public SlotGroup setInvTweaksCompat(int slotsPerRow, boolean verticalButtons) {
-        this.sortable = true;
+    public SlotGroup setInvTweaksCompat(ContainerSection section, int slotsPerRow, boolean verticalButtons) {
+        this.section = section;
         this.slotsPerRow = slotsPerRow;
         this.vertical = verticalButtons;
         return this;

@@ -25,11 +25,9 @@ public class ModularUIContainer extends Container {
     private boolean reservedSortingSlots = false;
     private boolean verticalInvTweaks = false;
     private int slotsPerRow = 0;
-    private final List<Slot> sortableSlot = new ArrayList<>();
     private final Map<ContainerSection, List<Slot>> invTweaksSectionSlots = new HashMap<>();
 
     public ModularUIContainer(ModularUIContext context, ModularWindow mainWindow) {
-        this.invTweaksSectionSlots.put(ContainerSection.CHEST, sortableSlot);
         this.context = context;
         this.context.initialize(this, mainWindow);
         checkSlotIds();
@@ -48,7 +46,6 @@ public class ModularUIContainer extends Container {
 
     public void sortSlots() {
         this.sortedShiftClickSlots.sort(Comparator.comparingInt(BaseSlot::getShiftClickPriority));
-        this.sortableSlot.sort(Comparator.comparingInt(slot -> ((BaseSlot) slot).getShiftClickPriority()));
     }
 
     public ModularUIContext getContext() {
@@ -88,14 +85,19 @@ public class ModularUIContainer extends Container {
             sortSlots();
         }
         checkSlotIds();
-        this.sortableSlot.remove(slot);
+        for (List<Slot> slots : invTweaksSectionSlots.values()) {
+            slots.removeIf(slot1 -> slot1 == slot);
+        }
     }
 
-    public void setSlotSortable(BaseSlot slot) {
+    public void setSlotSortable(BaseSlot slot, ContainerSection section) {
         if (slot != inventorySlots.get(slot.slotNumber)) {
             throw new IllegalArgumentException("Slot is not at the expected index!");
         }
-        this.sortableSlot.add(slot);
+        if (section == ContainerSection.INVENTORY_HOTBAR || section == ContainerSection.INVENTORY_NOT_HOTBAR) {
+            setSlotSortable(slot, ContainerSection.INVENTORY);
+        }
+        this.invTweaksSectionSlots.computeIfAbsent(section, section1 -> new ArrayList<>()).add(slot);
     }
 
     @Override
@@ -178,6 +180,12 @@ public class ModularUIContainer extends Container {
         return stack;
     }
 
+    // invtweaks compat
+
+    public boolean hasReservedSortingSlots() {
+        return reservedSortingSlots;
+    }
+
     @ChestContainer.IsLargeCallback
     public boolean isVerticalInvTweaks() {
         return verticalInvTweaks;
@@ -190,6 +198,10 @@ public class ModularUIContainer extends Container {
 
     @ContainerSectionCallback
     public Map<ContainerSection, List<Slot>> getSectionSlots() {
-        return this.sortableSlot.isEmpty() ? Collections.emptyMap() : invTweaksSectionSlots;
+        return this.reservedSortingSlots ? invTweaksSectionSlots : Collections.emptyMap();
+    }
+
+    public static boolean isPlayerInventory(ContainerSection section) {
+        return section == ContainerSection.INVENTORY || section == ContainerSection.INVENTORY_HOTBAR || section == ContainerSection.INVENTORY_NOT_HOTBAR;
     }
 }
