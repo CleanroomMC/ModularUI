@@ -17,6 +17,8 @@ import com.cleanroommc.modularui.api.widget.Widget;
 import com.cleanroommc.modularui.common.internal.mixin.GuiContainerMixin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiLabel;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -103,18 +105,19 @@ public class ModularGui extends GuiContainer {
         this.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
+        drawVanillaElements(mouseX, mouseY, partialTicks);
         GlStateManager.pushMatrix();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.enableRescaleNormal();
         getAccessor().setHoveredSlot(null);
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
+        GlStateManager.enableRescaleNormal();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         RenderHelper.disableStandardItemLighting();
         this.drawGuiContainerForegroundLayer(partialTicks, mouseX, mouseY);
         RenderHelper.enableGUIStandardItemLighting();
 
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager.enableBlend();
         GlStateManager.pushMatrix();
         GlStateManager.translate(i, j, 0);
         MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.DrawForeground(this, mouseX, mouseY));
@@ -270,6 +273,15 @@ public class ModularGui extends GuiContainer {
             drawText("Parent: " + (parent instanceof ModularWindow ? "ModularWindow" : parent.toString()), 5, lineY, 1, color, false);
             lineY -= 11;
             drawText("Class: " + hovered, 5, lineY, 1, color, false);
+        }
+    }
+
+    protected void drawVanillaElements(int mouseX, int mouseY, float partialTicks) {
+        for (GuiButton guiButton : this.buttonList) {
+            guiButton.drawButton(this.mc, mouseX, mouseY, partialTicks);
+        }
+        for (GuiLabel guiLabel : this.labelList) {
+            guiLabel.drawLabel(this.mc, mouseX, mouseY);
         }
     }
 
