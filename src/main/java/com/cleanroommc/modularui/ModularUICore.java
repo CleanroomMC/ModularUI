@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Mixins;
 import javax.annotation.Nullable;
 import java.util.Map;
 
-@IFMLLoadingPlugin.Name("ModularUI Core")
+@IFMLLoadingPlugin.Name("ModularUI-Core")
 @IFMLLoadingPlugin.MCVersion(ForgeVersion.mcVersion)
 public class ModularUICore implements IFMLLoadingPlugin {
 

@@ -63,11 +63,40 @@ public class SlotGroup extends MultiChildWidget {
                 y++;
             }
         }
+        slotGroup.sortable = true;
+        slotGroup.slotsPerRow = slotsWidth;
         return slotGroup;
+    }
+
+    private boolean sortable = false;
+    private int slotsPerRow = 1;
+    private boolean vertical = false;
+
+    @Override
+    public void onInit() {
+        if (this.sortable) {
+            getContext().getContainer().setSorted(slotsPerRow, vertical);
+            for (Widget widget : getChildren()) {
+                if (widget instanceof SlotWidget) {
+                    ((SlotWidget) widget).setSorted(true);
+                }
+            }
+        }
     }
 
     public SlotGroup addSlot(SlotWidget slotWidget) {
         addChild(slotWidget);
+        return this;
+    }
+
+    public SlotGroup setInvTweaksCompat(int slotsPerRow) {
+        return setInvTweaksCompat(slotsPerRow, false);
+    }
+
+    public SlotGroup setInvTweaksCompat(int slotsPerRow, boolean verticalButtons) {
+        this.sortable = true;
+        this.slotsPerRow = slotsPerRow;
+        this.vertical = verticalButtons;
         return this;
     }
 

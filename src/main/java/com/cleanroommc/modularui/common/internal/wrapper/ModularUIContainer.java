@@ -2,6 +2,9 @@ package com.cleanroommc.modularui.common.internal.wrapper;
 
 import com.cleanroommc.modularui.api.screen.ModularUIContext;
 import com.cleanroommc.modularui.api.screen.ModularWindow;
+import invtweaks.api.container.ChestContainer;
+import invtweaks.api.container.ContainerSection;
+import invtweaks.api.container.ContainerSectionCallback;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IContainerListener;
@@ -9,17 +12,24 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
+@ChestContainer
 public class ModularUIContainer extends Container {
 
     private final ModularUIContext context;
     private boolean initialisedContainer = false;
     private final List<BaseSlot> sortedShiftClickSlots = new ArrayList<>();
 
+    // invtweaks compat
+    private boolean reservedSortingSlots = false;
+    private boolean verticalInvTweaks = false;
+    private int slotsPerRow = 0;
+    private final List<Slot> sortableSlot = new ArrayList<>();
+    private final Map<ContainerSection, List<Slot>> invTweaksSectionSlots = new HashMap<>();
+
     public ModularUIContainer(ModularUIContext context, ModularWindow mainWindow) {
+        this.invTweaksSectionSlots.put(ContainerSection.CHEST, sortableSlot);
         this.context = context;
         this.context.initialize(this, mainWindow);
         checkSlotIds();
@@ -27,8 +37,18 @@ public class ModularUIContainer extends Container {
         initialisedContainer = true;
     }
 
+    public void setSorted(int slotsPerRow, boolean verticalButtons) {
+        if (this.reservedSortingSlots) {
+            throw new IllegalStateException("Sorting is already reserved for a different inventory");
+        }
+        this.slotsPerRow = slotsPerRow;
+        this.verticalInvTweaks = verticalButtons;
+        this.reservedSortingSlots = true;
+    }
+
     public void sortSlots() {
         this.sortedShiftClickSlots.sort(Comparator.comparingInt(BaseSlot::getShiftClickPriority));
+        this.sortableSlot.sort(Comparator.comparingInt(slot -> ((BaseSlot) slot).getShiftClickPriority()));
     }
 
     public ModularUIContext getContext() {
@@ -68,6 +88,14 @@ public class ModularUIContainer extends Container {
             sortSlots();
         }
         checkSlotIds();
+        this.sortableSlot.remove(slot);
+    }
+
+    public void setSlotSortable(BaseSlot slot) {
+        if (slot != inventorySlots.get(slot.slotNumber)) {
+            throw new IllegalArgumentException("Slot is not at the expected index!");
+        }
+        this.sortableSlot.add(slot);
     }
 
     @Override
@@ -148,5 +176,20 @@ public class ModularUIContainer extends Container {
             }
         }
         return stack;
+    }
+
+    @ChestContainer.IsLargeCallback
+    public boolean isVerticalInvTweaks() {
+        return verticalInvTweaks;
+    }
+
+    @ChestContainer.RowSizeCallback
+    public int getSlotsPerRow() {
+        return slotsPerRow;
+    }
+
+    @ContainerSectionCallback
+    public Map<ContainerSection, List<Slot>> getSectionSlots() {
+        return this.sortableSlot.isEmpty() ? Collections.emptyMap() : invTweaksSectionSlots;
     }
 }

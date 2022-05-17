@@ -32,6 +32,7 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     private final BaseSlot slot;
     private ItemStack cachedServerItem = null;
     private ItemStack lastStoredPhantomItem = ItemStack.EMPTY;
+    private boolean sorted = false;
 
     public SlotWidget(BaseSlot slot) {
         this.slot = slot;
@@ -56,6 +57,9 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     @Override
     public void onInit() {
         getContext().getContainer().addSlotToContainer(this.slot);
+        if (this.sorted) {
+            getContext().getContainer().setSlotSortable(this.slot);
+        }
         if (getBackground() == null) {
             setBackground(TEXTURE);
         }
@@ -144,6 +148,10 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     public SlotWidget setFilter(Predicate<ItemStack> filter) {
         this.slot.setFilter(filter);
         return this;
+    }
+
+    public void setSorted(boolean sorted) {
+        this.sorted = true;
     }
 
     @Override

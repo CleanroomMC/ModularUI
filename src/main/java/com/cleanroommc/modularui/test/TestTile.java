@@ -29,6 +29,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
     private final FluidTank fluidTank1 = new FluidTank(10000);
     private final FluidTank fluidTank2 = new FluidTank(Integer.MAX_VALUE);
     private final ItemStackHandler phantomInventory = new ItemStackHandler(2);
+    private final ItemStackHandler chestInventory = new ItemStackHandler(54);
     private String textFieldValue = "";
     private final int duration = 60;
     private int progress = 0;
@@ -41,7 +42,8 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
 
     @Override
     public ModularWindow createWindow(UIBuildContext buildContext) {
-        Text[] TEXT = {new Text("Blue \u00a7nUnderlined\u00a7rBlue ").color(0x3058B8), new Text("Mint").color(0x469E8F)};
+        return createChestWindow(buildContext);
+        /*Text[] TEXT = {new Text("Blue \u00a7nUnderlined\u00a7rBlue ").color(0x3058B8), new Text("Mint").color(0x469E8F)};
         ModularWindow.Builder builder = ModularWindow.builder(new Size(176, 272));
         //.addFromJson("modularui:test", buildContext);
         /*buildContext.applyToWidget("background", DrawableWidget.class, widget -> {
@@ -49,7 +51,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                     .addTooltip("Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.")
                     .addTooltip("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet");
         });*/
-        builder.setBackground(ModularUITextures.VANILLA_BACKGROUND)
+        /*builder.setBackground(ModularUITextures.VANILLA_BACKGROUND)
                 .bindPlayerInventory(buildContext.getPlayer());
         Column column = new Column();
         addInfo(column);
@@ -74,10 +76,6 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                                         .setBackground(false, ModularUITextures.VANILLA_TAB_TOP_MIDDLE.getSubArea(0, 0, 1f, 0.5f))
                                         .setBackground(true, ModularUITextures.VANILLA_TAB_TOP_MIDDLE.getSubArea(0, 0.5f, 1f, 1f))
                                         .setPos(84, -28))
-                                /*.addTabButton(new TabButton(4)
-                                        .setBackground(false, ModularUITextures.VANILLA_TAB_TOP_MIDDLE.getSubArea(0, 0, 1f, 0.5f))
-                                        .setBackground(true, ModularUITextures.VANILLA_TAB_TOP_MIDDLE.getSubArea(0, 0.5f, 1f, 1f))
-                                        .setPos(112, -28))*/
                                 .addPage(new MultiChildWidget()
                                         .addChild(new TextWidget("Page 1"))
                                         .addChild(new SlotWidget(phantomInventory, 0)
@@ -203,11 +201,8 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                                                         .setSize(92, 20)
                                                         .setPos(20, 25))
                                                 .setSize(156, 150))
-                                        .setPos(10, 10))
-                        /*.addPage(new GuiScreenWidget(() -> new GuiCrafting(buildContext.getPlayer().inventory, buildContext.getPlayer().world))
-                                .setPos(10, 10)
-                                .setSize(150, 100))*/)
-                .widget(new ExpandTab()
+                                        .setPos(10, 10)))
+                /*.widget(new ExpandTab()
                         .setNormalTexture(ModularUITextures.ICON_INFO.withFixedSize(14, 14, 3, 3))
                         .widget(new DrawableWidget()
                                 .setDrawable(ModularUITextures.ICON_INFO)
@@ -226,7 +221,21 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                         .setSize(20, 20)
                         .setPos(177, 5)
                         .respectAreaInJei())
-                .build();
+                .build();*/
+    }
+
+    public ModularWindow createChestWindow(UIBuildContext buildContext) {
+        int inventorySize = chestInventory.getSlots(), slotsPerRow = 9;
+        int slotsHeight = (int) Math.ceil(inventorySize * 1D / slotsPerRow) * 18;
+        int width = Math.max(176, slotsPerRow * 18 + 14);
+        ModularWindow.Builder builder = ModularWindow.builder(width, 8 + slotsHeight + 96);
+        builder.setBackground(ModularUITextures.VANILLA_BACKGROUND)
+                .bindPlayerInventory(buildContext.getPlayer(), new Pos2d(width / 2 - 81, 21 + slotsHeight))
+                .widget(new TextWidget(new Text("ModularUI Chest").localise())
+                        .setPos(8, 6))
+                .widget(SlotGroup.ofItemHandler(chestInventory, slotsPerRow, 0)
+                        .setPos(7, 16));
+        return builder.build();
     }
 
     public ModularWindow createAnotherWindow(EntityPlayer player) {
