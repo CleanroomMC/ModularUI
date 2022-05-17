@@ -1,6 +1,10 @@
 buildscript {
     repositories {
         maven {
+            name = "forge"
+            url = "https://maven.minecraftforge.net/"
+        }
+        maven {
             url = 'https://maven.cleanroommc.com'
         }
         maven {
@@ -122,6 +126,7 @@ jar {
             attribute_map['TweakClass'] = 'org.spongepowered.asm.launch.MixinTweaker'
         }
         attribute_map['ForceLoadAsMod'] = true
+        attribute_map['FMLCorePluginContainsFMLMod'] = true
         attributes(attribute_map)
     }
     if (project.use_mixins && project.pack_mixins_in_jar) {
