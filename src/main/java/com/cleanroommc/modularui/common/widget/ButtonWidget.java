@@ -1,5 +1,7 @@
 package com.cleanroommc.modularui.common.widget;
 
+import com.cleanroommc.modularui.api.ModularUITextures;
+import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.widget.Widget;
@@ -11,6 +13,17 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.BiConsumer;
 
 public class ButtonWidget extends SyncedWidget implements Interactable {
+
+    public static ButtonWidget closeWindowButton(boolean syncedWindow) {
+        return (ButtonWidget) new ButtonWidget()
+                .setOnClick((clickData, widget) -> {
+                    if (!syncedWindow || !widget.isClient()) {
+                        widget.getWindow().closeWindow();
+                    }
+                })
+                .setBackground(ModularUITextures.VANILLA_BACKGROUND, new Text("x"))
+                .setSize(12, 12);
+    }
 
     private BiConsumer<ClickData, Widget> clickAction;
 

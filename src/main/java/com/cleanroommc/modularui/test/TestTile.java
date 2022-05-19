@@ -239,14 +239,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
     public ModularWindow createAnotherWindow(EntityPlayer player) {
         return ModularWindow.builder(100, 100)
                 .setBackground(ModularUITextures.VANILLA_BACKGROUND)
-                .widget(new ButtonWidget()
-                        .setOnClick((clickData, widget) -> {
-                            if (!widget.isClient())
-                                widget.getWindow().closeWindow();
-                        })
-                        .setBackground(ModularUITextures.VANILLA_BACKGROUND, new Text("x"))
-                        .setSize(12, 12)
-                        .setPos(85, 5))
+                .widget(ButtonWidget.closeWindowButton(true).setPos(85, 5))
                 .widget(new SlotWidget(phantomInventory, 0)
                         .setShiftClickPrio(0)
                         .setPos(30, 30))
