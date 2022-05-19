@@ -31,6 +31,7 @@ import net.minecraftforge.client.event.GuiContainerEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
 
@@ -72,7 +73,7 @@ public class ModularGui extends GuiContainer {
     }
 
     @Override
-    public void onResize(Minecraft mc, int w, int h) {
+    public void onResize(@NotNull Minecraft mc, int w, int h) {
         super.onResize(mc, w, h);
         context.resize(new Size(w, h));
     }
@@ -105,6 +106,7 @@ public class ModularGui extends GuiContainer {
         this.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
+        // mainly for invtweaks compat
         drawVanillaElements(mouseX, mouseY, partialTicks);
         GlStateManager.pushMatrix();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
@@ -127,7 +129,6 @@ public class ModularGui extends GuiContainer {
         ItemStack itemstack = getAccessor().getDraggedStack().isEmpty() ? inventoryplayer.getItemStack() : getAccessor().getDraggedStack();
         GlStateManager.translate((float) i, (float) j, 0.0F);
         if (!itemstack.isEmpty()) {
-            int j2 = 8;
             int k2 = getAccessor().getDraggedStack().isEmpty() ? 8 : 16;
             String s = null;
 
