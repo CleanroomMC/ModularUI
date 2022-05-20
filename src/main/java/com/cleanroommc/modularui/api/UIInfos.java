@@ -7,9 +7,9 @@ import com.cleanroommc.modularui.api.screen.ModularWindow;
 import com.cleanroommc.modularui.api.screen.UIBuildContext;
 import com.cleanroommc.modularui.common.builder.UIBuilder;
 import com.cleanroommc.modularui.common.builder.UIInfo;
+import com.cleanroommc.modularui.common.internal.network.NetworkUtils;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularUIContainer;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -45,7 +45,7 @@ public class UIInfos {
 
     @SideOnly(Side.CLIENT)
     public static void openClientUI(EntityPlayer player, Function<UIBuildContext, ModularWindow> uiCreator) {
-        if (!(player instanceof EntityPlayerSP)) {
+        if (!NetworkUtils.isClient(player)) {
             ModularUI.LOGGER.info("Tried opening client ui on server!");
             return;
         }

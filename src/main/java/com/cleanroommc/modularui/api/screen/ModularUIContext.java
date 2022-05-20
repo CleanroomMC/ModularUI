@@ -16,7 +16,6 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
@@ -45,7 +44,7 @@ public class ModularUIContext {
     private final Cursor cursor;
     private final List<Widget> jeiExclusionZone = new ArrayList<>();
 
-    private boolean oneSided = true;
+    public final boolean clientOnly;
 
     @SideOnly(Side.CLIENT)
     private Size screenSize = new Size(MC.displayWidth, MC.displayHeight);
@@ -53,13 +52,21 @@ public class ModularUIContext {
     private ModularUIContainer container;
 
     public ModularUIContext(UIBuildContext context) {
+        this(context, false);
+    }
+
+    public ModularUIContext(UIBuildContext context, boolean clientOnly) {
         this.player = context.player;
+        if (!isClient() && clientOnly) {
+            throw new IllegalArgumentException("Client only ModularUI can not be opened on server!");
+        }
+        this.clientOnly = clientOnly;
         this.syncedWindowsCreators = context.syncedWindows.build();
         this.cursor = new Cursor(this);
     }
 
     public boolean isClient() {
-        return player.world != null ? player.world.isRemote : player instanceof EntityPlayerSP;
+        return NetworkUtils.isClient(this.player);
     }
 
     public void initialize(ModularUIContainer container, ModularWindow mainWindow) {
@@ -206,8 +213,8 @@ public class ModularUIContext {
         return screen;
     }
 
-    public boolean isOneSided() {
-        return oneSided;
+    public boolean isClientOnly() {
+        return clientOnly;
     }
 
     public Cursor getCursor() {
@@ -250,7 +257,6 @@ public class ModularUIContext {
     }
 
     public void readClientPacket(PacketBuffer buf, int widgetId) throws IOException {
-        this.oneSided = false;
         int id = buf.readVarInt();
         ModularWindow window = syncedWindows.get(buf.readVarInt());
         if (widgetId == DataCodes.INTERNAL_SYNC) {
@@ -273,7 +279,6 @@ public class ModularUIContext {
 
     @SideOnly(Side.CLIENT)
     public void readServerPacket(PacketBuffer buf, int widgetId) throws IOException {
-        this.oneSided = false;
         int id = buf.readVarInt();
         ModularWindow window = syncedWindows.get(buf.readVarInt());
         if (widgetId == DataCodes.INTERNAL_SYNC) {
@@ -296,7 +301,7 @@ public class ModularUIContext {
 
     @SideOnly(Side.CLIENT)
     public void sendClientPacket(int discriminator, ISyncedWidget syncedWidget, ModularWindow window, Consumer<PacketBuffer> bufferConsumer) {
-        if (isClient()) {
+        if (isClient() && !isClientOnly()) {
             if (!syncedWindows.containsValue(window)) {
                 ModularUI.LOGGER.throwing(new IllegalStateException("Window is not synced!"));
                 return;

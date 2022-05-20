@@ -3,9 +3,12 @@ package com.cleanroommc.modularui.common.internal.network;
 import com.cleanroommc.modularui.ModularUI;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -16,6 +19,15 @@ public class NetworkUtils {
 
     public static final Consumer<PacketBuffer> EMPTY_PACKET = buffer -> {
     };
+
+    public static boolean isDedicatedClient() {
+        return FMLCommonHandler.instance().getSide().isClient();
+    }
+
+    public static boolean isClient(EntityPlayer player) {
+        if (player == null) throw new NullPointerException("Can't get side of null player!");
+        return player.world == null ? player instanceof EntityPlayerSP : player.world.isRemote;
+    }
 
     public static void writePacketBuffer(PacketBuffer writeTo, PacketBuffer writeFrom) {
         writeTo.writeVarInt(writeFrom.readableBytes());
