@@ -265,129 +265,136 @@ public class Color implements Iterable<Integer> {
         return null;
     }
 
-    public static final Color WHITE = new Color(rgb(255, 255, 255), new int[]{},
-            rgb(230, 230, 230),
-            rgb(205, 205, 205),
-            rgb(180, 180, 180),
-            rgb(155, 155, 155),
-            rgb(130, 130, 130));
+    public static final Color WHITE = new Color(0xFFFFFF, new int[]{},
+            0xF7F7F7,
+            0xEFEFEF,
+            0xE7E7E7,
+            0xDFDFDF,
+            0xD7D7D7,
+            0xCFCFCF,
+            0xC7C7C7,
+            0xBFBFBF);
 
-    public static final Color BLACK = new Color(rgb(0, 0, 0), new int[]{
-            rgb(25, 25, 25),
-            rgb(50, 50, 50),
-            rgb(75, 75, 75),
-            rgb(100, 100, 100),
-            rgb(125, 125, 125)});
+    public static final Color BLACK = new Color(0x000000, new int[]{
+            0x080808,
+            0x101010,
+            0x181818,
+            0x202020,
+            0x282828,
+            0x303030,
+            0x383838,
+            0x404040
+    });
 
     // from here on color values are taken from https://github.com/flutter/flutter/blob/master/packages/flutter/lib/src/material/colors.dart
 
-    public static final Color RED = new Color(0xFFF44336,
-            new int[]{0xFFEF5350, 0xFFE57373, 0xFFEF9A9A, 0xFFFFCDD2, 0xFFFFEBEE},
-            0xFFE53935, 0xFFD32F2F, 0xFFC62828, 0xFFB71C1C);
+    public static final Color RED = new Color(0xF44336,
+            new int[]{0xEF5350, 0xE57373, 0xEF9A9A, 0xFFCDD2, 0xFFEBEE},
+            0xE53935, 0xD32F2F, 0xC62828, 0xB71C1C);
 
-    public static final Color RED_ACCENT = new Color(0xFFFF5252, new int[]{0xFFFF8A80}, 0xFFFF1744, 0xFFD50000);
+    public static final Color RED_ACCENT = new Color(0xFF5252, new int[]{0xFF8A80}, 0xFF1744, 0xD50000);
 
-    public static final Color PINK = new Color(0xFFE91E63,
-            new int[]{0xFFEC407A, 0xFFF06292, 0xFFF48FB1, 0xFFF8BBD0, 0xFFFCE4EC},
-            0xFFD81B60, 0xFFC2185B, 0xFFAD1457, 0xFF880E4F);
+    public static final Color PINK = new Color(0xE91E63,
+            new int[]{0xEC407A, 0xF06292, 0xF48FB1, 0xF8BBD0, 0xFCE4EC},
+            0xD81B60, 0xC2185B, 0xAD1457, 0x880E4F);
 
-    public static final Color PINK_ACCENT = new Color(0xFFFF4081, new int[]{0xFFFF80AB}, 0xFFF50057, 0xFFC51162);
+    public static final Color PINK_ACCENT = new Color(0xFF4081, new int[]{0xFF80AB}, 0xF50057, 0xC51162);
 
-    public static final Color PURPLE = new Color(0xFF9C27B0,
-            new int[]{0xFFAB47BC, 0xFFBA68C8, 0xFFCE93D8, 0xFFE1BEE7, 0xFFF3E5F5},
-            0xFF8E24AA, 0xFF7B1FA2, 0xFF6A1B9A, 0xFF4A148C);
+    public static final Color PURPLE = new Color(0x9C27B0,
+            new int[]{0xAB47BC, 0xBA68C8, 0xCE93D8, 0xE1BEE7, 0xF3E5F5},
+            0x8E24AA, 0x7B1FA2, 0x6A1B9A, 0x4A148C);
 
-    public static final Color PURPLE_ACCENT = new Color(0xFFE040FB, new int[]{0xFFEA80FC}, 0xFFD500F9, 0xFFAA00FF);
+    public static final Color PURPLE_ACCENT = new Color(0xE040FB, new int[]{0xEA80FC}, 0xD500F9, 0xAA00FF);
 
-    public static final Color DEEP_PURPLE = new Color(0xFF673AB7,
-            new int[]{0xFF7E57C2, 0xFF9575CD, 0xFFB39DDB, 0xFFD1C4E9, 0xFFEDE7F6},
-            0xFF5E35B1, 0xFF512DA8, 0xFF4527A0, 0xFF311B92);
+    public static final Color DEEP_PURPLE = new Color(0x673AB7,
+            new int[]{0x7E57C2, 0x9575CD, 0xB39DDB, 0xD1C4E9, 0xEDE7F6},
+            0x5E35B1, 0x512DA8, 0x4527A0, 0x311B92);
 
-    public static final Color DEEP_PURPLE_ACCENT = new Color(0xFF7C4DFF, new int[]{0xFFB388FF}, 0xFF651FFF, 0xFF651FFF);
+    public static final Color DEEP_PURPLE_ACCENT = new Color(0x7C4DFF, new int[]{0xB388FF}, 0x651FFF, 0x651FFF);
 
-    public static final Color INDIGO = new Color(0xFF3F51B5,
-            new int[]{0xFF5C6BC0, 0xFF7986CB, 0xFF9FA8DA, 0xFFC5CAE9, 0xFFE8EAF6},
-            0xFF3949AB, 0xFF303F9F, 0xFF283593, 0xFF1A237E);
+    public static final Color INDIGO = new Color(0x3F51B5,
+            new int[]{0x5C6BC0, 0x7986CB, 0x9FA8DA, 0xC5CAE9, 0xE8EAF6},
+            0x3949AB, 0x303F9F, 0x283593, 0x1A237E);
 
-    public static final Color INDIGO_ACCENT = new Color(0xFF536DFE, new int[]{0xFF8C9EFF}, 0xFF3D5AFE, 0xFF304FFE);
+    public static final Color INDIGO_ACCENT = new Color(0x536DFE, new int[]{0x8C9EFF}, 0x3D5AFE, 0x304FFE);
 
-    public static final Color BLUE = new Color(0xFF2196F3,
-            new int[]{0xFF42A5F5, 0xFF64B5F6, 0xFF90CAF9, 0xFFBBDEFB, 0xFFE3F2FD},
-            0xFF1E88E5, 0xFF1976D2, 0xFF1565C0, 0xFF0D47A1);
+    public static final Color BLUE = new Color(0x2196F3,
+            new int[]{0x42A5F5, 0x64B5F6, 0x90CAF9, 0xBBDEFB, 0xE3F2FD},
+            0x1E88E5, 0x1976D2, 0x1565C0, 0x0D47A1);
 
-    public static final Color BLUE_ACCENT = new Color(0xFF448AFF, new int[]{0xFF82B1FF}, 0xFF2979FF, 0xFF2962FF);
+    public static final Color BLUE_ACCENT = new Color(0x448AFF, new int[]{0x82B1FF}, 0x2979FF, 0x2962FF);
 
-    public static final Color LIGHT_BLUE = new Color(0xFF03A9F4,
-            new int[]{0xFF29B6F6, 0xFF4FC3F7, 0xFF81D4FA, 0xFFB3E5FC, 0xFFE1F5FE},
-            0xFF039BE5, 0xFF0288D1, 0xFF0277BD, 0xFF01579B);
+    public static final Color LIGHT_BLUE = new Color(0x03A9F4,
+            new int[]{0x29B6F6, 0x4FC3F7, 0x81D4FA, 0xB3E5FC, 0xE1F5FE},
+            0x039BE5, 0x0288D1, 0x0277BD, 0x01579B);
 
-    public static final Color LIGHT_BLUE_ACCENT = new Color(0xFF40C4FF, new int[]{0xFF80D8FF}, 0xFF00B0FF, 0xFF0091EA);
+    public static final Color LIGHT_BLUE_ACCENT = new Color(0x40C4FF, new int[]{0x80D8FF}, 0x00B0FF, 0x0091EA);
 
-    public static final Color CYAN = new Color(0xFF00BCD4,
-            new int[]{0xFF26C6DA, 0xFF4DD0E1, 0xFF80DEEA, 0xFFB2EBF2, 0xFFE0F7FA},
-            0xFF00ACC1, 0xFF0097A7, 0xFF00838F, 0xFF006064);
+    public static final Color CYAN = new Color(0x00BCD4,
+            new int[]{0x26C6DA, 0x4DD0E1, 0x80DEEA, 0xB2EBF2, 0xE0F7FA},
+            0x00ACC1, 0x0097A7, 0x00838F, 0x006064);
 
-    public static final Color CYAN_ACCENT = new Color(0xFF18FFFF, new int[]{0xFF84FFFF}, 0xFF00E5FF, 0xFF00B8D4);
+    public static final Color CYAN_ACCENT = new Color(0x18FFFF, new int[]{0x84FFFF}, 0x00E5FF, 0x00B8D4);
 
-    public static final Color TEAL = new Color(0xFF009688,
-            new int[]{0xFF26A69A, 0xFF4DB6AC, 0xFF80CBC4, 0xFFB2DFDB, 0xFFE0F2F1},
-            0xFF00897B, 0xFF00796B, 0xFF00695C, 0xFF004D40);
+    public static final Color TEAL = new Color(0x009688,
+            new int[]{0x26A69A, 0x4DB6AC, 0x80CBC4, 0xB2DFDB, 0xE0F2F1},
+            0x00897B, 0x00796B, 0x00695C, 0x004D40);
 
-    public static final Color TEAL_ACCENT = new Color(0xFF64FFDA, new int[]{0xFFA7FFEB}, 0xFF1DE9B6, 0xFF00BFA5);
+    public static final Color TEAL_ACCENT = new Color(0x64FFDA, new int[]{0xA7FFEB}, 0x1DE9B6, 0x00BFA5);
 
-    public static final Color GREEN = new Color(0xFF4CAF50,
-            new int[]{0xFF66BB6A, 0xFF81C784, 0xFFA5D6A7, 0xFFC8E6C9, 0xFFE8F5E9},
-            0xFF43A047, 0xFF388E3C, 0xFF2E7D32, 0xFF1B5E20);
+    public static final Color GREEN = new Color(0x4CAF50,
+            new int[]{0x66BB6A, 0x81C784, 0xA5D6A7, 0xC8E6C9, 0xE8F5E9},
+            0x43A047, 0x388E3C, 0x2E7D32, 0x1B5E20);
 
-    public static final Color GREEN_ACCENT = new Color(0xFF69F0AE, new int[]{0xFFB9F6CA}, 0xFF00E676, 0xFF00C853);
+    public static final Color GREEN_ACCENT = new Color(0x69F0AE, new int[]{0xB9F6CA}, 0x00E676, 0x00C853);
 
-    public static final Color LIGHT_GREEN = new Color(0xFF8BC34A,
-            new int[]{0xFF9CCC65, 0xFFAED581, 0xFFC5E1A5, 0xFFDCEDC8, 0xFFF1F8E9},
-            0xFF7CB342, 0xFF689F38, 0xFF558B2F, 0xFF33691E);
+    public static final Color LIGHT_GREEN = new Color(0x8BC34A,
+            new int[]{0x9CCC65, 0xAED581, 0xC5E1A5, 0xDCEDC8, 0xF1F8E9},
+            0x7CB342, 0x689F38, 0x558B2F, 0x33691E);
 
-    public static final Color LIGHT_GREEN_ACCENT = new Color(0xFFB2FF59, new int[]{0xFFCCFF90}, 0xFF76FF03, 0xFF64DD17);
+    public static final Color LIGHT_GREEN_ACCENT = new Color(0xB2FF59, new int[]{0xCCFF90}, 0x76FF03, 0x64DD17);
 
-    public static final Color LIME = new Color(0xFFCDDC39,
-            new int[]{0xFFD4E157, 0xFFDCE775, 0xFFE6EE9C, 0xFFF0F4C3, 0xFFF9FBE7},
-            0xFFC0CA33, 0xFFAFB42B, 0xFF9E9D24, 0xFF827717);
+    public static final Color LIME = new Color(0xCDDC39,
+            new int[]{0xD4E157, 0xDCE775, 0xE6EE9C, 0xF0F4C3, 0xF9FBE7},
+            0xC0CA33, 0xAFB42B, 0x9E9D24, 0x827717);
 
-    public static final Color LIME_ACCENT = new Color(0xFFEEFF41, new int[]{0xFFF4FF81}, 0xFFC6FF00, 0xFFAEEA00);
+    public static final Color LIME_ACCENT = new Color(0xEEFF41, new int[]{0xF4FF81}, 0xC6FF00, 0xAEEA00);
 
-    public static final Color YELLOW = new Color(0xFFFFEB3B,
-            new int[]{0xFFFFEE58, 0xFFFFF176, 0xFFFFF59D, 0xFFFFF9C4, 0xFFFFFDE7},
-            0xFFFDD835, 0xFFFBC02D, 0xFFF9A825, 0xFFF57F17);
+    public static final Color YELLOW = new Color(0xFFEB3B,
+            new int[]{0xFFEE58, 0xFFF176, 0xFFF59D, 0xFFF9C4, 0xFFFDE7},
+            0xFDD835, 0xFBC02D, 0xF9A825, 0xF57F17);
 
-    public static final Color YELLOW_ACCENT = new Color(0xFFFFFF00, new int[]{0xFFFFFF8D}, 0xFFFFEA00, 0xFFFFD600);
+    public static final Color YELLOW_ACCENT = new Color(0xFFFF00, new int[]{0xFFFF8D}, 0xFFEA00, 0xFFD600);
 
-    public static final Color AMBER = new Color(0xFFFFC107,
-            new int[]{0xFFFFCA28, 0xFFFFD54F, 0xFFFFE082, 0xFFFFECB3, 0xFFFFF8E1},
-            0xFFFFB300, 0xFFFFA000, 0xFFFF8F00, 0xFFFF6F00);
+    public static final Color AMBER = new Color(0xFFC107,
+            new int[]{0xFFCA28, 0xFFD54F, 0xFFE082, 0xFFECB3, 0xFFF8E1},
+            0xFFB300, 0xFFA000, 0xFF8F00, 0xFF6F00);
 
-    public static final Color AMBER_ACCENT = new Color(0xFFFFD740, new int[]{0xFFFFE57F}, 0xFFFFC400, 0xFFFFAB00);
+    public static final Color AMBER_ACCENT = new Color(0xFFD740, new int[]{0xFFE57F}, 0xFFC400, 0xFFAB00);
 
-    public static final Color ORANGE = new Color(0xFFFF9800,
-            new int[]{0xFFFFA726, 0xFFFFB74D, 0xFFFFCC80, 0xFFFFE0B2, 0xFFFFF3E0},
-            0xFFFB8C00, 0xFFF57C00, 0xFFEF6C00, 0xFFE65100);
+    public static final Color ORANGE = new Color(0xFF9800,
+            new int[]{0xFFA726, 0xFFB74D, 0xFFCC80, 0xFFE0B2, 0xFFFFF3E0},
+            0xFB8C00, 0xF57C00, 0xEF6C00, 0xE65100);
 
-    public static final Color ORANGE_ACCENT = new Color(0xFFFFAB40, new int[]{0xFFFFD180}, 0xFFFF9100, 0xFFFF6D00);
+    public static final Color ORANGE_ACCENT = new Color(0xFFAB40, new int[]{0xFFD180}, 0xFF9100, 0xFF6D00);
 
-    public static final Color DEEP_ORANGE = new Color(0xFFFF5722,
-            new int[]{0xFFFF7043, 0xFFFF8A65, 0xFFFFAB91, 0xFFFFCCBC, 0xFFFBE9E7},
-            0xFFF4511E, 0xFFE64A19, 0xFFD84315, 0xFFBF360C);
+    public static final Color DEEP_ORANGE = new Color(0xFF5722,
+            new int[]{0xFF7043, 0xFF8A65, 0xFFAB91, 0xFFCCBC, 0xFBE9E7},
+            0xF4511E, 0xE64A19, 0xD84315, 0xBF360C);
 
-    public static final Color DEEP_ORANGE_ACCENT = new Color(0xFFFF6E40, new int[]{0xFFFF9E80}, 0xFFFF3D00, 0xFFDD2C00);
+    public static final Color DEEP_ORANGE_ACCENT = new Color(0xFF6E40, new int[]{0xFF9E80}, 0xFF3D00, 0xDD2C00);
 
-    public static final Color BROWN = new Color(0xFF795548,
-            new int[]{0xFF8D6E63, 0xFFA1887F, 0xFFBCAAA4, 0xFFD7CCC8, 0xFFEFEBE9},
-            0xFF6D4C41, 0xFF5D4037, 0xFF4E342E, 0xFF3E2723);
+    public static final Color BROWN = new Color(0x795548,
+            new int[]{0x8D6E63, 0xA1887F, 0xBCAAA4, 0xD7CCC8, 0xEFEBE9},
+            0x6D4C41, 0x5D4037, 0x4E342E, 0x3E2723);
 
-    public static final Color GREY = new Color(0xFF9E9E9E,
-            new int[]{0xFFBDBDBD, 0xFFE0E0E0, 0xFFEEEEEE, 0xFFF5F5F5, 0xFFFAFAFA},
-            0xFF757575, 0xFF616161, 0xFF424242, 0xFF212121);
+    public static final Color GREY = new Color(0x9E9E9E,
+            new int[]{0xBDBDBD, 0xE0E0E0, 0xEEEEEE, 0xF5F5F5, 0xFAFAFA},
+            0x757575, 0x616161, 0x424242, 0x212121);
 
-    public static final Color BLUE_GREY = new Color(0xFF607D8B,
-            new int[]{0xFF78909C, 0xFF90A4AE, 0xFFB0BEC5, 0xFFCFD8DC, 0xFFECEFF1},
-            0xFF546E7A, 0xFF455A64, 0xFF37474F, 0xFF263238);
+    public static final Color BLUE_GREY = new Color(0x607D8B,
+            new int[]{0x78909C, 0x90A4AE, 0xB0BEC5, 0xCFD8DC, 0xECEFF1},
+            0x546E7A, 0x455A64, 0x37474F, 0x263238);
 
     public final int normal;
     private final int[] shadeBright;
@@ -395,9 +402,15 @@ public class Color implements Iterable<Integer> {
     private final int[] all;
 
     public Color(int normal, int[] shadeBright, int... shadeDark) {
-        this.normal = normal;
+        this.normal = withAlpha(normal, 255);
         this.shadeBright = shadeBright;
         this.shadeDark = shadeDark;
+        for (int i = 0; i < this.shadeBright.length; i++) {
+            this.shadeBright[i] = withAlpha(this.shadeBright[i], 255);
+        }
+        for (int i = 0; i < this.shadeDark.length; i++) {
+            this.shadeDark[i] = withAlpha(this.shadeDark[i], 255);
+        }
         this.all = new int[shadeBright.length + shadeDark.length + 1];
         int index = 0;
         for (int i = shadeBright.length - 1; i >= 0; i--) {
