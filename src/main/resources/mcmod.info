@@ -9,7 +9,7 @@
   "updateUrl": "",
   "authorList": ["CleanroomMC"],
   "credits": "GTCEu Dev Team",
-  "logoFile": "",
+  "logoFile": "assets/modular_ui_logo.png",
   "screenshots": [],
   "dependencies": []
 }
