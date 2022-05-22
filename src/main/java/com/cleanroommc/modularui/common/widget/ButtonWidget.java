@@ -14,6 +14,15 @@ import java.util.function.BiConsumer;
 
 public class ButtonWidget extends SyncedWidget implements Interactable {
 
+    public static ButtonWidget openSyncedWindowButton(int id) {
+        return (ButtonWidget) new ButtonWidget()
+                .setOnClick((clickData, widget) -> {
+                    if (!widget.isClient())
+                        widget.getContext().openSyncedWindow(id);
+                })
+                .setBackground(ModularUITextures.VANILLA_BACKGROUND, new Text("Window"));
+    }
+
     public static ButtonWidget closeWindowButton(boolean syncedWindow) {
         return (ButtonWidget) new ButtonWidget()
                 .setOnClick((clickData, widget) -> {
