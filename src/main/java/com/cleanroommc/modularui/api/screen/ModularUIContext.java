@@ -105,12 +105,16 @@ public class ModularUIContext {
         }
     }
 
+    public boolean isWindowOpen(int id) {
+        return this.syncedWindows.containsKey(id);
+    }
+
     public void openSyncedWindow(int id) {
         if (isClient()) {
             ModularUI.LOGGER.error("Synced windows must be opened on server!");
             return;
         }
-        if (syncedWindows.containsKey(id)) {
+        if (isWindowOpen(id)) {
             return;
         }
         if (syncedWindowsCreators.containsKey(id)) {
@@ -241,10 +245,16 @@ public class ModularUIContext {
     public List<Rectangle> getJeiExclusionZones() {
         List<Rectangle> zones = new ArrayList<>();
         for (ModularWindow window : getOpenWindows()) {
-            zones.add(window.getRectangle());
+            if (window.isEnabled()) {
+                zones.add(window.getRectangle());
+            }
         }
         for (Widget widget : jeiExclusionZone) {
             zones.add(widget.getRectangle());
+        }
+        Rectangle draggableArea = cursor.getDraggableArea();
+        if (draggableArea != null) {
+            zones.add(draggableArea);
         }
         return zones;
     }

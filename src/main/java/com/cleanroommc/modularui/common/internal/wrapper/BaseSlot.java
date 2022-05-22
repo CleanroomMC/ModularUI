@@ -23,6 +23,7 @@ public class BaseSlot extends SlotItemHandler {
     private int shiftClickPriority = 0;
     private Runnable changeListener;
     private Predicate<ItemStack> filter;
+    private ItemStack cachedItem = null;
 
     public static BaseSlot phantom() {
         return phantom(new ItemStackHandler(), 0, false);
@@ -98,6 +99,10 @@ public class BaseSlot extends SlotItemHandler {
 
     @Override
     public void onSlotChanged() {
+        if (this.cachedItem != null && ItemStack.areItemStacksEqual(this.cachedItem, getStack())) {
+            return;
+        }
+        this.cachedItem = getStack().copy();
         if (this.changeListener != null) {
             this.changeListener.run();
         }
