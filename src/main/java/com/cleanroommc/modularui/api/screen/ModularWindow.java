@@ -54,6 +54,7 @@ public class ModularWindow implements IWidgetParent {
     private final boolean fullScreen;
     private Size size;
     private Pos2d pos = Pos2d.ZERO;
+    private PosProvider posProvider;
     private final Alignment alignment = Alignment.Center;
     private final IDrawable[] background;
     protected boolean draggable;
@@ -90,6 +91,7 @@ public class ModularWindow implements IWidgetParent {
             return false;
         });
         this.syncedWidgets = syncedWidgetBuilder.build();
+        this.posProvider = ((screenSize, mainWindow) -> Alignment.Center.getAlignedPos(screenSize, this.size));
     }
 
     protected void initialize(ModularUIContext context) {
@@ -104,7 +106,7 @@ public class ModularWindow implements IWidgetParent {
             this.size = screenSize;
             this.pos = Pos2d.ZERO;
         } else {
-            this.pos = alignment.getAlignedPos(screenSize, size);
+            this.pos = this.posProvider.getPos(screenSize, this.context.getMainWindow());
         }
         markNeedsRebuild();
     }
@@ -406,6 +408,7 @@ public class ModularWindow implements IWidgetParent {
         private final List<Widget> widgets = new ArrayList<>();
         private IDrawable[] background = {};
         private Size size;
+        private PosProvider pos = null;
         private boolean draggable = true;
 
         private Builder(Size size) {
@@ -424,6 +427,11 @@ public class ModularWindow implements IWidgetParent {
 
         public Builder setSize(int width, int height) {
             return setSize(new Size(width, height));
+        }
+
+        public Builder setPos(PosProvider pos) {
+            this.pos = pos;
+            return this;
         }
 
         public Builder setDraggable(boolean draggable) {
@@ -447,7 +455,14 @@ public class ModularWindow implements IWidgetParent {
         public ModularWindow build() {
             ModularWindow window = new ModularWindow(size, widgets, background);
             window.draggable = draggable;
+            if (pos != null) {
+                window.posProvider = pos;
+            }
             return window;
         }
+    }
+
+    public interface PosProvider {
+        Pos2d getPos(Size screenSize, ModularWindow mainWindow);
     }
 }
