@@ -22,7 +22,7 @@ public class Cursor {
     private Widget hovered;
     @Nullable
     private Widget focused;
-    private final List<Interactable> hoveredWidgets = new ArrayList<>();
+    private final List<Object> hoveredWidgets = new ArrayList<>();
 
     private int timeHovered;
 
@@ -94,7 +94,7 @@ public class Cursor {
         return !this.hoveredWidgets.isEmpty() && this.hoveredWidgets.get(0) == widget;
     }
 
-    public List<Interactable> getAllHovered() {
+    public List<Object> getAllHovered() {
         return hoveredWidgets;
     }
 
@@ -162,19 +162,30 @@ public class Cursor {
 
     @ApiStatus.Internal
     public boolean onMouseClick(int button) {
-        if (getItemStack().isEmpty()) {
-            if (this.cursorDraggable == null) {
-                IDraggable draggable = findDraggable();
-                if (draggable != null && draggable.onDragStart(button)) {
-                    draggable.setMoving(true);
-                    this.cursorDraggable = draggable;
-                    return true;
-                }
+        if ((button == 0 || button == 1) && getItemStack().isEmpty() && this.cursorDraggable != null) {
+            ModularWindow window = findHoveredWindow();
+            this.cursorDraggable.onDragEnd(this.cursorDraggable.canDropHere(hovered, window != null));
+            this.cursorDraggable.setMoving(false);
+            this.cursorDraggable = null;
+            return true;
+        }
+        return false;
+    }
+
+    @ApiStatus.Internal
+    public boolean onHoveredClick(int button, Object hovered) {
+        if ((button == 0 || button == 1) && getItemStack().isEmpty() && this.cursorDraggable == null) {
+            IDraggable draggable;
+            if (hovered instanceof IDraggable) {
+                draggable = (IDraggable) hovered;
+            } else if (hovered instanceof ModularWindow && ((ModularWindow) hovered).isDraggable()) {
+                draggable = new DraggableWindowWrapper((ModularWindow) hovered, getPos().subtract(((ModularWindow) hovered).getPos()));
             } else {
-                ModularWindow window = findHoveredWindow();
-                this.cursorDraggable.onDragEnd(this.cursorDraggable.canDropHere(hovered, window != null));
-                this.cursorDraggable.setMoving(false);
-                this.cursorDraggable = null;
+                return false;
+            }
+            if (draggable.onDragStart(button)) {
+                draggable.setMoving(true);
+                this.cursorDraggable = draggable;
                 return true;
             }
         }
@@ -256,10 +267,14 @@ public class Cursor {
 
     private Widget findHoveredWidgets() {
         this.hoveredWidgets.clear();
-        AtomicReference<Widget> hovered = new AtomicReference<>();
+        Widget hovered = null;
         LinkedList<IWidgetParent> stack = new LinkedList<>();
-        for (ModularWindow window : uiContext.getOpenWindows()) {
+        boolean nextWindow = true;
+        for (ModularWindow window : uiContext.getOpenWindowsReversed()) {
             if (!window.isEnabled()) continue;
+            if (isAbove(window)) {
+                hoveredWidgets.add(0, window);
+            }
             stack.clear();
             stack.addLast(window);
             while (!stack.isEmpty()) {
@@ -268,11 +283,12 @@ public class Cursor {
                     if (!child.isEnabled()) continue;
                     boolean above = isAbove(child);
                     if (above) {
-                        if (child instanceof Interactable) {
-                            hoveredWidgets.add((Interactable) child);
-                        }
-                        if ((child instanceof Interactable || child.hasTooltip()) && (hovered.get() == null || child.getLayer() > hovered.get().getLayer())) {
-                            hovered.set(child);
+                        hoveredWidgets.add(0, child);
+                        if (child instanceof Interactable || child.hasTooltip()) {
+                            if (hovered == null || (nextWindow || child.getLayer() > hovered.getLayer())) {
+                                hovered = child;
+                                nextWindow = false;
+                            }
                         }
                     }
                     if (child instanceof IWidgetParent && (!((IWidgetParent) child).childrenMustBeInBounds() || above)) {
@@ -280,7 +296,8 @@ public class Cursor {
                     }
                 }
             }
+            nextWindow = true;
         }
-        return hovered.get();
+        return hovered;
     }
 }

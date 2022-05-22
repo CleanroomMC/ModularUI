@@ -318,27 +318,33 @@ public class ModularGui extends GuiContainer {
         boolean wasSuccess = false;
         doubleClick = isDoubleClick(lastFocusedClick, time);
         loop:
-        for (Interactable interactable : getCursor().getAllHovered()) {
-            Interactable.ClickResult result = interactable.onClick(mouseButton, doubleClick && lastClicked == interactable);
-            switch (result) {
-                case IGNORE:
-                    continue;
-                case ACKNOWLEDGED:
-                    if (probablyClicked == null) {
+        for (Object hovered : getCursor().getAllHovered()) {
+            if (context.getCursor().onHoveredClick(mouseButton, hovered)) {
+                break;
+            }
+            if (hovered instanceof Interactable) {
+                Interactable interactable = (Interactable) hovered;
+                Interactable.ClickResult result = interactable.onClick(mouseButton, doubleClick && lastClicked == interactable);
+                switch (result) {
+                    case IGNORE:
+                        continue;
+                    case ACKNOWLEDGED:
+                        if (probablyClicked == null) {
+                            probablyClicked = interactable;
+                        }
+                        continue;
+                    case REJECT:
+                        probablyClicked = null;
+                        break loop;
+                    case ACCEPT:
                         probablyClicked = interactable;
-                    }
-                    continue;
-                case REJECT:
-                    probablyClicked = null;
-                    break loop;
-                case ACCEPT:
-                    probablyClicked = interactable;
-                    break loop;
-                case SUCCESS:
-                    probablyClicked = interactable;
-                    wasSuccess = true;
-                    getCursor().updateFocused((Widget) interactable);
-                    break loop;
+                        break loop;
+                    case SUCCESS:
+                        probablyClicked = interactable;
+                        wasSuccess = true;
+                        getCursor().updateFocused((Widget) interactable);
+                        break loop;
+                }
             }
         }
         this.lastClicked = probablyClicked;
@@ -387,8 +393,8 @@ public class ModularGui extends GuiContainer {
         if (focused instanceof Interactable && ((Interactable) focused).onKeyPressed(typedChar, keyCode)) {
             return;
         }
-        for (Interactable interactable : getCursor().getAllHovered()) {
-            if (focused != interactable && interactable.onKeyPressed(typedChar, keyCode)) {
+        for (Object hovered : getCursor().getAllHovered()) {
+            if (focused != hovered && hovered instanceof Interactable && ((Interactable) hovered).onKeyPressed(typedChar, keyCode)) {
                 return;
             }
         }
@@ -411,8 +417,8 @@ public class ModularGui extends GuiContainer {
         if (focused instanceof Interactable && ((Interactable) focused).onMouseScroll(direction)) {
             return;
         }
-        for (Interactable interactable : getCursor().getAllHovered()) {
-            if (focused != interactable && interactable.onMouseScroll(direction)) {
+        for (Object hovered : getCursor().getAllHovered()) {
+            if (focused != hovered && hovered instanceof Interactable && ((Interactable) hovered).onMouseScroll(direction)) {
                 return;
             }
         }

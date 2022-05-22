@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class SlotWidget extends Widget implements IVanillaSlot, Interactable, ISyncedWidget, IIngredientProvider, IGhostIngredientTarget<ItemStack> {
@@ -146,6 +147,10 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     public SlotWidget setChangeListener(Runnable runnable) {
         this.slot.setChangeListener(runnable);
         return this;
+    }
+
+    public SlotWidget setChangeListener(Consumer<SlotWidget> changeListener) {
+        return setChangeListener(() -> changeListener.accept(this));
     }
 
     public SlotWidget setFilter(Predicate<ItemStack> filter) {
