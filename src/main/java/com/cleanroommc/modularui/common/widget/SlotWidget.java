@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.common.widget;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.UITexture;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
@@ -59,7 +60,7 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     @Override
     public void onInit() {
         getContext().getContainer().addSlotToContainer(this.slot);
-        if (this.sortingSection != null) {
+        if (ModularUI.isInvTweaksLoaded() && this.sortingSection != null) {
             getContext().getContainer().setSlotSortable(this.slot, this.sortingSection);
         }
         if (getBackground() == null) {

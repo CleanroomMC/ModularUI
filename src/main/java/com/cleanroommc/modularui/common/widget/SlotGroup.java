@@ -31,7 +31,9 @@ public class SlotGroup extends MultiChildWidget {
             for (int col = 0; col < 9; col++) {
                 SlotWidget slot = new SlotWidget(new BaseSlot(wrapper, col + (row + 1) * 9))
                         .setPos(new Pos2d(col * 18, row * 18));
-                slot.setSorted(ContainerSection.INVENTORY_NOT_HOTBAR);
+                if (ModularUI.isInvTweaksLoaded()) {
+                    slot.setSorted(ContainerSection.INVENTORY_NOT_HOTBAR);
+                }
                 slotGroup.addSlot(slot);
             }
         }
@@ -39,7 +41,9 @@ public class SlotGroup extends MultiChildWidget {
         for (int i = 0; i < 9; i++) {
             SlotWidget slot = new SlotWidget(new BaseSlot(wrapper, i))
                     .setPos(new Pos2d(i * 18, 58));
-            slot.setSorted(ContainerSection.INVENTORY_HOTBAR);
+            if (ModularUI.isInvTweaksLoaded()) {
+                slot.setSorted(ContainerSection.INVENTORY_HOTBAR);
+            }
             slotGroup.addSlot(slot);
         }
         return slotGroup;
@@ -68,7 +72,7 @@ public class SlotGroup extends MultiChildWidget {
                 y++;
             }
         }
-        if (sortable) {
+        if (sortable && ModularUI.isInvTweaksLoaded()) {
             slotGroup.section = ContainerSection.CHEST;
             slotGroup.slotsPerRow = slotsWidth;
         }
@@ -81,7 +85,7 @@ public class SlotGroup extends MultiChildWidget {
 
     @Override
     public void onInit() {
-        if (this.section != null) {
+        if (ModularUI.isInvTweaksLoaded() && this.section != null) {
             getContext().getContainer().setSorted(slotsPerRow, vertical);
             for (Widget widget : getChildren()) {
                 if (widget instanceof SlotWidget) {

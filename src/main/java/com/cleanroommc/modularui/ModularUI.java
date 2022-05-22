@@ -3,6 +3,7 @@ package com.cleanroommc.modularui;
 import com.cleanroommc.modularui.common.internal.JsonLoader;
 import com.cleanroommc.modularui.common.widget.WidgetJsonRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -19,6 +20,8 @@ public class ModularUI {
     public static final String NAME = "Modular UI";
     public static final String VERSION = "1.0";
     public static final Logger LOGGER = LogManager.getLogger(ID);
+
+    public static final String INV_TWEAKS = "inventorytweaks";
 
     @Mod.Instance
     public static ModularUI INSTANCE;
@@ -42,5 +45,9 @@ public class ModularUI {
     @Mod.EventHandler
     public void onPostInit(FMLPostInitializationEvent event) {
         proxy.postInit();
+    }
+
+    public static boolean isInvTweaksLoaded() {
+        return Loader.isModLoaded(INV_TWEAKS);
     }
 }
