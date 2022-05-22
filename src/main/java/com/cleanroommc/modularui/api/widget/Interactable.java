@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.init.SoundEvents;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.ApiStatus;
 import org.lwjgl.input.Keyboard;
 
 /**
@@ -22,6 +23,7 @@ public interface Interactable {
      * @param doubleClick if it is the second click within 400ms
      * @return if further operations should abort
      */
+    @ApiStatus.OverrideOnly
     default ClickResult onClick(int buttonId, boolean doubleClick) {
         return ClickResult.IGNORE;
     }
@@ -32,6 +34,7 @@ public interface Interactable {
      * @param buttonId the button id (Left == 0, right == 1)
      * @return if further operations should abort
      */
+    @ApiStatus.OverrideOnly
     default boolean onClickReleased(int buttonId) {
         return false;
     }
@@ -42,15 +45,19 @@ public interface Interactable {
      * @param buttonId  the button id (Left == 0, right == 1)
      * @param deltaTime milliseconds since last mouse event
      */
+    @ApiStatus.OverrideOnly
     default void onMouseDragged(int buttonId, long deltaTime) {
     }
 
     /**
-     * called when the interactable is focused and the scrollweel is used
-     * @param pos of the mouse
-     * @param amount of lines scrolled
+     * Called the mouse wheel moved
+     *
+     * @param direction -1 for down, 1 for up
      */
-    //default void onScrolled(Pos2d pos, double amount) {}
+    @ApiStatus.OverrideOnly
+    default boolean onMouseScroll(int direction) {
+        return false;
+    }
 
     /**
      * called when the interactable is focused and a key is pressed
@@ -59,16 +66,8 @@ public interface Interactable {
      * @param keyCode   code of the typed key. See {@link Keyboard}
      * @return if further operations should abort
      */
+    @ApiStatus.OverrideOnly
     default boolean onKeyPressed(char character, int keyCode) {
-        return false;
-    }
-
-    /**
-     * Called the mouse wheel moved
-     *
-     * @param direction -1 for down, 1 for up
-     */
-    default boolean onMouseScroll(int direction) {
         return false;
     }
 

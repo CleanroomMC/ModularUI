@@ -164,16 +164,7 @@ public class Cursor {
     public boolean onMouseClick(int button) {
         if (getItemStack().isEmpty()) {
             if (this.cursorDraggable == null) {
-                IDraggable draggable = null;
-                Object hovered = findHovered();
-                if (hovered instanceof IDraggable) {
-                    draggable = (IDraggable) hovered;
-                } else if (hovered instanceof ModularWindow) {
-                    ModularWindow window = (ModularWindow) hovered;
-                    if (window.isDraggable()) {
-                        draggable = new DraggableWindowWrapper(window, getPos().subtract(window.getPos()));
-                    }
-                }
+                IDraggable draggable = findDraggable();
                 if (draggable != null && draggable.onDragStart(button)) {
                     draggable.setMoving(true);
                     this.cursorDraggable = draggable;
@@ -204,24 +195,24 @@ public class Cursor {
      * @return the top most hovered object. Can be a widget or a window
      */
     @Nullable
-    public Object findHovered() {
+    public IDraggable findDraggable() {
+        IDraggable draggable = null;
         for (ModularWindow window : uiContext.getOpenWindows()) {
             if (!window.isEnabled()) continue;
             AtomicReference<Widget> hovered = new AtomicReference<>();
             IWidgetParent.forEachByLayer(window, true, widget -> {
-                if ((hovered.get() == null || widget.getLayer() > hovered.get().getLayer()) && isAbove(widget) && widget.canHover()) {
+                if (widget instanceof IDraggable && (hovered.get() == null || widget.getLayer() > hovered.get().getLayer()) && isAbove(widget) && widget.canHover()) {
                     hovered.set(widget);
                 }
                 return false;
             });
-            if (hovered.get() != null) {
-                return hovered.get();
-            }
-            if (Widget.isUnderMouse(getPos(), window.getPos(), window.getSize())) {
-                return window;
+            if (draggable == null && hovered.get() == null && window.isDraggable() && Widget.isUnderMouse(getPos(), window.getPos(), window.getSize())) {
+                draggable = new DraggableWindowWrapper(window, getPos().subtract(window.getPos()));
+            } else if (hovered.get() != null) {
+                draggable = (IDraggable) hovered.get();
             }
         }
-        return null;
+        return draggable;
     }
 
     @Nullable
@@ -278,7 +269,7 @@ public class Cursor {
                     boolean above = isAbove(child);
                     if (above) {
                         if (child instanceof Interactable) {
-                            hoveredWidgets.add(0, (Interactable) child);
+                            hoveredWidgets.add((Interactable) child);
                         }
                         if ((child instanceof Interactable || child.hasTooltip()) && (hovered.get() == null || child.getLayer() > hovered.get().getLayer())) {
                             hovered.set(child);
