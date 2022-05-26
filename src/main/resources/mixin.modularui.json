@@ -6,7 +6,5 @@
   "compatibilityLevel": "JAVA_8",
   "client": [
     "GuiContainerMixin"
-  ],
-  "mixins": [
   ]
 }

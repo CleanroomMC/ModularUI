@@ -13,7 +13,7 @@ buildscript {
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-        if (project.use_mixins) {
+        if (project.use_mixins.toBoolean()) {
             classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
         }
     }
@@ -21,7 +21,7 @@ buildscript {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-if (project.use_mixins) {
+if (project.use_mixins.toBoolean()) {
     apply plugin: 'org.spongepowered.mixin'
 }
 
@@ -45,10 +45,10 @@ minecraft {
     runDir = 'run'
     mappings = 'stable_39'
     def args = []
-    if (project.use_coremod) {
+    if (project.use_coremod.toBoolean()) {
         args << '-Dfml.coreMods.load=' + coremod_plugin_class_name
     }
-    if (project.use_mixins) {
+    if (project.use_mixins.toBoolean()) {
         args << '-Dmixin.hotSwap=true'
         args << '-Dmixin.checks.interfaces=true'
         args << '-Dmixin.debug.export=true'
@@ -75,17 +75,8 @@ repositories {
 dependencies {
     compile 'org.jetbrains:annotations:23.0.0'
 
-    if (project.use_mixins) {
-        embed ('org.spongepowered:mixin:0.8.3') {
-            exclude module: 'asm-commons'
-            exclude module: 'asm-tree'
-            exclude module: 'launchwrapper'
-            exclude module: 'guava'
-            exclude module: 'log4j-core'
-            exclude module: 'gson'
-            exclude module: 'commons-io'
-        }
-        annotationProcessor 'org.spongepowered:mixin:0.8.3:processor'
+    if (project.use_mixins.toBoolean()) {
+        deobfCompile 'zone.rong:mixinbooter:4.2'
     }
 
     compile 'mezz.jei:jei_1.12.2:4.15.0.293'
@@ -119,19 +110,13 @@ processResources {
 jar {
     manifest {
         def attribute_map = [:]
-        if (project.use_coremod) {
+        if (project.use_coremod.toBoolean()) {
             attribute_map['FMLCorePlugin'] = project.coremod_plugin_class_name
+            attribute_map['FMLCorePluginContainsFMLMod'] = true
         }
-        if (project.use_mixins) {
+        if (project.use_mixins.toBoolean()) {
             attribute_map['TweakClass'] = 'org.spongepowered.asm.launch.MixinTweaker'
         }
-        attribute_map['ForceLoadAsMod'] = true
-        attribute_map['FMLCorePluginContainsFMLMod'] = true
         attributes(attribute_map)
-    }
-    if (project.use_mixins && project.pack_mixins_in_jar) {
-        from (configurations.embed.collect { it.isDirectory() ? it : zipTree(it) }) {
-            exclude 'LICENSE.txt', 'module-info.class', 'META-INF/*'
-        }
     }
 }
