@@ -4,12 +4,14 @@ import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.animation.Eases;
 import com.cleanroommc.modularui.api.animation.Interpolator;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.common.internal.Theme;
+import com.cleanroommc.modularui.common.widget.TextWidget;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableBiMap;
@@ -445,6 +447,10 @@ public class ModularWindow implements IWidgetParent {
 
         public Builder bindPlayerInventory(EntityPlayer player) {
             return bindPlayerInventory(player, 7);
+        }
+
+        public Builder addPlayerInventoryLabel(int x, int y) {
+            return widget(new TextWidget(Text.localised("container.inventory")).setPos(x, y));
         }
 
         @Override
