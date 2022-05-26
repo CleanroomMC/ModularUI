@@ -88,6 +88,7 @@ public class TextWidget extends Widget {
             localised = text.getFormatted();
         }
         textRenderer.setPos(0, 0);
+        textRenderer.setShadow(text.hasShadow());
         textRenderer.setAlignment(textAlignment, size.width, size.height);
         textRenderer.setColor(text.hasColor() ? text.getColor() : Theme.INSTANCE.getText());
         textRenderer.draw(localised);
