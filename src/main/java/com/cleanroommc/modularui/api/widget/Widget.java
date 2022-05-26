@@ -744,9 +744,9 @@ public abstract class Widget {
             throw new NullPointerException("Widget size is null");
         }
         return mouse.x >= areaTopLeft.x &&
-                mouse.x <= areaTopLeft.x + areaSize.width &&
+                mouse.x < areaTopLeft.x + areaSize.width &&
                 mouse.y >= areaTopLeft.y &&
-                mouse.y <= areaTopLeft.y + areaSize.height;
+                mouse.y < areaTopLeft.y + areaSize.height;
     }
 
     public interface SizeProvider {
