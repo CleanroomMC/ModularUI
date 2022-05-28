@@ -12,6 +12,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.util.Collections;
 import java.util.List;
 
 public class TextFieldRenderer extends TextRenderer {
@@ -40,6 +41,11 @@ public class TextFieldRenderer extends TextRenderer {
     protected void drawMeasuredLines(List<Pair<String, Float>> measuredLines) {
         drawCursors(measuredLines);
         super.drawMeasuredLines(measuredLines);
+    }
+
+    @Override
+    public List<String> wrapLine(String line) {
+        return Collections.singletonList(line);
     }
 
     protected void drawCursors(List<Pair<String, Float>> measuredLines) {

@@ -247,45 +247,55 @@ public class TextFieldHandler {
     }
 
     public void insert(List<String> text) {
-        if (text.isEmpty() || (text.size() > 1 && this.text.size() + text.size() - 1 > this.maxLines)) {
-            return;
+        List<String> copy = new ArrayList<>(this.text);
+        Point point = insert(copy, text);
+        if (point == null || copy.size() > maxLines || !renderer.wouldFit(copy)) return;
+        this.text.clear();
+        this.text.addAll(copy);
+        setCursor(point);
+        onChanged();
+    }
+
+    private Point insert(List<String> text, List<String> insertion) {
+        if (insertion.isEmpty() || (insertion.size() > 1 && text.size() + insertion.size() - 1 > this.maxLines)) {
+            return null;
         }
+        int x = cursor.x, y = cursor.y;
         if (hasTextMarked()) {
             delete(false);
         }
-        if (text.isEmpty()) return;
-        if (this.text.isEmpty()) {
-            if (text.size() == 1 && !test(text.get(0))) {
-                return;
+        if (text.isEmpty()) {
+            if (insertion.size() == 1 && !test(insertion.get(0))) {
+                return null;
             }
-            this.text.addAll(text);
-            setCursor(this.text.size() - 1, this.text.get(this.text.size() - 1).length());
-            onChanged();
-            return;
+            text.addAll(insertion);
+            return new Point(text.get(text.size() - 1).length(), text.size() - 1);
         }
-        String lineStart = this.text.get(cursor.y).substring(0, cursor.x);
-        String lineEnd = this.text.get(cursor.y).substring(cursor.x);
-        if (text.size() == 1 && this.text.size() == 1 && !test(lineStart + text.get(0) + lineEnd)) {
-            return;
+        String lineStart = text.get(cursor.y).substring(0, cursor.x);
+        String lineEnd = text.get(cursor.y).substring(cursor.x);
+        if (insertion.size() == 1 && text.size() == 1 && !test(lineStart + insertion.get(0) + lineEnd)) {
+            return null;
         }
-        this.text.set(cursor.y, lineStart + text.get(0));
-        if (text.size() == 1) {
-            if (!test(text.get(0))) {
-                return;
+        text.set(cursor.y, lineStart + insertion.get(0));
+        if (insertion.size() == 1) {
+            if (!test(insertion.get(0))) {
+                return null;
             }
-            this.text.set(cursor.y, this.text.get(cursor.y) + lineEnd);
-            setCursor(cursor.y, cursor.x + text.get(0).length());
+            text.set(cursor.y, text.get(cursor.y) + lineEnd);
+            return new Point(cursor.x + insertion.get(0).length(), cursor.y);
         } else {
-            if (text.size() > 1) {
-                this.text.add(cursor.y + 1, text.get(text.size() - 1) + lineEnd);
-                setCursor(cursor.y + 1, text.get(text.size() - 1).length());
+            if (insertion.size() > 1) {
+                text.add(cursor.y + 1, insertion.get(insertion.size() - 1) + lineEnd);
+                x = insertion.get(insertion.size() - 1).length();
+                y += 1;
             }
-            if (text.size() > 2) {
-                this.text.addAll(cursor.y + 1, this.text.subList(1, text.size() - 1));
-                setCursor(cursor.y + text.size() - 1, text.get(text.size() - 1).length());
+            if (insertion.size() > 2) {
+                text.addAll(cursor.y + 1, text.subList(1, insertion.size() - 1));
+                x = insertion.get(insertion.size() - 1).length();
+                y += insertion.size() - 1;
             }
+            return new Point(x, y);
         }
-        onChanged();
     }
 
     public void newLine() {

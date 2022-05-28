@@ -85,13 +85,30 @@ public class TextRenderer {
     public List<Pair<String, Float>> measureLines(List<String> lines) {
         List<Pair<String, Float>> measuredLines = new ArrayList<>();
         for (String line : lines) {
-            List<String> subLines = maxWidth > 0 ? FR.listFormattedStringToWidth(line, (int) (maxWidth / scale)) : Collections.singletonList(line);
-            for (String subLine : subLines) {
+            for (String subLine : wrapLine(line)) {
                 float width = FR.getStringWidth(subLine) * scale;
                 measuredLines.add(Pair.of(subLine, width));
             }
         }
         return measuredLines;
+    }
+
+    public List<String> wrapLine(String line) {
+        return maxWidth > 0 ? FR.listFormattedStringToWidth(line, (int) (maxWidth / scale)) : Collections.singletonList(line);
+    }
+
+    public boolean wouldFit(List<String> text) {
+        if (maxHeight > 0 && maxHeight < text.size() * getFontHeight() - scale) {
+            return false;
+        }
+        if (maxWidth > 0) {
+            for (String line : text) {
+                if (maxWidth < FR.getStringWidth(line)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public int getMaxWidth(List<String> lines) {
