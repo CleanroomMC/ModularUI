@@ -25,6 +25,7 @@ public class TextFieldWidget extends BaseTextFieldWidget implements ISyncedWidge
     private Function<String, String> validator = val -> val;
     private boolean syncsToServer = true;
     private boolean syncsToClient = true;
+    private boolean init = false;
 
     public static Number parse(String num) {
         try {
@@ -36,13 +37,18 @@ public class TextFieldWidget extends BaseTextFieldWidget implements ISyncedWidge
     }
 
     @Override
+    public void onInit() {
+        setText(getter.get());
+    }
+
+    @Override
     public void draw(float partialTicks) {
         GuiHelper.useScissor(pos.x, pos.y, size.width, size.height, () -> {
             GlStateManager.pushMatrix();
             GlStateManager.translate(1 - scrollOffset, 1, 0);
             renderer.setSimulate(false);
             renderer.setScale(scale);
-            renderer.setAlignment(textAlignment, size.width - 2, size.height);
+            renderer.setAlignment(textAlignment, scrollBar == null ? size.width - 2 : -1, size.height);
             renderer.draw(handler.getText());
             GlStateManager.popMatrix();
         });
@@ -77,6 +83,7 @@ public class TextFieldWidget extends BaseTextFieldWidget implements ISyncedWidge
         } else {
             throw new IllegalStateException("TextFieldWidget can only have one line!");
         }
+        this.setter.accept(getText());
         if (syncsToServer()) {
             syncToServer(1, buffer -> NetworkUtils.writeStringSafe(buffer, getText()));
         }
@@ -94,7 +101,7 @@ public class TextFieldWidget extends BaseTextFieldWidget implements ISyncedWidge
     }
 
     @Override
-    public void readOnClient(int id, PacketBuffer buf) throws IOException {
+    public void readOnClient(int id, PacketBuffer buf) {
         if (id == 1) {
             if (!isFocused()) {
                 setText(buf.readString(Short.MAX_VALUE));
@@ -106,10 +113,12 @@ public class TextFieldWidget extends BaseTextFieldWidget implements ISyncedWidge
     }
 
     @Override
-    public void readOnServer(int id, PacketBuffer buf) throws IOException {
-        setText(buf.readString(Short.MAX_VALUE));
-        if (this.setter != null) {
-            this.setter.accept(getText());
+    public void readOnServer(int id, PacketBuffer buf) {
+        if (id == 1) {
+            setText(buf.readString(Short.MAX_VALUE));
+            if (this.setter != null) {
+                this.setter.accept(getText());
+            }
         }
     }
 
