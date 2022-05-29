@@ -1,6 +1,8 @@
 package com.cleanroommc.modularui.common.widget;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.drawable.shapes.Rectangle;
+import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.Interactable;
@@ -14,11 +16,19 @@ import org.jetbrains.annotations.Nullable;
 
 public class ScrollBar extends Widget implements Interactable {
 
+    public static ScrollBar defaultTextScrollBar() {
+        return new ScrollBar()
+                .setBarTexture(new Rectangle()
+                        .setColor(Color.WHITE.normal)
+                        .setCornerRadius(1));
+    }
+
     private ScrollType scrollType;
     private IVerticalScrollable verticalScrollable;
     private IHorizontalScrollable horizontalScrollable;
     private IDrawable barTexture = IDrawable.EMPTY;
     private int handleClickOffset = -1;
+    private int posOffset = 0;
 
     public void setScrollType(ScrollType scrollType, @Nullable IHorizontalScrollable horizontalScrollable, @Nullable IVerticalScrollable verticalScrollable) {
         this.scrollType = scrollType;
@@ -44,9 +54,9 @@ public class ScrollBar extends Widget implements Interactable {
         if (isAutoPositioned()) {
             setPosProvider((screenSize, window, parent) -> {
                 if (scrollType == ScrollType.HORIZONTAL) {
-                    return new Pos2d(0, parent.getSize().height - horizontalScrollable.getHorizontalBarHeight());
+                    return new Pos2d(0, parent.getSize().height - horizontalScrollable.getHorizontalBarHeight() + posOffset);
                 } else if (scrollType == ScrollType.VERTICAL) {
-                    return new Pos2d(parent.getSize().width - verticalScrollable.getVerticalBarWidth(), 0);
+                    return new Pos2d(parent.getSize().width - verticalScrollable.getVerticalBarWidth() + posOffset, 0);
                 }
                 return Pos2d.ZERO;
             });
@@ -203,6 +213,11 @@ public class ScrollBar extends Widget implements Interactable {
 
     public ScrollBar setBarTexture(IDrawable barTexture) {
         this.barTexture = barTexture;
+        return this;
+    }
+
+    public ScrollBar setPosOffset(int posOffset) {
+        this.posOffset = posOffset;
         return this;
     }
 }
