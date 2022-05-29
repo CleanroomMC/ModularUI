@@ -6,6 +6,8 @@ import com.cleanroommc.modularui.api.math.Size;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -14,7 +16,6 @@ import java.util.List;
 
 public class TextRenderer {
 
-    public static final FontRenderer FR = Minecraft.getMinecraft().fontRenderer;
     public static final int DEFAULT_COLOR = 0x404040;
     protected float maxWidth = -1, maxHeight = -1;
     protected int x = 0, y = 0;
@@ -74,10 +75,10 @@ public class TextRenderer {
         for (Pair<String, Float> measuredLine : measuredLines) {
             int x0 = getStartX(measuredLine.getRight());
             maxW = Math.max(draw(measuredLine.getLeft(), x0, y0), maxW);
-            y0 += FR.FONT_HEIGHT * scale;
+            y0 += getFontRenderer().FONT_HEIGHT * scale;
         }
         this.lastWidth = maxWidth > 0 ? Math.min(maxW, maxWidth) : maxW;
-        this.lastHeight = measuredLines.size() * FR.FONT_HEIGHT * scale;
+        this.lastHeight = measuredLines.size() * getFontHeight();
         this.lastWidth = Math.max(0, this.lastWidth - 1);
         this.lastHeight = Math.max(0, this.lastHeight - 1);
     }
@@ -86,7 +87,7 @@ public class TextRenderer {
         List<Pair<String, Float>> measuredLines = new ArrayList<>();
         for (String line : lines) {
             for (String subLine : wrapLine(line)) {
-                float width = FR.getStringWidth(subLine) * scale;
+                float width = getFontRenderer().getStringWidth(subLine) * scale;
                 measuredLines.add(Pair.of(subLine, width));
             }
         }
@@ -94,7 +95,7 @@ public class TextRenderer {
     }
 
     public List<String> wrapLine(String line) {
-        return maxWidth > 0 ? FR.listFormattedStringToWidth(line, (int) (maxWidth / scale)) : Collections.singletonList(line);
+        return maxWidth > 0 ? getFontRenderer().listFormattedStringToWidth(line, (int) (maxWidth / scale)) : Collections.singletonList(line);
     }
 
     public boolean wouldFit(List<String> text) {
@@ -103,7 +104,7 @@ public class TextRenderer {
         }
         if (maxWidth > 0) {
             for (String line : text) {
-                if (maxWidth < FR.getStringWidth(line)) {
+                if (maxWidth < getFontRenderer().getStringWidth(line)) {
                     return false;
                 }
             }
@@ -125,7 +126,7 @@ public class TextRenderer {
 
     protected int getStartY(int lines) {
         if (alignment.y >= 0 && maxHeight > 0) {
-            float height = lines * FR.FONT_HEIGHT * scale - scale;
+            float height = lines * getFontHeight() - scale;
             if (alignment.y > 0) {
                 return (int) (y + maxHeight - height);
             } else {
@@ -148,19 +149,19 @@ public class TextRenderer {
 
     protected float draw(String text, float x, float y) {
         if (simulate) {
-            return FR.getStringWidth(text);
+            return getFontRenderer().getStringWidth(text);
         }
         GlStateManager.disableBlend();
         GlStateManager.pushMatrix();
         GlStateManager.scale(scale, scale, 0f);
-        int width = FR.drawString(text, x / scale, y / scale, color, shadow);
+        int width = getFontRenderer().drawString(text, x / scale, y / scale, color, shadow);
         GlStateManager.popMatrix();
         GlStateManager.enableBlend();
         return width * scale;
     }
 
     public float getFontHeight() {
-        return FR.FONT_HEIGHT * scale;
+        return getFontRenderer().FONT_HEIGHT * scale;
     }
 
     public float getLastHeight() {
@@ -173,5 +174,10 @@ public class TextRenderer {
 
     public Size getLastSize() {
         return new Size(lastWidth, lastHeight);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static FontRenderer getFontRenderer() {
+        return Minecraft.getMinecraft().fontRenderer;
     }
 }

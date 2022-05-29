@@ -33,8 +33,6 @@ import java.util.function.Consumer;
 
 public class ModularUIContext {
 
-    public static final Minecraft MC = Minecraft.getMinecraft();
-
     private final ImmutableMap<Integer, IWindowCreator> syncedWindowsCreators;
     private final Deque<ModularWindow> windows = new LinkedList<>();
     private final BiMap<Integer, ModularWindow> syncedWindows = HashBiMap.create(4);
@@ -44,12 +42,10 @@ public class ModularUIContext {
     private final EntityPlayer player;
     private final Cursor cursor;
     private final List<Widget> jeiExclusionZone = new ArrayList<>();
-    @SideOnly(Side.CLIENT)
     private final List<Integer> queuedOpenWindow = new ArrayList<>();
     public final boolean clientOnly;
 
-    @SideOnly(Side.CLIENT)
-    private Size screenSize = new Size(MC.displayWidth, MC.displayHeight);
+    private Size screenSize = NetworkUtils.isDedicatedClient() ? new Size(Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight) : Size.ZERO;
 
     private ModularUIContainer container;
 

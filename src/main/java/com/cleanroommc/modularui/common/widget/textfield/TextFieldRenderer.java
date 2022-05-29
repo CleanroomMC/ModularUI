@@ -92,7 +92,7 @@ public class TextFieldRenderer extends TextRenderer {
         }
         List<Pair<String, Float>> measuredLines = measureLines(lines);
         y -= getStartY(measuredLines.size()) + this.y;
-        int index = (int) (y / (FR.FONT_HEIGHT * scale));
+        int index = (int) (y / (getFontHeight()));
         if (index < 0) return new Point();
         if (index >= measuredLines.size())
             return new Point(measuredLines.get(measuredLines.size() - 1).getKey().length(), measuredLines.size() - 1);
@@ -103,7 +103,7 @@ public class TextFieldRenderer extends TextRenderer {
         float currentX = 0;
         for (int i = 0; i < line.getKey().length(); i++) {
             char c = line.getKey().charAt(i);
-            currentX += FR.getCharWidth(c) * scale;
+            currentX += getFontRenderer().getCharWidth(c) * scale;
             if (currentX >= x) {
                 return new Point(i, index);
             }
@@ -117,7 +117,7 @@ public class TextFieldRenderer extends TextRenderer {
         }
         Pair<String, Float> line = measuredLines.get(cursorPos.y);
         String sub = line.getKey().substring(0, Math.min(line.getKey().length(), cursorPos.x));
-        return new Point2D.Float(getStartX(line.getRight()) + FR.getStringWidth(sub) * scale, getStartY(measuredLines.size()) + cursorPos.y * getFontHeight());
+        return new Point2D.Float(getStartX(line.getRight()) + getFontRenderer().getStringWidth(sub) * scale, getStartY(measuredLines.size()) + cursorPos.y * getFontHeight());
     }
 
     @SideOnly(Side.CLIENT)

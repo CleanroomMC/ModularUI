@@ -289,6 +289,7 @@ public class ModularGui extends GuiContainer {
     @Override
     public void updateScreen() {
         super.updateScreen();
+        context.onClientTick();
         for (ModularWindow window : context.getOpenWindowsReversed()) {
             window.update();
         }

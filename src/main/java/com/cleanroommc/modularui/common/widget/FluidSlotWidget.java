@@ -54,8 +54,6 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngr
     public FluidSlotWidget(IFluidTank fluidTank) {
         this.fluidTank = fluidTank;
         this.tankHandler = FluidTankHandler.getTankFluidHandler(fluidTank);
-        this.textRenderer.setShadow(true);
-        this.textRenderer.setScale(0.5f);
     }
 
     public static FluidSlotWidget phantom(IFluidTank fluidTank, boolean controlsAmount) {
@@ -75,6 +73,10 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngr
 
     @Override
     public void onInit() {
+        if (isClient()) {
+            this.textRenderer.setShadow(true);
+            this.textRenderer.setScale(0.5f);
+        }
         if (getBackground() == null) {
             setBackground(TEXTURE);
         }

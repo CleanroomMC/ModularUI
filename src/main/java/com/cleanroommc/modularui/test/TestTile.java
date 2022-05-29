@@ -225,7 +225,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
         return ModularWindow.builder(100, 100)
                 .setBackground(ModularUITextures.VANILLA_BACKGROUND)
                 .widget(ButtonWidget.closeWindowButton(true).setPos(85, 5))
-                .widget(new SlotWidget(phantomInventory, 0)
+                .widget(SlotWidget.phantom(phantomInventory, 0)
                         .setShiftClickPrio(0)
                         .setPos(30, 30))
                 .build();

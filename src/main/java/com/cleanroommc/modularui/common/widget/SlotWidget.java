@@ -19,6 +19,8 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -286,6 +288,7 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     /**
      * Copied from {@link net.minecraft.client.gui.inventory.GuiContainer} and removed the bad parts
      */
+    @SideOnly(Side.CLIENT)
     private void drawSlot(Slot slotIn) {
         int x = slotIn.xPos;
         int y = slotIn.yPos;

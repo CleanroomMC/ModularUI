@@ -236,6 +236,7 @@ public abstract class Widget {
      *
      * @param constraints constraints to modify
      */
+    @SideOnly(Side.CLIENT)
     protected void modifyConstraints(Dimension constraints) {
     }
 
@@ -246,6 +247,7 @@ public abstract class Widget {
      * @param maxHeight maximum height to fit in parent
      * @return the preferred size
      */
+    @SideOnly(Side.CLIENT)
     protected @NotNull Size determineSize(int maxWidth, int maxHeight) {
         return new Size(maxWidth, maxHeight);
     }

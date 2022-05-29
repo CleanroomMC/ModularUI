@@ -22,22 +22,22 @@ import java.util.function.Function;
 
 public class UIInfos {
 
+    public static void init() {
+    }
+
     public static final UIInfo<?, ?> TILE_MODULAR_UI = UIBuilder.of()
             .gui(((player, world, x, y, z) -> {
+                if (!world.isRemote) return null;
                 TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
                 if (te instanceof ITileWithModularUI) {
-                    UIBuildContext buildContext = new UIBuildContext(player);
-                    ModularWindow window = ((ITileWithModularUI) te).createWindow(buildContext);
-                    return new ModularGui(new ModularUIContainer(new ModularUIContext(buildContext), window));
+                    return ModularUI.createGuiScreen(player, ((ITileWithModularUI) te)::createWindow);
                 }
                 return null;
             }))
             .container((player, world, x, y, z) -> {
                 TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
                 if (te instanceof ITileWithModularUI) {
-                    UIBuildContext buildContext = new UIBuildContext(player);
-                    ModularWindow window = ((ITileWithModularUI) te).createWindow(buildContext);
-                    return new ModularUIContainer(new ModularUIContext(buildContext), window);
+                    return ModularUI.createContainer(player, ((ITileWithModularUI) te)::createWindow);
                 }
                 return null;
             })
