@@ -43,7 +43,8 @@ public class ModularUIContext {
     private final EntityPlayer player;
     private final Cursor cursor;
     private final List<Widget> jeiExclusionZone = new ArrayList<>();
-
+    @SideOnly(Side.CLIENT)
+    private final List<Integer> queuedOpenWindow = new ArrayList<>();
     public final boolean clientOnly;
 
     @SideOnly(Side.CLIENT)
@@ -102,6 +103,18 @@ public class ModularUIContext {
             if (window == this.mainWindow) {
                 getScreen().setMainWindowArea(window.getPos(), window.getSize());
             }
+        }
+    }
+
+    public void onClientTick() {
+        if (!queuedOpenWindow.isEmpty()) {
+            for (Integer windowId : queuedOpenWindow) {
+                ModularWindow newWindow = openWindow(syncedWindowsCreators.get(windowId));
+                syncedWindows.put(windowId, newWindow);
+                newWindow.initialized = true;
+                sendClientPacket(DataCodes.INIT_WINDOW, null, mainWindow, NetworkUtils.EMPTY_PACKET);
+            }
+            queuedOpenWindow.clear();
         }
     }
 
@@ -295,11 +308,7 @@ public class ModularUIContext {
             if (id == DataCodes.SYNC_CURSOR_STACK) {
                 player.inventory.setItemStack(buf.readItemStack());
             } else if (id == DataCodes.OPEN_WINDOW) {
-                int windowId = buf.readVarInt();
-                ModularWindow newWindow = openWindow(syncedWindowsCreators.get(windowId));
-                syncedWindows.put(windowId, newWindow);
-                newWindow.initialized = true;
-                sendClientPacket(DataCodes.INIT_WINDOW, null, window, NetworkUtils.EMPTY_PACKET);
+                queuedOpenWindow.add(buf.readVarInt());
             } else if (id == DataCodes.CLOSE_WINDOW) {
                 window.tryClose();
             }
