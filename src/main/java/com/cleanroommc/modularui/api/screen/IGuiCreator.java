@@ -1,12 +1,14 @@
 package com.cleanroommc.modularui.api.screen;
 
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @FunctionalInterface
-public interface IGuiCreator<G extends GuiScreen> {
+public interface IGuiCreator {
 
-	G create(EntityPlayer player, World world, int x, int y, int z);
+    @SideOnly(Side.CLIENT)
+    Object create(EntityPlayer player, World world, int x, int y, int z);
 
 }

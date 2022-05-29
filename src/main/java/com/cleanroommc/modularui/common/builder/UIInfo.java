@@ -10,7 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
 
-public class UIInfo<CC extends IContainerCreator<?>, GC extends IGuiCreator<?>> {
+public class UIInfo<CC extends IContainerCreator, GC extends IGuiCreator> {
 
     private final int id;
     private final CC containerCreator;
