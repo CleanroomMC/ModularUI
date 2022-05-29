@@ -94,6 +94,7 @@ public class Text implements IDrawable {
     public void draw(float x, float y, float width, float height, float partialTicks) {
         renderer.setPos((int) (x + 0.5), (int) (y + 0.5));
         renderer.setShadow(shadow);
+        renderer.setColor(color);
         renderer.setAlignment(Alignment.Center, width, height);
         renderer.draw(getFormatted());
     }
