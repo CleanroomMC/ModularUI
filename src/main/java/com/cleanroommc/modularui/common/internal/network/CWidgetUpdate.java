@@ -5,12 +5,11 @@ import com.cleanroommc.modularui.api.screen.ModularUIContext;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularUIContainer;
 import net.minecraft.inventory.Container;
 import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 
 import java.io.IOException;
 
-public class CWidgetUpdate implements Packet<NetHandlerPlayServer> {
+public class CWidgetUpdate implements IPacket {
 
     public int widgetId;
     public PacketBuffer packet;
@@ -24,19 +23,19 @@ public class CWidgetUpdate implements Packet<NetHandlerPlayServer> {
     }
 
     @Override
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void decode(PacketBuffer buf) {
         this.widgetId = buf.readVarInt();
         this.packet = NetworkUtils.readPacketBuffer(buf);
     }
 
     @Override
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void encode(PacketBuffer buf) {
         buf.writeVarInt(widgetId);
         NetworkUtils.writePacketBuffer(buf, packet);
     }
 
     @Override
-    public void processPacket(NetHandlerPlayServer handler) {
+    public IPacket executeServer(NetHandlerPlayServer handler) {
         Container container = handler.player.openContainer;
         if (container instanceof ModularUIContainer) {
             ModularUIContext context = ((ModularUIContainer) container).getContext();
@@ -49,5 +48,6 @@ public class CWidgetUpdate implements Packet<NetHandlerPlayServer> {
         } else {
             ModularUI.LOGGER.error("Expected ModularUIContainer on server, but got {}", container);
         }
+        return null;
     }
 }

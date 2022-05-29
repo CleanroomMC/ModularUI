@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.ISyncedWidget;
 import com.cleanroommc.modularui.api.widget.Widget;
 import com.cleanroommc.modularui.common.internal.network.CWidgetUpdate;
+import com.cleanroommc.modularui.common.internal.network.NetworkHandler;
 import com.cleanroommc.modularui.common.internal.network.NetworkUtils;
 import com.cleanroommc.modularui.common.internal.network.SWidgetUpdate;
 import com.cleanroommc.modularui.common.internal.wrapper.BaseSlot;
@@ -331,7 +332,7 @@ public class ModularUIContext {
             buffer.writeVarInt(syncedWindows.inverse().get(window));
             bufferConsumer.accept(buffer);
             CWidgetUpdate packet = new CWidgetUpdate(buffer, syncId);
-            Minecraft.getMinecraft().player.connection.sendPacket(packet);
+            NetworkHandler.sendToServer(packet);
         }
     }
 
@@ -347,7 +348,7 @@ public class ModularUIContext {
             buffer.writeVarInt(syncedWindows.inverse().get(window));
             bufferConsumer.accept(buffer);
             SWidgetUpdate packet = new SWidgetUpdate(buffer, syncId);
-            ((EntityPlayerMP) player).connection.sendPacket(packet);
+            NetworkHandler.sendToPlayer(packet, (EntityPlayerMP) player);
         }
     }
 
