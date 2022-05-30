@@ -68,7 +68,8 @@ public class ModularUIContainer extends Container {
         if (slotIn instanceof BaseSlot && ((BaseSlot) slotIn).getShiftClickPriority() > Integer.MIN_VALUE) {
             sortedShiftClickSlots.add((BaseSlot) slotIn);
         }
-        slotIn = super.addSlotToContainer(slotIn);
+        slotIn.slotNumber = this.inventorySlots.size();
+        this.inventorySlots.add(slotIn);
 
         if (initialisedContainer) {
             sortSlots();
@@ -80,7 +81,8 @@ public class ModularUIContainer extends Container {
         if (slot != inventorySlots.get(slot.slotNumber)) {
             throw new IllegalStateException("Could not find slot in container!");
         }
-        inventorySlots.remove(slot);
+        inventorySlots.remove(slot.slotNumber);
+
         if (slot instanceof BaseSlot && sortedShiftClickSlots.remove(slot) && initialisedContainer) {
             sortSlots();
         }
@@ -111,7 +113,6 @@ public class ModularUIContainer extends Container {
     }
 
     public void sendSlotChange(ItemStack stack, int index) {
-        this.inventoryItemStacks.set(index, stack);
         for (IContainerListener listener : this.listeners) {
             listener.sendSlotContents(this, index, stack);
         }

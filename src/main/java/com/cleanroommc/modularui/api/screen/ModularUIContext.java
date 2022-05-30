@@ -109,7 +109,7 @@ public class ModularUIContext {
                 ModularWindow newWindow = openWindow(syncedWindowsCreators.get(windowId));
                 syncedWindows.put(windowId, newWindow);
                 newWindow.initialized = true;
-                sendClientPacket(DataCodes.INIT_WINDOW, null, mainWindow, NetworkUtils.EMPTY_PACKET);
+                sendClientPacket(DataCodes.INIT_WINDOW, null, newWindow, NetworkUtils.EMPTY_PACKET);
             }
             queuedOpenWindow.clear();
         }

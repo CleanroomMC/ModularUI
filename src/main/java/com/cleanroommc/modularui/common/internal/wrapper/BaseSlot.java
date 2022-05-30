@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.common.internal.wrapper;
 
+import com.cleanroommc.modularui.ModularUI;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -24,6 +25,7 @@ public class BaseSlot extends SlotItemHandler {
     private Runnable changeListener;
     private Predicate<ItemStack> filter;
     private ItemStack cachedItem = null;
+    private boolean needsSyncing;
 
     public static BaseSlot phantom() {
         return phantom(new ItemStackHandler(), 0, false);
@@ -103,9 +105,18 @@ public class BaseSlot extends SlotItemHandler {
             return;
         }
         this.cachedItem = getStack().copy();
+        this.needsSyncing = true;
         if (this.changeListener != null) {
             this.changeListener.run();
         }
+    }
+
+    public boolean isNeedsSyncing() {
+        return needsSyncing;
+    }
+
+    public void resetNeedsSyncing() {
+        this.needsSyncing = false;
     }
 
     // handle background by widgets
@@ -131,11 +142,15 @@ public class BaseSlot extends SlotItemHandler {
         if (stack.isEmpty()) {
             return;
         }
+        int oldAmount = stack.getCount();
         if (amount < 0) {
-            amount = Math.max(0, stack.getCount() + amount);
+            amount = Math.max(0, oldAmount + amount);
         } else {
-            amount = Math.min(stack.getCount() + amount, getItemStackLimit(stack));
+            amount = Math.min(oldAmount + amount, getItemStackLimit(stack));
         }
-        stack.setCount(amount);
+        if (oldAmount != amount) {
+            stack.setCount(amount);
+            onSlotChanged();
+        }
     }
 }

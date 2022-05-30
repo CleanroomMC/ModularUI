@@ -35,7 +35,6 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     public static final UITexture TEXTURE = UITexture.fullImage("modularui", "gui/slot/item");
 
     private final BaseSlot slot;
-    private ItemStack cachedServerItem = null;
     private ItemStack lastStoredPhantomItem = ItemStack.EMPTY;
     @Nullable
     private ContainerSection sortingSection = null;
@@ -115,9 +114,7 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
 
     @Override
     public void detectAndSendChanges() {
-        ItemStack slotItem = this.slot.getStack();
-        if (this.cachedServerItem == null || !ItemStack.areItemStacksEqual(slotItem, this.cachedServerItem)) {
-            this.cachedServerItem = slotItem.copy();
+        if (this.slot.isNeedsSyncing()) {
             getContext().syncSlotContent(this.slot);
         }
     }
