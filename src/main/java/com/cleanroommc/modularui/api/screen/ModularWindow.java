@@ -62,6 +62,7 @@ public class ModularWindow implements IWidgetParent {
     protected boolean draggable;
     private boolean enabled = true;
     private boolean needsRebuild = false;
+    private boolean initSync = true;
     private int alpha = Color.getAlpha(Theme.INSTANCE.getBackground());
     private float scale = 1f;
     private float rotation = 0;
@@ -204,8 +205,9 @@ public class ModularWindow implements IWidgetParent {
 
     public void serverUpdate() {
         for (ISyncedWidget syncedWidget : syncedWidgets.values()) {
-            syncedWidget.detectAndSendChanges();
+            syncedWidget.detectAndSendChanges(this.initSync);
         }
+        this.initSync = false;
     }
 
     @SideOnly(Side.CLIENT)

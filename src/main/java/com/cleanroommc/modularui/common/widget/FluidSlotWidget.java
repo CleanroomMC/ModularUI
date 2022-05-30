@@ -235,12 +235,16 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngr
     }
 
     @Override
-    public void detectAndSendChanges() {
+    public void detectAndSendChanges(boolean init) {
         FluidStack currentFluid = this.fluidTank.getFluid();
-        if (currentFluid == null ^ this.cachedFluid == null || (currentFluid != null && (!currentFluid.isFluidEqual(cachedFluid) || currentFluid.amount != cachedFluid.amount))) {
+        if (init || fluidChanged(currentFluid, this.cachedFluid)) {
             this.cachedFluid = currentFluid == null ? null : currentFluid.copy();
             syncToClient(1, buffer -> NetworkUtils.writeFluidStack(buffer, currentFluid));
         }
+    }
+
+    public static boolean fluidChanged(@Nullable FluidStack current, @Nullable FluidStack cached) {
+        return current == null ^ cached == null || (current != null && (current.amount != cached.amount || !current.isFluidEqual(cached)));
     }
 
     @Override

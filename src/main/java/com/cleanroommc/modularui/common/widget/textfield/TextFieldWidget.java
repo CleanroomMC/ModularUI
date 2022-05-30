@@ -8,7 +8,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.network.PacketBuffer;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -38,7 +37,6 @@ public class TextFieldWidget extends BaseTextFieldWidget implements ISyncedWidge
 
     @Override
     public void onInit() {
-        setText(getter.get());
     }
 
     @Override
@@ -90,10 +88,10 @@ public class TextFieldWidget extends BaseTextFieldWidget implements ISyncedWidge
     }
 
     @Override
-    public void detectAndSendChanges() {
+    public void detectAndSendChanges(boolean init) {
         if (syncsToClient() && getter != null) {
             String val = getter.get();
-            if (!getText().equals(val)) {
+            if (init || !getText().equals(val)) {
                 setText(val);
                 syncToClient(1, buffer -> NetworkUtils.writeStringSafe(buffer, getText()));
             }

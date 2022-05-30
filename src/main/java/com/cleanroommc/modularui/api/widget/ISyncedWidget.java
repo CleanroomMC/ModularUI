@@ -21,8 +21,10 @@ public interface ISyncedWidget {
 
     /**
      * Called AT LEAST each tick on server. Use it to detect and sync changes
+     *
+     * @param init true if it is called the first time after init
      */
-    default void detectAndSendChanges() {
+    default void detectAndSendChanges(boolean init) {
     }
 
     /**

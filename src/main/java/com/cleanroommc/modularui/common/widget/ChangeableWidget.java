@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.Widget;
 import com.cleanroommc.modularui.common.internal.network.NetworkUtils;
 import net.minecraft.network.PacketBuffer;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
+@ApiStatus.Experimental
 public class ChangeableWidget extends Widget implements ISyncedWidget, IWidgetParent {
 
     private final List<Widget> child = new ArrayList<>();
@@ -82,6 +84,7 @@ public class ChangeableWidget extends Widget implements ISyncedWidget, IWidgetPa
             this.child.add(this.queuedChild);
             this.initialised = true;
             this.queuedChild = null;
+            this.firstTick = true;
         }
         checkNeedsRebuild();
     }
@@ -97,17 +100,17 @@ public class ChangeableWidget extends Widget implements ISyncedWidget, IWidgetPa
     }
 
     @Override
-    public void detectAndSendChanges() {
-        if (this.firstTick) {
+    public void detectAndSendChanges(boolean init) {
+        if (init) {
             notifyChangeServer();
-            this.firstTick = false;
         }
         if (this.initialised && !this.child.isEmpty()) {
             IWidgetParent.forEachByLayer(this.child.get(0), widget -> {
                 if (widget instanceof ISyncedWidget) {
-                    ((ISyncedWidget) widget).detectAndSendChanges();
+                    ((ISyncedWidget) widget).detectAndSendChanges(firstTick);
                 }
             });
+            firstTick = false;
         }
     }
 

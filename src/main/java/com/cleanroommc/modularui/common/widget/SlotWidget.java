@@ -68,6 +68,9 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
         if (getBackground() == null) {
             setBackground(TEXTURE);
         }
+        if (!isClient() && !this.slot.getStack().isEmpty()) {
+            this.lastStoredPhantomItem = this.slot.getStack().copy();
+        }
     }
 
     @Override
@@ -113,9 +116,10 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     }
 
     @Override
-    public void detectAndSendChanges() {
-        if (this.slot.isNeedsSyncing()) {
+    public void detectAndSendChanges(boolean init) {
+        if (init || this.slot.isNeedsSyncing()) {
             getContext().syncSlotContent(this.slot);
+            this.slot.resetNeedsSyncing();
         }
     }
 

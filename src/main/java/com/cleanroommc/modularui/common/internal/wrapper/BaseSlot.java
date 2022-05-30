@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.common.internal.wrapper;
 
-import com.cleanroommc.modularui.ModularUI;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -24,7 +23,7 @@ public class BaseSlot extends SlotItemHandler {
     private int shiftClickPriority = 0;
     private Runnable changeListener;
     private Predicate<ItemStack> filter;
-    private ItemStack cachedItem = null;
+    private ItemStack cachedItem = ItemStack.EMPTY;
     private boolean needsSyncing;
 
     public static BaseSlot phantom() {
@@ -101,7 +100,7 @@ public class BaseSlot extends SlotItemHandler {
 
     @Override
     public void onSlotChanged() {
-        if (this.cachedItem != null && ItemStack.areItemStacksEqual(this.cachedItem, getStack())) {
+        if (ItemStack.areItemStacksEqual(this.cachedItem, getStack())) {
             return;
         }
         this.cachedItem = getStack().copy();
