@@ -120,6 +120,7 @@ public class ExpandTab extends MultiChildWidget implements Interactable, IWidget
         if (!isExpanded() && this.normalTexture != null) {
             for (IDrawable drawable : this.normalTexture) {
                 if (drawable != null) {
+                    drawable.applyThemeColor();
                     drawable.draw(Pos2d.ZERO, this.normalSize, partialTicks);
                 }
             }

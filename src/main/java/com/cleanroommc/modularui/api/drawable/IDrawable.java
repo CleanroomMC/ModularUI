@@ -48,6 +48,11 @@ public interface IDrawable {
         GlStateManager.color(Color.getRedF(color), Color.getGreenF(color), Color.getBlueF(color), Color.getAlphaF(color));
     }
 
+    @SideOnly(Side.CLIENT)
+    default void applyThemeColor() {
+        applyThemeColor(Color.WHITE.normal);
+    }
+
     /**
      * @return a drawable that can be used in guis as a widget
      */

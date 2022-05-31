@@ -151,6 +151,7 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
 
     @Override
     public void draw(float partialTicks) {
+        texture.applyThemeColor();
         texture.draw(Pos2d.ZERO, getSize(), partialTicks);
     }
 

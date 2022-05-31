@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.api.drawable;
 import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.common.internal.Theme;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -16,13 +17,12 @@ import java.util.List;
 
 public class TextRenderer {
 
-    public static final int DEFAULT_COLOR = 0x404040;
     protected float maxWidth = -1, maxHeight = -1;
     protected int x = 0, y = 0;
     protected Alignment alignment = Alignment.TopLeft;
     protected float scale = 1f;
     protected boolean shadow = false;
-    protected int color = 0x404040;
+    protected int color = Theme.INSTANCE.getText();
     protected boolean simulate;
     protected float lastWidth = 0, lastHeight = 0;
 
