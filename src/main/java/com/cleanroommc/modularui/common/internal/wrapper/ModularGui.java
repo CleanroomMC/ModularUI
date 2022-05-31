@@ -42,6 +42,8 @@ import java.util.Set;
 @SideOnly(Side.CLIENT)
 public class ModularGui extends GuiContainer {
 
+    public static boolean debugMode = ModularUIConfig.debug;
+
     private final ModularUIContext context;
     private Pos2d mousePos = Pos2d.ZERO;
 
@@ -49,7 +51,6 @@ public class ModularGui extends GuiContainer {
     private Interactable lastClicked;
     private long lastClick = -1;
     private long lastFocusedClick = -1;
-    public boolean debugMode = ModularUIConfig.debug;
     private int drawCalls = 0;
     private long drawTime = 0;
     private int fps = 0;
@@ -253,11 +254,12 @@ public class ModularGui extends GuiContainer {
     }
 
     public void drawDebugScreen() {
+        Size screenSize = context.getScaledScreenSize();
         int color = Color.rgb(180, 40, 115);
-        int lineY = context.getScaledScreenSize().height - 13;
+        int lineY = screenSize.height - 13;
         drawString(fontRenderer, "Mouse Pos: " + getMousePos(), 5, lineY, color);
         lineY -= 11;
-        drawString(fontRenderer, "FPS: " + fps, 5, context.getScaledScreenSize().height - 24, color);
+        drawString(fontRenderer, "FPS: " + fps, 5, screenSize.height - 24, color);
         lineY -= 11;
         Widget hovered = context.getCursor().findHoveredWidget(true);
         if (hovered != null) {
@@ -275,6 +277,15 @@ public class ModularGui extends GuiContainer {
             lineY -= 11;
             drawText("Class: " + hovered, 5, lineY, 1, color, false);
         }
+        color = Color.withAlpha(color, 25);
+        for (int i = 5; i < screenSize.width; i += 5) {
+            drawVerticalLine(i, 0, screenSize.height, color);
+        }
+
+        for (int i = 5; i < screenSize.height; i += 5) {
+            drawHorizontalLine(0, screenSize.width, i, color);
+        }
+        drawRect(mousePos.x, mousePos.y, mousePos.x + 1, mousePos.y + 1, Color.withAlpha(Color.GREEN.normal, 0.8f));
     }
 
     protected void drawVanillaElements(int mouseX, int mouseY, float partialTicks) {

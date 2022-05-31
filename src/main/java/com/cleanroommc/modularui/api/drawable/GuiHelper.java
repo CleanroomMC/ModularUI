@@ -90,6 +90,7 @@ public class GuiHelper {
         if (MinecraftForge.EVENT_BUS.post(event)) {
             return;
         }
+        lines = event.getLines();
         mousePos = new Pos2d(event.getX(), event.getY());
         screenSize = new Size(event.getScreenWidth(), event.getScreenHeight());
         maxWidth = event.getMaxWidth();
@@ -99,40 +100,34 @@ public class GuiHelper {
         boolean mouseOnRightSide = false;
         int screenSpaceRight = screenSize.width - mousePos.x - 16;
         if (mousePos.x > screenSize.width / 2f) {
-            if (maxTextWidth > screenSpaceRight) {
-                mouseOnRightSide = true;
-            }
+            mouseOnRightSide = true;
         }
         if (maxTextWidth > screenSpaceRight) {
             maxTextWidth = screenSpaceRight;
         }
         boolean putOnLeft = false;
-        Pos2d renderPos = Pos2d.ZERO;
+        int tooltipY = mousePos.y - 12;
+        int tooltipX = mousePos.x;
         TextRenderer renderer = new TextRenderer();
         renderer.setPos(mousePos);
-        renderer.setAlignment(alignment, maxTextWidth);
+        renderer.setAlignment(Alignment.TopLeft, maxTextWidth);
         renderer.setScale(scale);
         renderer.setShadow(forceShadow);
         renderer.setSimulate(true);
         List<Pair<String, Float>> measuredLines = renderer.measureLines(lines);
         if (mouseOnRightSide && measuredLines.size() > lines.size()) {
             putOnLeft = true;
-        }
-
-        int tooltipTextWidth = 0, tooltipHeight = 0;
-        if (mouseOnRightSide && putOnLeft) {
-            maxTextWidth = Math.min(maxWidth, screenSize.width - (screenSize.width - mousePos.x) - 16);
-        } else {
-            renderPos = mousePos.add(12, -12);
+            maxTextWidth = Math.min(maxWidth, mousePos.x - 16);
         }
 
         renderer.setAlignment(Alignment.TopLeft, maxTextWidth);
+        measuredLines = renderer.measureLines(lines);
         renderer.drawMeasuredLines(measuredLines);
-        tooltipTextWidth = (int) renderer.lastWidth;
-        tooltipHeight = (int) renderer.lastHeight;
+        int tooltipTextWidth = (int) renderer.lastWidth;
+        int tooltipHeight = (int) renderer.lastHeight;
 
         if (mouseOnRightSide && putOnLeft) {
-            renderPos = mousePos.add(-12 - tooltipTextWidth, -12);
+            tooltipX += -12 - tooltipTextWidth;
         }
 
         GlStateManager.disableRescaleNormal();
@@ -141,9 +136,6 @@ public class GuiHelper {
         GlStateManager.disableDepth();
 
         int color = 0xFFFFFF;
-
-        int tooltipY = renderPos.y;
-        int tooltipX = renderPos.x;
 
         final int zLevel = 300;
         int backgroundColor = 0xF0100010;
@@ -167,7 +159,7 @@ public class GuiHelper {
         MinecraftForge.EVENT_BUS.post(new RenderTooltipEvent.PostBackground(ItemStack.EMPTY, lines, tooltipX, tooltipY, TextRenderer.getFontRenderer(), tooltipTextWidth, tooltipHeight));
 
         renderer.setSimulate(false);
-        renderer.setPos(renderPos);
+        renderer.setPos(tooltipX, tooltipY);
         renderer.setAlignment(alignment, maxTextWidth);
         renderer.setColor(color);
         renderer.drawMeasuredLines(measuredLines);

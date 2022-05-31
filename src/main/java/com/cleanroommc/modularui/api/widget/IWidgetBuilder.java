@@ -3,9 +3,9 @@ package com.cleanroommc.modularui.api.widget;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.math.Pos2d;
+import com.cleanroommc.modularui.api.screen.UIBuildContext;
 import com.cleanroommc.modularui.common.internal.JsonHelper;
 import com.cleanroommc.modularui.common.internal.JsonLoader;
-import com.cleanroommc.modularui.api.screen.UIBuildContext;
 import com.cleanroommc.modularui.common.internal.wrapper.BaseSlot;
 import com.cleanroommc.modularui.common.widget.SlotGroup;
 import com.cleanroommc.modularui.common.widget.SlotWidget;
@@ -14,6 +14,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.Collection;
+import java.util.function.Consumer;
 
 public interface IWidgetBuilder<T extends IWidgetBuilder<T>> {
 
@@ -33,6 +34,16 @@ public interface IWidgetBuilder<T extends IWidgetBuilder<T>> {
 
     default T widgets(Collection<Widget> widgets) {
         return widgets(widgets.toArray(new Widget[0]));
+    }
+
+    default T widgetWhen(boolean doAdd, Widget widget) {
+        if (doAdd) widget(widget);
+        return (T) this;
+    }
+
+    default T consume(Consumer<T> builderConsumer) {
+        builderConsumer.accept((T) this);
+        return (T) this;
     }
 
     default T drawable(IDrawable drawable) {

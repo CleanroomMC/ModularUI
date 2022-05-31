@@ -28,7 +28,7 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
     private IntSupplier getter;
     private Function<Integer, IDrawable> textureGetter;
     private IDrawable texture = IDrawable.EMPTY;
-    private List<List<Text>> stateTooltip = new ArrayList<>();
+    private final List<List<Text>> stateTooltip = new ArrayList<>();
 
     public CycleButtonWidget() {
     }
@@ -167,6 +167,11 @@ public class CycleButtonWidget extends SyncedWidget implements Interactable {
         if (id == 1) {
             setState(buf.readVarInt(), false, true);
         }
+    }
+
+    @Override
+    public boolean hasTooltip() {
+        return super.hasTooltip() || (this.stateTooltip.size() > this.state && !this.stateTooltip.get(this.state).isEmpty());
     }
 
     @Override

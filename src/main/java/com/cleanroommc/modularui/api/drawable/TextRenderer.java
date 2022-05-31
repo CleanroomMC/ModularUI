@@ -79,8 +79,8 @@ public class TextRenderer {
         }
         this.lastWidth = maxWidth > 0 ? Math.min(maxW, maxWidth) : maxW;
         this.lastHeight = measuredLines.size() * getFontHeight();
-        this.lastWidth = Math.max(0, this.lastWidth - 1);
-        this.lastHeight = Math.max(0, this.lastHeight - 1);
+        this.lastWidth = Math.max(0, this.lastWidth - scale);
+        this.lastHeight = Math.max(0, this.lastHeight - scale);
     }
 
     public List<Pair<String, Float>> measureLines(List<String> lines) {
