@@ -170,6 +170,10 @@ public class ModularWindow implements IWidgetParent {
         }
     }
 
+    public boolean isClosing() {
+        return closeAnimation != null && closeAnimation.isRunning();
+    }
+
     public void update() {
         for (IDrawable drawable : background) {
             drawable.tick();

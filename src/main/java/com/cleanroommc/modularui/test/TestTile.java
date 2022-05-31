@@ -232,7 +232,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
     }
 
     public <T extends Widget & IWidgetBuilder<T>> void addInfo(T builder) {
-        builder.widget(new TextWidget("Probably a Machine Name"))
+        builder.widget(new TextWidget(new Text("Probably a Machine Name").color(0x13610C)))
                 .widget(new TextWidget("Invalid Structure or whatever")
                         .addTooltip("This has a tooltip"));
         if (true) {

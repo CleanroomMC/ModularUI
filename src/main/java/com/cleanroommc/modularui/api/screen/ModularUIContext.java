@@ -105,13 +105,15 @@ public class ModularUIContext {
 
     public void onClientTick() {
         if (!queuedOpenWindow.isEmpty()) {
-            for (Integer windowId : queuedOpenWindow) {
+            queuedOpenWindow.removeIf(windowId -> {
+                ModularWindow oldWindow = syncedWindows.get(windowId);
+                if (oldWindow != null && oldWindow.isClosing()) return false;
                 ModularWindow newWindow = openWindow(syncedWindowsCreators.get(windowId));
                 syncedWindows.put(windowId, newWindow);
                 newWindow.initialized = true;
                 sendClientPacket(DataCodes.INIT_WINDOW, null, newWindow, NetworkUtils.EMPTY_PACKET);
-            }
-            queuedOpenWindow.clear();
+                return true;
+            });
         }
     }
 
