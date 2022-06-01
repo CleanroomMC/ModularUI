@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.common.widget;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ModularUITextures;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.math.Size;
@@ -36,10 +35,8 @@ public class SliderWidget extends SyncedWidget implements Interactable {
     }
 
     public void update(int relativePos, boolean sync) {
-        ModularUI.LOGGER.info("Update: click pos {}, width {}, handle width {}", relativePos, size.width, handleSize.width);
         this.sliderPos = MathHelper.clamp(relativePos - handleSize.width / 2f, 0, size.width - handleSize.width);
         setValue(toValue(this.sliderPos), sync);
-        ModularUI.LOGGER.info(" - slider pos {}, value {}", this.sliderPos, this.value);
     }
 
     @Override
