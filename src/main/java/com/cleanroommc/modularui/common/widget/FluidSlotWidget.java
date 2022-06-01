@@ -7,6 +7,7 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.TextRenderer;
 import com.cleanroommc.modularui.api.math.Alignment;
+import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.IGhostIngredientTarget;
@@ -57,6 +58,8 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngr
     public FluidSlotWidget(IFluidTank fluidTank) {
         this.fluidTank = fluidTank;
         this.tankHandler = FluidTankHandler.getTankFluidHandler(fluidTank);
+        this.textRenderer.setColor(Color.WHITE.normal);
+        this.textRenderer.setShadow(true);
     }
 
     public static FluidSlotWidget phantom(IFluidTank fluidTank, boolean controlsAmount) {

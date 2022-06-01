@@ -40,6 +40,10 @@ public class GuiHelper {
         return Minecraft.getMinecraft().currentScreen != null;
     }
 
+    public static GuiScreen getActiveScreen() {
+        return Minecraft.getMinecraft().currentScreen;
+    }
+
     /**
      * @return the scaled screen size. (0;0) if no screen is open.
      */

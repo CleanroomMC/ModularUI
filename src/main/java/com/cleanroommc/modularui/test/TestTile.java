@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.test;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ModularUITextures;
 import com.cleanroommc.modularui.api.drawable.AdaptableUITexture;
+import com.cleanroommc.modularui.api.drawable.ItemDrawable;
 import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.UITexture;
 import com.cleanroommc.modularui.api.math.*;
@@ -14,6 +15,7 @@ import com.cleanroommc.modularui.api.widget.Widget;
 import com.cleanroommc.modularui.common.widget.*;
 import com.cleanroommc.modularui.common.widget.textfield.TextFieldWidget;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
@@ -101,6 +103,9 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                                         .setBackground(ModularUITextures.VANILLA_BACKGROUND, new Text("Window"))
                                         .setSize(80, 20)
                                         .setPos(20, 100))
+                                .addChild(new ItemDrawable(new ItemStack(Blocks.COMMAND_BLOCK)).asWidget()
+                                        .setSize(32, 16)
+                                        .setPos(20, 80))
                                 .addChild(new SliderWidget()
                                         .setBounds(0, 15)
                                         .setGetter(() -> sliderValue)
