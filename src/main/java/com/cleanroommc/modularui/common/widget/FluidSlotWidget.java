@@ -1,7 +1,11 @@
 package com.cleanroommc.modularui.common.widget;
 
+import com.cleanroommc.modularui.api.ModularUITextures;
 import com.cleanroommc.modularui.api.NumberFormat;
-import com.cleanroommc.modularui.api.drawable.*;
+import com.cleanroommc.modularui.api.drawable.GuiHelper;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.drawable.Text;
+import com.cleanroommc.modularui.api.drawable.TextRenderer;
 import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
@@ -33,7 +37,6 @@ import java.util.List;
 public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngredientProvider, IGhostIngredientTarget<FluidStack> {
 
     public static final Size SIZE = new Size(18, 18);
-    public static final UITexture TEXTURE = UITexture.fullImage("modularui", "gui/slot/fluid");
 
     @Nullable
     private IDrawable overlayTexture;
@@ -78,7 +81,7 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngr
             this.textRenderer.setScale(0.5f);
         }
         if (getBackground() == null) {
-            setBackground(TEXTURE);
+            setBackground(ModularUITextures.FLUID_SLOT);
         }
     }
 

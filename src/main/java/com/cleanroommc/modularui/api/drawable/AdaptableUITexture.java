@@ -46,6 +46,10 @@ public class AdaptableUITexture extends UITexture {
 
     @Override
     public void draw(float x, float y, float width, float height) {
+        if (width == imageWidth && height == imageHeight) {
+            super.draw(x, y, width, height);
+            return;
+        }
         float borderU = borderWidthU * 1f / imageWidth;
         float borderV = borderWidthV * 1f / imageHeight;
         // draw corners

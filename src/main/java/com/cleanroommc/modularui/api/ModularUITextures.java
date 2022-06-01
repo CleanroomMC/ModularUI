@@ -8,6 +8,10 @@ public class ModularUITextures {
 
     public static final UITexture ICON_INFO = UITexture.fullImage(ModularUI.ID, "gui/widgets/information");
     public static final UITexture VANILLA_BACKGROUND = AdaptableUITexture.of(ModularUI.ID, "gui/background/vanilla_background", 195, 136, 4);
+    public static final AdaptableUITexture BASE_BUTTON = AdaptableUITexture.of(ModularUI.ID, "gui/widgets/base_button", 18, 18, 1);
+    public static final AdaptableUITexture ITEM_SLOT = AdaptableUITexture.of(ModularUI.ID, "gui/slot/item", 18, 18, 1);
+    public static final AdaptableUITexture FLUID_SLOT = AdaptableUITexture.of(ModularUI.ID, "gui/slot/fluid", 18, 18, 1);
+
 
     public static final UITexture VANILLA_TAB_TOP = UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_top");
     public static final UITexture VANILLA_TAB_BOTTOM = UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_bottom");

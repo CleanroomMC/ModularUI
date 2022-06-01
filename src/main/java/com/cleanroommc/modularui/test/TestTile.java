@@ -5,7 +5,6 @@ import com.cleanroommc.modularui.api.ModularUITextures;
 import com.cleanroommc.modularui.api.drawable.AdaptableUITexture;
 import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.UITexture;
-import com.cleanroommc.modularui.api.drawable.shapes.Rectangle;
 import com.cleanroommc.modularui.api.math.*;
 import com.cleanroommc.modularui.api.screen.ITileWithModularUI;
 import com.cleanroommc.modularui.api.screen.ModularWindow;
@@ -33,6 +32,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
     private final int duration = 60;
     private int progress = 0;
     private int ticks = 0;
+    private float sliderValue = 0;
     private int serverCounter = 0;
     private static final AdaptableUITexture DISPLAY = AdaptableUITexture.of("modularui:gui/background/display", 143, 75, 2);
     private static final AdaptableUITexture BACKGROUND = AdaptableUITexture.of("modularui:gui/background/background", 176, 166, 3);
@@ -101,6 +101,16 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                                         .setBackground(ModularUITextures.VANILLA_BACKGROUND, new Text("Window"))
                                         .setSize(80, 20)
                                         .setPos(20, 100))
+                                .addChild(new SliderWidget()
+                                        .setBounds(0, 15)
+                                        .setGetter(() -> sliderValue)
+                                        .setSetter(val -> sliderValue = val)
+                                        .setSize(120, 20)
+                                        .setPos(7, 130))
+                                .addChild(TextWidget.dynamicString(() -> String.valueOf((int) (sliderValue + 0.5f)))
+                                        .setTextAlignment(Alignment.CenterLeft)
+                                        .setSize(30, 20)
+                                        .setPos(135, 130))
                                 .setDebugLabel("Page2"))
                         .addPage(new MultiChildWidget()
                                 .addChild(new TextWidget("Page 3"))

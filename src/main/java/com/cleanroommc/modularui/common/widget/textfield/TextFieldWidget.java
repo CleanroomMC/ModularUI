@@ -24,7 +24,6 @@ public class TextFieldWidget extends BaseTextFieldWidget implements ISyncedWidge
     private Function<String, String> validator = val -> val;
     private boolean syncsToServer = true;
     private boolean syncsToClient = true;
-    private boolean init = false;
 
     public static Number parse(String num) {
         try {

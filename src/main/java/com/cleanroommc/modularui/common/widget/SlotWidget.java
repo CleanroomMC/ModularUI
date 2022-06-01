@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.common.widget;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.drawable.UITexture;
+import com.cleanroommc.modularui.api.ModularUITextures;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.*;
@@ -32,7 +32,6 @@ import java.util.function.Predicate;
 public class SlotWidget extends Widget implements IVanillaSlot, Interactable, ISyncedWidget, IIngredientProvider, IGhostIngredientTarget<ItemStack> {
 
     public static final Size SIZE = new Size(18, 18);
-    public static final UITexture TEXTURE = UITexture.fullImage("modularui", "gui/slot/item");
 
     private final BaseSlot slot;
     private ItemStack lastStoredPhantomItem = ItemStack.EMPTY;
@@ -66,7 +65,7 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
             getContext().getContainer().setSlotSortable(this.slot, this.sortingSection);
         }
         if (getBackground() == null) {
-            setBackground(TEXTURE);
+            setBackground(ModularUITextures.ITEM_SLOT);
         }
         if (!isClient() && !this.slot.getStack().isEmpty()) {
             this.lastStoredPhantomItem = this.slot.getStack().copy();

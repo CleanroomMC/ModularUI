@@ -49,11 +49,19 @@ public class SlotGroup extends MultiChildWidget {
         return slotGroup;
     }
 
+    public static SlotGroup ofItemHandler(IItemHandlerModifiable itemHandler, int slotsWidth, boolean output, boolean sortable) {
+        return ofItemHandler(itemHandler, slotsWidth, 0, 0, itemHandler.getSlots() - 1, sortable, output);
+    }
+
     public static SlotGroup ofItemHandler(IItemHandlerModifiable itemHandler, int slotsWidth, int shiftClickPriority, boolean sortable) {
-        return ofItemHandler(itemHandler, slotsWidth, shiftClickPriority, 0, itemHandler.getSlots() - 1, sortable);
+        return ofItemHandler(itemHandler, slotsWidth, shiftClickPriority, 0, itemHandler.getSlots() - 1, sortable, false);
     }
 
     public static SlotGroup ofItemHandler(IItemHandlerModifiable itemHandler, int slotsWidth, int shiftClickPriority, int startFromSlot, int endAtSlot, boolean sortable) {
+        return ofItemHandler(itemHandler, slotsWidth, shiftClickPriority, startFromSlot, endAtSlot, sortable, false);
+    }
+
+    public static SlotGroup ofItemHandler(IItemHandlerModifiable itemHandler, int slotsWidth, int shiftClickPriority, int startFromSlot, int endAtSlot, boolean sortable, boolean output) {
         SlotGroup slotGroup = new SlotGroup();
         if (itemHandler.getSlots() >= endAtSlot) {
             endAtSlot = itemHandler.getSlots() - 1;
@@ -65,7 +73,7 @@ public class SlotGroup extends MultiChildWidget {
         slotsWidth = Math.max(slotsWidth, 1);
         int x = 0, y = 0;
         for (int i = startFromSlot; i < endAtSlot + 1; i++) {
-            slotGroup.addSlot(new SlotWidget(new BaseSlot(itemHandler, i).setShiftClickPriority(shiftClickPriority))
+            slotGroup.addSlot(new SlotWidget(new BaseSlot(itemHandler, i, output, false).setShiftClickPriority(shiftClickPriority))
                     .setPos(new Pos2d(x * 18, y * 18)));
             if (++x == slotsWidth) {
                 x = 0;
