@@ -53,9 +53,6 @@ public class ButtonWidget extends SyncedWidget implements Interactable {
 
     @Override
     public ClickResult onClick(int buttonId, boolean doubleClick) {
-        if (!isRightBelowMouse()) {
-            return ClickResult.IGNORE;
-        }
         if (clickAction != null) {
             ClickData clickData = ClickData.create(buttonId, doubleClick);
             clickAction.accept(clickData, this);

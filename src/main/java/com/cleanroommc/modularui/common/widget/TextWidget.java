@@ -84,6 +84,7 @@ public class TextWidget extends Widget {
 
     @Override
     public void draw(float partialTicks) {
+        Text text = getText();
         if (localised == null) {
             localised = text.getFormatted();
         }
