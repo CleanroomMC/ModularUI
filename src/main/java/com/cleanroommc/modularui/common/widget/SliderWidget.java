@@ -62,6 +62,7 @@ public class SliderWidget extends SyncedWidget implements Interactable {
             return ClickResult.SUCCESS;
         }
         update(clickPos, true);
+        this.grabHandle = true;
         return ClickResult.SUCCESS;
     }
 
