@@ -35,7 +35,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.List;
 
-public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngredientProvider, IGhostIngredientTarget<FluidStack> {
+public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngredientProvider, IGhostIngredientTarget<Object> {
 
     public static final Size SIZE = new Size(18, 18);
 
@@ -419,16 +419,36 @@ public class FluidSlotWidget extends SyncedWidget implements Interactable, IIngr
     }
 
     @Override
-    public IGhostIngredientHandler.@Nullable Target<FluidStack> getTarget(@NotNull Object ingredient) {
-        if (!isPhantom() || !(ingredient instanceof FluidStack) || ((FluidStack) ingredient).amount <= 0) {
+    public IGhostIngredientHandler.@Nullable Target<Object> getTarget(@NotNull Object ingredient) {
+        if (!isPhantom()) {
             return null;
         }
-        return new GhostIngredientWrapper<>(this);
+        if (ingredient instanceof FluidStack) {
+            return ((FluidStack) ingredient).amount > 0 ? new GhostIngredientWrapper<>(this) : null;
+        }
+        if (ingredient instanceof ItemStack) {
+            if (((ItemStack) ingredient).isEmpty()) return null;
+            IFluidHandlerItem fluidHandlerItem = ((ItemStack) ingredient).getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null);
+            if (fluidHandlerItem != null) {
+                return new GhostIngredientWrapper<>(this);
+            }
+        }
+        return null;
     }
 
     @Override
-    public void accept(@NotNull FluidStack ingredient) {
-        syncToServer(4, buffer -> NetworkUtils.writeFluidStack(buffer, ingredient));
+    public void accept(@NotNull Object ingredient) {
+        FluidStack fluid = null;
+        if (ingredient instanceof FluidStack) {
+            fluid = (FluidStack) ingredient;
+        } else if (ingredient instanceof ItemStack) {
+            IFluidHandlerItem fluidHandlerItem = ((ItemStack) ingredient).getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null);
+            if (fluidHandlerItem == null) return;
+            fluid = fluidHandlerItem.drain(Integer.MAX_VALUE, false);
+        }
+        if (fluid == null) return;
+        final FluidStack finalFluid = fluid;
+        syncToServer(4, buffer -> NetworkUtils.writeFluidStack(buffer, finalFluid));
     }
 
     public boolean canFillSlot() {

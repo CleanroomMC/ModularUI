@@ -3,7 +3,7 @@ modularui.tooltip.shift=§bHold Shift
 modularui.fluid.empty=Empty
 modularui.fluid.amount=§9Amount: %,d/%,d L
 modularui.fluid.phantom.amount=§9Amount: %,d L
-modularui.fluid.phantom.control=§7Scroll wheel up increases amount, down decreases.\nShift[§6x10§7],Ctrl[§ex100§7],Shift+Ctrl[§ax1000§7]\nRight click increases amount, left click decreases.\nHold shift to double/halve.\nMiddle click to clear
+modularui.fluid.phantom.control=§7Scroll wheel up increases amount, down decreases.\nShift[§6x10§7],Ctrl[§ex100§7],Shift+Ctrl[§ax1000§7]\nRight click increases amount, left click decreases.\nShift + left click to clear.
 
 modularui.fluid.click_to_fill=§bLeft §7Click with a Fluid Container to §bfill §7the tank (Shift-click for a full stack).
 modularui.fluid.click_combined=§cRight §7or §bLeft §7Click with a Fluid Container to §cempty §7or §bfill §7the tank (Shift-click for a full stack).
