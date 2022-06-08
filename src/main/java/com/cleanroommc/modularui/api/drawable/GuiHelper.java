@@ -111,7 +111,7 @@ public class GuiHelper {
         }
         boolean putOnLeft = false;
         int tooltipY = mousePos.y - 12;
-        int tooltipX = mousePos.x;
+        int tooltipX = mousePos.x + 12;
         TextRenderer renderer = new TextRenderer();
         renderer.setPos(mousePos);
         renderer.setAlignment(Alignment.TopLeft, maxTextWidth);
@@ -131,7 +131,7 @@ public class GuiHelper {
         int tooltipHeight = (int) renderer.lastHeight;
 
         if (mouseOnRightSide && putOnLeft) {
-            tooltipX += -12 - tooltipTextWidth;
+            tooltipX += -24 - tooltipTextWidth;
         }
 
         GlStateManager.disableRescaleNormal();
