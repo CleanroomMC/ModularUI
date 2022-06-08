@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.api.widget;
 
-import net.minecraft.inventory.Slot;
+import com.cleanroommc.modularui.common.internal.wrapper.BaseSlot;
 
 public interface IVanillaSlot {
 
-    Slot getMcSlot();
+    BaseSlot getMcSlot();
 }

@@ -8,14 +8,15 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.function.Predicate;
 
 public class BaseSlot extends SlotItemHandler {
 
-    protected final boolean output;
     protected final boolean phantom;
+    protected boolean canInsert = true, canTake = true;
 
     protected boolean enabled = true;
     // lower priority means it gets targeted first
@@ -27,20 +28,19 @@ public class BaseSlot extends SlotItemHandler {
     private boolean needsSyncing;
 
     public static BaseSlot phantom() {
-        return phantom(new ItemStackHandler(), 0, false);
+        return phantom(new ItemStackHandler(), 0);
     }
 
-    public static BaseSlot phantom(IItemHandlerModifiable handler, int index, boolean output) {
-        return new BaseSlot(handler, index, output, true);
+    public static BaseSlot phantom(IItemHandlerModifiable handler, int index) {
+        return new BaseSlot(handler, index, true);
     }
 
     public BaseSlot(IItemHandlerModifiable inventory, int index) {
-        this(inventory, index, false, false);
+        this(inventory, index, false);
     }
 
-    public BaseSlot(IItemHandlerModifiable inventory, int index, boolean output, boolean phantom) {
+    public BaseSlot(IItemHandlerModifiable inventory, int index, boolean phantom) {
         super(inventory, index, 0, 0);
-        this.output = output;
         this.phantom = phantom;
         if (inventory instanceof PlayerMainInvWrapper) {
             setShiftClickPriority(index > 8 ? 40 : 20);
@@ -55,18 +55,28 @@ public class BaseSlot extends SlotItemHandler {
         return this;
     }
 
+    public BaseSlot disableShiftInsert() {
+        return setShiftClickPriority(Integer.MIN_VALUE);
+    }
+
+    public BaseSlot setAccess(boolean canInsert, boolean canTake) {
+        this.canTake = canTake;
+        this.canInsert = canInsert;
+        return this;
+    }
+
     @Override
-    public boolean isItemValid(ItemStack stack) {
+    public boolean isItemValid(@NotNull ItemStack stack) {
         return !this.phantom && isItemValidPhantom(stack);
     }
 
     public boolean isItemValidPhantom(ItemStack stack) {
-        return !this.output && (filter == null || filter.test(stack)) && getItemHandler().isItemValid(getSlotIndex(), stack);
+        return this.canInsert && (filter == null || filter.test(stack)) && getItemHandler().isItemValid(getSlotIndex(), stack);
     }
 
     @Override
     public boolean canTakeStack(EntityPlayer playerIn) {
-        return !this.phantom && super.canTakeStack(playerIn);
+        return !this.phantom && canTake && super.canTakeStack(playerIn);
     }
 
     @Override
@@ -74,8 +84,8 @@ public class BaseSlot extends SlotItemHandler {
         return enabled;
     }
 
-    public boolean isOutput() {
-        return output;
+    public boolean isCanInsert() {
+        return canInsert;
     }
 
     public boolean isPhantom() {

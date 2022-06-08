@@ -6,10 +6,12 @@ import invtweaks.api.container.ChestContainer;
 import invtweaks.api.container.ContainerSection;
 import invtweaks.api.container.ContainerSectionCallback;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import java.util.*;
@@ -115,6 +117,15 @@ public class ModularUIContainer extends Container {
     public void sendSlotChange(ItemStack stack, int index) {
         for (IContainerListener listener : this.listeners) {
             listener.sendSlotContents(this, index, stack);
+        }
+    }
+
+    public void sendHeldItemUpdate() {
+        for (IContainerListener listener : listeners) {
+            if (listener instanceof EntityPlayerMP) {
+                EntityPlayerMP player = (EntityPlayerMP) listener;
+                player.connection.sendPacket(new SPacketSetSlot(-1, -1, player.inventory.getItemStack()));
+            }
         }
     }
 

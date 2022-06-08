@@ -278,6 +278,10 @@ public class ModularUIContext {
         getContainer().sendSlotChange(slot.getStack(), slot.slotNumber);
     }
 
+    public void syncHeldItem() {
+        getContainer().sendHeldItemUpdate();
+    }
+
     public void readClientPacket(PacketBuffer buf, int widgetId) throws IOException {
         int id = buf.readVarInt();
         ModularWindow window = syncedWindows.get(buf.readVarInt());

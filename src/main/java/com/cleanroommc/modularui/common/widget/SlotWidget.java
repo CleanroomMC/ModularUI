@@ -43,19 +43,11 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     }
 
     public SlotWidget(IItemHandlerModifiable handler, int index) {
-        this(handler, index, false);
-    }
-
-    public SlotWidget(IItemHandlerModifiable handler, int index, boolean output) {
-        this(new BaseSlot(handler, index, output, false));
+        this(new BaseSlot(handler, index, false));
     }
 
     public static SlotWidget phantom(IItemHandlerModifiable handler, int index) {
-        return phantom(handler, index, false);
-    }
-
-    public static SlotWidget phantom(IItemHandlerModifiable handler, int index, boolean output) {
-        return new SlotWidget(BaseSlot.phantom(handler, index, output));
+        return new SlotWidget(BaseSlot.phantom(handler, index));
     }
 
     @Override
@@ -78,7 +70,7 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     }
 
     @Override
-    public Slot getMcSlot() {
+    public BaseSlot getMcSlot() {
         return this.slot;
     }
 
@@ -146,6 +138,11 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
         return this;
     }
 
+    public SlotWidget disableShiftInsert() {
+        this.slot.disableShiftInsert();
+        return this;
+    }
+
     public SlotWidget setChangeListener(Runnable runnable) {
         this.slot.setChangeListener(runnable);
         return this;
@@ -157,6 +154,11 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
 
     public SlotWidget setFilter(Predicate<ItemStack> filter) {
         this.slot.setFilter(filter);
+        return this;
+    }
+
+    public SlotWidget setAccess(boolean canTake, boolean canInsert) {
+        this.slot.setAccess(canInsert, canTake);
         return this;
     }
 

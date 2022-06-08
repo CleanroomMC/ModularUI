@@ -73,7 +73,7 @@ public class SlotGroup extends MultiChildWidget {
         slotsWidth = Math.max(slotsWidth, 1);
         int x = 0, y = 0;
         for (int i = startFromSlot; i < endAtSlot + 1; i++) {
-            slotGroup.addSlot(new SlotWidget(new BaseSlot(itemHandler, i, output, false).setShiftClickPriority(shiftClickPriority))
+            slotGroup.addSlot(new SlotWidget(new BaseSlot(itemHandler, i, false).setAccess(!output, true).setShiftClickPriority(shiftClickPriority))
                     .setPos(new Pos2d(x * 18, y * 18)));
             if (++x == slotsWidth) {
                 x = 0;

@@ -19,6 +19,10 @@ public class ItemDrawable implements IDrawable {
     }
 
     @Override
+    public void applyThemeColor(int color) {
+    }
+
+    @Override
     public void draw(float x, float y, float width, float height, float partialTicks) {
         if (item.isEmpty()) return;
         GlStateManager.pushMatrix();
