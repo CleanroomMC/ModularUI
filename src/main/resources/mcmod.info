@@ -1,16 +1,20 @@
 [
-{
-  "modid": "modularui",
-  "name": "ModularUI",
-  "description": "ModularUI from GTCE but cleaned up...",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
-  "url": "",
-  "updateUrl": "",
-  "authorList": ["CleanroomMC"],
-  "credits": "GTCEu Dev Team",
-  "logoFile": "assets/modular_ui_logo.png",
-  "screenshots": [],
-  "dependencies": []
-}
+  {
+    "modid": "modularui",
+    "name": "ModularUI",
+    "description": "A GUI library to ease the process of creating vanilla style GUIs. Heavily inspired by GTCE's ModularUI",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "updateUrl": "",
+    "authorList": [
+      "brachy84",
+      "Rongmario",
+      "CleanroomMC"
+    ],
+    "credits": "GTCE Autor for the idea and concept, Kila Bash for improvements in GTCEu",
+    "logoFile": "assets/modular_ui_logo.png",
+    "screenshots": [],
+    "dependencies": []
+  }
 ]
