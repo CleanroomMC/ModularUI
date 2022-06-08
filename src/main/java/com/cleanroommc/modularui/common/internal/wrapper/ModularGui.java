@@ -395,7 +395,7 @@ public class ModularGui extends GuiContainer {
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
         // debug mode C + CTRL + SHIFT + ALT
         if (keyCode == 46 && isCtrlKeyDown() && isShiftKeyDown() && isAltKeyDown()) {
-            this.debugMode = !this.debugMode;
+            debugMode = !debugMode;
         }
         for (Interactable interactable : context.getCurrentWindow().getInteractionListeners()) {
             interactable.onKeyPressed(typedChar, keyCode);
@@ -410,12 +410,9 @@ public class ModularGui extends GuiContainer {
                 return;
             }
         }
-        keyTypedSuper(typedChar, keyCode);
-    }
 
-    private void keyTypedSuper(char typedChar, int keyCode) throws IOException {
         if (keyCode == Keyboard.KEY_ESCAPE || this.mc.gameSettings.keyBindInventory.isActiveAndMatches(keyCode)) {
-            context.getMainWindow().tryClose();
+            this.context.tryClose();
         } else {
             super.keyTyped(typedChar, keyCode);
         }

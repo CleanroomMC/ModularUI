@@ -25,10 +25,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class ModularUIContext {
@@ -36,6 +34,7 @@ public class ModularUIContext {
     private final ImmutableMap<Integer, IWindowCreator> syncedWindowsCreators;
     private final Deque<ModularWindow> windows = new LinkedList<>();
     private final BiMap<Integer, ModularWindow> syncedWindows = HashBiMap.create(4);
+    private final Map<Integer, Pos2d> lastWindowPos = new HashMap<>();
     private ModularWindow mainWindow;
     @SideOnly(Side.CLIENT)
     private ModularGui screen;
@@ -44,6 +43,7 @@ public class ModularUIContext {
     private final List<Widget> jeiExclusionZone = new ArrayList<>();
     private final List<Integer> queuedOpenWindow = new ArrayList<>();
     public final boolean clientOnly;
+    private boolean isClosing = false;
 
     private Size screenSize = NetworkUtils.isDedicatedClient() ? new Size(Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight) : Size.ZERO;
 
@@ -110,6 +110,9 @@ public class ModularUIContext {
                 if (oldWindow != null && oldWindow.isClosing()) return false;
                 ModularWindow newWindow = openWindow(syncedWindowsCreators.get(windowId));
                 syncedWindows.put(windowId, newWindow);
+                newWindow.onResize(screenSize);
+                newWindow.rebuild();
+                newWindow.onOpen();
                 newWindow.initialized = true;
                 sendClientPacket(DataCodes.INIT_WINDOW, null, newWindow, NetworkUtils.EMPTY_PACKET);
                 return true;
@@ -141,11 +144,6 @@ public class ModularUIContext {
     public ModularWindow openWindow(IWindowCreator windowCreator) {
         ModularWindow window = windowCreator.create(player);
         pushWindow(window);
-        if (isClient()) {
-            window.onResize(screenSize);
-            window.rebuild();
-            window.onOpen();
-        }
         return window;
     }
 
@@ -193,7 +191,17 @@ public class ModularUIContext {
     }
 
     public void tryClose() {
-        mainWindow.tryClose();
+        if (this.isClosing) {
+            for (ModularWindow window : getOpenWindows()) {
+                closeWindow(window);
+            }
+            return;
+        }
+        for (ModularWindow window : getOpenWindows()) {
+            if (window.tryClose() && window == mainWindow) {
+                this.isClosing = true;
+            }
+        }
     }
 
     public void close() {
@@ -206,6 +214,22 @@ public class ModularUIContext {
                 window.tryClose();
             }
         }
+    }
+
+    public void storeWindowPos(ModularWindow window, Pos2d pos) {
+        if (syncedWindows.containsValue(window)) {
+            this.lastWindowPos.put(this.syncedWindows.inverse().get(window), pos);
+        }
+    }
+
+    public boolean tryApplyStoredPos(ModularWindow window) {
+        if (window == this.mainWindow || !this.syncedWindows.containsValue(window)) return false;
+        int id = this.syncedWindows.inverse().get(window);
+        if (this.lastWindowPos.containsKey(id)) {
+            window.setPos(this.lastWindowPos.get(id));
+            return true;
+        }
+        return false;
     }
 
     @SideOnly(Side.CLIENT)

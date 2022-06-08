@@ -108,8 +108,8 @@ public class ModularWindow implements IWidgetParent {
         if (this.fullScreen) {
             this.size = screenSize;
             this.pos = Pos2d.ZERO;
-        } else {
-            this.pos = this.posProvider.getPos(screenSize, this.context.getMainWindow());
+        } else if (!this.context.tryApplyStoredPos(this)) {
+            setPos(this.posProvider.getPos(screenSize, this.context.getMainWindow()));
         }
         markNeedsRebuild();
     }
@@ -162,12 +162,14 @@ public class ModularWindow implements IWidgetParent {
     /**
      * Called when the player tries to close the ui. Starts animation or closes directly.
      */
-    public void tryClose() {
+    public boolean tryClose() {
         if (closeAnimation == null) {
             closeWindow();
         } else if (!closeAnimation.isRunning()) {
             closeAnimation.forward();
+            return true;
         }
+        return false;
     }
 
     public boolean isClosing() {
@@ -311,6 +313,7 @@ public class ModularWindow implements IWidgetParent {
 
     public void setPos(Pos2d pos) {
         this.pos = pos;
+        this.context.storeWindowPos(this, pos);
     }
 
     public boolean doesNeedRebuild() {
