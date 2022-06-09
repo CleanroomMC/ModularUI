@@ -31,6 +31,9 @@ public class InternalUIMapper implements IGuiHandler {
     private final List<IGuiCreator> clientGuis;
 
     public InternalUIMapper() {
+        if (ModularUI.INSTANCE == null) {
+            throw new NullPointerException("Something went wrong! Mod instance should not be null!");
+        }
         NetworkRegistry.INSTANCE.registerGuiHandler(ModularUI.INSTANCE, this);
         this.serverContainers = new ArrayList<>();
         this.clientGuis = new ArrayList<>();
@@ -54,7 +57,7 @@ public class InternalUIMapper implements IGuiHandler {
     public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
         Object screen = clientGuis.get(id).create(player, world, x, y, z);
         if (screen != null && !(screen instanceof GuiScreen)) {
-			throw new RuntimeException("The returned Object of IGuiCreator must be a instance of GuiScreen!");
+            throw new RuntimeException("The returned Object of IGuiCreator must be a instance of GuiScreen!");
         }
         return screen;
     }
