@@ -274,6 +274,7 @@ public class Cursor {
             if (!window.isEnabled()) continue;
             if (isAbove(window)) {
                 hoveredWidgets.add(0, window);
+                hovered = null;
             }
             stack.clear();
             stack.addLast(window);
