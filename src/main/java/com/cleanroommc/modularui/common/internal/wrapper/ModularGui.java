@@ -313,6 +313,16 @@ public class ModularGui extends GuiContainer {
     }
 
     @Override
+    protected boolean hasClickedOutside(int p_193983_1_, int p_193983_2_, int p_193983_3_, int p_193983_4_) {
+        for (ModularWindow window : context.getOpenWindows()) {
+            if (Widget.isUnderMouse(new Pos2d(p_193983_1_, p_193983_2_), window.getAbsolutePos(), window.getSize())) {
+                return false;
+            }
+        }
+        return super.hasClickedOutside(p_193983_1_, p_193983_2_, p_193983_3_, p_193983_4_);
+    }
+
+    @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         long time = Minecraft.getSystemTime();
         boolean doubleClick = isDoubleClick(lastClick, time);
