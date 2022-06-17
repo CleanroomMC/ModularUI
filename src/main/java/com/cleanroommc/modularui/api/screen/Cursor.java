@@ -43,11 +43,11 @@ public class Cursor {
     }
 
     public boolean isAbove(Widget widget) {
-        return Widget.isUnderMouse(getPos(), widget.getAbsolutePos(), widget.getSize());
+        return widget.isUnderMouse(getPos());
     }
 
     public boolean isAbove(IWidgetParent widget) {
-        return Widget.isUnderMouse(getPos(), widget.getAbsolutePos(), widget.getSize());
+        return getPos().isInside(widget.getAbsolutePos(), widget.getSize());
     }
 
     public boolean isHovering(Widget widget) {
@@ -217,7 +217,7 @@ public class Cursor {
                 }
                 return false;
             });
-            if (draggable == null && hovered.get() == null && window.isDraggable() && Widget.isUnderMouse(getPos(), window.getPos(), window.getSize())) {
+            if (draggable == null && hovered.get() == null && window.isDraggable() && isAbove(window)) {
                 draggable = new DraggableWindowWrapper(window, getPos().subtract(window.getPos()));
             } else if (hovered.get() != null) {
                 draggable = (IDraggable) hovered.get();
@@ -258,7 +258,7 @@ public class Cursor {
     @Nullable
     public ModularWindow findHoveredWindow() {
         for (ModularWindow window : uiContext.getOpenWindows()) {
-            if (window.isEnabled() && Widget.isUnderMouse(getPos(), window.getPos(), window.getSize())) {
+            if (window.isEnabled() && isAbove(window)) {
                 return window;
             }
         }

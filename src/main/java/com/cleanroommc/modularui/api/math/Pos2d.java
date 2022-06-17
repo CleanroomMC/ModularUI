@@ -65,6 +65,33 @@ public class Pos2d {
         return (float) Math.toDegrees(Math.atan(y / x)) + 90;
     }
 
+    public static boolean isInside(int posX, int posY, Pos2d areaPos, Size size) {
+        return isInside(posX, posY, areaPos.x, areaPos.y, size.width, size.height);
+    }
+
+    public static boolean isInside(int posX, int posY, int areaX, int areaY, int width, int height) {
+        return  posX >= areaX &&
+                posX < areaX + width &&
+                posY >= areaY &&
+                posY < areaY + height;
+    }
+
+    public boolean isInside(Pos2d pos, Size size) {
+        return isInside(pos.x, pos.y, size.width, size.height);
+    }
+
+    public boolean isInside(Pos2d pos, int width, int height) {
+        return isInside(pos.x, pos.y, width, height);
+    }
+
+    public boolean isInside(int x, int y, Size size) {
+        return isInside(x, y, size.width, size.height);
+    }
+
+    public boolean isInside(int x, int y, int width, int height) {
+        return isInside(this.x, this.y, x, y, width, height);
+    }
+
     public float getX() {
         return x;
     }

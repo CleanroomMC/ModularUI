@@ -457,13 +457,12 @@ public abstract class Widget {
 
     //==== Getter ====
 
-    public String getName() {
-        return name;
+    public boolean isUnderMouse(Pos2d mousePos) {
+        return mousePos.isInside(pos, size);
     }
 
-    @SideOnly(Side.CLIENT)
-    public boolean isUnderMouse() {
-        return isUnderMouse(getContext().getMousePos(), getAbsolutePos(), getSize());
+    public String getName() {
+        return name;
     }
 
     public ModularUIContext getContext() {
@@ -722,6 +721,20 @@ public abstract class Widget {
         return this;
     }
 
+    /**
+     * Consumes the widget. Can be used to apply advanced actions in a builder.
+     *
+     * @param widgetConsumer action to apply
+     */
+    public Widget consume(Consumer<Widget> widgetConsumer) {
+        widgetConsumer.accept(this);
+        return this;
+    }
+
+    /**
+     * Makes JEI always respect this widgets area.
+     * This should be used when the widget is outside its windows area and overlaps with JEI
+     */
     public Widget respectAreaInJei() {
         if (!this.respectJeiArea) {
             this.respectJeiArea = true;
@@ -734,22 +747,6 @@ public abstract class Widget {
 
 
     //==== Utility ====
-
-    public static boolean isUnderMouse(Pos2d mouse, Pos2d areaTopLeft, Size areaSize) {
-        if (mouse == null) {
-            throw new NullPointerException("Mouse pos is null");
-        }
-        if (areaTopLeft == null) {
-            throw new NullPointerException("Widget pos is null");
-        }
-        if (areaSize == null) {
-            throw new NullPointerException("Widget size is null");
-        }
-        return mouse.x >= areaTopLeft.x &&
-                mouse.x < areaTopLeft.x + areaSize.width &&
-                mouse.y >= areaTopLeft.y &&
-                mouse.y < areaTopLeft.y + areaSize.height;
-    }
 
     public interface SizeProvider {
         Size getSize(Size screenSize, ModularWindow window, IWidgetParent parent);
