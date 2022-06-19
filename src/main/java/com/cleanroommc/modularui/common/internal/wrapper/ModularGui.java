@@ -120,6 +120,12 @@ public class ModularGui extends GuiContainer {
         this.drawGuiContainerForegroundLayer(partialTicks, mouseX, mouseY);
         RenderHelper.enableGUIStandardItemLighting();
 
+        getAccessor().setHoveredSlot(null);
+        Widget hovered = getCursor().getHovered();
+        if (hovered instanceof IVanillaSlot) {
+            getAccessor().setHoveredSlot(((IVanillaSlot) hovered).getMcSlot());
+        }
+
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.pushMatrix();
         GlStateManager.translate(i, j, 0);
