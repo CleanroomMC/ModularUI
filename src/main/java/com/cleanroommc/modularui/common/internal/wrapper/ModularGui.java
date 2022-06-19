@@ -391,7 +391,7 @@ public class ModularGui extends GuiContainer {
         for (Interactable interactable : context.getCurrentWindow().getInteractionListeners()) {
             interactable.onClickReleased(mouseButton);
         }
-        if ((lastClicked == null || !lastClicked.onClickReleased(mouseButton)) && !context.getCursor().onMouseRelease()) {
+        if (!context.getCursor().onMouseReleased(mouseButton) && (lastClicked == null || !lastClicked.onClickReleased(mouseButton))) {
             super.mouseReleased(mouseX, mouseY, mouseButton);
         }
     }

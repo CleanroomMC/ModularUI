@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.api.screen;
 
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.widget.*;
+import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +24,8 @@ public class Cursor {
     @Nullable
     private Widget focused;
     private final List<Object> hoveredWidgets = new ArrayList<>();
+    private int lastButton = -1;
+    private long lastClickTime = 0;
 
     private int timeHovered;
 
@@ -167,6 +170,24 @@ public class Cursor {
             this.cursorDraggable.onDragEnd(this.cursorDraggable.canDropHere(hovered, window != null));
             this.cursorDraggable.setMoving(false);
             this.cursorDraggable = null;
+            this.lastButton = -1;
+            this.lastClickTime = 0;
+            return true;
+        }
+        return false;
+    }
+
+    @ApiStatus.Internal
+    public boolean onMouseReleased(int button) {
+        if (button == this.lastButton && getItemStack().isEmpty() && this.cursorDraggable != null) {
+            long time = Minecraft.getSystemTime();
+            if (time - this.lastClickTime < 200) return false;
+            ModularWindow window = findHoveredWindow();
+            this.cursorDraggable.onDragEnd(this.cursorDraggable.canDropHere(hovered, window != null));
+            this.cursorDraggable.setMoving(false);
+            this.cursorDraggable = null;
+            this.lastButton = -1;
+            this.lastClickTime = 0;
             return true;
         }
         return false;
@@ -186,14 +207,11 @@ public class Cursor {
             if (draggable.onDragStart(button)) {
                 draggable.setMoving(true);
                 this.cursorDraggable = draggable;
+                this.lastButton = button;
+                this.lastClickTime = Minecraft.getSystemTime();
                 return true;
             }
         }
-        return false;
-    }
-
-    @ApiStatus.Internal
-    public boolean onMouseRelease() {
         return false;
     }
 
