@@ -51,7 +51,7 @@ public class UIInfos {
         }
         UIBuildContext buildContext = new UIBuildContext(player);
         ModularWindow window = uiCreator.apply(buildContext);
-        GuiScreen screen = new ModularGui(new ModularUIContainer(new ModularUIContext(buildContext), window));
+        GuiScreen screen = new ModularGui(new ModularUIContainer(new ModularUIContext(buildContext, true), window));
         FMLCommonHandler.instance().showGuiScreen(screen);
     }
 }
