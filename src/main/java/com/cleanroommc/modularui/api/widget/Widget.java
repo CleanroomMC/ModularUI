@@ -478,8 +478,8 @@ public abstract class Widget {
     }
 
     @SideOnly(Side.CLIENT)
-    public GuiArea getArea() {
-        return GuiArea.of(size, pos);
+    public Rectangle getArea() {
+        return new Rectangle(pos.x, pos.y, size.width, size.height);
     }
 
     public Pos2d getPos() {
@@ -563,10 +563,10 @@ public abstract class Widget {
     }
 
     public boolean intersects(Widget widget) {
-        return !(widget.getPos().x > getPos().x + getSize().width ||
-                widget.getPos().x + widget.getSize().width < getPos().x ||
-                widget.getPos().y > getPos().y + getSize().height ||
-                widget.getPos().y + widget.getSize().height < getPos().y);
+        return !(widget.getAbsolutePos().x > getAbsolutePos().x + getSize().width ||
+                widget.getAbsolutePos().x + widget.getSize().width < getAbsolutePos().x ||
+                widget.getAbsolutePos().y > getAbsolutePos().y + getSize().height ||
+                widget.getAbsolutePos().y + widget.getSize().height < getAbsolutePos().y);
     }
 
     public Rectangle getRectangle() {

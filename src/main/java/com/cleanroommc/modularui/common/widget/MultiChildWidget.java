@@ -17,28 +17,23 @@ public class MultiChildWidget extends Widget implements IWidgetParent {
     public MultiChildWidget addChild(Widget widget) {
         if (checkChild(this, widget)) {
             children.add(widget);
+            checkNeedsRebuild();
         }
         return this;
     }
 
     public void removeChild(Widget widget) {
-        if (!isInitialised()) {
-            throw new IllegalStateException("Can only remove child after init!");
+        if (checkEditable(this)) {
+            children.remove(widget);
+            checkNeedsRebuild();
         }
-        if (!getContext().isClientOnly()) {
-            throw new IllegalStateException("Can only dynamically remove widgets when the ui is client only!");
-        }
-        children.remove(widget);
     }
 
     public void removeChild(int index) {
-        if (!isInitialised()) {
-            throw new IllegalStateException("Can only remove child after init!");
+        if (checkEditable(this)) {
+            children.remove(index);
+            checkNeedsRebuild();
         }
-        if (!getContext().isClientOnly()) {
-            throw new IllegalStateException("Can only dynamically remove widgets when the ui is client only!");
-        }
-        children.remove(index);
     }
 
     @Override
@@ -72,9 +67,12 @@ public class MultiChildWidget extends Widget implements IWidgetParent {
             ModularUI.LOGGER.error("Can't add self!");
             return false;
         }
+        return checkEditable(parent);
+    }
+
+    public static boolean checkEditable(Widget parent) {
         if (parent.isInitialised() && !parent.getContext().isClientOnly()) {
-            ModularUI.LOGGER.error("Can only dynamically add widgets when the ui is client only!");
-            return false;
+            throw new IllegalStateException("Can only dynamically add/remove widgets when the ui is client only!");
         }
         return true;
     }

@@ -1,9 +1,9 @@
 package com.cleanroommc.modularui.common.widget;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.widget.IWidgetParent;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.api.widget.IWidgetParent;
 import com.cleanroommc.modularui.api.widget.Widget;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,11 +26,9 @@ public class SingleChildWidget extends Widget implements IWidgetParent {
     }
 
     public final SingleChildWidget setChild(Widget widget) {
-        if (isInitialised()) {
-            ModularUI.LOGGER.error("Can't add child after initialised!");
-        } else if (this.child != null) {
+        if (this.child != null) {
             ModularUI.LOGGER.error("Child is already set!");
-        } else {
+        } else if (MultiChildWidget.checkEditable(this)) {
             this.child = widget;
         }
         return this;
