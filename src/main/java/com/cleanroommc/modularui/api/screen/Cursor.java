@@ -215,6 +215,14 @@ public class Cursor {
         return false;
     }
 
+    @ApiStatus.Internal
+    public boolean onMouseDrag(int button, long timSinceLastClick) {
+        if (this.cursorDraggable != null) {
+            this.cursorDraggable.onDrag(button, timSinceLastClick);
+        }
+        return false;
+    }
+
     @Nullable
     public Widget findHoveredWidget() {
         return findHoveredWidget(false);

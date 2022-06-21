@@ -30,6 +30,8 @@ public interface IDraggable {
      */
     void onDragEnd(boolean successful);
 
+    void onDrag(int mouseButton, long timeSinceLastClick);
+
     /**
      * Gets called when the mouse is released
      *

@@ -24,6 +24,10 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.items.ItemStackHandler;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI, ITickable {
 
     private int serverValue = 0;
@@ -51,6 +55,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                     .addTooltip("Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.")
                     .addTooltip("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet");
         });*/
+        List<Integer> nums = IntStream.range(1, 101).boxed().collect(Collectors.toList());
         builder.setBackground(ModularUITextures.VANILLA_BACKGROUND)
                 .bindPlayerInventory(buildContext.getPlayer());
         Column column = new Column();
@@ -220,8 +225,8 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                                 .setDrawable(ModularUITextures.ICON_INFO)
                                 .setSize(14, 14)
                                 .setPos(3, 3))
-                        .widget(ListWidget.builder(100, index -> new TextWidget(String.valueOf(index)))
-                                .setSize(50, 120)
+                        .widget(new SortableListWidget<>(nums)
+                                .setSize(50, 135)
                                 .setPos(5, 20))
                         .setExpandedSize(60, 160)
                         .setBackground(BACKGROUND)

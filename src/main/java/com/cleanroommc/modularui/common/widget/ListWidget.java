@@ -7,10 +7,10 @@ import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.widget.Widget;
 import com.cleanroommc.modularui.api.widget.scroll.IVerticalScrollable;
 import com.cleanroommc.modularui.api.widget.scroll.ScrollType;
+import com.cleanroommc.modularui.common.internal.wrapper.MultiList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
@@ -23,7 +23,7 @@ public class ListWidget extends MultiChildWidget implements Interactable, IVerti
     @Nullable
     private ScrollBar scrollBar;
     private int maxHeight = -1;
-    private List<Widget> allChildren = new ArrayList<>();
+    private final MultiList<Widget> allChildren = new MultiList<>();
 
     public static <T> ListWidget builder(List<T> list, BiFunction<T, Integer, Widget> widgetCreator) {
         ListWidget listWidget = new ListWidget();
@@ -55,31 +55,31 @@ public class ListWidget extends MultiChildWidget implements Interactable, IVerti
     }
 
     @Override
-    public void onInit() {
-        this.allChildren.clear();
-        this.allChildren.addAll(this.children);
+    public void initChildren() {
+        makeChildrenList();
+    }
+
+    protected void makeChildrenList() {
+        this.allChildren.clearLists();
+        this.allChildren.addList(this.children);
         if (this.scrollBar != null) {
-            this.allChildren.add(this.scrollBar);
+            this.allChildren.addElements(this.scrollBar);
         }
     }
 
     @Override
     public void onRebuild() {
-        this.allChildren.clear();
-        this.allChildren.addAll(this.children);
-        if (this.scrollBar != null) {
-            this.allChildren.add(this.scrollBar);
-        }
         this.totalHeight = 0;
         for (Widget child : this.children) {
             this.totalHeight += child.getSize().height;
+            child.setEnabled(intersects(child));
         }
     }
 
     @Override
     public void layoutChildren(int maxWidth, int maxHeight) {
-        int y = this.scrollOffset;
-        for (Widget widget : children) {
+        int y = -this.scrollOffset;
+        for (Widget widget : this.children) {
             widget.setPosSilent(new Pos2d(0, y));
             y += widget.getSize().height;
         }

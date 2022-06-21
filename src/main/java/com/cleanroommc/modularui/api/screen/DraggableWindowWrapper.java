@@ -45,6 +45,10 @@ public class DraggableWindowWrapper implements IDraggable {
     }
 
     @Override
+    public void onDrag(int mouseButton, long timeSinceLastClick) {
+    }
+
+    @Override
     public boolean canDropHere(@Nullable Widget widget, boolean isInBounds) {
         return true;
     }
