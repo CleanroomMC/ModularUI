@@ -11,7 +11,6 @@ public interface IDraggable {
     /**
      * Get's called from the cursor
      * Usually you just call {@link Widget#drawInternal(float)}
-     * No need to translate
      *
      * @param partialTicks difference from last from
      */

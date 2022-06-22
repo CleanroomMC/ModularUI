@@ -1,7 +1,10 @@
 package com.cleanroommc.modularui.api.screen;
 
 import com.cleanroommc.modularui.api.math.Pos2d;
-import com.cleanroommc.modularui.api.widget.*;
+import com.cleanroommc.modularui.api.widget.IDraggable;
+import com.cleanroommc.modularui.api.widget.IVanillaSlot;
+import com.cleanroommc.modularui.api.widget.IWidgetParent;
+import com.cleanroommc.modularui.api.widget.Widget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
@@ -161,6 +164,9 @@ public class Cursor {
             this.cursorDraggable.setMoving(false);
             this.cursorDraggable = null;
         }
+        if (this.cursorDraggable != null) {
+            this.cursorDraggable.onDrag(lastButton, Minecraft.getSystemTime() - lastClickTime);
+        }
     }
 
     @ApiStatus.Internal
@@ -211,14 +217,6 @@ public class Cursor {
                 this.lastClickTime = Minecraft.getSystemTime();
                 return true;
             }
-        }
-        return false;
-    }
-
-    @ApiStatus.Internal
-    public boolean onMouseDrag(int button, long timSinceLastClick) {
-        if (this.cursorDraggable != null) {
-            this.cursorDraggable.onDrag(button, timSinceLastClick);
         }
         return false;
     }
@@ -311,7 +309,7 @@ public class Cursor {
                     boolean above = isAbove(child);
                     if (above) {
                         hoveredWidgets.add(0, child);
-                        if (child instanceof Interactable || child.hasTooltip()) {
+                        if (child.canHover()) {
                             if (hovered == null || (nextWindow || child.getLayer() > hovered.getLayer())) {
                                 hovered = child;
                                 nextWindow = false;

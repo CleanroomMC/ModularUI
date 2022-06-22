@@ -63,6 +63,13 @@ public class SortableListWidget<T> extends ListWidget {
         }
     }
 
+    protected void putAtIndex(int index, int toIndex) {
+        Widget widget = children.remove(index);
+        children.add(toIndex, widget);
+        assignIndexes();
+        checkNeedsRebuild();
+    }
+
     protected void assignIndexes() {
         for (int i = 0; i < children.size(); i++) {
             ((SortableListItem<T>) children.get(i)).setCurrentIndex(i);

@@ -402,9 +402,6 @@ public class ModularGui extends GuiContainer {
         for (Interactable interactable : context.getCurrentWindow().getInteractionListeners()) {
             interactable.onMouseDragged(mouseButton, timeSinceLastClick);
         }
-        if (context.getCursor().onMouseDrag(mouseButton, timeSinceLastClick)) {
-            return;
-        }
         if (lastClicked != null) {
             lastClicked.onMouseDragged(mouseButton, timeSinceLastClick);
         }

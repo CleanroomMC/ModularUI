@@ -198,14 +198,20 @@ public abstract class Widget {
         onRebuild();
     }
 
+    @SideOnly(Side.CLIENT)
+    @ApiStatus.Internal
+    public final void drawInternal(float partialTicks) {
+        drawInternal(partialTicks, false);
+    }
+
     /**
      * Thou shall not call
      */
     @SideOnly(Side.CLIENT)
     @ApiStatus.Internal
-    public final void drawInternal(float partialTicks) {
+    public final void drawInternal(float partialTicks, boolean ignoreEnabled) {
         onFrameUpdate();
-        if (isEnabled()) {
+        if (isEnabled() || ignoreEnabled) {
             GlStateManager.pushMatrix();
             Pos2d windowPos = getWindow().getPos();
             Size windowSize = getWindow().getSize();
@@ -424,7 +430,7 @@ public abstract class Widget {
 
     @SideOnly(Side.CLIENT)
     public boolean canHover() {
-        return hasTooltip() || !(this instanceof IWidgetParent) || (this.background != null && this.background.length > 0);
+        return this instanceof  Interactable || hasTooltip();
     }
 
     /**

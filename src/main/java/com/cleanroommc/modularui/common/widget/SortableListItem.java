@@ -5,10 +5,13 @@ import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.api.screen.Cursor;
 import com.cleanroommc.modularui.api.widget.IDraggable;
 import com.cleanroommc.modularui.api.widget.IWidgetParent;
 import com.cleanroommc.modularui.api.widget.Widget;
+import net.minecraft.client.renderer.GlStateManager;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +28,8 @@ public class SortableListItem<T> extends Widget implements IWidgetParent, IDragg
     private SortableListWidget<T> listWidget;
     private final T value;
     private Function<T, Widget> widgetCreator;
+    private boolean moving;
+    private Pos2d relativeClickPos;
 
     public SortableListItem(T value) {
         this.value = value;
@@ -95,33 +100,61 @@ public class SortableListItem<T> extends Widget implements IWidgetParent, IDragg
     }
 
     @Override
+    public boolean canHover() {
+        return true;
+    }
+
+    @Override
     public void renderMovingState(float partialTicks) {
-        drawInternal(partialTicks);
+        Cursor cursor = getContext().getCursor();
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(-getAbsolutePos().x, -getAbsolutePos().y, 0);
+        GlStateManager.translate(cursor.getX() - relativeClickPos.x, cursor.getY() - relativeClickPos.y, 0);
+        drawInternal(partialTicks, true);
+        GlStateManager.popMatrix();
     }
 
     @Override
     public boolean onDragStart(int button) {
-        return false;
+        setEnabled(false);
+        relativeClickPos = getContext().getMousePos().subtract(getAbsolutePos());
+        return true;
     }
 
     @Override
     public void onDragEnd(boolean successful) {
-
+        setEnabled(true);
+        checkNeedsRebuild();
     }
 
     @Override
-    public void onDrag(int mouseButton, long timeSinceLastClick) {
-
-    }
-
-    @Override
-    public boolean isMoving() {
+    public boolean canDropHere(@Nullable Widget widget, boolean isInBounds) {
+        if (widget != null && widget.getParent() instanceof SortableListItem) {
+            SortableListItem<T> listItem = (SortableListItem<T>) widget.getParent();
+            return value.getClass().isAssignableFrom(listItem.value.getClass()) && currentIndex != listItem.currentIndex;
+        }
         return false;
     }
 
     @Override
-    public void setMoving(boolean moving) {
+    public void onDrag(int mouseButton, long timeSinceLastClick) {
+        Widget widget = getContext().getCursor().getHovered();
+        if (widget instanceof SortableListItem) {
+            SortableListItem<T> listItem = (SortableListItem<T>) widget;
+            if (value.getClass().isAssignableFrom(listItem.value.getClass()) && currentIndex != listItem.currentIndex) {
+                listWidget.putAtIndex(currentIndex, listItem.currentIndex);
+            }
+        }
+    }
 
+    @Override
+    public boolean isMoving() {
+        return moving;
+    }
+
+    @Override
+    public void setMoving(boolean moving) {
+        this.moving = moving;
     }
 
     public T getValue() {
