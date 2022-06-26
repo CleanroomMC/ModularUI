@@ -44,6 +44,7 @@ public class ModularUIContext {
     private final List<Integer> queuedOpenWindow = new ArrayList<>();
     public final boolean clientOnly;
     private boolean isClosing = false;
+    private final List<Runnable> closeListeners;
 
     private Size screenSize = NetworkUtils.isDedicatedClient() ? new Size(Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight) : Size.ZERO;
 
@@ -61,6 +62,7 @@ public class ModularUIContext {
         this.clientOnly = clientOnly;
         this.syncedWindowsCreators = context.syncedWindows.build();
         this.cursor = new Cursor(this);
+        this.closeListeners = context.closeListeners;
     }
 
     public boolean isClient() {
@@ -293,6 +295,14 @@ public class ModularUIContext {
             zones.add(draggableArea);
         }
         return zones;
+    }
+
+    public List<Runnable> getCloseListeners() {
+        return closeListeners;
+    }
+
+    public void addCloseListener(Runnable runnable) {
+        this.closeListeners.add(runnable);
     }
 
     public void syncSlotContent(BaseSlot slot) {

@@ -6,9 +6,7 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.entity.player.EntityPlayer;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class UIBuildContext {
@@ -16,6 +14,7 @@ public class UIBuildContext {
     protected final EntityPlayer player;
     private final Map<String, Widget> jsonWidgets = new HashMap<>();
     protected final ImmutableMap.Builder<Integer, IWindowCreator> syncedWindows = new ImmutableMap.Builder<>();
+    protected final List<Runnable> closeListeners = new ArrayList<>();
 
     public UIBuildContext(EntityPlayer player) {
         this.player = player;
@@ -30,6 +29,10 @@ public class UIBuildContext {
             ModularUI.LOGGER.warn("Widget {} is already registered from json", name);
         }
         jsonWidgets.put(name, widget);
+    }
+
+    public void addCloseListener(Runnable runnable) {
+        closeListeners.add(runnable);
     }
 
     @Nullable

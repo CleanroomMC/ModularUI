@@ -68,7 +68,7 @@ public class MultiList<T> extends AbstractList<T> {
 
         @Override
         public boolean hasNext() {
-            return listCursor != lists.size() || cursor != currentLists.size();
+            return listCursor < lists.size() || cursor < currentLists.size();
         }
 
         @Override

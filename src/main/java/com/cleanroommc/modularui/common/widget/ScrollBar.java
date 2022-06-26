@@ -207,7 +207,9 @@ public class ScrollBar extends Widget implements Interactable {
 
     @Override
     public boolean onMouseScroll(int direction) {
-        setScrollOffset(getScrollOffset() - direction * 6);
+        if (isActive()) {
+            setScrollOffset(getScrollOffset() - direction * 6);
+        }
         return true;
     }
 

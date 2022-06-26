@@ -449,6 +449,11 @@ public class ModularGui extends GuiContainer {
         }
     }
 
+    @Override
+    public void onGuiClosed() {
+        context.getCloseListeners().forEach(Runnable::run);
+    }
+
     public boolean isDragSplitting() {
         return dragSplitting;
     }

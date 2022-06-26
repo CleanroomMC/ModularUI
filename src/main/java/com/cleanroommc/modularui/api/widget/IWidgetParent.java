@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.screen.ModularUIContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -19,6 +20,7 @@ public interface IWidgetParent {
 
     Pos2d getPos();
 
+    @Unmodifiable
     List<Widget> getChildren();
 
     ModularUIContext getContext();

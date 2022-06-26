@@ -12,6 +12,11 @@ public class ModularUITextures {
     public static final AdaptableUITexture ITEM_SLOT = AdaptableUITexture.of(ModularUI.ID, "gui/slot/item", 18, 18, 1);
     public static final AdaptableUITexture FLUID_SLOT = AdaptableUITexture.of(ModularUI.ID, "gui/slot/fluid", 18, 18, 1);
 
+    public static final UITexture ARROW_LEFT = UITexture.fullImage(ModularUI.ID, "gui/icons/arrow_left");
+    public static final UITexture ARROW_RIGHT = UITexture.fullImage(ModularUI.ID, "gui/icons/arrow_right");
+    public static final UITexture ARROW_UP = UITexture.fullImage(ModularUI.ID, "gui/icons/arrow_up");
+    public static final UITexture ARROW_DOWN = UITexture.fullImage(ModularUI.ID, "gui/icons/arrow_down");
+    public static final UITexture CROSS = UITexture.fullImage(ModularUI.ID, "gui/icons/cross");
 
     public static final UITexture VANILLA_TAB_TOP = UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_top");
     public static final UITexture VANILLA_TAB_BOTTOM = UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_bottom");

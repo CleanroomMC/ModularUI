@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.Text;
-import com.cleanroommc.modularui.api.math.GuiArea;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.screen.ModularUIContext;
@@ -52,6 +51,7 @@ public abstract class Widget {
     private int layer = -1;
     private boolean respectJeiArea = false;
     private boolean tooltipDirty = true;
+    private boolean firstRebuild = true;
 
     // visuals
     @Nullable
@@ -151,6 +151,8 @@ public abstract class Widget {
         int cw = constraints.width, ch = constraints.height;
         if (this instanceof IWidgetParent) {
             modifyConstraints(constraints);
+            cw = constraints.width;
+            ch = constraints.height;
             IWidgetParent parentThis = (IWidgetParent) this;
             for (Widget widget : parentThis.getChildren()) {
                 widget.buildTopToBottom(constraints);
@@ -194,7 +196,10 @@ public abstract class Widget {
                 child.buildBottomToTop();
             }
         }
-
+        if (firstRebuild) {
+            onFirstRebuild();
+            firstRebuild = false;
+        }
         onRebuild();
     }
 
@@ -264,6 +269,14 @@ public abstract class Widget {
     @ApiStatus.OverrideOnly
     @SideOnly(Side.CLIENT)
     public void onRebuild() {
+    }
+
+    /**
+     * Called the first time this widget is fully build
+     */
+    @ApiStatus.OverrideOnly
+    @SideOnly(Side.CLIENT)
+    public void onFirstRebuild() {
     }
 
     /**
@@ -430,7 +443,7 @@ public abstract class Widget {
 
     @SideOnly(Side.CLIENT)
     public boolean canHover() {
-        return this instanceof  Interactable || hasTooltip();
+        return this instanceof Interactable || hasTooltip();
     }
 
     /**
