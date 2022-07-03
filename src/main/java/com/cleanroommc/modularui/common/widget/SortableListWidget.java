@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.common.widget;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.widget.Widget;
 
 import java.util.*;
@@ -50,9 +51,14 @@ public class SortableListWidget<T> extends ListWidget {
 
     @Override
     public void onFirstRebuild() {
-        SortableListWidget.this.children.clear();
+        this.children.clear();
         for (T t : startValues) {
-            SortableListWidget.this.children.add(widgetMap.get(t));
+            SortableListItem<T> listItem = widgetMap.get(t);
+            if (listItem == null) {
+                ModularUI.LOGGER.error("Unexpected error: Could not find sortable list item for {}!", t);
+                continue;
+            }
+            this.children.add(listItem);
         }
         assignIndexes();
         layoutChildren(0, 0);
