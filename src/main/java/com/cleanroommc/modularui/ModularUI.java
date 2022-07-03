@@ -29,7 +29,7 @@ public class ModularUI {
 
     public static final String ID = "modularui";
     public static final String NAME = "Modular UI";
-    public static final String VERSION = "1.0.2";
+    public static final String VERSION = "1.0.3";
     public static final Logger LOGGER = LogManager.getLogger(ID);
 
     public static final String INV_TWEAKS = "inventorytweaks";
