@@ -57,12 +57,21 @@ public class Color implements Iterable<Integer> {
 
     /**
      * Creates a color from a hex string
-     * @param hexCode (i.e 0xAARRGGBB)
+     * @param hexCode (i.e 0xRRGGBB)
      */
     public static int rgb(int hexCode){
-        int a = (hexCode & 0xFF000000) >> 24;
-        if (a == 0) a = 255;
+        int r = (hexCode & 0xFF0000) >> 16;
+        int g = (hexCode & 0xFF00) >> 8;
+        int b = (hexCode & 0xFF);
+        return argb(r, g, b, 255);
+    }
 
+    /**
+     * Creates a color from a hex string
+     * @param hexCode (i.e 0xAARRGGBB)
+     */
+    public static int argb(int hexCode){
+        int a = (hexCode & 0xFF000000) >> 24;
         int r = (hexCode & 0xFF0000) >> 16;
         int g = (hexCode & 0xFF00) >> 8;
         int b = (hexCode & 0xFF);
