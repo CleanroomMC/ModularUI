@@ -56,6 +56,20 @@ public class Color implements Iterable<Integer> {
     }
 
     /**
+     * Creates a color from a hex string
+     * @param hexCode (i.e 0xAARRGGBB)
+     */
+    public static int rgb(int hexCode){
+        int a = (hexCode & 0xFF000000) >> 24;
+        if (a == 0) a = 255;
+
+        int r = (hexCode & 0xFF0000) >> 16;
+        int g = (hexCode & 0xFF00) >> 8;
+        int b = (hexCode & 0xFF);
+        return argb(r, g, b, a);
+    }
+
+    /**
      * Converts a HSV color to rgba
      *
      * @param hue        value from 0 to 360
