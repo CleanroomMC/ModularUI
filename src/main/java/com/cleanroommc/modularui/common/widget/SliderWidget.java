@@ -6,6 +6,8 @@ import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -16,7 +18,9 @@ public class SliderWidget extends SyncedWidget implements Interactable {
     private IDrawable slider = ModularUITextures.BASE_BUTTON;
     private Size handleSize = new Size(8, 0);
     private float min = 0, max = 1;
-    private float sliderPos = 0, value = 0;
+    @SideOnly(Side.CLIENT)
+    private float sliderPos = 0;
+    private float value = 0;
     private Supplier<Float> getter;
     private Consumer<Float> setter;
 
@@ -34,14 +38,16 @@ public class SliderWidget extends SyncedWidget implements Interactable {
         return (value - min) / (max - min) * (size.width - handleSize.width);
     }
 
-    public void update(int relativePos, boolean sync) {
+    @SideOnly(Side.CLIENT)
+    public void updateSlider(int relativePos, boolean sync) {
         this.sliderPos = MathHelper.clamp(relativePos - handleSize.width / 2f, 0, size.width - handleSize.width);
-        setValue(toValue(this.sliderPos), sync);
+        setValue(toValue(sliderPos), sync);
     }
 
     @Override
     public void onInit() {
         setValue(getter.get(), false);
+        this.sliderPos = toPos(this.value);
     }
 
     @Override
@@ -56,13 +62,11 @@ public class SliderWidget extends SyncedWidget implements Interactable {
 
     @Override
     public ClickResult onClick(int buttonId, boolean doubleClick) {
-        int clickPos = getContext().getCursor().getX() - getAbsolutePos().x;
-        if (clickPos >= this.sliderPos && clickPos < this.sliderPos + handleSize.width) {
-            this.grabHandle = true;
-            return ClickResult.SUCCESS;
-        }
-        update(clickPos, true);
         this.grabHandle = true;
+        int clickPos = getContext().getCursor().getX() - getAbsolutePos().x;
+        if (!(clickPos >= this.sliderPos && clickPos < this.sliderPos + handleSize.width)) {
+            updateSlider(clickPos, true);
+        }
         return ClickResult.SUCCESS;
     }
 
@@ -79,7 +83,7 @@ public class SliderWidget extends SyncedWidget implements Interactable {
     @Override
     public void onMouseDragged(int buttonId, long deltaTime) {
         if (this.grabHandle) {
-            update(getContext().getCursor().getX() - getAbsolutePos().x, false);
+            updateSlider(getContext().getCursor().getX() - getAbsolutePos().x, false);
         }
     }
 
@@ -121,7 +125,7 @@ public class SliderWidget extends SyncedWidget implements Interactable {
     }
 
     public float getValue() {
-        return toValue(this.sliderPos);
+        return this.value;
     }
 
     public SliderWidget setHandleTexture(IDrawable slider) {
