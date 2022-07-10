@@ -40,14 +40,12 @@ public class SliderWidget extends SyncedWidget implements Interactable {
 
     @SideOnly(Side.CLIENT)
     public void updateSlider(int relativePos, boolean sync) {
-        this.sliderPos = MathHelper.clamp(relativePos - handleSize.width / 2f, 0, size.width - handleSize.width);
-        setValue(toValue(sliderPos), sync);
+        setValue(toValue(MathHelper.clamp(relativePos - handleSize.width / 2f, 0, size.width - handleSize.width)), sync);
     }
 
     @Override
     public void onInit() {
         setValue(getter.get(), false);
-        this.sliderPos = toPos(this.value);
     }
 
     @Override
@@ -101,7 +99,6 @@ public class SliderWidget extends SyncedWidget implements Interactable {
     public void readOnClient(int id, PacketBuffer buf) throws IOException {
         if (id == 1) {
             setValue(buf.readFloat(), false);
-            this.sliderPos = toPos(this.value);
         }
     }
 
@@ -120,6 +117,9 @@ public class SliderWidget extends SyncedWidget implements Interactable {
             } else {
                 syncToClient(1, buffer -> buffer.writeFloat(this.value));
             }
+        }
+        if (isClient()) {
+            this.sliderPos = toPos(this.value);
         }
         this.setter.accept(this.value);
     }
