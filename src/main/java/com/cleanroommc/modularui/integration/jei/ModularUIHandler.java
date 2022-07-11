@@ -8,14 +8,17 @@ import com.cleanroommc.modularui.api.widget.Widget;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
 import mezz.jei.api.gui.IAdvancedGuiHandler;
 import mezz.jei.api.gui.IGhostIngredientHandler;
+import mezz.jei.api.gui.IGuiProperties;
+import mezz.jei.api.gui.IGuiScreenHandler;
+import mezz.jei.gui.overlay.GuiProperties;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ModularUIHandler implements IAdvancedGuiHandler<ModularGui>, IGhostIngredientHandler<ModularGui> {
+public class ModularUIHandler implements IAdvancedGuiHandler<ModularGui>, IGhostIngredientHandler<ModularGui>, IGuiScreenHandler<ModularGui> {
 
     @Override
     public @NotNull Class<ModularGui> getGuiContainerClass() {
@@ -54,6 +57,11 @@ public class ModularUIHandler implements IAdvancedGuiHandler<ModularGui>, IGhost
 
     @Override
     public void onComplete() {
+    }
 
+    @Nullable
+    @Override
+    public IGuiProperties apply(@NotNull ModularGui guiScreen) {
+        return guiScreen.getContext().doShowJei() ? GuiProperties.create(guiScreen) : null;
     }
 }

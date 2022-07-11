@@ -45,6 +45,7 @@ public class ModularUIContext {
     public final boolean clientOnly;
     private boolean isClosing = false;
     private final List<Runnable> closeListeners;
+    private final boolean showJei;
 
     private Size screenSize = NetworkUtils.isDedicatedClient() ? new Size(Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight) : Size.ZERO;
 
@@ -63,6 +64,7 @@ public class ModularUIContext {
         this.syncedWindowsCreators = context.syncedWindows.build();
         this.cursor = new Cursor(this);
         this.closeListeners = context.closeListeners;
+        this.showJei = context.showJei;
     }
 
     public boolean isClient() {
@@ -274,6 +276,10 @@ public class ModularUIContext {
     @SideOnly(Side.CLIENT)
     public Size getScaledScreenSize() {
         return screenSize;
+    }
+
+    public boolean doShowJei() {
+        return showJei;
     }
 
     public void registerExclusionZone(Widget widget) {
