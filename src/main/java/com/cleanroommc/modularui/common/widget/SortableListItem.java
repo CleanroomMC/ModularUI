@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.api.ModularUITextures;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.screen.Cursor;
+import com.cleanroommc.modularui.api.screen.ModularWindow;
 import com.cleanroommc.modularui.api.widget.IDraggable;
 import com.cleanroommc.modularui.api.widget.IWidgetParent;
 import com.cleanroommc.modularui.api.widget.Widget;
@@ -26,6 +27,7 @@ public class SortableListItem<T> extends Widget implements IWidgetParent, IDragg
     private final T value;
     private boolean moving;
     private Pos2d relativeClickPos;
+    private boolean active = true;
 
     public SortableListItem(T value) {
         this.value = value;
@@ -68,9 +70,7 @@ public class SortableListItem<T> extends Widget implements IWidgetParent, IDragg
 
     @Override
     public Widget setEnabled(boolean enabled) {
-        for (Widget widget : allChildren) {
-            widget.setEnabled(enabled);
-        }
+        enabled = this.active;
         return super.setEnabled(enabled);
     }
 
@@ -121,6 +121,7 @@ public class SortableListItem<T> extends Widget implements IWidgetParent, IDragg
 
     @Override
     public boolean onDragStart(int button) {
+        setActive(false);
         setEnabled(false);
         relativeClickPos = getContext().getMousePos().subtract(getAbsolutePos());
         return true;
@@ -128,6 +129,7 @@ public class SortableListItem<T> extends Widget implements IWidgetParent, IDragg
 
     @Override
     public void onDragEnd(boolean successful) {
+        setActive(true);
         setEnabled(true);
         checkNeedsRebuild();
         relativeClickPos = null;
@@ -144,13 +146,24 @@ public class SortableListItem<T> extends Widget implements IWidgetParent, IDragg
 
     @Override
     public void onDrag(int mouseButton, long timeSinceLastClick) {
-        Widget widget = getContext().getCursor().getHovered();
-        if (widget instanceof SortableListItem) {
-            SortableListItem<T> listItem = (SortableListItem<T>) widget;
-            if (value.getClass().isAssignableFrom(listItem.value.getClass()) && currentIndex != listItem.currentIndex) {
-                listWidget.putAtIndex(currentIndex, listItem.currentIndex);
+        SortableListItem<T> listItem = findSortableListItem();
+        if (listItem != null) {
+            listWidget.putAtIndex(currentIndex, listItem.currentIndex);
+        }
+    }
+
+    @Nullable
+    private SortableListItem<T> findSortableListItem() {
+        if (!listWidget.isUnderMouse(getContext().getMousePos())) return null;
+        for (Object hovered : getContext().getCursor().getAllHovered()) {
+            if (hovered instanceof ModularWindow && hovered != getWindow()) return null;
+            if (hovered instanceof SortableListItem) {
+                if (((SortableListItem<?>) hovered).listWidget == listWidget) {
+                    return (SortableListItem<T>) hovered;
+                }
             }
         }
+        return null;
     }
 
     @Override
@@ -170,5 +183,13 @@ public class SortableListItem<T> extends Widget implements IWidgetParent, IDragg
     @Override
     public List<Widget> getChildren() {
         return this.allChildren;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

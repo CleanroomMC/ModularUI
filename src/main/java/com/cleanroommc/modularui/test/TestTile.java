@@ -226,6 +226,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                                 .setSize(14, 14)
                                 .setPos(3, 3))
                         .widget(new SortableListWidget<>(nums)
+                                .setWidgetCreator(integer -> new TextWidget(integer.toString()).setSize(20, 20).addTooltip(integer.toString()))
                                 .setSize(50, 135)
                                 .setPos(5, 20))
                         .setExpandedSize(60, 160)
