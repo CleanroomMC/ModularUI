@@ -234,6 +234,26 @@ public class Color implements Iterable<Integer> {
         return Color.argb(r, g, b, a);
     }
 
+    /**
+     * A helper method to apply a color to rendering.
+     * If the alpha is 0 and any other value is not null, the alpha will be set to max.
+     *
+     * @param color argb color
+     */
+    @SideOnly(Side.CLIENT)
+    public static void setGlColor(int color) {
+        if (color == 0) {
+            GlStateManager.color(0, 0, 0, 0);
+            return;
+        }
+        float a = getAlphaF(color);
+        float r = getRedF(color);
+        float g = getGreenF(color);
+        float b = getBlueF(color);
+        if (a == 0) a = 1f;
+        GlStateManager.color(r, g, b, a);
+    }
+
     @Nullable
     public static Integer ofJson(JsonElement jsonElement) {
         if (jsonElement.isJsonPrimitive()) {
