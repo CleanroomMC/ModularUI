@@ -4,7 +4,10 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.common.internal.JsonHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -100,103 +103,103 @@ public class Color implements Iterable<Integer> {
         return argb(r + m, g + m, b + m, alpha);
     }
 
-    public static int withRed(int color, int red) {
-        color &= ~(0xFF << 16);
-        return color | red << 16;
+    public static int withRed(int argb, int red) {
+        argb &= ~(0xFF << 16);
+        return argb | red << 16;
     }
 
-    public static int withGreen(int color, int green) {
-        color &= ~(0xFF << 8);
-        return color | green << 8;
+    public static int withGreen(int argb, int green) {
+        argb &= ~(0xFF << 8);
+        return argb | green << 8;
     }
 
-    public static int withBlue(int color, int blue) {
-        color &= ~0xFF;
-        return color | blue;
+    public static int withBlue(int argb, int blue) {
+        argb &= ~0xFF;
+        return argb | blue;
     }
 
-    public static int withAlpha(int color, int alpha) {
-        color &= ~(0xFF << 24);
-        return color | alpha << 24;
+    public static int withAlpha(int argb, int alpha) {
+        argb &= ~(0xFF << 24);
+        return argb | alpha << 24;
     }
 
-    public static int withRed(int color, float red) {
-        return withRed(color, (int) (red * 255));
+    public static int withRed(int argb, float red) {
+        return withRed(argb, (int) (red * 255));
     }
 
-    public static int withGreen(int color, float green) {
-        return withGreen(color, (int) (green * 255));
+    public static int withGreen(int argb, float green) {
+        return withGreen(argb, (int) (green * 255));
     }
 
-    public static int withBlue(int color, float blue) {
-        return withBlue(color, (int) (blue * 255));
+    public static int withBlue(int argb, float blue) {
+        return withBlue(argb, (int) (blue * 255));
     }
 
-    public static int withAlpha(int color, float alpha) {
-        return withAlpha(color, (int) (alpha * 255));
-    }
-
-    /**
-     * @return the red value
-     */
-    public static int getRed(int rgba) {
-        return rgba >> 16 & 255;
-    }
-
-    /**
-     * @return the green value
-     */
-    public static int getGreen(int rgba) {
-        return rgba >> 8 & 255;
-    }
-
-    /**
-     * @return the blue value
-     */
-    public static int getBlue(int rgba) {
-        return rgba & 255;
-    }
-
-    /**
-     * @return the alpha value
-     */
-    public static int getAlpha(int rgba) {
-        return rgba >> 24 & 255;
+    public static int withAlpha(int argb, float alpha) {
+        return withAlpha(argb, (int) (alpha * 255));
     }
 
     /**
      * @return the red value
      */
-    public static float getRedF(int rgba) {
-        return getRed(rgba) / 255f;
+    public static int getRed(int argb) {
+        return argb >> 16 & 255;
     }
 
     /**
      * @return the green value
      */
-    public static float getGreenF(int rgba) {
-        return getGreen(rgba) / 255f;
+    public static int getGreen(int argb) {
+        return argb >> 8 & 255;
     }
 
     /**
      * @return the blue value
      */
-    public static float getBlueF(int rgba) {
-        return getBlue(rgba) / 255f;
+    public static int getBlue(int argb) {
+        return argb & 255;
     }
 
     /**
      * @return the alpha value
      */
-    public static float getAlphaF(int rgba) {
-        return getAlpha(rgba) / 255f;
+    public static int getAlpha(int argb) {
+        return argb >> 24 & 255;
+    }
+
+    /**
+     * @return the red value
+     */
+    public static float getRedF(int argb) {
+        return getRed(argb) / 255f;
+    }
+
+    /**
+     * @return the green value
+     */
+    public static float getGreenF(int argb) {
+        return getGreen(argb) / 255f;
+    }
+
+    /**
+     * @return the blue value
+     */
+    public static float getBlueF(int argb) {
+        return getBlue(argb) / 255f;
+    }
+
+    /**
+     * @return the alpha value
+     */
+    public static float getAlphaF(int argb) {
+        return getAlpha(argb) / 255f;
     }
 
     /**
      * @return rgba as an array [red, green, blue, alpha]
      */
-    public static int[] getValues(int rgba) {
-        return new int[]{getRed(rgba), getGreen(rgba), getBlue(rgba), getAlpha(rgba)};
+    public static int[] getValues(int argb) {
+        return new int[]{getRed(argb), getGreen(argb), getBlue(argb), getAlpha(argb)};
     }
 
     public static int rgbaToArgb(int rgba) {
@@ -207,12 +210,8 @@ public class Color implements Iterable<Integer> {
         return Color.rgba(getRed(argb), getGreen(argb), getBlue(argb), getAlpha(argb));
     }
 
-    public static int invert(int rgb) {
-        int alpha = Color.getAlpha(rgb);
-        if (alpha == 0) {
-            alpha = 255;
-        }
-        return Color.argb(255 - getRed(rgb), 255 - getGreen(rgb), 255 - getBlue(rgb), alpha);
+    public static int invert(int argb) {
+        return Color.argb(255 - getRed(argb), 255 - getGreen(argb), 255 - getBlue(argb), getAlpha(argb));
     }
 
     public static int average(int... colors) {
