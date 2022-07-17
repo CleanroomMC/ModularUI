@@ -165,11 +165,15 @@ public class BaseSlot extends SlotItemHandler {
         if (amount < 0) {
             amount = Math.max(0, oldAmount + amount);
         } else {
-            int maxSize = getItemHandler().getSlotLimit(getSlotIndex());
-            if (!isIgnoreStackSizeLimit() && stack.getMaxStackSize() < maxSize) {
-                maxSize = stack.getMaxStackSize();
+            if (Integer.MAX_VALUE - amount < oldAmount) {
+                amount = Integer.MAX_VALUE;
+            } else {
+                int maxSize = getItemHandler().getSlotLimit(getSlotIndex());
+                if (!isIgnoreStackSizeLimit() && stack.getMaxStackSize() < maxSize) {
+                    maxSize = stack.getMaxStackSize();
+                }
+                amount = Math.min(oldAmount + amount, maxSize);
             }
-            amount = Math.min(oldAmount + amount, maxSize);
         }
         if (oldAmount != amount) {
             stack.setCount(amount);

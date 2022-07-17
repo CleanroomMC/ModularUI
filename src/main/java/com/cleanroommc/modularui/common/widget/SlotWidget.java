@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.common.widget;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ModularUITextures;
 import com.cleanroommc.modularui.api.NumberFormat;
+import com.cleanroommc.modularui.api.drawable.Text;
 import com.cleanroommc.modularui.api.drawable.TextRenderer;
 import com.cleanroommc.modularui.api.math.Alignment;
 import com.cleanroommc.modularui.api.math.Color;
@@ -31,6 +32,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -123,11 +126,23 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     }
 
     @Override
-    public List<String> getExtraTooltip() {
-        if (slot.getStack().getCount() >= 10000) {
-            return Collections.singletonList(I18n.format("modularui.amount", slot.getStack().getCount()));
+    public void buildTooltip(List<Text> tooltip) {
+        if (isPhantom()) {
+            tooltip.add(Text.localised("modularui.item.phantom.control"));
         }
-        return Collections.emptyList();
+    }
+
+    @Override
+    public List<String> getExtraTooltip() {
+        List<String> extraLines = new ArrayList<>();
+        if (slot.getStack().getCount() >= 10000) {
+            extraLines.add(I18n.format("modularui.amount", slot.getStack().getCount()));
+        }
+        if (isPhantom()) {
+            String[] lines = I18n.format("modularui.item.phantom.control").split("\\\\n");
+            extraLines.addAll(Arrays.asList(lines));
+        }
+        return extraLines.isEmpty() ? Collections.emptyList() : extraLines;
     }
 
     public boolean isPhantom() {
