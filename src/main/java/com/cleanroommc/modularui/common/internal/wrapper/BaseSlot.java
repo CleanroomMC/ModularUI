@@ -22,6 +22,7 @@ public class BaseSlot extends SlotItemHandler {
     // lower priority means it gets targeted first
     // hotbar 20, player inventory 40, machine input 0
     private int shiftClickPriority = 0;
+    private boolean ignoreStackSizeLimit = false;
     private Runnable changeListener;
     private Predicate<ItemStack> filter;
     private ItemStack cachedItem = null;
@@ -65,6 +66,11 @@ public class BaseSlot extends SlotItemHandler {
         return this;
     }
 
+    public BaseSlot setIgnoreStackSizeLimit(boolean ignoreStackSizeLimit) {
+        this.ignoreStackSizeLimit = ignoreStackSizeLimit;
+        return this;
+    }
+
     @Override
     public boolean isItemValid(@NotNull ItemStack stack) {
         return !this.phantom && isItemValidPhantom(stack);
@@ -90,6 +96,10 @@ public class BaseSlot extends SlotItemHandler {
 
     public boolean isPhantom() {
         return phantom;
+    }
+
+    public boolean isIgnoreStackSizeLimit() {
+        return ignoreStackSizeLimit;
     }
 
     public void setEnabled(boolean enabled) {
@@ -155,7 +165,11 @@ public class BaseSlot extends SlotItemHandler {
         if (amount < 0) {
             amount = Math.max(0, oldAmount + amount);
         } else {
-            amount = Math.min(oldAmount + amount, getItemStackLimit(stack));
+            int maxSize = getItemHandler().getSlotLimit(getSlotIndex());
+            if (!isIgnoreStackSizeLimit() && stack.getMaxStackSize() < maxSize) {
+                maxSize = stack.getMaxStackSize();
+            }
+            amount = Math.min(oldAmount + amount, maxSize);
         }
         if (oldAmount != amount) {
             stack.setCount(amount);

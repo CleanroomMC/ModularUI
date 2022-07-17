@@ -2,18 +2,23 @@ package com.cleanroommc.modularui.common.widget;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ModularUITextures;
+import com.cleanroommc.modularui.api.NumberFormat;
+import com.cleanroommc.modularui.api.drawable.TextRenderer;
+import com.cleanroommc.modularui.api.math.Alignment;
+import com.cleanroommc.modularui.api.math.Color;
 import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.common.internal.Theme;
-import com.cleanroommc.modularui.common.internal.mixin.GuiContainerMixin;
 import com.cleanroommc.modularui.common.internal.wrapper.BaseSlot;
 import com.cleanroommc.modularui.common.internal.wrapper.GhostIngredientWrapper;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
+import com.cleanroommc.modularui.core.mixin.GuiContainerMixin;
 import invtweaks.api.container.ContainerSection;
 import mezz.jei.api.gui.IGhostIngredientHandler;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -26,6 +31,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -33,6 +40,7 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
 
     public static final Size SIZE = new Size(18, 18);
 
+    private final TextRenderer textRenderer = new TextRenderer();
     private final BaseSlot slot;
     private ItemStack lastStoredPhantomItem = ItemStack.EMPTY;
     @Nullable
@@ -114,6 +122,14 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
         }
     }
 
+    @Override
+    public List<String> getExtraTooltip() {
+        if (slot.getStack().getCount() >= 10000) {
+            return Collections.singletonList(I18n.format("modularui.amount", slot.getStack().getCount()));
+        }
+        return Collections.emptyList();
+    }
+
     public boolean isPhantom() {
         return this.slot.isPhantom();
     }
@@ -159,6 +175,11 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
 
     public SlotWidget setAccess(boolean canTake, boolean canInsert) {
         this.slot.setAccess(canInsert, canTake);
+        return this;
+    }
+
+    public SlotWidget setIgnoreStackSizeLimit(boolean ignoreStackSizeLimit) {
+        this.slot.setIgnoreStackSizeLimit(ignoreStackSizeLimit);
         return this;
     }
 
@@ -298,7 +319,8 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
         boolean flag = false;
         boolean flag1 = slotIn == getGuiAccessor().getClickedSlot() && !getGuiAccessor().getDraggedStack().isEmpty() && !getGuiAccessor().getIsRightMouseClick();
         ItemStack itemstack1 = getScreen().mc.player.inventory.getItemStack();
-        String s = null;
+        int amount = -1;
+        String format = null;
 
         if (slotIn == this.getGuiAccessor().getClickedSlot() && !getGuiAccessor().getDraggedStack().isEmpty() && getGuiAccessor().getIsRightMouseClick() && !itemstack.isEmpty()) {
             itemstack = itemstack.copy();
@@ -315,7 +337,8 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
                 int k = Math.min(itemstack.getMaxStackSize(), slotIn.getItemStackLimit(itemstack));
 
                 if (itemstack.getCount() > k) {
-                    s = TextFormatting.YELLOW.toString() + k;
+                    amount = k;
+                    format = TextFormatting.YELLOW.toString();
                     itemstack.setCount(k);
                 }
             } else {
@@ -334,8 +357,44 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
 
             if (!itemstack.isEmpty()) {
                 GlStateManager.enableDepth();
+                // render the item itself
                 getScreen().getItemRenderer().renderItemAndEffectIntoGUI(getScreen().mc.player, itemstack, 1, 1);
-                getScreen().getItemRenderer().renderItemOverlayIntoGUI(getScreen().getFontRenderer(), itemstack, 1, 1, s);
+                if (amount < 0) {
+                    amount = itemstack.getCount();
+                }
+                // render the amount overlay
+                if (amount > 1 || format != null) {
+                    String amountText = NumberFormat.format(amount, 2);
+                    if (format != null) {
+                        amountText = format + amountText;
+                    }
+                    float scale = 1f;
+                    if (amountText.length() == 3) {
+                        scale = 0.8f;
+                    } else if (amountText.length() == 4) {
+                        scale = 0.6f;
+                    } else if (amountText.length() > 4) {
+                        scale = 0.5f;
+                    }
+                    textRenderer.setShadow(true);
+                    textRenderer.setScale(scale);
+                    textRenderer.setColor(Color.WHITE.normal);
+                    textRenderer.setAlignment(Alignment.BottomRight, size.width - 1, size.height - 1);
+                    textRenderer.setPos(1, 1);
+                    GlStateManager.disableLighting();
+                    GlStateManager.disableDepth();
+                    GlStateManager.disableBlend();
+                    textRenderer.draw(amountText);
+                    GlStateManager.enableLighting();
+                    GlStateManager.enableDepth();
+                    GlStateManager.enableBlend();
+                }
+
+                int cachedCount = itemstack.getCount();
+                itemstack.setCount(1); // required to not render the amount overlay
+                // render other overlays like durability bar
+                getScreen().getItemRenderer().renderItemOverlayIntoGUI(getScreen().getFontRenderer(), itemstack, 1, 1, null);
+                itemstack.setCount(cachedCount);
                 GlStateManager.disableDepth();
             }
         }

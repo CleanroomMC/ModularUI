@@ -16,6 +16,7 @@ import com.cleanroommc.modularui.common.widget.*;
 import com.cleanroommc.modularui.common.widget.textfield.TextFieldWidget;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
@@ -33,7 +34,12 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
     private int serverValue = 0;
     private final FluidTank fluidTank1 = new FluidTank(10000);
     private final FluidTank fluidTank2 = new FluidTank(Integer.MAX_VALUE);
-    private final ItemStackHandler phantomInventory = new ItemStackHandler(2);
+    private final ItemStackHandler phantomInventory = new ItemStackHandler(2) {
+        @Override
+        public int getSlotLimit(int slot) {
+            return Integer.MAX_VALUE;
+        }
+    };
     private String textFieldValue = "";
     private final int duration = 60;
     private int progress = 0;
@@ -47,6 +53,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
 
     @Override
     public ModularWindow createWindow(UIBuildContext buildContext) {
+        phantomInventory.setStackInSlot(1, new ItemStack(Items.DIAMOND, Integer.MAX_VALUE));
         Text[] TEXT = {new Text("Blue \u00a7nUnderlined\u00a7rBlue ").color(0x3058B8), new Text("Mint").color(0x469E8F)};
         ModularWindow.Builder builder = ModularWindow.builder(new Size(176, 272));
         //.addFromJson("modularui:test", buildContext);
@@ -91,6 +98,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                                         .setPos(10, 30))
                                 .addChild(SlotWidget.phantom(phantomInventory, 1)
                                         .setShiftClickPrio(1)
+                                        .setIgnoreStackSizeLimit(true)
                                         .setPos(28, 30))
                                 .addChild(changeableWidget
                                         .setPos(12, 55))

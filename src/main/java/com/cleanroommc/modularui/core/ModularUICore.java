@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui;
+package com.cleanroommc.modularui.core;
 
 import net.minecraftforge.common.ForgeVersion;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
@@ -15,7 +15,7 @@ public class ModularUICore implements IFMLLoadingPlugin, IEarlyMixinLoader {
 
     @Override
     public String[] getASMTransformerClass() {
-        return new String[0];
+        return null;
     }
 
     @Override
@@ -35,7 +35,7 @@ public class ModularUICore implements IFMLLoadingPlugin, IEarlyMixinLoader {
 
     @Override
     public String getAccessTransformerClass() {
-        return null;
+        return "com.cleanroommc.modularui.core.ModularUITransformer";
     }
 
     @Override

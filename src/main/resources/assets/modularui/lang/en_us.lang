@@ -2,6 +2,7 @@ modularui.test=Test Text\n2. Line
 modularui.tooltip.shift=§bHold Shift
 modularui.increment.tooltip=§7Click to increase the number by §6%d§7\nHold shift[§6%d§7], ctrl[§6%d§7] or shift+ctrl[§6%d§7]
 modularui.decrement.tooltip=§7Click to decrease the number by §6%d§7\nHold shift[§6%d§7], ctrl[§6%d§7] or shift+ctrl[§6%d§7]
+modularui.amount=§9Amount: %,d
 modularui.fluid.empty=Empty
 modularui.fluid.amount=§9Amount: %,d/%,d L
 modularui.fluid.phantom.amount=§9Amount: %,d L

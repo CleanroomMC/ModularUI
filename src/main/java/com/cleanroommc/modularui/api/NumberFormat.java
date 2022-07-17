@@ -1,42 +1,75 @@
 package com.cleanroommc.modularui.api;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.DecimalFormat;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 
 public class NumberFormat {
 
-    // kilo, Mega, Giga, Tera, Peta, Exa, Zetta, Yotta
-    private static final String ABOVE_1_PREFIX = "kMGTPEZY";
-    // millie, micro, nano, pico, femto, atto, zepto, yocto
-    private static final String BELOW_1_PREFIX = "munpfazy";
+    private static final NavigableMap<Double, String> suffixesByPower = new TreeMap<>();
+    private static final java.text.NumberFormat[] NUMBER_FORMAT = {
+            new DecimalFormat("0."),
+            new DecimalFormat("0.#"),
+            new DecimalFormat("0.##"),
+            new DecimalFormat("0.###"),
+            new DecimalFormat("0.####"),
+            new DecimalFormat("0.#####"),
+            new DecimalFormat("0.######"),
+            new DecimalFormat("0.#######"),
+            new DecimalFormat("0.########"),
+            new DecimalFormat("0.#########"),
+    };
 
-    public static final DecimalFormat FORMAT_0 = new DecimalFormat("0.");
-    public static final DecimalFormat FORMAT_1 = new DecimalFormat("0.#");
-    public static final DecimalFormat FORMAT_2 = new DecimalFormat("0.##");
-    public static final DecimalFormat FORMAT_3 = new DecimalFormat("0.###");
+    static {
+        suffixesByPower.put(0.000_000_000_000_000_001D, "a");
+        suffixesByPower.put(0.000_000_000_000_001D, "f");
+        suffixesByPower.put(0.000_000_000_001D, "p");
+        suffixesByPower.put(0.000_000_001D, "n");
+        suffixesByPower.put(0.000_001D, "u");
+        suffixesByPower.put(0.001D, "m");
+        suffixesByPower.put(1_000D, "k");
+        suffixesByPower.put(1_000_000D, "M");
+        suffixesByPower.put(1_000_000_000D, "G");
+        suffixesByPower.put(1_000_000000_000D, "T");
+        suffixesByPower.put(1_000_000000_000_000D, "P");
+        suffixesByPower.put(1_000_000000_000_000_000D, "E");
+    }
 
-    public static String format(double num, java.text.NumberFormat format) {
-        if (num == 0) {
-            return "0";
+    @NotNull
+    public static String format(double value, int precision) {
+        //Double.MIN_VALUE == -Double.MIN_VALUE so we need an adjustment here
+        if (value == Double.MIN_VALUE) return format(Double.MIN_VALUE + 1, precision);
+        if (value == 0) return "0";
+        if (value < 0) return '-' + format(-value, precision);
+        double divideBy;
+        String suffix;
+        if (value < pow(10, precision)) {
+            divideBy = 1;
+            suffix = "";
+        } else {
+            Map.Entry<Double, String> e = suffixesByPower.floorEntry(value);
+            divideBy = e.getKey();
+            suffix = e.getValue();
         }
-        if ((1 <= num && num < 1000)) {
-            return format.format(num);
+
+        double truncated = value / (divideBy / 10); //the number part of the output times 10
+        boolean hasDecimal = truncated < 100 && (truncated / 10D) != (truncated / 10);
+        return hasDecimal ? NUMBER_FORMAT[precision].format(truncated / 10D) + suffix : NUMBER_FORMAT[precision].format(truncated / 10) + suffix;
+    }
+
+    @NotNull
+    public static String format(double value) {
+        return format(value, 3);
+    }
+
+    private static int pow(int num, int e) {
+        int result = num;
+        for (int i = 0; i < e; i++) {
+            result *= num;
         }
-        int index = 0;
-        if ((num < 1 && num > 0) || (num < 0 && num > -1)) {
-            while ((num > 0 && num <= 0.00095) || (num < 0 && num >= -0.00095)) {
-                num *= 1000;
-                if (++index == 7) {
-                    break;
-                }
-            }
-            return format.format(num * 1000) + BELOW_1_PREFIX.charAt(index);
-        }
-        while (num <= -999_950 || num >= 999_950) {
-            num /= 1000;
-            if (++index == 7) {
-                break;
-            }
-        }
-        return format.format(num / 1000) + ABOVE_1_PREFIX.charAt(index);
+        return result;
     }
 }

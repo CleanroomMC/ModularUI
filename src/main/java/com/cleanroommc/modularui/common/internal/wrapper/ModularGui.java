@@ -14,7 +14,7 @@ import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.IWidgetParent;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.widget.Widget;
-import com.cleanroommc.modularui.common.internal.mixin.GuiContainerMixin;
+import com.cleanroommc.modularui.core.mixin.GuiContainerMixin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -239,7 +239,7 @@ public class ModularGui extends GuiContainer {
         Widget hovered = context.getCursor().getHovered();
         if (hovered != null && !context.getCursor().isHoldingSomething()) {
             if (hovered instanceof IVanillaSlot && ((IVanillaSlot) hovered).getMcSlot().getHasStack()) {
-                renderToolTip(((IVanillaSlot) hovered).getMcSlot().getStack(), mouseX, mouseY);
+                renderToolTip(((IVanillaSlot) hovered).getMcSlot().getStack(), mouseX, mouseY, ((IVanillaSlot) hovered).getExtraTooltip());
             } else if (hovered.getTooltipShowUpDelay() <= context.getCursor().getTimeHovered()) {
                 List<Text> tooltip = hovered.getTooltip();
                 if (!tooltip.isEmpty()) {
@@ -292,6 +292,15 @@ public class ModularGui extends GuiContainer {
             drawHorizontalLine(0, screenSize.width, i, color);
         }
         drawRect(mousePos.x, mousePos.y, mousePos.x + 1, mousePos.y + 1, Color.withAlpha(Color.GREEN.normal, 0.8f));
+    }
+
+    protected void renderToolTip(ItemStack stack, int x, int y, List<String> extraLines) {
+        FontRenderer font = stack.getItem().getFontRenderer(stack);
+        net.minecraftforge.fml.client.config.GuiUtils.preItemToolTip(stack);
+        List<String> lines = getItemToolTip(stack);
+        lines.addAll(extraLines);
+        this.drawHoveringText(lines, x, y, (font == null ? fontRenderer : font));
+        net.minecraftforge.fml.client.config.GuiUtils.postItemToolTip();
     }
 
     protected void drawVanillaElements(int mouseX, int mouseY, float partialTicks) {
