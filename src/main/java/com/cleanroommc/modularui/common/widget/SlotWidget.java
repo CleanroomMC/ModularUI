@@ -15,7 +15,6 @@ import com.cleanroommc.modularui.common.internal.wrapper.BaseSlot;
 import com.cleanroommc.modularui.common.internal.wrapper.GhostIngredientWrapper;
 import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
 import com.cleanroommc.modularui.core.mixin.GuiContainerMixin;
-import invtweaks.api.container.ContainerSection;
 import mezz.jei.api.gui.IGhostIngredientHandler;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
@@ -47,7 +46,7 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     private final BaseSlot slot;
     private ItemStack lastStoredPhantomItem = ItemStack.EMPTY;
     @Nullable
-    private ContainerSection sortingSection = null;
+    private String sortAreaName = null;
 
     public SlotWidget(BaseSlot slot) {
         this.slot = slot;
@@ -64,8 +63,8 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     @Override
     public void onInit() {
         getContext().getContainer().addSlotToContainer(this.slot);
-        if (ModularUI.isInvTweaksLoaded() && this.sortingSection != null) {
-            getContext().getContainer().setSlotSortable(this.slot, this.sortingSection);
+        if (ModularUI.isSortModLoaded() && this.sortAreaName != null) {
+            getContext().getContainer().setSlotSortable(this.sortAreaName, this.slot);
         }
         if (getBackground() == null) {
             setBackground(ModularUITextures.ITEM_SLOT);
@@ -198,10 +197,11 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
         return this;
     }
 
-    public void setSorted(ContainerSection sortingSection) {
-        if (this.sortingSection == null ^ sortingSection == null) {
-            this.sortingSection = sortingSection;
+    public SlotWidget setSortable(String areaName) {
+        if (this.sortAreaName == null ^ areaName == null) {
+            this.sortAreaName = areaName;
         }
+        return this;
     }
 
     @Override

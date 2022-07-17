@@ -32,7 +32,7 @@ public class ModularUI {
     public static final String VERSION = "1.0.4";
     public static final Logger LOGGER = LogManager.getLogger(ID);
 
-    public static final String INV_TWEAKS = "inventorytweaks";
+    public static final String BOGO_SORT = "bogosorter";
 
     @Mod.Instance
     public static ModularUI INSTANCE;
@@ -60,8 +60,8 @@ public class ModularUI {
         proxy.postInit();
     }
 
-    public static boolean isInvTweaksLoaded() {
-        return Loader.isModLoaded(INV_TWEAKS);
+    public static boolean isSortModLoaded() {
+        return Loader.isModLoaded(BOGO_SORT);
     }
 
     public static ModularUIContainer createContainer(EntityPlayer player, Function<UIBuildContext, ModularWindow> windowCreator) {

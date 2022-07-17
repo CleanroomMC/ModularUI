@@ -1,10 +1,12 @@
 package com.cleanroommc.modularui.common.internal.wrapper;
 
+import com.cleanroommc.bogosorter.api.ISortableContainer;
+import com.cleanroommc.bogosorter.api.ISortingContextBuilder;
 import com.cleanroommc.modularui.api.screen.ModularUIContext;
 import com.cleanroommc.modularui.api.screen.ModularWindow;
-import invtweaks.api.container.ChestContainer;
-import invtweaks.api.container.ContainerSection;
-import invtweaks.api.container.ContainerSectionCallback;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
@@ -14,20 +16,19 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
-@ChestContainer
-public class ModularUIContainer extends Container {
+public class ModularUIContainer extends Container implements ISortableContainer {
 
     private final ModularUIContext context;
     private boolean initialisedContainer = false;
     private final List<BaseSlot> sortedShiftClickSlots = new ArrayList<>();
 
-    // invtweaks compat
-    private boolean reservedSortingSlots = false;
-    private boolean verticalInvTweaks = false;
-    private int slotsPerRow = 0;
-    private final Map<ContainerSection, List<Slot>> invTweaksSectionSlots = new HashMap<>();
+    private final Map<String, List<Slot>> sortingAreas = new Object2ObjectOpenHashMap<>();
+    private final Object2IntMap<String> sortRowSizes = new Object2IntOpenHashMap<>();
 
     public ModularUIContainer(ModularUIContext context, ModularWindow mainWindow) {
         this.context = context;
@@ -35,15 +36,6 @@ public class ModularUIContainer extends Container {
         checkSlotIds();
         sortSlots();
         initialisedContainer = true;
-    }
-
-    public void setSorted(int slotsPerRow, boolean verticalButtons) {
-        if (this.reservedSortingSlots) {
-            throw new IllegalStateException("Sorting is already reserved for a different inventory");
-        }
-        this.slotsPerRow = slotsPerRow;
-        this.verticalInvTweaks = verticalButtons;
-        this.reservedSortingSlots = true;
     }
 
     public void sortSlots() {
@@ -89,19 +81,20 @@ public class ModularUIContainer extends Container {
             sortSlots();
         }
         checkSlotIds();
-        for (List<Slot> slots : invTweaksSectionSlots.values()) {
+        for (List<Slot> slots : sortingAreas.values()) {
             slots.removeIf(slot1 -> slot1 == slot);
         }
     }
 
-    public void setSlotSortable(BaseSlot slot, ContainerSection section) {
+    public void setRowSize(String sortArea, int size) {
+        sortRowSizes.put(sortArea, size);
+    }
+
+    public void setSlotSortable(String area, BaseSlot slot) {
         if (slot != inventorySlots.get(slot.slotNumber)) {
             throw new IllegalArgumentException("Slot is not at the expected index!");
         }
-        if (section == ContainerSection.INVENTORY_HOTBAR || section == ContainerSection.INVENTORY_NOT_HOTBAR) {
-            setSlotSortable(slot, ContainerSection.INVENTORY);
-        }
-        this.invTweaksSectionSlots.computeIfAbsent(section, section1 -> new ArrayList<>()).add(slot);
+        this.sortingAreas.computeIfAbsent(area, section1 -> new ArrayList<>()).add(slot);
     }
 
     @Override
@@ -192,28 +185,14 @@ public class ModularUIContainer extends Container {
         return stack;
     }
 
-    // invtweaks compat
+    // InventoryBogoSort compat
 
-    public boolean hasReservedSortingSlots() {
-        return reservedSortingSlots;
-    }
-
-    @ChestContainer.IsLargeCallback
-    public boolean isVerticalInvTweaks() {
-        return verticalInvTweaks;
-    }
-
-    @ChestContainer.RowSizeCallback
-    public int getSlotsPerRow() {
-        return slotsPerRow;
-    }
-
-    @ContainerSectionCallback
-    public Map<ContainerSection, List<Slot>> getSectionSlots() {
-        return this.reservedSortingSlots ? invTweaksSectionSlots : Collections.emptyMap();
-    }
-
-    public static boolean isPlayerInventory(ContainerSection section) {
-        return section == ContainerSection.INVENTORY || section == ContainerSection.INVENTORY_HOTBAR || section == ContainerSection.INVENTORY_NOT_HOTBAR;
+    @Override
+    public void buildSortingContext(ISortingContextBuilder builder) {
+        for (Map.Entry<String, List<Slot>> entry : sortingAreas.entrySet()) {
+            int rowSize = sortRowSizes.get(entry.getKey());
+            if (rowSize < 1) rowSize = 9;
+            builder.addSlotGroup(rowSize, entry.getValue());
+        }
     }
 }

@@ -6,11 +6,11 @@ import com.cleanroommc.modularui.api.math.Pos2d;
 import com.cleanroommc.modularui.api.math.Size;
 import com.cleanroommc.modularui.api.widget.Widget;
 import com.cleanroommc.modularui.common.internal.wrapper.BaseSlot;
-import invtweaks.api.container.ContainerSection;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,9 +31,6 @@ public class SlotGroup extends MultiChildWidget {
             for (int col = 0; col < 9; col++) {
                 SlotWidget slot = new SlotWidget(new BaseSlot(wrapper, col + (row + 1) * 9))
                         .setPos(new Pos2d(col * 18, row * 18));
-                if (ModularUI.isInvTweaksLoaded()) {
-                    slot.setSorted(ContainerSection.INVENTORY_NOT_HOTBAR);
-                }
                 slotGroup.addSlot(slot);
             }
         }
@@ -41,27 +38,24 @@ public class SlotGroup extends MultiChildWidget {
         for (int i = 0; i < 9; i++) {
             SlotWidget slot = new SlotWidget(new BaseSlot(wrapper, i))
                     .setPos(new Pos2d(i * 18, 58));
-            if (ModularUI.isInvTweaksLoaded()) {
-                slot.setSorted(ContainerSection.INVENTORY_HOTBAR);
-            }
             slotGroup.addSlot(slot);
         }
         return slotGroup;
     }
 
-    public static SlotGroup ofItemHandler(IItemHandlerModifiable itemHandler, int slotsWidth, boolean output, boolean sortable) {
-        return ofItemHandler(itemHandler, slotsWidth, 0, 0, itemHandler.getSlots() - 1, sortable, output);
+    public static SlotGroup ofItemHandler(IItemHandlerModifiable itemHandler, int slotsWidth, boolean output, @Nullable String sortArea) {
+        return ofItemHandler(itemHandler, slotsWidth, 0, 0, itemHandler.getSlots() - 1, sortArea, output);
     }
 
-    public static SlotGroup ofItemHandler(IItemHandlerModifiable itemHandler, int slotsWidth, int shiftClickPriority, boolean sortable) {
-        return ofItemHandler(itemHandler, slotsWidth, shiftClickPriority, 0, itemHandler.getSlots() - 1, sortable, false);
+    public static SlotGroup ofItemHandler(IItemHandlerModifiable itemHandler, int slotsWidth, int shiftClickPriority, @Nullable String sortArea) {
+        return ofItemHandler(itemHandler, slotsWidth, shiftClickPriority, 0, itemHandler.getSlots() - 1, sortArea, false);
     }
 
-    public static SlotGroup ofItemHandler(IItemHandlerModifiable itemHandler, int slotsWidth, int shiftClickPriority, int startFromSlot, int endAtSlot, boolean sortable) {
-        return ofItemHandler(itemHandler, slotsWidth, shiftClickPriority, startFromSlot, endAtSlot, sortable, false);
+    public static SlotGroup ofItemHandler(IItemHandlerModifiable itemHandler, int slotsWidth, int shiftClickPriority, int startFromSlot, int endAtSlot, @Nullable String sortArea) {
+        return ofItemHandler(itemHandler, slotsWidth, shiftClickPriority, startFromSlot, endAtSlot, sortArea, false);
     }
 
-    public static SlotGroup ofItemHandler(IItemHandlerModifiable itemHandler, int slotsWidth, int shiftClickPriority, int startFromSlot, int endAtSlot, boolean sortable, boolean output) {
+    public static SlotGroup ofItemHandler(IItemHandlerModifiable itemHandler, int slotsWidth, int shiftClickPriority, int startFromSlot, int endAtSlot, @Nullable String sortArea, boolean output) {
         SlotGroup slotGroup = new SlotGroup();
         if (itemHandler.getSlots() >= endAtSlot) {
             endAtSlot = itemHandler.getSlots() - 1;
@@ -80,24 +74,23 @@ public class SlotGroup extends MultiChildWidget {
                 y++;
             }
         }
-        if (sortable && ModularUI.isInvTweaksLoaded()) {
-            slotGroup.section = ContainerSection.CHEST;
+        if (sortArea != null && ModularUI.isSortModLoaded()) {
+            slotGroup.section = sortArea;
             slotGroup.slotsPerRow = slotsWidth;
         }
         return slotGroup;
     }
 
-    private ContainerSection section = null;
-    private int slotsPerRow = 1;
-    private boolean vertical = false;
+    private String section = null;
+    private int slotsPerRow = 9;
 
     @Override
     public void onInit() {
-        if (ModularUI.isInvTweaksLoaded() && this.section != null) {
-            getContext().getContainer().setSorted(slotsPerRow, vertical);
+        if (ModularUI.isSortModLoaded() && this.section != null) {
+            getContext().getContainer().setRowSize(section, slotsPerRow);
             for (Widget widget : getChildren()) {
                 if (widget instanceof SlotWidget) {
-                    ((SlotWidget) widget).setSorted(this.section);
+                    ((SlotWidget) widget).setSortable(this.section);
                 }
             }
         }
@@ -108,14 +101,13 @@ public class SlotGroup extends MultiChildWidget {
         return this;
     }
 
-    public SlotGroup setInvTweaksCompat(int slotsPerRow) {
-        return setInvTweaksCompat(ContainerSection.CHEST, slotsPerRow, false);
+    public SlotGroup setSortable(String areaName) {
+        return setSortable(areaName, 9);
     }
 
-    public SlotGroup setInvTweaksCompat(ContainerSection section, int slotsPerRow, boolean verticalButtons) {
-        this.section = section;
-        this.slotsPerRow = slotsPerRow;
-        this.vertical = verticalButtons;
+    public SlotGroup setSortable(String areaName, int rowSize) {
+        section = areaName;
+        slotsPerRow = rowSize;
         return this;
     }
 

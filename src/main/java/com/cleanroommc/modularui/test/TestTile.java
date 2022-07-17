@@ -40,6 +40,7 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
             return Integer.MAX_VALUE;
         }
     };
+    private final ItemStackHandler items = new ItemStackHandler(9);
     private String textFieldValue = "";
     private final int duration = 60;
     private int progress = 0;
@@ -102,6 +103,8 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
                                         .setPos(28, 30))
                                 .addChild(changeableWidget
                                         .setPos(12, 55))
+                                .addChild(SlotGroup.ofItemHandler(items, 3, false, "inv")
+                                        .setPos(12, 80))
                                 .setPos(10, 10)
                                 .setDebugLabel("Page1"))
                         .addPage(new MultiChildWidget()
