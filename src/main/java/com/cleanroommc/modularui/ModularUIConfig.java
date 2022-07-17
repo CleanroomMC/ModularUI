@@ -16,6 +16,8 @@ public class ModularUIConfig {
     public static final Animations animations = new Animations();
 
     public static class Animations {
+        @Config.RangeInt(min = 0, max = 3000)
+        public int openCloseDurationMs = 250;
         public boolean openCloseFade = false;
         public boolean openCloseScale = true;
         public boolean openCloseTranslateFromBottom = true;

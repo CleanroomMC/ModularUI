@@ -115,10 +115,11 @@ public class ModularWindow implements IWidgetParent {
     }
 
     public static boolean anyAnimation() {
-        return ModularUIConfig.animations.openCloseFade ||
+        return ModularUIConfig.animations.openCloseDurationMs > 0 &&
+                (ModularUIConfig.animations.openCloseFade ||
                 ModularUIConfig.animations.openCloseTranslateFromBottom ||
                 ModularUIConfig.animations.openCloseScale ||
-                ModularUIConfig.animations.openCloseRotateFast;
+                ModularUIConfig.animations.openCloseRotateFast);
     }
 
     /**
@@ -127,7 +128,7 @@ public class ModularWindow implements IWidgetParent {
     public void onOpen() {
         if (openAnimation == null && anyAnimation()) {
             final int startY = context.getScaledScreenSize().height - pos.y;
-            openAnimation = new Interpolator(0, 1, 250, Eases.EaseQuadOut, value -> {
+            openAnimation = new Interpolator(0, 1, ModularUIConfig.animations.openCloseDurationMs, Eases.EaseQuadOut, value -> {
                 float val = (float) value;
                 if (ModularUIConfig.animations.openCloseFade) {
                     alpha = (int) (val * Color.getAlpha(Theme.INSTANCE.getBackground()));
@@ -148,7 +149,7 @@ public class ModularWindow implements IWidgetParent {
                 scale = 1f;
                 rotation = 360;
             });
-            closeAnimation = openAnimation.getReversed(250, Eases.EaseQuadIn);
+            closeAnimation = openAnimation.getReversed(ModularUIConfig.animations.openCloseDurationMs, Eases.EaseQuadIn);
             openAnimation.forward();
             closeAnimation.setCallback(val -> {
                 closeWindow();
