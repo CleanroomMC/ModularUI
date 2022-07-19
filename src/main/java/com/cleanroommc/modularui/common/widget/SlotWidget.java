@@ -134,7 +134,7 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     @Override
     public List<String> getExtraTooltip() {
         List<String> extraLines = new ArrayList<>();
-        if (slot.getStack().getCount() >= 10000) {
+        if (slot.getStack().getCount() >= 1000) {
             extraLines.add(I18n.format("modularui.amount", slot.getStack().getCount()));
         }
         if (isPhantom()) {

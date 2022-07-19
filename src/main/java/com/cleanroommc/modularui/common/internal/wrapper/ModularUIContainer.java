@@ -14,6 +14,7 @@ import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketSetSlot;
+import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+@Optional.Interface(modid = "bogosorter", iface = "com.cleanroommc.bogosorter.api.ISortableContainer")
 public class ModularUIContainer extends Container implements ISortableContainer {
 
     private final ModularUIContext context;
