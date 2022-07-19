@@ -35,7 +35,7 @@ public class ModularUICore implements IFMLLoadingPlugin, IEarlyMixinLoader {
 
     @Override
     public String getAccessTransformerClass() {
-        return "com.cleanroommc.modularui.core.ModularUITransformer";
+        return null;
     }
 
     @Override
