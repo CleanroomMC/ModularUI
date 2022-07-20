@@ -24,12 +24,12 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.function.Function;
 
-@Mod(modid = ModularUI.ID, name = ModularUI.NAME, version = ModularUI.VERSION)
+@Mod(modid = ModularUI.ID, name = ModularUI.NAME, version = ModularUI.VERSION, dependencies = "required-after:mixinbooter@[5.0,);")
 public class ModularUI {
 
     public static final String ID = "modularui";
     public static final String NAME = "Modular UI";
-    public static final String VERSION = "1.0.4";
+    public static final String VERSION = "1.0.5";
     public static final Logger LOGGER = LogManager.getLogger(ID);
 
     public static final String BOGO_SORT = "bogosorter";
