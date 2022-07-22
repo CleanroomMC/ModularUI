@@ -19,7 +19,7 @@ import java.util.List;
 
 public class Scrollable extends Widget implements IWidgetBuilder<Scrollable>, IWidgetParent, Interactable, IHorizontalScrollable, IVerticalScrollable {
 
-    private int xScroll = -1, yScroll = -1;
+    private int xScroll = 0, yScroll = 0;
     private final List<Widget> children = new ArrayList<>();
     private final List<Widget> allChildren = new ArrayList<>();
     private Size actualSize = Size.ZERO;
