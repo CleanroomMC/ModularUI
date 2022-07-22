@@ -156,12 +156,12 @@ public class Scrollable extends Widget implements IWidgetBuilder<Scrollable>, IW
     public void onMouseDragged(int buttonId, long deltaTime) {
         if (this.grabScrollX >= 0 && this.grabScrollY >= 0) {
             int dif = getContext().getMousePos().x - grabScrollX;
-            if (dif != 0) {
+            if (dif != 0 && canScrollHorizontal()) {
                 horizontalScrollBar.setScrollOffset(xScroll - dif);
                 grabScrollX = getContext().getMousePos().x;
             }
             dif = getContext().getMousePos().y - grabScrollY;
-            if (dif != 0) {
+            if (dif != 0 && canScrollVertical()) {
                 verticalScrollBar.setScrollOffset(yScroll - dif);
                 grabScrollY = getContext().getMousePos().y;
             }
