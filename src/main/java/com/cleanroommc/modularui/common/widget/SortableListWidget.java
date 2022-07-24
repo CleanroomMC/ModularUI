@@ -135,6 +135,7 @@ public class SortableListWidget<T> extends ListWidget {
             throw new NoSuchElementException("This list widget was not initialised with the value " + t);
         }
         SortableListItem<T> listItem = widgetMap.get(t);
+        listItem.setActive(true);
         listItem.setEnabled(true);
         this.children.add(listItem);
         assignIndexes();

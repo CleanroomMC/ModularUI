@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.common.widget;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.widget.IWidgetParent;
 import com.cleanroommc.modularui.api.math.Size;
+import com.cleanroommc.modularui.api.widget.IWidgetParent;
 import com.cleanroommc.modularui.api.widget.Widget;
 import org.jetbrains.annotations.NotNull;
 
@@ -77,12 +77,6 @@ public class PageControlWidget extends Widget implements IWidgetParent {
     private void setPage(int page, boolean active) {
         Widget widget = pages.get(page);
         widget.setEnabled(active);
-        if (widget instanceof IWidgetParent) {
-            IWidgetParent.forEachByLayer((IWidgetParent) widget, widget1 -> {
-                widget1.setEnabled(active);
-                return false;
-            });
-        }
     }
 
     public PageControlWidget addPage(Widget page) {

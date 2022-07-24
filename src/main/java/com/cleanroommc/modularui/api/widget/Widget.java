@@ -542,6 +542,11 @@ public abstract class Widget {
     }
 
     @Nullable
+    public String getDebugLabel() {
+        return debugLabel;
+    }
+
+    @Nullable
     public IDrawable[] getBackground() {
         return background;
     }
