@@ -52,8 +52,21 @@ public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI
     private static final UITexture PROGRESS_BAR = UITexture.fullImage("modularui", "gui/widgets/progress_bar_arrow");
     private static final UITexture PROGRESS_BAR_MIXER = UITexture.fullImage("modularui", "gui/widgets/progress_bar_mixer");
 
+    private final ItemStackHandler chestInventory = new ItemStackHandler(9 * 6);
+
+
     @Override
     public ModularWindow createWindow(UIBuildContext buildContext) {
+        ModularWindow.Builder builder = ModularWindow.builder(new Size(176, 272));
+        builder.setBackground(ModularUITextures.VANILLA_BACKGROUND)
+                .bindPlayerInventory(buildContext.getPlayer());
+        return builder.widget(SlotGroup.ofItemHandler(chestInventory, 9, false, null)
+                .setPos(7, 10))
+                .build();
+    }
+
+    //@Override
+    public ModularWindow createWindow2(UIBuildContext buildContext) {
         phantomInventory.setStackInSlot(1, new ItemStack(Items.DIAMOND, Integer.MAX_VALUE));
         Text[] TEXT = {new Text("Blue \u00a7nUnderlined\u00a7rBlue ").color(0x3058B8), new Text("Mint").color(0x469E8F)};
         ModularWindow.Builder builder = ModularWindow.builder(new Size(176, 272));

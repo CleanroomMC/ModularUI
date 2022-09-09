@@ -61,11 +61,10 @@ public class ModularUIContainer extends Container implements ISortableContainer 
 
     @Override
     public Slot addSlotToContainer(Slot slotIn) {
+        slotIn = super.addSlotToContainer(slotIn);
         if (slotIn instanceof BaseSlot && ((BaseSlot) slotIn).getShiftClickPriority() > Integer.MIN_VALUE) {
             sortedShiftClickSlots.add((BaseSlot) slotIn);
         }
-        slotIn.slotNumber = this.inventorySlots.size();
-        this.inventorySlots.add(slotIn);
 
         if (initialisedContainer) {
             sortSlots();
@@ -101,6 +100,7 @@ public class ModularUIContainer extends Container implements ISortableContainer 
 
     @Override
     public void detectAndSendChanges() {
+        super.detectAndSendChanges();
         for (ModularWindow window : this.context.getOpenWindows()) {
             if (window.isInitialized()) {
                 // do not allow syncing before the client is initialized

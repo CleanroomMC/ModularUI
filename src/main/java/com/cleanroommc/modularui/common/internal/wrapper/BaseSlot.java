@@ -25,8 +25,6 @@ public class BaseSlot extends SlotItemHandler {
     private boolean ignoreStackSizeLimit = false;
     private Runnable changeListener;
     private Predicate<ItemStack> filter;
-    private ItemStack cachedItem = null;
-    private boolean needsSyncing;
 
     public static BaseSlot phantom() {
         return phantom(new ItemStackHandler(), 0);
@@ -120,22 +118,10 @@ public class BaseSlot extends SlotItemHandler {
 
     @Override
     public void onSlotChanged() {
-        if (this.cachedItem != null && ItemStack.areItemStacksEqual(this.cachedItem, getStack())) {
-            return;
-        }
-        this.cachedItem = getStack().copy();
-        this.needsSyncing = true;
+        super.onSlotChanged();
         if (this.changeListener != null) {
             this.changeListener.run();
         }
-    }
-
-    public boolean isNeedsSyncing() {
-        return needsSyncing;
-    }
-
-    public void resetNeedsSyncing() {
-        this.needsSyncing = false;
     }
 
     // handle background by widgets

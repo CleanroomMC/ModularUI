@@ -117,14 +117,6 @@ public class SlotWidget extends Widget implements IVanillaSlot, Interactable, IS
     }
 
     @Override
-    public void detectAndSendChanges(boolean init) {
-        if (init || this.slot.isNeedsSyncing()) {
-            getContext().syncSlotContent(this.slot);
-            this.slot.resetNeedsSyncing();
-        }
-    }
-
-    @Override
     public void buildTooltip(List<Text> tooltip) {
         if (isPhantom()) {
             tooltip.add(Text.localised("modularui.item.phantom.control"));
