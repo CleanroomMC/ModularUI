@@ -41,7 +41,7 @@ public class SortableListItem<T> extends Widget implements IWidgetParent, IDragg
                 .setSize(10, 10);
         this.removeButton = new ButtonWidget()
                 .setOnClick((clickData, widget) -> listWidget.removeElement(this.currentIndex))
-                .setBackground(ModularUITextures.BASE_BUTTON, ModularUITextures.CROSS)
+                .setBackground(ModularUITextures.BASE_BUTTON, ModularUITextures.CROSS.withFixedSize(10, 10, 0, 5))
                 .setSize(10, 20);
     }
 
