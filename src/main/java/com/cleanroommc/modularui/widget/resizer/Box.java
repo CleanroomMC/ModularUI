@@ -1,0 +1,60 @@
+package com.cleanroommc.modularui.widget.resizer;
+
+public class Box {
+
+    public static final Box SHARED = new Box();
+
+    public int left;
+    public int top;
+    public int right;
+    public int bottom;
+
+    public Box all(int all) {
+        return this.all(all, all);
+    }
+
+    public Box all(int horizontal, int vertical) {
+        return this.all(horizontal, vertical, horizontal, vertical);
+    }
+
+    public Box all(int left, int top, int right, int bottom) {
+        this.left = left;
+        this.top = top;
+        this.right = right;
+        this.bottom = bottom;
+
+        return this;
+    }
+
+    public Box left(int left) {
+        this.left = left;
+
+        return this;
+    }
+
+    public Box top(int top) {
+        this.top = top;
+
+        return this;
+    }
+
+    public Box right(int right) {
+        this.right = right;
+
+        return this;
+    }
+
+    public Box bottom(int bottom) {
+        this.bottom = bottom;
+
+        return this;
+    }
+
+    public int vertical() {
+        return this.top + this.bottom;
+    }
+
+    public int horizontal() {
+        return this.left + this.right;
+    }
+}

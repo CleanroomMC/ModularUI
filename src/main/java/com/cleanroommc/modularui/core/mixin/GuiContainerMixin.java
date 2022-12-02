@@ -1,51 +1,24 @@
 package com.cleanroommc.modularui.core.mixin;
 
+import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
-import org.spongepowered.asm.mixin.gen.Invoker;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GuiContainer.class)
-public interface GuiContainerMixin {
+public class GuiContainerMixin {
 
-    @Accessor
-    void setHoveredSlot(Slot slot);
+    @Shadow
+    private Slot hoveredSlot;
 
-    @Accessor
-    Slot getClickedSlot();
-
-    @Accessor
-    ItemStack getDraggedStack();
-
-    @Accessor
-    boolean getIsRightMouseClick();
-
-    @Accessor
-    int getDragSplittingLimit();
-
-    @Invoker
-    void invokeUpdateDragSplitting();
-
-    @Accessor
-    int getDragSplittingRemnant();
-
-    @Accessor
-    ItemStack getReturningStack();
-
-    @Accessor
-    void setReturningStack(ItemStack stack);
-
-    @Accessor
-    Slot getReturningStackDestSlot();
-
-    @Accessor
-    int getTouchUpX();
-
-    @Accessor
-    int getTouchUpY();
-
-    @Accessor
-    long getReturningStackTime();
+    @Inject(method = "getSlotAtPosition", at = @At("HEAD"), cancellable = true)
+    public void getSlot(int x, int y, CallbackInfoReturnable<Slot> cir) {
+        if (((Object) this).getClass() == GuiScreenWrapper.class) {
+            cir.setReturnValue(hoveredSlot);
+        }
+    }
 }
