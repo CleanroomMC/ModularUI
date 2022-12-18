@@ -228,6 +228,10 @@ public class Area extends Rectangle implements IResizeable {
         guiElement.getArea().set(this);
     }
 
+    @Override
+    public void postApply(IGuiElement guiElement) {
+    }
+
     public Area createCopy() {
         return new Area(this);
     }

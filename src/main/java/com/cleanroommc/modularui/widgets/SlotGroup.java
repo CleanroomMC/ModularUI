@@ -8,8 +8,10 @@ public class SlotGroup extends ParentWidget<SlotGroup> {
 
     public static SlotGroup playerInventory() {
         SlotGroup slotGroup = new SlotGroup();
-        slotGroup.flex().startDefaultMode()
-                .width(9 * 18).height(4 * 18 + 5).left(0.5f).bottom(7)
+        slotGroup.flex()
+                .coverChildren()
+                .startDefaultMode()
+                .left(0.5f).bottom(7)
                 .endDefaultMode();
         slotGroup.debugName("player_inventory");
         String key = "player";

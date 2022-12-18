@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.sync.MapKey;
 import com.cleanroommc.modularui.theme.Theme;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import com.cleanroommc.modularui.widget.sizer.IResizeable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
@@ -106,8 +107,18 @@ public abstract class ModularScreen {
 
         this.context.pushViewport(this.viewport);
         for (ModularPanel panel : this.windowManager.getOpenWindows()) {
+            // resize each widget and calculate their relative pos
             panel.resize();
+            // now apply the calculated pos
+            WidgetTree.foreachChildByLayer(panel, child -> {
+                IResizeable resizer = child.resizer();
+                if (resizer != null) {
+                    resizer.applyPos(child);
+                }
+                return true;
+            }, true);
         }
+
         //this.ROOT.resize();
         this.context.popViewport();
 

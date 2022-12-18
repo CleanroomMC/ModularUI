@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.api;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.widget.resizer.Box;
@@ -102,10 +101,13 @@ public interface IWidget extends IGuiElement {
             getChildren().forEach(IWidget::resize);
         }
 
-        /*if (this.resizer != null) {
-            this.resizer.postApply(this.area);
-        }*/
-        ModularUI.LOGGER.info("Resized {}: {}", getClass().getSimpleName(), getArea());
+        if (this instanceof ILayoutWidget) {
+            ((ILayoutWidget) this).layoutWidgets();
+        }
+
+        if (resizer != null) {
+            resizer.postApply(this);
+        }
     }
 
     @Nullable

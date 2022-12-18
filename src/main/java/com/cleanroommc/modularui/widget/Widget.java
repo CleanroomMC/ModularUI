@@ -209,22 +209,6 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
     }
 
     @Override
-    public void resize() {
-        if (this.resizer != null) {
-            this.resizer.apply(this);
-        }
-
-        if (hasChildren()) {
-            getChildren().forEach(IWidget::resize);
-        }
-
-        /*if (this.resizer != null) {
-            this.resizer.postApply(this.area);
-        }*/
-        //ModularUI.LOGGER.info("Resized {}: {}", getClass().getSimpleName(), getArea());
-    }
-
-    @Override
     public Box getMargin() {
         return margin;
     }
@@ -261,6 +245,11 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
 
     public W size(int w, int h) {
         flex().width(w).height(h);
+        return getThis();
+    }
+
+    public W coverChildren() {
+        flex().coverChildren();
         return getThis();
     }
 
