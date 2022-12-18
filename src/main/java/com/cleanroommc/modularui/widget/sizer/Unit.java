@@ -29,6 +29,15 @@ public class Unit {
     public Unit() {
     }
 
+    public void reset() {
+        autoAnchor = true;
+        value = 0f;
+        valueSupplier = null;
+        measure = Measure.PIXEL;
+        anchor = 0f;
+        offset = 0;
+    }
+
     public void setValue(float value) {
         this.value = value;
         this.valueSupplier = null;

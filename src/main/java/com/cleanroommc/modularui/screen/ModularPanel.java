@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import com.cleanroommc.modularui.widgets.SlotGroup;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -304,5 +305,9 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @Override
     public void draw(float partialTicks) {
         getContext().pushViewport(getArea());
+    }
+
+    public ModularPanel bindPlayerInventory() {
+        return child(SlotGroup.playerInventory());
     }
 }

@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.test;
 
+import com.cleanroommc.modularui.api.CrossAxisAlignment;
 import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.api.IKey;
 import com.cleanroommc.modularui.drawable.GuiTextures;
@@ -12,7 +13,7 @@ import com.cleanroommc.modularui.sync.IntSyncHandler;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.FluidSlot;
-import com.cleanroommc.modularui.widgets.SlotGroup;
+import com.cleanroommc.modularui.widgets.layout.Column;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
@@ -41,7 +42,20 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                 .size(176, 166)       // set a static size for the main panel
                 .align(Alignment.Center);    // center the panel in the screen
         panel.background(GuiTextures.BACKGROUND);
-        panel.child(new ButtonWidget<>()
+        panel.bindPlayerInventory()
+                .child(new Column()
+                        .crossAxisAlignment(CrossAxisAlignment.CENTER)
+                        .flex(flex -> flex.top(7).left(7).right(7).bottom(7))
+                        .child(new ButtonWidget<>()
+                                .flex(flex -> flex.size(60, 20)
+                                        .top(7)
+                                        .left(0.5f))
+                                .background(GuiTextures.BUTTON, IKey.dynamic(() -> "Button " + this.val)))
+                        .child(new FluidSlot().flex(flex -> flex
+                                        .top(30)
+                                        .left(0.5f))
+                                .setSynced("fluid_slot")));
+        /*panel.child(new ButtonWidget<>()
                         .flex(flex -> flex.size(60, 20)
                                 .top(7)
                                 .left(0.5f))
@@ -50,7 +64,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                 .child(new FluidSlot().flex(flex -> flex
                                 .top(30)
                                 .left(0.5f))
-                        .setSynced("fluid_slot"));
+                        .setSynced("fluid_slot"));*/
         return panel;
     }
 

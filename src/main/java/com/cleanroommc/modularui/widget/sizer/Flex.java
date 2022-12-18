@@ -16,7 +16,7 @@ public class Flex implements IResizeable {
     private Unit left, right, top, bottom, width, height;
     private final IGuiElement parent;
     private Area relativeTo;
-    private boolean coverChildren = false;
+    private boolean coverChildren = false, defaultCover = false;
     private boolean relativeToParent = true;
     private boolean defaultMode = false;
 
@@ -40,8 +40,17 @@ public class Flex implements IResizeable {
         return coverChildren(true);
     }
 
+    public Flex coverChildrenByDefault() {
+        coverChildren(true);
+        this.defaultCover = true;
+        return this;
+    }
+
     public Flex coverChildren(boolean coverChildren) {
         this.coverChildren = coverChildren;
+        if (this.defaultMode) {
+            this.defaultCover = coverChildren;
+        }
         return this;
     }
 
@@ -276,6 +285,29 @@ public class Flex implements IResizeable {
         return relativeTo != null ? relativeTo : this.parent.getScreen().getViewport();
     }
 
+    public void setRelativePos(int x, int y) {
+        this.relativeX = x;
+        this.relativeY = y;
+    }
+
+    public boolean doCoverChildren() {
+        if (this.coverChildren) {
+            if (this.width != null && this.height != null) {
+                return !this.defaultCover;
+            }
+            return (this.width == null || this.width.type == Unit.DEFAULT) && (this.height == null || this.height.type == Unit.DEFAULT);
+        }
+        return false;
+    }
+
+    public boolean doCoverChildrenHeight() {
+        return doCoverChildren() && this.height == null || this.height.type == Unit.DEFAULT;
+    }
+
+    public boolean doCoverChildrenWidth() {
+        return doCoverChildren() && this.width == null || this.width.type == Unit.DEFAULT;
+    }
+
     @Override
     public void apply(IGuiElement guiElement) {
         Area relativeTo = getRelativeTo();
@@ -284,20 +316,17 @@ public class Flex implements IResizeable {
             GuiErrorHandler.INSTANCE.pushError(this.parent, "Widget can't be relative to a widget at the same level or above");
             return;
         }
-
-        if (this.width != null && this.left != null && this.right != null) {
+        boolean coverChildren = doCoverChildren();
+        if ((this.width != null && this.width.type != Unit.DEFAULT) && this.left != null && this.right != null) {
             throw new IllegalStateException("Widget size/pos in x is over-specified");
         }
         if (this.height != null && this.top != null && this.bottom != null) {
             throw new IllegalStateException("Widget size/pos in y is over-specified");
         }
-        if (this.coverChildren && this.width != null && this.width.type != Unit.DEFAULT && this.height != null && this.height.type != Unit.DEFAULT) {
-            throw new IllegalStateException("Can't cover children when size is already specified");
-        }
 
         int w = -1, h = -1, x, y;
 
-        if (this.coverChildren) {
+        if (coverChildren) {
             if (!(this.parent instanceof IWidget)) {
                 throw new IllegalStateException("Can only cover children if instance of IWidget");
             }
@@ -328,7 +357,7 @@ public class Flex implements IResizeable {
             }
         } else {
             if (this.width == null) {
-                if (this.coverChildren) {
+                if (coverChildren) {
                     w = 0;
                     if (this.left == null) {
                         x = calcX(this.right, -1);
@@ -368,7 +397,7 @@ public class Flex implements IResizeable {
             }
         } else {
             if (this.height == null) {
-                if (this.coverChildren) {
+                if (coverChildren) {
                     w = 0;
                     if (this.top == null) {
                         y = calcY(this.bottom, -1);
@@ -420,7 +449,7 @@ public class Flex implements IResizeable {
 
     @Override
     public void postApply(IGuiElement guiElement) {
-        if (this.coverChildren) {
+        if (doCoverChildren()) {
             List<IWidget> children = ((IWidget) parent).getChildren();
             if (!children.isEmpty()) {
                 // calculate the area the children span
@@ -531,11 +560,17 @@ public class Flex implements IResizeable {
             if (x.type == Unit.UNUSED) u = x;
             else if (x2.type == Unit.UNUSED) u = x2;
             else if (!defaultMode) {
-                if (x.type == Unit.DEFAULT) u = x;
-                else if (x2.type == Unit.DEFAULT) u = x2;
+                if (right.type == Unit.DEFAULT) {
+                    u = right;
+                    right = null;
+                } else if (width.type == Unit.DEFAULT) {
+                    u = width;
+                    width = null;
+                }
             }
             if (u == null) throw new IllegalStateException();
             left = u;
+            left.reset();
         }
         left.type = defaultMode ? Unit.DEFAULT : Unit.LEFT;
         return left;
@@ -547,11 +582,17 @@ public class Flex implements IResizeable {
             if (x.type == Unit.UNUSED) u = x;
             else if (x2.type == Unit.UNUSED) u = x2;
             else if (!defaultMode) {
-                if (x.type == Unit.DEFAULT) u = x;
-                else if (x2.type == Unit.DEFAULT) u = x2;
+                if (left.type == Unit.DEFAULT) {
+                    u = left;
+                    left = null;
+                } else if (width.type == Unit.DEFAULT) {
+                    u = width;
+                    width = null;
+                }
             }
             if (u == null) throw new IllegalStateException();
             right = u;
+            right.reset();
         }
         right.type = defaultMode ? Unit.DEFAULT : Unit.RIGHT;
         return right;
@@ -563,13 +604,19 @@ public class Flex implements IResizeable {
             if (y.type == Unit.UNUSED) u = y;
             else if (y2.type == Unit.UNUSED) u = y2;
             else if (!defaultMode) {
-                if (y.type == Unit.DEFAULT) u = y;
-                else if (y2.type == Unit.DEFAULT) u = y2;
+                if (bottom.type == Unit.DEFAULT) {
+                    u = bottom;
+                    bottom = null;
+                } else if (height.type == Unit.DEFAULT) {
+                    u = height;
+                    height = null;
+                }
             }
             if (u == null) {
                 throw new IllegalStateException();
             }
             top = u;
+            top.reset();
         }
         top.type = defaultMode ? Unit.DEFAULT : Unit.TOP;
         return top;
@@ -581,13 +628,19 @@ public class Flex implements IResizeable {
             if (y.type == Unit.UNUSED) u = y;
             else if (y2.type == Unit.UNUSED) u = y2;
             else if (!defaultMode) {
-                if (y.type == Unit.DEFAULT) u = y;
-                else if (y2.type == Unit.DEFAULT) u = y2;
+                if (top.type == Unit.DEFAULT) {
+                    u = top;
+                    top = null;
+                } else if (height.type == Unit.DEFAULT) {
+                    u = height;
+                    height = null;
+                }
             }
             if (u == null) {
                 throw new IllegalStateException();
             }
             bottom = u;
+            bottom.reset();
         }
         bottom.type = defaultMode ? Unit.DEFAULT : Unit.BOTTOM;
         return bottom;
@@ -599,11 +652,17 @@ public class Flex implements IResizeable {
             if (x.type == Unit.UNUSED) u = x;
             else if (x2.type == Unit.UNUSED) u = x2;
             else if (!defaultMode) {
-                if (x.type == Unit.DEFAULT) u = x;
-                else if (x2.type == Unit.DEFAULT) u = x2;
+                if (right.type == Unit.DEFAULT) {
+                    u = right;
+                    right = null;
+                } else if (left.type == Unit.DEFAULT) {
+                    u = left;
+                    left = null;
+                }
             }
             if (u == null) throw new IllegalStateException();
             width = u;
+            width.reset();
         }
         width.type = defaultMode ? Unit.DEFAULT : Unit.WIDTH;
         return width;
@@ -615,14 +674,19 @@ public class Flex implements IResizeable {
             if (y.type == Unit.UNUSED) u = y;
             else if (y2.type == Unit.UNUSED) u = y2;
             else if (!defaultMode) {
-                if (y.type == Unit.DEFAULT) u = y;
-                else if (y2.type == Unit.DEFAULT) u = y2;
+                if (bottom.type == Unit.DEFAULT) {
+                    u = bottom;
+                    bottom = null;
+                } else if (top.type == Unit.DEFAULT) {
+                    u = top;
+                    top = null;
+                }
             }
             if (u == null) {
                 throw new IllegalStateException();
             }
-            u.type = defaultMode ? Unit.DEFAULT : Unit.HEIGHT;
             height = u;
+            height.reset();
         }
         height.type = defaultMode ? Unit.DEFAULT : Unit.HEIGHT;
         return height;

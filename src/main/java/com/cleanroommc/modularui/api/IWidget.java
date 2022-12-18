@@ -108,6 +108,10 @@ public interface IWidget extends IGuiElement {
         if (resizer != null) {
             resizer.postApply(this);
         }
+
+        if (this instanceof ILayoutWidget) {
+            ((ILayoutWidget) this).postLayoutWidgets();
+        }
     }
 
     @Nullable
