@@ -12,6 +12,8 @@ import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.PacketBuffer;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+
 public class PacketSyncHandler implements IPacket {
 
     private MapKey key;
@@ -41,7 +43,11 @@ public class PacketSyncHandler implements IPacket {
     public @Nullable IPacket executeClient(NetHandlerPlayClient handler) {
         ModularScreen screen = ModularScreen.getCurrent();
         if (screen != null) {
-            screen.getSyncHandler().receiveWidgetUpdate(this.key, this.packet.readVarInt(), this.packet);
+            try {
+                screen.getSyncHandler().receiveWidgetUpdate(this.key, this.packet.readVarInt(), this.packet);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         return null;
     }
@@ -50,7 +56,11 @@ public class PacketSyncHandler implements IPacket {
     public @Nullable IPacket executeServer(NetHandlerPlayServer handler) {
         Container container = handler.player.openContainer;
         if (container instanceof ModularContainer) {
-            ((ModularContainer) container).getSyncHandler().receiveWidgetUpdate(this.key, this.packet.readVarInt(), this.packet);
+            try {
+                ((ModularContainer) container).getSyncHandler().receiveWidgetUpdate(this.key, this.packet.readVarInt(), this.packet);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         return null;
     }

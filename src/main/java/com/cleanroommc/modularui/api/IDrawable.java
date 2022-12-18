@@ -1,13 +1,13 @@
 package com.cleanroommc.modularui.api;
 
-import com.cleanroommc.modularui.utils.Area;
+import com.cleanroommc.modularui.widget.sizer.Area;
 
 public interface IDrawable {
 
     void draw(int x, int y, int width, int height);
 
     default void draw(Area area) {
-        draw(area.x, area.y, area.w, area.h);
+        draw(area.x, area.y, area.width, area.height);
     }
 
     /*default Widget asWidget() {

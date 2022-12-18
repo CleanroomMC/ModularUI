@@ -4,18 +4,21 @@ import com.cleanroommc.modularui.api.SyncHandler;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.widget.Widget;
-import com.cleanroommc.modularui.widgets.ItemSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotDelegate;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.io.IOException;
 import java.util.Map;
 
 public class GuiSyncHandler {
 
+    private static final MapKey CURSOR_KEY = new MapKey("cursor_slot", 255255);
+    private final CursorSlotSyncHandler cursorSlotSyncHandler = new CursorSlotSyncHandler();
     private final EntityPlayer player;
     private final Map<MapKey, SyncHandler> syncedValues = new Object2ObjectOpenHashMap<>();
     private ModularContainer container;
@@ -25,6 +28,7 @@ public class GuiSyncHandler {
 
     public GuiSyncHandler(EntityPlayer player) {
         this.player = player;
+        syncValue(CURSOR_KEY, cursorSlotSyncHandler);
         String key = "player";
         for (int i = 0; i < 9; i++) {
             Slot slot = player.inventoryContainer.getSlot(i + 36);
@@ -47,6 +51,11 @@ public class GuiSyncHandler {
         this.syncedValues.forEach((mapKey, syncHandler) -> syncHandler.init(mapKey, this));
     }
 
+    public void setCursorItem(ItemStack item) {
+        getPlayer().inventory.setItemStack(item);
+        this.cursorSlotSyncHandler.sync();
+    }
+
     public boolean isFrozen() {
         return frozen;
     }
@@ -56,12 +65,14 @@ public class GuiSyncHandler {
     }
 
     public void detectAndSendChanges(boolean init) {
-        for (SyncHandler syncHandler : this.syncedValues.values()) {
-            syncHandler.detectAndSendChanges(init);
+        if (!NetworkUtils.isClient(this.player)) {
+            for (SyncHandler syncHandler : this.syncedValues.values()) {
+                syncHandler.detectAndSendChanges(init);
+            }
         }
     }
 
-    public void receiveWidgetUpdate(MapKey mapKey, int id, PacketBuffer buf) {
+    public void receiveWidgetUpdate(MapKey mapKey, int id, PacketBuffer buf)  throws IOException {
         SyncHandler syncHandler = syncedValues.get(mapKey);
         if (NetworkUtils.isClient(this.player)) {
             syncHandler.readOnClient(id, buf);

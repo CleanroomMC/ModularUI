@@ -11,6 +11,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
+import java.io.IOException;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -41,9 +42,9 @@ public abstract class SyncHandler {
     }
 
     @SideOnly(Side.CLIENT)
-    public abstract void readOnClient(int id, PacketBuffer buf);
+    public abstract void readOnClient(int id, PacketBuffer buf) throws IOException;
 
-    public abstract void readOnServer(int id, PacketBuffer buf);
+    public abstract void readOnServer(int id, PacketBuffer buf) throws IOException;
 
     public void detectAndSendChanges(boolean init) {
     }
@@ -54,6 +55,13 @@ public abstract class SyncHandler {
 
     public final boolean isValid() {
         return key != null;
+    }
+
+    public GuiSyncHandler getSyncHandler() {
+        if (!isValid()) {
+            throw new IllegalStateException("Sync handler is not yet initialised!");
+        }
+        return syncHandler;
     }
 
     public static void sendToClient(PacketBuffer buffer, SyncHandler syncHandler) {

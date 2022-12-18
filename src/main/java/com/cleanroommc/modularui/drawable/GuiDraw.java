@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.api.IWidget;
 import com.cleanroommc.modularui.screen.GuiContext;
+import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import net.minecraft.client.Minecraft;
@@ -10,7 +11,12 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
@@ -608,6 +614,32 @@ public class GuiDraw {
         bufferbuilder.pos(left, top, 0.0D).endVertex();
         tessellator.draw();
         GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
+    }
+
+    public static void drawFluidTexture(FluidStack content, float x0, float y0, float width, float height, float z) {
+        if (content == null) {
+            return;
+        }
+        Fluid fluid = content.getFluid();
+        ResourceLocation fluidStill = fluid.getStill(content);
+        TextureAtlasSprite sprite = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(fluidStill.toString());
+        int fluidColor = fluid.getColor(content);
+        GlStateManager.enableBlend();
+        Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+
+        float u0 = sprite.getMinU(), u1 = sprite.getMaxU(), v0 = sprite.getMinV(), v1 = sprite.getMaxV();
+        float x1 = x0 + width, y1 = y0 + height;
+        float r = Color.getRedF(fluidColor), g = Color.getGreenF(fluidColor), b = Color.getBlueF(fluidColor), a = Color.getAlphaF(fluidColor);
+
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+        buffer.pos(x0, y1, z).tex(u0, v1).color(r, g, b, a).endVertex();
+        buffer.pos(x1, y1, z).tex(u1, v1).color(r, g, b, a).endVertex();
+        buffer.pos(x1, y0, z).tex(u1, v0).color(r, g, b, a).endVertex();
+        buffer.pos(x0, y0, z).tex(u0, v0).color(r, g, b, a).endVertex();
+        tessellator.draw();
         GlStateManager.disableBlend();
     }
 }

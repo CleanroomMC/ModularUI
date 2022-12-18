@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
+// TODO merge into ModularScreen and yeet
 public class GuiContext implements IViewportStack {
 
     public final Minecraft mc;

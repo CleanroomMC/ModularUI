@@ -43,7 +43,7 @@ public class IntSyncHandler extends ValueSyncHandler<Integer> {
     }
 
     @Override
-    public void write(PacketBuffer buffer) {
+    public void updateAndWrite(PacketBuffer buffer) {
         this.cache = getter.getAsInt();
         buffer.writeVarInt(this.cache);
     }

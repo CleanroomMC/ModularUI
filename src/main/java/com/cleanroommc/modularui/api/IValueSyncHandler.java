@@ -10,7 +10,7 @@ public interface IValueSyncHandler<T>  {
 
     boolean needsSync(boolean isFirstSync);
 
-    void write(PacketBuffer buffer);
+    void updateAndWrite(PacketBuffer buffer);
 
     void read(PacketBuffer buffer);
 }
