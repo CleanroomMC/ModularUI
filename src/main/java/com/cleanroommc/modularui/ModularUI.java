@@ -2,6 +2,7 @@ package com.cleanroommc.modularui;
 
 import com.cleanroommc.modularui.manager.GuiManager;
 import com.cleanroommc.modularui.network.NetworkHandler;
+import com.cleanroommc.modularui.test.EventHandler;
 import com.cleanroommc.modularui.test.TestBlock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Timer;
@@ -13,6 +14,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,7 +43,12 @@ public class ModularUI {
 
         //proxy.preInit(event);
         MinecraftForge.EVENT_BUS.register(TestBlock.class);
-        TestBlock.preInit();
+
+        if (FMLLaunchHandler.isDeobfuscatedEnvironment()) {
+            MinecraftForge.EVENT_BUS.register(EventHandler.class);
+            TestBlock.preInit();
+        }
+
         NetworkHandler.init();
         //TODO UIInfos.init();
         //WidgetJsonRegistry.init();
