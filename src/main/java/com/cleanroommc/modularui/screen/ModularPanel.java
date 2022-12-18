@@ -1,9 +1,6 @@
 package com.cleanroommc.modularui.screen;
 
-import com.cleanroommc.modularui.api.IViewport;
-import com.cleanroommc.modularui.api.IViewportStack;
-import com.cleanroommc.modularui.api.IWidget;
-import com.cleanroommc.modularui.api.Interactable;
+import com.cleanroommc.modularui.api.*;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.ParentWidget;
@@ -14,7 +11,9 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 public class ModularPanel extends ParentWidget<ModularPanel> implements IViewport {
 
@@ -33,7 +32,10 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     private ModularScreen screen;
     private final LinkedList<IWidget> hovering = new LinkedList<>();
+    // TODO compare performance with Set<Interactable>
+    private final List<Interactable> acceptedInteractions = new ArrayList<>();
     private int lastMouseX, lastMouseY;
+    private boolean isMouseButtonHeld = false, isKeyHeld = false;
     @Nullable
     private IWidget lastPressed;
     private long timePressed;
@@ -103,8 +105,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                     case IGNORE:
                         break;
                     case ACCEPT: {
+                        if (!this.isKeyHeld && !this.isMouseButtonHeld) {
+                            this.acceptedInteractions.add((Interactable) widget);
+                        }
                         pressed = widget;
-                        result = false;
+                        // result = false;
                         break;
                     }
                     case STOP: {
@@ -113,6 +118,9 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                         break loop;
                     }
                     case SUCCESS: {
+                        if (!this.isKeyHeld && !this.isMouseButtonHeld) {
+                            this.acceptedInteractions.add((Interactable) widget);
+                        }
                         pressed = widget;
                         result = true;
                         break loop;
@@ -120,28 +128,42 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 }
             }
         }
-        this.lastPressed = pressed;
-        if (this.lastPressed != null) {
-            this.timePressed = Minecraft.getSystemTime();
+        if (!this.isKeyHeld && !this.isMouseButtonHeld) {
+            this.lastPressed = pressed;
+            if (this.lastPressed != null) {
+                this.timePressed = Minecraft.getSystemTime();
+            }
+            this.lastMouseButton = mouseButton;
+            this.isMouseButtonHeld = true;
         }
-        this.lastMouseButton = mouseButton;
         return result;
     }
 
     @ApiStatus.OverrideOnly
     public boolean onMouseRelease(int mouseButton) {
         boolean result = false;
+        boolean tryTap = mouseButton == this.lastMouseButton && Minecraft.getSystemTime() - this.timePressed < tapTime;
         for (IWidget widget : this.hovering) {
             if (widget instanceof Interactable) {
-                if (((Interactable) widget).onMouseRelease(mouseButton)) {
+                Interactable interactable = (Interactable) widget;
+                if (interactable.onMouseRelease(mouseButton)) {
                     result = true;
                     break;
                 }
+                if (tryTap && this.acceptedInteractions.remove(interactable)) {
+                    Interactable.Result tabResult = interactable.onMouseTapped(mouseButton);
+                    switch (tabResult) {
+                        case SUCCESS:
+                        case STOP:
+                            tryTap = false;
+                    }
+                }
             }
         }
-        if (this.lastPressed instanceof Interactable && mouseButton == this.lastMouseButton && Minecraft.getSystemTime() - this.timePressed < tapTime) {
-            ((Interactable) this.lastPressed).onMouseTapped(mouseButton);
-        }
+        this.acceptedInteractions.clear();
+        this.lastMouseButton = -1;
+        this.timePressed = 0;
+        this.isMouseButtonHeld = false;
         return result;
     }
 
@@ -156,8 +178,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                     case IGNORE:
                         break;
                     case ACCEPT: {
+                        if (!this.isKeyHeld && !this.isMouseButtonHeld) {
+                            this.acceptedInteractions.add((Interactable) widget);
+                        }
                         pressed = widget;
-                        result = false;
+                        // result = false;
                         break;
                     }
                     case STOP: {
@@ -166,6 +191,9 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                         break loop;
                     }
                     case SUCCESS: {
+                        if (!this.isKeyHeld && !this.isMouseButtonHeld) {
+                            this.acceptedInteractions.add((Interactable) widget);
+                        }
                         pressed = widget;
                         result = true;
                         break loop;
@@ -173,33 +201,51 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 }
             }
         }
-        this.lastPressed = pressed;
-        if (this.lastPressed != null) {
-            this.timePressed = Minecraft.getSystemTime();
+        if (!this.isKeyHeld && !this.isMouseButtonHeld) {
+            this.lastPressed = pressed;
+            if (this.lastPressed != null) {
+                this.timePressed = Minecraft.getSystemTime();
+            }
+            this.lastMouseButton = keyCode;
+            this.isKeyHeld = true;
         }
-        this.lastMouseButton = keyCode;
         return result;
     }
 
     @ApiStatus.OverrideOnly
     public boolean onKeyRelease(char typedChar, int keyCode) {
         boolean result = false;
+        boolean tryTap = keyCode == this.lastMouseButton && Minecraft.getSystemTime() - this.timePressed < tapTime;
         for (IWidget widget : this.hovering) {
             if (widget instanceof Interactable) {
-                if (((Interactable) widget).onKeyRelease(typedChar, keyCode)) {
+                Interactable interactable = (Interactable) widget;
+                if (interactable.onKeyRelease(typedChar, keyCode)) {
                     result = true;
                     break;
                 }
+                if (tryTap && this.acceptedInteractions.remove(interactable)) {
+                    Interactable.Result tabResult = interactable.onKeyTapped(typedChar, keyCode);
+                    switch (tabResult) {
+                        case SUCCESS:
+                        case STOP:
+                            tryTap = false;
+                    }
+                }
             }
         }
-        if (this.lastPressed instanceof Interactable && keyCode == this.lastMouseButton && Minecraft.getSystemTime() - this.timePressed < tapTime) {
-            ((Interactable) this.lastPressed).onKeyTapped(typedChar, keyCode);
-        }
+        this.acceptedInteractions.clear();
+        this.lastMouseButton = -1;
+        this.timePressed = 0;
+        this.isMouseButtonHeld = false;
         return result;
     }
 
     @ApiStatus.OverrideOnly
     public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
+        IFocusedWidget focused = this.getContext().focusedWidget;
+        if (focused instanceof Interactable && ((Interactable) focused).onMouseScroll(scrollDirection, amount)) {
+            return true;
+        }
         for (IWidget widget : this.hovering) {
             if (widget instanceof Interactable && ((Interactable) widget).onMouseScroll(scrollDirection, amount)) {
                 return true;
@@ -209,21 +255,10 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     @ApiStatus.OverrideOnly
-    public boolean onMouseDrag() {
-        for (IWidget widget : this.hovering) {
-            if (widget instanceof Interactable && ((Interactable) widget).onMouseDrag()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @ApiStatus.OverrideOnly
-    public boolean onMouseMove() {
-        for (IWidget widget : this.hovering) {
-            if (widget instanceof Interactable && ((Interactable) widget).onMouseDrag()) {
-                return true;
-            }
+    public boolean onMouseDrag(int mouseButton, long timeSinceClick) {
+        if (this.isMouseButtonHeld && mouseButton == this.lastMouseButton && this.lastPressed instanceof Interactable) {
+            ((Interactable) this.lastPressed).onMouseDrag(mouseButton, timeSinceClick);
+            return true;
         }
         return false;
     }

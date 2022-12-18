@@ -269,19 +269,9 @@ public abstract class ModularScreen {
     }
 
     @ApiStatus.OverrideOnly
-    public boolean onMouseDrag(int clickedMouseButton, long timeSinceLastClick) {
+    public boolean onMouseDrag(int mouseButton, long timeSinceClick) {
         for (ModularPanel panel : this.windowManager.getOpenWindows()) {
-            if (panel.onMouseDrag()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @ApiStatus.OverrideOnly
-    public boolean onMouseMove() {
-        for (ModularPanel panel : this.windowManager.getOpenWindows()) {
-            if (panel.onMouseMove()) {
+            if (panel.onMouseDrag(mouseButton, timeSinceClick)) {
                 return true;
             }
         }

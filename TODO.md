@@ -2,8 +2,9 @@
 
 ## High Priority
 
-- [x]  syncing
-- [x]  vanilla slots compat (properly)
+- [X]  syncing
+- [X]  vanilla slots compat (properly)
+- [x]  proper interaction managing
 - [ ]  Text field
 
 ## Low Priority
@@ -28,5 +29,5 @@
 - [ ]  create JEI UIs (?)
 - [ ]  properly add modularui elements to any gui screen
 - [ ]  a gui to create guis
-- [ ]  sounds ?  
+- [ ]  sounds ?
 - [ ]  change color of themes to IDrawable

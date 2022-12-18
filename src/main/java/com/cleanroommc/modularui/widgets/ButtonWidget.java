@@ -4,11 +4,12 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.widget.Widget;
+import org.jetbrains.annotations.NotNull;
 
 public class ButtonWidget<W extends ButtonWidget<W>> extends Widget<W> implements Interactable {
 
     @Override
-    public Result onMousePressed(int mouseButton) {
+    public @NotNull Result onMousePressed(int mouseButton) {
         ModularUI.LOGGER.info("Mousebutton {} pressed", mouseButton);
         return Result.SUCCESS;
     }
@@ -19,14 +20,16 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends Widget<W> implement
         return Interactable.super.onMouseRelease(mouseButton);
     }
 
+    @NotNull
     @Override
-    public void onMouseTapped(int mouseButton) {
+    public Result onMouseTapped(int mouseButton) {
         ModularUI.LOGGER.info("Mousebutton {} tapped", mouseButton);
         Interactable.playButtonClickSound();
+        return Result.SUCCESS;
     }
 
     @Override
-    public Result onKeyPressed(char typedChar, int keyCode) {
+    public @NotNull Result onKeyPressed(char typedChar, int keyCode) {
         ModularUI.LOGGER.info("Key {} with char {} pressed", keyCode, typedChar);
         return Result.SUCCESS;
     }
@@ -37,9 +40,11 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends Widget<W> implement
         return Interactable.super.onKeyRelease(typedChar, keyCode);
     }
 
+    @NotNull
     @Override
-    public void onKeyTapped(char typedChar, int keyCode) {
+    public Result onKeyTapped(char typedChar, int keyCode) {
         ModularUI.LOGGER.info("Key {} with char {} tapped", keyCode, typedChar);
+        return Result.SUCCESS;
     }
 
     @Override
