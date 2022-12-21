@@ -4,14 +4,15 @@
 
 - [X]  syncing
 - [X]  vanilla slots compat (properly)
-- [x]  proper interaction managing
+- [X]  proper interaction managing
 - [ ]  Text field
+- [ ]  Tooltips
 
 ## Low Priority
 
 - [ ]  Layout Widgets
-- [ ]  Row
-- [ ]  Column
+- [X]  Row
+- [X]  Column
 - [ ]  Grid
 - [ ]  Scrollable
 - [ ]  Text editor

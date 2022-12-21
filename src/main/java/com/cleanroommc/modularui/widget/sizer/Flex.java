@@ -13,10 +13,9 @@ public class Flex implements IResizeable {
     private final Unit y = new Unit();
     private final Unit x2 = new Unit();
     private final Unit y2 = new Unit();
-    private Unit left, right, top, bottom, width, height;
     private final IGuiElement parent;
+    private Unit left, right, top, bottom, width, height;
     private Area relativeTo;
-    private boolean coverChildren = false, defaultCover = false;
     private boolean relativeToParent = true;
     private boolean defaultMode = false;
 
@@ -36,22 +35,18 @@ public class Flex implements IResizeable {
         return this;
     }
 
+    public Flex coverChildrenWidth() {
+        getWidth().setCoverChildren(true);
+        return this;
+    }
+
+    public Flex coverChildrenHeight() {
+        getHeight().setCoverChildren(true);
+        return this;
+    }
+
     public Flex coverChildren() {
-        return coverChildren(true);
-    }
-
-    public Flex coverChildrenByDefault() {
-        coverChildren(true);
-        this.defaultCover = true;
-        return this;
-    }
-
-    public Flex coverChildren(boolean coverChildren) {
-        this.coverChildren = coverChildren;
-        if (this.defaultMode) {
-            this.defaultCover = coverChildren;
-        }
-        return this;
+        return coverChildrenWidth().coverChildrenHeight();
     }
 
     public Flex relative(IGuiElement guiElement) {
@@ -290,22 +285,30 @@ public class Flex implements IResizeable {
         this.relativeY = y;
     }
 
-    public boolean doCoverChildren() {
-        if (this.coverChildren) {
-            if (this.width != null && this.height != null) {
-                return !this.defaultCover;
-            }
-            return (this.width == null || this.width.type == Unit.DEFAULT) && (this.height == null || this.height.type == Unit.DEFAULT);
-        }
-        return false;
-    }
-
     public boolean doCoverChildrenHeight() {
-        return doCoverChildren() && this.height == null || this.height.type == Unit.DEFAULT;
+        return this.height != null && this.height.isCoverChildren();
     }
 
     public boolean doCoverChildrenWidth() {
-        return doCoverChildren() && this.width == null || this.width.type == Unit.DEFAULT;
+        return this.width != null && this.width.isCoverChildren();
+    }
+
+    public boolean dependsOnChildren() {
+        return (this.width != null && this.width.dependsOnChildren()) ||
+                (this.width != null && this.width.dependsOnChildren()) ||
+                (this.left != null && this.left.dependsOnChildren()) ||
+                (this.right != null && this.right.dependsOnChildren()) ||
+                (this.top != null && this.top.dependsOnChildren()) ||
+                (this.bottom != null && this.bottom.dependsOnChildren());
+    }
+
+    public boolean dependsOnParent() {
+        return (this.width != null && this.width.dependsOnParent()) ||
+                (this.width != null && this.width.dependsOnParent()) ||
+                (this.left != null && this.left.dependsOnParent()) ||
+                (this.right != null && this.right.dependsOnParent()) ||
+                (this.top != null && this.top.dependsOnParent()) ||
+                (this.bottom != null && this.bottom.dependsOnParent());
     }
 
     @Override
@@ -316,7 +319,7 @@ public class Flex implements IResizeable {
             GuiErrorHandler.INSTANCE.pushError(this.parent, "Widget can't be relative to a widget at the same level or above");
             return;
         }
-        boolean coverChildren = doCoverChildren();
+        boolean dependsOnChildren = dependsOnChildren();
         if ((this.width != null && this.width.type != Unit.DEFAULT) && this.left != null && this.right != null) {
             throw new IllegalStateException("Widget size/pos in x is over-specified");
         }
@@ -326,10 +329,11 @@ public class Flex implements IResizeable {
 
         int w = -1, h = -1, x, y;
 
-        if (coverChildren) {
+        if (dependsOnChildren) {
             if (!(this.parent instanceof IWidget)) {
                 throw new IllegalStateException("Can only cover children if instance of IWidget");
             }
+
             IWidget widget = (IWidget) this.parent;
 
             List<IWidget> children = widget.getChildren();
@@ -357,7 +361,7 @@ public class Flex implements IResizeable {
             }
         } else {
             if (this.width == null) {
-                if (coverChildren) {
+                if (doCoverChildrenWidth()) {
                     w = 0;
                     if (this.left == null) {
                         x = calcX(this.right, -1);
@@ -397,7 +401,7 @@ public class Flex implements IResizeable {
             }
         } else {
             if (this.height == null) {
-                if (coverChildren) {
+                if (doCoverChildrenHeight()) {
                     w = 0;
                     if (this.top == null) {
                         y = calcY(this.bottom, -1);
@@ -449,7 +453,7 @@ public class Flex implements IResizeable {
 
     @Override
     public void postApply(IGuiElement guiElement) {
-        if (doCoverChildren()) {
+        if (doCoverChildrenWidth() || doCoverChildrenHeight()) {
             List<IWidget> children = ((IWidget) parent).getChildren();
             if (!children.isEmpty()) {
                 // calculate the area the children span
@@ -462,7 +466,7 @@ public class Flex implements IResizeable {
                 }
 
                 Area relativeTo = getRelativeTo();
-                if (this.width == null || this.width.type == Unit.DEFAULT) {
+                if (doCoverChildrenWidth()) {
                     // calculate width and recalculate x based on the new width
                     int w = x1 - x0, x = 0;
                     parent.getArea().width = w;
@@ -474,7 +478,7 @@ public class Flex implements IResizeable {
                     }
                     this.relativeX = x;
                 }
-                if (this.height == null || this.height.type == Unit.DEFAULT) {
+                if (doCoverChildrenHeight()) {
                     // calculate height and recalculate y based on the new height
                     int h = y1 - y0, y = 0;
                     parent.getArea().height = h;
