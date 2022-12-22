@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.widget.resizer;
+package com.cleanroommc.modularui.widget.sizer;
 
 public class Box {
 
@@ -17,7 +17,7 @@ public class Box {
         return this.all(horizontal, vertical, horizontal, vertical);
     }
 
-    public Box all(int left, int top, int right, int bottom) {
+    public Box all(int left, int right, int top, int bottom) {
         this.left = left;
         this.top = top;
         this.right = right;
@@ -48,6 +48,10 @@ public class Box {
         this.bottom = bottom;
 
         return this;
+    }
+
+    public Box set(Box box) {
+        return all(box.left, box.right, box.top, box.bottom);
     }
 
     public int vertical() {

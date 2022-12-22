@@ -44,17 +44,18 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
         panel.background(GuiTextures.BACKGROUND);
         panel.bindPlayerInventory()
                 .child(new Column()
+                        .coverChildren()
+                        .padding(7)
                         .crossAxisAlignment(CrossAxisAlignment.CENTER)
-                        .flex(flex -> flex.top(7).left(7).right(7).bottom(7))
                         .child(new ButtonWidget<>()
-                                .flex(flex -> flex.size(60, 20)
-                                        .top(7)
-                                        .left(0.5f))
+                                .size(60, 18)
                                 .background(GuiTextures.BUTTON, IKey.dynamic(() -> "Button " + this.val)))
-                        .child(new FluidSlot().flex(flex -> flex
-                                        .top(30)
-                                        .left(0.5f))
-                                .setSynced("fluid_slot")));
+                        .child(new FluidSlot()
+                                .margin(4)
+                                .setSynced("fluid_slot"))
+                        .child(new ButtonWidget<>()
+                                .size(60, 18)
+                                .background(GuiTextures.BUTTON, IKey.str("Button 2"))));
         /*panel.child(new ButtonWidget<>()
                         .flex(flex -> flex.size(60, 20)
                                 .top(7)

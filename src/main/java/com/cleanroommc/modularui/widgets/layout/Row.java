@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.ILayoutWidget;
 import com.cleanroommc.modularui.api.IWidget;
 import com.cleanroommc.modularui.api.MainAxisAlignment;
 import com.cleanroommc.modularui.widget.ParentWidget;
+import com.cleanroommc.modularui.widget.sizer.Box;
 
 public class Row extends ParentWidget<Row> implements ILayoutWidget {
 
@@ -21,13 +22,14 @@ public class Row extends ParentWidget<Row> implements ILayoutWidget {
     public void layoutWidgets() {
         int width = getArea().width;
         int height = getArea().height;
+        Box padding = getArea().getPadding();
 
         int maxHeight = 0;
         int totalWidth = 0;
 
         for (IWidget widget : getChildren()) {
-            totalWidth += widget.getArea().width;
-            maxHeight = Math.max(maxHeight, widget.getArea().height);
+            totalWidth += widget.getArea().requestedWidth();
+            maxHeight = Math.max(maxHeight, widget.getArea().requestedHeight());
         }
 
         int lastX = 0;
@@ -36,16 +38,18 @@ public class Row extends ParentWidget<Row> implements ILayoutWidget {
         } else if (maa == MainAxisAlignment.END) {
             lastX = width - totalWidth;
         }
+        lastX = Math.max(lastX, padding.left);
 
         for (IWidget widget : getChildren()) {
             int y = 0;
             if (caa == CrossAxisAlignment.CENTER) {
-                y = (int) (height / 2f - widget.getArea().height / 2f);
+                y = (int) (height / 2f - widget.getArea().requestedHeight() / 2f);
             } else if (caa == CrossAxisAlignment.END) {
-                y = height - widget.getArea().height;
+                y = height - widget.getArea().requestedHeight();
             }
-            widget.flex().setRelativePos(lastX, y);
-            lastX += widget.getArea().width;
+            y = Math.max(y, padding.top);
+            widget.flex().setRelativePos(lastX + widget.getArea().getMargin().left, y);
+            lastX += widget.getArea().requestedWidth();
             if (maa == MainAxisAlignment.SPACE_BETWEEN) {
                 lastX += (width - totalWidth) / (getChildren().size() - 1);
             }

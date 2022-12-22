@@ -433,6 +433,27 @@ public class Flex implements IResizeable {
             }
         }
 
+        // apply padding and margin
+        Box.SHARED.all(0);
+        Box padding = relativeTo.getPadding();
+        Box margin = this.parent.getParentArea().getMargin();
+        int parentWidth = relativeTo.width;
+        int parentHeight = relativeTo.height;
+
+        if (parentWidth < 1 || doCoverChildrenWidth() || (this.width != null && !this.width.isRelative())) {
+            this.relativeX = x;
+        } else {
+            this.relativeX = Math.max(x, padding.left + margin.left);
+            w = Math.min(w, parentWidth - padding.horizontal() - margin.horizontal());
+        }
+
+        if (parentHeight < 1 || doCoverChildrenHeight() || (this.height != null && !this.height.isRelative())) {
+            this.relativeY = y;
+        } else {
+            this.relativeY = Math.max(y, padding.top + margin.top);
+            w = Math.min(w, parentHeight - padding.vertical() - margin.vertical());
+        }
+
         /*TODO not that simple
         Box.SHARED.all(0);
         Box padding = this.parent.getPadding();
@@ -441,9 +462,6 @@ public class Flex implements IResizeable {
         w -= padding.horizontal() + margin.horizontal();
         y += padding.top + margin.top;
         h -= padding.vertical() + margin.vertical();*/
-
-        this.relativeX = x;
-        this.relativeY = y;
 
         x += relativeTo.x;
         y += relativeTo.y;
@@ -456,13 +474,15 @@ public class Flex implements IResizeable {
         if (doCoverChildrenWidth() || doCoverChildrenHeight()) {
             List<IWidget> children = ((IWidget) parent).getChildren();
             if (!children.isEmpty()) {
+                Box padding = this.parent.getArea().getPadding();
                 // calculate the area the children span
                 int x0 = Integer.MAX_VALUE, x1 = Integer.MIN_VALUE, y0 = Integer.MAX_VALUE, y1 = Integer.MIN_VALUE;
                 for (IWidget child : children) {
-                    x0 = Math.min(x0, child.getArea().x);
-                    x1 = Math.max(x1, child.getArea().ex());
-                    y0 = Math.min(y0, child.getArea().y);
-                    y1 = Math.max(y1, child.getArea().ey());
+                    Box margin = child.getArea().getMargin();
+                    x0 = Math.min(x0, child.getArea().x - padding.left - margin.left);
+                    x1 = Math.max(x1, child.getArea().ex() + padding.right + margin.right);
+                    y0 = Math.min(y0, child.getArea().y) - padding.top - margin.top;
+                    y1 = Math.max(y1, child.getArea().ey() + padding.bottom + margin.bottom);
                 }
 
                 Area relativeTo = getRelativeTo();

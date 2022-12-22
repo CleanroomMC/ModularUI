@@ -11,6 +11,8 @@ public class Area extends Rectangle implements IResizeable {
     public static final Area SHARED = new Area();
 
     private int z;
+    private final Box margin = new Box();
+    private final Box padding = new Box();
 
     public Area() {
     }
@@ -85,6 +87,14 @@ public class Area extends Rectangle implements IResizeable {
 
     public void z(int z) {
         this.z = z;
+    }
+
+    public int requestedWidth() {
+        return width + this.margin.horizontal();
+    }
+
+    public int requestedHeight() {
+        return height + this.margin.vertical();
     }
 
     /**
@@ -221,6 +231,14 @@ public class Area extends Rectangle implements IResizeable {
 
     public void set(Rectangle area) {
         setBounds(area.x, area.y, area.width, area.height);
+    }
+
+    public Box getMargin() {
+        return margin;
+    }
+
+    public Box getPadding() {
+        return padding;
     }
 
     @Override

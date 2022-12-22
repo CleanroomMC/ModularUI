@@ -1,10 +1,13 @@
 package com.cleanroommc.modularui.theme;
 
+import com.cleanroommc.modularui.config.Config;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.util.Map;
 
 public class Theme {
+
+    public static final Config CONFIG;
 
     private static final Map<String, Theme> THEMES = new Object2ObjectOpenHashMap<>();
 
@@ -39,4 +42,10 @@ public class Theme {
             Color.setGlColor(Color.WHITE.normal);
         }
     }*/
+
+    static {
+        Config.Builder builder = Config.builder("themes");
+
+        CONFIG = builder.build();
+    }
 }

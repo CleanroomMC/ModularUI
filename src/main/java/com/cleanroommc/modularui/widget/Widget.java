@@ -8,7 +8,6 @@ import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
 import com.cleanroommc.modularui.sync.MapKey;
-import com.cleanroommc.modularui.widget.resizer.Box;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Flex;
 import com.cleanroommc.modularui.widget.sizer.IResizeable;
@@ -32,8 +31,6 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
 
     private Flex flex;
     private IResizeable resizer;
-    private Box margin = new Box();
-    private Box padding = new Box();
     private String debugName;
 
     @Nullable
@@ -43,10 +40,6 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
 
     @NotNull
     private IDrawable[] background = EMPTY_BACKGROUND;
-
-    protected final void setContext(GuiContext context) {
-        this.context = context;
-    }
 
     @ApiStatus.Internal
     @Override
@@ -176,6 +169,10 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
         return context;
     }
 
+    protected final void setContext(GuiContext context) {
+        this.context = context;
+    }
+
     public IDrawable[] getBackground() {
         return background;
     }
@@ -206,16 +203,6 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
     @Override
     public void resizer(IResizeable resizer) {
         this.resizer = resizer;
-    }
-
-    @Override
-    public Box getMargin() {
-        return margin;
-    }
-
-    @Override
-    public Box getPadding() {
-        return padding;
     }
 
     public SyncHandler getSyncHandler() {
@@ -253,8 +240,88 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
         return getThis();
     }
 
+    public W coverChildrenWidth() {
+        flex().coverChildrenWidth();
+        return getThis();
+    }
+
+    public W coverChildrenHeight() {
+        flex().coverChildrenHeight();
+        return getThis();
+    }
+
     public W flex(Consumer<Flex> flexConsumer) {
         flexConsumer.accept(flex());
+        return getThis();
+    }
+
+    public W padding(int left, int right, int top, int bottom) {
+        getArea().getPadding().all(left, right, top, bottom);
+        return getThis();
+    }
+
+    public W padding(int horizontal, int vertical) {
+        getArea().getPadding().all(horizontal, vertical);
+        return getThis();
+    }
+
+    public W padding(int all) {
+        getArea().getPadding().all(all);
+        return getThis();
+    }
+
+    public W paddingLeft(int val) {
+        getArea().getPadding().left(val);
+        return getThis();
+    }
+
+    public W paddingRight(int val) {
+        getArea().getPadding().right(val);
+        return getThis();
+    }
+
+    public W paddingTop(int val) {
+        getArea().getPadding().top(val);
+        return getThis();
+    }
+
+    public W paddingBottom(int val) {
+        getArea().getPadding().bottom(val);
+        return getThis();
+    }
+
+    public W margin(int left, int right, int top, int bottom) {
+        getArea().getMargin().all(left, right, top, bottom);
+        return getThis();
+    }
+
+    public W margin(int horizontal, int vertical) {
+        getArea().getMargin().all(horizontal, vertical);
+        return getThis();
+    }
+
+    public W margin(int all) {
+        getArea().getMargin().all(all);
+        return getThis();
+    }
+
+    public W marginLeft(int val) {
+        getArea().getMargin().left(val);
+        return getThis();
+    }
+
+    public W marginRight(int val) {
+        getArea().getMargin().right(val);
+        return getThis();
+    }
+
+    public W marginTop(int val) {
+        getArea().getMargin().top(val);
+        return getThis();
+    }
+
+    public W marginBottom(int val) {
+        getArea().getMargin().bottom(val);
         return getThis();
     }
 

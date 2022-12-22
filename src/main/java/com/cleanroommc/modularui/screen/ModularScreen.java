@@ -21,6 +21,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @SideOnly(Side.CLIENT)
@@ -215,6 +216,10 @@ public abstract class ModularScreen {
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableLighting();
         RenderHelper.enableStandardItemLighting();
+    }
+
+    public void showTooltip(Consumer<Tooltip> tooltipBuilder) {
+
     }
 
     @ApiStatus.OverrideOnly

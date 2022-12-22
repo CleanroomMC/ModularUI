@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.api;
 
 import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.widget.resizer.Box;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Flex;
 import com.cleanroommc.modularui.widget.sizer.IResizeable;
@@ -76,12 +75,6 @@ public interface IWidget extends IGuiElement {
     IWidget getParent();
 
     GuiContext getContext();
-
-    @Override
-    Box getMargin();
-
-    @Override
-    Box getPadding();
 
     Flex flex();
 
