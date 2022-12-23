@@ -28,27 +28,40 @@ public class Row extends ParentWidget<Row> implements ILayoutWidget {
         int totalWidth = 0;
 
         for (IWidget widget : getChildren()) {
+            // exclude self positioned (X) children
+            if (widget.flex().hasXPos()) continue;
             totalWidth += widget.getArea().requestedWidth();
             maxHeight = Math.max(maxHeight, widget.getArea().requestedHeight());
         }
 
+        // calculate start y
         int lastX = 0;
         if (maa == MainAxisAlignment.CENTER) {
             lastX = (int) (width / 2f - totalWidth / 2f);
         } else if (maa == MainAxisAlignment.END) {
             lastX = width - totalWidth;
         }
-        lastX = Math.max(lastX, padding.left);
+        lastX = Math.max(lastX, padding.left) - getArea().getMargin().left;
 
         for (IWidget widget : getChildren()) {
-            int y = 0;
-            if (caa == CrossAxisAlignment.CENTER) {
-                y = (int) (height / 2f - widget.getArea().requestedHeight() / 2f);
-            } else if (caa == CrossAxisAlignment.END) {
-                y = height - widget.getArea().requestedHeight();
+            // exclude self positioned (X) children
+            if (widget.flex().hasXPos()) continue;
+            Box margin = widget.getArea().getMargin();
+            // don't align auto positioned (Y) children in Y
+            if (!widget.flex().hasYPos()) {
+                int y = 0;
+                if (caa == CrossAxisAlignment.CENTER) {
+                    y = (int) (height / 2f - widget.getArea().height / 2f);
+                } else if (caa == CrossAxisAlignment.END) {
+                    y = height - widget.getArea().height;
+                }
+                y = Math.max(y, padding.top);
+                widget.flex().setRelativeY(y);
             }
-            y = Math.max(y, padding.top);
-            widget.flex().setRelativePos(lastX + widget.getArea().getMargin().left, y);
+
+            // set calculated relative Y pos and set bottom margin for next widget
+            widget.flex().setRelativeX(lastX + margin.left);
+
             lastX += widget.getArea().requestedWidth();
             if (maa == MainAxisAlignment.SPACE_BETWEEN) {
                 lastX += (width - totalWidth) / (getChildren().size() - 1);

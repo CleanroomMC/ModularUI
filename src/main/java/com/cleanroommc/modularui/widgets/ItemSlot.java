@@ -47,13 +47,6 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot {
     }
 
     @Override
-    public void resize() {
-        super.resize();
-        getSlot().xPos = getArea().x;
-        getSlot().yPos = getArea().y;
-    }
-
-    @Override
     public void draw(float partialTicks) {
         if (this.syncHandler == null) return;
         RenderHelper.enableGUIStandardItemLighting();

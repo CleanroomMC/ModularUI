@@ -45,7 +45,9 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
         panel.bindPlayerInventory()
                 .child(new Column()
                         .coverChildren()
+                        //.flex(flex -> flex.height(0.5f))
                         .padding(7)
+                        .margin(5) // ?
                         .crossAxisAlignment(CrossAxisAlignment.CENTER)
                         .child(new ButtonWidget<>()
                                 .size(60, 18)
@@ -55,6 +57,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                 .setSynced("fluid_slot"))
                         .child(new ButtonWidget<>()
                                 .size(60, 18)
+                                //.flex(flex -> flex.left(3)) // ?
                                 .background(GuiTextures.BUTTON, IKey.str("Button 2"))));
         /*panel.child(new ButtonWidget<>()
                         .flex(flex -> flex.size(60, 20)

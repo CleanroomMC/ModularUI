@@ -10,4 +10,8 @@ public interface IResizeable {
 
     default void applyPos(IGuiElement guiElement) {
     }
+
+    default boolean isSkip() {
+        return false;
+    }
 }

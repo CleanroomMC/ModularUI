@@ -87,6 +87,7 @@ public interface IWidget extends IGuiElement {
     default void resize() {
         IResizeable resizer = resizer();
         if (resizer != null) {
+            if (resizer.isSkip()) return;
             resizer.apply(this);
         }
 

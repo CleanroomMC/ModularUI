@@ -14,7 +14,7 @@ public class Box {
     }
 
     public Box all(int horizontal, int vertical) {
-        return this.all(horizontal, vertical, horizontal, vertical);
+        return this.all(horizontal, horizontal, vertical, vertical);
     }
 
     public Box all(int left, int right, int top, int bottom) {
