@@ -14,6 +14,8 @@ import java.util.List;
 
 public class TextRenderer {
 
+    public static final TextRenderer SHARED = new TextRenderer();
+
     protected float maxWidth = -1, maxHeight = -1;
     protected int x = 0, y = 0;
     protected Alignment alignment = Alignment.TopLeft;
@@ -55,7 +57,11 @@ public class TextRenderer {
     }
 
     public void draw(String text) {
-        draw(Collections.singletonList(text));
+        if (this.maxWidth <= 0 && !text.contains("\n'")) {
+            drawSimple(text);
+        } else {
+            draw(Collections.singletonList(text));
+        }
     }
 
     public void draw(List<String> lines) {
@@ -72,6 +78,16 @@ public class TextRenderer {
         }
         this.lastWidth = maxWidth > 0 ? Math.min(maxW, maxWidth) : maxW;
         this.lastHeight = measuredLines.size() * getFontHeight();
+        this.lastWidth = Math.max(0, this.lastWidth - scale);
+        this.lastHeight = Math.max(0, this.lastHeight - scale);
+    }
+
+    public void drawSimple(String text) {
+        float w = getFontRenderer().getStringWidth(text);
+        int y = getStartY(1), x = getStartX(w);
+        draw(text, x, y);
+        this.lastWidth = w;
+        this.lastHeight = getFontHeight();
         this.lastWidth = Math.max(0, this.lastWidth - scale);
         this.lastHeight = Math.max(0, this.lastHeight - scale);
     }

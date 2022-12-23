@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.api;
 
+import com.cleanroommc.modularui.drawable.Icon;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
 public interface IDrawable {
@@ -13,4 +14,8 @@ public interface IDrawable {
     /*default Widget asWidget() {
         return new Widget().background(this);
     }*/
+
+    default Icon asIcon() {
+        return new Icon(this);
+    }
 }

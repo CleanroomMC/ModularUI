@@ -37,6 +37,7 @@ public interface IKey extends IDrawable {
 
     String get();
 
+    @Deprecated
     void set(String string);
 
     @Override
