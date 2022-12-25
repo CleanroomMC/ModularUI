@@ -7,6 +7,8 @@ public class TextIcon implements IIcon {
 
     private final String text;
     private final int width, height;
+    private int color = 0xFFFFFF;
+    private boolean shadow;
 
     public TextIcon(String text, int width, int height) {
         this.text = text;
@@ -18,7 +20,7 @@ public class TextIcon implements IIcon {
     public void draw(int x, int y, int width, int height) {
         TextRenderer.SHARED.setAlignment(Alignment.TopLeft, width);
         TextRenderer.SHARED.setPos(x, y);
-        TextRenderer.SHARED.setColor(0x404040);
+        TextRenderer.SHARED.setColor(0xFFFFFF);
         TextRenderer.SHARED.setShadow(false);
         TextRenderer.SHARED.drawSimple(text);
     }
@@ -31,5 +33,9 @@ public class TextIcon implements IIcon {
     @Override
     public int getHeight() {
         return height;
+    }
+
+    public String getText() {
+        return text;
     }
 }

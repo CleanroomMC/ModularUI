@@ -119,6 +119,12 @@ public class GuiTextures {
     public static final UITexture DISABLED = icon("disabled", 16, 240);
     public static final UITexture CURSOR = icon("cursor", 32, 240);
 
+    public static final UITexture LOGO = UITexture.builder()
+            .location(ModularUI.ID, "modular_ui_logo")
+            .imageSize(603, 603)
+            .registerAsIcon("logo")
+            .build();
+
     public static final UITexture BACKGROUND = UITexture.builder()
             .location(ModularUI.ID, "gui/background/vanilla_background")
             .imageSize(195, 136)

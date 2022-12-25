@@ -9,23 +9,25 @@ public abstract class ValueSyncHandler<T> extends SyncHandler implements IValueS
     @Override
     public void readOnClient(int id, PacketBuffer buf) {
         read(buf);
-        if (this.changeListener != null) {
-            this.changeListener.run();
-        }
+        onValueChanged();
     }
 
     @Override
     public void readOnServer(int id, PacketBuffer buf) {
         read(buf);
-        if (this.changeListener != null) {
-            this.changeListener.run();
-        }
+        onValueChanged();
     }
 
     @Override
     public void detectAndSendChanges(boolean init) {
         if (needsSync(init)) {
             syncToClient(0, this::updateAndWrite);
+        }
+    }
+
+    protected void onValueChanged() {
+        if (this.changeListener != null) {
+            this.changeListener.run();
         }
     }
 

@@ -1,12 +1,15 @@
 package com.cleanroommc.modularui.widgets;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IDrawable;
+import com.cleanroommc.modularui.api.IKey;
 import com.cleanroommc.modularui.api.Interactable;
 import com.cleanroommc.modularui.api.SyncHandler;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.TextRenderer;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.sync.FluidSlotSyncHandler;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
@@ -19,8 +22,10 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.input.Keyboard;
 
 public class FluidSlot extends Widget<FluidSlot> implements Interactable {
 
@@ -37,6 +42,50 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable {
         flex().startDefaultMode()
                 .size(18, 18)
                 .endDefaultMode();
+
+        tooltipBuilder(tooltip -> {
+            IFluidTank fluidTank = getFluidTank();
+            FluidStack fluid = this.syncHandler.getCachedValue();
+            if (this.syncHandler.isPhantom()) {
+                if (fluid != null) {
+                    tooltip.addLine(IKey.str(fluid.getLocalizedName()));
+                    if (this.syncHandler.controlsAmount()) {
+                        tooltip.addLine(IKey.format("modularui.fluid.phantom.amount", fluid.amount));
+                    }
+                } else {
+                    tooltip.addLine(IKey.format("modularui.fluid.empty"));
+                }
+                if (this.syncHandler.controlsAmount()) {
+                    tooltip.addLine(IKey.format("modularui.fluid.phantom.control"));
+                }
+            } else {
+                if (fluid != null) {
+                    tooltip.addLine(IKey.str(fluid.getLocalizedName()));
+                    tooltip.addLine(IKey.format("modularui.fluid.amount", fluid.amount, fluidTank.getCapacity()));
+                    addAdditionalFluidInfo(tooltip, fluid);
+                } else {
+                    tooltip.addLine(IKey.format("modularui.fluid.empty"));
+                }
+                if (this.syncHandler.canFillSlot() || this.syncHandler.canDrainSlot()) {
+                    tooltip.addLine(IKey.EMPTY); // Add an empty line to separate from the bottom material tooltips
+                    if (Interactable.hasShiftDown()) {
+                        if (this.syncHandler.canFillSlot() && this.syncHandler.canDrainSlot()) {
+                            tooltip.addLine(IKey.format("modularui.fluid.click_combined"));
+                        } else if (this.syncHandler.canDrainSlot()) {
+                            tooltip.addLine(IKey.format("modularui.fluid.click_to_fill"));
+                        } else if (this.syncHandler.canFillSlot()) {
+                            tooltip.addLine(IKey.format("modularui.fluid.click_to_empty"));
+                        }
+                    } else {
+                        tooltip.addLine(IKey.format("modularui.tooltip.shift"));
+                    }
+                }
+            }
+        });
+    }
+
+    @ApiStatus.OverrideOnly
+    public void addAdditionalFluidInfo(Tooltip tooltip, FluidStack fluidStack) {
     }
 
     @Override
@@ -91,6 +140,11 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable {
         }
     }
 
+    @Override
+    public @NotNull Result onMousePressed(int mouseButton) {
+        return Interactable.super.onMousePressed(mouseButton);
+    }
+
     @NotNull
     @Override
     public Result onMouseTapped(int mouseButton) {
@@ -125,6 +179,23 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public @NotNull Result onKeyPressed(char typedChar, int keyCode) {
+        if (keyCode == Keyboard.KEY_LSHIFT || keyCode == Keyboard.KEY_RSHIFT) {
+            ModularUI.LOGGER.info("Pressing shift");
+            markDirty();
+        }
+        return Interactable.super.onKeyPressed(typedChar, keyCode);
+    }
+
+    @Override
+    public boolean onKeyRelease(char typedChar, int keyCode) {
+        if (keyCode == Keyboard.KEY_LSHIFT || keyCode == Keyboard.KEY_RSHIFT) {
+            markDirty();
+        }
+        return Interactable.super.onKeyRelease(typedChar, keyCode);
     }
 
     public IFluidTank getFluidTank() {

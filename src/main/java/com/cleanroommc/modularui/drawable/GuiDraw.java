@@ -1,7 +1,10 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.api.IDrawable;
+import com.cleanroommc.modularui.api.IKey;
 import com.cleanroommc.modularui.api.IWidget;
 import com.cleanroommc.modularui.screen.GuiContext;
+import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -10,19 +13,26 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.RenderTooltipEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.opengl.GL11;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 public class GuiDraw {
 
@@ -641,5 +651,156 @@ public class GuiDraw {
         buffer.pos(x0, y0, z).tex(u0, v0).color(r, g, b, a).endVertex();
         tessellator.draw();
         GlStateManager.disableBlend();
+    }
+
+    //==== Draw helpers ====
+
+    public static void drawGradientRect(float zLevel, float left, float top, float right, float bottom, int startColor, int endColor) {
+        float startAlpha = (float) (startColor >> 24 & 255) / 255.0F;
+        float startRed = (float) (startColor >> 16 & 255) / 255.0F;
+        float startGreen = (float) (startColor >> 8 & 255) / 255.0F;
+        float startBlue = (float) (startColor & 255) / 255.0F;
+        float endAlpha = (float) (endColor >> 24 & 255) / 255.0F;
+        float endRed = (float) (endColor >> 16 & 255) / 255.0F;
+        float endGreen = (float) (endColor >> 8 & 255) / 255.0F;
+        float endBlue = (float) (endColor & 255) / 255.0F;
+
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        GlStateManager.shadeModel(GL11.GL_SMOOTH);
+
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+        buffer.pos(right, top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+        buffer.pos(left, top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
+        buffer.pos(left, bottom, zLevel).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+        buffer.pos(right, bottom, zLevel).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+        tessellator.draw();
+
+        GlStateManager.shadeModel(GL11.GL_FLAT);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
+    }
+
+    //==== Tooltip helpers ====
+
+    public static void drawHoveringText(GuiContext context, List<IKey> textLines, int maxWidth, float scale, boolean forceShadow, Alignment alignment) {
+        if (textLines.isEmpty()) {
+            return;
+        }
+        List<String> lines = textLines.stream().map(IKey::get).collect(Collectors.toList());
+        drawHoveringTextFormatted(context, lines, maxWidth, scale, forceShadow, alignment);
+    }
+
+    public static void drawHoveringTextFormatted(GuiContext context, List<String> lines, int maxWidth) {
+        drawHoveringTextFormatted(context, lines, maxWidth, 1f, false, Alignment.TopLeft);
+    }
+
+    public static void drawTooltip(GuiContext context, List<IDrawable> lines, int maxWidth, float scale, boolean forceShadow, Alignment alignment) {
+
+    }
+
+    public static void drawHoveringTextFormatted(GuiContext context, List<String> lines, int maxWidth, float scale, boolean forceShadow, Alignment alignment) {
+        if (lines.isEmpty()) {
+            return;
+        }
+        if (maxWidth < 0) {
+            maxWidth = Integer.MAX_VALUE;
+        }
+        Area screen = context.screen.getViewport();
+        int mouseX = context.mouseX, mouseY = context.mouseY;
+        RenderTooltipEvent.Pre event = new RenderTooltipEvent.Pre(ItemStack.EMPTY, lines, mouseX, mouseY, screen.width, screen.height, maxWidth, TextRenderer.getFontRenderer());
+        if (MinecraftForge.EVENT_BUS.post(event)) {
+            return;
+        }
+        lines = event.getLines();
+        mouseX = event.getX();
+        mouseY = event.getY();
+        int screenWidth = event.getScreenWidth(), screenHeight = event.getScreenHeight();
+        maxWidth = event.getMaxWidth();
+
+        int maxTextWidth = maxWidth;
+
+        boolean mouseOnRightSide = false;
+        int screenSpaceRight = screenWidth - mouseX - 16;
+        if (mouseX > screenWidth / 2f) {
+            mouseOnRightSide = true;
+        }
+        if (maxTextWidth > screenSpaceRight) {
+            maxTextWidth = screenSpaceRight;
+        }
+        boolean putOnLeft = false;
+        int tooltipY = mouseY - 12;
+        int tooltipX = mouseX + 12;
+        TextRenderer renderer = TextRenderer.SHARED;
+        renderer.setPos(mouseX, mouseY);
+        renderer.setAlignment(Alignment.TopLeft, maxTextWidth);
+        renderer.setScale(scale);
+        renderer.setShadow(forceShadow);
+        renderer.setSimulate(true);
+        List<Pair<String, Float>> measuredLines = renderer.measureLines(lines);
+        if (mouseOnRightSide && measuredLines.size() > lines.size()) {
+            putOnLeft = true;
+            maxTextWidth = Math.min(maxWidth, mouseX - 16);
+        }
+
+        renderer.setAlignment(Alignment.TopLeft, maxTextWidth);
+        measuredLines = renderer.measureLines(lines);
+        renderer.drawMeasuredLines(measuredLines);
+        int tooltipTextWidth = (int) renderer.lastWidth;
+        int tooltipHeight = (int) renderer.lastHeight;
+
+        if (mouseOnRightSide && putOnLeft) {
+            tooltipX += -24 - tooltipTextWidth;
+        }
+
+        GlStateManager.disableRescaleNormal();
+        RenderHelper.disableStandardItemLighting();
+        GlStateManager.disableLighting();
+        GlStateManager.disableDepth();
+
+        int color = 0xFFFFFF;
+
+        drawTooltipBackground(lines, tooltipX, tooltipY, tooltipTextWidth, tooltipHeight, 300);
+
+        MinecraftForge.EVENT_BUS.post(new RenderTooltipEvent.PostBackground(ItemStack.EMPTY, lines, tooltipX, tooltipY, TextRenderer.getFontRenderer(), tooltipTextWidth, tooltipHeight));
+
+        renderer.setSimulate(false);
+        renderer.setPos(tooltipX, tooltipY);
+        renderer.setAlignment(alignment, maxTextWidth);
+        renderer.setColor(color);
+        renderer.drawMeasuredLines(measuredLines);
+
+        MinecraftForge.EVENT_BUS.post(new RenderTooltipEvent.PostText(ItemStack.EMPTY, lines, tooltipX, tooltipY, TextRenderer.getFontRenderer(), tooltipTextWidth, tooltipHeight));
+
+        GlStateManager.enableLighting();
+        GlStateManager.enableDepth();
+        RenderHelper.enableStandardItemLighting();
+        GlStateManager.enableRescaleNormal();
+    }
+
+    public static void drawTooltipBackground(List<String> lines, int x, int y, int textWidth, int height, int z) {
+        // TODO theme color
+        int backgroundColor = 0xF0100010;
+        int borderColorStart = 0x505000FF;
+        int borderColorEnd = (borderColorStart & 0xFEFEFE) >> 1 | borderColorStart & 0xFF000000;
+        RenderTooltipEvent.Color colorEvent = new RenderTooltipEvent.Color(ItemStack.EMPTY, lines, x, y, TextRenderer.getFontRenderer(), backgroundColor, borderColorStart, borderColorEnd);
+        MinecraftForge.EVENT_BUS.post(colorEvent);
+        backgroundColor = colorEvent.getBackground();
+        borderColorStart = colorEvent.getBorderStart();
+        borderColorEnd = colorEvent.getBorderEnd();
+        drawGradientRect(z, x - 3, y - 4, x + textWidth + 3, y - 3, backgroundColor, backgroundColor);
+        drawGradientRect(z, x - 3, y + height + 3, x + textWidth + 3, y + height + 4, backgroundColor, backgroundColor);
+        drawGradientRect(z, x - 3, y - 3, x + textWidth + 3, y + height + 3, backgroundColor, backgroundColor);
+        drawGradientRect(z, x - 4, y - 3, x - 3, y + height + 3, backgroundColor, backgroundColor);
+        drawGradientRect(z, x + textWidth + 3, y - 3, x + textWidth + 4, y + height + 3, backgroundColor, backgroundColor);
+        drawGradientRect(z, x - 3, y - 3 + 1, x - 3 + 1, y + height + 3 - 1, borderColorStart, borderColorEnd);
+        drawGradientRect(z, x + textWidth + 2, y - 3 + 1, x + textWidth + 3, y + height + 3 - 1, borderColorStart, borderColorEnd);
+        drawGradientRect(z, x - 3, y - 3, x + textWidth + 3, y - 3 + 1, borderColorStart, borderColorStart);
+        drawGradientRect(z, x - 3, y + height + 2, x + textWidth + 3, y + height + 3, borderColorEnd, borderColorEnd);
     }
 }

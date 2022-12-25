@@ -3,9 +3,11 @@ package com.cleanroommc.modularui.widget;
 import com.cleanroommc.modularui.api.IDrawable;
 import com.cleanroommc.modularui.api.IWidget;
 import com.cleanroommc.modularui.api.SyncHandler;
+import com.cleanroommc.modularui.api.ValueSyncHandler;
 import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
 import com.cleanroommc.modularui.sync.MapKey;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -40,6 +42,8 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
 
     @NotNull
     private IDrawable[] background = EMPTY_BACKGROUND;
+    @Nullable
+    private Tooltip tooltip;
 
     @ApiStatus.Internal
     @Override
@@ -71,6 +75,9 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
             if (!isValidSyncHandler(this.syncHandler)) {
                 this.syncHandler = null;
                 throw new IllegalStateException();
+            }
+            if (this.syncHandler instanceof ValueSyncHandler) {
+                ((ValueSyncHandler<?>) this.syncHandler).setChangeListener(this::markDirty);
             }
         }
         if (hasChildren()) {
@@ -114,6 +121,9 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
 
     @Override
     public void drawForeground(float partialTicks) {
+        if (this.tooltip != null && isHovering()) {
+            this.tooltip.draw(getContext());
+        }
     }
 
     @Override
@@ -154,6 +164,13 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
     }
 
     @Override
+    public void markDirty() {
+        if (this.tooltip != null) {
+            this.tooltip.markDirty();
+        }
+    }
+
+    @Override
     public @NotNull IWidget getParent() {
         if (!isValid()) {
             throw new IllegalStateException("Widget is not in a valid state!");
@@ -175,6 +192,12 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
 
     public IDrawable[] getBackground() {
         return background;
+    }
+
+    @Nullable
+    @Override
+    public Tooltip getTooltip() {
+        return tooltip;
     }
 
     @Nullable
@@ -322,6 +345,23 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
 
     public W marginBottom(int val) {
         getArea().getMargin().bottom(val);
+        return getThis();
+    }
+
+    public Tooltip tooltip() {
+        if (this.tooltip == null) {
+            this.tooltip = new Tooltip().excludeArea(getArea());
+        }
+        return this.tooltip;
+    }
+
+    public W tooltip(Consumer<Tooltip> tooltipConsumer) {
+        tooltipConsumer.accept(tooltip());
+        return getThis();
+    }
+
+    public W tooltipBuilder(Consumer<Tooltip> tooltipBuilder) {
+        tooltip().tooltipBuilder(tooltipBuilder);
         return getThis();
     }
 

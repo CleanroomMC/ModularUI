@@ -15,7 +15,7 @@ import java.util.List;
 
 public class IconRenderer {
 
-    private static final IconRenderer SHARED = new IconRenderer();
+    public static final IconRenderer SHARED = new IconRenderer();
 
     protected float maxWidth = -1, maxHeight = -1;
     protected int x = 0, y = 0;
@@ -65,7 +65,7 @@ public class IconRenderer {
         drawMeasuredLines(measureLines(lines));
     }
 
-    protected void drawMeasuredLines(List<IIcon> lines) {
+    public void drawMeasuredLines(List<IIcon> lines) {
         int totalHeight = 0, maxWidth = 0;
         for (IIcon icon : lines) {
             totalHeight += icon.getHeight();
@@ -94,7 +94,7 @@ public class IconRenderer {
                 String text = ((IKey) element).get();
                 for (String subLine : wrapLine(text)) {
                     int width = (int) (getFontRenderer().getStringWidth(subLine) * scale);
-                    icons.add(new TextIcon(text, width, (int) getFontHeight()));
+                    icons.add(new TextIcon(subLine, width, getFontRenderer().FONT_HEIGHT));
                 }
             } else {
                 icons.add(element.asIcon().height(getFontRenderer().FONT_HEIGHT));

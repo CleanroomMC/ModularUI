@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.test;
 import com.cleanroommc.modularui.api.CrossAxisAlignment;
 import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.api.IKey;
+import com.cleanroommc.modularui.drawable.Circle;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.screen.ModularPanel;
@@ -11,6 +12,7 @@ import com.cleanroommc.modularui.sync.FluidSlotSyncHandler;
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
 import com.cleanroommc.modularui.sync.IntSyncHandler;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.FluidSlot;
 import com.cleanroommc.modularui.widgets.layout.Column;
@@ -57,6 +59,15 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                 .setSynced("fluid_slot"))
                         .child(new ButtonWidget<>()
                                 .size(60, 18)
+                                .tooltip(tooltip -> {
+                                    tooltip.addLine(IKey.str("An image inside of a tooltip:"));
+                                    tooltip.addLine(GuiTextures.LOGO.asIcon().size(50));
+                                    tooltip.addLine(IKey.str("And here a circle:"));
+                                    tooltip.addLine(new Circle()
+                                            .setColor(Color.RED.dark(2), Color.RED.bright(2))
+                                            .asIcon()
+                                            .size(20));
+                                })
                                 //.flex(flex -> flex.left(3)) // ?
                                 .background(GuiTextures.BUTTON, IKey.str("Button 2"))));
         /*panel.child(new ButtonWidget<>()

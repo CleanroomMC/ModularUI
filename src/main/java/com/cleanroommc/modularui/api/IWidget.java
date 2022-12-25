@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.api;
 
 import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Flex;
 import com.cleanroommc.modularui.widget.sizer.IResizeable;
@@ -44,6 +45,13 @@ public interface IWidget extends IGuiElement {
 
     void drawForeground(float partialTicks);
 
+    default boolean hasTooltip() {
+        return getTooltip() != null;
+    }
+
+    @Nullable
+    Tooltip getTooltip();
+
     void onFrameUpdate();
 
     @Override
@@ -70,6 +78,8 @@ public interface IWidget extends IGuiElement {
     default boolean canHover() {
         return true;
     }
+
+    void markDirty();
 
     @NotNull
     IWidget getParent();

@@ -41,6 +41,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
     @Override
     public void setValue(@Nullable FluidStack value) {
         this.cache = value;
+        onValueChanged();
     }
 
     @Override
@@ -60,8 +61,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
 
     @Override
     public void read(PacketBuffer buffer) {
-        this.cache = NetworkUtils.readFluidStack(buffer);
-        setValue(this.cache != null ? this.cache.copy() : null);
+        setValue(NetworkUtils.readFluidStack(buffer));
     }
 
     @Override
