@@ -30,6 +30,10 @@ public interface IGuiElement {
         return getScreen().context.isHovered(this);
     }
 
+    default boolean isHoveringFor(int ticks) {
+        return getScreen().context.isHoveredFor(this, ticks);
+    }
+
     boolean isEnabled();
 
     void resize();

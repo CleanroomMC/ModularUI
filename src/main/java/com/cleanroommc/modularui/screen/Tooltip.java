@@ -32,7 +32,6 @@ public class Tooltip {
     private Pos pos = ModularUIConfig.tooltipPos;
     private Consumer<Tooltip> tooltipBuilder;
     private int showUpTimer = 0;
-    private int time = 0;
 
     private int x = 0, y = 0;
     private int maxWidth = Integer.MAX_VALUE;
@@ -61,9 +60,6 @@ public class Tooltip {
         }
         if (lines.isEmpty()) {
             return;
-        }
-        if (this.showUpTimer > 0) {
-
         }
         if (maxWidth <= 0) {
             maxWidth = Integer.MAX_VALUE;
@@ -183,7 +179,7 @@ public class Tooltip {
             boolean usedMoreSpaceSide = false;
             Pos pos = this.pos;
             if (this.pos == Pos.HORIZONTAL) {
-                if(this.excludeArea.x > screenWidth - this.excludeArea.x - this.excludeArea.width) {
+                if (this.excludeArea.x > screenWidth - this.excludeArea.x - this.excludeArea.width) {
                     pos = Pos.LEFT;
                     x = 0;
                 } else {
@@ -236,6 +232,10 @@ public class Tooltip {
 
     public Area getExcludeArea() {
         return excludeArea;
+    }
+
+    public int getShowUpTimer() {
+        return showUpTimer;
     }
 
     @Nullable

@@ -63,6 +63,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                         .child(new ButtonWidget<>()
                                 .size(60, 18)
                                 .tooltip(tooltip -> {
+                                    tooltip.showUpTimer(10);
                                     tooltip.addLine(IKey.str("Test Line g"));
                                     tooltip.addLine(IKey.str("An image inside of a tooltip:"));
                                     tooltip.addLine(GuiTextures.LOGO.asIcon().size(50).alignment(Alignment.TopCenter));

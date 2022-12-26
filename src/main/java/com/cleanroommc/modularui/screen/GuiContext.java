@@ -27,6 +27,7 @@ public class GuiContext implements IViewportStack {
     public IFocusedWidget focusedWidget;
     @Nullable
     private IGuiElement hovered;
+    private int timeHovered = 0;
     private final HoveredIterable hoveredWidgets;
     //public GuiContextMenu contextMenu;
 
@@ -110,6 +111,10 @@ public class GuiContext implements IViewportStack {
 
     public boolean isHovered(IGuiElement guiElement) {
         return isHovered() && this.hovered == guiElement;
+    }
+
+    public boolean isHoveredFor(IGuiElement guiElement, int ticks) {
+        return isHovered(guiElement) && this.timeHovered / 3 >= ticks;
     }
 
     @Nullable
@@ -299,6 +304,7 @@ public class GuiContext implements IViewportStack {
                 this.hovered.onMouseEndHover();
             }
             this.hovered = hovered;
+            this.timeHovered = 0;
             if (this.hovered != null) {
                 this.hovered.onMouseStartHover();
                 if (this.hovered instanceof IVanillaSlot) {
@@ -307,6 +313,8 @@ public class GuiContext implements IViewportStack {
                     ((GuiContainerAccessor) this.screen.getScreenWrapper()).setHoveredSlot(null);
                 }
             }
+        } else {
+            this.timeHovered++;
         }
     }
 
