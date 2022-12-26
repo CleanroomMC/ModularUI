@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.screen;
 
+import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.IDrawable;
 import com.cleanroommc.modularui.api.IIcon;
 import com.cleanroommc.modularui.api.IKey;
@@ -22,15 +23,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class Tooltip {
 
     private final List<IDrawable> lines = new ArrayList<>();
     private List<IDrawable> additionalLines = new ArrayList<>();
     private Area excludeArea;
-    private Pos pos = Pos.VERTICAL;
+    private Pos pos = ModularUIConfig.tooltipPos;
     private Consumer<Tooltip> tooltipBuilder;
+    private int showUpTimer = 0;
+    private int time = 0;
 
     private int x = 0, y = 0;
     private int maxWidth = Integer.MAX_VALUE;
@@ -53,12 +55,15 @@ public class Tooltip {
         this.additionalLines = additionalLines;
     }
 
-    public void draw(GuiContext context) {
+    public void draw(GuiContext context, float elapsedTime) {
         if (this.dirty) {
             buildTooltip();
         }
         if (lines.isEmpty()) {
             return;
+        }
+        if (this.showUpTimer > 0) {
+
         }
         if (maxWidth <= 0) {
             maxWidth = Integer.MAX_VALUE;
@@ -137,18 +142,10 @@ public class Tooltip {
         for (IDrawable line : lines) {
             if (line instanceof IIcon && !(line instanceof TextIcon)) {
                 minWidth = Math.max(minWidth, ((IIcon) line).getWidth());
-            } else if(!(line instanceof IKey)) {
+            } else if (!(line instanceof IKey)) {
                 minWidth = Math.max(minWidth, 18);
             }
         }
-
-        /*float factor = width / (float) height;
-        if ((width > screenWidth && factor >= 2) || (width > 100 && factor >= 4)) {
-            renderer.setAlignment(this.alignment, width / (factor * 0.4f));
-            renderer.drawMeasuredLines(icons);
-            width = (int) renderer.getLastWidth();
-            height = (int) renderer.getLastHeight();
-        }*/
 
         int shiftAmount = 10;
         int borderSpace = 7;
@@ -162,7 +159,7 @@ public class Tooltip {
                 x = xArea - shiftAmount;
                 if (x < borderSpace) {
                     x = borderSpace;
-                } else if(x + width > screenWidth - borderSpace) {
+                } else if (x + width > screenWidth - borderSpace) {
                     int maxWidth = Math.max(minWidth, screenWidth - x - borderSpace);
                     renderer.setAlignment(this.alignment, maxWidth);
                     renderer.draw(lines);
@@ -170,18 +167,11 @@ public class Tooltip {
                     height = (int) renderer.getLastHeight();
                 }
             }
-            //x = width > this.excludeArea.width ? xArea - shiftAmount : xArea + shiftAmount;
-            if (x < borderSpace) {
-                x = borderSpace;
-            } else if (x + width > screenWidth - borderSpace) {
-                x = Math.max(2, screenWidth - borderSpace - width);
-            }
 
             Pos pos = this.pos;
             if (this.pos == Pos.VERTICAL) {
                 int bottomSpace = screenHeight - this.excludeArea.y - this.excludeArea.height;
                 pos = bottomSpace < height && bottomSpace < this.excludeArea.y ? Pos.ABOVE : Pos.BELOW;
-                //pos = this.excludeArea.y > screenHeight - this.excludeArea.y - this.excludeArea.height ? Pos.ABOVE : Pos.BELOW;
             }
 
             if (pos == Pos.BELOW) {
@@ -190,19 +180,45 @@ public class Tooltip {
                 y = this.excludeArea.y - height - borderSpace;
             }
         } else if (this.pos.horizontal) {
-            int yArea = this.excludeArea.y;
-            y = height > this.excludeArea.height ? yArea - shiftAmount : yArea + shiftAmount;
-            if (y < borderSpace) {
-                y = borderSpace;
-            } else if (x + width > screenHeight - borderSpace) {
-                y = Math.max(2, screenWidth - borderSpace - height);
+            boolean usedMoreSpaceSide = false;
+            Pos pos = this.pos;
+            if (this.pos == Pos.HORIZONTAL) {
+                if(this.excludeArea.x > screenWidth - this.excludeArea.x - this.excludeArea.width) {
+                    pos = Pos.LEFT;
+                    x = 0;
+                } else {
+                    pos = Pos.RIGHT;
+                    x = screenWidth - this.excludeArea.x - this.excludeArea.width + borderSpace;
+                }
             }
 
-            Pos pos;
-            if (this.pos == Pos.HORIZONTAL) {
-                pos = this.excludeArea.x > screenWidth - this.excludeArea.x - this.excludeArea.width ? Pos.LEFT : Pos.RIGHT;
+            int yArea = this.excludeArea.y;
+            if (height < this.excludeArea.height) {
+                y = yArea + shiftAmount;
             } else {
-                pos = this.pos;
+                y = yArea - shiftAmount;
+                if (y < borderSpace) {
+                    y = borderSpace;
+                }
+            }
+
+            if (x + width > screenWidth - borderSpace) {
+                int maxWidth;
+                if (pos == Pos.LEFT) {
+                    maxWidth = Math.max(minWidth, this.excludeArea.x - borderSpace * 2);
+                } else {
+                    maxWidth = Math.max(minWidth, screenWidth - this.excludeArea.x - this.excludeArea.width - borderSpace * 2);
+                }
+                usedMoreSpaceSide = true;
+                renderer.setAlignment(this.alignment, maxWidth);
+                renderer.draw(lines);
+                width = (int) renderer.getLastWidth();
+                height = (int) renderer.getLastHeight();
+            }
+
+            if (this.pos == Pos.HORIZONTAL && !usedMoreSpaceSide) {
+                int rightSpace = screenWidth - this.excludeArea.x - this.excludeArea.width;
+                pos = rightSpace < width && rightSpace < this.excludeArea.x ? Pos.LEFT : Pos.RIGHT;
             }
 
             if (pos == Pos.RIGHT) {
@@ -256,6 +272,11 @@ public class Tooltip {
 
     public Tooltip scale(float scale) {
         this.scale = scale;
+        return this;
+    }
+
+    public Tooltip showUpTimer(int showUpTimer) {
+        this.showUpTimer = showUpTimer;
         return this;
     }
 

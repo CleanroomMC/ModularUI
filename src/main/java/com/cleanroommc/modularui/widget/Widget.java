@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widget;
 
+import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.IDrawable;
 import com.cleanroommc.modularui.api.IWidget;
 import com.cleanroommc.modularui.api.SyncHandler;
@@ -57,6 +58,9 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
             this.area.z(parent.getArea().z() + 1);
         }
         this.valid = true;
+        if (this.tooltip != null && this.tooltip.getExcludeArea() == null && ModularUIConfig.placeTooltipNextToPanel()) {
+            this.tooltip.excludeArea(getPanel().getArea());
+        }
         onInit();
         if (hasChildren()) {
             for (IWidget child : getChildren()) {
@@ -122,7 +126,7 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
     @Override
     public void drawForeground(float partialTicks) {
         if (this.tooltip != null && isHovering()) {
-            this.tooltip.draw(getContext());
+            this.tooltip.draw(getContext(), partialTicks);
         }
     }
 
@@ -350,7 +354,10 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
 
     public Tooltip tooltip() {
         if (this.tooltip == null) {
-            this.tooltip = new Tooltip().excludeArea(getArea());
+            this.tooltip = new Tooltip();
+            if (!ModularUIConfig.placeTooltipNextToPanel()) {
+                this.tooltip.excludeArea(getArea());
+            }
         }
         return this.tooltip;
     }

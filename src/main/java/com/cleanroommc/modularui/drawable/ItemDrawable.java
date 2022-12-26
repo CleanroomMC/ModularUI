@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-/*public class ItemDrawable implements IDrawable {
+public class ItemDrawable implements IDrawable {
 
     private ItemStack item = ItemStack.EMPTY;
 
@@ -19,17 +19,13 @@ import org.jetbrains.annotations.NotNull;
     }
 
     @Override
-    public void applyThemeColor(int color) {
-    }
-
-    @Override
-    public void draw(float x, float y, float width, float height, float partialTicks) {
+    public void draw(int x, int y, int width, int height) {
         if (item.isEmpty()) return;
         GlStateManager.pushMatrix();
         RenderHelper.enableGUIStandardItemLighting();
         GlStateManager.enableDepth();
-        GlStateManager.scale(width / 16, height / 16, 1);
-        Minecraft.getMinecraft().getRenderItem().renderItemAndEffectIntoGUI(Minecraft.getMinecraft().player, item, (int) x, (int) y);
+        GlStateManager.scale(width / 16f, height / 16f, 1);
+        Minecraft.getMinecraft().getRenderItem().renderItemAndEffectIntoGUI(Minecraft.getMinecraft().player, item, x, y);
         GlStateManager.disableDepth();
         RenderHelper.enableStandardItemLighting();
         GlStateManager.disableLighting();
@@ -37,12 +33,12 @@ import org.jetbrains.annotations.NotNull;
     }
 
     @Override
-    public DrawableWidget asWidget() {
-        return (DrawableWidget) IDrawable.super.asWidget().setSize(16, 16);
+    public Icon asIcon() {
+        return IDrawable.super.asIcon().size(16);
     }
 
     public ItemDrawable setItem(@NotNull ItemStack item) {
         this.item = item;
         return this;
     }
-}*/
+}

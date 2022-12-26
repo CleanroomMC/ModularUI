@@ -29,7 +29,7 @@ public class Icon implements IIcon {
 
     @Override
     public int getHeight() {
-        return height;
+        return height + 1;
     }
 
     public Icon height(int height) {
@@ -56,8 +56,8 @@ public class Icon implements IIcon {
 
     @Override
     public void draw(int x, int y, int width, int height) {
-        x += this.width * alignment.x - width * alignment.x;
-        y += this.height * alignment.y - height * alignment.y;
-        drawable.draw(x, y, width, height);
+        x += width * alignment.x - this.width * alignment.x;
+        y += height * alignment.y - this.height * alignment.y;
+        drawable.draw(x, y, this.width, this.height);
     }
 }

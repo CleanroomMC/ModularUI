@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.api.IKey;
 import com.cleanroommc.modularui.drawable.Circle;
 import com.cleanroommc.modularui.drawable.GuiTextures;
+import com.cleanroommc.modularui.drawable.ItemDrawable;
 import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
@@ -17,6 +18,8 @@ import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.FluidSlot;
 import com.cleanroommc.modularui.widgets.layout.Column;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.fluids.FluidTank;
@@ -60,13 +63,15 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                         .child(new ButtonWidget<>()
                                 .size(60, 18)
                                 .tooltip(tooltip -> {
+                                    tooltip.addLine(IKey.str("Test Line g"));
                                     tooltip.addLine(IKey.str("An image inside of a tooltip:"));
-                                    tooltip.addLine(GuiTextures.LOGO.asIcon().size(50));
+                                    tooltip.addLine(GuiTextures.LOGO.asIcon().size(50).alignment(Alignment.TopCenter));
                                     tooltip.addLine(IKey.str("And here a circle:"));
                                     tooltip.addLine(new Circle()
-                                            .setColor(Color.RED.dark(2), Color.RED.bright(2))
-                                            .asIcon()
-                                            .size(20));
+                                                    .setColor(Color.RED.dark(2), Color.RED.bright(2))
+                                                    .asIcon()
+                                                    .size(20))
+                                            .addLine(new ItemDrawable(new ItemStack(Items.DIAMOND)).asIcon());
                                 })
                                 //.flex(flex -> flex.left(3)) // ?
                                 .background(GuiTextures.BUTTON, IKey.str("Button 2"))));

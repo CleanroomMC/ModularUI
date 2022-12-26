@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.GuiErrorHandler;
+import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.IGuiElement;
 import com.cleanroommc.modularui.api.IVanillaSlot;
 import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
@@ -12,7 +13,10 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiLabel;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -20,7 +24,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.GuiContainerEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
@@ -34,7 +37,6 @@ public class GuiScreenWrapper extends GuiContainer {
     private final ModularScreen screen;
     private boolean init = true;
     private char lastChar;
-    public static boolean debugMode = FMLLaunchHandler.isDeobfuscatedEnvironment();
 
     public GuiScreenWrapper(ModularContainer container, ModularScreen screen) {
         super(container);
@@ -140,7 +142,7 @@ public class GuiScreenWrapper extends GuiContainer {
 
         GlStateManager.popMatrix();
 
-        if (debugMode) {
+        if (ModularUIConfig.guiDebugMode) {
             GlStateManager.disableDepth();
             GlStateManager.disableLighting();
             GlStateManager.enableBlend();
@@ -281,7 +283,7 @@ public class GuiScreenWrapper extends GuiContainer {
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
         // debug mode C + CTRL + SHIFT + ALT
         if (keyCode == 46 && isCtrlKeyDown() && isShiftKeyDown() && isAltKeyDown()) {
-            debugMode = !debugMode;
+            ModularUIConfig.guiDebugMode = !ModularUIConfig.guiDebugMode;
             return;
         }
         super.keyTyped(typedChar, keyCode);

@@ -66,6 +66,10 @@ public class IconRenderer {
     }
 
     public void drawMeasuredLines(List<IIcon> lines) {
+        TextRenderer.SHARED.setColor(this.color);
+        TextRenderer.SHARED.setShadow(this.shadow);
+        TextRenderer.SHARED.setScale(this.scale);
+        TextRenderer.SHARED.setAlignment(this.alignment, this.maxWidth);
         int totalHeight = 0, maxWidth = 0;
         for (IIcon icon : lines) {
             totalHeight += icon.getHeight();
@@ -75,7 +79,7 @@ public class IconRenderer {
         for (IIcon icon : lines) {
             int x = getStartX(icon.getWidth());
             if (!simulate) {
-                icon.draw(x, y, icon.getWidth(), icon.getHeight());
+                icon.draw(x, y, maxWidth, icon.getHeight());
             }
             y += icon.getHeight() * scale;
         }
@@ -94,7 +98,7 @@ public class IconRenderer {
                 String text = ((IKey) element).get();
                 for (String subLine : wrapLine(text)) {
                     int width = (int) (getFontRenderer().getStringWidth(subLine) * scale);
-                    icons.add(new TextIcon(subLine, width, getFontRenderer().FONT_HEIGHT));
+                    icons.add(new TextIcon(subLine, width, (int) (getFontRenderer().FONT_HEIGHT + scale)));
                 }
             } else {
                 icons.add(element.asIcon().height(getFontRenderer().FONT_HEIGHT));
