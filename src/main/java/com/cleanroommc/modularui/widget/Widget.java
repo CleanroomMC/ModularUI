@@ -50,12 +50,12 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
     @Override
     public final void initialise(@NotNull IWidget parent) {
         if (this instanceof ModularPanel) {
-            this.area.z(1);
+            getArea().z(1);
         } else {
             this.parent = parent;
             this.panel = parent.getPanel();
             this.context = parent.getContext();
-            this.area.z(parent.getArea().z() + 1);
+            getArea().z(parent.getArea().z() + 1);
         }
         this.valid = true;
         if (this.tooltip != null && this.tooltip.getExcludeArea() == null && ModularUIConfig.placeTooltipNextToPanel()) {
@@ -242,9 +242,18 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
         return syncHandler;
     }
 
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     @SuppressWarnings("all")
     protected W getThis() {
         return (W) this;
+    }
+
+    public W disabled() {
+        setEnabled(false);
+        return getThis();
     }
 
     public W background(IDrawable... background) {

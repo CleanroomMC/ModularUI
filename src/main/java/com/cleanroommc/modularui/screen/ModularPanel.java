@@ -237,7 +237,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         this.acceptedInteractions.clear();
         this.lastMouseButton = -1;
         this.timePressed = 0;
-        this.isMouseButtonHeld = false;
+        this.isKeyHeld = false;
         return result;
     }
 

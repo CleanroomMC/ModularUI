@@ -8,7 +8,7 @@ public interface IFocusedWidget {
 
     void onFocus(GuiContext context);
 
-    void onUnfocus(GuiContext context);
+    void onRemoveFocus(GuiContext context);
 
     void selectAll(GuiContext context);
 

@@ -31,6 +31,8 @@ import java.util.Map;
  */
 public class MathBuilder {
 
+    public static final MathBuilder INSTANCE = new MathBuilder();
+
     /**
      * Named variables that can be used in math expression by this
      * builder

@@ -5,14 +5,9 @@
 - [X]  syncing
 - [X]  vanilla slots compat (properly)
 - [X]  proper interaction managing
-- [ ]  proper sizing & positioning with widgets that depend on children or parents
+- [x]  proper sizing & positioning with widgets that depend on children or parents
 - [ ]  Text field
-- [ ]  Tooltips
-
-#### Tooltip
-
-A object with all lines (can be any drawable). And information about where to draw the tooltip,
-how it should look like, when it should be updated and when it should be closed.
+- [x]  Tooltips
 
 ## Low Priority
 
@@ -27,7 +22,7 @@ how it should look like, when it should be updated and when it should be closed.
 - [ ]  Json Guis
 - [ ]  Inject to any mc gui
 - [ ]  Error handling with on screen reports
-- [ ]  Parent widgets can "cover" all children
+- [x]  Parent widgets can "cover" all children
 
 ## In the future
 

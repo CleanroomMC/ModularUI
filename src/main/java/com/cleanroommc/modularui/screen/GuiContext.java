@@ -134,6 +134,13 @@ public class GuiContext implements IViewportStack {
     }
 
     /**
+     * @return true if there is any focused widget
+     */
+    public boolean isFocused(IFocusedWidget widget) {
+        return this.focusedWidget == widget;
+    }
+
+    /**
      * Tries to focus the given widget
      *
      * @param widget widget to focus
@@ -154,7 +161,7 @@ public class GuiContext implements IViewportStack {
         }
 
         if (this.focusedWidget != null) {
-            this.focusedWidget.onUnfocus(this);
+            this.focusedWidget.onRemoveFocus(this);
             this.screen.setFocused(false);
 
             if (select) {
@@ -177,7 +184,7 @@ public class GuiContext implements IViewportStack {
     /**
      * Removes focus from any widget
      */
-    public void unfocus() {
+    public void removeFocus() {
         this.focus(null);
     }
 

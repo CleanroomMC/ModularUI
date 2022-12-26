@@ -38,6 +38,10 @@ public class GuiDraw {
 
     private final static Stack<Area> scissors = new Stack<Area>();
 
+    public static void scissor(Area area, GuiContext context) {
+        scissor(area.x, area.y, area.width, area.height, context);
+    }
+
     public static void scissor(int x, int y, int w, int h, GuiContext context) {
         scissor(context.globalX(x), context.globalY(y), w, h, context.getViewport().width, context.screen.getViewport().height);
     }

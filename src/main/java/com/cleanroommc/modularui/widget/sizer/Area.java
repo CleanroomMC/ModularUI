@@ -89,6 +89,20 @@ public class Area extends Rectangle implements IResizeable {
         this.z = z;
     }
 
+    /**
+     * Calculate X based on anchor value
+     */
+    public int x(float anchor) {
+        return this.x + (int) (this.width * anchor);
+    }
+
+    /**
+     * Calculate X based on anchor value
+     */
+    public int y(float anchor) {
+        return this.y + (int) (this.height * anchor);
+    }
+
     public int requestedWidth() {
         return width + this.margin.horizontal();
     }

@@ -132,6 +132,13 @@ public class GuiTextures {
             .registerAsBackground("vanilla_background")
             .build();
 
+    public static final UITexture DISPLAY = UITexture.builder()
+            .location(ModularUI.ID, "gui/background/display")
+            .imageSize(143, 75)
+            .adaptable(1)
+            .registerAsBackground("display")
+            .build();
+
     public static final UITexture BUTTON = UITexture.builder()
             .location(ModularUI.ID, "gui/widgets/base_button")
             .imageSize(18, 18)

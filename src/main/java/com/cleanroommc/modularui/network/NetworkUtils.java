@@ -65,7 +65,7 @@ public class NetworkUtils {
     }
 
     public static void writeStringSafe(PacketBuffer buffer, String string) {
-        byte[] bytesTest = string.getBytes(StandardCharsets.UTF_8);
+        byte[] bytesTest = string == null ? new byte[0] :  string.getBytes(StandardCharsets.UTF_8);
         byte[] bytes;
 
         if (bytesTest.length > 32767) {
