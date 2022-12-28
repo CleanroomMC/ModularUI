@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.IDrawable;
 import com.cleanroommc.modularui.api.IWidget;
 import com.cleanroommc.modularui.api.SyncHandler;
 import com.cleanroommc.modularui.api.ValueSyncHandler;
+import com.cleanroommc.modularui.api.IGuiAction;
 import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
@@ -18,6 +19,8 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 public abstract class Widget<W extends Widget<W>> implements IWidget {
@@ -27,6 +30,7 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
     private final Area area = new Area();
     private boolean enabled = true;
     private boolean valid = false;
+    private List<IGuiAction> guiActionListeners;
 
     private IWidget parent = null;
     private ModularPanel panel = null;
@@ -56,6 +60,11 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
             this.panel = parent.getPanel();
             this.context = parent.getContext();
             getArea().z(parent.getArea().z() + 1);
+            if (this.guiActionListeners != null) {
+                for (IGuiAction action : this.guiActionListeners) {
+                    this.context.screen.registerGuiActionListener(action);
+                }
+            }
         }
         this.valid = true;
         if (this.tooltip != null && this.tooltip.getExcludeArea() == null && ModularUIConfig.placeTooltipNextToPanel()) {
@@ -99,6 +108,11 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
 
     @Override
     public void dispose() {
+        if (this.guiActionListeners != null) {
+            for (IGuiAction action : this.guiActionListeners) {
+                this.context.screen.removeGuiActionListener(action);
+            }
+        }
         if (!(this instanceof ModularPanel)) {
             this.panel = null;
             this.parent = null;
@@ -378,6 +392,17 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
 
     public W tooltipBuilder(Consumer<Tooltip> tooltipBuilder) {
         tooltip().tooltipBuilder(tooltipBuilder);
+        return getThis();
+    }
+
+    public W listenGuiAction(IGuiAction action) {
+        if (this.guiActionListeners == null) {
+            this.guiActionListeners = new ArrayList<>();
+        }
+        this.guiActionListeners.add(action);
+        if (isValid()) {
+            this.context.screen.registerGuiActionListener(action);
+        }
         return getThis();
     }
 

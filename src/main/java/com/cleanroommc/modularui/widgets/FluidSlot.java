@@ -140,11 +140,6 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable {
         }
     }
 
-    @Override
-    public @NotNull Result onMousePressed(int mouseButton) {
-        return Interactable.super.onMousePressed(mouseButton);
-    }
-
     @NotNull
     @Override
     public Result onMouseTapped(int mouseButton) {
@@ -184,7 +179,6 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable {
     @Override
     public @NotNull Result onKeyPressed(char typedChar, int keyCode) {
         if (keyCode == Keyboard.KEY_LSHIFT || keyCode == Keyboard.KEY_RSHIFT) {
-            ModularUI.LOGGER.info("Pressing shift");
             markDirty();
         }
         return Interactable.super.onKeyPressed(typedChar, keyCode);

@@ -43,7 +43,11 @@ public class GuiDraw {
     }
 
     public static void scissor(int x, int y, int w, int h, GuiContext context) {
-        scissor(context.globalX(x), context.globalY(y), w, h, context.getViewport().width, context.screen.getViewport().height);
+        scissor(context.globalX(x), context.globalY(y), w, h, context.screen.getViewport().width, context.screen.getViewport().height);
+    }
+
+    public static void scissorTransformed(Area area, GuiContext context) {
+        scissor(area.x, area.y, area.width, area.height, context.screen.getViewport().width, context.screen.getViewport().height);
     }
 
     /**
@@ -716,7 +720,7 @@ public class GuiDraw {
             maxWidth = Integer.MAX_VALUE;
         }
         Area screen = context.screen.getViewport();
-        int mouseX = context.mouseX, mouseY = context.mouseY;
+        int mouseX = context.getMouseX(), mouseY = context.getMouseY();
         RenderTooltipEvent.Pre event = new RenderTooltipEvent.Pre(ItemStack.EMPTY, lines, mouseX, mouseY, screen.width, screen.height, maxWidth, TextRenderer.getFontRenderer());
         if (MinecraftForge.EVENT_BUS.post(event)) {
             return;

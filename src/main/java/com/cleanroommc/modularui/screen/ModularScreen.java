@@ -1,12 +1,14 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.IGuiAction;
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
 import com.cleanroommc.modularui.sync.MapKey;
 import com.cleanroommc.modularui.theme.Theme;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.IResizeable;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
@@ -21,6 +23,10 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -63,6 +69,7 @@ public abstract class ModularScreen {
     public final GuiContext context;
     private final Area viewport = new Area();
     private Theme currentTheme; //= Theme.VANILLA;
+    private final Map<Class<?>, List<IGuiAction>> guiActionListeners = new Object2ObjectOpenHashMap<>();
 
     private GuiScreenWrapper screenWrapper;
     private GuiSyncHandler syncHandler;
@@ -97,10 +104,6 @@ public abstract class ModularScreen {
     @ApiStatus.OverrideOnly
     public void onResize(int width, int height) {
         current = this.context;
-
-        /*if (!this.context.keybinds.hasParent()) {
-            this.ROOT.add(this.context.keybinds);
-        }*/
 
         this.viewport.set(0, 0, width, height);
         this.viewport.z(0);
@@ -160,6 +163,7 @@ public abstract class ModularScreen {
         this.context.tick();
     }
 
+    @MustBeInvokedByOverriders
     public void onFrameUpdate() {
         for (ModularPanel panel : this.windowManager.getOpenWindows()) {
             WidgetTree.onFrameUpdate(panel);
@@ -172,8 +176,7 @@ public abstract class ModularScreen {
 
     @ApiStatus.OverrideOnly
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        this.context.setMouse(mouseX, mouseY);
-        this.context.partialTicks = Minecraft.getMinecraft().getRenderPartialTicks();
+        this.context.updateState(mouseX, mouseY, partialTicks);
 
         GlStateManager.disableRescaleNormal();
         RenderHelper.disableStandardItemLighting();
@@ -183,9 +186,7 @@ public abstract class ModularScreen {
         this.context.reset();
         this.context.pushViewport(this.viewport);
         for (ModularPanel panel : this.windowManager.getOpenWindows()) {
-            if (panel.isEnabled()) {
-                WidgetTree.drawInternal(panel, this.context, partialTicks);
-            }
+            WidgetTree.drawInternal(panel, this.context, partialTicks);
         }
         this.context.popViewport();
 
@@ -224,6 +225,9 @@ public abstract class ModularScreen {
 
     @ApiStatus.OverrideOnly
     public boolean onMousePressed(int mouseButton) {
+        for (IGuiAction.MousePressed action : getGuiActionListeners(IGuiAction.MousePressed.class)) {
+            action.press(mouseButton);
+        }
         for (ModularPanel panel : this.windowManager.getOpenWindows()) {
             if (panel.onMousePressed(mouseButton)) {
                 return true;
@@ -234,6 +238,9 @@ public abstract class ModularScreen {
 
     @ApiStatus.OverrideOnly
     public boolean onMouseRelease(int mouseButton) {
+        for (IGuiAction.MouseReleased action : getGuiActionListeners(IGuiAction.MouseReleased.class)) {
+            action.release(mouseButton);
+        }
         for (ModularPanel panel : this.windowManager.getOpenWindows()) {
             if (panel.onMouseRelease(mouseButton)) {
                 return true;
@@ -243,13 +250,10 @@ public abstract class ModularScreen {
     }
 
     @ApiStatus.OverrideOnly
-    public boolean onMouseTapped(int mouseButton) {
-
-        return false;
-    }
-
-    @ApiStatus.OverrideOnly
     public boolean onKeyPressed(char typedChar, int keyCode) {
+        for (IGuiAction.KeyPressed action : getGuiActionListeners(IGuiAction.KeyPressed.class)) {
+            action.press(typedChar, keyCode);
+        }
         for (ModularPanel panel : this.windowManager.getOpenWindows()) {
             if (panel.onKeyPressed(typedChar, keyCode)) {
                 return true;
@@ -260,6 +264,9 @@ public abstract class ModularScreen {
 
     @ApiStatus.OverrideOnly
     public boolean onKeyRelease(char typedChar, int keyCode) {
+        for (IGuiAction.KeyReleased action : getGuiActionListeners(IGuiAction.KeyReleased.class)) {
+            action.release(typedChar, keyCode);
+        }
         for (ModularPanel panel : this.windowManager.getOpenWindows()) {
             if (panel.onKeyRelease(typedChar, keyCode)) {
                 return true;
@@ -269,13 +276,10 @@ public abstract class ModularScreen {
     }
 
     @ApiStatus.OverrideOnly
-    public boolean onKeyTapped(int keyCode) {
-
-        return false;
-    }
-
-    @ApiStatus.OverrideOnly
     public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
+        for (IGuiAction.MouseScroll action : getGuiActionListeners(IGuiAction.MouseScroll.class)) {
+            action.scroll(scrollDirection, amount);
+        }
         for (ModularPanel panel : this.windowManager.getOpenWindows()) {
             if (panel.onMouseScroll(scrollDirection, amount)) {
                 return true;
@@ -286,6 +290,9 @@ public abstract class ModularScreen {
 
     @ApiStatus.OverrideOnly
     public boolean onMouseDrag(int mouseButton, long timeSinceClick) {
+        for (IGuiAction.MouseDrag action : getGuiActionListeners(IGuiAction.MouseDrag.class)) {
+            action.drag(mouseButton, timeSinceClick);
+        }
         for (ModularPanel panel : this.windowManager.getOpenWindows()) {
             if (panel.onMouseDrag(mouseButton, timeSinceClick)) {
                 return true;
@@ -356,6 +363,30 @@ public abstract class ModularScreen {
 
     protected ModularContainer getContainer() {
         return (ModularContainer) this.screenWrapper.inventorySlots;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T extends IGuiAction> List<T> getGuiActionListeners(Class<T> clazz) {
+        return (List<T>) this.guiActionListeners.getOrDefault(clazz, Collections.emptyList());
+    }
+
+    public void registerGuiActionListener(IGuiAction action) {
+        this.guiActionListeners.computeIfAbsent(getGuiActionClass(action), key -> new ArrayList<>()).add(action);
+    }
+
+    @ApiStatus.Internal
+    public void removeGuiActionListener(IGuiAction action) {
+        this.guiActionListeners.getOrDefault(getGuiActionClass(action), Collections.emptyList()).remove(action);
+    }
+
+    private static Class<?> getGuiActionClass(IGuiAction action) {
+        Class<?>[] classes = action.getClass().getInterfaces();
+        for (Class<?> clazz : classes) {
+            if (IGuiAction.class.isAssignableFrom(clazz)) {
+                return clazz;
+            }
+        }
+        throw new IllegalArgumentException();
     }
 
     public static ModularScreen simple(@NotNull String name, Function<GuiContext, ModularPanel> panel) {

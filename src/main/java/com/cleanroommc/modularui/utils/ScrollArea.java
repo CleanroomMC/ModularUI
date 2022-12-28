@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.utils;
 
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.screen.GuiContext;
+import com.cleanroommc.modularui.widget.sizer.Area;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
@@ -171,16 +172,21 @@ public class ScrollArea extends Area {
 
     @SideOnly(Side.CLIENT)
     public boolean mouseClicked(GuiContext context) {
-        return this.mouseClicked(context.mouseX, context.mouseY);
+        return this.mouseClicked(context.getAbsMouseX(), context.getAbsMouseY());
     }
 
     /**
      * This method should be invoked to register dragging
      */
     public boolean mouseClicked(int x, int y) {
-        boolean isInside = this.isInside(x, y) && this.scrollSize > this.h;
+        boolean isInside = this.isInside(x, y) &&
+                this.scrollSize > this.height &&
+                this.direction == ScrollDirection.VERTICAL ?
+                x >= ex() - getScrollbarWidth() :
+                y >= ey() - getScrollbarWidth();
 
         if (isInside) {
+            this.dragging = true;
             int scrollbar = this.getScrollbarWidth();
 
             if (this.opposite) {
@@ -190,16 +196,12 @@ public class ScrollArea extends Area {
             }
         }
 
-        if (isInside) {
-            this.dragging = true;
-        }
-
         return isInside;
     }
 
     @SideOnly(Side.CLIENT)
     public boolean mouseScroll(GuiContext context) {
-        return this.mouseScroll(context.mouseX, context.mouseY, context.mouseWheel);
+        return this.mouseScroll(context.getAbsMouseX(), context.getAbsMouseY(), context.getMouseWheel());
     }
 
     /**
@@ -226,7 +228,7 @@ public class ScrollArea extends Area {
 
     @SideOnly(Side.CLIENT)
     public void mouseReleased(GuiContext context) {
-        this.mouseReleased(context.mouseX, context.mouseY);
+        this.mouseReleased(context.getAbsMouseX(), context.getAbsMouseY());
     }
 
     /**
@@ -238,7 +240,7 @@ public class ScrollArea extends Area {
 
     @SideOnly(Side.CLIENT)
     public void drag(GuiContext context) {
-        this.drag(context.mouseX, context.mouseY);
+        this.drag(context.getMouseX(), context.getMouseY());
     }
 
     /**
@@ -253,6 +255,16 @@ public class ScrollArea extends Area {
         }
     }
 
+    public boolean isScrollBarActive() {
+        return this.scrollSize > this.direction.getSide(this);
+    }
+
+    public int getContentSize() {
+        return this.direction == ScrollDirection.HORIZONTAL ?
+                this.w() - getPadding().horizontal() :
+                h() - getPadding().vertical();
+    }
+
     /**
      * This method is responsible for drawing a scroll bar
      */
@@ -260,28 +272,35 @@ public class ScrollArea extends Area {
     public void drawScrollbar() {
         int side = this.direction.getSide(this);
 
-        if (this.scrollSize <= side) {
+        if (!isScrollBarActive()) {
             return;
         }
 
         int scrollbar = this.getScrollbarWidth();
         int h = this.getScrollBar(side / 2);
-        int x = this.opposite ? this.x : this.ex() - scrollbar;
+        int content = getContentSize();
+        int x = 0;
+        int y = 0;
+        int rx = 0;
+        int ry = 0;
+
         /* Sometimes I don't understand how I come up with such clever
          * formulas, but it's all ratios, y'all */
-        int y = this.y + (int) ((this.scroll / (float) (this.scrollSize - this.h)) * (this.h - h));
-        int rx = x + scrollbar;
-        int ry = y + h;
 
-        if (this.direction == ScrollDirection.HORIZONTAL) {
-            y = this.opposite ? this.y : this.ey() - scrollbar;
-            x = this.x + (int) ((this.scroll / (float) (this.scrollSize - this.w)) * (this.w - h));
+        if (this.direction == ScrollDirection.VERTICAL) {
+            y = (int) ((this.scroll / (float) (this.scrollSize - content)) * (content - h));
+            x = this.opposite ? 0 : this.width - scrollbar;
+            rx = x + scrollbar;
+            ry = y + h;
+        } else if (this.direction == ScrollDirection.HORIZONTAL) {
+            y = this.opposite ? 0 : this.height - scrollbar;
+            x = (int) ((this.scroll / (float) (this.scrollSize - this.width)) * (side - h));
             rx = x + h;
             ry = y + scrollbar;
         }
 
         // TODO
-        if (/*ModularUI.scrollbarFlat.get()*/true) {
+        if (/*ModularUI.scrollbarFlat.get()*/false) {
             Gui.drawRect(x, y, rx, ry, -6250336);
         } else {
             int color = 0;//ModularUI.scrollbarShadow.get();

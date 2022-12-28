@@ -5,9 +5,7 @@ import com.cleanroommc.modularui.api.IViewport;
 import com.cleanroommc.modularui.api.IViewportStack;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Viewport stack
@@ -19,8 +17,8 @@ public class GuiViewportStack implements IViewportStack {
 
     private final Stack<Area> viewportStack = new Stack<>();
     private final List<Area> viewportAreas = new ArrayList<>();
-    private int shiftX;
-    private int shiftY;
+    private int shiftX = 0;
+    private int shiftY = 0;
 
     public static GuiViewportStack fromElement(IWidget element) {
         GuiViewportStack stack = new GuiViewportStack();
@@ -30,7 +28,7 @@ public class GuiViewportStack implements IViewportStack {
         return stack;
     }
 
-    public void applyFromElement(IWidget element) {
+    private void applyFromElement(IWidget element) {
         List<IViewport> elements = new ArrayList<>();
 
         while (element != null) {

@@ -146,7 +146,7 @@ public class GuiScreenWrapper extends GuiContainer {
             GlStateManager.disableDepth();
             GlStateManager.disableLighting();
             GlStateManager.enableBlend();
-            drawDebugScreen(mouseX, mouseY);
+            drawDebugScreen();
             GlStateManager.color(1f, 1f, 1f, 1f);
         }
         GuiErrorHandler.INSTANCE.drawErrors(0, 0);
@@ -178,7 +178,9 @@ public class GuiScreenWrapper extends GuiContainer {
         }
     }
 
-    public void drawDebugScreen(int mouseX, int mouseY) {
+    public void drawDebugScreen() {
+        GuiContext context = screen.context;
+        int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
         int screenW = this.screen.getViewport().width, screenH = this.screen.getViewport().height;
         int color = Color.rgb(180, 40, 115);
         int lineY = screenH - 13;

@@ -1,13 +1,18 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.*;
+import com.cleanroommc.modularui.api.IFocusedWidget;
+import com.cleanroommc.modularui.api.IGuiElement;
+import com.cleanroommc.modularui.api.IVanillaSlot;
+import com.cleanroommc.modularui.api.IWidget;
 import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
-import com.cleanroommc.modularui.widget.sizer.Area;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -15,92 +20,44 @@ import java.util.List;
 import java.util.function.Consumer;
 
 // TODO merge into ModularScreen and yeet
-public class GuiContext implements IViewportStack {
+public class GuiContext extends GuiViewportStack {
 
     public final Minecraft mc;
     public final FontRenderer font;
 
     /* GUI elements */
     public final ModularScreen screen;
-    //public final GuiTooltip tooltip; // TODO weird
-    //public final GuiKeybinds keybinds;
-    public IFocusedWidget focusedWidget;
+    private LocatedWidget focusedWidget = LocatedWidget.EMPTY;
     @Nullable
     private IGuiElement hovered;
     private int timeHovered = 0;
     private final HoveredIterable hoveredWidgets;
-    //public GuiContextMenu contextMenu;
 
     /* Mouse states */
-    public int mouseX;
-    public int mouseY;
-    public int mouseButton;
-    public int mouseWheel;
+    private int mouseX;
+    private int mouseY;
+    private int mouseButton;
+    private int mouseWheel;
 
     /* Keyboard states */
-    public char typedChar;
-    public int keyCode;
+    private char typedChar;
+    private int keyCode;
 
     /* Render states */
-    public float partialTicks;
+    private float partialTicks;
     private long tick;
 
     public List<Consumer<GuiContext>> postRenderCallbacks = new ArrayList<>();
-    public GuiViewportStack viewportStack = new GuiViewportStack();
 
     public GuiContext(ModularScreen screen) {
         this.screen = screen;
         this.hoveredWidgets = new HoveredIterable(this.screen.getWindowManager());
-        //this.tooltip = new GuiTooltip();
-        //this.keybinds = new GuiKeybinds();
-        //this.keybinds.setVisible(false);
         this.mc = ModularUI.getMC();
         this.font = this.mc.fontRenderer;
     }
 
     public boolean isAbove(IGuiElement widget) {
         return widget.getArea().isInside(mouseX, mouseY);
-    }
-
-    public void setMouse(int mouseX, int mouseY) {
-        this.mouseX = mouseX;
-        this.mouseY = mouseY;
-        this.viewportStack.reset();
-    }
-
-    public void setMouse(int mouseX, int mouseY, int mouseButton) {
-        this.setMouse(mouseX, mouseY);
-        this.mouseButton = mouseButton;
-    }
-
-    public void setMouseWheel(int mouseX, int mouseY, int mouseWheel) {
-        this.setMouse(mouseX, mouseY);
-        this.mouseWheel = mouseWheel;
-    }
-
-    public void setKey(char typedChar, int keyCode) {
-        this.typedChar = typedChar;
-        this.keyCode = keyCode;
-    }
-
-    public void reset() {
-        this.viewportStack.reset();
-
-        //this.resetTooltip();
-    }
-
-    /*public void resetTooltip() {
-        this.tooltip.set(null, null);
-
-        if (this.focusedWidget instanceof Widget && !((Widget) this.focusedWidget).canBeSeen()) {
-            this.unfocus();
-        }
-    }
-
-    /* Tooltip */
-
-    /*public void drawTooltip() {
-        this.tooltip.drawTooltip(this);
     }
 
     /* Element focusing */
@@ -130,14 +87,18 @@ public class GuiContext implements IViewportStack {
      * @return true if there is any focused widget
      */
     public boolean isFocused() {
-        return this.focusedWidget != null;
+        return this.focusedWidget.getWidget() != null;
     }
 
     /**
      * @return true if there is any focused widget
      */
     public boolean isFocused(IFocusedWidget widget) {
-        return this.focusedWidget == widget;
+        return this.focusedWidget.getWidget() == widget;
+    }
+
+    public LocatedWidget getFocusedWidget() {
+        return this.focusedWidget;
     }
 
     /**
@@ -149,34 +110,44 @@ public class GuiContext implements IViewportStack {
         this.focus(widget, false);
     }
 
+    public void focus(IFocusedWidget widget, boolean select) {
+        focus(LocatedWidget.of((IWidget) widget), select);
+    }
+
     /**
      * Tries to focus the given widget
      *
      * @param widget widget to focus
      * @param select true if the widget should also be selected (f.e. the text in a text field)
      */
-    public void focus(IFocusedWidget widget, boolean select) {
-        if (this.focusedWidget == widget) {
+    public void focus(@NotNull LocatedWidget widget, boolean select) {
+        if (this.focusedWidget.getWidget() == widget.getWidget()) {
             return;
         }
 
-        if (this.focusedWidget != null) {
-            this.focusedWidget.onRemoveFocus(this);
+        if (widget.getWidget() != null && !(widget.getWidget() instanceof IFocusedWidget)) {
+            throw new IllegalArgumentException();
+        }
+
+        if (this.focusedWidget.getWidget() != null) {
+            IFocusedWidget focusedWidget = (IFocusedWidget) this.focusedWidget.getWidget();
+            focusedWidget.onRemoveFocus(this);
             this.screen.setFocused(false);
 
             if (select) {
-                this.focusedWidget.unselect(this);
+                focusedWidget.unselect(this);
             }
         }
 
         this.focusedWidget = widget;
 
-        if (this.focusedWidget != null) {
-            this.focusedWidget.onFocus(this);
+        if (this.focusedWidget.getWidget() != null) {
+            IFocusedWidget focusedWidget = (IFocusedWidget) this.focusedWidget.getWidget();
+            focusedWidget.onFocus(this);
             this.screen.setFocused(true);
 
             if (select) {
-                this.focusedWidget.selectAll(this);
+                focusedWidget.selectAll(this);
             }
         }
     }
@@ -261,50 +232,20 @@ public class GuiContext implements IViewportStack {
         return false;
     }
 
-    /* Context menu */
-
-    /*public boolean hasContextMenu() {
-        if (this.contextMenu == null) {
-            return false;
-        }
-
-        if (!this.contextMenu.hasParent()) {
-            this.contextMenu = null;
-        }
-
-        return this.contextMenu != null;
-    }*/
-
-    //TODO: WTF is a GuiContextMenu
-    /*public void setContextMenu(GuiContextMenu menu) {
-        if (this.hasContextMenu() || menu == null) {
-            return;
-        }
-
-        menu.setMouse(this);
-        menu.resize();
-
-        this.contextMenu = menu;
-        this.screen.root.add(menu);
+    @ApiStatus.Internal
+    public void updateState(int mouseX, int mouseY, float partialTicks) {
+        this.mouseX = mouseX;
+        this.mouseY = mouseY;
+        this.partialTicks = partialTicks;
     }
 
-    public void replaceContextMenu(GuiContextMenu menu) {
-        if (menu == null) {
-            return;
-        }
-
-        if (this.contextMenu != null) {
-            this.contextMenu.removeFromParent();
-        }
-
-        menu.setMouse(this);
-        menu.resize();
-
-        this.contextMenu = menu;
-        this.screen.root.add(menu);
-    }*/
-
+    @ApiStatus.Internal
     public void onFrameUpdate() {
+        this.mouseButton = Mouse.getEventButton();
+        this.mouseWheel = Mouse.getEventDWheel();
+        this.keyCode = Keyboard.getEventKey();
+        this.typedChar = Keyboard.getEventCharacter();
+
         IGuiElement hovered = this.screen.getWindowManager().getTopWidget();
         if (this.hovered != hovered) {
             if (this.hovered != null) {
@@ -335,77 +276,48 @@ public class GuiContext implements IViewportStack {
 
     /* Viewport */
 
+    public int getMouseX() {
+        return localX(this.mouseX);
+    }
+
+    public int getMouseY() {
+        return localY(this.mouseY);
+    }
+
     /**
      * Get absolute X coordinate of the mouse without the
      * scrolling areas applied
      */
-    public int mouseX() {
-        return this.globalX(this.mouseX);
+    public int getAbsMouseX() {
+        return this.mouseX;
     }
 
     /**
      * Get absolute Y coordinate of the mouse without the
      * scrolling areas applied
      */
-    public int mouseY() {
-        return this.globalY(this.mouseY);
-    }
-
-    @Override
-    public int getShiftX() {
-        return this.mouseX;
-    }
-
-    @Override
-    public int getShiftY() {
+    public int getAbsMouseY() {
         return this.mouseY;
     }
 
-    @Override
-    public int globalX(int x) {
-        return this.viewportStack.globalX(x);
+    public int getMouseButton() {
+        return mouseButton;
     }
 
-    @Override
-    public int globalY(int y) {
-        return this.viewportStack.globalY(y);
+    public int getMouseWheel() {
+        return mouseWheel;
     }
 
-    @Override
-    public int localX(int x) {
-        return this.viewportStack.localX(x);
+    public int getKeyCode() {
+        return keyCode;
     }
 
-    @Override
-    public int localY(int y) {
-        return this.viewportStack.localY(y);
+    public char getTypedChar() {
+        return typedChar;
     }
 
-    @Override
-    public void shiftX(int x) {
-        this.mouseX += x;
-        this.viewportStack.shiftX(x);
-    }
-
-    @Override
-    public void shiftY(int y) {
-        this.mouseY += y;
-        this.viewportStack.shiftY(y);
-    }
-
-    @Override
-    public void pushViewport(Area viewport) {
-        this.viewportStack.pushViewport(viewport);
-    }
-
-    @Override
-    public void popViewport() {
-        this.viewportStack.popViewport();
-    }
-
-    @Override
-    public Area getViewport() {
-        return this.viewportStack.getViewport();
+    public float getPartialTicks() {
+        return partialTicks;
     }
 
     private static class HoveredIterable implements Iterable<IGuiElement> {
@@ -422,7 +334,7 @@ public class GuiContext implements IViewportStack {
             return new Iterator<IGuiElement>() {
 
                 private final Iterator<ModularPanel> panelIt = windowManager.getOpenWindows().iterator();
-                private Iterator<IWidget> widgetIt;
+                private Iterator<LocatedWidget> widgetIt;
 
                 @Override
                 public boolean hasNext() {
@@ -440,7 +352,7 @@ public class GuiContext implements IViewportStack {
                     if (widgetIt == null || !widgetIt.hasNext()) {
                         widgetIt = panelIt.next().getHovering().iterator();
                     }
-                    return widgetIt.next();
+                    return widgetIt.next().getWidget();
                 }
             };
         }

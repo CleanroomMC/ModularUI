@@ -1,5 +1,7 @@
 package com.cleanroommc.modularui.utils;
 
+import com.cleanroommc.modularui.widget.sizer.Area;
+
 /**
  * Scroll direction
  */
@@ -13,7 +15,7 @@ public enum ScrollDirection {
 
         @Override
         public int getSide(Area area) {
-            return area.h;
+            return Math.max(0, area.height - area.getPadding().vertical());
         }
 
         @Override
@@ -23,7 +25,7 @@ public enum ScrollDirection {
 
         @Override
         public float getProgress(Area area, int x, int y) {
-            return (y - area.y) / (float) area.h;
+            return (y - area.y) / (float) area.height;
         }
     },
     HORIZONTAL() {
@@ -34,7 +36,7 @@ public enum ScrollDirection {
 
         @Override
         public int getSide(Area area) {
-            return area.w;
+            return Math.max(0, area.width - area.getPadding().horizontal());
         }
 
         @Override
@@ -44,7 +46,7 @@ public enum ScrollDirection {
 
         @Override
         public float getProgress(Area area, int x, int y) {
-            return (x - area.x) / (float) area.w;
+            return (x - area.x) / (float) area.width;
         }
     };
 

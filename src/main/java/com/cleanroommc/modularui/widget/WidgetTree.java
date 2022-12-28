@@ -1,13 +1,17 @@
 package com.cleanroommc.modularui.widget;
 
+import com.cleanroommc.modularui.api.IViewport;
 import com.cleanroommc.modularui.api.IWidget;
 import com.cleanroommc.modularui.screen.GuiContext;
-import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.LocatedWidget;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.renderer.GlStateManager;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -56,6 +60,22 @@ public class WidgetTree {
         return true;
     }
 
+    public static boolean foreachChildByLayer2(IWidget parent, Predicate<IWidget> consumer, boolean includeSelf) {
+        if (includeSelf && !consumer.test(parent)) return false;
+        LinkedList<IWidget> parents = new LinkedList<>();
+        parents.add(parent);
+        while (!parents.isEmpty()) {
+            for (IWidget child : parents.pollFirst().getChildren()) {
+                if (!consumer.test(child)) return false;
+
+                if (child.hasChildren()) {
+                    parents.addLast(child);
+                }
+            }
+        }
+        return true;
+    }
+
     public static boolean foreachChild(IWidget parent, Predicate<IWidget> consumer, boolean includeSelf) {
         if (includeSelf && !consumer.test(parent)) return false;
         if (parent.getChildren().isEmpty()) return true;
@@ -82,14 +102,11 @@ public class WidgetTree {
     }
 
     @ApiStatus.Internal
-    public static void drawInternal(ModularPanel panel, GuiContext context, float partialTicks) {
-        context.pushViewport(panel.getArea());
-        drawInternal((IWidget) panel, context, partialTicks);
-        context.popViewport();
-    }
-
-    @ApiStatus.Internal
     public static void drawInternal(IWidget parent, GuiContext context, float partialTicks) {
+        if (!parent.isEnabled()) return;
+        if (parent instanceof IViewport) {
+            ((IViewport) parent).apply(context);
+        }
         GlStateManager.pushMatrix();
         Area viewport = context.getViewport();
         int alpha = 1;//getWindow().getAlpha();
@@ -108,6 +125,9 @@ public class WidgetTree {
         List<IWidget> children = parent.getChildren();
         if (!children.isEmpty()) {
             children.forEach(widget -> drawInternal(widget, context, partialTicks));
+        }
+        if (parent instanceof IViewport) {
+            ((IViewport) parent).unapply(context);
         }
     }
 

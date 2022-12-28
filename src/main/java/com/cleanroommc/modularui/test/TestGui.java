@@ -17,10 +17,7 @@ public class TestGui extends ModularScreen {
 
     @Override
     public ModularPanel buildUI(GuiContext context) {
-        ModularPanel panel = new ModularPanel(context);
-        panel.flex()                         // returns object which is responsible for sizing
-                .size(176, 166)       // set a static size for the main panel
-                .align(Alignment.Center);    // center the panel in the screen
+        ModularPanel panel = ModularPanel.defaultPanel(context);
         panel.background(GuiTextures.BACKGROUND);
         panel.child(new ButtonWidget<>()
                         .flex(flex -> flex.left(10)
@@ -28,10 +25,10 @@ public class TestGui extends ModularScreen {
                                 .height(20)
                                 .top(10))
                         .background(GuiTextures.BUTTON, IKey.str("Button")))
-                .child(SlotGroup.playerInventory()
+                /*.child(SlotGroup.playerInventory()
                         .flex(flex -> flex
                                 .left(0.5f)
-                                .bottom(7)));
+                                .bottom(7)))*/;
 
         return panel;
     }
