@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.sync.IStringValueSyncHandler;
 import com.cleanroommc.modularui.api.sync.IValue;
-import com.cleanroommc.modularui.api.sync.IValueSyncHandler;
 import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.api.sync.ValueSyncHandler;
 import com.cleanroommc.modularui.screen.GuiContext;
@@ -11,6 +11,7 @@ import com.cleanroommc.modularui.utils.math.MathBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.text.ParsePosition;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -20,7 +21,7 @@ import java.util.regex.Pattern;
  */
 public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
-    private IValueSyncHandler.IStringValueSyncHandler<?> syncHandler;
+    private IStringValueSyncHandler<?> syncHandler;
     private Function<String, String> validator = val -> val;
 
     public static IValue parse(String num) {
@@ -45,8 +46,8 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof IValueSyncHandler.IStringValueSyncHandler && syncHandler instanceof ValueSyncHandler) {
-            this.syncHandler = (IValueSyncHandler.IStringValueSyncHandler<?>) syncHandler;
+        if (syncHandler instanceof IStringValueSyncHandler && syncHandler instanceof ValueSyncHandler) {
+            this.syncHandler = (IStringValueSyncHandler<?>) syncHandler;
             ((ValueSyncHandler<?>) this.syncHandler).setChangeListener(() -> {
                 markDirty();
                 setText(this.syncHandler.getCachedValue().toString());
@@ -115,7 +116,11 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         } else {
             throw new IllegalStateException("TextFieldWidget can only have one line!");
         }
-        this.syncHandler.updateFromClient(getText());
+        if (this.syncHandler.getCachedValue() instanceof Number) {
+            this.syncHandler.updateFromClient(format.parse(getText(), new ParsePosition(0)).toString());
+        } else {
+            this.syncHandler.updateFromClient(getText());
+        }
     }
 
     public TextFieldWidget setMaxLength(int maxLength) {

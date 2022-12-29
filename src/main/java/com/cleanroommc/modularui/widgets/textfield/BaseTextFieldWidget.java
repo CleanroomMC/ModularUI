@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -22,7 +21,7 @@ import java.util.regex.Pattern;
  */
 public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends ScrollWidget<W> implements IFocusedWidget {
 
-    public static final DecimalFormat format = (DecimalFormat) NumberFormat.getInstance();
+    public static final DecimalFormat format = new DecimalFormat("###.###");
 
     // all positive whole numbers
     public static final Pattern NATURAL_NUMS = Pattern.compile("[0-9]*([+\\-*/%^][0-9]*)*");

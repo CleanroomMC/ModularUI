@@ -15,9 +15,11 @@ import com.cleanroommc.modularui.utils.math.functions.string.StringEndsWith;
 import com.cleanroommc.modularui.utils.math.functions.string.StringStartsWith;
 import com.cleanroommc.modularui.utils.math.functions.trig.*;
 import com.cleanroommc.modularui.utils.math.functions.utility.*;
+import com.cleanroommc.modularui.widgets.textfield.BaseTextFieldWidget;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.lang.reflect.Constructor;
+import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -497,7 +499,7 @@ public class MathBuilder {
             }
 
             if (this.isDecimal(symbol)) {
-                return new Constant(Double.parseDouble(symbol));
+                return new Constant(BaseTextFieldWidget.format.parse(symbol, new ParsePosition(0)).doubleValue());
             } else if (this.isVariable(symbol)) {
                 /* Need to account for a negative value variable */
                 if (symbol.startsWith("-")) {

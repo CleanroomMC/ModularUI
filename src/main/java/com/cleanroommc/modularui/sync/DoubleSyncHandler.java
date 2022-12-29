@@ -1,13 +1,13 @@
 package com.cleanroommc.modularui.sync;
 
-import com.cleanroommc.modularui.api.sync.IValueSyncHandler;
+import com.cleanroommc.modularui.api.sync.IStringValueSyncHandler;
 import com.cleanroommc.modularui.api.sync.ValueSyncHandler;
 import net.minecraft.network.PacketBuffer;
 
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
-public class DoubleSyncHandler extends ValueSyncHandler<Double> implements IValueSyncHandler.IStringValueSyncHandler<Double> {
+public class DoubleSyncHandler extends ValueSyncHandler<Double> implements IStringValueSyncHandler<Double> {
 
     private final DoubleSupplier getter;
     private final DoubleConsumer setter;
