@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.sync;
 
+import com.cleanroommc.modularui.api.IValueSyncHandler;
 import com.cleanroommc.modularui.api.ValueSyncHandler;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import net.minecraft.network.PacketBuffer;
@@ -7,15 +8,16 @@ import net.minecraft.network.PacketBuffer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class StringSyncHandler extends ValueSyncHandler<String> {
+public class StringSyncHandler extends ValueSyncHandler<String> implements IValueSyncHandler.IStringValueSyncHandler<String> {
 
     private final Supplier<String> getter;
     private final Consumer<String> setter;
-    private String cache = "";
+    private String cache;
 
     public StringSyncHandler(Supplier<String> getter, Consumer<String> setter) {
         this.getter = getter;
         this.setter = setter;
+        this.cache = getter.get();
     }
 
     @Override
@@ -45,8 +47,14 @@ public class StringSyncHandler extends ValueSyncHandler<String> {
         this.setter.accept(getCachedValue());
     }
 
+    @Override
     public void updateFromClient(String value) {
         this.setter.accept(value);
         syncToServer(0, this::updateAndWrite);
+    }
+
+    @Override
+    public String fromString(String value) {
+        return value;
     }
 }

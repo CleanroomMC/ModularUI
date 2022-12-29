@@ -9,10 +9,7 @@ import com.cleanroommc.modularui.drawable.ItemDrawable;
 import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.sync.FluidSlotSyncHandler;
-import com.cleanroommc.modularui.sync.GuiSyncHandler;
-import com.cleanroommc.modularui.sync.IntSyncHandler;
-import com.cleanroommc.modularui.sync.StringSyncHandler;
+import com.cleanroommc.modularui.sync.*;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
@@ -26,17 +23,21 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.fluids.FluidTank;
 
+import java.util.function.Function;
+
 public class TestTile extends TileEntity implements IGuiHolder, ITickable {
 
     private long time = 0;
     private int val;
     private final FluidTank fluidTank = new FluidTank(10000);
     private String value = "";
+    private double doubleValue = 1;
 
     @Override
     public void buildSyncHandler(GuiSyncHandler guiSyncHandler, EntityPlayer player) {
         guiSyncHandler.syncValue(0, new IntSyncHandler(() -> val, val -> this.val = val));
         guiSyncHandler.syncValue(1, new StringSyncHandler(() -> this.value, val -> this.value = val));
+        guiSyncHandler.syncValue(2, new DoubleSyncHandler(() -> this.doubleValue, val -> this.doubleValue = val));
         guiSyncHandler.syncValue("fluid_slot", new FluidSlotSyncHandler(fluidTank));
     }
 
@@ -83,7 +84,15 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                 .setTextColor(Color.WHITE.normal)
                                 .background(GuiTextures.DISPLAY)
                                 .size(60, 20)
-                                .setSynced(1)));
+                                .setSynced(1)
+                                .margin(0, 3))
+                        .child(new TextFieldWidget()
+                                .setTextColor(Color.WHITE.normal)
+                                .background(GuiTextures.DISPLAY)
+                                .size(60, 20)
+                                .setSynced(2)
+                                .setNumbersDouble(Function.identity())
+                        ));
         /*panel.child(new ButtonWidget<>()
                         .flex(flex -> flex.size(60, 20)
                                 .top(7)

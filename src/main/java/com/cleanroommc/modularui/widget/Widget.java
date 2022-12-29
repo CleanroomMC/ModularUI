@@ -67,10 +67,10 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
             }
         }
         this.valid = true;
+        onInit();
         if (this.tooltip != null && this.tooltip.getExcludeArea() == null && ModularUIConfig.placeTooltipNextToPanel()) {
             this.tooltip.excludeArea(getPanel().getArea());
         }
-        onInit();
         if (hasChildren()) {
             for (IWidget child : getChildren()) {
                 child.initialise(this);
@@ -89,7 +89,7 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
                 this.syncHandler = null;
                 throw new IllegalStateException();
             }
-            if (this.syncHandler instanceof ValueSyncHandler) {
+            if (this.syncHandler instanceof ValueSyncHandler && ((ValueSyncHandler<?>) this.syncHandler).getChangeListener() == null) {
                 ((ValueSyncHandler<?>) this.syncHandler).setChangeListener(this::markDirty);
             }
         }

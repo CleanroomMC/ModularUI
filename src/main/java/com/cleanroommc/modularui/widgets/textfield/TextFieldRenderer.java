@@ -10,7 +10,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.tuple.Pair;
 
-
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.Collections;
@@ -80,8 +79,12 @@ public class TextFieldRenderer extends TextRenderer {
                 }
             }
             // draw cursor
-            start = getPosOf(measuredLines, handler.getMainCursor());
+            Point main = this.handler.getMainCursor();
+            start = getPosOf(measuredLines, main);
             if (this.renderCursor) {
+                if (this.handler.getText().get(main.y).isEmpty()) {
+                    start.x += 0.7f;
+                }
                 drawCursor(start.x, start.y);
             }
         }

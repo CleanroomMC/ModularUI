@@ -11,6 +11,7 @@ import net.minecraft.client.gui.GuiScreen;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 
+import java.awt.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Collections;
@@ -33,7 +34,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     public static final Pattern ANY = Pattern.compile(".*");
     private static final Pattern BASE_PATTERN = Pattern.compile("[A-Za-z0-9\\s_+\\-.,!@#$%^&*();\\\\/|<>\"'\\[\\]?=]");
 
-    protected TextFieldHandler handler = new TextFieldHandler();
+    protected TextFieldHandler handler = new TextFieldHandler(this);
     protected TextFieldRenderer renderer = new TextFieldRenderer(handler);
     protected Alignment textAlignment = Alignment.CenterLeft;
     protected int scrollOffset = 0;
@@ -74,14 +75,11 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
 
     @Override
     protected void preDraw(GuiContext context) {
-        //GlStateManager.pushMatrix();
-        //GlStateManager.translate(1 - scrollOffset, 1, 0);
         renderer.setSimulate(false);
         renderer.setScale(scale);
         renderer.setAlignment(textAlignment, -2, getArea().height);
         renderer.draw(handler.getText());
-        getScrollArea().scrollSize = Math.max(0, (int) renderer.getLastWidth());
-        //GlStateManager.popMatrix();
+        getScrollArea().scrollSize = Math.max(0, (int) (renderer.getLastWidth() + 0.5f));
     }
 
     @Override
@@ -100,6 +98,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
         this.renderer.setCursor(false);
         this.cursorTimer = 0;
         this.scrollOffset = 0;
+        this.handler.setCursor(0, 0, true, true);
     }
 
     @Override
@@ -126,17 +125,14 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
         if (!isHovering()) {
             return Result.IGNORE;
         }
-        //handler.setCursor(renderer.getCursorPos(handler.getText(), getContext().mouseX - getArea().x + scrollOffset, getContext().mouseY - getArea().y));
-        handler.setCursor(renderer.getCursorPos(handler.getText(), getContext().getMouseX() - getArea().x, getContext().getMouseY() - getArea().y));
-
+        handler.setCursor(renderer.getCursorPos(handler.getText(), getContext().getMouseX() - getArea().x, getContext().getMouseY() - getArea().y), true);
         return Result.SUCCESS;
     }
 
     @Override
     public void onMouseDrag(int mouseButton, long timeSinceClick) {
         if (isFocused()) {
-            handler.setMainCursor(renderer.getCursorPos(handler.getText(), getContext().getMouseX() - getArea().x, getContext().getMouseY() - getArea().y));
-            //handler.setMainCursor(renderer.getCursorPos(handler.getText(), getContext().mouseX - getArea().x + scrollOffset, getContext().mouseY - getArea().y));
+            handler.setMainCursor(renderer.getCursorPos(handler.getText(), getContext().getMouseX() - getArea().x, getContext().getMouseY() - getArea().y), true);
         }
     }
 

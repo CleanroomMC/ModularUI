@@ -1,21 +1,19 @@
 package com.cleanroommc.modularui.sync;
 
+import com.cleanroommc.modularui.api.IValueSyncHandler;
 import com.cleanroommc.modularui.api.ValueSyncHandler;
 import net.minecraft.network.PacketBuffer;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 
-public class IntSyncHandler extends ValueSyncHandler<Integer> {
+public class IntSyncHandler extends ValueSyncHandler<Integer> implements IValueSyncHandler.IStringValueSyncHandler<Integer> {
 
     private int cache;
-    @Nullable
     private final IntSupplier getter;
-    @Nullable
     private final IntConsumer setter;
 
-    public IntSyncHandler(@Nullable IntSupplier getter, @Nullable IntConsumer setter) {
+    public IntSyncHandler(IntSupplier getter, IntConsumer setter) {
         this.getter = getter;
         this.setter = setter;
     }
@@ -54,5 +52,16 @@ public class IntSyncHandler extends ValueSyncHandler<Integer> {
         if (setter != null) {
             setter.accept(cache);
         }
+    }
+
+    @Override
+    public void updateFromClient(Integer value) {
+        this.setter.accept(value);
+        syncToServer(0, this::updateAndWrite);
+    }
+
+    @Override
+    public Integer fromString(String value) {
+        return Integer.parseInt(value);
     }
 }

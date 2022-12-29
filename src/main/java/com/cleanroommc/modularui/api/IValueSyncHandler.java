@@ -13,4 +13,19 @@ public interface IValueSyncHandler<T>  {
     void updateAndWrite(PacketBuffer buffer);
 
     void read(PacketBuffer buffer);
+
+    void updateFromClient(T value);
+
+    interface IStringValueSyncHandler<T> extends IValueSyncHandler<T> {
+
+        default String asString(T value) {
+            return asString(value);
+        }
+
+        T fromString(String value);
+
+        default void updateFromClient(String value) {
+            updateFromClient(fromString(value));
+        }
+    }
 }

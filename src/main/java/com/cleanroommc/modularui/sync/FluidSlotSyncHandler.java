@@ -65,6 +65,11 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
     }
 
     @Override
+    public void updateFromClient(FluidStack value) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void readOnClient(int id, PacketBuffer buf) {
         if (id == 0) {
             read(buf);

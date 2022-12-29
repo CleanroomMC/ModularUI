@@ -46,8 +46,8 @@ public class GuiDraw {
         scissor(context.globalX(x), context.globalY(y), w, h, context.screen.getViewport().width, context.screen.getViewport().height);
     }
 
-    public static void scissorTransformed(Area area, GuiContext context) {
-        scissor(area.x, area.y, area.width, area.height, context.screen.getViewport().width, context.screen.getViewport().height);
+    public static void scissorTransformed(int x, int y, int w, int h, GuiContext context) {
+        scissor(x, y, w, h, context.screen.getViewport().width, context.screen.getViewport().height);
     }
 
     /**

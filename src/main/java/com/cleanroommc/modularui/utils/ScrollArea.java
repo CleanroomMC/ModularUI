@@ -75,7 +75,7 @@ public class ScrollArea extends Area {
         this.scrollItemSize = itemSize;
     }
 
-    public int getScrollbarWidth() {
+    public int getScrollbarThickness() {
         // TODO
         return this.scrollbarWidth <= 0 ? /*ModularUI.scrollbarWidth.get()*/ 4 : this.scrollbarWidth;
     }
@@ -158,14 +158,8 @@ public class ScrollArea extends Area {
     /**
      * Calculates scroll bar's height
      */
-    public int getScrollBar(int size) {
-        int maxSize = this.direction.getSide(this);
-
-        if (this.scrollSize < size) {
-            return 0;
-        }
-
-        return (int) ((1.0F - ((this.scrollSize - maxSize) / (float) this.scrollSize)) * size);
+    public int getScrollBarLength() {
+        return (int) (this.direction.getSide(this) * this.direction.getFullSide(this) / (float) this.scrollSize);
     }
 
     /* GUI code for easier manipulations */
@@ -182,12 +176,12 @@ public class ScrollArea extends Area {
         boolean isInside = this.isInside(x, y) &&
                 this.scrollSize > this.height &&
                 this.direction == ScrollDirection.VERTICAL ?
-                x >= ex() - getScrollbarWidth() :
-                y >= ey() - getScrollbarWidth();
+                x >= ex() - getScrollbarThickness() :
+                y >= ey() - getScrollbarThickness();
 
         if (isInside) {
             this.dragging = true;
-            int scrollbar = this.getScrollbarWidth();
+            int scrollbar = this.getScrollbarThickness();
 
             if (this.opposite) {
                 isInside = this.direction == ScrollDirection.VERTICAL ? x <= this.x + scrollbar : y <= this.y + scrollbar;
@@ -251,18 +245,12 @@ public class ScrollArea extends Area {
         if (this.dragging) {
             float progress = this.direction.getProgress(this, x, y);
 
-            this.scrollTo((int) (progress * (this.scrollSize - this.direction.getSide(this) + this.getScrollbarWidth())));
+            this.animateTo((int) (progress * (this.scrollSize - this.direction.getSide(this) + this.getScrollbarThickness())));
         }
     }
 
     public boolean isScrollBarActive() {
         return this.scrollSize > this.direction.getSide(this);
-    }
-
-    public int getContentSize() {
-        return this.direction == ScrollDirection.HORIZONTAL ?
-                this.w() - getPadding().horizontal() :
-                h() - getPadding().vertical();
     }
 
     /**
@@ -276,9 +264,8 @@ public class ScrollArea extends Area {
             return;
         }
 
-        int scrollbar = this.getScrollbarWidth();
-        int h = this.getScrollBar(side / 2);
-        int content = getContentSize();
+        int scrollbar = this.getScrollbarThickness();
+        int h = this.getScrollBarLength();
         int x = 0;
         int y = 0;
         int rx = 0;
@@ -288,13 +275,13 @@ public class ScrollArea extends Area {
          * formulas, but it's all ratios, y'all */
 
         if (this.direction == ScrollDirection.VERTICAL) {
-            y = (int) ((this.scroll / (float) (this.scrollSize - content)) * (content - h));
+            y = ((this.direction.getFullSide(this) - h) * this.scroll) / (this.scrollSize - side);
             x = this.opposite ? 0 : this.width - scrollbar;
             rx = x + scrollbar;
             ry = y + h;
         } else if (this.direction == ScrollDirection.HORIZONTAL) {
             y = this.opposite ? 0 : this.height - scrollbar;
-            x = (int) ((this.scroll / (float) (this.scrollSize - this.width)) * (side - h));
+            x = ((this.direction.getFullSide(this) - h) * this.scroll) / (this.scrollSize - side);
             rx = x + h;
             ry = y + scrollbar;
         }

@@ -165,12 +165,10 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 widget.unapplyViewports(getContext());
             }
         }
-        if (result) {
-            if (pressed.getWidget() instanceof IFocusedWidget) {
-                getContext().focus(pressed, true);
-            } else {
-                getContext().focus(null);
-            }
+        if (result && pressed.getWidget() instanceof IFocusedWidget) {
+            getContext().focus(pressed, true);
+        } else {
+            getContext().focus(null);
         }
         if (!this.isKeyHeld && !this.isMouseButtonHeld) {
             this.lastPressed = pressed;

@@ -105,7 +105,6 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
         return false;
     }
 
-
     @Override
     public void draw(float partialTicks) {
         super.draw(partialTicks);
@@ -113,7 +112,10 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
 
         this.scroll.drag(context.getAbsMouseX(), context.getAbsMouseY());
 
-        GuiDraw.scissorTransformed(this.scroll, context);
+        GuiDraw.scissorTransformed(this.scroll.x + this.scroll.getPadding().left,
+                this.scroll.y + this.scroll.getPadding().top,
+                this.scroll.width - this.scroll.getPadding().horizontal(),
+                this.scroll.height - this.scroll.getPadding().vertical(), context);
 
         GlStateManager.pushMatrix();
 
@@ -125,21 +127,11 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
         }
 
         this.preDraw(context);
-
-        super.draw(partialTicks);
-
         this.postDraw(context);
 
         GlStateManager.popMatrix();
-
-        this.scroll.drawScrollbar();
-
         GuiDraw.unscissor(context);
-
-        /* TODO Clear tooltip in case if it was set outside of scroll area within the scroll */
-        /*if (!this.getArea().isInside(context) && context.tooltip.element != lastTooltip) {
-            context.tooltip.set(context, null);
-        }*/
+        this.scroll.drawScrollbar();
     }
 
     protected void preDraw(GuiContext context) {

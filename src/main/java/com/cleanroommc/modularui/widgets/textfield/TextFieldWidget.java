@@ -1,12 +1,13 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
-import com.cleanroommc.modularui.api.SyncHandler;
+import com.cleanroommc.modularui.api.*;
 import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.sync.StringSyncHandler;
+import com.cleanroommc.modularui.utils.math.Constant;
 import com.cleanroommc.modularui.utils.math.MathBuilder;
 import org.jetbrains.annotations.NotNull;
 
-import java.text.ParseException;
+import java.awt.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -16,36 +17,40 @@ import java.util.regex.Pattern;
  */
 public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
-    private StringSyncHandler syncHandler;
+    private IValueSyncHandler.IStringValueSyncHandler<?> syncHandler;
     private Function<String, String> validator = val -> val;
 
-    public static Number parse(String num) {
+    public static IValue parse(String num) {
         try {
-            return format.parse(num);
-        } catch (ParseException e) {
+            return MathBuilder.INSTANCE.parse(num);
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return 0;
+        return new Constant(0);
+    }
+
+    @Override
+    public void onInit() {
+        super.onInit();
+        if (!hasTooltip()) {
+            tooltip().excludeArea(getArea());
+            tooltipBuilder(tooltip -> {
+                tooltip.addLine(IKey.str(getText()));
+            });
+        }
     }
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof StringSyncHandler) {
-            this.syncHandler = (StringSyncHandler) syncHandler;
+        if (syncHandler instanceof IValueSyncHandler.IStringValueSyncHandler && syncHandler instanceof ValueSyncHandler) {
+            this.syncHandler = (IValueSyncHandler.IStringValueSyncHandler<?>) syncHandler;
+            ((ValueSyncHandler<?>) this.syncHandler).setChangeListener(() -> {
+                markDirty();
+                setText(this.syncHandler.getCachedValue().toString());
+            });
             return true;
         }
         return false;
-    }
-
-    @Override
-    public void onFrameUpdate() {
-        super.onFrameUpdate();
-        if (this.syncHandler != null) {
-            String current = getText();
-            if (!current.equals(this.syncHandler.getCachedValue())) {
-                setText(current);
-            }
-        }
     }
 
     @Override
@@ -60,6 +65,13 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         renderer.draw(handler.getText());
         getScrollArea().scrollSize = Math.max(0, (int) renderer.getLastWidth());
         //GlStateManager.popMatrix();
+    }
+
+    @Override
+    public void drawForeground(float partialTicks) {
+        if (hasTooltip() && getScrollArea().isScrollBarActive() && isHoveringFor(getTooltip().getShowUpTimer())) {
+            getTooltip().draw(getContext(), partialTicks);
+        }
     }
 
     @NotNull
@@ -78,6 +90,15 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             handler.getText().add(text);
         } else {
             handler.getText().set(0, text);
+        }
+    }
+
+    @Override
+    public void onFocus(GuiContext context) {
+        super.onFocus(context);
+        Point main = this.handler.getMainCursor();
+        if (main.x == 0) {
+            this.handler.setCursor(main.y, getText().length(), true, true);
         }
     }
 
@@ -120,17 +141,13 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     public TextFieldWidget setNumbersLong(Function<Long, Long> validator) {
-        setPattern(WHOLE_NUMS);
+        //setPattern(WHOLE_NUMS);
         setValidator(val -> {
             long num;
             if (val.isEmpty()) {
                 num = 0;
             } else {
-                try {
-                    num = (long) MathBuilder.INSTANCE.parse(val).doubleValue();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+                num = (long) parse(val).doubleValue();
             }
             return format.format(validator.apply(num));
         });
@@ -138,34 +155,26 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     public TextFieldWidget setNumbers(Function<Integer, Integer> validator) {
-        setPattern(WHOLE_NUMS);
+        //setPattern(WHOLE_NUMS);
         return setValidator(val -> {
             int num;
             if (val.isEmpty()) {
                 num = 0;
             } else {
-                try {
-                    num = (int) MathBuilder.INSTANCE.parse(val).doubleValue();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+                num = (int) parse(val).doubleValue();
             }
             return format.format(validator.apply(num));
         });
     }
 
     public TextFieldWidget setNumbersDouble(Function<Double, Double> validator) {
-        setPattern(DECIMALS);
+        //setPattern(DECIMALS);
         return setValidator(val -> {
             double num;
             if (val.isEmpty()) {
                 num = 0;
             } else {
-                try {
-                    num = MathBuilder.INSTANCE.parse(val).doubleValue();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+                num = parse(val).doubleValue();
             }
             return format.format(validator.apply(num));
         });

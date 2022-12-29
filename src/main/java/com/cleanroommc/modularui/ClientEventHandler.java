@@ -15,7 +15,10 @@ public class ClientEventHandler {
         ModularScreen screen = ModularScreen.getCurrent();
         if (screen != null) {
             int w = Mouse.getEventDWheel();
-            if (screen.onMouseScroll(w > 0 ? ModularScreen.UpOrDown.UP : ModularScreen.UpOrDown.DOWN, Math.abs(w))) {
+            if (w != 0) {
+                ModularUI.LOGGER.info("Scrolling: {}", w);
+            }
+            if (w != 0 && screen.onMouseScroll(w > 0 ? ModularScreen.UpOrDown.UP : ModularScreen.UpOrDown.DOWN, Math.abs(w))) {
                 event.setCanceled(true);
             }
         }

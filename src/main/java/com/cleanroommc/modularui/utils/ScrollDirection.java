@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.widget.sizer.Area;
 public enum ScrollDirection {
 
     VERTICAL() {
+
         @Override
         public int getPosition(Area area, float x) {
             return area.y(x);
@@ -15,7 +16,12 @@ public enum ScrollDirection {
 
         @Override
         public int getSide(Area area) {
-            return Math.max(0, area.height - area.getPadding().vertical());
+            return Math.max(0, getFullSide(area) - area.getPadding().vertical());
+        }
+
+        @Override
+        public int getFullSide(Area area) {
+            return area.h();
         }
 
         @Override
@@ -29,6 +35,7 @@ public enum ScrollDirection {
         }
     },
     HORIZONTAL() {
+
         @Override
         public int getPosition(Area area, float x) {
             return area.x(x);
@@ -36,7 +43,12 @@ public enum ScrollDirection {
 
         @Override
         public int getSide(Area area) {
-            return Math.max(0, area.width - area.getPadding().horizontal());
+            return Math.max(0, getFullSide(area) - area.getPadding().horizontal());
+        }
+
+        @Override
+        public int getFullSide(Area area) {
+            return area.w();
         }
 
         @Override
@@ -59,6 +71,8 @@ public enum ScrollDirection {
      * Get dominant side for this scrolling direction
      */
     public abstract int getSide(Area area);
+
+    public abstract int getFullSide(Area area);
 
     /**
      * Get scrolled amount for given mouse position
