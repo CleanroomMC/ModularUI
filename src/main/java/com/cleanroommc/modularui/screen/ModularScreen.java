@@ -68,7 +68,7 @@ public abstract class ModularScreen {
     private final WindowManager windowManager;
     public final GuiContext context;
     private final Area viewport = new Area();
-    private Theme currentTheme; //= Theme.VANILLA;
+    private Theme currentTheme; // = Theme.VANILLA;
     private final Map<Class<?>, List<IGuiAction>> guiActionListeners = new Object2ObjectOpenHashMap<>();
 
     private GuiScreenWrapper screenWrapper;
@@ -359,6 +359,10 @@ public abstract class ModularScreen {
 
     public void registerItemSlot(Slot slot) {
         getContainer().addSlotToContainer(slot);
+    }
+
+    public boolean isClientOnly() {
+        return getSyncHandler() == null;
     }
 
     protected ModularContainer getContainer() {

@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.widget;
 
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
-import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.IWidgetList;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiDraw;
@@ -29,10 +28,6 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
         this.scroll = new ScrollArea(0);
         this.scroll.direction = direction;
         this.scroll.scrollSpeed = 20;
-        listenGuiAction((IGuiAction.MouseReleased) mouseButton -> {
-            this.scroll.mouseReleased(getContext());
-            return false;
-        });
     }
 
     @Override

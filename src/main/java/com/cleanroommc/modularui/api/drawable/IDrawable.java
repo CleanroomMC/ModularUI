@@ -31,7 +31,7 @@ public interface IDrawable {
     /**
      * @return a widget with this drawable as a background
      */
-    default DrawableWidget asWidget() {
+    default Widget<?> asWidget() {
         return new DrawableWidget(this);
     }
 

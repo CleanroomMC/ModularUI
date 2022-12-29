@@ -91,8 +91,8 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                 .background(GuiTextures.DISPLAY)
                                 .size(60, 20)
                                 .setSynced(2)
-                                .setNumbersDouble(Function.identity())
-                        ));
+                                .setNumbersDouble(Function.identity()))
+                        .child(IKey.str("Test string").asWidget().padding(2)));
         /*panel.child(new ButtonWidget<>()
                         .flex(flex -> flex.size(60, 20)
                                 .top(7)

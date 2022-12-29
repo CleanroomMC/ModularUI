@@ -5,9 +5,9 @@
 - [X]  syncing
 - [X]  vanilla slots compat (properly)
 - [X]  proper interaction managing
-- [x]  proper sizing & positioning with widgets that depend on children or parents
-- [ ]  Text field
-- [x]  Tooltips
+- [X]  proper sizing & positioning with widgets that depend on children or parents
+- [X]  Text field
+- [X]  Tooltips
 
 ## Low Priority
 
@@ -15,14 +15,14 @@
 - [X]  Row
 - [X]  Column
 - [ ]  Grid
-- [ ]  Scrollable
+- [X]  Scrollable
 - [ ]  Text editor
 - [ ]  Themes
 - [ ]  Animations
 - [ ]  Json Guis
 - [ ]  Inject to any mc gui
 - [ ]  Error handling with on screen reports
-- [x]  Parent widgets can "cover" all children
+- [X]  Parent widgets can "cover" all children
 
 ## In the future
 

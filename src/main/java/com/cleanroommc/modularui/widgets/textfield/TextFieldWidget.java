@@ -1,19 +1,20 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
+import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.IValue;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.sync.IStringValueSyncHandler;
-import com.cleanroommc.modularui.api.IValue;
 import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.api.sync.ValueSyncHandler;
 import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.utils.math.Constant;
 import com.cleanroommc.modularui.utils.math.MathBuilder;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.text.ParsePosition;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.function.*;
 import java.util.regex.Pattern;
 
 /**
@@ -23,6 +24,11 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
     private IStringValueSyncHandler<?> syncHandler;
     private Function<String, String> validator = val -> val;
+
+    @Nullable
+    private Supplier<String> getter;
+    @Nullable
+    private Consumer<String> setter;
 
     public static IValue parse(String num) {
         try {
@@ -36,6 +42,9 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     @Override
     public void onInit() {
         super.onInit();
+        if (this.getter != null) {
+            setText(getter.get());
+        }
         if (!hasTooltip()) {
             tooltip().excludeArea(getArea());
             tooltipBuilder(tooltip -> {
@@ -58,17 +67,24 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     @Override
+    public void onFrameUpdate() {
+        super.onFrameUpdate();
+        if (this.getter != null) {
+            String s = this.getter.get();
+            if (!getText().equals(s)) {
+                setText(s);
+            }
+        }
+    }
+
+    @Override
     protected void preDraw(GuiContext context) {
-        //GlStateManager.pushMatrix();
-        //GlStateManager.translate(1 - scrollOffset, 1, 0);
         renderer.setSimulate(false);
         renderer.setPos(getArea().getPadding().left, 0);
         renderer.setScale(scale);
-        //renderer.setAlignment(textAlignment, getScrollArea() == null ? getArea().width - 2 : -1, getArea().height);
         renderer.setAlignment(textAlignment, -1, getArea().height);
         renderer.draw(handler.getText());
         getScrollArea().scrollSize = Math.max(0, (int) renderer.getLastWidth());
-        //GlStateManager.popMatrix();
     }
 
     @Override
@@ -116,10 +132,15 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         } else {
             throw new IllegalStateException("TextFieldWidget can only have one line!");
         }
-        if (this.syncHandler.getCachedValue() instanceof Number) {
-            this.syncHandler.updateFromClient(format.parse(getText(), new ParsePosition(0)).toString());
-        } else {
-            this.syncHandler.updateFromClient(getText());
+        if (this.syncHandler != null) {
+            if (this.syncHandler.getCachedValue() instanceof Number) {
+                this.syncHandler.updateFromClient(format.parse(getText(), new ParsePosition(0)).toString());
+            } else {
+                this.syncHandler.updateFromClient(getText());
+            }
+        }
+        if (this.setter != null) {
+            this.setter.accept(getText());
         }
     }
 
@@ -200,4 +221,47 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         return setNumbers(val -> Math.min(max, Math.max(min, val)));
     }
 
+    public TextFieldWidget getter(Supplier<String> getter) {
+        this.getter = getter;
+        return this;
+    }
+
+    public TextFieldWidget setter(Consumer<String> setter) {
+        this.setter = setter;
+        return this;
+    }
+
+    public TextFieldWidget getterLong(LongSupplier getter) {
+        this.getter = () -> String.valueOf(getter.getAsLong());
+        return this;
+    }
+
+    public TextFieldWidget setterLong(LongConsumer setter) {
+        this.setter = val -> {
+            try {
+                setter.accept(Long.parseLong(val));
+            } catch (NumberFormatException e) {
+                ModularUI.LOGGER.catching(e);
+                setter.accept(0);
+            }
+        };
+        return this;
+    }
+
+    public TextFieldWidget getterDouble(DoubleSupplier getter) {
+        this.getter = () -> String.valueOf(getter.getAsDouble());
+        return this;
+    }
+
+    public TextFieldWidget setterDouble(DoubleConsumer setter) {
+        this.setter = val -> {
+            try {
+                setter.accept(Double.parseDouble(val));
+            } catch (NumberFormatException e) {
+                ModularUI.LOGGER.catching(e);
+                setter.accept(0);
+            }
+        };
+        return this;
+    }
 }

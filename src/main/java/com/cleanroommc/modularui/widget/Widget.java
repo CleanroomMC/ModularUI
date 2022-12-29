@@ -36,8 +36,8 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
     private ModularPanel panel = null;
     private GuiContext context = null;
 
-    private Flex flex;
-    private IResizeable resizer;
+    private Flex flex = new Flex(this);
+    private IResizeable resizer = this.flex;
     private String debugName;
 
     @Nullable

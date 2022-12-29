@@ -6,6 +6,8 @@ import com.cleanroommc.modularui.utils.keys.CompoundKey;
 import com.cleanroommc.modularui.utils.keys.DynamicKey;
 import com.cleanroommc.modularui.utils.keys.LangKey;
 import com.cleanroommc.modularui.utils.keys.StringKey;
+import com.cleanroommc.modularui.widget.Widget;
+import com.cleanroommc.modularui.widgets.TextWidget;
 
 import java.util.function.Supplier;
 
@@ -84,5 +86,10 @@ public interface IKey extends IDrawable {
         renderer.setPos(x, y);
         renderer.setShadow(false);
         renderer.draw(get());
+    }
+
+    @Override
+    default Widget<?> asWidget() {
+        return new TextWidget(this);
     }
 }
