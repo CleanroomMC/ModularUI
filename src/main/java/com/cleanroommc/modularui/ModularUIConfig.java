@@ -6,6 +6,8 @@ import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 
 public class ModularUIConfig {
 
+    public static boolean smoothProgressBar = true;
+
     // Tooltip
     public static boolean placeNextToPanelByDefault = true;
     // Default direction

@@ -160,6 +160,16 @@ public class GuiTextures {
             .registerAsBackground("slot_fluid")
             .build();
 
+    public static final UITexture PROGRESS_ARROW = UITexture.builder()
+            .location(ModularUI.ID, "gui/widgets/progress_bar_arrow")
+            .imageSize(20, 40)
+            .build();
+
+    public static final UITexture PROGRESS_CYCLE = UITexture.builder()
+            .location(ModularUI.ID, "gui/widgets/progress_bar_mixer")
+            .imageSize(20, 40)
+            .build();
+
     private static UITexture icon(String name, int x, int y, int w, int h) {
         return UITexture.builder()
                 .location(ICONS_LOCATION)

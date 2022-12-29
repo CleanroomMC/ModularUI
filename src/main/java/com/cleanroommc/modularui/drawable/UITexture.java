@@ -105,17 +105,19 @@ public class UITexture implements IDrawable {
     }
 
     public void draw(float x, float y, float width, float height) {
-        GlStateManager.enableAlpha();
         GlStateManager.enableBlend();
         GlStateManager.enableTexture2D();
         Minecraft.getMinecraft().renderEngine.bindTexture(location);
         draw(location, x, y, width, height, u0, v0, u1, v1);
         GlStateManager.disableBlend();
-        GlStateManager.disableAlpha();
     }
 
     public void drawSubArea(float x, float y, float width, float height, float uStart, float vStart, float uEnd, float vEnd) {
+        GlStateManager.enableBlend();
+        GlStateManager.enableTexture2D();
+        Minecraft.getMinecraft().renderEngine.bindTexture(location);
         draw(location, x, y, width, height, calcU(uStart), calcV(vStart), calcU(uEnd), calcV(vEnd));
+        GlStateManager.disableBlend();
     }
 
     public static void draw(ResourceLocation location, float x0, float y0, float width, float height, float u0, float v0, float u1, float v1) {

@@ -14,7 +14,9 @@ import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.FluidSlot;
+import com.cleanroommc.modularui.widgets.ProgressWidget;
 import com.cleanroommc.modularui.widgets.layout.Column;
+import com.cleanroommc.modularui.widgets.layout.Row;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -27,11 +29,12 @@ import java.util.function.Function;
 
 public class TestTile extends TileEntity implements IGuiHolder, ITickable {
 
+    private final FluidTank fluidTank = new FluidTank(10000);
     private long time = 0;
     private int val;
-    private final FluidTank fluidTank = new FluidTank(10000);
     private String value = "";
     private double doubleValue = 1;
+    private int duration = 80, progress = 0;
 
     @Override
     public void buildSyncHandler(GuiSyncHandler guiSyncHandler, EntityPlayer player) {
@@ -53,46 +56,61 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                 .align(Alignment.Center);    // center the panel in the screen
         panel.background(GuiTextures.BACKGROUND);
         panel.bindPlayerInventory()
-                .child(new Column()
-                        .coverChildren()
-                        //.flex(flex -> flex.height(0.5f))
+                .child(new Row()
+                        .flex(flex -> flex.height(137))
                         .padding(7)
-                        .crossAxisAlignment(CrossAxisAlignment.CENTER)
-                        .child(new ButtonWidget<>()
-                                .size(60, 18)
-                                .background(GuiTextures.BUTTON, IKey.dynamic(() -> "Button " + this.val)))
-                        .child(new FluidSlot()
-                                .margin(2)
-                                .setSynced("fluid_slot"))
-                        .child(new ButtonWidget<>()
-                                .size(60, 18)
-                                .tooltip(tooltip -> {
-                                    tooltip.showUpTimer(10);
-                                    tooltip.addLine(IKey.str("Test Line g"));
-                                    tooltip.addLine(IKey.str("An image inside of a tooltip:"));
-                                    tooltip.addLine(GuiTextures.LOGO.asIcon().size(50).alignment(Alignment.TopCenter));
-                                    tooltip.addLine(IKey.str("And here a circle:"));
-                                    tooltip.addLine(new Circle()
-                                                    .setColor(Color.RED.dark(2), Color.RED.bright(2))
-                                                    .asIcon()
-                                                    .size(20))
-                                            .addLine(new ItemDrawable(new ItemStack(Items.DIAMOND)).asIcon());
-                                })
-                                //.flex(flex -> flex.left(3)) // ?
-                                .background(GuiTextures.BUTTON, IKey.str("Button 2")))
-                        .child(new TextFieldWidget()
-                                .setTextColor(Color.WHITE.normal)
-                                .background(GuiTextures.DISPLAY)
-                                .size(60, 20)
-                                .setSynced(1)
-                                .margin(0, 3))
-                        .child(new TextFieldWidget()
-                                .setTextColor(Color.WHITE.normal)
-                                .background(GuiTextures.DISPLAY)
-                                .size(60, 20)
-                                .setSynced(2)
-                                .setNumbersDouble(Function.identity()))
-                        .child(IKey.str("Test string").asWidget().padding(2)));
+                        .child(new Column()
+                                .coverChildren()
+                                //.flex(flex -> flex.height(0.5f))
+                                .flex(flex -> flex.width(0.5f))
+                                .crossAxisAlignment(CrossAxisAlignment.CENTER)
+                                .child(new ButtonWidget<>()
+                                        .size(60, 18)
+                                        .background(GuiTextures.BUTTON, IKey.dynamic(() -> "Button " + this.val)))
+                                .child(new FluidSlot()
+                                        .margin(2)
+                                        .setSynced("fluid_slot"))
+                                .child(new ButtonWidget<>()
+                                        .size(60, 18)
+                                        .tooltip(tooltip -> {
+                                            tooltip.showUpTimer(10);
+                                            tooltip.addLine(IKey.str("Test Line g"));
+                                            tooltip.addLine(IKey.str("An image inside of a tooltip:"));
+                                            tooltip.addLine(GuiTextures.LOGO.asIcon().size(50).alignment(Alignment.TopCenter));
+                                            tooltip.addLine(IKey.str("And here a circle:"));
+                                            tooltip.addLine(new Circle()
+                                                            .setColor(Color.RED.dark(2), Color.RED.bright(2))
+                                                            .asIcon()
+                                                            .size(20))
+                                                    .addLine(new ItemDrawable(new ItemStack(Items.DIAMOND)).asIcon());
+                                        })
+                                        //.flex(flex -> flex.left(3)) // ?
+                                        .background(GuiTextures.BUTTON, IKey.str("Button 2")))
+                                .child(new TextFieldWidget()
+                                        .setTextColor(Color.WHITE.normal)
+                                        .background(GuiTextures.DISPLAY)
+                                        .size(60, 20)
+                                        .setSynced(1)
+                                        .margin(0, 3))
+                                .child(new TextFieldWidget()
+                                        .setTextColor(Color.WHITE.normal)
+                                        .background(GuiTextures.DISPLAY)
+                                        .size(60, 20)
+                                        .setSynced(2)
+                                        .setNumbersDouble(Function.identity()))
+                                .child(IKey.str("Test string").asWidget().padding(2)))
+                        .child(new Column()
+                                .coverChildren()
+                                .flex(flex -> flex.width(0.5f))
+                                .crossAxisAlignment(CrossAxisAlignment.CENTER)
+                                .child(new ProgressWidget()
+                                        .progress(() -> progress / (double) duration)
+                                        .texture(GuiTextures.PROGRESS_ARROW, 20))
+                                .child(new ProgressWidget()
+                                        .progress(() -> progress / (double) duration)
+                                        .texture(GuiTextures.PROGRESS_CYCLE, 20)
+                                        .direction(ProgressWidget.Direction.CIRCULAR_CW))
+                        ));
         /*panel.child(new ButtonWidget<>()
                         .flex(flex -> flex.size(60, 20)
                                 .top(7)
@@ -112,6 +130,9 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
             if (time++ % 20 == 0) {
                 val++;
             }
+        }
+        if (++progress == duration) {
+            progress = 0;
         }
     }
 }
