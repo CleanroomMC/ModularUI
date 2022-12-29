@@ -106,12 +106,6 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
 
     @Override
     public void unselect(GuiContext context) {
-
-    }
-
-    @Override
-    public boolean canHover() {
-        return true;
     }
 
     @Override

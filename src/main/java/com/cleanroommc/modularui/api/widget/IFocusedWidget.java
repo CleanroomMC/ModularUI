@@ -2,6 +2,9 @@ package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.screen.GuiContext;
 
+/**
+ * An interface for {@link IWidget} objects, that makes them focusable.
+ */
 public interface IFocusedWidget {
 
     boolean isFocused();
@@ -10,7 +13,9 @@ public interface IFocusedWidget {
 
     void onRemoveFocus(GuiContext context);
 
+    @Deprecated
     void selectAll(GuiContext context);
 
+    @Deprecated
     void unselect(GuiContext context);
 }

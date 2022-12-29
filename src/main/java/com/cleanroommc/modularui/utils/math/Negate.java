@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.utils.math;
 
-import com.cleanroommc.modularui.api.sync.IValue;
+import com.cleanroommc.modularui.api.IValue;
 
 /**
  * Negate operator class

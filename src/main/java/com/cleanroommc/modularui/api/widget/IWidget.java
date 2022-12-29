@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * A element in a Gui
+ * A widget in a Gui
  */
 public interface IWidget extends IGuiElement {
 
@@ -39,61 +39,128 @@ public interface IWidget extends IGuiElement {
      */
     boolean isValid();
 
+    /**
+     * Draws the background of this widget
+     *
+     * @param partialTicks ticks since last draw
+     */
     void drawBackground(float partialTicks);
 
+    /**
+     * Draws additional stuff in this widget
+     *
+     * @param partialTicks ticks since last draw
+     */
     @Override
     void draw(float partialTicks);
 
+    /**
+     * Draws foreground elements of this widget. For example tooltips.
+     *
+     * @param partialTicks ticks since last draw
+     */
     void drawForeground(float partialTicks);
 
+    /**
+     * @return if this widget has a tooltip
+     */
     default boolean hasTooltip() {
         return getTooltip() != null;
     }
 
+    /**
+     * @return the tooltip of this widget
+     */
     @Nullable
     Tooltip getTooltip();
 
+    /**
+     * Called approximately 60 times per second.
+     */
     void onFrameUpdate();
 
+    /**
+     * @return the area this widget occupies
+     */
     @Override
     Area getArea();
 
+    /**
+     * @return all children of this widget
+     */
     @Unmodifiable
     @NotNull
     default List<IWidget> getChildren() {
         return Collections.emptyList();
     }
 
+    /**
+     * @return if this widget has any children
+     */
     default boolean hasChildren() {
         return !getChildren().isEmpty();
     }
 
+    /**
+     * @return the panel this widget is in
+     */
     @NotNull
     ModularPanel getPanel();
 
+    /**
+     * Returns if this element is enabled. Disabled elements are not drawn and can not be interacted with.
+     *
+     * @return if this element is enabled
+     */
     @Override
     boolean isEnabled();
 
+    // TODO: Really needed?
     boolean canBeSeen();
 
+    // TODO: Really needed?
     default boolean canHover() {
         return true;
     }
 
+    /**
+     * Marks this widget as dirty.
+     * Mainly used for the tooltip.
+     */
     void markDirty();
 
+    /**
+     * @return the parent of this widget
+     */
     @NotNull
     IWidget getParent();
 
+    /**
+     * @return the context the current screen
+     */
     GuiContext getContext();
 
+    /**
+     * @return flex of this widget. Creates a new one if it doesn't already have onw.
+     */
     Flex flex();
 
+    /**
+     * @return resizer of this widget
+     */
     @Nullable
     IResizeable resizer();
 
+    /**
+     * Sets the resizer of this widget.
+     *
+     * @param resizer resizer
+     */
     void resizer(IResizeable resizer);
 
+    /**
+     * Called when the screen resizes. Handles the positioning and sizing of this element.
+     */
     @Override
     default void resize() {
         IResizeable resizer = resizer();
@@ -119,6 +186,9 @@ public interface IWidget extends IGuiElement {
         }
     }
 
+    /**
+     * @return flex of this widget
+     */
     @Nullable
     Flex getFlex();
 }

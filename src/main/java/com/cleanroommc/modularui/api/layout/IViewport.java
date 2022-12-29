@@ -6,10 +6,23 @@ import com.cleanroommc.modularui.api.widget.IWidgetList;
 import java.util.Stack;
 import java.util.function.Predicate;
 
+/**
+ * An area in a GUI that can be shifted around. Used for scrollable widgets.
+ */
 public interface IViewport {
 
+    /**
+     * Apply shifts of this viewport.
+     *
+     * @param stack viewport stack
+     */
     void apply(IViewportStack stack);
 
+    /**
+     * Undo shifts of this viewport.
+     *
+     * @param stack viewport stack
+     */
     void unapply(IViewportStack stack);
 
     void getWidgetsAt(Stack<IViewport> viewports, IWidgetList widgets, int x, int y);

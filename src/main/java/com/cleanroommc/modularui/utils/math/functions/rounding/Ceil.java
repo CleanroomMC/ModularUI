@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.utils.math.functions.rounding;
 
-import com.cleanroommc.modularui.api.sync.IValue;
+import com.cleanroommc.modularui.api.IValue;
 import com.cleanroommc.modularui.utils.math.functions.NNFunction;
 
 public class Ceil extends NNFunction {

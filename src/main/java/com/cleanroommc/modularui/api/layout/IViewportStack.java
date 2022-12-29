@@ -3,20 +3,39 @@ package com.cleanroommc.modularui.api.layout;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
 /**
- * General interface for viewport stack
+ * This handles all viewports in a GUI.
  */
 public interface IViewportStack {
 
+    /**
+     * Reset all viewports.
+     */
     void reset();
 
+    /**
+     * @return current viewport
+     */
     Area getViewport();
 
+    /**
+     * Pushes a new viewport
+     * @param area area of the viewport
+     */
     void pushViewport(Area area);
 
+    /**
+     * Pops the current viewport from the stack
+     */
     void popViewport();
 
+    /**
+     * The current total shift in x
+     */
     int getShiftX();
 
+    /**
+     * The current total shift in y
+     */
     int getShiftY();
 
     /**

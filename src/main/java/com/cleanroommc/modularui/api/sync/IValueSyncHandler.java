@@ -2,6 +2,11 @@ package com.cleanroommc.modularui.api.sync;
 
 import net.minecraft.network.PacketBuffer;
 
+/**
+ * A helper interface for syncing an object value.
+ *
+ * @param <T> object value type
+ */
 public interface IValueSyncHandler<T> {
 
     T getCachedValue();

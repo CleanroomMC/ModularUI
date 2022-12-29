@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.utils.math.functions;
 
-import com.cleanroommc.modularui.api.sync.IValue;
+import com.cleanroommc.modularui.api.IValue;
 
 /**
  * Function that expects string input arguments and outputs a string

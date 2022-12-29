@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.utils.math.functions.utility;
 
-import com.cleanroommc.modularui.api.sync.IValue;
+import com.cleanroommc.modularui.api.IValue;
 
 public class DieRollInteger extends DieRoll {
 

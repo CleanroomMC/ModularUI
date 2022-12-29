@@ -11,9 +11,8 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 
 /**
- * An interface that handles user interactions.
+ * An interface that handles user interactions on {@link IWidget} objects.
  * These methods get called on the client
- * Can also be used as a listener.
  */
 public interface Interactable {
 

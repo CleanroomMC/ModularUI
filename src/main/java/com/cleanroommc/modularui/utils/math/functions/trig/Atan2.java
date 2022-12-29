@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.utils.math.functions.trig;
 
-import com.cleanroommc.modularui.api.sync.IValue;
+import com.cleanroommc.modularui.api.IValue;
 import com.cleanroommc.modularui.utils.math.functions.NNFunction;
 
 public class Atan2 extends NNFunction {

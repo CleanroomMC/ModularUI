@@ -2,7 +2,7 @@ package com.cleanroommc.modularui.widgets.textfield;
 
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.sync.IStringValueSyncHandler;
-import com.cleanroommc.modularui.api.sync.IValue;
+import com.cleanroommc.modularui.api.IValue;
 import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.api.sync.ValueSyncHandler;
 import com.cleanroommc.modularui.screen.GuiContext;
