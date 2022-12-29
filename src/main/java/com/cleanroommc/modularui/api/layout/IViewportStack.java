@@ -1,8 +1,6 @@
-package com.cleanroommc.modularui.api;
+package com.cleanroommc.modularui.api.layout;
 
 import com.cleanroommc.modularui.widget.sizer.Area;
-
-import java.util.Iterator;
 
 /**
  * General interface for viewport stack

@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.utils.math;
 
-import com.cleanroommc.modularui.api.IValue;
+import com.cleanroommc.modularui.api.sync.IValue;
 
 /**
  * Operator class
@@ -15,7 +15,7 @@ public class Operator implements IValue {
     public Operation operation;
     public IValue a;
     public IValue b;
-    private IValue result = new Constant(0);
+    private final IValue result = new Constant(0);
 
     public Operator(Operation op, IValue a, IValue b) {
         this.operation = op;

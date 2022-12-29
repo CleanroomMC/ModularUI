@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.widget.sizer;
 
-import com.cleanroommc.modularui.api.IGuiElement;
+import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.utils.MathUtils;
 
 import java.awt.*;

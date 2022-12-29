@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.api;
+package com.cleanroommc.modularui.api.widget;
 
 import net.minecraft.inventory.Slot;
 

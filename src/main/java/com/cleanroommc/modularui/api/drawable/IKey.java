@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.api;
+package com.cleanroommc.modularui.api.drawable;
 
 import com.cleanroommc.modularui.drawable.TextRenderer;
 import com.cleanroommc.modularui.utils.Alignment;

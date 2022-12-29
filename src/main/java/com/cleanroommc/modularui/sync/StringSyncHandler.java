@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.sync;
 
-import com.cleanroommc.modularui.api.IValueSyncHandler;
-import com.cleanroommc.modularui.api.ValueSyncHandler;
+import com.cleanroommc.modularui.api.sync.IValueSyncHandler;
+import com.cleanroommc.modularui.api.sync.ValueSyncHandler;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import net.minecraft.network.PacketBuffer;
 

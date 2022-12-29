@@ -103,8 +103,8 @@ public class Config {
 
     public static class Builder {
 
-        private String name;
-        private Builder parent;
+        private final String name;
+        private final Builder parent;
         private String basePath = "modularui";
         private final Object2ObjectOpenHashMap<String, Config> categories = new Object2ObjectOpenHashMap<>();
         private final Object2ObjectOpenHashMap<String, Value> values = new Object2ObjectOpenHashMap<>();

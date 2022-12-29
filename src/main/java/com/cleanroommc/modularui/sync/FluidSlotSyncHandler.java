@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.sync;
 
-import com.cleanroommc.modularui.api.ValueSyncHandler;
+import com.cleanroommc.modularui.api.sync.ValueSyncHandler;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.utils.FluidTankHandler;
 import net.minecraft.entity.player.EntityPlayer;

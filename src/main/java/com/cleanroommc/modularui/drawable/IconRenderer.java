@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.drawable;
 
-import com.cleanroommc.modularui.api.IDrawable;
-import com.cleanroommc.modularui.api.IIcon;
-import com.cleanroommc.modularui.api.IKey;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.drawable.IIcon;
+import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.utils.Alignment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;

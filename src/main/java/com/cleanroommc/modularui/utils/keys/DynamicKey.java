@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.utils.keys;
 
-import com.cleanroommc.modularui.api.IKey;
+import com.cleanroommc.modularui.api.drawable.IKey;
 
 import java.util.function.Supplier;
 

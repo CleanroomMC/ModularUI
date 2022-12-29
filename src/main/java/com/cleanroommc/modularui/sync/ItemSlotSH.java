@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.sync;
 
-import com.cleanroommc.modularui.api.SyncHandler;
+import com.cleanroommc.modularui.api.sync.SyncHandler;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.network.PacketBuffer;

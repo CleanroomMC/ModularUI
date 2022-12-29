@@ -1,11 +1,11 @@
 package com.cleanroommc.modularui.widget;
 
 import com.cleanroommc.modularui.ModularUIConfig;
-import com.cleanroommc.modularui.api.IDrawable;
-import com.cleanroommc.modularui.api.IWidget;
-import com.cleanroommc.modularui.api.SyncHandler;
-import com.cleanroommc.modularui.api.ValueSyncHandler;
-import com.cleanroommc.modularui.api.IGuiAction;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.sync.SyncHandler;
+import com.cleanroommc.modularui.api.sync.ValueSyncHandler;
+import com.cleanroommc.modularui.api.widget.IGuiAction;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;

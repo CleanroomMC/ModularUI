@@ -1,10 +1,10 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.IFocusedWidget;
-import com.cleanroommc.modularui.api.IGuiElement;
-import com.cleanroommc.modularui.api.IVanillaSlot;
-import com.cleanroommc.modularui.api.IWidget;
+import com.cleanroommc.modularui.api.widget.IFocusedWidget;
+import com.cleanroommc.modularui.api.widget.IGuiElement;
+import com.cleanroommc.modularui.api.widget.IVanillaSlot;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;

@@ -1,8 +1,8 @@
-package com.cleanroommc.modularui.api;
+package com.cleanroommc.modularui.api.sync;
 
 import net.minecraft.network.PacketBuffer;
 
-public interface IValueSyncHandler<T>  {
+public interface IValueSyncHandler<T> {
 
     T getCachedValue();
 

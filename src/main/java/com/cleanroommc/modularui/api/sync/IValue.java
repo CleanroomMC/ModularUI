@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.api;
+package com.cleanroommc.modularui.api.sync;
 
 /**
  * Math value interface

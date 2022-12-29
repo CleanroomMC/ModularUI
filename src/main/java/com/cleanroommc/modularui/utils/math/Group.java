@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.utils.math;
 
-import com.cleanroommc.modularui.api.IValue;
+import com.cleanroommc.modularui.api.sync.IValue;
 
 /**
  * Group class
@@ -10,7 +10,7 @@ import com.cleanroommc.modularui.api.IValue;
  */
 public class Group implements IValue {
 
-    private IValue value;
+    private final IValue value;
 
     public Group(IValue value) {
         this.value = value;

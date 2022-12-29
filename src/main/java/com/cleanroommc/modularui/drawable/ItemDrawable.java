@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.drawable;
 
-import com.cleanroommc.modularui.api.IDrawable;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;

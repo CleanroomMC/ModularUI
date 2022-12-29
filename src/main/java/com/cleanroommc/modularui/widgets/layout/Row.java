@@ -1,9 +1,9 @@
 package com.cleanroommc.modularui.widgets.layout;
 
-import com.cleanroommc.modularui.api.CrossAxisAlignment;
-import com.cleanroommc.modularui.api.ILayoutWidget;
-import com.cleanroommc.modularui.api.IWidget;
-import com.cleanroommc.modularui.api.MainAxisAlignment;
+import com.cleanroommc.modularui.api.layout.CrossAxisAlignment;
+import com.cleanroommc.modularui.api.layout.ILayoutWidget;
+import com.cleanroommc.modularui.api.layout.MainAxisAlignment;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.sizer.Box;
 

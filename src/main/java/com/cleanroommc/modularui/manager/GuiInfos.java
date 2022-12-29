@@ -41,8 +41,8 @@ public class GuiInfos {
                 .serverGui((context, guiSyncHandler) -> {
                     ItemStack itemStack = context.getOffHandItem();
                     if (itemStack.getItem() instanceof IItemGuiHolder) {
-                       ((IItemGuiHolder) itemStack.getItem()).buildSyncHandler(guiSyncHandler, context.getPlayer(), itemStack);
-                       return;
+                        ((IItemGuiHolder) itemStack.getItem()).buildSyncHandler(guiSyncHandler, context.getPlayer(), itemStack);
+                        return;
                     }
                     throw new UnsupportedOperationException();
                 })

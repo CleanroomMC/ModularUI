@@ -1,9 +1,9 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUIConfig;
-import com.cleanroommc.modularui.api.IDrawable;
-import com.cleanroommc.modularui.api.IIcon;
-import com.cleanroommc.modularui.api.IKey;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.drawable.IIcon;
+import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.IconRenderer;
 import com.cleanroommc.modularui.drawable.TextIcon;
@@ -257,6 +257,11 @@ public class Tooltip {
         this.pos = null;
         this.x = x;
         this.y = y;
+        return this;
+    }
+
+    public Tooltip alignment(Alignment alignment) {
+        this.alignment = alignment;
         return this;
     }
 

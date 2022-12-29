@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.utils.keys;
 
-import com.cleanroommc.modularui.api.IKey;
+import com.cleanroommc.modularui.api.drawable.IKey;
 import com.google.gson.*;
 import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.ByteBufUtils;

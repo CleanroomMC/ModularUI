@@ -1,13 +1,13 @@
 package com.cleanroommc.modularui;
 
-import com.cleanroommc.modularui.api.IGuiElement;
+import com.cleanroommc.modularui.api.widget.IGuiElement;
 import org.apache.logging.log4j.Level;
 
 public class GuiError {
 
-    private Level level = Level.ERROR;
-    private String msg;
-    private IGuiElement reference;
+    private final Level level = Level.ERROR;
+    private final String msg;
+    private final IGuiElement reference;
 
     public GuiError(String msg, IGuiElement reference) {
         this.msg = msg;

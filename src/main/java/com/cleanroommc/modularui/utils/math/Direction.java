@@ -11,7 +11,7 @@ public enum Direction {
     public final int factorX;
     public final int factorY;
 
-    private Direction(float anchorX, float anchorY) {
+    Direction(float anchorX, float anchorY) {
         this.anchorX = anchorX;
         this.anchorY = anchorY;
         this.factorX = (int) Interpolations.lerp(-1, 1, anchorX);

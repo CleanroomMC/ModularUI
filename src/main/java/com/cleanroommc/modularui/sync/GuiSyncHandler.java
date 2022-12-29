@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.sync;
 
-import com.cleanroommc.modularui.api.SyncHandler;
+import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.widget.Widget;
@@ -72,7 +72,7 @@ public class GuiSyncHandler {
         }
     }
 
-    public void receiveWidgetUpdate(MapKey mapKey, int id, PacketBuffer buf)  throws IOException {
+    public void receiveWidgetUpdate(MapKey mapKey, int id, PacketBuffer buf) throws IOException {
         SyncHandler syncHandler = syncedValues.get(mapKey);
         if (NetworkUtils.isClient(this.player)) {
             syncHandler.readOnClient(id, buf);

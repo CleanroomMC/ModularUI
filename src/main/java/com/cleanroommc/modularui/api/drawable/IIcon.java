@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.api;
+package com.cleanroommc.modularui.api.drawable;
 
 public interface IIcon extends IDrawable {
 

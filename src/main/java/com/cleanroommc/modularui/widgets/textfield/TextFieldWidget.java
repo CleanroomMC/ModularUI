@@ -1,8 +1,11 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
-import com.cleanroommc.modularui.api.*;
+import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.sync.IValue;
+import com.cleanroommc.modularui.api.sync.IValueSyncHandler;
+import com.cleanroommc.modularui.api.sync.SyncHandler;
+import com.cleanroommc.modularui.api.sync.ValueSyncHandler;
 import com.cleanroommc.modularui.screen.GuiContext;
-import com.cleanroommc.modularui.sync.StringSyncHandler;
 import com.cleanroommc.modularui.utils.math.Constant;
 import com.cleanroommc.modularui.utils.math.MathBuilder;
 import org.jetbrains.annotations.NotNull;

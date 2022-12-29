@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.drawable;
 
-import com.cleanroommc.modularui.api.IDrawable;
-import com.cleanroommc.modularui.api.IIcon;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.utils.Alignment;
 
 /**

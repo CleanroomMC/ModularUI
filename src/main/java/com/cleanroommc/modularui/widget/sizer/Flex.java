@@ -1,9 +1,9 @@
 package com.cleanroommc.modularui.widget.sizer;
 
 import com.cleanroommc.modularui.GuiErrorHandler;
-import com.cleanroommc.modularui.api.IGuiElement;
-import com.cleanroommc.modularui.api.IVanillaSlot;
-import com.cleanroommc.modularui.api.IWidget;
+import com.cleanroommc.modularui.api.widget.IGuiElement;
+import com.cleanroommc.modularui.api.widget.IVanillaSlot;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.utils.Alignment;
 import net.minecraft.inventory.Slot;
 import org.jetbrains.annotations.ApiStatus;

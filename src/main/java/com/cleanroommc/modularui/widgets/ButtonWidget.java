@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.Interactable;
+import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.widget.Widget;
 import org.jetbrains.annotations.NotNull;

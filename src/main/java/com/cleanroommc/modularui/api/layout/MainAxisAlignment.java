@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.api;
+package com.cleanroommc.modularui.api.layout;
 
 public enum MainAxisAlignment {
 

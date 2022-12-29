@@ -8,5 +8,6 @@ import net.minecraft.item.ItemStack;
 public interface IItemGuiHolder {
 
     void buildSyncHandler(GuiSyncHandler guiSyncHandler, EntityPlayer player, ItemStack itemStack);
+
     ModularScreen createGuiScreen(EntityPlayer player, ItemStack itemStack);
 }

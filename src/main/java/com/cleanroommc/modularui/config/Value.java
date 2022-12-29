@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.config;
 
-import com.cleanroommc.modularui.api.IWidget;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.GuiContext;
 import com.google.gson.JsonElement;
 import net.minecraft.network.PacketBuffer;
@@ -9,8 +9,8 @@ import org.jetbrains.annotations.Nullable;
 public abstract class Value {
 
     private final String key;
-    private boolean synced = false;
-    private boolean hidden = false;
+    private final boolean synced = false;
+    private final boolean hidden = false;
 
     public Value(String key) {
         this.key = key;

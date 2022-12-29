@@ -1,17 +1,13 @@
 package com.cleanroommc.modularui.widget;
 
-import com.cleanroommc.modularui.api.IViewport;
-import com.cleanroommc.modularui.api.IWidget;
+import com.cleanroommc.modularui.api.layout.IViewport;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.GuiContext;
-import com.cleanroommc.modularui.screen.LocatedWidget;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.renderer.GlStateManager;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;

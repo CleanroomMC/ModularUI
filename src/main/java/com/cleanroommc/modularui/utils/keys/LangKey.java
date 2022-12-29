@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.utils.keys;
 
-import com.cleanroommc.modularui.api.IKey;
+import com.cleanroommc.modularui.api.drawable.IKey;
 import net.minecraft.client.resources.I18n;
 
 public class LangKey implements IKey {

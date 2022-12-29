@@ -1,10 +1,9 @@
 package com.cleanroommc.modularui.widgets;
 
-import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.IDrawable;
-import com.cleanroommc.modularui.api.IKey;
-import com.cleanroommc.modularui.api.Interactable;
-import com.cleanroommc.modularui.api.SyncHandler;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.sync.SyncHandler;
+import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.TextRenderer;

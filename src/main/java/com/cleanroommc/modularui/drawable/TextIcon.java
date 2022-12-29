@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.drawable;
 
-import com.cleanroommc.modularui.api.IIcon;
-import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.api.drawable.IIcon;
 
 public class TextIcon implements IIcon {
 

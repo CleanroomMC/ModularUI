@@ -1,4 +1,7 @@
-package com.cleanroommc.modularui.api;
+package com.cleanroommc.modularui.api.layout;
+
+import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.api.widget.IWidgetList;
 
 import java.util.Stack;
 import java.util.function.Predicate;

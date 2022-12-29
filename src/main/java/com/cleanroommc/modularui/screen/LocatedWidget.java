@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.screen;
 
-import com.cleanroommc.modularui.api.IViewport;
-import com.cleanroommc.modularui.api.IViewportStack;
-import com.cleanroommc.modularui.api.IWidget;
+import com.cleanroommc.modularui.api.layout.IViewport;
+import com.cleanroommc.modularui.api.layout.IViewportStack;
+import com.cleanroommc.modularui.api.widget.IWidget;
 
 import java.util.ArrayList;
 import java.util.Collections;

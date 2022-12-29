@@ -2,8 +2,8 @@ package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.GuiErrorHandler;
 import com.cleanroommc.modularui.ModularUIConfig;
-import com.cleanroommc.modularui.api.IGuiElement;
-import com.cleanroommc.modularui.api.IVanillaSlot;
+import com.cleanroommc.modularui.api.widget.IGuiElement;
+import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.utils.Color;

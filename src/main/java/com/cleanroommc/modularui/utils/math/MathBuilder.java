@@ -1,11 +1,18 @@
 package com.cleanroommc.modularui.utils.math;
 
-import com.cleanroommc.modularui.api.IValue;
-import com.cleanroommc.modularui.utils.math.functions.*;
-import com.cleanroommc.modularui.utils.math.functions.rounding.*;
+import com.cleanroommc.modularui.api.sync.IValue;
+import com.cleanroommc.modularui.utils.math.functions.Function;
 import com.cleanroommc.modularui.utils.math.functions.classic.*;
-import com.cleanroommc.modularui.utils.math.functions.limit.*;
-import com.cleanroommc.modularui.utils.math.functions.string.*;
+import com.cleanroommc.modularui.utils.math.functions.limit.Clamp;
+import com.cleanroommc.modularui.utils.math.functions.limit.Max;
+import com.cleanroommc.modularui.utils.math.functions.limit.Min;
+import com.cleanroommc.modularui.utils.math.functions.rounding.Ceil;
+import com.cleanroommc.modularui.utils.math.functions.rounding.Floor;
+import com.cleanroommc.modularui.utils.math.functions.rounding.Round;
+import com.cleanroommc.modularui.utils.math.functions.rounding.Trunc;
+import com.cleanroommc.modularui.utils.math.functions.string.StringContains;
+import com.cleanroommc.modularui.utils.math.functions.string.StringEndsWith;
+import com.cleanroommc.modularui.utils.math.functions.string.StringStartsWith;
 import com.cleanroommc.modularui.utils.math.functions.trig.*;
 import com.cleanroommc.modularui.utils.math.functions.utility.*;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;

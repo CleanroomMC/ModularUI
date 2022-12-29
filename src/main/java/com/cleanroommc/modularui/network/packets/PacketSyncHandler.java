@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.network.packets;
 
 import com.cleanroommc.modularui.network.IPacket;
-import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.screen.ModularScreen;

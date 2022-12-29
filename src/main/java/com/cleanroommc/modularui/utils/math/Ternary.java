@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.utils.math;
 
-import com.cleanroommc.modularui.api.IValue;
+import com.cleanroommc.modularui.api.sync.IValue;
 
 /**
  * Ternary operator class
@@ -14,7 +14,7 @@ public class Ternary implements IValue {
     public IValue ifTrue;
     public IValue ifFalse;
 
-    private IValue result = new Constant(0);
+    private final IValue result = new Constant(0);
 
     public Ternary(IValue condition, IValue ifTrue, IValue ifFalse) {
         this.condition = condition;

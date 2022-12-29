@@ -8,7 +8,6 @@ import com.cleanroommc.modularui.widget.sizer.Area;
 public enum ScrollDirection {
 
     VERTICAL() {
-
         @Override
         public int getPosition(Area area, float x) {
             return area.y(x);
@@ -35,7 +34,6 @@ public enum ScrollDirection {
         }
     },
     HORIZONTAL() {
-
         @Override
         public int getPosition(Area area, float x) {
             return area.x(x);
