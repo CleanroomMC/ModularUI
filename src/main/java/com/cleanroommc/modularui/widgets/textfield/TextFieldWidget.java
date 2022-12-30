@@ -3,7 +3,7 @@ package com.cleanroommc.modularui.widgets.textfield;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IValue;
 import com.cleanroommc.modularui.api.drawable.IKey;
-import com.cleanroommc.modularui.api.sync.IStringValueSyncHandler;
+import com.cleanroommc.modularui.api.sync.IStringSyncHandler;
 import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.api.sync.ValueSyncHandler;
 import com.cleanroommc.modularui.screen.GuiContext;
@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
  */
 public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
-    private IStringValueSyncHandler<?> syncHandler;
+    private IStringSyncHandler<?> syncHandler;
     private Function<String, String> validator = val -> val;
 
     @Nullable
@@ -55,8 +55,8 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof IStringValueSyncHandler && syncHandler instanceof ValueSyncHandler) {
-            this.syncHandler = (IStringValueSyncHandler<?>) syncHandler;
+        if (syncHandler instanceof IStringSyncHandler && syncHandler instanceof ValueSyncHandler) {
+            this.syncHandler = (IStringSyncHandler<?>) syncHandler;
             ((ValueSyncHandler<?>) this.syncHandler).setChangeListener(() -> {
                 markDirty();
                 setText(this.syncHandler.getCachedValue().toString());

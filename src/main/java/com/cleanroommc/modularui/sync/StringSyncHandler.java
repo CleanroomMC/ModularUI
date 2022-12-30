@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.sync;
 
-import com.cleanroommc.modularui.api.sync.IStringValueSyncHandler;
+import com.cleanroommc.modularui.api.sync.IStringSyncHandler;
 import com.cleanroommc.modularui.api.sync.ValueSyncHandler;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import net.minecraft.network.PacketBuffer;
@@ -8,7 +8,7 @@ import net.minecraft.network.PacketBuffer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class StringSyncHandler extends ValueSyncHandler<String> implements IStringValueSyncHandler<String> {
+public class StringSyncHandler extends ValueSyncHandler<String> implements IStringSyncHandler<String> {
 
     private final Supplier<String> getter;
     private final Consumer<String> setter;

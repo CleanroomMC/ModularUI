@@ -1,13 +1,14 @@
 package com.cleanroommc.modularui.sync;
 
-import com.cleanroommc.modularui.api.sync.IStringValueSyncHandler;
+import com.cleanroommc.modularui.api.sync.INumberSyncHandler;
+import com.cleanroommc.modularui.api.sync.IStringSyncHandler;
 import com.cleanroommc.modularui.api.sync.ValueSyncHandler;
 import net.minecraft.network.PacketBuffer;
 
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 
-public class IntSyncHandler extends ValueSyncHandler<Integer> implements IStringValueSyncHandler<Integer> {
+public class IntSyncHandler extends ValueSyncHandler<Integer> implements INumberSyncHandler, IStringSyncHandler<Integer> {
 
     private int cache;
     private final IntSupplier getter;
@@ -63,5 +64,10 @@ public class IntSyncHandler extends ValueSyncHandler<Integer> implements IString
     @Override
     public Integer fromString(String value) {
         return Integer.parseInt(value);
+    }
+
+    @Override
+    public int getCacheAsInt() {
+        return this.cache;
     }
 }

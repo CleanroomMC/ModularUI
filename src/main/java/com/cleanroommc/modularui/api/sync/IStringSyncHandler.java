@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.api.sync;
 
-public interface IStringValueSyncHandler<T> extends IValueSyncHandler<T> {
+public interface IStringSyncHandler<T> extends IValueSyncHandler<T> {
 
     default String asString(T value) {
         return value.toString();
