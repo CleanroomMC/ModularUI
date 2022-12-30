@@ -245,10 +245,22 @@ public class GuiScreenWrapper extends GuiContainer {
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
+    public void clickSlot() {
+        try {
+            super.mouseClicked(screen.context.getAbsMouseX(), screen.context.getAbsMouseY(), screen.context.getMouseButton());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     protected void mouseReleased(int mouseX, int mouseY, int state) {
         if (this.screen.onMouseRelease(state)) return;
         super.mouseReleased(mouseX, mouseY, state);
+    }
+
+    public void releaseSlot() {
+        super.mouseReleased(screen.context.getAbsMouseX(), screen.context.getAbsMouseY(), screen.context.getMouseButton());
     }
 
     @Override

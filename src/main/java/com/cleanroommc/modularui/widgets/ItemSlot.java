@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
+import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.GuiTextures;
@@ -20,8 +21,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.NotNull;
 
-public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot {
+public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable {
 
     private static final TextRenderer textRenderer = new TextRenderer();
     private ItemSlotSH syncHandler;
@@ -58,6 +60,23 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot {
             GuiDraw.drawSolidRect(1, 1, 16, 16, Color.withAlpha(Color.WHITE.normal, 0x80)/*Theme.INSTANCE.getSlotHighlight()*/);
             GlStateManager.colorMask(true, true, true, true);
         }
+    }
+
+    @Override
+    public boolean canHover() {
+        return true;
+    }
+
+    @Override
+    public @NotNull Result onMousePressed(int mouseButton) {
+        getScreen().getScreenWrapper().clickSlot();
+        return Result.SUCCESS;
+    }
+
+    @Override
+    public boolean onMouseRelease(int mouseButton) {
+        getScreen().getScreenWrapper().releaseSlot();
+        return true;
     }
 
     public Slot getSlot() {

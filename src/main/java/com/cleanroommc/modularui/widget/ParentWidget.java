@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ParentWidget<W extends ParentWidget<W>> extends Widget<W> {
+public class ParentWidget<W extends ParentWidget<W>> extends Widget<W> {
 
     private final List<IWidget> children = new ArrayList<>();
 

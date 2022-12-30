@@ -111,16 +111,7 @@ public abstract class ModularScreen {
 
         this.context.pushViewport(this.viewport);
         for (ModularPanel panel : this.windowManager.getOpenWindows()) {
-            // resize each widget and calculate their relative pos
-            panel.resize();
-            // now apply the calculated pos
-            WidgetTree.foreachChildByLayer(panel, child -> {
-                IResizeable resizer = child.resizer();
-                if (resizer != null) {
-                    resizer.applyPos(child);
-                }
-                return true;
-            }, true);
+            WidgetTree.resize(panel);
         }
 
         //this.ROOT.resize();
@@ -193,13 +184,10 @@ public abstract class ModularScreen {
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableLighting();
         RenderHelper.enableStandardItemLighting();
-        //this.context.drawTooltip();
         this.context.postRenderCallbacks.forEach(element -> element.accept(this.context));
     }
 
     public void drawForeground(float partialTicks) {
-        // TODO draw tooltip
-
         GlStateManager.disableRescaleNormal();
         RenderHelper.disableStandardItemLighting();
         GlStateManager.disableLighting();
@@ -217,10 +205,6 @@ public abstract class ModularScreen {
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableLighting();
         RenderHelper.enableStandardItemLighting();
-    }
-
-    public void showTooltip(Consumer<Tooltip> tooltipBuilder) {
-
     }
 
     @ApiStatus.OverrideOnly

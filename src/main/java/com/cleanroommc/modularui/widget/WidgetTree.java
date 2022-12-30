@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import com.cleanroommc.modularui.widget.sizer.IResizeable;
 import net.minecraft.client.renderer.GlStateManager;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -143,6 +144,19 @@ public class WidgetTree {
     public static void onFrameUpdate(IWidget parent) {
         foreachChildByLayer(parent, widget -> {
             widget.onFrameUpdate();
+            return true;
+        }, true);
+    }
+
+    public static void resize(IWidget parent) {
+        // resize each widget and calculate their relative pos
+        parent.resize();
+        // now apply the calculated pos
+        WidgetTree.foreachChildByLayer(parent, child -> {
+            IResizeable resizer = child.resizer();
+            if (resizer != null) {
+                resizer.applyPos(child);
+            }
             return true;
         }, true);
     }

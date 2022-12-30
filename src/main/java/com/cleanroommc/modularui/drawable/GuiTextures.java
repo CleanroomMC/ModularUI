@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.widgets.TabContainer;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
@@ -174,6 +175,11 @@ public class GuiTextures {
             .location(ModularUI.ID, "gui/widgets/cycle_button_demo")
             .imageSize(18, 54)
             .build();
+
+    public static final TabTexture TAB_TOP = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_top"), TabContainer.Side.TOP, 28, 32);
+    public static final TabTexture TAB_BOTTOM = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_bottom"), TabContainer.Side.BOTTOM, 28, 32);
+    public static final TabTexture TAB_LEFT = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_left"), TabContainer.Side.LEFT, 32, 28);
+    public static final TabTexture TAB_RIGHT = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_right"), TabContainer.Side.RIGHT, 32, 28);;
 
     private static UITexture icon(String name, int x, int y, int w, int h) {
         return UITexture.builder()

@@ -76,10 +76,15 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
                 child.initialise(this);
             }
         }
+        afterInit();
     }
 
     @ApiStatus.OverrideOnly
     public void onInit() {
+    }
+
+    @ApiStatus.OverrideOnly
+    public void afterInit() {
     }
 
     public void initialiseSyncHandler(GuiSyncHandler syncHandler) {
@@ -183,6 +188,11 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
     }
 
     @Override
+    public boolean canHover() {
+        return getBackground().length > 0;
+    }
+
+    @Override
     public void markDirty() {
         if (this.tooltip != null) {
             this.tooltip.markDirty();
@@ -257,6 +267,7 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
         return syncHandler;
     }
 
+    @Override
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }

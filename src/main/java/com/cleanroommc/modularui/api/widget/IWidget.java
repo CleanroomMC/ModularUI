@@ -115,10 +115,11 @@ public interface IWidget extends IGuiElement {
     @Override
     boolean isEnabled();
 
+    void setEnabled(boolean enabled);
+
     // TODO: Really needed?
     boolean canBeSeen();
 
-    // TODO: Really needed?
     default boolean canHover() {
         return true;
     }
