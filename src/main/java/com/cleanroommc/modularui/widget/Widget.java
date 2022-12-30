@@ -139,8 +139,9 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
 
     @Override
     public void drawForeground(float partialTicks) {
-        if (this.tooltip != null && isHoveringFor(this.tooltip.getShowUpTimer())) {
-            this.tooltip.draw(getContext(), partialTicks);
+        Tooltip tooltip = getTooltip();
+        if (tooltip != null && isHoveringFor(tooltip.getShowUpTimer())) {
+            tooltip.draw(getContext(), partialTicks);
         }
     }
 

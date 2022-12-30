@@ -55,12 +55,8 @@ public class Tooltip {
     }
 
     public void draw(GuiContext context, float elapsedTime) {
-        if (this.dirty) {
-            buildTooltip();
-        }
-        if (lines.isEmpty()) {
-            return;
-        }
+        if (isEmpty()) return;
+
         if (maxWidth <= 0) {
             maxWidth = Integer.MAX_VALUE;
         }
@@ -224,6 +220,13 @@ public class Tooltip {
             }
         }
         return new Rectangle(x, y, width, height);
+    }
+
+    public boolean isEmpty() {
+        if (this.dirty) {
+            buildTooltip();
+        }
+        return this.lines.isEmpty();
     }
 
     public void markDirty() {

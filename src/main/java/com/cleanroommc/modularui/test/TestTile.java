@@ -9,10 +9,12 @@ import com.cleanroommc.modularui.drawable.ItemDrawable;
 import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.sync.*;
+import com.cleanroommc.modularui.sync.GuiSyncHandler;
+import com.cleanroommc.modularui.sync.SyncHandlers;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
+import com.cleanroommc.modularui.widgets.CycleButtonWidget;
 import com.cleanroommc.modularui.widgets.FluidSlot;
 import com.cleanroommc.modularui.widgets.ProgressWidget;
 import com.cleanroommc.modularui.widgets.layout.Column;
@@ -35,13 +37,15 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
     private String value = "";
     private double doubleValue = 1;
     private int duration = 80, progress = 0;
+    private int cycleState = 0;
 
     @Override
     public void buildSyncHandler(GuiSyncHandler guiSyncHandler, EntityPlayer player) {
-        guiSyncHandler.syncValue(0, new IntSyncHandler(() -> val, val -> this.val = val));
-        guiSyncHandler.syncValue(1, new StringSyncHandler(() -> this.value, val -> this.value = val));
-        guiSyncHandler.syncValue(2, new DoubleSyncHandler(() -> this.doubleValue, val -> this.doubleValue = val));
-        guiSyncHandler.syncValue("fluid_slot", new FluidSlotSyncHandler(fluidTank));
+        guiSyncHandler.syncValue(0, SyncHandlers.intNumber(() -> val, val -> this.val = val));
+        guiSyncHandler.syncValue(1, SyncHandlers.string(() -> this.value, val -> this.value = val));
+        guiSyncHandler.syncValue(2, SyncHandlers.doubleNumber(() -> this.doubleValue, val -> this.doubleValue = val));
+        guiSyncHandler.syncValue(3, SyncHandlers.intNumber(() -> this.cycleState, val -> this.cycleState = val));
+        guiSyncHandler.syncValue("fluid_slot", SyncHandlers.fluidSlot(fluidTank));
     }
 
     @Override
@@ -110,6 +114,14 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                         .progress(() -> progress / (double) duration)
                                         .texture(GuiTextures.PROGRESS_CYCLE, 20)
                                         .direction(ProgressWidget.Direction.CIRCULAR_CW))
+                                .child(new CycleButtonWidget()
+                                        .length(3)
+                                        .texture(GuiTextures.CYCLE_BUTTON_DEMO)
+                                        .addTooltip(0, "State 1")
+                                        .addTooltip(1, "State 2")
+                                        .addTooltip(2, "State 3")
+                                        .background(GuiTextures.BUTTON)
+                                        .setSynced(3))
                         ));
         /*panel.child(new ButtonWidget<>()
                         .flex(flex -> flex.size(60, 20)

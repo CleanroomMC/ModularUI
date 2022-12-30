@@ -42,6 +42,8 @@ public interface IDrawable {
         return new Icon(this);
     }
 
+    IDrawable EMPTY = (x, y, width, height) -> {};
+
     class DrawableWidget extends Widget<DrawableWidget> {
         public DrawableWidget(IDrawable drawable) {
             background(drawable);

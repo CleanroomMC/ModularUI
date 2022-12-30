@@ -65,7 +65,7 @@ public interface IWidget extends IGuiElement {
      * @return if this widget has a tooltip
      */
     default boolean hasTooltip() {
-        return getTooltip() != null;
+        return getTooltip() != null && !getTooltip().isEmpty();
     }
 
     /**

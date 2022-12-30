@@ -170,6 +170,11 @@ public class GuiTextures {
             .imageSize(20, 40)
             .build();
 
+    public static final UITexture CYCLE_BUTTON_DEMO = UITexture.builder()
+            .location(ModularUI.ID, "gui/widgets/cycle_button_demo")
+            .imageSize(18, 54)
+            .build();
+
     private static UITexture icon(String name, int x, int y, int w, int h) {
         return UITexture.builder()
                 .location(ICONS_LOCATION)
