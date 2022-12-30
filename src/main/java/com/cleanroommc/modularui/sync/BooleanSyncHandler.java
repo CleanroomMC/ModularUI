@@ -8,7 +8,7 @@ import net.minecraft.network.PacketBuffer;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
-public class BooleanSyncHandler extends ValueSyncHandler<Boolean> implements INumberSyncHandler, IStringSyncHandler<Boolean> {
+public class BooleanSyncHandler extends ValueSyncHandler<Boolean> implements INumberSyncHandler<Boolean>, IStringSyncHandler<Boolean> {
 
     private final BooleanSupplier getter;
     private final Consumer<Boolean> setter;
@@ -23,6 +23,11 @@ public class BooleanSyncHandler extends ValueSyncHandler<Boolean> implements INu
     @Override
     public int getCacheAsInt() {
         return this.cache ? 1 : 0;
+    }
+
+    @Override
+    public Boolean fromInt(int val) {
+        return val == 1;
     }
 
     @Override

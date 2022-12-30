@@ -47,4 +47,8 @@ public class SyncHandlers {
     public static FluidSlotSyncHandler fluidSlot(IFluidTank fluidTank) {
         return new FluidSlotSyncHandler(fluidTank);
     }
+
+    public static <T extends Enum<T>> EnumSyncHandler<T> enumValue(Class<T> clazz, Supplier<T> getter, Consumer<T> setter) {
+        return new EnumSyncHandler<>(clazz, getter, setter);
+    }
 }

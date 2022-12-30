@@ -8,7 +8,7 @@ import net.minecraft.network.PacketBuffer;
 import java.util.function.LongConsumer;
 import java.util.function.LongSupplier;
 
-public class LongSyncHandler extends ValueSyncHandler<Long> implements INumberSyncHandler, IStringSyncHandler<Long> {
+public class LongSyncHandler extends ValueSyncHandler<Long> implements INumberSyncHandler<Long>, IStringSyncHandler<Long> {
 
     private final LongSupplier getter;
     private final LongConsumer setter;
@@ -23,6 +23,11 @@ public class LongSyncHandler extends ValueSyncHandler<Long> implements INumberSy
     @Override
     public int getCacheAsInt() {
         return (int) cache;
+    }
+
+    @Override
+    public Long fromInt(int val) {
+        return (long) val;
     }
 
     @Override

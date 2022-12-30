@@ -8,7 +8,7 @@ import net.minecraft.network.PacketBuffer;
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 
-public class IntSyncHandler extends ValueSyncHandler<Integer> implements INumberSyncHandler, IStringSyncHandler<Integer> {
+public class IntSyncHandler extends ValueSyncHandler<Integer> implements INumberSyncHandler<Integer>, IStringSyncHandler<Integer> {
 
     private int cache;
     private final IntSupplier getter;
@@ -69,5 +69,10 @@ public class IntSyncHandler extends ValueSyncHandler<Integer> implements INumber
     @Override
     public int getCacheAsInt() {
         return this.cache;
+    }
+
+    @Override
+    public Integer fromInt(int val) {
+        return val;
     }
 }
