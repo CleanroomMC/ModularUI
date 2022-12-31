@@ -32,11 +32,11 @@ public class GuiSyncHandler {
         String key = "player";
         for (int i = 0; i < 9; i++) {
             Slot slot = player.inventoryContainer.getSlot(i + 36);
-            syncValue(key, i, SyncHandlers.itemSlot(SlotDelegate.create(slot)));
+            syncValue(key, i, SyncHandlers.itemSlot(SlotDelegate.create(slot)).shiftClickPriority(ItemSlotSH.PLAYER_HOTBAR_PRIO));
         }
         for (int i = 0; i < 27; i++) {
             Slot slot = player.inventoryContainer.getSlot(i + 9);
-            syncValue(key, i + 9, SyncHandlers.itemSlot(SlotDelegate.create(slot)));
+            syncValue(key, i + 9, SyncHandlers.itemSlot(SlotDelegate.create(slot)).shiftClickPriority(ItemSlotSH.PLAYER_INVENTORY_PRIO));
         }
     }
 

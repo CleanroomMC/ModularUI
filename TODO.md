@@ -1,4 +1,4 @@
-# ModularUI TODO's
+``# ModularUI TODO's
 
 ## High Priority
 
@@ -9,8 +9,24 @@
 - [X]  Text field
 - [X]  Tooltips
 
+## Widgets
+
+* [ ]  Phantom Item Slot
+* [ ]  Phantom Fluid Slot
+* [ ]  Slider
+* [ ]  Trackpad
+* [ ]  Color picker (button for setting number which can be dragged)
+* [ ]  List (column but scrollable)
+* [ ]  Sortable List (for bogosorter)
+* [ ]  Slot Group (Builder, sorting)
+* [ ]  Dialog
+* [ ]  Popup menu
+* [ ]  Dropdown menu
+* [ ]  Pie menu
+
 ## Low Priority
 
+- [ ]  Item slot features (like shift click)
 - [ ]  Layout Widgets
 - [X]  Row
 - [X]  Column
