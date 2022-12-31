@@ -32,6 +32,7 @@ import java.util.function.Function;
 public class TestTile extends TileEntity implements IGuiHolder, ITickable {
 
     private final FluidTank fluidTank = new FluidTank(10000);
+    private final FluidTank fluidTankPhantom = new FluidTank(10000);
     private long time = 0;
     private int val;
     private String value = "";
@@ -55,6 +56,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
         guiSyncHandler.syncValue(3, SyncHandlers.intNumber(() -> this.cycleState, val -> this.cycleState = val));
         guiSyncHandler.syncValue("phantom_item_slot", SyncHandlers.phantomItemSlot(this.inventory, 0).ignoreMaxStackSize(true));
         guiSyncHandler.syncValue("fluid_slot", SyncHandlers.fluidSlot(fluidTank));
+        guiSyncHandler.syncValue("fluid_slot", 1, SyncHandlers.fluidSlot(fluidTankPhantom).phantom(true));
 
         for (int i = 0; i < bigInventory.getSlots(); i++) {
             guiSyncHandler.syncValue("item_inv", i, SyncHandlers.itemSlot(bigInventory, i).slotGroup("item_inv"));
@@ -146,13 +148,18 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                                         .setSynced(3))
                                                 .child(new ItemSlot()
                                                         .setSynced("phantom_item_slot"))
+                                                .child(new FluidSlot()
+                                                        .margin(2)
+                                                        .setSynced("fluid_slot", 1))
                                         )))
-                        .addPage(new SlotGroupWidget.Builder()
-                                        .matrix("III", "III", "III")
-                                        .key('I', index -> new ItemSlot())
-                                        .synced("item_inv")
-                                        .build()
-                                        .flex(flex -> flex.top(7).left(0.5f))
+                        .addPage(new Column()
+                                        .coverChildren()
+                                        .child(SlotGroupWidget.builder()
+                                                .matrix("III", "III", "III")
+                                                .key('I', index -> new ItemSlot())
+                                                .synced("item_inv")
+                                                .build()
+                                                .flex(flex -> flex.top(7).left(0.5f)))
                                 /*GuiTextures.LOGO.asIcon()
                                 .size(80, 80)
                                 .asWidget()

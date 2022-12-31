@@ -11,6 +11,7 @@ import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.sync.FluidSlotSyncHandler;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.ClickData;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.widget.Widget;
@@ -131,11 +132,9 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable {
             textRenderer.draw(s);
         }
         if (isHovering()) {
-            if (isHovering()) {
-                GlStateManager.colorMask(true, true, true, false);
-                GuiDraw.drawSolidRect(1, 1, 16, 16, Color.withAlpha(Color.WHITE.normal, 0x80)/*TODO Theme.INSTANCE.getSlotHighlight()*/);
-                GlStateManager.colorMask(true, true, true, true);
-            }
+            GlStateManager.colorMask(true, true, true, false);
+            GuiDraw.drawSolidRect(1, 1, 16, 16, Color.withAlpha(Color.WHITE.normal, 0x80)/*TODO Theme.INSTANCE.getSlotHighlight()*/);
+            GlStateManager.colorMask(true, true, true, true);
         }
     }
 
@@ -147,10 +146,8 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable {
         }
         ItemStack cursorStack = Minecraft.getMinecraft().player.inventory.getItemStack();
         if (this.syncHandler.isPhantom() || (!cursorStack.isEmpty() && cursorStack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null))) {
-            this.syncHandler.syncToServer(1, buffer -> {
-                buffer.writeVarInt(mouseButton);
-                buffer.writeBoolean(Interactable.hasShiftDown());
-            });
+            ClickData clickData = ClickData.create(mouseButton);
+            this.syncHandler.syncToServer(1, clickData::writeToPacket);
         }
         return Result.SUCCESS;
     }
@@ -158,18 +155,11 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable {
     @Override
     public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
         if (this.syncHandler.isPhantom()) {
-            amount = scrollDirection.modifier;
             if ((scrollDirection.isUp() && !this.syncHandler.canFillSlot()) || (scrollDirection.isDown() && !this.syncHandler.canDrainSlot())) {
                 return false;
             }
-            if (Interactable.hasShiftDown()) {
-                amount *= 10;
-            }
-            if (Interactable.hasControlDown()) {
-                amount *= 100;
-            }
-            final int finalAmount = amount;
-            this.syncHandler.syncToServer(2, buffer -> buffer.writeVarInt(finalAmount));
+            ClickData clickData = ClickData.create(scrollDirection.modifier);
+            this.syncHandler.syncToServer(2, clickData::writeToPacket);
             return true;
         }
         return false;

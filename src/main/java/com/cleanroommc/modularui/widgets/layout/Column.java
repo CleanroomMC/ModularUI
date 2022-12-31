@@ -10,7 +10,7 @@ import com.cleanroommc.modularui.widget.sizer.Box;
 public class Column extends ParentWidget<Column> implements ILayoutWidget {
 
     private MainAxisAlignment maa = MainAxisAlignment.START;
-    private CrossAxisAlignment caa = CrossAxisAlignment.START;
+    private CrossAxisAlignment caa = CrossAxisAlignment.CENTER;
 
     public Column() {
         flex().startDefaultMode()

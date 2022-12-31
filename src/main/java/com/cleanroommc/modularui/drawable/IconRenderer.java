@@ -96,9 +96,11 @@ public class IconRenderer {
                 icons.add((IIcon) element);
             } else if (element instanceof IKey) {
                 String text = ((IKey) element).get();
-                for (String subLine : wrapLine(text)) {
-                    int width = (int) (getFontRenderer().getStringWidth(subLine) * scale);
-                    icons.add(new TextIcon(subLine, width, (int) (getFontRenderer().FONT_HEIGHT + scale)));
+                for (String subLine : text.split("\\\\n")) {
+                    for (String subSubLine : wrapLine(subLine)) {
+                        int width = (int) (getFontRenderer().getStringWidth(subSubLine) * scale);
+                        icons.add(new TextIcon(subSubLine, width, (int) (getFontRenderer().FONT_HEIGHT + scale)));
+                    }
                 }
             } else {
                 icons.add(element.asIcon().height(getFontRenderer().FONT_HEIGHT));

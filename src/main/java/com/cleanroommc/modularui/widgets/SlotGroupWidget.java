@@ -52,13 +52,17 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
         }
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder {
 
         private String syncKey;
         private final List<String> matrix = new ArrayList<>();
         private final Char2ObjectMap<Object> keys = new Char2ObjectOpenHashMap<>();
 
-        public Builder() {
+        private Builder() {
             this.keys.put(' ', null);
         }
 
