@@ -16,15 +16,10 @@ import java.util.function.Predicate;
 
 public class ItemSlotSH extends SyncHandler {
 
-    public static final int PLAYER_HOTBAR_PRIO = 0;
-    public static final int PLAYER_INVENTORY_PRIO = 100;
-    public static final int STORAGE_SLOT_PRIO = 200;
-
     private final SlotCustomSlot customSlot;
     private final Slot slot;
-    private int shiftClickPriority = 100;
-    private boolean allowShiftClick = true;
     private Predicate<ItemStack> filter;
+    private String slotGroup;
 
     private boolean phantom = false;
     private ItemStack lastStoredPhantomItem = ItemStack.EMPTY;
@@ -189,26 +184,12 @@ public class ItemSlotSH extends SyncHandler {
         return getSlot().isItemValid(itemStack) && (this.filter == null || this.filter.test(itemStack));
     }
 
-    public int getShiftClickPriority() {
-        return shiftClickPriority;
-    }
-
-    public boolean isAllowShiftClick() {
-        return allowShiftClick;
-    }
-
     public boolean isPhantom() {
         return phantom;
     }
 
-    public ItemSlotSH allowShiftClick(boolean allowShiftClick) {
-        this.allowShiftClick = allowShiftClick;
-        return this;
-    }
-
-    public ItemSlotSH shiftClickPriority(int shiftClickPriority) {
-        this.shiftClickPriority = shiftClickPriority;
-        return this;
+    public String getSlotGroup() {
+        return slotGroup;
     }
 
     public ItemSlotSH filter(Predicate<ItemStack> filter) {
@@ -222,10 +203,15 @@ public class ItemSlotSH extends SyncHandler {
     }
 
     public ItemSlotSH ignoreMaxStackSize(boolean ignore) {
-        if(this.customSlot == null) {
+        if (this.customSlot == null) {
             throw new IllegalStateException("Slot must be a SlotCustomSlot");
         }
         this.customSlot.setIgnoreMaxStackSize(ignore);
+        return this;
+    }
+
+    public ItemSlotSH slotGroup(String name) {
+        this.slotGroup = name;
         return this;
     }
 }

@@ -18,7 +18,7 @@
 * [ ]  Color picker (button for setting number which can be dragged)
 * [ ]  List (column but scrollable)
 * [ ]  Sortable List (for bogosorter)
-* [ ]  Slot Group (Builder, sorting)
+* [X]  Slot Group (Builder, sorting)
 * [ ]  Dialog
 * [ ]  Popup menu
 * [ ]  Dropdown menu
@@ -26,7 +26,7 @@
 
 ## Low Priority
 
-- [ ]  Item slot features (like shift click)
+- [X]  Item slot features (like shift click)
 - [ ]  Layout Widgets
 - [X]  Row
 - [X]  Column

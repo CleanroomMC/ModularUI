@@ -45,6 +45,8 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
         }
     };
 
+    private final ItemStackHandler bigInventory = new ItemStackHandler(9);
+
     @Override
     public void buildSyncHandler(GuiSyncHandler guiSyncHandler, EntityPlayer player) {
         guiSyncHandler.syncValue(0, SyncHandlers.intNumber(() -> val, val -> this.val = val));
@@ -53,6 +55,12 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
         guiSyncHandler.syncValue(3, SyncHandlers.intNumber(() -> this.cycleState, val -> this.cycleState = val));
         guiSyncHandler.syncValue("phantom_item_slot", SyncHandlers.phantomItemSlot(this.inventory, 0).ignoreMaxStackSize(true));
         guiSyncHandler.syncValue("fluid_slot", SyncHandlers.fluidSlot(fluidTank));
+
+        for (int i = 0; i < bigInventory.getSlots(); i++) {
+            guiSyncHandler.syncValue("item_inv", i, SyncHandlers.itemSlot(bigInventory, i).slotGroup("item_inv"));
+        }
+
+        guiSyncHandler.registerSlotGroup("item_inv", 3);
     }
 
     @Override
@@ -66,14 +74,14 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                 .size(176, 220)       // set a static size for the main panel
                 .align(Alignment.Center);    // center the panel in the screen
         panel.background(GuiTextures.BACKGROUND)
-                //.bindPlayerInventory()
+                .bindPlayerInventory()
                 .child(new TabContainer()
                         .flex(flex -> flex.size(1f, 1f))
                         .tabButton(new TabButton(0))
                         .tabButton(new TabButton(1))
                         .addPage(new ParentWidget<>()
                                 .flex(flex -> flex.size(1f, 1f))
-                                .child(SlotGroup.playerInventory())
+                                //.child(SlotGroupWidget.playerInventory())
                                 .child(new Row()
                                         .flex(flex -> flex.height(137))
                                         .padding(7)
@@ -139,10 +147,16 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                                 .child(new ItemSlot()
                                                         .setSynced("phantom_item_slot"))
                                         )))
-                        .addPage(GuiTextures.LOGO.asIcon()
+                        .addPage(new SlotGroupWidget.Builder()
+                                        .matrix("III", "III", "III")
+                                        .key('I', index -> new ItemSlot())
+                                        .synced("item_inv")
+                                        .build()
+                                        .flex(flex -> flex.top(7).left(0.5f))
+                                /*GuiTextures.LOGO.asIcon()
                                 .size(80, 80)
                                 .asWidget()
-                                .flex(flex -> flex.width(1f).height(1f))));
+                                .flex(flex -> flex.width(1f).height(1f))*/));
         /*panel.child(new ButtonWidget<>()
                         .flex(flex -> flex.size(60, 20)
                                 .top(7)

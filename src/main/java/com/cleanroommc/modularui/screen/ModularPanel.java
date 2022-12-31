@@ -10,7 +10,7 @@ import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import com.cleanroommc.modularui.widgets.SlotGroup;
+import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -398,6 +398,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     public ModularPanel bindPlayerInventory() {
-        return child(SlotGroup.playerInventory());
+        return child(SlotGroupWidget.playerInventory());
     }
 }
