@@ -46,6 +46,7 @@ public class ModularContainer extends Container {
 
     @Override
     public void detectAndSendChanges() {
+        super.detectAndSendChanges();
         this.guiSyncHandler.detectAndSendChanges(this.init);
         this.init = false;
     }

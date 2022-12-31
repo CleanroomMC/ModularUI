@@ -44,6 +44,10 @@ public class SyncHandlers {
         return new ItemSlotSH(inventory, index);
     }
 
+    public static ItemSlotSH phantomItemSlot(IItemHandlerModifiable inventory, int index) {
+        return ItemSlotSH.phantom(inventory, index);
+    }
+
     public static FluidSlotSyncHandler fluidSlot(IFluidTank fluidTank) {
         return new FluidSlotSyncHandler(fluidTank);
     }

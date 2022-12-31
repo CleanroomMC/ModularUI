@@ -51,6 +51,10 @@ public class GuiSyncHandler {
         this.syncedValues.forEach((mapKey, syncHandler) -> syncHandler.init(mapKey, this));
     }
 
+    public ItemStack getCursorItem() {
+        return getPlayer().inventory.getItemStack();
+    }
+
     public void setCursorItem(ItemStack item) {
         getPlayer().inventory.setItemStack(item);
         this.cursorSlotSyncHandler.sync();

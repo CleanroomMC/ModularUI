@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.api.sync;
 
 import com.cleanroommc.modularui.network.NetworkHandler;
+import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.network.packets.PacketSyncHandler;
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
 import com.cleanroommc.modularui.sync.MapKey;
@@ -58,6 +59,23 @@ public abstract class SyncHandler {
         buffer.writeVarInt(id);
         bufferConsumer.accept(buffer);
         sendToServer(buffer, this);
+    }
+
+    /**
+     * Sync a custom packet to the other side.
+     *
+     * @param id             an internal denominator to identify this package
+     * @param bufferConsumer the package builder
+     */
+    public final void sync(int id, Consumer<PacketBuffer> bufferConsumer) {
+        PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
+        buffer.writeVarInt(id);
+        bufferConsumer.accept(buffer);
+        if (NetworkUtils.isClient(getSyncHandler().getPlayer())) {
+            sendToServer(buffer, this);
+        } else {
+            sendToClient(buffer, this);
+        }
     }
 
     /**

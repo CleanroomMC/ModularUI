@@ -8,8 +8,10 @@ import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.TextRenderer;
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
+import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.sync.ItemSlotSH;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.ClickData;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.widget.Widget;
@@ -69,7 +71,12 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @Override
     public @NotNull Result onMousePressed(int mouseButton) {
-        getScreen().getScreenWrapper().clickSlot();
+        if (this.syncHandler.isPhantom()) {
+            ClickData clickData = ClickData.create(mouseButton);
+            this.syncHandler.syncToServer(2, clickData::writeToPacket);
+        } else {
+            getScreen().getScreenWrapper().clickSlot();
+        }
         return Result.SUCCESS;
     }
 
@@ -77,6 +84,16 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     public boolean onMouseRelease(int mouseButton) {
         getScreen().getScreenWrapper().releaseSlot();
         return true;
+    }
+
+    @Override
+    public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
+        if (this.syncHandler.isPhantom()) {
+            ClickData clickData = ClickData.create(scrollDirection.modifier);
+            this.syncHandler.syncToServer(3, clickData::writeToPacket);
+            return true;
+        }
+        return false;
     }
 
     public Slot getSlot() {

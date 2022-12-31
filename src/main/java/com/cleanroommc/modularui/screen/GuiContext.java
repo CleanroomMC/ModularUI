@@ -240,12 +240,15 @@ public class GuiContext extends GuiViewportStack {
     }
 
     @ApiStatus.Internal
-    public void onFrameUpdate() {
+    public void updateEventState() {
         this.mouseButton = Mouse.getEventButton();
         this.mouseWheel = Mouse.getEventDWheel();
         this.keyCode = Keyboard.getEventKey();
         this.typedChar = Keyboard.getEventCharacter();
+    }
 
+    @ApiStatus.Internal
+    public void onFrameUpdate() {
         IGuiElement hovered = this.screen.getWindowManager().getTopWidget();
         if (this.hovered != hovered) {
             if (this.hovered != null) {

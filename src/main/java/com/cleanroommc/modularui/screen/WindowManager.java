@@ -95,8 +95,8 @@ public class WindowManager {
         for (ModularPanel panel : this.panels) {
             panel.onClose();
         }
-        this.panels.clear();
-        this.closed = true;
+        //this.panels.clear();
+        //this.closed = true;
     }
 
     public void pushUp(@NotNull ModularPanel window) {

@@ -5,6 +5,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fluids.FluidStack;
@@ -39,6 +40,19 @@ public class NetworkUtils {
         ByteBuf copiedDataBuffer = Unpooled.copiedBuffer(directSliceBuffer);
         directSliceBuffer.release();
         return new PacketBuffer(copiedDataBuffer);
+    }
+
+    public static void writeItemStack(PacketBuffer buffer, ItemStack itemStack) {
+        buffer.writeItemStack(itemStack);
+    }
+
+    public static ItemStack readItemStack(PacketBuffer buffer) {
+        try {
+            return buffer.readItemStack();
+        } catch (IOException e) {
+            ModularUI.LOGGER.catching(e);
+            return ItemStack.EMPTY;
+        }
     }
 
     public static void writeFluidStack(PacketBuffer buffer, @Nullable FluidStack fluidStack) {

@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.screen;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
+import com.cleanroommc.modularui.sync.ItemSlotSH;
 import com.cleanroommc.modularui.sync.MapKey;
 import com.cleanroommc.modularui.theme.Theme;
 import com.cleanroommc.modularui.widget.WidgetTree;
@@ -209,6 +210,7 @@ public abstract class ModularScreen {
 
     @ApiStatus.OverrideOnly
     public boolean onMousePressed(int mouseButton) {
+        this.context.updateEventState();
         for (IGuiAction.MousePressed action : getGuiActionListeners(IGuiAction.MousePressed.class)) {
             action.press(mouseButton);
         }
@@ -222,6 +224,7 @@ public abstract class ModularScreen {
 
     @ApiStatus.OverrideOnly
     public boolean onMouseRelease(int mouseButton) {
+        this.context.updateEventState();
         for (IGuiAction.MouseReleased action : getGuiActionListeners(IGuiAction.MouseReleased.class)) {
             action.release(mouseButton);
         }
@@ -235,6 +238,7 @@ public abstract class ModularScreen {
 
     @ApiStatus.OverrideOnly
     public boolean onKeyPressed(char typedChar, int keyCode) {
+        this.context.updateEventState();
         for (IGuiAction.KeyPressed action : getGuiActionListeners(IGuiAction.KeyPressed.class)) {
             action.press(typedChar, keyCode);
         }
@@ -248,6 +252,7 @@ public abstract class ModularScreen {
 
     @ApiStatus.OverrideOnly
     public boolean onKeyRelease(char typedChar, int keyCode) {
+        this.context.updateEventState();
         for (IGuiAction.KeyReleased action : getGuiActionListeners(IGuiAction.KeyReleased.class)) {
             action.release(typedChar, keyCode);
         }
@@ -261,6 +266,7 @@ public abstract class ModularScreen {
 
     @ApiStatus.OverrideOnly
     public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
+        this.context.updateEventState();
         for (IGuiAction.MouseScroll action : getGuiActionListeners(IGuiAction.MouseScroll.class)) {
             action.scroll(scrollDirection, amount);
         }
@@ -274,6 +280,7 @@ public abstract class ModularScreen {
 
     @ApiStatus.OverrideOnly
     public boolean onMouseDrag(int mouseButton, long timeSinceClick) {
+        this.context.updateEventState();
         for (IGuiAction.MouseDrag action : getGuiActionListeners(IGuiAction.MouseDrag.class)) {
             action.drag(mouseButton, timeSinceClick);
         }
@@ -341,8 +348,8 @@ public abstract class ModularScreen {
         this.currentTheme = theme;
     }
 
-    public void registerItemSlot(Slot slot) {
-        getContainer().addSlotToContainer(slot);
+    public void registerItemSlot(ItemSlotSH syncHandler) {
+        getContainer().registerSlot(syncHandler);
     }
 
     public boolean isClientOnly() {

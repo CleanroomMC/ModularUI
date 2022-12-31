@@ -11,7 +11,7 @@
 
 ## Widgets
 
-* [ ]  Phantom Item Slot
+* [X]  Phantom Item Slot
 * [ ]  Phantom Fluid Slot
 * [ ]  Slider
 * [ ]  Trackpad

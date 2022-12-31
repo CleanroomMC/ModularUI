@@ -13,7 +13,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public class SlotDelegate extends Slot {
+public class SlotDelegate extends Slot implements ICustomSlot {
+
+    private boolean enabled = true;
 
     public static SlotDelegate create(Slot slot) {
         return create(slot, false);
@@ -124,7 +126,11 @@ public class SlotDelegate extends Slot {
 
     @Override
     public boolean isEnabled() {
-        return slot.isEnabled();
+        return this.enabled && slot.isEnabled();
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     @Override
