@@ -12,7 +12,7 @@
 ## Widgets
 
 * [X]  Phantom Item Slot
-* [ ]  Phantom Fluid Slot
+* [X]  Phantom Fluid Slot
 * [ ]  Slider
 * [ ]  Trackpad
 * [ ]  Color picker (button for setting number which can be dragged)

@@ -48,6 +48,11 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
 
     private final ItemStackHandler bigInventory = new ItemStackHandler(9);
 
+    private final ItemStackHandler mixerItems = new ItemStackHandler(4);
+    private final FluidTank mixerFluids1 = new FluidTank(16000);
+    private final FluidTank mixerFluids2 = new FluidTank(16000);
+
+
     @Override
     public void buildSyncHandler(GuiSyncHandler guiSyncHandler, EntityPlayer player) {
         guiSyncHandler.syncValue(0, SyncHandlers.intNumber(() -> val, val -> this.val = val));
@@ -63,6 +68,15 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
         }
 
         guiSyncHandler.registerSlotGroup("item_inv", 3);
+
+        // mixer
+        guiSyncHandler.registerSlotGroup("mixer_items", 2);
+        for (int i = 0; i < 4; i++) {
+            guiSyncHandler.syncValue("mixer_items", i, SyncHandlers.itemSlot(mixerItems, i).slotGroup("mixer_items"));
+        }
+        guiSyncHandler.syncValue("mixer_fluids", 0, SyncHandlers.fluidSlot(mixerFluids1));
+        guiSyncHandler.syncValue("mixer_fluids", 1, SyncHandlers.fluidSlot(mixerFluids2));
+
     }
 
     @Override
@@ -84,7 +98,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                         .addPage(new ParentWidget<>()
                                 .flex(flex -> flex.size(1f, 1f))
                                 //.child(SlotGroupWidget.playerInventory())
-                                .child(new Row()
+                                /*.child(new Row()
                                         .flex(flex -> flex.height(137))
                                         .padding(7)
                                         .child(new Column()
@@ -151,19 +165,26 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                                 .child(new FluidSlot()
                                                         .margin(2)
                                                         .setSynced("fluid_slot", 1))
-                                        )))
+                                        ))*/)
                         .addPage(new Column()
-                                        .coverChildren()
+                                        //.coverChildren()
+                                        .padding(7)
                                         .child(SlotGroupWidget.builder()
                                                 .matrix("III", "III", "III")
                                                 .key('I', index -> new ItemSlot())
                                                 .synced("item_inv")
                                                 .build()
-                                                .flex(flex -> flex.top(7).left(0.5f)))
+                                                .marginBottom(8))
+                                        .child(SlotGroupWidget.builder()
+                                                .row("FII")
+                                                .row("FII")
+                                                .key('F', index -> new FluidSlot().setSynced("mixer_fluids", index))
+                                                .key('I', index -> new ItemSlot().setSynced("mixer_items", index))
+                                                .build()
                                 /*GuiTextures.LOGO.asIcon()
                                 .size(80, 80)
                                 .asWidget()
-                                .flex(flex -> flex.width(1f).height(1f))*/));
+                                .flex(flex -> flex.width(1f).height(1f))*/)));
         /*panel.child(new ButtonWidget<>()
                         .flex(flex -> flex.size(60, 20)
                                 .top(7)

@@ -133,6 +133,9 @@ public class ItemSlotSH extends SyncHandler {
         if (clickData.ctrl) {
             amount *= 16;
         }
+        if (clickData.alt) {
+            amount *= 64;
+        }
         if (amount > 0 && currentItem.isEmpty() && !lastStoredPhantomItem.isEmpty()) {
             ItemStack stackToPut = this.lastStoredPhantomItem.copy();
             stackToPut.setCount(amount);

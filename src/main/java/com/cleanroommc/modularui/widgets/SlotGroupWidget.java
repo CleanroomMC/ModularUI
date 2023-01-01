@@ -98,7 +98,6 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
             int x = 0, y = 0, maxWidth = 0;
             int syncId = 0;
             for (String row : this.matrix) {
-                maxWidth = Math.max(maxWidth, row.length());
                 for (int i = 0; i < row.length(); i++) {
                     char c = row.charAt(i);
                     charCount.put(c, charCount.get(c) + 1);
@@ -118,11 +117,12 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
                         ((Widget<?>) widget).setSynced(this.syncKey, syncId++);
                     }
                     x += 18;
+                    maxWidth = Math.max(maxWidth, x);
                 }
                 y += 18;
                 x = 0;
             }
-            slotGroupWidget.flex().size(maxWidth * 18, this.matrix.size() * 18);
+            slotGroupWidget.flex().size(maxWidth, this.matrix.size() * 18);
             return slotGroupWidget;
         }
     }

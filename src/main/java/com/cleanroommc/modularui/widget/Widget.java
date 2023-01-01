@@ -91,8 +91,9 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
         if (this.syncKey != null) {
             this.syncHandler = syncHandler.getSyncHandler(this.syncKey);
             if (!isValidSyncHandler(this.syncHandler)) {
+                String type = this.syncHandler == null ? null : this.syncHandler.getClass().getName();
                 this.syncHandler = null;
-                throw new IllegalStateException();
+                throw new IllegalStateException("SyncHandler of type " + type + " is not valid for " + getClass().getName() + ", with key " + this.syncKey);
             }
             if (this.syncHandler instanceof ValueSyncHandler && ((ValueSyncHandler<?>) this.syncHandler).getChangeListener() == null) {
                 ((ValueSyncHandler<?>) this.syncHandler).setChangeListener(this::markDirty);
