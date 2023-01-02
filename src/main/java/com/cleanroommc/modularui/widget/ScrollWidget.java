@@ -72,6 +72,9 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
             return;
         }
         widgets.add(this, viewports);
+        if (getScrollArea().isInsideScrollbarArea(x, y)) {
+            return;
+        }
         if (hasChildren()) {
             IViewport.getChildrenAt(this, viewports, widgets, x, y);
         }

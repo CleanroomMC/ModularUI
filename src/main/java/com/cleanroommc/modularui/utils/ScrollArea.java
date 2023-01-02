@@ -162,6 +162,20 @@ public class ScrollArea extends Area {
         return (int) (this.direction.getSide(this) * this.direction.getFullSide(this) / (float) this.scrollSize);
     }
 
+    public boolean isInsideScrollbarArea(int x, int y) {
+        if (!isInside(x, y) || !isScrollBarActive()) {
+            return false;
+        }
+        int scrollbar = this.getScrollbarThickness();
+        if (this.direction == ScrollDirection.HORIZONTAL) {
+            return this.opposite ? y >= this.y && y < this.y + scrollbar : y > ey() - scrollbar && y <= ey();
+        }
+        if (this.direction == ScrollDirection.VERTICAL) {
+            return this.opposite ? x >= this.x && x < this.x + scrollbar : x > ex() - scrollbar && x <= ex();
+        }
+        return false;
+    }
+
     /* GUI code for easier manipulations */
 
     @SideOnly(Side.CLIENT)
@@ -173,11 +187,7 @@ public class ScrollArea extends Area {
      * This method should be invoked to register dragging
      */
     public boolean mouseClicked(int x, int y) {
-        boolean isInside = this.isInside(x, y) &&
-                this.scrollSize > this.height &&
-                this.direction == ScrollDirection.VERTICAL ?
-                x >= ex() - getScrollbarThickness() :
-                y >= ey() - getScrollbarThickness();
+        boolean isInside = isInsideScrollbarArea(x, y);
 
         if (isInside) {
             this.dragging = true;
