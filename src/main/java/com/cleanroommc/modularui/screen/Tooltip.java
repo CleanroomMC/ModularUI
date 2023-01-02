@@ -105,11 +105,6 @@ public class Tooltip {
         renderer.draw(this.lines);
 
         MinecraftForge.EVENT_BUS.post(new RenderTooltipEvent.PostText(ItemStack.EMPTY, textLines, area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height));
-
-        GlStateManager.enableLighting();
-        GlStateManager.enableDepth();
-        RenderHelper.enableStandardItemLighting();
-        GlStateManager.enableRescaleNormal();
     }
 
     public Rectangle determineTooltipArea(List<IDrawable> lines, IconRenderer renderer, int screenWidth, int screenHeight, int mouseX, int mouseY) {

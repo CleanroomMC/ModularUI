@@ -16,6 +16,11 @@ public class ParentWidget<W extends ParentWidget<W>> extends Widget<W> {
         return children;
     }
 
+    @Override
+    public boolean canHover() {
+        return getBackground().length > 0;
+    }
+
     public boolean addChild(IWidget child, int index) {
         if (child == null || child == this || getChildren().contains(child)) {
             return false;

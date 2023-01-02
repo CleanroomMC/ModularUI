@@ -149,41 +149,55 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     public boolean onMousePressed(int mouseButton) {
         LocatedWidget pressed = LocatedWidget.EMPTY;
         boolean result = false;
-        loop:
-        for (LocatedWidget widget : this.hovering) {
-            if (widget.getWidget() instanceof Interactable) {
-                Interactable interactable = (Interactable) widget.getWidget();
-                widget.applyViewports(getContext());
-                switch (interactable.onMousePressed(mouseButton)) {
-                    case IGNORE:
-                        break;
-                    case ACCEPT: {
-                        if (!this.isKeyHeld && !this.isMouseButtonHeld) {
-                            this.acceptedInteractions.add(interactable);
-                        }
-                        pressed = widget;
-                        // result = false;
-                        break;
-                    }
-                    case STOP: {
-                        pressed = LocatedWidget.EMPTY;
-                        result = true;
-                        widget.unapplyViewports(getContext());
-                        break loop;
-                    }
-                    case SUCCESS: {
-                        if (!this.isKeyHeld && !this.isMouseButtonHeld) {
-                            this.acceptedInteractions.add(interactable);
-                        }
-                        pressed = widget;
-                        result = true;
-                        widget.unapplyViewports(getContext());
-                        break loop;
-                    }
+
+        if (this.hovering.isEmpty()) {
+            if (closeOnOutOfBoundsClick()) {
+                closeIfOpen();
+                result = true;
+            }
+        } else {
+            loop:
+            for (LocatedWidget widget : this.hovering) {
+                if (getContext().onHoveredClick(mouseButton, widget.getWidget())) {
+                    pressed = LocatedWidget.EMPTY;
+                    result = true;
+                    break;
                 }
-                widget.unapplyViewports(getContext());
+                if (widget.getWidget() instanceof Interactable) {
+                    Interactable interactable = (Interactable) widget.getWidget();
+                    widget.applyViewports(getContext());
+                    switch (interactable.onMousePressed(mouseButton)) {
+                        case IGNORE:
+                            break;
+                        case ACCEPT: {
+                            if (!this.isKeyHeld && !this.isMouseButtonHeld) {
+                                this.acceptedInteractions.add(interactable);
+                            }
+                            pressed = widget;
+                            // result = false;
+                            break;
+                        }
+                        case STOP: {
+                            pressed = LocatedWidget.EMPTY;
+                            result = true;
+                            widget.unapplyViewports(getContext());
+                            break loop;
+                        }
+                        case SUCCESS: {
+                            if (!this.isKeyHeld && !this.isMouseButtonHeld) {
+                                this.acceptedInteractions.add(interactable);
+                            }
+                            pressed = widget;
+                            result = true;
+                            widget.unapplyViewports(getContext());
+                            break loop;
+                        }
+                    }
+                    widget.unapplyViewports(getContext());
+                }
             }
         }
+
         if (result && pressed.getWidget() instanceof IFocusedWidget) {
             getContext().focus(pressed, true);
         } else {
@@ -368,6 +382,27 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return result;
     }
 
+    /**
+     * @return if this panel can be dragged. Never works on the main panel.
+     */
+    public boolean isDraggable() {
+        return true;
+    }
+
+    /**
+     * @return if panels below this can still be interacted with.
+     */
+    public boolean disablePanelsBelow() {
+        return false;
+    }
+
+    /**
+     * @return if this panel should be closed if outside of this panel is clicked.
+     */
+    public boolean closeOnOutOfBoundsClick() {
+        return false;
+    }
+
     @Override
     public GuiContext getContext() {
         return super.getContext();
@@ -408,7 +443,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @Override
     public void draw(float partialTicks) {
-        //getContext().pushViewport(getArea());
     }
 
     public ModularPanel bindPlayerInventory() {

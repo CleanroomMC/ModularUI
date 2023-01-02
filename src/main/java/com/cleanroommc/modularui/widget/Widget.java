@@ -189,11 +189,6 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
     }
 
     @Override
-    public boolean canHover() {
-        return getBackground().length > 0;
-    }
-
-    @Override
     public void markDirty() {
         if (this.tooltip != null) {
             this.tooltip.markDirty();

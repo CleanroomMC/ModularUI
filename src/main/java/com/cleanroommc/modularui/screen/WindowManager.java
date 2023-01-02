@@ -1,13 +1,17 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.utils.ReverseIterable;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 public class WindowManager {
 
@@ -22,6 +26,7 @@ public class WindowManager {
      */
     private final LinkedList<ModularPanel> panels = new LinkedList<>();
     private final List<ModularPanel> panelsView = Collections.unmodifiableList(panels);
+    private final ReverseIterable<ModularPanel> reversePanels = new ReverseIterable<>(this.panelsView);
     private final List<ModularPanel> queueOpenPanels = new ArrayList<>();
     private final List<ModularPanel> queueClosePanels = new ArrayList<>();
     private boolean closed;
@@ -45,6 +50,10 @@ public class WindowManager {
             throw new IllegalStateException("WindowManager is not yet constructed!");
         }
         openPanel(this.mainPanel, false);
+    }
+
+    public boolean isMainPanel(ModularPanel panel) {
+        return this.mainPanel == panel;
     }
 
     @ApiStatus.Internal
@@ -73,7 +82,7 @@ public class WindowManager {
 
     private void openPanel(ModularPanel panel, boolean resize) {
         if (this.panels.contains(panel)) throw new IllegalStateException();
-        this.panels.addLast(panel);
+        this.panels.addFirst(panel);
         panel.onOpen(this.screen);
         if (resize) {
             WidgetTree.resize(panel);
@@ -102,9 +111,7 @@ public class WindowManager {
 
     @Nullable
     public IWidget getTopWidget() {
-        Iterator<ModularPanel> panelIterator = this.panels.descendingIterator();
-        while (panelIterator.hasNext()) {
-            ModularPanel panel = panelIterator.next();
+        for (ModularPanel panel : this.panels) {
             IWidget widget = panel.getTopHovering();
             if (widget != null) {
                 return widget;
@@ -163,26 +170,14 @@ public class WindowManager {
 
     @NotNull
     @UnmodifiableView
-    public List<ModularPanel> getOpenWindows() {
+    public List<ModularPanel> getOpenPanels() {
         return panelsView;
     }
 
     @NotNull
     @UnmodifiableView
-    public Iterator<ModularPanel> getOpenWindowsReversed() {
-        return new Iterator<ModularPanel>() {
-            final ListIterator<ModularPanel> it = panelsView.listIterator(panelsView.size());
-
-            @Override
-            public boolean hasNext() {
-                return it.hasPrevious();
-            }
-
-            @Override
-            public ModularPanel next() {
-                return it.previous();
-            }
-        };
+    public Iterable<ModularPanel> getReverseOpenPanels() {
+        return this.reversePanels;
     }
 
     public boolean isClosed() {

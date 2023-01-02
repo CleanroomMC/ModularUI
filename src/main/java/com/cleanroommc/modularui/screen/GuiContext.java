@@ -1,10 +1,7 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.widget.IFocusedWidget;
-import com.cleanroommc.modularui.api.widget.IGuiElement;
-import com.cleanroommc.modularui.api.widget.IVanillaSlot;
-import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -32,6 +29,10 @@ public class GuiContext extends GuiViewportStack {
     private IGuiElement hovered;
     private int timeHovered = 0;
     private final HoveredIterable hoveredWidgets;
+
+    private IDraggable draggable;
+    private int lastButton = -1;
+    private long lastClickTime = 0;
 
     /* Mouse states */
     private int mouseX;
@@ -232,6 +233,78 @@ public class GuiContext extends GuiViewportStack {
         return false;
     }
 
+    /* draggable */
+
+    public boolean hasDraggable() {
+        return this.draggable != null;
+    }
+
+    public boolean isMouseItemEmpty() {
+        return this.mc.player.inventory.getItemStack().isEmpty();
+    }
+
+    @ApiStatus.Internal
+    public boolean onMousePressed(int button) {
+        if ((button == 0 || button == 1) && isMouseItemEmpty() && hasDraggable()) {
+            this.draggable.onDragEnd(this.draggable.canDropHere(getAbsMouseX(), getAbsMouseY(), this.hovered));
+            this.draggable.setMoving(false);
+            this.draggable = null;
+            this.lastButton = -1;
+            this.lastClickTime = 0;
+            return true;
+        }
+        return false;
+    }
+
+    @ApiStatus.Internal
+    public boolean onMouseReleased(int button) {
+        if (button == this.lastButton && isMouseItemEmpty() && hasDraggable()) {
+            long time = Minecraft.getSystemTime();
+            if (time - this.lastClickTime < 200) return false;
+            this.draggable.onDragEnd(this.draggable.canDropHere(getAbsMouseX(), getAbsMouseY(), this.hovered));
+            this.draggable.setMoving(false);
+            this.draggable = null;
+            this.lastButton = -1;
+            this.lastClickTime = 0;
+            return true;
+        }
+        return false;
+    }
+
+    @ApiStatus.Internal
+    public boolean onHoveredClick(int button, IWidget hovered) {
+        if ((button == 0 || button == 1) && isMouseItemEmpty() && !hasDraggable()) {
+            IDraggable draggable;
+            if (hovered instanceof IDraggable) {
+                draggable = (IDraggable) hovered;
+            } else if (hovered instanceof ModularPanel) {
+                ModularPanel panel = (ModularPanel) hovered;
+                if (!this.screen.getWindowManager().isMainPanel(panel) && panel.isDraggable()) {
+                    draggable = new DraggablePanelWrapper(panel, getAbsMouseX() - panel.getArea().x, getAbsMouseY() - panel.getArea().y);
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+            if (draggable.onDragStart(button)) {
+                draggable.setMoving(true);
+                this.draggable = draggable;
+                this.lastButton = button;
+                this.lastClickTime = Minecraft.getSystemTime();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @ApiStatus.Internal
+    public void drawDraggable() {
+        if (hasDraggable()) {
+            this.draggable.drawMovingState(this.partialTicks);
+        }
+    }
+
     @ApiStatus.Internal
     public void updateState(int mouseX, int mouseY, float partialTicks) {
         this.mouseX = mouseX;
@@ -250,6 +323,9 @@ public class GuiContext extends GuiViewportStack {
     @ApiStatus.Internal
     public void onFrameUpdate() {
         IGuiElement hovered = this.screen.getWindowManager().getTopWidget();
+        if (hasDraggable()) {
+            this.draggable.onDrag(this.lastButton, this.lastClickTime);
+        }
         if (this.hovered != hovered) {
             if (this.hovered != null) {
                 this.hovered.onMouseEndHover();
@@ -336,7 +412,7 @@ public class GuiContext extends GuiViewportStack {
         public Iterator<IGuiElement> iterator() {
             return new Iterator<IGuiElement>() {
 
-                private final Iterator<ModularPanel> panelIt = windowManager.getOpenWindows().iterator();
+                private final Iterator<ModularPanel> panelIt = windowManager.getOpenPanels().iterator();
                 private Iterator<LocatedWidget> widgetIt;
 
                 @Override

@@ -100,7 +100,12 @@ public class WidgetTree {
 
     @ApiStatus.Internal
     public static void drawInternal(IWidget parent, GuiContext context, float partialTicks) {
-        if (!parent.isEnabled()) return;
+        drawInternal(parent, context, false, partialTicks);
+    }
+
+    @ApiStatus.Internal
+    public static void drawInternal(IWidget parent, GuiContext context, boolean ignoreEnabled, float partialTicks) {
+        if (!parent.isEnabled() && !ignoreEnabled) return;
         if (parent instanceof IViewport) {
             ((IViewport) parent).apply(context);
         }

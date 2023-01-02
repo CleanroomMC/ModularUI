@@ -126,7 +126,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                                                             .size(20))
                                                                     .addLine(new ItemDrawable(new ItemStack(Items.DIAMOND)).asIcon());
                                                         })
-                                                        .onMouseTapped(mouseButton -> {
+                                                        .onMousePressed(mouseButton -> {
                                                             openSecondWindow(context).openIn(panel.getScreen());
                                                             return true;
                                                         })
@@ -203,17 +203,28 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
     }
 
     public ModularPanel openSecondWindow(GuiContext context) {
-        ModularPanel panel = ModularPanel.defaultPanel(context, 150, 150);
+        ModularPanel panel = new ModularPanel(context) {
+            @Override
+            public boolean disablePanelsBelow() {
+                return true;
+            }
+
+            @Override
+            public boolean closeOnOutOfBoundsClick() {
+                return true;
+            }
+        }.flex(flex -> flex.size(100, 100).align(Alignment.Center))
+                .background(GuiTextures.BACKGROUND);
         panel.child(new ButtonWidget<>()
-                        .flex(flex -> flex.size(8, 8).top(3).right(3))
+                        .flex(flex -> flex.size(8, 8).top(4).right(4))
                         .background(GuiTextures.BUTTON, IKey.str("x"))
-                        .onMouseTapped(mouseButton -> {
+                        .onMousePressed(mouseButton -> {
                             panel.closeIfOpen();
                             return true;
                         }))
                 .child(IKey.str("2nd Panel")
                         .asWidget()
-                        .flex(flex -> flex.left(0.5f).top(0.5f)));
+                        .flex(flex -> flex.align(Alignment.Center)));
         return panel;
     }
 

@@ -2,10 +2,12 @@ package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
+import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
 import com.cleanroommc.modularui.sync.ItemSlotSH;
 import com.cleanroommc.modularui.sync.MapKey;
 import com.cleanroommc.modularui.theme.Theme;
+import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -108,7 +110,7 @@ public abstract class ModularScreen {
         this.viewportSet();
 
         this.context.pushViewport(this.viewport);
-        for (ModularPanel panel : this.windowManager.getOpenWindows()) {
+        for (ModularPanel panel : this.windowManager.getOpenPanels()) {
             WidgetTree.resize(panel);
         }
 
@@ -125,7 +127,7 @@ public abstract class ModularScreen {
     public void onOpen() {
         windowManager.init();
         if (!getContainer().isClientOnly()) {
-            windowManager.getOpenWindows().forEach(panel -> panel.initialiseSyncHandler(getSyncHandler()));
+            windowManager.getOpenPanels().forEach(panel -> panel.initialiseSyncHandler(getSyncHandler()));
         }
     }
 
@@ -163,7 +165,7 @@ public abstract class ModularScreen {
     @MustBeInvokedByOverriders
     public void onFrameUpdate() {
         this.windowManager.clearQueue();
-        for (ModularPanel panel : this.windowManager.getOpenWindows()) {
+        for (ModularPanel panel : this.windowManager.getOpenPanels()) {
             WidgetTree.onFrameUpdate(panel);
         }
         context.onFrameUpdate();
@@ -183,7 +185,11 @@ public abstract class ModularScreen {
 
         this.context.reset();
         this.context.pushViewport(this.viewport);
-        for (ModularPanel panel : this.windowManager.getOpenWindows()) {
+        for (ModularPanel panel : this.windowManager.getReverseOpenPanels()) {
+            if (panel.disablePanelsBelow()) {
+                // TODO
+                GuiDraw.drawSolidRect(0, 0, this.viewport.w(), this.viewport.h(), Color.argb(16, 16, 16, 125));
+            }
             WidgetTree.drawInternal(panel, this.context, partialTicks);
         }
         this.context.popViewport();
@@ -202,11 +208,12 @@ public abstract class ModularScreen {
 
         this.context.reset();
         this.context.pushViewport(this.viewport);
-        for (ModularPanel panel : this.windowManager.getOpenWindows()) {
+        for (ModularPanel panel : this.windowManager.getReverseOpenPanels()) {
             if (panel.isEnabled()) {
                 WidgetTree.drawForegroundInternal(panel, partialTicks);
             }
         }
+        this.context.drawDraggable();
         this.context.popViewport();
 
         GlStateManager.enableRescaleNormal();
@@ -220,9 +227,15 @@ public abstract class ModularScreen {
         for (IGuiAction.MousePressed action : getGuiActionListeners(IGuiAction.MousePressed.class)) {
             action.press(mouseButton);
         }
-        for (ModularPanel panel : this.windowManager.getOpenWindows()) {
+        if (this.context.onMousePressed(mouseButton)) {
+            return true;
+        }
+        for (ModularPanel panel : this.windowManager.getOpenPanels()) {
             if (panel.onMousePressed(mouseButton)) {
                 return true;
+            }
+            if (panel.disablePanelsBelow()) {
+                break;
             }
         }
         return false;
@@ -234,9 +247,15 @@ public abstract class ModularScreen {
         for (IGuiAction.MouseReleased action : getGuiActionListeners(IGuiAction.MouseReleased.class)) {
             action.release(mouseButton);
         }
-        for (ModularPanel panel : this.windowManager.getOpenWindows()) {
+        if (this.context.onMouseReleased(mouseButton)) {
+            return true;
+        }
+        for (ModularPanel panel : this.windowManager.getOpenPanels()) {
             if (panel.onMouseRelease(mouseButton)) {
                 return true;
+            }
+            if (panel.disablePanelsBelow()) {
+                break;
             }
         }
         return false;
@@ -248,9 +267,12 @@ public abstract class ModularScreen {
         for (IGuiAction.KeyPressed action : getGuiActionListeners(IGuiAction.KeyPressed.class)) {
             action.press(typedChar, keyCode);
         }
-        for (ModularPanel panel : this.windowManager.getOpenWindows()) {
+        for (ModularPanel panel : this.windowManager.getOpenPanels()) {
             if (panel.onKeyPressed(typedChar, keyCode)) {
                 return true;
+            }
+            if (panel.disablePanelsBelow()) {
+                break;
             }
         }
         return false;
@@ -262,9 +284,12 @@ public abstract class ModularScreen {
         for (IGuiAction.KeyReleased action : getGuiActionListeners(IGuiAction.KeyReleased.class)) {
             action.release(typedChar, keyCode);
         }
-        for (ModularPanel panel : this.windowManager.getOpenWindows()) {
+        for (ModularPanel panel : this.windowManager.getOpenPanels()) {
             if (panel.onKeyRelease(typedChar, keyCode)) {
                 return true;
+            }
+            if (panel.disablePanelsBelow()) {
+                break;
             }
         }
         return false;
@@ -276,9 +301,12 @@ public abstract class ModularScreen {
         for (IGuiAction.MouseScroll action : getGuiActionListeners(IGuiAction.MouseScroll.class)) {
             action.scroll(scrollDirection, amount);
         }
-        for (ModularPanel panel : this.windowManager.getOpenWindows()) {
+        for (ModularPanel panel : this.windowManager.getOpenPanels()) {
             if (panel.onMouseScroll(scrollDirection, amount)) {
                 return true;
+            }
+            if (panel.disablePanelsBelow()) {
+                break;
             }
         }
         return false;
@@ -290,9 +318,12 @@ public abstract class ModularScreen {
         for (IGuiAction.MouseDrag action : getGuiActionListeners(IGuiAction.MouseDrag.class)) {
             action.drag(mouseButton, timeSinceClick);
         }
-        for (ModularPanel panel : this.windowManager.getOpenWindows()) {
+        for (ModularPanel panel : this.windowManager.getOpenPanels()) {
             if (panel.onMouseDrag(mouseButton, timeSinceClick)) {
                 return true;
+            }
+            if (panel.disablePanelsBelow()) {
+                break;
             }
         }
         return false;

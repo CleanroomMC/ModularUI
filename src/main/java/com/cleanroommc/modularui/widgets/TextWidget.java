@@ -23,7 +23,7 @@ public class TextWidget extends Widget<TextWidget> {
         super.draw(partialTicks);
         TextRenderer renderer = TextRenderer.SHARED;
         renderer.setColor(this.color);
-        renderer.setAlignment(alignment, getArea().w());
+        renderer.setAlignment(alignment, getArea().w() + 1);
         renderer.setShadow(shadow);
         renderer.setPos(getArea().getPadding().left, getArea().getPadding().top);
         renderer.setScale(this.scale);
