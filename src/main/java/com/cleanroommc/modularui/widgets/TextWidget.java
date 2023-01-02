@@ -35,6 +35,7 @@ public class TextWidget extends Widget<TextWidget> {
     public int getDefaultHeight() {
         Box padding = getArea().getPadding();
         TextRenderer renderer = TextRenderer.SHARED;
+        renderer.setAlignment(Alignment.TopLeft, Integer.MAX_VALUE);
         renderer.setPos(padding.left, padding.top);
         renderer.setScale(this.scale);
         renderer.setSimulate(true);
@@ -46,6 +47,7 @@ public class TextWidget extends Widget<TextWidget> {
     public int getDefaultWidth() {
         Box padding = getArea().getPadding();
         TextRenderer renderer = TextRenderer.SHARED;
+        renderer.setAlignment(Alignment.TopLeft, Integer.MAX_VALUE);
         renderer.setPos(padding.left, padding.top);
         renderer.setScale(this.scale);
         renderer.setSimulate(true);

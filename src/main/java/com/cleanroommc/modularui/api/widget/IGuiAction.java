@@ -9,31 +9,31 @@ public interface IGuiAction {
 
     @FunctionalInterface
     interface MousePressed extends IGuiAction {
-        void press(int mouseButton);
+        boolean press(int mouseButton);
     }
 
     @FunctionalInterface
     interface MouseReleased extends IGuiAction {
-        void release(int mouseButton);
+        boolean release(int mouseButton);
     }
 
     @FunctionalInterface
     interface KeyPressed extends IGuiAction {
-        void press(char typedChar, int keyCode);
+        boolean press(char typedChar, int keyCode);
     }
 
     @FunctionalInterface
     interface KeyReleased extends IGuiAction {
-        void release(char typedChar, int keyCode);
+        boolean release(char typedChar, int keyCode);
     }
 
     @FunctionalInterface
     interface MouseScroll extends IGuiAction {
-        void scroll(ModularScreen.UpOrDown direction, int amount);
+        boolean scroll(ModularScreen.UpOrDown direction, int amount);
     }
 
     @FunctionalInterface
     interface MouseDrag extends IGuiAction {
-        void drag(int mouseButton, long timeSinceClick);
+        boolean drag(int mouseButton, long timeSinceClick);
     }
 }

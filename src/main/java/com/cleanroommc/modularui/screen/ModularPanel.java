@@ -62,8 +62,21 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return getScreen().getViewport();
     }
 
-    public void openIn(ModularScreen screen) {
+    public boolean isOpen() {
+        return this.screen != null;
+    }
 
+    public void openIn(ModularScreen screen) {
+        if (this.screen != null) {
+            throw new IllegalStateException("Panel is already open!");
+        }
+        screen.getWindowManager().openPanel(this);
+    }
+
+    public void closeIfOpen() {
+        if (isOpen()) {
+            this.screen.closePanel(this);
+        }
     }
 
     @Override
@@ -123,6 +136,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @ApiStatus.OverrideOnly
     public void onClose() {
+        dispose();
     }
 
     @Override

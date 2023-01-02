@@ -126,6 +126,10 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                                                             .size(20))
                                                                     .addLine(new ItemDrawable(new ItemStack(Items.DIAMOND)).asIcon());
                                                         })
+                                                        .onMouseTapped(mouseButton -> {
+                                                            openSecondWindow(context).openIn(panel.getScreen());
+                                                            return true;
+                                                        })
                                                         //.flex(flex -> flex.left(3)) // ?
                                                         .background(GuiTextures.BUTTON, IKey.str("Button 2")))
                                                 .child(new TextFieldWidget()
@@ -167,15 +171,15 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                                         .setSynced("fluid_slot", 1))
                                         )))
                         .addPage(new Column()
-                                        //.coverChildren()
-                                        .padding(7)
-                                        .child(SlotGroupWidget.builder()
-                                                .matrix("III", "III", "III")
-                                                .key('I', index -> new ItemSlot())
-                                                .synced("item_inv")
-                                                .build()
-                                                .marginBottom(8))
-                                        .child(SlotGroupWidget.builder()
+                                //.coverChildren()
+                                .padding(7)
+                                .child(SlotGroupWidget.builder()
+                                        .matrix("III", "III", "III")
+                                        .key('I', index -> new ItemSlot())
+                                        .synced("item_inv")
+                                        .build()
+                                        .marginBottom(8))
+                                .child(SlotGroupWidget.builder()
                                                 .row("FII")
                                                 .row("FII")
                                                 .key('F', index -> new FluidSlot().setSynced("mixer_fluids", index))
@@ -195,6 +199,21 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                 .top(30)
                                 .left(0.5f))
                         .setSynced("fluid_slot"));*/
+        return panel;
+    }
+
+    public ModularPanel openSecondWindow(GuiContext context) {
+        ModularPanel panel = ModularPanel.defaultPanel(context, 150, 150);
+        panel.child(new ButtonWidget<>()
+                        .flex(flex -> flex.size(8, 8).top(3).right(3))
+                        .background(GuiTextures.BUTTON, IKey.str("x"))
+                        .onMouseTapped(mouseButton -> {
+                            panel.closeIfOpen();
+                            return true;
+                        }))
+                .child(IKey.str("2nd Panel")
+                        .asWidget()
+                        .flex(flex -> flex.left(0.5f).top(0.5f)));
         return panel;
     }
 
