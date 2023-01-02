@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.test;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.layout.CrossAxisAlignment;
@@ -27,6 +28,7 @@ import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 public class TestTile extends TileEntity implements IGuiHolder, ITickable {
@@ -127,7 +129,8 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                                                     .addLine(new ItemDrawable(new ItemStack(Items.DIAMOND)).asIcon());
                                                         })
                                                         .onMousePressed(mouseButton -> {
-                                                            openSecondWindow(context).openIn(panel.getScreen());
+                                                            panel.getScreen().openDialog(this::buildDialog, ModularUI.LOGGER::info);
+                                                            //openSecondWindow(context).openIn(panel.getScreen());
                                                             return true;
                                                         })
                                                         //.flex(flex -> flex.left(3)) // ?
@@ -216,7 +219,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
         }.flex(flex -> flex.size(100, 100).align(Alignment.Center))
                 .background(GuiTextures.BACKGROUND);
         panel.child(new ButtonWidget<>()
-                        .flex(flex -> flex.size(8, 8).top(4).right(4))
+                        .flex(flex -> flex.size(8, 8).top(5).right(5))
                         .background(GuiTextures.BUTTON, IKey.str("x"))
                         .onMousePressed(mouseButton -> {
                             panel.closeIfOpen();
@@ -226,6 +229,23 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                         .asWidget()
                         .flex(flex -> flex.align(Alignment.Center)));
         return panel;
+    }
+
+    public void buildDialog(Dialog<String> dialog) {
+        AtomicReference<String> value = new AtomicReference<>("");
+        dialog.child(new TextFieldWidget()
+                        .flex(flex -> flex.size(100, 20).align(Alignment.Center))
+                        .setTextColor(Color.WHITE.normal)
+                        .background(GuiTextures.DISPLAY)
+                        .getter(value::get)
+                        .setter(value::set))
+                .child(new ButtonWidget<>()
+                        .flex(flex -> flex.size(8, 8).top(5).right(5))
+                        .background(GuiTextures.BUTTON, IKey.str("x"))
+                        .onMousePressed(mouseButton -> {
+                            dialog.closeWith(value.get());
+                            return true;
+                        }));
     }
 
     @Override

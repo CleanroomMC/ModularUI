@@ -31,9 +31,6 @@ public class ModularUI {
     @Mod.Instance
     public static ModularUI INSTANCE;
 
-    //@SidedProxy(modId = ID, clientSide = "com.cleanroommc.modularui.ClientProxy", serverSide = "com.cleanroommc.modularui.CommonProxy")
-    //public static CommonProxy proxy;
-
     public static final Timer TIMER_60_FPS = new Timer(60f);
 
     @Mod.EventHandler
@@ -52,8 +49,6 @@ public class ModularUI {
         }
 
         NetworkHandler.init();
-        //TODO UIInfos.init();
-        //WidgetJsonRegistry.init();
     }
 
     @Mod.EventHandler

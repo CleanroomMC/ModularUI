@@ -3,13 +3,16 @@ package com.cleanroommc.modularui.screen;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.drawable.GuiDraw;
+import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
 import com.cleanroommc.modularui.sync.ItemSlotSH;
 import com.cleanroommc.modularui.sync.MapKey;
 import com.cleanroommc.modularui.theme.Theme;
+import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import com.cleanroommc.modularui.widgets.Dialog;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -28,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @SideOnly(Side.CLIENT)
@@ -327,6 +331,18 @@ public abstract class ModularScreen {
             }
         }
         return false;
+    }
+
+    public <T> void openDialog(Consumer<Dialog<T>> dialogBuilder) {
+        openDialog(dialogBuilder, null);
+    }
+
+    public <T> void openDialog(Consumer<Dialog<T>> dialogBuilder, Consumer<T> resultConsumer) {
+        Dialog<T> dialog = new Dialog<>(this.context, resultConsumer);
+        dialog.flex().size(150, 100).align(Alignment.Center);
+        dialog.background(GuiTextures.BACKGROUND);
+        dialogBuilder.accept(dialog);
+        openPanel(dialog);
     }
 
     @ApiStatus.Internal

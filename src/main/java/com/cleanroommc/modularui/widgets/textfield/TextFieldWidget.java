@@ -69,7 +69,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     @Override
     public void onFrameUpdate() {
         super.onFrameUpdate();
-        if (this.getter != null) {
+        if (!isFocused() && this.getter != null) {
             String s = this.getter.get();
             if (!getText().equals(s)) {
                 setText(s);
@@ -142,6 +142,11 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         if (this.setter != null) {
             this.setter.accept(getText());
         }
+    }
+
+    @Override
+    public boolean canHover() {
+        return true;
     }
 
     public TextFieldWidget setMaxLength(int maxLength) {

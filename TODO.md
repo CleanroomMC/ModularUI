@@ -19,7 +19,7 @@
 * [ ]  List (column but scrollable)
 * [ ]  Sortable List (for bogosorter)
 * [X]  Slot Group (Builder, sorting)
-* [ ]  Dialog
+* [X]  Dialog
 * [ ]  Popup menu
 * [ ]  Dropdown menu
 * [ ]  Pie menu

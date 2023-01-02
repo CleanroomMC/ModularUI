@@ -39,7 +39,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     private ModularScreen screen;
     private final LinkedList<LocatedWidget> hovering = new LinkedList<>();
-    // TODO compare performance with Set<Interactable>
     private final List<Interactable> acceptedInteractions = new ArrayList<>();
     private int lastMouseX, lastMouseY;
     private boolean isMouseButtonHeld = false, isKeyHeld = false;
