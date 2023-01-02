@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui;
 
+import com.cleanroommc.modularui.keybind.KeyBindHandler;
 import com.cleanroommc.modularui.manager.GuiManager;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.test.EventHandler;
@@ -11,7 +12,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
@@ -40,6 +40,7 @@ public class ModularUI {
         if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
             MinecraftForge.EVENT_BUS.register(ClientEventHandler.class);
             MinecraftForge.EVENT_BUS.register(Animator.class);
+            MinecraftForge.EVENT_BUS.register(KeyBindHandler.class);
         }
 
         if (FMLLaunchHandler.isDeobfuscatedEnvironment()) {
@@ -49,11 +50,6 @@ public class ModularUI {
         }
 
         NetworkHandler.init();
-    }
-
-    @Mod.EventHandler
-    public void init(FMLInitializationEvent event) {
-
     }
 
     public static boolean isSortModLoaded() {
