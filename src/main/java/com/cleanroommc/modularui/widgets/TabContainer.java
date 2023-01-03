@@ -45,8 +45,8 @@ public class TabContainer extends PageControlWidget<TabContainer> implements ILa
                 y = current;
                 current += tabButton.getArea().h();
             }
-            tabButton.flex().setRelativeX(x);
-            tabButton.flex().setRelativeY(y);
+            tabButton.getArea().rx = x;
+            tabButton.getArea().ry = y;
             tabButton.updateDefaultTexture();
         }
     }

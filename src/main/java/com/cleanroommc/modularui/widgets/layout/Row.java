@@ -56,11 +56,11 @@ public class Row extends ParentWidget<Row> implements ILayoutWidget {
                     y = height - widget.getArea().height;
                 }
                 y = Math.max(y, padding.top);
-                widget.flex().setRelativeY(y);
+                widget.getArea().ry = y;
             }
 
             // set calculated relative Y pos and set bottom margin for next widget
-            widget.flex().setRelativeX(lastX + margin.left);
+            widget.getArea().rx = lastX + margin.left;
 
             lastX += widget.getArea().requestedWidth();
             if (maa == MainAxisAlignment.SPACE_BETWEEN) {

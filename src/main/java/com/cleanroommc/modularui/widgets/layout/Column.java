@@ -57,11 +57,11 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
                     x = width - widget.getArea().width;
                 }
                 x = Math.max(x, padding.left + margin.left);
-                widget.flex().setRelativeX(x);
+                widget.getArea().rx = x;
             }
 
             // set calculated relative Y pos and set bottom margin for next widget
-            widget.flex().setRelativeY(lastY + margin.top);
+            widget.getArea().ry = lastY + margin.top;
 
             lastY += widget.getArea().requestedHeight();
             if (maa == MainAxisAlignment.SPACE_BETWEEN) {

@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.api.sync.ValueSyncHandler;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
+import com.cleanroommc.modularui.api.widget.IPositioned;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.screen.ModularPanel;
@@ -23,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public abstract class Widget<W extends Widget<W>> implements IWidget {
+public abstract class Widget<W extends Widget<W>> implements IWidget, IPositioned<W> {
 
     public static final IDrawable[] EMPTY_BACKGROUND = {};
 
@@ -268,11 +269,6 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
         this.enabled = enabled;
     }
 
-    @SuppressWarnings("all")
-    protected W getThis() {
-        return (W) this;
-    }
-
     public W disabled() {
         setEnabled(false);
         return getThis();
@@ -280,106 +276,6 @@ public abstract class Widget<W extends Widget<W>> implements IWidget {
 
     public W background(IDrawable... background) {
         this.background = background == null ? EMPTY_BACKGROUND : background;
-        return getThis();
-    }
-
-    public W pos(int x, int y) {
-        flex().left(x).top(y);
-        return getThis();
-    }
-
-    public W size(int w, int h) {
-        flex().width(w).height(h);
-        return getThis();
-    }
-
-    public W coverChildren() {
-        flex().coverChildren();
-        return getThis();
-    }
-
-    public W coverChildrenWidth() {
-        flex().coverChildrenWidth();
-        return getThis();
-    }
-
-    public W coverChildrenHeight() {
-        flex().coverChildrenHeight();
-        return getThis();
-    }
-
-    public W flex(Consumer<Flex> flexConsumer) {
-        flexConsumer.accept(flex());
-        return getThis();
-    }
-
-    public W padding(int left, int right, int top, int bottom) {
-        getArea().getPadding().all(left, right, top, bottom);
-        return getThis();
-    }
-
-    public W padding(int horizontal, int vertical) {
-        getArea().getPadding().all(horizontal, vertical);
-        return getThis();
-    }
-
-    public W padding(int all) {
-        getArea().getPadding().all(all);
-        return getThis();
-    }
-
-    public W paddingLeft(int val) {
-        getArea().getPadding().left(val);
-        return getThis();
-    }
-
-    public W paddingRight(int val) {
-        getArea().getPadding().right(val);
-        return getThis();
-    }
-
-    public W paddingTop(int val) {
-        getArea().getPadding().top(val);
-        return getThis();
-    }
-
-    public W paddingBottom(int val) {
-        getArea().getPadding().bottom(val);
-        return getThis();
-    }
-
-    public W margin(int left, int right, int top, int bottom) {
-        getArea().getMargin().all(left, right, top, bottom);
-        return getThis();
-    }
-
-    public W margin(int horizontal, int vertical) {
-        getArea().getMargin().all(horizontal, vertical);
-        return getThis();
-    }
-
-    public W margin(int all) {
-        getArea().getMargin().all(all);
-        return getThis();
-    }
-
-    public W marginLeft(int val) {
-        getArea().getMargin().left(val);
-        return getThis();
-    }
-
-    public W marginRight(int val) {
-        getArea().getMargin().right(val);
-        return getThis();
-    }
-
-    public W marginTop(int val) {
-        getArea().getMargin().top(val);
-        return getThis();
-    }
-
-    public W marginBottom(int val) {
-        getArea().getMargin().bottom(val);
         return getThis();
     }
 

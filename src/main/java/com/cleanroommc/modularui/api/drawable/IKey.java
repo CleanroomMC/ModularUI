@@ -1,12 +1,12 @@
 package com.cleanroommc.modularui.api.drawable;
 
+import com.cleanroommc.modularui.drawable.StyledText;
 import com.cleanroommc.modularui.drawable.TextRenderer;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.keys.CompoundKey;
 import com.cleanroommc.modularui.utils.keys.DynamicKey;
 import com.cleanroommc.modularui.utils.keys.LangKey;
 import com.cleanroommc.modularui.utils.keys.StringKey;
-import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widgets.TextWidget;
 
 import java.util.function.Supplier;
@@ -83,13 +83,34 @@ public interface IKey extends IDrawable {
     default void draw(int x, int y, int width, int height) {
         renderer.setAlignment(Alignment.Center, width, height);
         renderer.setColor(0);
+        renderer.setScale(1f);
         renderer.setPos(x, y);
         renderer.setShadow(false);
         renderer.draw(get());
     }
 
     @Override
-    default Widget<?> asWidget() {
+    default TextWidget asWidget() {
         return new TextWidget(this);
+    }
+
+    default StyledText withStyle() {
+        return new StyledText(this);
+    }
+
+    default StyledText alignment(Alignment alignment) {
+        return withStyle().alignment(alignment);
+    }
+
+    default StyledText color(int color) {
+        return withStyle().color(color);
+    }
+
+    default StyledText scale(float scale) {
+        return withStyle().scale(scale);
+    }
+
+    default StyledText shadow(boolean shadow) {
+        return withStyle().shadow(shadow);
     }
 }

@@ -23,8 +23,6 @@ public class Flex implements IResizeable {
     private boolean defaultMode = false;
     private boolean skip = false;
 
-    private int relativeX, relativeY;
-
     public Flex(IGuiElement parent) {
         this.parent = parent;
     }
@@ -94,7 +92,8 @@ public class Flex implements IResizeable {
         return left(x, offset, anchor, measure, false);
     }
 
-    private Flex left(float x, int offset, float anchor, Unit.Measure measure, boolean autoAnchor) {
+    @ApiStatus.Internal
+    public Flex left(float x, int offset, float anchor, Unit.Measure measure, boolean autoAnchor) {
         return unit(getLeft(), x, offset, anchor, measure, autoAnchor);
     }
 
@@ -117,8 +116,8 @@ public class Flex implements IResizeable {
     public Flex right(float x, int offset, float anchor, Unit.Measure measure) {
         return right(x, offset, anchor, measure, false);
     }
-
-    private Flex right(float x, int offset, float anchor, Unit.Measure measure, boolean autoAnchor) {
+    @ApiStatus.Internal
+    public Flex right(float x, int offset, float anchor, Unit.Measure measure, boolean autoAnchor) {
         return unit(getRight(), x, offset, anchor, measure, autoAnchor);
     }
 
@@ -151,7 +150,8 @@ public class Flex implements IResizeable {
         return top(y, offset, anchor, measure, false);
     }
 
-    private Flex top(float y, int offset, float anchor, Unit.Measure measure, boolean autoAnchor) {
+    @ApiStatus.Internal
+    public Flex top(float y, int offset, float anchor, Unit.Measure measure, boolean autoAnchor) {
         return unit(getTop(), y, offset, anchor, measure, autoAnchor);
     }
 
@@ -175,7 +175,8 @@ public class Flex implements IResizeable {
         return bottom(y, offset, anchor, measure, false);
     }
 
-    private Flex bottom(float y, int offset, float anchor, Unit.Measure measure, boolean autoAnchor) {
+    @ApiStatus.Internal
+    public Flex bottom(float y, int offset, float anchor, Unit.Measure measure, boolean autoAnchor) {
         return unit(getBottom(), y, offset, anchor, measure, autoAnchor);
     }
 
@@ -284,16 +285,6 @@ public class Flex implements IResizeable {
         return relativeTo != null ? relativeTo : this.parent.getScreen().getViewport();
     }
 
-    @ApiStatus.Internal
-    public void setRelativeX(int x) {
-        this.relativeX = x;
-    }
-
-    @ApiStatus.Internal
-    public void setRelativeY(int y) {
-        this.relativeY = y;
-    }
-
     public boolean hasYPos() {
         return this.top != null || this.bottom != null;
     }
@@ -326,6 +317,30 @@ public class Flex implements IResizeable {
                 (this.right != null) ||
                 (this.top != null && this.top.dependsOnParent()) ||
                 (this.bottom != null);
+    }
+
+    private void rx(int v) {
+        this.parent.getArea().rx = v;
+    }
+
+    private void ry(int v) {
+        this.parent.getArea().ry = v;
+    }
+
+    private int rx() {
+        return this.parent.getArea().rx;
+    }
+
+    private int ry() {
+        return this.parent.getArea().ry;
+    }
+
+    private int rex() {
+        return this.parent.getArea().relativeEndX();
+    }
+
+    private int rey() {
+        return this.parent.getArea().relativeEndY();
     }
 
     @ApiStatus.Internal
@@ -384,7 +399,7 @@ public class Flex implements IResizeable {
                 if (this.left != null && this.right != null) {
                     x = calcX(this.left, -1);
                     int x2 = calcX(this.right, -1);
-                    w = Math.abs(relativeTo.ex() - x2 - x - relativeTo.x);
+                    w = Math.abs(relativeTo.w() - x2 - x);
                 } else {
                     w = this.parent.getDefaultWidth();
                     if (this.left == null) {
@@ -413,7 +428,7 @@ public class Flex implements IResizeable {
                 if (this.top != null && this.bottom != null) {
                     y = calcY(this.top, -1);
                     int y2 = calcY(this.bottom, -1);
-                    h = Math.abs(relativeTo.ey() - y2 - y - relativeTo.y);
+                    h = Math.abs(relativeTo.w() - y2 - y);
                 } else {
                     h = this.parent.getDefaultHeight();
                     if (this.top == null) {
@@ -441,16 +456,16 @@ public class Flex implements IResizeable {
         int parentHeight = relativeTo.height;
 
         if (parentWidth < 1 /*|| (this.width != null && !this.width.isRelative())*/) {
-            this.relativeX = x;
+            rx(x);
         } else {
-            this.relativeX = Math.max(x, padding.left + margin.left);
+            rx(Math.max(x, padding.left + margin.left));
             w = Math.min(w, parentWidth - padding.horizontal() - margin.horizontal());
         }
 
         if (parentHeight < 1 /*|| (this.height != null && !this.height.isRelative())*/) {
-            this.relativeY = y;
+            ry(y);
         } else {
-            this.relativeY = Math.max(y, padding.top + margin.top);
+            ry(Math.max(y, padding.top + margin.top));
             w = Math.min(w, parentHeight - padding.vertical() - margin.vertical());
         }
 
@@ -474,10 +489,10 @@ public class Flex implements IResizeable {
                     Box margin = child.getArea().getMargin();
                     Flex flex = child.flex();
                     Area area = child.getArea();
-                    x0 = Math.min(x0, flex.relativeX - padding.left - margin.left);
-                    x1 = Math.max(x1, flex.relativeX + area.width + padding.right + margin.right);
-                    y0 = Math.min(y0, flex.relativeY - padding.top - margin.top);
-                    y1 = Math.max(y1, flex.relativeY + area.height + padding.bottom + margin.bottom);
+                    x0 = Math.min(x0, area.rx - padding.left - margin.left);
+                    x1 = Math.max(x1, area.rx + area.width + padding.right + margin.right);
+                    y0 = Math.min(y0, area.ry - padding.top - margin.top);
+                    y1 = Math.max(y1, area.ry + area.height + padding.bottom + margin.bottom);
                 }
 
                 Area relativeTo = getRelativeTo();
@@ -491,10 +506,10 @@ public class Flex implements IResizeable {
                         x = calcX(this.right, w);
                         x = relativeTo.w() - x - w;
                     } else {
-                        x = this.relativeX + x0 + this.parent.getArea().getMargin().left;
+                        x = rx() + x0 + this.parent.getArea().getMargin().left;
                         moveChildrenX = -x0;
                     }
-                    this.relativeX = x;
+                    rx(x);
                 }
                 if (doCoverChildrenHeight()) {
                     // calculate height and recalculate y based on the new height
@@ -506,10 +521,10 @@ public class Flex implements IResizeable {
                         y = calcY(this.bottom, h);
                         y = relativeTo.h() - y - h;
                     } else {
-                        y = this.relativeY + y0 + this.parent.getArea().getMargin().top;
+                        y = ry() + y0 + this.parent.getArea().getMargin().top;
                         moveChildrenY = -y0;
                     }
-                    this.relativeY = y;
+                    ry(y);
                 }
             }
             for (IWidget widget : children) {
@@ -517,9 +532,9 @@ public class Flex implements IResizeable {
                     widget.flex().skip = false;
                     widget.resize();
                 } else {
-                    Flex flex = widget.flex();
-                    flex.relativeX += moveChildrenX;
-                    flex.relativeY += moveChildrenY;
+                    Area area = widget.getArea();
+                    area.rx += moveChildrenX;
+                    area.ry += moveChildrenY;
                 }
             }
         }
@@ -528,8 +543,8 @@ public class Flex implements IResizeable {
     @Override
     public void applyPos(IGuiElement parent) {
         Area relativeTo = getRelativeTo();
-        parent.getArea().x = relativeTo.x + this.relativeX;
-        parent.getArea().y = relativeTo.y + this.relativeY;
+        parent.getArea().x = relativeTo.x + rx();
+        parent.getArea().y = relativeTo.y + ry();
         if (parent instanceof IVanillaSlot) {
             Slot slot = ((IVanillaSlot) parent).getVanillaSlot();
             slot.xPos = parent.getArea().x;

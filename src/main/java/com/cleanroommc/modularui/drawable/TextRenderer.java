@@ -74,7 +74,7 @@ public class TextRenderer {
         for (Pair<String, Float> measuredLine : measuredLines) {
             int x0 = getStartX(measuredLine.getRight());
             maxW = Math.max(draw(measuredLine.getLeft(), x0, y0), maxW);
-            y0 += getFontRenderer().FONT_HEIGHT * scale;
+            y0 += getFontHeight();
         }
         this.lastWidth = maxWidth > 0 ? Math.min(maxW, maxWidth) : maxW;
         this.lastHeight = measuredLines.size() * getFontHeight();

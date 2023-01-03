@@ -105,7 +105,6 @@ public abstract class ModularScreen {
         this.screenWrapper.updateArea(this.windowManager.getMainPanel().getArea());
     }
 
-    @ApiStatus.OverrideOnly
     public void onResize(int width, int height) {
         current = this.context;
 
@@ -127,7 +126,6 @@ public abstract class ModularScreen {
     @ApiStatus.OverrideOnly
     public abstract ModularPanel buildUI(GuiContext context);
 
-    @ApiStatus.OverrideOnly
     public void onOpen() {
         windowManager.init();
         if (!getContainer().isClientOnly()) {
@@ -135,7 +133,6 @@ public abstract class ModularScreen {
         }
     }
 
-    @ApiStatus.OverrideOnly
     @MustBeInvokedByOverriders
     public void onClose() {
         current = null;
@@ -178,7 +175,6 @@ public abstract class ModularScreen {
     protected void viewportSet() {
     }
 
-    @ApiStatus.OverrideOnly
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.context.updateState(mouseX, mouseY, partialTicks);
 
@@ -225,7 +221,6 @@ public abstract class ModularScreen {
         RenderHelper.enableStandardItemLighting();
     }
 
-    @ApiStatus.OverrideOnly
     public boolean onMousePressed(int mouseButton) {
         this.context.updateEventState();
         for (IGuiAction.MousePressed action : getGuiActionListeners(IGuiAction.MousePressed.class)) {
@@ -245,7 +240,6 @@ public abstract class ModularScreen {
         return false;
     }
 
-    @ApiStatus.OverrideOnly
     public boolean onMouseRelease(int mouseButton) {
         this.context.updateEventState();
         for (IGuiAction.MouseReleased action : getGuiActionListeners(IGuiAction.MouseReleased.class)) {
@@ -265,7 +259,6 @@ public abstract class ModularScreen {
         return false;
     }
 
-    @ApiStatus.OverrideOnly
     public boolean onKeyPressed(char typedChar, int keyCode) {
         this.context.updateEventState();
         for (IGuiAction.KeyPressed action : getGuiActionListeners(IGuiAction.KeyPressed.class)) {
@@ -282,7 +275,6 @@ public abstract class ModularScreen {
         return false;
     }
 
-    @ApiStatus.OverrideOnly
     public boolean onKeyRelease(char typedChar, int keyCode) {
         this.context.updateEventState();
         for (IGuiAction.KeyReleased action : getGuiActionListeners(IGuiAction.KeyReleased.class)) {
@@ -299,7 +291,6 @@ public abstract class ModularScreen {
         return false;
     }
 
-    @ApiStatus.OverrideOnly
     public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
         this.context.updateEventState();
         for (IGuiAction.MouseScroll action : getGuiActionListeners(IGuiAction.MouseScroll.class)) {
@@ -316,7 +307,6 @@ public abstract class ModularScreen {
         return false;
     }
 
-    @ApiStatus.OverrideOnly
     public boolean onMouseDrag(int mouseButton, long timeSinceClick) {
         this.context.updateEventState();
         for (IGuiAction.MouseDrag action : getGuiActionListeners(IGuiAction.MouseDrag.class)) {
@@ -348,11 +338,6 @@ public abstract class ModularScreen {
     @ApiStatus.Internal
     public void setFocused(boolean focus) {
         this.screenWrapper.setFocused(focus);
-    }
-
-    @ApiStatus.Internal
-    public void receiveValueUpdate(MapKey key, PacketBuffer buffer) {
-
     }
 
     public boolean isActive() {

@@ -9,7 +9,7 @@ import com.cleanroommc.modularui.widget.sizer.Box;
 public class TextWidget extends Widget<TextWidget> {
 
     private final IKey key;
-    private Alignment alignment = Alignment.TopLeft;
+    private Alignment alignment = Alignment.CenterLeft;
     private int color = 0x404040;
     private boolean shadow = false;
     private float scale = 1f;
@@ -20,11 +20,10 @@ public class TextWidget extends Widget<TextWidget> {
 
     @Override
     public void draw(float partialTicks) {
-        super.draw(partialTicks);
         TextRenderer renderer = TextRenderer.SHARED;
         renderer.setColor(this.color);
-        renderer.setAlignment(alignment, getArea().w() + 1);
-        renderer.setShadow(shadow);
+        renderer.setAlignment(this.alignment, getArea().w() + 1, getArea().h());
+        renderer.setShadow(this.shadow);
         renderer.setPos(getArea().getPadding().left, getArea().getPadding().top);
         renderer.setScale(this.scale);
         renderer.setSimulate(false);
