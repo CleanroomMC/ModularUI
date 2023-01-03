@@ -11,10 +11,12 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class GuiContext extends GuiViewportStack {
 
@@ -47,7 +49,12 @@ public class GuiContext extends GuiViewportStack {
     private float partialTicks;
     private long tick;
 
+    private byte jeiState = 0;
+
     public List<Consumer<GuiContext>> postRenderCallbacks = new ArrayList<>();
+
+    private final List<IWidget> jeiExclusionWidgets = new ArrayList<>();
+    private final List<Rectangle> jeiExclusionAreas = new ArrayList<>();
 
     public GuiContext(ModularScreen screen) {
         this.screen = screen;
@@ -396,6 +403,66 @@ public class GuiContext extends GuiViewportStack {
 
     public float getPartialTicks() {
         return partialTicks;
+    }
+
+    public void enableJei() {
+        this.jeiState = 1;
+    }
+
+    public void disableJei() {
+        this.jeiState = 2;
+    }
+
+    public void defaultJei() {
+        this.jeiState = 0;
+    }
+
+    public boolean isJeiEnabled() {
+        switch (this.jeiState) {
+            case 1:
+                return true;
+            case 2:
+                return false;
+            default:
+                return !screen.getContainer().isClientOnly();
+        }
+    }
+
+    public void addJeiExclusionArea(Rectangle area) {
+        if (!this.jeiExclusionAreas.contains(area)) {
+            this.jeiExclusionAreas.add(area);
+        }
+    }
+
+    public void removeJeiExclusionArea(Rectangle area) {
+        this.jeiExclusionAreas.remove(area);
+    }
+
+    public void addJeiExclusionArea(IWidget area) {
+        if (!this.jeiExclusionWidgets.contains(area)) {
+            this.jeiExclusionWidgets.add(area);
+        }
+    }
+
+    public void removeJeiExclusionArea(IWidget area) {
+        this.jeiExclusionWidgets.remove(area);
+    }
+
+    public List<Rectangle> getJeiExclusionAreas() {
+        return jeiExclusionAreas;
+    }
+
+    public List<IWidget> getJeiExclusionWidgets() {
+        return jeiExclusionWidgets;
+    }
+
+    public List<Rectangle> getAllJeiExclusionAreas() {
+        List<Rectangle> areas = new ArrayList<>(this.jeiExclusionAreas);
+        areas.addAll(this.jeiExclusionWidgets.stream()
+                .filter(IWidget::isEnabled)
+                .map(IWidget::getArea)
+                .collect(Collectors.toList()));
+        return areas;
     }
 
     private static class HoveredIterable implements Iterable<IGuiElement> {

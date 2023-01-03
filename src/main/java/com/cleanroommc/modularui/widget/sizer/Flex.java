@@ -1,9 +1,11 @@
 package com.cleanroommc.modularui.widget.sizer;
 
 import com.cleanroommc.modularui.GuiErrorHandler;
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.utils.Alignment;
 import net.minecraft.inventory.Slot;
 import org.jetbrains.annotations.ApiStatus;
@@ -116,6 +118,7 @@ public class Flex implements IResizeable {
     public Flex right(float x, int offset, float anchor, Unit.Measure measure) {
         return right(x, offset, anchor, measure, false);
     }
+
     @ApiStatus.Internal
     public Flex right(float x, int offset, float anchor, Unit.Measure measure, boolean autoAnchor) {
         return unit(getRight(), x, offset, anchor, measure, autoAnchor);
@@ -356,6 +359,9 @@ public class Flex implements IResizeable {
     @Override
     public void apply(IGuiElement guiElement) {
         if (isSkip()) return;
+        if (this.parent instanceof ModularPanel) {
+            ModularUI.LOGGER.info("Resizing Panel");
+        }
         Area relativeTo = getRelativeTo();
 
         if (relativeTo.z() >= parent.getArea().z()) {
@@ -466,7 +472,7 @@ public class Flex implements IResizeable {
             ry(y);
         } else {
             ry(Math.max(y, padding.top + margin.top));
-            w = Math.min(w, parentHeight - padding.vertical() - margin.vertical());
+            h = Math.min(h, parentHeight - padding.vertical() - margin.vertical());
         }
 
         x += relativeTo.x;

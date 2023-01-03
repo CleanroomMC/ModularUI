@@ -87,6 +87,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
     }
 
     public ModularPanel createPanel(GuiContext context) {
+        context.enableJei();
         ModularPanel panel = new ModularPanel(context);
         panel.flex()                        // returns object which is responsible for sizing
                 .size(176, 220)       // set a static size for the main panel
@@ -245,6 +246,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
 
     public void buildDialog(Dialog<String> dialog) {
         AtomicReference<String> value = new AtomicReference<>("");
+        dialog.setDraggable(true);
         dialog.child(new TextFieldWidget()
                         .flex(flex -> flex.size(100, 20).align(Alignment.Center))
                         .setTextColor(Color.WHITE.normal)
