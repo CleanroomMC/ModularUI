@@ -296,6 +296,14 @@ public class Flex implements IResizeable {
         return this.left != null || this.right != null;
     }
 
+    public boolean hasHeight() {
+        return this.height != null;
+    }
+
+    public boolean hasWidth() {
+        return this.width != null;
+    }
+
     public boolean doCoverChildrenHeight() {
         return this.height != null && this.height.isCoverChildren();
     }
@@ -359,9 +367,6 @@ public class Flex implements IResizeable {
     @Override
     public void apply(IGuiElement guiElement) {
         if (isSkip()) return;
-        if (this.parent instanceof ModularPanel) {
-            ModularUI.LOGGER.info("Resizing Panel");
-        }
         Area relativeTo = getRelativeTo();
 
         if (relativeTo.z() >= parent.getArea().z()) {
@@ -434,7 +439,7 @@ public class Flex implements IResizeable {
                 if (this.top != null && this.bottom != null) {
                     y = calcY(this.top, -1);
                     int y2 = calcY(this.bottom, -1);
-                    h = Math.abs(relativeTo.w() - y2 - y);
+                    h = Math.abs(relativeTo.h() - y2 - y);
                 } else {
                     h = this.parent.getDefaultHeight();
                     if (this.top == null) {

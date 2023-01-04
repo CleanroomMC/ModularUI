@@ -146,13 +146,14 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @Override
     public void dispose() {
+        getContext().removeJeiExclusionArea(this);
         super.dispose();
         this.screen = null;
-        getContext().removeJeiExclusionArea(this);
     }
 
     @ApiStatus.OverrideOnly
     public boolean onMousePressed(int mouseButton) {
+        if (!isValid()) return false;
         LocatedWidget pressed = LocatedWidget.EMPTY;
         boolean result = false;
 
@@ -222,6 +223,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @ApiStatus.OverrideOnly
     public boolean onMouseRelease(int mouseButton) {
+        if (!isValid()) return false;
         if (interactFocused(widget -> widget.onMouseRelease(mouseButton), false)) {
             return true;
         }
@@ -256,6 +258,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @ApiStatus.OverrideOnly
     public boolean onKeyPressed(char typedChar, int keyCode) {
+        if (!isValid()) return false;
         switch (interactFocused(widget -> widget.onKeyPressed(typedChar, keyCode), Interactable.Result.IGNORE)) {
             case STOP:
             case SUCCESS:
@@ -318,6 +321,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @ApiStatus.OverrideOnly
     public boolean onKeyRelease(char typedChar, int keyCode) {
+        if (!isValid()) return false;
         if (interactFocused(widget -> widget.onKeyRelease(typedChar, keyCode), false)) {
             return true;
         }
@@ -352,6 +356,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @ApiStatus.OverrideOnly
     public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
+        if (!isValid()) return false;
         if (interactFocused(widget -> widget.onMouseScroll(scrollDirection, amount), false)) {
             return true;
         }
@@ -369,6 +374,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @ApiStatus.OverrideOnly
     public boolean onMouseDrag(int mouseButton, long timeSinceClick) {
+        if (!isValid()) return false;
         if (this.isMouseButtonHeld && mouseButton == this.lastMouseButton && this.lastPressed instanceof Interactable) {
             ((Interactable) this.lastPressed).onMouseDrag(mouseButton, timeSinceClick);
             return true;

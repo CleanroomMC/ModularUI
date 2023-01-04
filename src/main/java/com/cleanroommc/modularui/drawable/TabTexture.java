@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public class TabTexture {
 
-    public static TabTexture of(UITexture texture, TabContainer.Side side, int width, int height) {
+    public static TabTexture of(UITexture texture, TabContainer.Side side, int width, int height, int textureInset) {
         Objects.requireNonNull(texture);
         Objects.requireNonNull(side);
         UITexture sa, ma, ea, si, mi, ei;
@@ -41,7 +41,7 @@ public class TabTexture {
         } else {
             throw new IllegalArgumentException();
         }
-        return new TabTexture(sa, ma, ea, si, mi, ei, width, height);
+        return new TabTexture(sa, ma, ea, si, mi, ei, width, height, textureInset);
     }
 
     private final UITexture startActive;
@@ -52,8 +52,9 @@ public class TabTexture {
     private final UITexture inactive;
     private final UITexture endInactive;
     private final int width, height;
+    private final int textureInset;
 
-    public TabTexture(UITexture startActive, UITexture active, UITexture endActive, UITexture startInactive, UITexture inactive, UITexture endInactive, int width, int height) {
+    public TabTexture(UITexture startActive, UITexture active, UITexture endActive, UITexture startInactive, UITexture inactive, UITexture endInactive, int width, int height, int textureInset) {
         this.startActive = startActive;
         this.active = active;
         this.endActive = endActive;
@@ -62,6 +63,7 @@ public class TabTexture {
         this.endInactive = endInactive;
         this.width = width;
         this.height = height;
+        this.textureInset = textureInset;
     }
 
     public UITexture getStart(boolean active) {
@@ -92,5 +94,9 @@ public class TabTexture {
 
     public int getHeight() {
         return height;
+    }
+
+    public int getTextureInset() {
+        return textureInset;
     }
 }

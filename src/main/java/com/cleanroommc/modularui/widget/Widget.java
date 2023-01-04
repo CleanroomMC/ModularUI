@@ -169,7 +169,7 @@ public abstract class Widget<W extends Widget<W>> implements IWidget, IPositione
     @Override
     public @NotNull ModularPanel getPanel() {
         if (!isValid()) {
-            throw new IllegalStateException("Widget is not in a valid state!");
+            throw new IllegalStateException(getClass().getSimpleName() + " is not in a valid state!");
         }
         return panel;
     }
@@ -199,7 +199,7 @@ public abstract class Widget<W extends Widget<W>> implements IWidget, IPositione
     @Override
     public @NotNull IWidget getParent() {
         if (!isValid()) {
-            throw new IllegalStateException("Widget is not in a valid state!");
+            throw new IllegalStateException(getClass().getSimpleName() + " is not in a valid state!");
         }
         return parent;
     }
@@ -207,7 +207,7 @@ public abstract class Widget<W extends Widget<W>> implements IWidget, IPositione
     @Override
     public GuiContext getContext() {
         if (!isValid()) {
-            throw new IllegalStateException("Widget is not in a valid state!");
+            throw new IllegalStateException(getClass().getSimpleName() + " is not in a valid state!");
         }
         return context;
     }

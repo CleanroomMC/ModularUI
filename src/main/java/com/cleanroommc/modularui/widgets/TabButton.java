@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.widgets;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
+import com.cleanroommc.modularui.drawable.TabTexture;
 import com.cleanroommc.modularui.widget.Widget;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +14,7 @@ public class TabButton extends Widget<TabButton> implements Interactable {
     private final int index;
     private IDrawable[] activeTexture = null;
     private int location = 0;
+    private int textureInset = 0;
 
     public TabButton(int index) {
         this.index = index;
@@ -27,20 +29,16 @@ public class TabButton extends Widget<TabButton> implements Interactable {
         if (getBackground().length == 0 && this.activeTexture == null) {
             switch (this.tabContainer.getButtonBarSide()) {
                 case TOP:
-                    background(GuiTextures.TAB_TOP.get(this.location, false));
-                    activeBackground(GuiTextures.TAB_TOP.get(this.location, true));
+                    background(GuiTextures.TAB_TOP);
                     break;
                 case BOTTOM:
-                    background(GuiTextures.TAB_BOTTOM.get(this.location, false));
-                    activeBackground(GuiTextures.TAB_BOTTOM.get(this.location, true));
+                    background(GuiTextures.TAB_BOTTOM);
                     break;
                 case LEFT:
-                    background(GuiTextures.TAB_LEFT.get(this.location, false));
-                    activeBackground(GuiTextures.TAB_LEFT.get(this.location, true));
+                    background(GuiTextures.TAB_LEFT);
                     break;
                 case RIGHT:
-                    background(GuiTextures.TAB_RIGHT.get(this.location, false));
-                    activeBackground(GuiTextures.TAB_RIGHT.get(this.location, true));
+                    background(GuiTextures.TAB_RIGHT);
                     break;
             }
         }
@@ -80,6 +78,10 @@ public class TabButton extends Widget<TabButton> implements Interactable {
         return this.tabContainer.getCurrentPageIndex() == this.index;
     }
 
+    public int getTextureInset() {
+        return textureInset;
+    }
+
     public TabButton activeBackground(IDrawable... activeTexture) {
         this.activeTexture = activeTexture;
         return this;
@@ -87,6 +89,12 @@ public class TabButton extends Widget<TabButton> implements Interactable {
 
     public TabButton background(boolean active, IDrawable... background) {
         return active ? activeBackground(background) : background(background);
+    }
+
+    public TabButton background(TabTexture texture) {
+        this.textureInset = texture.getTextureInset();
+        return activeBackground(texture.get(this.location, true))
+                .background(texture.get(this.location, false));
     }
 
     public TabButton start() {
@@ -101,6 +109,11 @@ public class TabButton extends Widget<TabButton> implements Interactable {
 
     public TabButton end() {
         this.location = 1;
+        return this;
+    }
+
+    public TabButton textureInset(int textureInset) {
+        this.textureInset = textureInset;
         return this;
     }
 }
