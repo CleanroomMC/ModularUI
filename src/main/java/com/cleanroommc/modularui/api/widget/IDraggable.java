@@ -1,18 +1,16 @@
 package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.screen.GuiContext;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 
-@ApiStatus.Experimental
 public interface IDraggable {
 
     /**
      * Gets called every frame after everything else is rendered.
      * Is only called when {@link #isMoving()} is true.
-     * Translate to the mouse pos and draw with {@link com.cleanroommc.modularui.widget.WidgetTree#drawInternal(IWidget, GuiContext, boolean, float)}.
+     * Translate to the mouse pos and draw with {@link com.cleanroommc.modularui.widget.WidgetTree#drawTree(IWidget, GuiContext, boolean, float)}.
      *
      * @param partialTicks difference from last from
      */
@@ -47,11 +45,7 @@ public interface IDraggable {
      * @return the size and pos during move
      */
     @Nullable
-    Rectangle getArea();
-
-    default boolean shouldRenderChildren() {
-        return true;
-    }
+    Rectangle getMovingArea();
 
     boolean isMoving();
 

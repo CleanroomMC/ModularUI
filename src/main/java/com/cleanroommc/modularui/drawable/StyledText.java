@@ -1,11 +1,10 @@
 package com.cleanroommc.modularui.drawable;
 
-import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widgets.TextWidget;
 
-public class StyledText implements IKey, IDrawable {
+public class StyledText implements IKey {
 
     private final IKey key;
     private Alignment alignment = Alignment.TopLeft;
@@ -36,6 +35,22 @@ public class StyledText implements IKey, IDrawable {
         renderer.draw(get());
     }
 
+    public Alignment getAlignment() {
+        return alignment;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public float getScale() {
+        return scale;
+    }
+
+    public boolean isShadow() {
+        return shadow;
+    }
+
     @Override
     public StyledText alignment(Alignment alignment) {
         this.alignment = alignment;
@@ -63,6 +78,15 @@ public class StyledText implements IKey, IDrawable {
     @Override
     public TextWidget asWidget() {
         return new TextWidget(this.key)
+                .alignment(this.alignment)
+                .color(this.color)
+                .scale(this.scale)
+                .shadow(this.shadow);
+    }
+
+    @Override
+    public AnimatedText withAnimation() {
+        return new AnimatedText(this)
                 .alignment(this.alignment)
                 .color(this.color)
                 .scale(this.scale)

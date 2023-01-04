@@ -10,6 +10,7 @@ import java.awt.*;
 public class DraggablePanelWrapper implements IDraggable {
 
     private final ModularPanel panel;
+    private final Rectangle movingArea;
     private final int relativeClickX, relativeClickY;
     private boolean moving;
 
@@ -17,6 +18,7 @@ public class DraggablePanelWrapper implements IDraggable {
         this.panel = panel;
         this.relativeClickX = relativeClickX;
         this.relativeClickY = relativeClickY;
+        this.movingArea = new Rectangle(panel.getArea());
     }
 
     @Override
@@ -25,7 +27,7 @@ public class DraggablePanelWrapper implements IDraggable {
         GlStateManager.pushMatrix();
         GlStateManager.translate(-this.panel.getArea().x, -this.panel.getArea().y, 0);
         GlStateManager.translate(context.getAbsMouseX() - this.relativeClickX, context.getAbsMouseY() - this.relativeClickY, 0);
-        WidgetTree.drawInternal(this.panel, this.panel.getContext(), true, partialTicks);
+        WidgetTree.drawTree(this.panel, this.panel.getContext(), true, partialTicks);
         GlStateManager.popMatrix();
     }
 
@@ -45,12 +47,13 @@ public class DraggablePanelWrapper implements IDraggable {
 
     @Override
     public void onDrag(int mouseButton, long timeSinceLastClick) {
-
+        this.movingArea.x = this.panel.getContext().getMouseX() - this.relativeClickX;
+        this.movingArea.y = this.panel.getContext().getMouseY() - this.relativeClickY;
     }
 
     @Override
-    public @Nullable Rectangle getArea() {
-        return this.panel.getArea();
+    public @Nullable Rectangle getMovingArea() {
+        return this.movingArea;
     }
 
     @Override

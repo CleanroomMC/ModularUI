@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.layout.CrossAxisAlignment;
+import com.cleanroommc.modularui.drawable.AnimatedText;
 import com.cleanroommc.modularui.drawable.Circle;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.ItemDrawable;
@@ -182,7 +183,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                                 .key('I', index -> new ItemSlot())
                                                 .synced("item_inv")
                                                 .build()
-                                                .marginBottom(8))
+                                                .marginBottom(2))
                                         .child(SlotGroupWidget.builder()
                                                 .row("FII")
                                                 .row("FII")
@@ -198,9 +199,11 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                                         .background(GuiTextures.BUTTON)
                                                         .getter(() -> val2)
                                                         .setter(val -> this.val2 = val)
-                                                        .margin(8, 0)
-                                                        .marginTop(4))
-                                                .child(IKey.str("Hello World").asWidget().height(14)))
+                                                        .margin(8, 0))
+                                                .child(IKey.str("Hello World").asWidget().height(18)))
+                                        .child(new SpecialButton(IKey.str("A very long string that looks cool when animated").withAnimation())
+                                                .height(14)
+                                                .width(1f))
                                 /*GuiTextures.LOGO.asIcon()
                                 .size(80, 80)
                                 .asWidget()
@@ -271,6 +274,31 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
         }
         if (++progress == duration) {
             progress = 0;
+        }
+    }
+
+    private static class SpecialButton extends ButtonWidget<SpecialButton> {
+
+        private final AnimatedText animatedKey;
+
+        private SpecialButton(AnimatedText animatedKey) {
+            this.animatedKey = animatedKey.stopAnimation().forward(true);
+            this.animatedKey.reset();
+        }
+
+        @Override
+        public void draw(float partialTicks) {
+            animatedKey.draw(0, 0, getArea().w(), getArea().h());
+        }
+
+        @Override
+        public void onMouseStartHover() {
+            this.animatedKey.startAnimation().forward(true);
+        }
+
+        @Override
+        public void onMouseEndHover() {
+            this.animatedKey.forward(false);
         }
     }
 }

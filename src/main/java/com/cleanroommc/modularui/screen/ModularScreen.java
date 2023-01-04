@@ -6,7 +6,6 @@ import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
 import com.cleanroommc.modularui.sync.ItemSlotSH;
-import com.cleanroommc.modularui.sync.MapKey;
 import com.cleanroommc.modularui.theme.Theme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
@@ -18,7 +17,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -190,7 +188,7 @@ public abstract class ModularScreen {
                 // TODO
                 GuiDraw.drawSolidRect(0, 0, this.viewport.w(), this.viewport.h(), Color.argb(16, 16, 16, 125));
             }
-            WidgetTree.drawInternal(panel, this.context, partialTicks);
+            WidgetTree.drawTree(panel, this.context, partialTicks);
         }
         this.context.popViewport();
 
@@ -210,7 +208,7 @@ public abstract class ModularScreen {
         this.context.pushViewport(this.viewport);
         for (ModularPanel panel : this.windowManager.getReverseOpenPanels()) {
             if (panel.isEnabled()) {
-                WidgetTree.drawForegroundInternal(panel, partialTicks);
+                WidgetTree.drawTreeForeground(panel, partialTicks);
             }
         }
         this.context.drawDraggable();

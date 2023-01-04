@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.api.drawable;
 
+import com.cleanroommc.modularui.drawable.AnimatedText;
 import com.cleanroommc.modularui.drawable.StyledText;
 import com.cleanroommc.modularui.drawable.TextRenderer;
 import com.cleanroommc.modularui.utils.Alignment;
@@ -96,6 +97,10 @@ public interface IKey extends IDrawable {
 
     default StyledText withStyle() {
         return new StyledText(this);
+    }
+
+    default AnimatedText withAnimation() {
+        return new AnimatedText(this);
     }
 
     default StyledText alignment(Alignment alignment) {

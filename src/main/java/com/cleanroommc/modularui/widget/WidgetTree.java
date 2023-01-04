@@ -98,13 +98,11 @@ public class WidgetTree {
         return !includeSelf || consumer.test(parent);
     }
 
-    @ApiStatus.Internal
-    public static void drawInternal(IWidget parent, GuiContext context, float partialTicks) {
-        drawInternal(parent, context, false, partialTicks);
+    public static void drawTree(IWidget parent, GuiContext context, float partialTicks) {
+        drawTree(parent, context, false, partialTicks);
     }
 
-    @ApiStatus.Internal
-    public static void drawInternal(IWidget parent, GuiContext context, boolean ignoreEnabled, float partialTicks) {
+    public static void drawTree(IWidget parent, GuiContext context, boolean ignoreEnabled, float partialTicks) {
         if (!parent.isEnabled() && !ignoreEnabled) return;
         if (parent instanceof IViewport) {
             ((IViewport) parent).apply(context);
@@ -126,22 +124,21 @@ public class WidgetTree {
 
         List<IWidget> children = parent.getChildren();
         if (!children.isEmpty()) {
-            children.forEach(widget -> drawInternal(widget, context, partialTicks));
+            children.forEach(widget -> drawTree(widget, context, false, partialTicks));
         }
         if (parent instanceof IViewport) {
             ((IViewport) parent).unapply(context);
         }
     }
 
-    @ApiStatus.Internal
-    public static void drawForegroundInternal(IWidget parent, float partialTicks) {
+    public static void drawTreeForeground(IWidget parent, float partialTicks) {
         GlStateManager.color(1, 1, 1, 1);
         GlStateManager.enableBlend();
         parent.drawForeground(partialTicks);
 
         List<IWidget> children = parent.getChildren();
         if (!children.isEmpty()) {
-            children.forEach(widget -> drawForegroundInternal(widget, partialTicks));
+            children.forEach(widget -> drawTreeForeground(widget, partialTicks));
         }
     }
 
