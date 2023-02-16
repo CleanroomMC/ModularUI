@@ -19,6 +19,10 @@ public interface IDrawable {
      */
     void draw(int x, int y, int width, int height);
 
+    default void draw(int width, int height) {
+        draw(0, 0, width, height);
+    }
+
     /**
      * Draws this drawable in a given area.
      *
@@ -26,6 +30,10 @@ public interface IDrawable {
      */
     default void draw(Area area) {
         draw(area.x, area.y, area.width, area.height);
+    }
+
+    default void drawAtZero(Area area) {
+        draw(0, 0, area.width, area.height);
     }
 
     /**

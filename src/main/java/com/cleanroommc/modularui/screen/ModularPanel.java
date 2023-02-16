@@ -13,6 +13,7 @@ import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,17 +23,17 @@ import java.util.List;
 import java.util.Stack;
 import java.util.function.Function;
 
-public class ModularPanel extends ParentWidget<ModularPanel> implements IViewport {
+public class ModularPanel<W extends ModularPanel<W>> extends ParentWidget<W> implements IViewport {
 
-    public static ModularPanel defaultPanel(GuiContext context) {
+    public static <W extends ModularPanel<W>> W defaultPanel(GuiContext context) {
         return defaultPanel(context, 176, 166);
     }
 
-    public static ModularPanel defaultPanel(GuiContext context, int width, int height) {
-        ModularPanel panel = new ModularPanel(context);
+    public static <W extends ModularPanel<W>> W defaultPanel(GuiContext context, int width, int height) {
+        ModularPanel<W> panel = new ModularPanel<>(context);
         panel.flex().size(width, height).align(Alignment.Center);
         panel.background(GuiTextures.BACKGROUND);
-        return panel;
+        return (W) panel;
     }
 
     private static final int tapTime = 200;
@@ -53,7 +54,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     @Override
-    public @NotNull ModularPanel getPanel() {
+    public @NotNull ModularPanel<W> getPanel() {
         return this;
     }
 
@@ -133,13 +134,13 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         viewports.pop();
     }
 
-    @ApiStatus.OverrideOnly
+    @MustBeInvokedByOverriders
     public void onOpen(ModularScreen screen) {
         this.screen = screen;
         initialise(this);
     }
 
-    @ApiStatus.OverrideOnly
+    @MustBeInvokedByOverriders
     public void onClose() {
         dispose();
     }
@@ -457,7 +458,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     public void draw(float partialTicks) {
     }
 
-    public ModularPanel bindPlayerInventory() {
+    public W bindPlayerInventory() {
         return child(SlotGroupWidget.playerInventory());
     }
 }

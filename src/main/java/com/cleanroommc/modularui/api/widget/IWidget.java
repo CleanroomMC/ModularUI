@@ -88,7 +88,6 @@ public interface IWidget extends IGuiElement {
     /**
      * @return all children of this widget
      */
-    @Unmodifiable
     @NotNull
     default List<IWidget> getChildren() {
         return Collections.emptyList();

@@ -65,5 +65,6 @@ public class DraggableWidget<W extends DraggableWidget<W>> extends Widget<W> imp
     @Override
     public void setMoving(boolean moving) {
         this.moving = moving;
+        setEnabled(!moving);
     }
 }
