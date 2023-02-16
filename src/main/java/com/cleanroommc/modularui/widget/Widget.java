@@ -48,6 +48,7 @@ public abstract class Widget<W extends Widget<W>> implements IWidget, IPositione
 
     @NotNull
     private IDrawable[] background = EMPTY_BACKGROUND;
+    private IDrawable[] hoverBackground = EMPTY_BACKGROUND;
     @Nullable
     private Tooltip tooltip;
 
@@ -135,8 +136,8 @@ public abstract class Widget<W extends Widget<W>> implements IWidget, IPositione
 
     @Override
     public void drawBackground(float partialTicks) {
-        for (IDrawable drawable : getBackground()) {
-            drawable.draw(0, 0, getArea().width, getArea().height);
+        for (IDrawable drawable : getCurrentBackground()) {
+            drawable.drawAtZero(getArea());
         }
     }
 
@@ -220,6 +221,15 @@ public abstract class Widget<W extends Widget<W>> implements IWidget, IPositione
         return background;
     }
 
+    public IDrawable[] getHoverBackground() {
+        return hoverBackground;
+    }
+
+    public IDrawable[] getCurrentBackground() {
+        IDrawable[] hoverBackground = getHoverBackground();
+        return hoverBackground.length > 0 && isHovering() ? hoverBackground : getBackground();
+    }
+
     @Nullable
     @Override
     public Tooltip getTooltip() {
@@ -276,6 +286,11 @@ public abstract class Widget<W extends Widget<W>> implements IWidget, IPositione
 
     public W background(IDrawable... background) {
         this.background = background == null ? EMPTY_BACKGROUND : background;
+        return getThis();
+    }
+
+    public W hoverBackground(IDrawable... background) {
+        this.hoverBackground = background == null ? EMPTY_BACKGROUND : background;
         return getThis();
     }
 
