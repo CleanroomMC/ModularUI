@@ -1,17 +1,21 @@
 package com.cleanroommc.modularui;
 
 import com.cleanroommc.modularui.api.widget.IGuiElement;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @SideOnly(Side.CLIENT)
 public class GuiErrorHandler {
 
     public static final GuiErrorHandler INSTANCE = new GuiErrorHandler();
 
+    private final Set<GuiError> errorSet = new ObjectOpenHashSet<>();
     private final List<GuiError> errors = new ArrayList<>();
 
     private GuiErrorHandler() {
@@ -21,13 +25,13 @@ public class GuiErrorHandler {
         errors.clear();
     }
 
-    public void pushError(GuiError error) {
-        this.errors.add(error);
-    }
-
-    public void pushError(IGuiElement reference, String msg) {
-        ModularUI.LOGGER.error(msg);
-        this.errors.add(new GuiError(msg, reference));
+    @ApiStatus.Internal
+    public void pushError(IGuiElement reference, GuiError.Type type, String msg) {
+        GuiError error = new GuiError(msg, reference, type);
+        if (errorSet.add(error)) {
+            ModularUI.LOGGER.error(msg);
+            this.errors.add(error);
+        }
     }
 
     public List<GuiError> getErrors() {

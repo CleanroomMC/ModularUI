@@ -1,11 +1,9 @@
 package com.cleanroommc.modularui.widget.sizer;
 
-import com.cleanroommc.modularui.GuiErrorHandler;
-import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.GuiError;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.utils.Alignment;
 import net.minecraft.inventory.Slot;
 import org.jetbrains.annotations.ApiStatus;
@@ -14,38 +12,41 @@ import java.util.List;
 
 public class Flex implements IResizeable {
 
-    private final Unit x = new Unit();
-    private final Unit y = new Unit();
-    private final Unit x2 = new Unit();
-    private final Unit y2 = new Unit();
+    private final DimensionSizer x = new DimensionSizer(GuiAxis.X);
+    private final DimensionSizer y = new DimensionSizer(GuiAxis.Y);
     private final IGuiElement parent;
-    private Unit left, right, top, bottom, width, height;
     private Area relativeTo;
     private boolean relativeToParent = true;
-    private boolean defaultMode = false;
     private boolean skip = false;
 
     public Flex(IGuiElement parent) {
         this.parent = parent;
     }
 
+    public void reset() {
+        x.reset();
+        y.reset();
+    }
+
     public Flex startDefaultMode() {
-        this.defaultMode = true;
+        this.x.setDefaultMode(true);
+        this.y.setDefaultMode(true);
         return this;
     }
 
     public Flex endDefaultMode() {
-        this.defaultMode = false;
+        this.x.setDefaultMode(false);
+        this.y.setDefaultMode(false);
         return this;
     }
 
     public Flex coverChildrenWidth() {
-        getWidth().setCoverChildren(true);
+        this.x.setCoverChildren(true);
         return this;
     }
 
     public Flex coverChildrenHeight() {
-        getHeight().setCoverChildren(true);
+        this.y.setCoverChildren(true);
         return this;
     }
 
@@ -254,16 +255,16 @@ public class Flex implements IResizeable {
     }
 
     public Flex anchor(Alignment alignment) {
-        if (this.left != null) {
+        if (this.x.hasStart()) {
             anchorLeft(alignment.x);
         }
-        if (this.right != null) {
+        if (this.x.hasEnd()) {
             anchorRight(alignment.x);
         }
-        if (this.top != null) {
+        if (this.y.hasStart()) {
             anchorTop(alignment.y);
         }
-        if (this.bottom != null) {
+        if (this.y.hasEnd()) {
             anchorBottom(alignment.y);
         }
         return this;
@@ -289,69 +290,19 @@ public class Flex implements IResizeable {
     }
 
     public boolean hasYPos() {
-        return this.top != null || this.bottom != null;
+        return this.y.hasPos();
     }
 
     public boolean hasXPos() {
-        return this.left != null || this.right != null;
+        return this.x.hasPos();
     }
 
     public boolean hasHeight() {
-        return this.height != null;
+        return this.y.hasSize();
     }
 
     public boolean hasWidth() {
-        return this.width != null;
-    }
-
-    public boolean doCoverChildrenHeight() {
-        return this.height != null && this.height.isCoverChildren();
-    }
-
-    public boolean doCoverChildrenWidth() {
-        return this.width != null && this.width.isCoverChildren();
-    }
-
-    public boolean dependsOnChildren() {
-        return (this.width != null && this.width.dependsOnChildren()) ||
-                (this.width != null && this.width.dependsOnChildren()) ||
-                (this.left != null && this.left.dependsOnChildren()) ||
-                (this.right != null && this.right.dependsOnChildren()) ||
-                (this.top != null && this.top.dependsOnChildren()) ||
-                (this.bottom != null && this.bottom.dependsOnChildren());
-    }
-
-    public boolean dependsOnParent() {
-        return (this.width != null && this.width.dependsOnParent()) ||
-                (this.height != null && this.height.dependsOnParent()) ||
-                (this.left != null && this.left.dependsOnParent()) ||
-                (this.right != null) ||
-                (this.top != null && this.top.dependsOnParent()) ||
-                (this.bottom != null);
-    }
-
-    private void rx(int v) {
-        this.parent.getArea().rx = v;
-    }
-
-    private void ry(int v) {
-        this.parent.getArea().ry = v;
-    }
-
-    private int rx() {
-        return this.parent.getArea().rx;
-    }
-
-    private int ry() {
-        return this.parent.getArea().ry;
-    }
-
-    private int rex() {
-        return this.parent.getArea().relativeEndX();
-    }
-
-    private int rey() {
-        return this.parent.getArea().relativeEndY();
+        return this.x.hasSize();
     }
 
     @ApiStatus.Internal
@@ -370,20 +321,12 @@ public class Flex implements IResizeable {
         Area relativeTo = getRelativeTo();
 
         if (relativeTo.z() >= parent.getArea().z()) {
-            GuiErrorHandler.INSTANCE.pushError(this.parent, "Widget can't be relative to a widget at the same level or above");
+            GuiError.throwNew(this.parent, GuiError.Type.SIZING, "Widget can't be relative to a widget at the same level or above");
             return;
         }
-        boolean dependsOnChildren = dependsOnChildren();
-        if (this.width != null && this.left != null && this.right != null) {
-            throw new IllegalStateException("Widget size/pos in x is over-specified");
-        }
-        if (this.height != null && this.top != null && this.bottom != null) {
-            throw new IllegalStateException("Widget size/pos in y is over-specified");
-        }
 
-        int w, h, x, y;
-
-        if (dependsOnChildren) {
+        // check if children area is required for this widget
+        if (this.x.dependsOnChildren() || this.y.dependsOnChildren()) {
             if (!(this.parent instanceof IWidget)) {
                 throw new IllegalStateException("Can only cover children if instance of IWidget");
             }
@@ -394,158 +337,63 @@ public class Flex implements IResizeable {
             if (!children.isEmpty()) {
                 for (IWidget child : children) {
                     if (dependsOnThis(child)) {
-                        //throw new IllegalStateException("Children can't depend on their parent if the parent wants to cover it's children");
+                        // children area requires this area to be calculated and will be skipped
                         child.flex().skip();
                     }
                 }
             }
         }
 
-        // calc left, right and width
-        if (this.left == null && this.right == null) {
-            x = 0;
-            w = this.width == null ? this.parent.getDefaultWidth() : calcWidth(this.width);
-        } else {
-            if (this.width == null) {
-                if (this.left != null && this.right != null) {
-                    x = calcX(this.left, -1);
-                    int x2 = calcX(this.right, -1);
-                    w = Math.abs(relativeTo.w() - x2 - x);
-                } else {
-                    w = this.parent.getDefaultWidth();
-                    if (this.left == null) {
-                        x = calcX(this.right, w);
-                        x -= w;
-                    } else {
-                        x = calcX(this.left, w);
-                    }
-                }
-            } else if (right == null) {
-                w = calcWidth(this.width);
-                x = calcX(this.left, w);
-            } else {
-                w = calcWidth(this.width);
-                x = calcX(this.right, w);
-                x = relativeTo.w() - x - w;
-            }
-        }
-
-        // calc top, bottom and height
-        if (this.top == null && this.bottom == null) {
-            y = 0;
-            h = this.height == null ? this.parent.getDefaultHeight() : calcHeight(this.height);
-        } else {
-            if (this.height == null) {
-                if (this.top != null && this.bottom != null) {
-                    y = calcY(this.top, -1);
-                    int y2 = calcY(this.bottom, -1);
-                    h = Math.abs(relativeTo.h() - y2 - y);
-                } else {
-                    h = this.parent.getDefaultHeight();
-                    if (this.top == null) {
-                        y = calcY(this.bottom, h);
-                        y -= h;
-                    } else {
-                        y = calcY(this.top, h);
-                    }
-                }
-            } else if (bottom == null) {
-                h = calcHeight(this.height);
-                y = calcY(this.top, h);
-            } else {
-                h = calcHeight(this.height);
-                y = calcY(this.bottom, h);
-                y = relativeTo.h() - y - h;
-            }
-        }
-
-        // apply padding and margin
-        Box.SHARED.all(0);
-        Box padding = relativeTo.getPadding();
-        Box margin = this.parent.getArea().getMargin();
-        int parentWidth = relativeTo.width;
-        int parentHeight = relativeTo.height;
-
-        if (parentWidth < 1 /*|| (this.width != null && !this.width.isRelative())*/) {
-            rx(x);
-        } else {
-            rx(Math.max(x, padding.left + margin.left));
-            w = Math.min(w, parentWidth - padding.horizontal() - margin.horizontal());
-        }
-
-        if (parentHeight < 1 /*|| (this.height != null && !this.height.isRelative())*/) {
-            ry(y);
-        } else {
-            ry(Math.max(y, padding.top + margin.top));
-            h = Math.min(h, parentHeight - padding.vertical() - margin.vertical());
-        }
-
-        x += relativeTo.x;
-        y += relativeTo.y;
-
-        parent.getArea().set(x, y, w, h);
+        // calculate x, y, width and height if possible
+        this.x.apply(guiElement.getArea(), relativeTo, guiElement::getDefaultWidth);
+        this.y.apply(guiElement.getArea(), relativeTo, guiElement::getDefaultHeight);
     }
 
     @Override
     public void postApply(IGuiElement guiElement) {
-        List<IWidget> children = ((IWidget) parent).getChildren();
-        if (!children.isEmpty()) {
-            int moveChildrenX = 0, moveChildrenY = 0;
+        // not skipped children are now calculated and now this area can be calculated if it requires childrens area
+        if (this.x.dependsOnChildren() || this.y.dependsOnChildren()) {
+            List<IWidget> children = ((IWidget) parent).getChildren();
+            if (!children.isEmpty()) {
+                int moveChildrenX = 0, moveChildrenY = 0;
 
-            if (doCoverChildrenWidth() || doCoverChildrenHeight()) {
                 Box padding = this.parent.getArea().getPadding();
-                // calculate the area the children span
+                // first calculate the area the children span
                 int x0 = Integer.MAX_VALUE, x1 = Integer.MIN_VALUE, y0 = Integer.MAX_VALUE, y1 = Integer.MIN_VALUE;
                 for (IWidget child : children) {
                     Box margin = child.getArea().getMargin();
                     Flex flex = child.flex();
                     Area area = child.getArea();
-                    x0 = Math.min(x0, area.rx - padding.left - margin.left);
-                    x1 = Math.max(x1, area.rx + area.width + padding.right + margin.right);
-                    y0 = Math.min(y0, area.ry - padding.top - margin.top);
-                    y1 = Math.max(y1, area.ry + area.height + padding.bottom + margin.bottom);
+                    if (this.x.dependsOnChildren() && !flex.x.dependsOnParent()) {
+                        x0 = Math.min(x0, area.rx - padding.left - margin.left);
+                        x1 = Math.max(x1, area.rx + area.width + padding.right + margin.right);
+                    }
+                    if (this.y.dependsOnChildren() && !flex.y.dependsOnParent()) {
+                        y0 = Math.min(y0, area.ry - padding.top - margin.top);
+                        y1 = Math.max(y1, area.ry + area.height + padding.bottom + margin.bottom);
+                    }
                 }
 
+                // now calculate new x, y, width and height based on the childrens area
                 Area relativeTo = getRelativeTo();
-                if (doCoverChildrenWidth()) {
-                    // calculate width and recalculate x based on the new width
-                    int w = x1 - x0, x;
-                    parent.getArea().width = w;
-                    if (left != null) {
-                        x = calcX(this.left, w);
-                    } else if (right != null) {
-                        x = calcX(this.right, w);
-                        x = relativeTo.w() - x - w;
-                    } else {
-                        x = rx() + x0 + this.parent.getArea().getMargin().left;
-                        moveChildrenX = -x0;
-                    }
-                    rx(x);
+                if (this.x.dependsOnChildren()) {
+                    moveChildrenX = this.x.postApply(this.parent.getArea(), relativeTo, x0, x1);
                 }
-                if (doCoverChildrenHeight()) {
-                    // calculate height and recalculate y based on the new height
-                    int h = y1 - y0, y;
-                    parent.getArea().height = h;
-                    if (top != null) {
-                        y = calcY(this.top, h);
-                    } else if (bottom != null) {
-                        y = calcY(this.bottom, h);
-                        y = relativeTo.h() - y - h;
-                    } else {
-                        y = ry() + y0 + this.parent.getArea().getMargin().top;
-                        moveChildrenY = -y0;
-                    }
-                    ry(y);
+                if (this.y.dependsOnChildren()) {
+                    moveChildrenY = this.y.postApply(this.parent.getArea(), relativeTo, y0, y1);
                 }
-            }
-            for (IWidget widget : children) {
-                if (widget.flex().isSkip()) {
-                    widget.flex().skip = false;
-                    widget.resize();
-                } else {
-                    Area area = widget.getArea();
-                    area.rx += moveChildrenX;
-                    area.ry += moveChildrenY;
+                for (IWidget widget : children) {
+                    if (widget.flex().isSkip()) {
+                        // child was skipped before
+                        // this area is now calculated and child can now be calculated
+                        widget.flex().skip = false;
+                        widget.resize();
+                    } else {
+                        // child was already calculated and now needs to be moved, so that child stays in the same spot and doesn't get moved with the whole parent
+                        Area area = widget.getArea();
+                        area.rx += moveChildrenX;
+                        area.ry += moveChildrenY;
+                    }
                 }
             }
         }
@@ -553,9 +401,9 @@ public class Flex implements IResizeable {
 
     @Override
     public void applyPos(IGuiElement parent) {
+        // after all widgets x, y, width and height have been calculated when can now calculate the absolute position
         Area relativeTo = getRelativeTo();
-        parent.getArea().x = relativeTo.x + rx();
-        parent.getArea().y = relativeTo.y + ry();
+        parent.getArea().applyPos(relativeTo.x, relativeTo.y);
         if (parent instanceof IVanillaSlot) {
             Slot slot = ((IVanillaSlot) parent).getVanillaSlot();
             slot.xPos = parent.getArea().x;
@@ -566,190 +414,30 @@ public class Flex implements IResizeable {
     private boolean dependsOnThis(IWidget child) {
         Flex flex = child.getFlex();
         if (flex == null || flex.getRelativeTo() != this.parent.getArea()) return false;
-        return flex.dependsOnParent();
-    }
-
-    private int calcWidth(Unit w) {
-        float val = w.getValue();
-        if (w.isRelative()) {
-            return (int) (val * getRelativeTo().width);
-        }
-        return (int) val;
-    }
-
-    public int calcHeight(Unit h) {
-        float val = h.getValue();
-        if (h.isRelative()) {
-            return (int) (val * getRelativeTo().height);
-        }
-        return (int) val;
-    }
-
-    public int calcX(Unit x, int width) {
-        float val = x.getValue();
-        if (x.isRelative()) {
-            Area relativeTo = getRelativeTo();
-            val = relativeTo.width * val;
-        }
-        float anchor = x.getAnchor();
-        if (width > 0 && anchor != 0) {
-            val -= width * anchor;
-        } else if (x.getOffset() != 0) {
-            val += x.getOffset();
-        }
-        return (int) val;
-    }
-
-    public int calcY(Unit y, int height) {
-        float val = y.getValue();
-        if (y.isRelative()) {
-            Area relativeTo = getRelativeTo();
-            val = relativeTo.height * val;
-        }
-        float anchor = y.getAnchor();
-        if (height > 0 && anchor != 0) {
-            val -= height * anchor;
-        } else if (y.getOffset() != 0) {
-            val += y.getOffset();
-        }
-        return (int) val;
+        return flex.x.dependsOnParent() || flex.y.dependsOnParent();
     }
 
     private Unit getLeft() {
-        if (left == null) {
-            Unit u = null;
-            if (x.type == Unit.UNUSED) u = x;
-            else if (x2.type == Unit.UNUSED) u = x2;
-            else if (!defaultMode) {
-                if (right.type == Unit.DEFAULT) {
-                    u = right;
-                    right = null;
-                } else if (width.type == Unit.DEFAULT) {
-                    u = width;
-                    width = null;
-                }
-            }
-            if (u == null) throw new IllegalStateException();
-            left = u;
-            left.reset();
-        }
-        left.type = defaultMode ? Unit.DEFAULT : Unit.LEFT;
-        return left;
+        return this.x.getStart();
     }
 
     private Unit getRight() {
-        if (right == null) {
-            Unit u = null;
-            if (x.type == Unit.UNUSED) u = x;
-            else if (x2.type == Unit.UNUSED) u = x2;
-            else if (!defaultMode) {
-                if (left.type == Unit.DEFAULT) {
-                    u = left;
-                    left = null;
-                } else if (width.type == Unit.DEFAULT) {
-                    u = width;
-                    width = null;
-                }
-            }
-            if (u == null) throw new IllegalStateException();
-            right = u;
-            right.reset();
-        }
-        right.type = defaultMode ? Unit.DEFAULT : Unit.RIGHT;
-        return right;
+        return this.x.getEnd();
     }
 
     private Unit getTop() {
-        if (top == null) {
-            Unit u = null;
-            if (y.type == Unit.UNUSED) u = y;
-            else if (y2.type == Unit.UNUSED) u = y2;
-            else if (!defaultMode) {
-                if (bottom.type == Unit.DEFAULT) {
-                    u = bottom;
-                    bottom = null;
-                } else if (height.type == Unit.DEFAULT) {
-                    u = height;
-                    height = null;
-                }
-            }
-            if (u == null) {
-                throw new IllegalStateException();
-            }
-            top = u;
-            top.reset();
-        }
-        top.type = defaultMode ? Unit.DEFAULT : Unit.TOP;
-        return top;
+        return this.y.getStart();
     }
 
     private Unit getBottom() {
-        if (bottom == null) {
-            Unit u = null;
-            if (y.type == Unit.UNUSED) u = y;
-            else if (y2.type == Unit.UNUSED) u = y2;
-            else if (!defaultMode) {
-                if (top.type == Unit.DEFAULT) {
-                    u = top;
-                    top = null;
-                } else if (height.type == Unit.DEFAULT) {
-                    u = height;
-                    height = null;
-                }
-            }
-            if (u == null) {
-                throw new IllegalStateException();
-            }
-            bottom = u;
-            bottom.reset();
-        }
-        bottom.type = defaultMode ? Unit.DEFAULT : Unit.BOTTOM;
-        return bottom;
+        return this.y.getEnd();
     }
 
     private Unit getWidth() {
-        if (width == null) {
-            Unit u = null;
-            if (x.type == Unit.UNUSED) u = x;
-            else if (x2.type == Unit.UNUSED) u = x2;
-            else if (!defaultMode) {
-                if (right.type == Unit.DEFAULT) {
-                    u = right;
-                    right = null;
-                } else if (left.type == Unit.DEFAULT) {
-                    u = left;
-                    left = null;
-                }
-            }
-            if (u == null) throw new IllegalStateException();
-            width = u;
-            width.reset();
-        }
-        width.type = defaultMode ? Unit.DEFAULT : Unit.WIDTH;
-        return width;
+        return this.x.getSize();
     }
 
     private Unit getHeight() {
-        if (height == null) {
-            Unit u = null;
-            if (y.type == Unit.UNUSED) u = y;
-            else if (y2.type == Unit.UNUSED) u = y2;
-            else if (!defaultMode) {
-                if (bottom.type == Unit.DEFAULT) {
-                    u = bottom;
-                    bottom = null;
-                } else if (top.type == Unit.DEFAULT) {
-                    u = top;
-                    top = null;
-                }
-            }
-            if (u == null) {
-                throw new IllegalStateException();
-            }
-            height = u;
-            height.reset();
-        }
-        height.type = defaultMode ? Unit.DEFAULT : Unit.HEIGHT;
-        return height;
+        return this.y.getSize();
     }
 }

@@ -61,4 +61,16 @@ public class Box {
     public int horizontal() {
         return this.left + this.right;
     }
+
+    public int getTotal(GuiAxis axis) {
+        return axis.isHorizontal() ? horizontal() : vertical();
+    }
+
+    public int getStart(GuiAxis axis) {
+        return axis.isHorizontal() ? this.left : this.top;
+    }
+
+    public int getEnd(GuiAxis axis) {
+        return axis.isHorizontal() ? this.right : this.bottom;
+    }
 }

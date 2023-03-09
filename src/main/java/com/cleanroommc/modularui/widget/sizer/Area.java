@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.widget.sizer;
 
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.utils.MathUtils;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -104,6 +105,48 @@ public class Area extends Rectangle implements IResizeable {
         return this.y + (int) (this.height * anchor);
     }
 
+    public int getPoint(GuiAxis axis) {
+        return axis.isHorizontal() ? this.x : this.y;
+    }
+
+    public int getSize(GuiAxis axis) {
+        return axis.isHorizontal() ? this.width : this.height;
+    }
+
+    public int getRelativePoint(GuiAxis axis) {
+        return axis.isHorizontal() ? this.rx : this.ry;
+    }
+
+    public void setPoint(GuiAxis axis, int v) {
+        if (axis.isHorizontal()) {
+            this.x = v;
+        } else {
+            this.y = v;
+        }
+    }
+
+    public void setSize(GuiAxis axis, int v) {
+        if (axis.isHorizontal()) {
+            this.width = v;
+        } else {
+            this.height = v;
+        }
+    }
+
+    public void setRelativePoint(GuiAxis axis, int v) {
+        if (axis.isHorizontal()) {
+            this.rx = v;
+        } else {
+            this.ry = v;
+        }
+    }
+
+    @ApiStatus.Internal
+    public void applyPos(int parentX, int parentY) {
+        this.x = parentX + this.rx;
+        this.y = parentY + this.ry;
+    }
+
     public int requestedWidth() {
         return width + this.margin.horizontal();
     }
@@ -132,7 +175,7 @@ public class Area extends Rectangle implements IResizeable {
      */
     public boolean intersects(Rectangle2D area) {
         return this.x < area.getX() + area.getWidth() && this.y < area.getY() + area.getHeight()
-                && area.getX() < this.x + this.width && area.getY() < this.y + this.height;
+               && area.getX() < this.x + this.width && area.getY() < this.y + this.height;
     }
 
     /**

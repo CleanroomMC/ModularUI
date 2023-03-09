@@ -8,12 +8,9 @@ public class Unit {
 
     public static final byte UNUSED = -2;
     public static final byte DEFAULT = -1;
-    public static final byte TOP = 0;
-    public static final byte LEFT = 1;
-    public static final byte BOTTOM = 2;
-    public static final byte RIGHT = 3;
-    public static final byte WIDTH = 4;
-    public static final byte HEIGHT = 5;
+    public static final byte START = 0;
+    public static final byte END = 1;
+    public static final byte SIZE = 2;
 
     private boolean autoAnchor = true;
     private float value = 0f;
@@ -21,9 +18,8 @@ public class Unit {
     private Measure measure = Measure.PIXEL;
     private float anchor = 0f;
     private int offset = 0;
-    private boolean coverChildren = false;
 
-    @MagicConstant(intValues = {UNUSED, DEFAULT, TOP, BOTTOM, LEFT, RIGHT, WIDTH, HEIGHT})
+    @MagicConstant(intValues = {UNUSED, DEFAULT, START, END, SIZE})
     public byte type = UNUSED;
 
     public Unit() {
@@ -36,18 +32,15 @@ public class Unit {
         this.measure = Measure.PIXEL;
         this.anchor = 0f;
         this.offset = 0;
-        this.coverChildren = false;
     }
 
     public void setValue(float value) {
         this.value = value;
         this.valueSupplier = null;
-        this.coverChildren = false;
     }
 
     public void setValue(DoubleSupplier valueSupplier) {
         this.valueSupplier = valueSupplier;
-        this.coverChildren = false;
     }
 
     public float getValue() {
@@ -87,22 +80,6 @@ public class Unit {
     }
 
     public boolean isRelative() {
-        return measure == Measure.RELATIVE;
-    }
-
-    public boolean isCoverChildren() {
-        return coverChildren;
-    }
-
-    public void setCoverChildren(boolean coverChildren) {
-        this.coverChildren = coverChildren;
-    }
-
-    public boolean dependsOnChildren() {
-        return this.coverChildren;
-    }
-
-    public boolean dependsOnParent() {
         return measure == Measure.RELATIVE;
     }
 
