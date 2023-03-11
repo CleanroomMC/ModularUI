@@ -48,7 +48,8 @@ public class Unit {
     }
 
     public float getAnchor() {
-        return isAutoAnchor() && isRelative() ? getValue() : this.anchor;
+        float val = getValue();
+        return isAutoAnchor() && isRelative() && val < 1 ? val : this.anchor;
     }
 
     public boolean isAutoAnchor() {

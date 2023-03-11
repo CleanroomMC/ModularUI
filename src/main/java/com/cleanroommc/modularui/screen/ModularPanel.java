@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.screen;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IFocusedWidget;
@@ -23,17 +24,17 @@ import java.util.List;
 import java.util.Stack;
 import java.util.function.Function;
 
-public class ModularPanel<W extends ModularPanel<W>> extends ParentWidget<W> implements IViewport {
+public class ModularPanel extends ParentWidget<ModularPanel> implements IViewport {
 
-    public static <W extends ModularPanel<W>> W defaultPanel(GuiContext context) {
+    public static ModularPanel defaultPanel(GuiContext context) {
         return defaultPanel(context, 176, 166);
     }
 
-    public static <W extends ModularPanel<W>> W defaultPanel(GuiContext context, int width, int height) {
-        ModularPanel<W> panel = new ModularPanel<>(context);
+    public static ModularPanel defaultPanel(GuiContext context, int width, int height) {
+        ModularPanel panel = new ModularPanel(context);
         panel.flex().size(width, height).align(Alignment.Center);
         panel.background(GuiTextures.BACKGROUND);
-        return (W) panel;
+        return panel;
     }
 
     private static final int tapTime = 200;
@@ -54,13 +55,8 @@ public class ModularPanel<W extends ModularPanel<W>> extends ParentWidget<W> imp
     }
 
     @Override
-    public @NotNull ModularPanel<W> getPanel() {
+    public @NotNull ModularPanel getPanel() {
         return this;
-    }
-
-    @Override
-    public Area getArea() {
-        return super.getArea();
     }
 
     @Override
@@ -138,6 +134,7 @@ public class ModularPanel<W extends ModularPanel<W>> extends ParentWidget<W> imp
     public void onOpen(ModularScreen screen) {
         this.screen = screen;
         initialise(this);
+        ModularUI.LOGGER.info("Initialised widget tree");
     }
 
     @MustBeInvokedByOverriders
@@ -458,7 +455,7 @@ public class ModularPanel<W extends ModularPanel<W>> extends ParentWidget<W> imp
     public void draw(float partialTicks) {
     }
 
-    public W bindPlayerInventory() {
+    public ModularPanel bindPlayerInventory() {
         return child(SlotGroupWidget.playerInventory());
     }
 }

@@ -50,6 +50,16 @@ public class Flex implements IResizeable {
         return this;
     }
 
+    public Flex cancelMovementX() {
+        this.x.setCancelAutoMovement(true);
+        return this;
+    }
+
+    public Flex cancelMovementY() {
+        this.y.setCancelAutoMovement(true);
+        return this;
+    }
+
     public Flex coverChildren() {
         return coverChildrenWidth().coverChildrenHeight();
     }
@@ -336,7 +346,7 @@ public class Flex implements IResizeable {
             List<IWidget> children = widget.getChildren();
             if (!children.isEmpty()) {
                 for (IWidget child : children) {
-                    if (dependsOnThis(child)) {
+                    if (dependsOnThis(child, null)) {
                         // children area requires this area to be calculated and will be skipped
                         child.flex().skip();
                     }
@@ -364,11 +374,11 @@ public class Flex implements IResizeable {
                     Box margin = child.getArea().getMargin();
                     Flex flex = child.flex();
                     Area area = child.getArea();
-                    if (this.x.dependsOnChildren() && !flex.x.dependsOnParent()) {
+                    if (this.x.dependsOnChildren() && !dependsOnThis(child, GuiAxis.X)) {
                         x0 = Math.min(x0, area.rx - padding.left - margin.left);
                         x1 = Math.max(x1, area.rx + area.width + padding.right + margin.right);
                     }
-                    if (this.y.dependsOnChildren() && !flex.y.dependsOnParent()) {
+                    if (this.y.dependsOnChildren() && !dependsOnThis(child, GuiAxis.Y)) {
                         y0 = Math.min(y0, area.ry - padding.top - margin.top);
                         y1 = Math.max(y1, area.ry + area.height + padding.bottom + margin.bottom);
                     }
@@ -411,10 +421,10 @@ public class Flex implements IResizeable {
         }
     }
 
-    private boolean dependsOnThis(IWidget child) {
+    private boolean dependsOnThis(IWidget child, GuiAxis axis) {
         Flex flex = child.getFlex();
         if (flex == null || flex.getRelativeTo() != this.parent.getArea()) return false;
-        return flex.x.dependsOnParent() || flex.y.dependsOnParent();
+        return axis == null ? flex.x.dependsOnParent() || flex.y.dependsOnParent() : axis == GuiAxis.X ? flex.x.dependsOnParent() : flex.y.dependsOnParent();
     }
 
     private Unit getLeft() {

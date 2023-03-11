@@ -1,4 +1,4 @@
-``# ModularUI TODO's
+# ModularUI TODO's
 
 ## High Priority
 
@@ -16,11 +16,11 @@
 * [ ]  Slider
 * [ ]  Trackpad
 * [ ]  Color picker (button for setting number which can be dragged)
-* [ ]  List (column but scrollable)
+* [X]  List (column but scrollable)
 * [ ]  Sortable List (for bogosorter)
 * [X]  Slot Group (Builder, sorting)
 * [X]  Dialog
-* [ ]  Popup menu
+* [X]  Popup menu
 * [ ]  Dropdown menu
 * [ ]  Pie menu
 

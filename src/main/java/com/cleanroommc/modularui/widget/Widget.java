@@ -54,7 +54,7 @@ public abstract class Widget<W extends Widget<W>> implements IWidget, IPositione
 
     @ApiStatus.Internal
     @Override
-    public final void initialise(@NotNull IWidget parent) {
+    public void initialise(@NotNull IWidget parent) {
         if (this instanceof ModularPanel) {
             getArea().z(1);
         } else {

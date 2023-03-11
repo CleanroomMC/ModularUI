@@ -10,6 +10,7 @@ public class DimensionSizer {
     private Unit p1, p2;
 
     private boolean coverChildren = false;
+    private boolean cancelAutoMovement = false;
     private boolean defaultMode = false;
 
     public DimensionSizer(GuiAxis axis) {
@@ -34,6 +35,10 @@ public class DimensionSizer {
         this.coverChildren = coverChildren;
     }
 
+    public void setCancelAutoMovement(boolean cancelAutoMovement) {
+        this.cancelAutoMovement = cancelAutoMovement;
+    }
+
     public boolean hasStart() {
         return this.start != null;
     }
@@ -56,8 +61,8 @@ public class DimensionSizer {
 
     public boolean dependsOnParent() {
         return this.end != null ||
-               (this.start != null && this.start.isRelative()) ||
-               (this.size != null && this.size.isRelative());
+                (this.start != null && this.start.isRelative()) ||
+                (this.size != null && this.size.isRelative());
     }
 
     public void apply(Area area, Area relativeTo, IntSupplier defaultSize) {
@@ -98,7 +103,7 @@ public class DimensionSizer {
         Box padding = relativeTo.getPadding();
         Box margin = area.getMargin();
 
-        if (parentSize < 1 /*|| (this.size != null && !this.size.isRelative())*/) {
+        if (parentSize < 1 || (this.size != null && !this.size.isRelative())) {
             area.setRelativePoint(this.axis, p);
         } else {
             area.setRelativePoint(this.axis, Math.max(p, padding.getStart(this.axis) + margin.getStart(this.axis)));
@@ -121,8 +126,10 @@ public class DimensionSizer {
             p = calcPoint(this.end, s, relativeTo.getSize(this.axis));
             p = relativeTo.getSize(this.axis) - p - s;
         } else {
-            p = area.getRelativePoint(this.axis) + p0 + area.getMargin().left;
-            moveAmount = -p0;
+            p = area.getRelativePoint(this.axis) + p0 + area.getMargin().getStart(this.axis);
+            if (!cancelAutoMovement) {
+                moveAmount = -p0;
+            }
         }
         area.setRelativePoint(this.axis, p);
         return moveAmount;

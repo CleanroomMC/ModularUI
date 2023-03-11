@@ -7,7 +7,7 @@ import com.cleanroommc.modularui.widgets.TextWidget;
 public class StyledText implements IKey {
 
     private final IKey key;
-    private Alignment alignment = Alignment.TopLeft;
+    private Alignment alignment = Alignment.Center;
     private int color = 0x404040;
     private boolean shadow = false;
     private float scale = 1f;

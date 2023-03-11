@@ -9,7 +9,6 @@ import com.cleanroommc.modularui.widget.sizer.Flex;
 import com.cleanroommc.modularui.widget.sizer.IResizeable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Collections;
 import java.util.List;

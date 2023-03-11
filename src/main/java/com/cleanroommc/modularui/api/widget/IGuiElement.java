@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.api.widget;
 
+import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import org.jetbrains.annotations.ApiStatus;
@@ -70,6 +71,16 @@ public interface IGuiElement {
      */
     default boolean isHoveringFor(int ticks) {
         return getScreen().context.isHoveredFor(this, ticks);
+    }
+
+    default boolean isBelowMouse() {
+        IGuiElement hovered = getScreen().context.getHovered();
+        if (hovered == null) return false;
+        while (!(hovered instanceof ModularPanel)) {
+            if (hovered == this) return true;
+            hovered = hovered.getParent();
+        }
+        return hovered == this;
     }
 
     /**
