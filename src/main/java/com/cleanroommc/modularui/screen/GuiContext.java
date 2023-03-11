@@ -34,6 +34,7 @@ public class GuiContext extends GuiViewportStack {
     private IDraggable draggable;
     private int lastButton = -1;
     private long lastClickTime = 0;
+    private int lastDragX, lastDragY;
 
     /* Mouse states */
     private int mouseX;
@@ -286,7 +287,7 @@ public class GuiContext extends GuiViewportStack {
             } else if (hovered instanceof ModularPanel) {
                 ModularPanel panel = (ModularPanel) hovered;
                 if (!this.screen.getWindowManager().isMainPanel(panel) && panel.isDraggable()) {
-                    draggable = new DraggablePanelWrapper(panel, getAbsMouseX() - panel.getArea().x, getAbsMouseY() - panel.getArea().y);
+                    draggable = new DraggablePanelWrapper(panel);
                 } else {
                     return false;
                 }
@@ -329,7 +330,9 @@ public class GuiContext extends GuiViewportStack {
     @ApiStatus.Internal
     public void onFrameUpdate() {
         IGuiElement hovered = this.screen.getWindowManager().getTopWidget();
-        if (hasDraggable()) {
+        if (hasDraggable() && (this.lastDragX != this.mouseX || this.lastDragY != this.mouseY)) {
+            this.lastDragX = this.mouseX;
+            this.lastDragY = this.mouseY;
             this.draggable.onDrag(this.lastButton, this.lastClickTime);
         }
         if (this.hovered != hovered) {

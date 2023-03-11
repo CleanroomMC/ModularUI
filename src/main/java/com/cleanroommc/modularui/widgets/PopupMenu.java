@@ -9,11 +9,11 @@ import java.util.List;
 
 public class PopupMenu<W extends PopupMenu<W>> extends Widget<W> {
 
-    private final Menu menu;
+    private final MenuWrapper menu;
     private final List<IWidget> children;
 
     public PopupMenu(IWidget child) {
-        this.menu = new Menu(child);
+        this.menu = new MenuWrapper(child);
         child.flex().relative(this);
         this.menu.setEnabled(false);
         this.children = Collections.singletonList(this.menu);
@@ -36,13 +36,13 @@ public class PopupMenu<W extends PopupMenu<W>> extends Widget<W> {
         this.menu.mightClose = true;
     }
 
-    private static class Menu extends Widget<Menu> {
+    public static class MenuWrapper extends Widget<MenuWrapper> {
 
         private final IWidget child;
         private final List<IWidget> children;
         private boolean mightClose = false;
 
-        private Menu(IWidget child) {
+        private MenuWrapper(IWidget child) {
             this.child = child;
             this.children = Collections.singletonList(child);
             flex().coverChildren().cancelMovementX().cancelMovementY();
@@ -58,6 +58,10 @@ public class PopupMenu<W extends PopupMenu<W>> extends Widget<W> {
             if (this.mightClose && !isBelowMouse()) {
                 setEnabled(false);
             }
+        }
+
+        public void setMightClose(boolean mightClose) {
+            this.mightClose = mightClose;
         }
     }
 }

@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
 
 public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> extends ScrollWidget<W> implements ILayoutWidget {
 
-    private final Function<T, I> valueToWidgetMapper;
-    private final Function<I, T> widgetToValueMapper;
+    protected final Function<T, I> valueToWidgetMapper;
+    protected final Function<I, T> widgetToValueMapper;
 
     public ListWidget() {
         this(v -> null, w -> null);

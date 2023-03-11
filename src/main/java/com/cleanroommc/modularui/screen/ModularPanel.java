@@ -149,6 +149,14 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         this.screen = null;
     }
 
+    @Override
+    public void markDirty() {
+        super.markDirty();
+        this.hovering.clear();
+        this.lastMouseX = -1;
+        this.lastMouseY = -1;
+    }
+
     @ApiStatus.OverrideOnly
     public boolean onMousePressed(int mouseButton) {
         if (!isValid()) return false;

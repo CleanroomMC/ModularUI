@@ -1,8 +1,10 @@
 package com.cleanroommc.modularui.widget;
 
 import com.cleanroommc.modularui.api.layout.IViewport;
+import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.GuiContext;
+import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.IResizeable;
 import net.minecraft.client.renderer.GlStateManager;
@@ -161,5 +163,29 @@ public class WidgetTree {
             }
             return true;
         }, true);
+        // make sure hovered widgets are updated
+        parent.getPanel().markDirty();
+    }
+
+    public static IGuiElement findParent(IGuiElement parent, Predicate<IGuiElement> filter) {
+        if (parent == null) return null;
+        while (!(parent instanceof ModularPanel)) {
+            if (filter.test(parent)) {
+                return parent;
+            }
+            parent = parent.getParent();
+        }
+        return filter.test(parent) ? parent : null;
+    }
+
+    public static IWidget findParent(IWidget parent, Predicate<IWidget> filter) {
+        if (parent == null) return null;
+        while (!(parent instanceof ModularPanel)) {
+            if (filter.test(parent)) {
+                return parent;
+            }
+            parent = parent.getParent();
+        }
+        return filter.test(parent) ? parent : null;
     }
 }

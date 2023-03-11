@@ -11,13 +11,11 @@ public class DraggablePanelWrapper implements IDraggable {
 
     private final ModularPanel panel;
     private final Rectangle movingArea;
-    private final int relativeClickX, relativeClickY;
+    private int relativeClickX, relativeClickY;
     private boolean moving;
 
-    public DraggablePanelWrapper(ModularPanel panel, int relativeClickX, int relativeClickY) {
+    public DraggablePanelWrapper(ModularPanel panel) {
         this.panel = panel;
-        this.relativeClickX = relativeClickX;
-        this.relativeClickY = relativeClickY;
         this.movingArea = new Rectangle(panel.getArea());
     }
 
@@ -33,7 +31,12 @@ public class DraggablePanelWrapper implements IDraggable {
 
     @Override
     public boolean onDragStart(int button) {
-        return button == 0;
+        if (button == 0) {
+            this.relativeClickX = panel.getContext().getMouseX() - panel.getArea().x;
+            this.relativeClickY = panel.getContext().getMouseY() - panel.getArea().y;
+            return true;
+        }
+        return false;
     }
 
     @Override
