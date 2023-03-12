@@ -38,6 +38,9 @@ public class GuiScreenWrapper extends GuiContainer {
     private boolean init = true;
     private char lastChar;
 
+    private int fps, frameCount = 0;
+    private long timer = Minecraft.getSystemTime();
+
     public GuiScreenWrapper(ModularContainer container, ModularScreen screen) {
         super(container);
         this.screen = screen;
@@ -68,6 +71,13 @@ public class GuiScreenWrapper extends GuiContainer {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        frameCount++;
+        long time = Minecraft.getSystemTime();
+        if (time - timer >= 1000) {
+            fps = frameCount;
+            frameCount = 0;
+            timer += 1000;
+        }
         drawDefaultBackground();
         int i = this.guiLeft;
         int j = this.guiTop;
@@ -186,14 +196,17 @@ public class GuiScreenWrapper extends GuiContainer {
         int lineY = screenH - 13;
         drawString(fontRenderer, "Mouse Pos: " + mouseX + ", " + mouseY, 5, lineY, color);
         lineY -= 11;
-        //drawString(fontRenderer, "FPS: " + fps, 5, screenSize.height - 24, color);
+        drawString(fontRenderer, "FPS: " + fps, 5, screenH - 24, color);
         lineY -= 11;
-        IGuiElement hovered = this.screen.context.getHovered();
-        if (hovered != null) {
+        LocatedWidget locatedHovered = this.screen.getWindowManager().getTopWidgetLocated();
+        if (locatedHovered != null) {
+            IGuiElement hovered = locatedHovered.getWidget();
+            locatedHovered.applyViewports(context);
+
             Area area = hovered.getArea();
             IGuiElement parent = hovered.getParent();
 
-            GuiDraw.drawBorder(area.x, area.y, area.width, area.height, color, 1f);
+            GuiDraw.drawBorder(area.x - context.getShiftX(), area.y - context.getShiftY(), area.width, area.height, color, 1f);
             if (parent != null) {
                 GuiDraw.drawBorder(parent.getArea().x, parent.getArea().y, parent.getArea().width, parent.getArea().height, Color.withAlpha(color, 0.3f), 1f);
             }
