@@ -106,9 +106,7 @@ public class WidgetTree {
 
     public static void drawTree(IWidget parent, GuiContext context, boolean ignoreEnabled, float partialTicks) {
         if (!parent.isEnabled() && !ignoreEnabled) return;
-        if (parent instanceof IViewport) {
-            ((IViewport) parent).apply(context);
-        }
+
         GlStateManager.pushMatrix();
         Area viewport = context.getViewport();
         int alpha = 1;//getWindow().getAlpha();
@@ -120,8 +118,14 @@ public class WidgetTree {
         GlStateManager.translate(x, y, 0);
         GlStateManager.color(1, 1, 1, alpha);
         GlStateManager.enableBlend();
+        context.applyToOpenGl();
         parent.drawBackground(partialTicks);
         parent.draw(partialTicks);
+
+        if (parent instanceof IViewport) {
+            ((IViewport) parent).apply(context);
+            ((IViewport) parent).preDraw(context);
+        }
         GlStateManager.popMatrix();
 
         List<IWidget> children = parent.getChildren();
@@ -130,6 +134,12 @@ public class WidgetTree {
         }
         if (parent instanceof IViewport) {
             ((IViewport) parent).unapply(context);
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(x, y, 0);
+            GlStateManager.color(1, 1, 1, alpha);
+            GlStateManager.enableBlend();
+            ((IViewport) parent).postDraw(context);
+            GlStateManager.popMatrix();
         }
     }
 

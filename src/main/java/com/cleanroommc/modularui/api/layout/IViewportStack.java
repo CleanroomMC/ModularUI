@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.api.layout;
 
 import com.cleanroommc.modularui.widget.sizer.Area;
+import net.minecraft.client.renderer.GlStateManager;
 
 /**
  * This handles all viewports in a GUI.
@@ -61,4 +62,8 @@ public interface IViewportStack {
     void shiftX(int x);
 
     void shiftY(int y);
+
+    default void applyToOpenGl() {
+        GlStateManager.translate(-getShiftX(), -getShiftY(), 0);
+    }
 }

@@ -78,18 +78,18 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     @Override
-    protected void preDraw(GuiContext context) {
+    public void drawText(GuiContext context) {
         renderer.setSimulate(false);
         renderer.setPos(getArea().getPadding().left, 0);
         renderer.setScale(scale);
         renderer.setAlignment(textAlignment, -1, getArea().height);
         renderer.draw(handler.getText());
-        getScrollArea().scrollSize = Math.max(0, (int) renderer.getLastWidth());
+        getScrollData().scrollSize = Math.max(0, (int) renderer.getLastWidth());
     }
 
     @Override
     public void drawForeground(float partialTicks) {
-        if (hasTooltip() && getScrollArea().isScrollBarActive() && isHoveringFor(getTooltip().getShowUpTimer())) {
+        if (hasTooltip() && getScrollData().isScrollBarActive(getScrollArea()) && isHoveringFor(getTooltip().getShowUpTimer())) {
             getTooltip().draw(getContext(), partialTicks);
         }
     }

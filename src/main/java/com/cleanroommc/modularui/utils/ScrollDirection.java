@@ -1,13 +1,14 @@
 package com.cleanroommc.modularui.utils;
 
 import com.cleanroommc.modularui.widget.sizer.Area;
+import com.cleanroommc.modularui.widget.sizer.GuiAxis;
 
 /**
  * Scroll direction
  */
 public enum ScrollDirection {
 
-    VERTICAL() {
+    VERTICAL(GuiAxis.X) {
         @Override
         public int getPosition(Area area, float x) {
             return area.y(x);
@@ -25,7 +26,7 @@ public enum ScrollDirection {
 
         @Override
         public int getScroll(ScrollArea area, int x, int y) {
-            return y - area.y + area.scroll;
+            return y - area.y + area.getScrollY().scroll;
         }
 
         @Override
@@ -33,7 +34,7 @@ public enum ScrollDirection {
             return (y - area.y) / (float) area.height;
         }
     },
-    HORIZONTAL() {
+    HORIZONTAL(GuiAxis.Y) {
         @Override
         public int getPosition(Area area, float x) {
             return area.x(x);
@@ -51,7 +52,7 @@ public enum ScrollDirection {
 
         @Override
         public int getScroll(ScrollArea area, int x, int y) {
-            return x - area.x + area.scroll;
+            return x - area.x + area.getScrollX().scroll;
         }
 
         @Override
@@ -59,6 +60,12 @@ public enum ScrollDirection {
             return (x - area.x) / (float) area.width;
         }
     };
+
+    public final GuiAxis axis;
+
+    ScrollDirection(GuiAxis axis) {
+        this.axis = axis;
+    }
 
     /**
      * Get position of the area, x = 0 minimum corner, x = 1 maximum corner

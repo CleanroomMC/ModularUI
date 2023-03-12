@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.ScrollData;
 import com.cleanroommc.modularui.utils.ScrollDirection;
 import com.cleanroommc.modularui.widget.ScrollWidget;
 import net.minecraft.client.gui.GuiScreen;
@@ -40,10 +41,10 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     private int cursorTimer;
 
     public BaseTextFieldWidget() {
-        super(ScrollDirection.HORIZONTAL);
+        super(new ScrollData(ScrollDirection.HORIZONTAL));
         this.handler.setRenderer(renderer);
         this.handler.setScrollArea(getScrollArea());
-        getScrollArea().scrollItemSize = 4;
+        getScrollArea().getScrollX().scrollItemSize = 4;
         padding(4, 0);
     }
 
@@ -65,6 +66,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
 
     @Override
     public void onFrameUpdate() {
+        super.onFrameUpdate();
         if (isFocused() && ++cursorTimer == 30) {
             renderer.toggleCursor();
             cursorTimer = 0;
@@ -72,12 +74,17 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     }
 
     @Override
-    protected void preDraw(GuiContext context) {
+    public void preDraw(GuiContext context) {
+        super.preDraw(context);
+        drawText(context);
+    }
+
+    public void drawText(GuiContext context) {
         renderer.setSimulate(false);
         renderer.setScale(scale);
         renderer.setAlignment(textAlignment, -2, getArea().height);
         renderer.draw(handler.getText());
-        getScrollArea().scrollSize = Math.max(0, (int) (renderer.getLastWidth() + 0.5f));
+        getScrollArea().getScrollX().scrollSize = Math.max(0, (int) (renderer.getLastWidth() + 0.5f));
     }
 
     @Override
@@ -199,6 +206,10 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
 
     public int getMaxLines() {
         return handler.getMaxLines();
+    }
+
+    public ScrollData getScrollData() {
+        return getScrollArea().getScrollX();
     }
 
     public W setTextAlignment(Alignment textAlignment) {

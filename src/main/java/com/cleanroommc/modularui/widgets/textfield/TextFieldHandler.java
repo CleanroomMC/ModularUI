@@ -95,15 +95,15 @@ public class TextFieldHandler {
                 this.renderer.setSimulate(true);
                 this.renderer.draw(this.text);
                 this.renderer.setSimulate(false);
-                this.scrollArea.scrollSize = (int) (this.renderer.getLastWidth() + 0.5f);
-                if (this.scrollArea.isScrollBarActive()) {
+                this.scrollArea.getScrollX().scrollSize = (int) (this.renderer.getLastWidth() + 0.5f);
+                if (this.scrollArea.getScrollX().isScrollBarActive(this.scrollArea)) {
                     String line = this.text.get(main.y);
                     int scrollTo = (int) this.renderer.getPosOf(this.renderer.measureLines(Collections.singletonList(line)), main).x;
-                    scrollTo -= this.scrollArea.direction.getSide(this.scrollArea) / 2;
+                    scrollTo -= this.scrollArea.getScrollX().direction.getSide(this.scrollArea) / 2;
                     if (animate) {
-                        this.scrollArea.animateTo(scrollTo);
+                        this.scrollArea.getScrollX().animateTo(this.scrollArea, scrollTo);
                     } else {
-                        this.scrollArea.scrollTo(scrollTo);
+                        this.scrollArea.getScrollX().scrollTo(this.scrollArea, scrollTo);
                     }
                 }
             }
@@ -372,7 +372,7 @@ public class TextFieldHandler {
             }
         }
         if (this.scrollArea != null) {
-            this.scrollArea.clamp();
+            this.scrollArea.getScrollX().clamp(this.scrollArea);
         }
         onChanged();
     }

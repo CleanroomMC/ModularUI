@@ -236,7 +236,6 @@ public abstract class Widget<W extends Widget<W>> implements IWidget, IPositione
         return tooltip;
     }
 
-    @Nullable
     @Override
     public Flex getFlex() {
         return flex;

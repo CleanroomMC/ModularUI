@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.api.layout;
 
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.IWidgetList;
+import com.cleanroommc.modularui.screen.GuiContext;
 
 import java.util.Stack;
 import java.util.function.Predicate;
@@ -26,6 +27,12 @@ public interface IViewport {
     void unapply(IViewportStack stack);
 
     void getWidgetsAt(Stack<IViewport> viewports, IWidgetList widgets, int x, int y);
+
+    default void preDraw(GuiContext context) {
+    }
+
+    default void postDraw(GuiContext context) {
+    }
 
     static void getChildrenAt(IWidget parent, Stack<IViewport> viewports, IWidgetList widgetList, int x, int y) {
         final int currentX = parent.getContext().localX(x);

@@ -6,6 +6,7 @@ import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 
 public class ModularUIConfig {
 
+    public static int defaultScrollSpeed = 30;
     public static boolean smoothProgressBar = true;
 
     // Tooltip

@@ -2,32 +2,40 @@ package com.cleanroommc.modularui.widget;
 
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
+import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.IWidgetList;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.utils.ScrollArea;
-import com.cleanroommc.modularui.utils.ScrollDirection;
+import com.cleanroommc.modularui.utils.ScrollData;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import net.minecraft.client.renderer.GlStateManager;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Stack;
 
 public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> implements IViewport, Interactable {
 
-    private final ScrollArea scroll;
+    private final ScrollArea scroll = new ScrollArea();
 
     public ScrollWidget() {
-        this(ScrollDirection.VERTICAL);
+        this(null, null);
     }
 
-    public ScrollWidget(ScrollDirection direction) {
+    public ScrollWidget(ScrollData data) {
+        this(data, null);
+    }
+
+    public ScrollWidget(@Nullable ScrollData x, @Nullable ScrollData y) {
         super();
-        this.scroll = new ScrollArea(0);
-        this.scroll.direction = direction;
-        this.scroll.scrollSpeed = 20;
+        this.scroll.setScrollData(x);
+        this.scroll.setScrollData(y);
+        listenGuiAction((IGuiAction.MouseReleased) mouseButton -> {
+            this.scroll.mouseReleased(getContext());
+            return false;
+        });
     }
 
     @Override
@@ -39,28 +47,25 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
         return scroll;
     }
 
-    public W cancelScrollEdge() {
-        this.scroll.cancelScrollEdge = true;
-        return getThis();
-    }
-
     @Override
     public void apply(IViewportStack stack) {
         stack.pushViewport(getArea());
 
-        if (this.scroll.direction == ScrollDirection.VERTICAL) {
-            stack.shiftY(this.scroll.scroll);
-        } else {
-            stack.shiftX(this.scroll.scroll);
+        if (this.scroll.getScrollX() != null) {
+            stack.shiftX(this.scroll.getScrollX().scroll);
+        }
+        if (this.scroll.getScrollY() != null) {
+            stack.shiftY(this.scroll.getScrollY().scroll);
         }
     }
 
     @Override
     public void unapply(IViewportStack stack) {
-        if (this.scroll.direction == ScrollDirection.VERTICAL) {
-            stack.shiftY(-this.scroll.scroll);
-        } else {
-            stack.shiftX(-this.scroll.scroll);
+        if (this.scroll.getScrollX() != null) {
+            stack.shiftX(-this.scroll.getScrollX().scroll);
+        }
+        if (this.scroll.getScrollY() != null) {
+            stack.shiftY(-this.scroll.getScrollY().scroll);
         }
 
         stack.popViewport();
@@ -83,8 +88,12 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
     @Override
     public void resize() {
         super.resize();
-
-        this.scroll.clamp();
+        if (this.scroll.getScrollX() != null) {
+            this.scroll.getScrollX().clamp(this.scroll);
+        }
+        if (this.scroll.getScrollY() != null) {
+            this.scroll.getScrollY().clamp(this.scroll);
+        }
     }
 
     @Override
@@ -98,7 +107,12 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
 
     @Override
     public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
-        return this.scroll.mouseScroll(getContext());
+        if (this.scroll.mouseScroll(getContext())) {
+            // invalidate hovered widgets
+            getPanel().markDirty();
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -108,37 +122,21 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
     }
 
     @Override
-    public void draw(float partialTicks) {
-        super.draw(partialTicks);
-        GuiContext context = getContext();
+    public void onFrameUpdate() {
+        this.scroll.drag(getContext().getAbsMouseX(), getContext().getAbsMouseY());
+    }
 
-        this.scroll.drag(context.getAbsMouseX(), context.getAbsMouseY());
-
+    @Override
+    public void preDraw(GuiContext context) {
         GuiDraw.scissorTransformed(this.scroll.x + this.scroll.getPadding().left,
                 this.scroll.y + this.scroll.getPadding().top,
                 this.scroll.width - this.scroll.getPadding().horizontal(),
                 this.scroll.height - this.scroll.getPadding().vertical(), context);
+    }
 
-        GlStateManager.pushMatrix();
-
-        /* Translate the contents using OpenGL (scroll) */
-        if (this.scroll.direction == ScrollDirection.VERTICAL) {
-            GlStateManager.translate(0, -this.scroll.scroll, 0);
-        } else {
-            GlStateManager.translate(-this.scroll.scroll, 0, 0);
-        }
-
-        this.preDraw(context);
-        this.postDraw(context);
-
-        GlStateManager.popMatrix();
+    @Override
+    public void postDraw(GuiContext context) {
         GuiDraw.unscissor(context);
         this.scroll.drawScrollbar();
-    }
-
-    protected void preDraw(GuiContext context) {
-    }
-
-    protected void postDraw(GuiContext context) {
     }
 }

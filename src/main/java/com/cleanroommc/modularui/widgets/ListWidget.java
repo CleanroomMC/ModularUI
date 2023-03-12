@@ -3,7 +3,10 @@ package com.cleanroommc.modularui.widgets;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.widget.IValueWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.utils.ScrollData;
+import com.cleanroommc.modularui.utils.ScrollDirection;
 import com.cleanroommc.modularui.widget.ScrollWidget;
+import com.cleanroommc.modularui.widget.sizer.GuiAxis;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,6 +20,8 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
 
     protected final Function<T, I> valueToWidgetMapper;
     protected final Function<I, T> widgetToValueMapper;
+
+    private ScrollData scrollData;
 
     public ListWidget() {
         this(v -> null, w -> null);
@@ -32,6 +37,7 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
     public ListWidget(Function<T, I> valueToWidgetMapper, Function<I, T> widgetToValueMapper) {
         this.valueToWidgetMapper = valueToWidgetMapper;
         this.widgetToValueMapper = widgetToValueMapper;
+        this.scrollData = new ScrollData(ScrollDirection.VERTICAL);
     }
 
     public static <T, V extends IValueWidget<T> & IWidget, W extends ListWidget<T, V, W>> ListWidget<T, V, W> of(Function<T, V> valueToWidgetMapper) {
@@ -76,14 +82,26 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
 
     @Override
     public void postLayoutWidgets() {
-        int y = 0;
-        int lastMargin = getArea().getPadding().top;
+        GuiAxis axis = this.scrollData.direction.axis;
+        int p = 0;
+        int lastMargin = getArea().getPadding().getStart(axis);
         for (IWidget widget : getChildren()) {
-            y += Math.max(lastMargin, widget.getArea().getMargin().top);
-            widget.getArea().ry = y;
-            y += widget.getArea().height;
-            lastMargin = widget.getArea().getMargin().bottom;
+            p += Math.max(lastMargin, widget.getArea().getMargin().getStart(axis));
+            widget.getArea().setRelativePoint(axis, p);
+            p += widget.getArea().getSize(axis);
+            lastMargin = widget.getArea().getMargin().getEnd(axis);
         }
-        getScrollArea().scrollSize = y + Math.max(lastMargin, getArea().getPadding().bottom);
+        getScrollData().scrollSize = p + Math.max(lastMargin, getArea().getPadding().getEnd(axis));
+    }
+
+    public ScrollData getScrollData() {
+        return scrollData;
+    }
+
+    public W scrollDirection(ScrollDirection direction) {
+        if (this.scrollData.direction != direction) {
+            this.scrollData = this.scrollData.copyWith(direction);
+        }
+        return getThis();
     }
 }

@@ -441,9 +441,15 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @Nullable
     public IWidget getTopHovering() {
+        LocatedWidget lw = getTopHoveringLocated();
+        return lw == null ? null : lw.getWidget();
+    }
+
+    @Nullable
+    public LocatedWidget getTopHoveringLocated() {
         for (LocatedWidget widget : hovering) {
             if (widget.getWidget().canHover()) {
-                return widget.getWidget();
+                return widget;
             }
         }
         return null;

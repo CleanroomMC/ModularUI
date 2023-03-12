@@ -188,6 +188,5 @@ public interface IWidget extends IGuiElement {
     /**
      * @return flex of this widget
      */
-    @Nullable
     Flex getFlex();
 }
