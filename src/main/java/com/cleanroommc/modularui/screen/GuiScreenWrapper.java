@@ -219,6 +219,7 @@ public class GuiScreenWrapper extends GuiContainer {
                 lineY -= 11;
             }
             GuiDraw.drawText("Class: " + hovered, 5, lineY, 1, color, false);
+            locatedHovered.unapplyViewports(context);
         }
         color = Color.withAlpha(color, 25);
         for (int i = 5; i < screenW; i += 5) {

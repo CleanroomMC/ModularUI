@@ -122,12 +122,14 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 return ModularPanel.this.hovering.isEmpty();
             }
         };
+        getContext().reset();
         Stack<IViewport> viewports = new Stack<>();
         viewports.push(this);
         apply(getContext());
         getWidgetsAt(viewports, widgetList, this.lastMouseX, this.lastMouseY);
         unapply(getContext());
         viewports.pop();
+        getContext().reset();
     }
 
     @MustBeInvokedByOverriders

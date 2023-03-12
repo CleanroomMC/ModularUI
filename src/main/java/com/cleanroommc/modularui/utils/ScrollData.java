@@ -152,10 +152,10 @@ public class ScrollData {
         }
         int scrollbar = this.getScrollbarThickness();
         if (this.direction == ScrollDirection.HORIZONTAL) {
-            return this.opposite ? y >= area.y && y < area.y + scrollbar : y > area.ey() - scrollbar && y <= area.ey();
+            return this.opposite ? y >= area.y && y < area.y + scrollbar : y >= area.ey() - scrollbar && y < area.ey();
         }
         if (this.direction == ScrollDirection.VERTICAL) {
-            return this.opposite ? x >= area.x && x < area.x + scrollbar : x > area.ex() - scrollbar && x <= area.ex();
+            return this.opposite ? x >= area.x && x < area.x + scrollbar : x >= area.ex() - scrollbar && x < area.ex();
         }
         return false;
     }

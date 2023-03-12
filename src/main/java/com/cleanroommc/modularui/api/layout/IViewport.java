@@ -1,5 +1,7 @@
 package com.cleanroommc.modularui.api.layout;
 
+import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.IWidgetList;
 import com.cleanroommc.modularui.screen.GuiContext;

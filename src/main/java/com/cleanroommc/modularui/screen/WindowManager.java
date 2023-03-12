@@ -120,6 +120,17 @@ public class WindowManager {
         return null;
     }
 
+    @Nullable
+    public LocatedWidget getTopWidgetLocated() {
+        for (ModularPanel panel : this.panels) {
+            LocatedWidget widget = panel.getTopHoveringLocated();
+            if (widget != null) {
+                return widget;
+            }
+        }
+        return null;
+    }
+
     public void openPanel(@NotNull ModularPanel panel) {
         this.queueOpenPanels.add(panel);
     }

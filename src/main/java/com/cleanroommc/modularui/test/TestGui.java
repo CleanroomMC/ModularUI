@@ -3,14 +3,13 @@ package com.cleanroommc.modularui.test;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
-import com.cleanroommc.modularui.drawable.GuiTextures;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.utils.Color;
-import com.cleanroommc.modularui.widgets.SimpleWidget;
-import com.cleanroommc.modularui.widgets.SortableListWidget;
+import com.cleanroommc.modularui.widgets.layout.Grid;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
@@ -36,11 +35,28 @@ public class TestGui extends ModularScreen {
             return true;
         };
         lines = Arrays.asList("Option 1", "Option 2", "Option 3", "Option 4", "Option 5", "Option 6");
-        panel.child(SortableListWidget.sortableBuilder(lines, s -> new SortableListWidget.Item<>(s, new SimpleWidget().background(GuiTextures.BUTTON, IKey.str(s).color(Color.WHITE.normal))))
+        /*panel.child(SortableListWidget.sortableBuilder(lines, s -> new SortableListWidget.Item<>(s, new SimpleWidget().background(GuiTextures.BUTTON, IKey.str(s).color(Color.WHITE.normal))))
                 .onChange(list -> this.lines = list)
                 .pos(10, 10)
                 .bottom(10)
-                .width(100))
+                .width(100))*/
+        List<List<IWidget>> matrix = new ArrayList<>();
+        for (int i = 0; i < 400; i++) {
+            int r = i / 20;
+            int c = i % 20;
+            List<IWidget> row;
+            if (matrix.size() <= r) {
+                row = new ArrayList<>();
+                matrix.add(row);
+            } else {
+                row = matrix.get(r);
+            }
+            row.add(IKey.str(String.valueOf(i + 1)).asWidget());
+        }
+        panel.child(new Grid()
+                .matrix(matrix)
+                .scrollable()
+                .pos(10, 10).right(10).bottom(10))
         /*IDrawable optionHoverEffect = new Rectangle().setColor(Color.withAlpha(Color.WHITE.dark(5), 50));
         panel.child(new PopupMenu<>(ListWidget.builder(lines, t -> new SimpleWidget()
                         .width(1f).height(12)
