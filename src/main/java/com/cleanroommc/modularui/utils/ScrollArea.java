@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.utils;
 
+import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.GuiAxis;
@@ -16,6 +17,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ScrollArea extends Area {
 
     private ScrollData scrollX, scrollY;
+    private int scrollBarBackgroundColor = Color.withAlpha(Color.BLACK.normal, 0.25f);
 
     public ScrollArea(int x, int y, int w, int h) {
         super(x, y, w, h);
@@ -179,6 +181,14 @@ public class ScrollArea extends Area {
         return this.scrollY != null && this.scrollY.scrollSize > this.scrollY.direction.getSide(this);
     }
 
+    public int getScrollBarBackgroundColor() {
+        return scrollBarBackgroundColor;
+    }
+
+    public void setScrollBarBackgroundColor(int scrollBarBackgroundColor) {
+        this.scrollBarBackgroundColor = scrollBarBackgroundColor;
+    }
+
     /**
      * This method is responsible for drawing a scroll bar
      */
@@ -190,5 +200,23 @@ public class ScrollArea extends Area {
         if (this.scrollY != null) {
             this.scrollY.drawScrollbar(this);
         }
+        /*if (this.scrollY != null && this.scrollX != null) {
+            int x, y, rx, ry;
+            if (this.scrollX.opposite) {
+                x = 0;
+                rx = this.scrollX.getScrollbarThickness();
+            } else {
+                x = this.width - this.scrollX.getScrollbarThickness();
+                rx = this.width;
+            }
+            if (this.scrollY.opposite) {
+                y = 0;
+                ry = this.scrollY.getScrollbarThickness();
+            } else {
+                y = this.height - this.scrollY.getScrollbarThickness();
+                ry = this.height;
+            }
+            GuiDraw.drawRect(x, y, rx, ry, Color.RED.normal);
+        }*/
     }
 }

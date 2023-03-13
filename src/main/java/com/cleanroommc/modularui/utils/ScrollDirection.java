@@ -34,8 +34,8 @@ public enum ScrollDirection {
         }
 
         @Override
-        public float getProgress(Area area, int x, int y) {
-            return (y - area.y) / (float) area.height;
+        public float getProgress(ScrollArea area, int x, int y) {
+            return (y - area.y) / (float) getFullSide(area);
         }
     },
     HORIZONTAL(GuiAxis.X) {
@@ -64,8 +64,8 @@ public enum ScrollDirection {
         }
 
         @Override
-        public float getProgress(Area area, int x, int y) {
-            return (x - area.x) / (float) area.width;
+        public float getProgress(ScrollArea area, int x, int y) {
+            return (x - area.x) / (float) getFullSide(area);
         }
     };
 
@@ -104,5 +104,5 @@ public enum ScrollDirection {
      * Get progress scalar between 0 and 1 which identifies how much
      * it is near the maximum side
      */
-    public abstract float getProgress(Area area, int x, int y);
+    public abstract float getProgress(ScrollArea area, int x, int y);
 }

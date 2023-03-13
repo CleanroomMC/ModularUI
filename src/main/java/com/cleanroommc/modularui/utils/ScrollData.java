@@ -192,8 +192,19 @@ public class ScrollData {
         int h = this.getScrollBarLength(area);
         int x = 0;
         int y = 0;
-        int rx = 0;
-        int ry = 0;
+        int rx;
+        int ry;
+
+        if (this.direction == ScrollDirection.VERTICAL) {
+            x = this.opposite ? 0 : area.width - scrollbar;
+            rx = x + scrollbar;
+            ry = area.height;
+        } else {
+            y = this.opposite ? 0 : area.height - scrollbar;
+            ry = y + scrollbar;
+            rx = area.width;
+        }
+        GuiDraw.drawRect(x, y, rx, ry, area.getScrollBarBackgroundColor());
 
         if (this.direction == ScrollDirection.VERTICAL) {
             y = ((this.direction.getFullSide(area) - h) * this.scroll) / (this.scrollSize - side);
