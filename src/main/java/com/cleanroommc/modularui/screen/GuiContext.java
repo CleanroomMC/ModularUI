@@ -286,7 +286,7 @@ public class GuiContext extends GuiViewportStack {
                 draggable = (IDraggable) hovered;
             } else if (hovered instanceof ModularPanel) {
                 ModularPanel panel = (ModularPanel) hovered;
-                if (!this.screen.getWindowManager().isMainPanel(panel) && panel.isDraggable()) {
+                if (panel.isDraggable()) {
                     draggable = new DraggablePanelWrapper(panel);
                 } else {
                     return false;

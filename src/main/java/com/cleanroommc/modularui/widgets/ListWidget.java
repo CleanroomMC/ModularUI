@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -35,8 +36,8 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
     }
 
     public ListWidget(Function<T, I> valueToWidgetMapper, Function<I, T> widgetToValueMapper) {
-        this.valueToWidgetMapper = valueToWidgetMapper;
-        this.widgetToValueMapper = widgetToValueMapper;
+        this.valueToWidgetMapper = Objects.requireNonNull(valueToWidgetMapper);
+        this.widgetToValueMapper = Objects.requireNonNull(widgetToValueMapper);
         this.scrollData = new ScrollData(ScrollDirection.VERTICAL);
     }
 

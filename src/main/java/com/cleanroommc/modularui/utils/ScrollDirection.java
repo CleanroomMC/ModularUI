@@ -8,20 +8,24 @@ import com.cleanroommc.modularui.widget.sizer.GuiAxis;
  */
 public enum ScrollDirection {
 
-    VERTICAL(GuiAxis.X) {
+    VERTICAL(GuiAxis.Y) {
         @Override
         public int getPosition(Area area, float x) {
             return area.y(x);
         }
 
         @Override
-        public int getSide(Area area) {
-            return Math.max(0, getFullSide(area) - area.getPadding().vertical());
+        public int getSide(ScrollArea area, boolean otherIsActive) {
+            return Math.max(0, getFullSide(area, otherIsActive) - area.getPadding().vertical());
         }
 
         @Override
-        public int getFullSide(Area area) {
-            return area.h();
+        public int getFullSide(ScrollArea area, boolean otherIsActive) {
+            int offset = 0;
+            if (otherIsActive || (area.getScrollX() != null && area.getScrollX().isScrollBarActive(area, true))) {
+                offset = area.getScrollX().getScrollbarThickness();
+            }
+            return area.h() - offset;
         }
 
         @Override
@@ -34,20 +38,24 @@ public enum ScrollDirection {
             return (y - area.y) / (float) area.height;
         }
     },
-    HORIZONTAL(GuiAxis.Y) {
+    HORIZONTAL(GuiAxis.X) {
         @Override
         public int getPosition(Area area, float x) {
             return area.x(x);
         }
 
         @Override
-        public int getSide(Area area) {
-            return Math.max(0, getFullSide(area) - area.getPadding().horizontal());
+        public int getSide(ScrollArea area, boolean otherIsActive) {
+            return Math.max(0, getFullSide(area, otherIsActive) - area.getPadding().horizontal());
         }
 
         @Override
-        public int getFullSide(Area area) {
-            return area.w();
+        public int getFullSide(ScrollArea area, boolean otherIsActive) {
+            int offset = 0;
+            if (otherIsActive || (area.getScrollY() != null && area.getScrollY().isScrollBarActive(area, true))) {
+                offset = area.getScrollY().getScrollbarThickness();
+            }
+            return area.w() - offset;
         }
 
         @Override
@@ -75,9 +83,17 @@ public enum ScrollDirection {
     /**
      * Get dominant side for this scrolling direction
      */
-    public abstract int getSide(Area area);
+    public int getSide(ScrollArea area) {
+        return getSide(area, false);
+    }
 
-    public abstract int getFullSide(Area area);
+    public abstract int getSide(ScrollArea area, boolean otherIsActive);
+
+    public int getFullSide(ScrollArea area) {
+        return getFullSide(area, false);
+    }
+
+    public abstract int getFullSide(ScrollArea area, boolean otherIsActive);
 
     /**
      * Get scrolled amount for given mouse position

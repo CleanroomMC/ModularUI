@@ -152,16 +152,32 @@ public class ScrollData {
         }
         int scrollbar = this.getScrollbarThickness();
         if (this.direction == ScrollDirection.HORIZONTAL) {
+            if (area.getScrollY() != null && area.getScrollY().isScrollBarActive(area, true)) {
+                int thickness = area.getScrollY().getScrollbarThickness();
+                if (area.getScrollY().opposite ? x < area.x + thickness : x >= area.ex() - thickness) {
+                    return false;
+                }
+            }
             return this.opposite ? y >= area.y && y < area.y + scrollbar : y >= area.ey() - scrollbar && y < area.ey();
         }
         if (this.direction == ScrollDirection.VERTICAL) {
+            if (area.getScrollX() != null && area.getScrollX().isScrollBarActive(area, true)) {
+                int thickness = area.getScrollX().getScrollbarThickness();
+                if (area.getScrollX().opposite ? y < area.y + thickness : y >= area.ey() - thickness) {
+                    return false;
+                }
+            }
             return this.opposite ? x >= area.x && x < area.x + scrollbar : x >= area.ex() - scrollbar && x < area.ex();
         }
         return false;
     }
 
     public boolean isScrollBarActive(ScrollArea area) {
-        return this.scrollSize > this.direction.getSide(area);
+        return isScrollBarActive(area, false);
+    }
+
+    public boolean isScrollBarActive(ScrollArea area, boolean isOtherActive) {
+        return this.scrollSize > this.direction.getSide(area, isOtherActive);
     }
 
     @SideOnly(Side.CLIENT)
@@ -181,12 +197,17 @@ public class ScrollData {
 
         if (this.direction == ScrollDirection.VERTICAL) {
             y = ((this.direction.getFullSide(area) - h) * this.scroll) / (this.scrollSize - side);
-            x = this.opposite ? 0 : area.width - scrollbar;
-            rx = x + scrollbar;
+
+            if (area.getScrollX() != null && area.getScrollX().isScrollBarActive(area, true) && area.getScrollX().opposite) {
+                y += area.getScrollX().getScrollbarThickness();
+            }
             ry = y + h;
-        } else if (this.direction == ScrollDirection.HORIZONTAL) {
+        } else {
             y = this.opposite ? 0 : area.height - scrollbar;
             x = ((this.direction.getFullSide(area) - h) * this.scroll) / (this.scrollSize - side);
+            if (area.getScrollY() != null && area.getScrollY().isScrollBarActive(area, true) && area.getScrollY().opposite) {
+                x += area.getScrollY().getScrollbarThickness();
+            }
             rx = x + h;
             ry = y + scrollbar;
         }

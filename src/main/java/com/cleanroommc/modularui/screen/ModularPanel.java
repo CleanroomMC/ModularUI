@@ -136,7 +136,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     public void onOpen(ModularScreen screen) {
         this.screen = screen;
         initialise(this);
-        ModularUI.LOGGER.info("Initialised widget tree");
     }
 
     @MustBeInvokedByOverriders
@@ -406,7 +405,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
      * @return if this panel can be dragged. Never works on the main panel.
      */
     public boolean isDraggable() {
-        return true;
+        return getScreen().getMainPanel() != this;
     }
 
     /**

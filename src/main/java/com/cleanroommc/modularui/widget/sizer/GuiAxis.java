@@ -11,4 +11,8 @@ public enum GuiAxis {
     public boolean isVertical() {
         return this == Y;
     }
+
+    public GuiAxis getOther() {
+        return this == X ? Y : X;
+    }
 }
