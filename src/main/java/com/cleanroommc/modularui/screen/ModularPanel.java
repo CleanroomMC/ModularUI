@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.screen;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IFocusedWidget;
@@ -39,6 +38,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     private static final int tapTime = 200;
 
+    private String name;
     private ModularScreen screen;
     private final LinkedList<LocatedWidget> hovering = new LinkedList<>();
     private final List<Interactable> acceptedInteractions = new ArrayList<>();
@@ -52,6 +52,14 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     public ModularPanel(GuiContext context) {
         setContext(context);
         context.addJeiExclusionArea(this);
+    }
+
+    public ModularPanel name(String name) {
+        if (this.screen != null) {
+            throw new IllegalStateException("Name must be set before initialization!");
+        }
+        this.name = name;
+        return this;
     }
 
     @Override
@@ -132,9 +140,22 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         getContext().reset();
     }
 
+    protected void validateName() {
+        if (this.name == null) {
+            throw new IllegalArgumentException("Non main panels must be given a name via .name()");
+        }
+    }
+
     @MustBeInvokedByOverriders
     public void onOpen(ModularScreen screen) {
         this.screen = screen;
+        if (this.name == null) {
+            if (this == screen.getMainPanel()) {
+                this.name = "Main";
+            } else {
+                throw new IllegalArgumentException("Non main panels must be given a name via .name()");
+            }
+        }
         initialise(this);
     }
 
@@ -422,6 +443,10 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return false;
     }
 
+    public String getName() {
+        return name;
+    }
+
     @Override
     public GuiContext getContext() {
         return super.getContext();
@@ -464,10 +489,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @Override
     public void unapply(IViewportStack stack) {
         stack.popViewport();
-    }
-
-    @Override
-    public void draw(float partialTicks) {
     }
 
     public ModularPanel bindPlayerInventory() {

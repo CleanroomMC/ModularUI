@@ -156,6 +156,10 @@ public abstract class ModularScreen {
         this.windowManager.closePanel(panel);
     }
 
+    public boolean isPanelOpen(String name) {
+        return this.windowManager.isPanelOpen(name);
+    }
+
     @ApiStatus.OverrideOnly
     public void onUpdate() {
         this.context.tick();

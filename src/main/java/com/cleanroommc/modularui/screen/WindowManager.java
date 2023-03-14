@@ -43,11 +43,15 @@ public class WindowManager {
             throw new NullPointerException();
         }
         this.mainPanel = panel;
+
     }
 
     void init() {
         if (this.mainPanel == null) {
             throw new IllegalStateException("WindowManager is not yet constructed!");
+        }
+        if (this.mainPanel.getName() == null) {
+            this.mainPanel.name("Main");
         }
         openPanel(this.mainPanel, false);
     }
@@ -81,12 +85,22 @@ public class WindowManager {
     }
 
     private void openPanel(ModularPanel panel, boolean resize) {
-        if (this.panels.contains(panel)) throw new IllegalStateException();
+        panel.validateName();
+        if (this.panels.contains(panel) || isPanelOpen(panel.getName())) throw new IllegalStateException();
         this.panels.addFirst(panel);
         panel.onOpen(this.screen);
         if (resize) {
             WidgetTree.resize(panel);
         }
+    }
+
+    public boolean isPanelOpen(String name) {
+        for (ModularPanel panel : this.panels) {
+            if (panel.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @NotNull
