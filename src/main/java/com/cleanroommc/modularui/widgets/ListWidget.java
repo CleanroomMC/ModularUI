@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.utils.ScrollData;
 import com.cleanroommc.modularui.utils.ScrollDirection;
 import com.cleanroommc.modularui.widget.ScrollWidget;
+import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.GuiAxis;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.Nullable;
@@ -39,6 +40,7 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
         this.valueToWidgetMapper = Objects.requireNonNull(valueToWidgetMapper);
         this.widgetToValueMapper = Objects.requireNonNull(widgetToValueMapper);
         this.scrollData = new ScrollData(ScrollDirection.VERTICAL);
+        getScrollArea().setScrollData(this.scrollData);
     }
 
     public static <T, V extends IValueWidget<T> & IWidget, W extends ListWidget<T, V, W>> ListWidget<T, V, W> of(Function<T, V> valueToWidgetMapper) {
@@ -58,8 +60,24 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
         return listWidget;
     }
 
+    @Override
+    public void resize() {
+        super.resize();
+        if (this.scrollData.direction == ScrollDirection.VERTICAL) {
+            getArea().width += this.scrollData.getScrollbarThickness();
+        } else {
+            getArea().height += this.scrollData.getScrollbarThickness();
+        }
+    }
+
     public boolean add(T value, int index) {
-        return addChild(this.valueToWidgetMapper.apply(value), index);
+        if (addChild(this.valueToWidgetMapper.apply(value), index)) {
+            if (isValid()) {
+                WidgetTree.resize(this);
+            }
+            return true;
+        }
+        return false;
     }
 
     @Nullable
@@ -102,6 +120,9 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
     public W scrollDirection(ScrollDirection direction) {
         if (this.scrollData.direction != direction) {
             this.scrollData = this.scrollData.copyWith(direction);
+            getScrollArea().setScrollDataY(null);
+            getScrollArea().setScrollDataX(null);
+            getScrollArea().setScrollData(this.scrollData);
         }
         return getThis();
     }

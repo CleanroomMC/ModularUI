@@ -29,6 +29,20 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
         this.minElementMargin.all(2);
     }
 
+    @Override
+    public void onInit() {
+        super.onInit();
+        int maxRowSize = 0;
+        for (List<? extends IWidget> row : this.matrix) {
+            maxRowSize = Math.max(maxRowSize, row.size());
+        }
+        for (List<? extends IWidget> row : this.matrix) {
+            while (row.size() < maxRowSize) {
+                row.add(null);
+            }
+        }
+    }
+
     private int getElementWidth(Area area) {
         return area.width + Math.max(area.getMargin().left, this.minElementMargin.left) + Math.max(area.getMargin().right, this.minElementMargin.right);
     }
@@ -115,7 +129,7 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
     public int getDefaultWidth() {
         IntList colSizes = new IntArrayList();
         int i = 0, j;
-        for (List<IWidget> row : this.matrix) {
+        for (List<? extends IWidget> row : this.matrix) {
             j = 0;
             for (IWidget child : row) {
                 if (i == 0) {
@@ -135,9 +149,11 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
         return w;
     }
 
-    public Grid matrix(List<List<IWidget>> matrix) {
+    public <I extends IWidget> Grid matrix(List<List<I>> matrix) {
         this.matrix.clear();
-        this.matrix.addAll(matrix);
+        for (List<I> row : matrix) {
+            this.matrix.add((List<IWidget>) row);
+        }
         this.dirty = true;
         return this;
     }
@@ -167,6 +183,7 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
             child.initialise(this);
         }
         onChildAdd(child);
+        dirty = true;
         return true;
     }
 
@@ -179,6 +196,10 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
     public Grid nextRow() {
         this.matrix.add(new ArrayList<>());
         return this;
+    }
+
+    public <T, I extends IWidget> Grid mapTo(int rowLength, List<T> collection, IndexedElementMapper<T, I> widgetCreator) {
+        return matrix(mapToMatrix(rowLength, collection, widgetCreator));
     }
 
     public Grid minColWidth(int minColWidth) {
@@ -243,5 +264,25 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
     public Grid minElementMarginBottom(int val) {
         this.minElementMargin.bottom(val);
         return getThis();
+    }
+
+    public static <T, I extends IWidget> List<List<I>> mapToMatrix(int rowLength, List<T> collection, IndexedElementMapper<T, I> widgetCreator) {
+        List<List<I>> matrix = new ArrayList<>();
+        for (int i = 0; i < collection.size(); i++) {
+            int r = i / rowLength;
+            List<I> row;
+            if (matrix.size() <= r) {
+                row = new ArrayList<>();
+                matrix.add(row);
+            } else {
+                row = matrix.get(r);
+            }
+            row.add(widgetCreator.apply(i, collection.get(i)));
+        }
+        return matrix;
+    }
+
+    public interface IndexedElementMapper<T, I> {
+        I apply(int index, T value);
     }
 }

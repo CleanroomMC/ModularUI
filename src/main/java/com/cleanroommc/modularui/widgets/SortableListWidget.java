@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widgets;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IValueWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
@@ -10,27 +11,33 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class SortableListWidget<T, I extends SortableListWidget.Item<T>> extends ListWidget<T, I, SortableListWidget<T, I>> {
 
-    public static <T, I extends SortableListWidget.Item<T>> SortableListWidget<T, I> sortableBuilder(List<T> list, Function<T, I> builder) {
+    public static <T, I extends SortableListWidget.Item<T>> SortableListWidget<T, I> sortableBuilder(Collection<T> fullList, List<T> list, Function<T, I> builder) {
+        Objects.requireNonNull(list);
+        Objects.requireNonNull(builder);
         Map<T, I> map = new Object2ObjectOpenHashMap<>();
         SortableListWidget<T, I> sortableListWidget = new SortableListWidget<>(map::get);
-        for (T t : list) {
+        for (T t : fullList) {
             I item = builder.apply(t);
             map.put(t, item);
-            sortableListWidget.child(item);
+        }
+        for (T t : list) {
+            if (!fullList.contains(t)) {
+                throw new IllegalArgumentException("Elements from list must also be inside the full list!");
+            }
+            sortableListWidget.add(t, -1);
         }
         return sortableListWidget;
     }
 
     private Consumer<List<T>> onChange;
+    private Consumer<Item<T>> onRemove;
     private int timeSinceLastMove = 0;
 
     public SortableListWidget(Function<T, I> valueToWidgetMapper) {
@@ -57,12 +64,22 @@ public class SortableListWidget<T, I extends SortableListWidget.Item<T>> extends
             throw new IllegalArgumentException();
         }
         ((Item<T>) child).listWidget = this;
-        return super.addChild(child, index);
+        boolean result = super.addChild(child, index);
+        if (result) {
+            if (isValid()) {
+                assignIndexes();
+                this.onChange.accept(getValues());
+            }
+        }
+        return result;
     }
 
     public void moveTo(int from, int to) {
         if (this.timeSinceLastMove < 3) return;
-        if (from < 0 || to < 0 || from == to) throw new IllegalArgumentException();
+        if (from < 0 || to < 0 || from == to) {
+            ModularUI.LOGGER.error("Failed to move element from {} to {}", from, to);
+            return;
+        }
         Item<?> child = (Item<?>) getChildren().remove(from);
         getChildren().add(to, child);
         assignIndexes();
@@ -73,6 +90,24 @@ public class SortableListWidget<T, I extends SortableListWidget.Item<T>> extends
             this.onChange.accept(getValues());
         }
         this.timeSinceLastMove = 0;
+    }
+
+    public boolean remove(int index) {
+        IWidget widget = getChildren().remove(index);
+        if (widget != null) {
+            assignIndexes();
+            if (isValid()) {
+                WidgetTree.resize(this);
+            }
+            if (this.onChange != null) {
+                this.onChange.accept(getValues());
+            }
+            if (this.onRemove != null) {
+                this.onRemove.accept((Item<T>) widget);
+            }
+            return true;
+        }
+        return false;
     }
 
     private void assignIndexes() {
@@ -87,22 +122,37 @@ public class SortableListWidget<T, I extends SortableListWidget.Item<T>> extends
         return this;
     }
 
+    public SortableListWidget<T, I> onRemove(Consumer<Item<T>> onRemove) {
+        this.onRemove = onRemove;
+        return this;
+    }
+
     public static class Item<T> extends DraggableWidget<Item<T>> implements IValueWidget<T> {
 
         private final T value;
         private final IWidget content;
-        private final List<IWidget> children;
+        private ButtonWidget<? extends ButtonWidget<?>> removeButton;
+        private final List<IWidget> children = new ArrayList<>();
         private Predicate<IGuiElement> dropPredicate;
         private SortableListWidget<T, ? extends Item<T>> listWidget;
-        private int index = -1, time;
+        private int index = -1;
 
         public Item(T value, IWidget content) {
             this.value = value;
             this.content = content;
-            this.children = Collections.singletonList(content);
-            this.content.flex().size(1f, 1f);
+            this.children.add(content);
+            this.content.flex().height(1f);
             flex().width(1f).height(18);
             background(GuiTextures.BUTTON);
+        }
+
+        @Override
+        public void onInit() {
+            super.onInit();
+            if (removeButton != null) {
+
+                children.add(removeButton);
+            }
         }
 
         @NotNull
@@ -117,26 +167,12 @@ public class SortableListWidget<T, I extends SortableListWidget.Item<T>> extends
         }
 
         @Override
-        public boolean onDragStart(int mouseButton) {
-            time = 0;
-            return super.onDragStart(mouseButton);
-        }
-
-        @Override
         public void onDrag(int mouseButton, long timeSinceLastClick) {
             super.onDrag(mouseButton, timeSinceLastClick);
             IGuiElement hovered = getContext().getHovered();
             Item<?> item = (Item<?>) WidgetTree.findParent(hovered, guiElement -> guiElement instanceof Item);
             if (item != null && item != this && item.listWidget == this.listWidget) {
                 this.listWidget.moveTo(this.index, item.index);
-            }
-        }
-
-        @Override
-        public void onFrameUpdate() {
-            if (isMoving() && ++time % 4 == 0) {
-                time = 0;
-
             }
         }
 
@@ -155,6 +191,21 @@ public class SortableListWidget<T, I extends SortableListWidget.Item<T>> extends
 
         public Item<T> dropPredicate(Predicate<IGuiElement> dropPredicate) {
             this.dropPredicate = dropPredicate;
+            return this;
+        }
+
+        public Item<T> removeable() {
+            this.removeButton = new ButtonWidget<>()
+                    .onMousePressed(mouseButton -> this.listWidget.remove(this.index))
+                    .background(GuiTextures.BUTTON, GuiTextures.CLOSE.asIcon())
+                    .width(10).height(1f)
+                    .right(0);
+            return this;
+        }
+
+        public Item<T> removeable(Consumer<ButtonWidget<? extends ButtonWidget<?>>> buttonBuilder) {
+            removeable();
+            buttonBuilder.accept(this.removeButton);
             return this;
         }
     }
