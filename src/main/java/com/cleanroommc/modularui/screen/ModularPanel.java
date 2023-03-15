@@ -174,7 +174,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @Override
     public void markDirty() {
         super.markDirty();
-        this.hovering.clear();
+        // it is important to not clear the hovered list here
         this.lastMouseX = -1;
         this.lastMouseY = -1;
     }
@@ -193,14 +193,15 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         } else {
             loop:
             for (LocatedWidget widget : this.hovering) {
+                widget.applyViewports(getContext());
                 if (getContext().onHoveredClick(mouseButton, widget.getWidget())) {
                     pressed = LocatedWidget.EMPTY;
                     result = true;
+                    widget.unapplyViewports(getContext());
                     break;
                 }
                 if (widget.getWidget() instanceof Interactable) {
                     Interactable interactable = (Interactable) widget.getWidget();
-                    widget.applyViewports(getContext());
                     switch (interactable.onMousePressed(mouseButton)) {
                         case IGNORE:
                             break;
@@ -228,8 +229,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                             break loop;
                         }
                     }
-                    widget.unapplyViewports(getContext());
                 }
+                widget.unapplyViewports(getContext());
             }
         }
 
@@ -246,12 +247,12 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             this.lastMouseButton = mouseButton;
             this.isMouseButtonHeld = true;
         }
-        return result;
+        return !this.hovering.isEmpty();
     }
 
     @ApiStatus.OverrideOnly
     public boolean onMouseRelease(int mouseButton) {
-        if (!isValid()) return false;
+        if (!isValid() || !isEnabled()) return false;
         if (interactFocused(widget -> widget.onMouseRelease(mouseButton), false)) {
             return true;
         }
@@ -281,7 +282,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         this.lastMouseButton = -1;
         this.timePressed = 0;
         this.isMouseButtonHeld = false;
-        return result;
+        return !this.hovering.isEmpty();
     }
 
     @ApiStatus.OverrideOnly
@@ -344,7 +345,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             this.lastMouseButton = keyCode;
             this.isKeyHeld = true;
         }
-        return result;
+        return !this.hovering.isEmpty();
     }
 
     @ApiStatus.OverrideOnly
@@ -379,7 +380,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         this.lastMouseButton = -1;
         this.timePressed = 0;
         this.isKeyHeld = false;
-        return result;
+        return !this.hovering.isEmpty();
     }
 
     @ApiStatus.OverrideOnly
@@ -388,6 +389,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         if (interactFocused(widget -> widget.onMouseScroll(scrollDirection, amount), false)) {
             return true;
         }
+        if (this.hovering.isEmpty()) return false;
         for (LocatedWidget widget : this.hovering) {
             if (widget.getWidget() instanceof Interactable) {
                 Interactable interactable = (Interactable) widget.getWidget();
@@ -397,7 +399,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 if (result) return true;
             }
         }
-        return false;
+        return true;
     }
 
     @ApiStatus.OverrideOnly
@@ -493,5 +495,10 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     public ModularPanel bindPlayerInventory() {
         return child(SlotGroupWidget.playerInventory());
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + "#" + getName();
     }
 }
