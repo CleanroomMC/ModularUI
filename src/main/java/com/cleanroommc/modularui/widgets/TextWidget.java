@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.TextRenderer;
+import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Box;
@@ -19,7 +20,7 @@ public class TextWidget extends Widget<TextWidget> {
     }
 
     @Override
-    public void draw(float partialTicks) {
+    public void draw(GuiContext context) {
         TextRenderer renderer = TextRenderer.SHARED;
         renderer.setColor(this.color);
         renderer.setAlignment(this.alignment, getArea().w() + 1, getArea().h());

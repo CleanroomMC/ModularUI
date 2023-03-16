@@ -7,6 +7,7 @@ import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.TextRenderer;
+import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.sync.ItemSlotSH;
@@ -51,7 +52,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     @Override
-    public void draw(float partialTicks) {
+    public void draw(GuiContext context) {
         if (this.syncHandler == null) return;
         RenderHelper.enableGUIStandardItemLighting();
         drawSlot(getSlot());

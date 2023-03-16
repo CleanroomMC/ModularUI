@@ -41,24 +41,24 @@ public interface IWidget extends IGuiElement {
     /**
      * Draws the background of this widget
      *
-     * @param partialTicks ticks since last draw
+     * @param context gui context
      */
-    void drawBackground(float partialTicks);
+    void drawBackground(GuiContext context);
 
     /**
      * Draws additional stuff in this widget
      *
-     * @param partialTicks ticks since last draw
+     * @param context gui context
      */
     @Override
-    void draw(float partialTicks);
+    void draw(GuiContext context);
 
     /**
      * Draws foreground elements of this widget. For example tooltips.
      *
-     * @param partialTicks ticks since last draw
+     * @param context gui context
      */
-    void drawForeground(float partialTicks);
+    void drawForeground(GuiContext context);
 
     /**
      * @return if this widget has a tooltip

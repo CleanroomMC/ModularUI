@@ -212,7 +212,7 @@ public abstract class ModularScreen {
         this.context.pushViewport(this.viewport);
         for (ModularPanel panel : this.windowManager.getReverseOpenPanels()) {
             if (panel.isEnabled()) {
-                WidgetTree.drawTreeForeground(panel, partialTicks);
+                WidgetTree.drawTreeForeground(panel, this.context);
             }
         }
         this.context.drawDraggable();

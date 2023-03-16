@@ -287,7 +287,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
         }
 
         @Override
-        public void draw(float partialTicks) {
+        public void draw(GuiContext context) {
             animatedKey.draw(0, 0, getArea().w(), getArea().h());
         }
 

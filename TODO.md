@@ -17,7 +17,7 @@
 * [ ]  Trackpad
 * [ ]  Color picker (button for setting number which can be dragged)
 * [X]  List (column but scrollable)
-* [ ]  Sortable List (for bogosorter)
+* [X]  Sortable List (for bogosorter)
 * [X]  Slot Group (Builder, sorting)
 * [X]  Dialog
 * [X]  Popup menu

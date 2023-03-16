@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.api.widget;
 
+import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -38,9 +39,9 @@ public interface IGuiElement {
     /**
      * Draws this element
      *
-     * @param partialTicks ticks since last draw
+     * @param context gui context
      */
-    void draw(float partialTicks);
+    void draw(GuiContext context);
 
     /**
      * Called when the mouse enters the area of this element

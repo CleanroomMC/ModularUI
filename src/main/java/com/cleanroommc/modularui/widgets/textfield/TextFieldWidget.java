@@ -88,9 +88,9 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     @Override
-    public void drawForeground(float partialTicks) {
+    public void drawForeground(GuiContext context) {
         if (hasTooltip() && getScrollData().isScrollBarActive(getScrollArea()) && isHoveringFor(getTooltip().getShowUpTimer())) {
-            getTooltip().draw(getContext(), partialTicks);
+            getTooltip().draw(getContext());
         }
     }
 

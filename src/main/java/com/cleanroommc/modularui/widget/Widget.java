@@ -138,21 +138,21 @@ public abstract class Widget<W extends Widget<W>> implements IWidget, IPositione
     }
 
     @Override
-    public void drawBackground(float partialTicks) {
+    public void drawBackground(GuiContext context) {
         for (IDrawable drawable : getCurrentBackground()) {
             drawable.drawAtZero(getArea());
         }
     }
 
     @Override
-    public void draw(float partialTicks) {
+    public void draw(GuiContext context) {
     }
 
     @Override
-    public void drawForeground(float partialTicks) {
+    public void drawForeground(GuiContext context) {
         Tooltip tooltip = getTooltip();
         if (tooltip != null && isHoveringFor(tooltip.getShowUpTimer())) {
-            tooltip.draw(getContext(), partialTicks);
+            tooltip.draw(getContext());
         }
     }
 

@@ -7,6 +7,7 @@ import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.TextRenderer;
+import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.sync.FluidSlotSyncHandler;
@@ -109,7 +110,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable {
     }
 
     @Override
-    public void draw(float partialTicks) {
+    public void draw(GuiContext context) {
         IFluidTank fluidTank = getFluidTank();
         FluidStack content = this.syncHandler.getCachedValue();
         if (content != null) {

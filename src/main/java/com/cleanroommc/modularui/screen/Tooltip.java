@@ -54,7 +54,7 @@ public class Tooltip {
         this.additionalLines = additionalLines;
     }
 
-    public void draw(GuiContext context, float elapsedTime) {
+    public void draw(GuiContext context) {
         if (isEmpty()) return;
 
         if (maxWidth <= 0) {

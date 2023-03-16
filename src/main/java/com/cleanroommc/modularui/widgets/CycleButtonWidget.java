@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.api.sync.INumberSyncHandler;
 import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.UITexture;
+import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.widget.Widget;
 import org.jetbrains.annotations.NotNull;
@@ -108,7 +109,7 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
     }
 
     @Override
-    public void draw(float partialTicks) {
+    public void draw(GuiContext context) {
         //texture.applyThemeColor();
         texture.draw(0, 0, getArea().w(), getArea().h());
     }

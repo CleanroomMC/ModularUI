@@ -119,8 +119,8 @@ public class WidgetTree {
         GlStateManager.color(1, 1, 1, alpha);
         GlStateManager.enableBlend();
         context.applyToOpenGl();
-        parent.drawBackground(partialTicks);
-        parent.draw(partialTicks);
+        parent.drawBackground(context);
+        parent.draw(context);
 
         IViewport viewport = parent instanceof IViewport ? (IViewport) parent : null;
         if (viewport != null) {
@@ -153,14 +153,14 @@ public class WidgetTree {
         }
     }
 
-    public static void drawTreeForeground(IWidget parent, float partialTicks) {
+    public static void drawTreeForeground(IWidget parent, GuiContext context) {
         GlStateManager.color(1, 1, 1, 1);
         GlStateManager.enableBlend();
-        parent.drawForeground(partialTicks);
+        parent.drawForeground(context);
 
         List<IWidget> children = parent.getChildren();
         if (!children.isEmpty()) {
-            children.forEach(widget -> drawTreeForeground(widget, partialTicks));
+            children.forEach(widget -> drawTreeForeground(widget, context));
         }
     }
 

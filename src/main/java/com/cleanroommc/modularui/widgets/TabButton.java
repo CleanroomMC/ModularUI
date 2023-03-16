@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.TabTexture;
+import com.cleanroommc.modularui.screen.GuiContext;
 import com.cleanroommc.modularui.widget.Widget;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -45,14 +46,14 @@ public class TabButton extends Widget<TabButton> implements Interactable {
     }
 
     @Override
-    public void drawBackground(float partialTicks) {
+    public void drawBackground(GuiContext context) {
         if (isActive() && this.activeTexture != null) {
             for (IDrawable drawable : this.activeTexture) {
                 drawable.draw(0, 0, getArea().width, getArea().height);
             }
             return;
         }
-        super.drawBackground(partialTicks);
+        super.drawBackground(context);
     }
 
     @Override
