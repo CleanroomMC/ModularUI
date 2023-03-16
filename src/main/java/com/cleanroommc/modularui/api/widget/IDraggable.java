@@ -1,11 +1,14 @@
 package com.cleanroommc.modularui.api.widget;
 
+import com.cleanroommc.modularui.api.layout.IViewport;
+import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.screen.GuiContext;
+import com.cleanroommc.modularui.widget.sizer.Area;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
+import java.util.Stack;
 
-public interface IDraggable {
+public interface IDraggable extends IViewport {
 
     /**
      * Gets called every frame after everything else is rendered.
@@ -45,9 +48,28 @@ public interface IDraggable {
      * @return the size and pos during move
      */
     @Nullable
-    Rectangle getMovingArea();
+    Area getMovingArea();
 
     boolean isMoving();
 
     void setMoving(boolean moving);
+
+
+    @Override
+    default void apply(IViewportStack stack) {
+        if (isMoving()) {
+            stack.pushViewport(getMovingArea());
+        }
+    }
+
+    @Override
+    default void unapply(IViewportStack stack) {
+        if (isMoving()) {
+            stack.popViewport();
+        }
+    }
+
+    @Override
+    default void getWidgetsAt(Stack<IViewport> viewports, IWidgetList widgets, int x, int y) {
+    }
 }

@@ -1,7 +1,5 @@
 package com.cleanroommc.modularui.api.layout;
 
-import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.IWidgetList;
 import com.cleanroommc.modularui.screen.GuiContext;
@@ -28,12 +26,44 @@ public interface IViewport {
      */
     void unapply(IViewportStack stack);
 
+    /**
+     * Gathers all children at a position. Transformations from this viewport are already applied.
+     *
+     * @param viewports current viewport stack. Should not be modified.
+     * @param widgets   widget list of already gathered widgets. Add children here.
+     * @param x         x position
+     * @param y         y position
+     */
     void getWidgetsAt(Stack<IViewport> viewports, IWidgetList widgets, int x, int y);
 
-    default void preDraw(GuiContext context) {
+    /**
+     * Gathers all children at a position. Transformations from this viewport are not applied.
+     * Called before {@link #getWidgetsAt(Stack, IWidgetList, int, int)}
+     *
+     * @param viewports current viewport stack. Should not be modified.
+     * @param widgets   widget list of already gathered widgets. Add children here.
+     * @param x         x position
+     * @param y         y position
+     */
+    default void getWidgetsBeforeApply(Stack<IViewport> viewports, IWidgetList widgets, int x, int y) {
     }
 
-    default void postDraw(GuiContext context) {
+    /**
+     * Called during drawing twice (before children are drawn). Once with transformation of this viewport and once without
+     *
+     * @param context     gui context
+     * @param transformed if transformation from this viewport is active
+     */
+    default void preDraw(GuiContext context, boolean transformed) {
+    }
+
+    /**
+     * Called during drawing twice (after children are drawn). Once with transformation of this viewport and once without
+     *
+     * @param context     gui context
+     * @param transformed if transformation from this viewport is active
+     */
+    default void postDraw(GuiContext context, boolean transformed) {
     }
 
     static void getChildrenAt(IWidget parent, Stack<IViewport> viewports, IWidgetList widgetList, int x, int y) {
@@ -46,6 +76,7 @@ public interface IViewport {
             }
             if (child instanceof IViewport) {
                 IViewport viewport = (IViewport) child;
+                viewport.getWidgetsBeforeApply(viewports, widgetList, x, y);
                 viewports.push(viewport);
                 viewport.apply(parent.getContext());
                 viewport.getWidgetsAt(viewports, widgetList, x, y);

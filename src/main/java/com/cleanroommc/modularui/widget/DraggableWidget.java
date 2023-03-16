@@ -1,37 +1,34 @@
 package com.cleanroommc.modularui.widget;
 
+import com.cleanroommc.modularui.api.layout.IViewport;
+import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IDraggable;
-import com.cleanroommc.modularui.screen.GuiContext;
-import net.minecraft.client.renderer.GlStateManager;
+import com.cleanroommc.modularui.api.widget.IWidgetList;
+import com.cleanroommc.modularui.widget.sizer.Area;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
+import java.util.Stack;
 
 public class DraggableWidget<W extends DraggableWidget<W>> extends Widget<W> implements IDraggable {
 
     private boolean moving = false;
     private int relativeClickX, relativeClickY;
-    private final Rectangle movingArea;
+    private final Area movingArea;
 
     public DraggableWidget() {
-        this.movingArea = new Rectangle(getArea());
+        this.movingArea = getArea().createCopy();
     }
 
     @Override
     public void drawMovingState(float partialTicks) {
-        GuiContext context = getContext();
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(-getArea().x, -getArea().y, 0);
-        GlStateManager.translate(context.getAbsMouseX() - this.relativeClickX, context.getAbsMouseY() - this.relativeClickY, 0);
         WidgetTree.drawTree(this, getContext(), true, partialTicks);
-        GlStateManager.popMatrix();
     }
 
     @Override
     public boolean onDragStart(int mouseButton) {
         if (mouseButton == 0) {
-            this.relativeClickX = getContext().getMouseX() - getArea().x;
-            this.relativeClickY = getContext().getMouseY() - getArea().y;
+            this.relativeClickX = getContext().getMouseX() - getContext().localX(getArea().x);
+            this.relativeClickY = getContext().getMouseY() - getContext().localY(getArea().y);
             return true;
         }
         return false;
@@ -53,7 +50,7 @@ public class DraggableWidget<W extends DraggableWidget<W>> extends Widget<W> imp
     }
 
     @Override
-    public @Nullable Rectangle getMovingArea() {
+    public @Nullable Area getMovingArea() {
         return this.movingArea;
     }
 
@@ -66,5 +63,34 @@ public class DraggableWidget<W extends DraggableWidget<W>> extends Widget<W> imp
     public void setMoving(boolean moving) {
         this.moving = moving;
         setEnabled(!moving);
+    }
+
+    @Override
+    public void getWidgetsAt(Stack<IViewport> viewports, IWidgetList widgets, int x, int y) {
+        if (isMoving()) return;
+        if (getArea().isInside(x, y)) {
+            widgets.add(this, viewports);
+        }
+        if (hasChildren()) {
+            IViewport.getChildrenAt(this, viewports, widgets, x, y);
+        }
+    }
+
+    @Override
+    public void apply(IViewportStack stack) {
+        if (isMoving()) {
+            stack.pushViewport(getMovingArea());
+            stack.shiftX(this.movingArea.x - getArea().x);
+            stack.shiftY(this.movingArea.y - getArea().y);
+        }
+    }
+
+    @Override
+    public void unapply(IViewportStack stack) {
+        if (isMoving()) {
+            stack.popViewport();
+            stack.shiftX(-this.movingArea.x + getArea().x);
+            stack.shiftY(-this.movingArea.y + getArea().y);
+        }
     }
 }

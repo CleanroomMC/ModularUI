@@ -42,7 +42,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     private ModularScreen screen;
     private final LinkedList<LocatedWidget> hovering = new LinkedList<>();
     private final List<Interactable> acceptedInteractions = new ArrayList<>();
-    private int lastMouseX, lastMouseY;
     private boolean isMouseButtonHeld = false, isKeyHeld = false;
     @Nullable
     private LocatedWidget lastPressed;
@@ -91,12 +90,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @Override
     public void onFrameUpdate() {
-        super.onFrameUpdate();
-        if (this.getContext().getAbsMouseX() != this.lastMouseX || this.getContext().getAbsMouseY() != this.lastMouseY) {
-            this.lastMouseX = this.getContext().getAbsMouseX();
-            this.lastMouseY = this.getContext().getAbsMouseY();
-            gatherWidgets();
-        }
+        // only updating hovered widgets when the mouse was moved is a bad idea
+        gatherWidgets();
     }
 
     @Override
@@ -122,7 +117,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
             @Override
             public IWidget peek() {
-                return isEmpty() ? null : ModularPanel.this.hovering.peekFirst().getWidget();
+                return isEmpty() ? null : ModularPanel.this.hovering.peekFirst().getElement();
             }
 
             @Override
@@ -134,7 +129,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         Stack<IViewport> viewports = new Stack<>();
         viewports.push(this);
         apply(getContext());
-        getWidgetsAt(viewports, widgetList, this.lastMouseX, this.lastMouseY);
+        getWidgetsAt(viewports, widgetList, getContext().getAbsMouseX(), getContext().getAbsMouseY());
         unapply(getContext());
         viewports.pop();
         getContext().reset();
@@ -171,14 +166,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         this.screen = null;
     }
 
-    @Override
-    public void markDirty() {
-        super.markDirty();
-        // it is important to not clear the hovered list here
-        this.lastMouseX = -1;
-        this.lastMouseY = -1;
-    }
-
     @ApiStatus.OverrideOnly
     public boolean onMousePressed(int mouseButton) {
         if (!isValid()) return false;
@@ -194,14 +181,14 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             loop:
             for (LocatedWidget widget : this.hovering) {
                 widget.applyViewports(getContext());
-                if (getContext().onHoveredClick(mouseButton, widget.getWidget())) {
+                if (getContext().onHoveredClick(mouseButton, widget)) {
                     pressed = LocatedWidget.EMPTY;
                     result = true;
                     widget.unapplyViewports(getContext());
                     break;
                 }
-                if (widget.getWidget() instanceof Interactable) {
-                    Interactable interactable = (Interactable) widget.getWidget();
+                if (widget.getElement() instanceof Interactable) {
+                    Interactable interactable = (Interactable) widget.getElement();
                     switch (interactable.onMousePressed(mouseButton)) {
                         case IGNORE:
                             break;
@@ -234,14 +221,14 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             }
         }
 
-        if (result && pressed.getWidget() instanceof IFocusedWidget) {
+        if (result && pressed.getElement() instanceof IFocusedWidget) {
             getContext().focus(pressed, true);
         } else {
             getContext().focus(null);
         }
         if (!this.isKeyHeld && !this.isMouseButtonHeld) {
             this.lastPressed = pressed;
-            if (this.lastPressed.getWidget() != null) {
+            if (this.lastPressed.getElement() != null) {
                 this.timePressed = Minecraft.getSystemTime();
             }
             this.lastMouseButton = mouseButton;
@@ -259,8 +246,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         boolean result = false;
         boolean tryTap = mouseButton == this.lastMouseButton && Minecraft.getSystemTime() - this.timePressed < tapTime;
         for (LocatedWidget widget : this.hovering) {
-            if (widget.getWidget() instanceof Interactable) {
-                Interactable interactable = (Interactable) widget.getWidget();
+            if (widget.getElement() instanceof Interactable) {
+                Interactable interactable = (Interactable) widget.getElement();
                 widget.applyViewports(getContext());
                 if (interactable.onMouseRelease(mouseButton)) {
                     result = true;
@@ -305,8 +292,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         boolean result = false;
         loop:
         for (LocatedWidget widget : this.hovering) {
-            if (widget.getWidget() instanceof Interactable) {
-                Interactable interactable = (Interactable) widget.getWidget();
+            if (widget.getElement() instanceof Interactable) {
+                Interactable interactable = (Interactable) widget.getElement();
                 widget.applyViewports(getContext());
                 switch (interactable.onKeyPressed(typedChar, keyCode)) {
                     case IGNORE:
@@ -357,8 +344,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         boolean result = false;
         boolean tryTap = keyCode == this.lastMouseButton && Minecraft.getSystemTime() - this.timePressed < tapTime;
         for (LocatedWidget widget : this.hovering) {
-            if (widget.getWidget() instanceof Interactable) {
-                Interactable interactable = (Interactable) widget.getWidget();
+            if (widget.getElement() instanceof Interactable) {
+                Interactable interactable = (Interactable) widget.getElement();
                 widget.applyViewports(getContext());
                 if (interactable.onKeyRelease(typedChar, keyCode)) {
                     result = true;
@@ -391,8 +378,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         }
         if (this.hovering.isEmpty()) return false;
         for (LocatedWidget widget : this.hovering) {
-            if (widget.getWidget() instanceof Interactable) {
-                Interactable interactable = (Interactable) widget.getWidget();
+            if (widget.getElement() instanceof Interactable) {
+                Interactable interactable = (Interactable) widget.getElement();
                 widget.applyViewports(getContext());
                 boolean result = interactable.onMouseScroll(scrollDirection, amount);
                 widget.unapplyViewports(getContext());
@@ -415,8 +402,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     private <T, W extends IWidget & IFocusedWidget & Interactable> T interactFocused(Function<W, T> function, T defaultValue) {
         LocatedWidget focused = this.getContext().getFocusedWidget();
         T result = defaultValue;
-        if (focused.getWidget() instanceof Interactable) {
-            Interactable interactable = (Interactable) focused.getWidget();
+        if (focused.getElement() instanceof Interactable) {
+            Interactable interactable = (Interactable) focused.getElement();
             focused.applyViewports(getContext());
             result = function.apply((W) interactable);
             focused.unapplyViewports(getContext());
@@ -470,13 +457,13 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @Nullable
     public IWidget getTopHovering() {
         LocatedWidget lw = getTopHoveringLocated();
-        return lw == null ? null : lw.getWidget();
+        return lw == null ? null : lw.getElement();
     }
 
     @Nullable
     public LocatedWidget getTopHoveringLocated() {
         for (LocatedWidget widget : hovering) {
-            if (widget.getWidget().canHover()) {
+            if (widget.getElement().canHover()) {
                 return widget;
             }
         }

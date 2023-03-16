@@ -72,15 +72,15 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
     }
 
     @Override
+    public void getWidgetsBeforeApply(Stack<IViewport> viewports, IWidgetList widgets, int x, int y) {
+        if (getArea().isInside(x, y)) {
+            widgets.add(this, viewports);
+        }
+    }
+
+    @Override
     public void getWidgetsAt(Stack<IViewport> viewports, IWidgetList widgets, int x, int y) {
-        if (!getArea().isInside(x, y)) {
-            return;
-        }
-        widgets.add(this, viewports);
-        if (getScrollArea().isInsideScrollbarArea(x, y)) {
-            return;
-        }
-        if (hasChildren()) {
+        if (getArea().isInside(x, y) && !getScrollArea().isInsideScrollbarArea(x, y) && hasChildren()) {
             IViewport.getChildrenAt(this, viewports, widgets, x, y);
         }
     }
@@ -107,12 +107,7 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
 
     @Override
     public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
-        if (this.scroll.mouseScroll(getContext())) {
-            // invalidate hovered widgets
-            getPanel().markDirty();
-            return true;
-        }
-        return false;
+        return this.scroll.mouseScroll(getContext());
     }
 
     @Override
@@ -127,16 +122,20 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
     }
 
     @Override
-    public void preDraw(GuiContext context) {
-        GuiDraw.scissorTransformed(this.scroll.x + this.scroll.getPadding().left,
-                this.scroll.y + this.scroll.getPadding().top,
-                this.scroll.width - this.scroll.getPadding().horizontal(),
-                this.scroll.height - this.scroll.getPadding().vertical(), context);
+    public void preDraw(GuiContext context, boolean transformed) {
+        if (!transformed) {
+            GuiDraw.scissor(this.scroll.x + this.scroll.getPadding().left,
+                    this.scroll.y + this.scroll.getPadding().top,
+                    this.scroll.width - this.scroll.getPadding().horizontal(),
+                    this.scroll.height - this.scroll.getPadding().vertical(), getContext());
+        }
     }
 
     @Override
-    public void postDraw(GuiContext context) {
-        GuiDraw.unscissor(context);
-        this.scroll.drawScrollbar();
+    public void postDraw(GuiContext context, boolean transformed) {
+        if (!transformed) {
+            GuiDraw.unscissor(context);
+            this.scroll.drawScrollbar();
+        }
     }
 }

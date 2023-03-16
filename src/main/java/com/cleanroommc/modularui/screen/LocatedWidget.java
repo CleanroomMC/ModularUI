@@ -1,14 +1,13 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.api.layout.IViewport;
-import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IWidget;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class LocatedWidget {
+public class LocatedWidget extends LocatedElement<IWidget> {
 
     public static LocatedWidget of(IWidget widget) {
         if (widget == null) {
@@ -30,32 +29,11 @@ public class LocatedWidget {
 
     public static final LocatedWidget EMPTY = new LocatedWidget(null, Collections.emptyList(), false);
 
-    private final IWidget widget;
-    private final List<IViewport> viewports;
-
-    public LocatedWidget(IWidget widget, List<IViewport> viewports) {
-        this.widget = widget;
-        this.viewports = new ArrayList<>(viewports);
+    public LocatedWidget(IWidget element, List<IViewport> viewports) {
+        super(element, viewports);
     }
 
-    private LocatedWidget(IWidget widget, List<IViewport> viewports, boolean copy) {
-        this.widget = widget;
-        this.viewports = viewports;
-    }
-
-    public void applyViewports(IViewportStack viewportStack) {
-        for (IViewport viewport : viewports) {
-            viewport.apply(viewportStack);
-        }
-    }
-
-    public void unapplyViewports(IViewportStack viewportStack) {
-        for (IViewport viewport : viewports) {
-            viewport.unapply(viewportStack);
-        }
-    }
-
-    public IWidget getWidget() {
-        return widget;
+    LocatedWidget(IWidget element, List<IViewport> viewports, boolean copy) {
+        super(element, viewports, copy);
     }
 }

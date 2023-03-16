@@ -73,9 +73,10 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
         }
     }
 
+    // TODO
     @Override
-    public void preDraw(GuiContext context) {
-        super.preDraw(context);
+    public void preDraw(GuiContext context, boolean transformed) {
+        super.preDraw(context, transformed);
         drawText(context);
     }
 

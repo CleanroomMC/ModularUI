@@ -20,6 +20,7 @@ public interface IViewportStack {
 
     /**
      * Pushes a new viewport
+     *
      * @param area area of the viewport
      */
     void pushViewport(Area area);
@@ -59,11 +60,31 @@ public interface IViewportStack {
      */
     int localY(int y);
 
+    /**
+     * Applies a shift transformation in x
+     *
+     * @param x shift amount in x
+     */
     void shiftX(int x);
 
+    /**
+     * Applies a shift transformation in y
+     *
+     * @param y shift amount in y
+     */
     void shiftY(int y);
 
+    /**
+     * Applies the active transformation to open gl
+     */
     default void applyToOpenGl() {
         GlStateManager.translate(-getShiftX(), -getShiftY(), 0);
+    }
+
+    /**
+     * Removes the active transformation to open gl
+     */
+    default void unapplyToOpenGl() {
+        GlStateManager.translate(getShiftX(), getShiftY(), 0);
     }
 }

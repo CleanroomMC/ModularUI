@@ -200,7 +200,7 @@ public class GuiScreenWrapper extends GuiContainer {
         lineY -= 11;
         LocatedWidget locatedHovered = this.screen.getWindowManager().getTopWidgetLocated();
         if (locatedHovered != null) {
-            IGuiElement hovered = locatedHovered.getWidget();
+            IGuiElement hovered = locatedHovered.getElement();
             locatedHovered.applyViewports(context);
 
             Area area = hovered.getArea();

@@ -108,13 +108,13 @@ public class WidgetTree {
         if (!parent.isEnabled() && !ignoreEnabled) return;
 
         GlStateManager.pushMatrix();
-        Area viewport = context.getViewport();
+        Area screen = context.getViewport();
         int alpha = 1;//getWindow().getAlpha();
         float scale = 1;//getWindow().getScale();
         float sf = 1 / scale;
         // translate to center according to scale
-        float x = parent.getArea().x;//(viewport.x + viewport.w / 2f * (1 - scale) + (parent.getArea().x - viewport.x) * scale) * sf;
-        float y = parent.getArea().y;//(viewport.y + viewport.h / 2f * (1 - scale) + (parent.getArea().y - viewport.y) * scale) * sf;
+        float x = parent.getArea().x;//(screen.x + screen.w / 2f * (1 - scale) + (parent.getArea().x - screen.x) * scale) * sf;
+        float y = parent.getArea().y;//(screen.y + screen.h / 2f * (1 - scale) + (parent.getArea().y - screen.y) * scale) * sf;
         GlStateManager.translate(x, y, 0);
         GlStateManager.color(1, 1, 1, alpha);
         GlStateManager.enableBlend();
@@ -122,9 +122,14 @@ public class WidgetTree {
         parent.drawBackground(partialTicks);
         parent.draw(partialTicks);
 
-        if (parent instanceof IViewport) {
-            ((IViewport) parent).apply(context);
-            ((IViewport) parent).preDraw(context);
+        IViewport viewport = parent instanceof IViewport ? (IViewport) parent : null;
+        if (viewport != null) {
+            viewport.preDraw(context, false);
+            context.unapplyToOpenGl();
+            viewport.apply(context);
+            // update open gl transformation
+            context.applyToOpenGl();
+            viewport.preDraw(context, true);
         }
         GlStateManager.popMatrix();
 
@@ -132,13 +137,18 @@ public class WidgetTree {
         if (!children.isEmpty()) {
             children.forEach(widget -> drawTree(widget, context, false, partialTicks));
         }
-        if (parent instanceof IViewport) {
-            ((IViewport) parent).unapply(context);
+        if (viewport != null) {
             GlStateManager.pushMatrix();
             GlStateManager.translate(x, y, 0);
             GlStateManager.color(1, 1, 1, alpha);
             GlStateManager.enableBlend();
-            ((IViewport) parent).postDraw(context);
+            context.applyToOpenGl();
+            viewport.postDraw(context, true);
+            context.unapplyToOpenGl();
+            viewport.unapply(context);
+            // update open gl transformation
+            context.applyToOpenGl();
+            viewport.postDraw(context, false);
             GlStateManager.popMatrix();
         }
     }

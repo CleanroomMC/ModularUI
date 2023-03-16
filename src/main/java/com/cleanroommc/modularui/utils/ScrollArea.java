@@ -200,23 +200,5 @@ public class ScrollArea extends Area {
         if (this.scrollY != null) {
             this.scrollY.drawScrollbar(this);
         }
-        /*if (this.scrollY != null && this.scrollX != null) {
-            int x, y, rx, ry;
-            if (this.scrollX.opposite) {
-                x = 0;
-                rx = this.scrollX.getScrollbarThickness();
-            } else {
-                x = this.width - this.scrollX.getScrollbarThickness();
-                rx = this.width;
-            }
-            if (this.scrollY.opposite) {
-                y = 0;
-                ry = this.scrollY.getScrollbarThickness();
-            } else {
-                y = this.height - this.scrollY.getScrollbarThickness();
-                ry = this.height;
-            }
-            GuiDraw.drawRect(x, y, rx, ry, Color.RED.normal);
-        }*/
     }
 }

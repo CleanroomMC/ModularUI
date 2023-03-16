@@ -64,14 +64,16 @@ public class SortableListWidget<T, I extends SortableListWidget.Item<T>> extends
             throw new IllegalArgumentException();
         }
         ((Item<T>) child).listWidget = this;
-        boolean result = super.addChild(child, index);
-        if (result) {
+        if (super.addChild(child, index)) {
             if (isValid()) {
                 assignIndexes();
-                this.onChange.accept(getValues());
+                if (this.onChange != null) {
+                    this.onChange.accept(getValues());
+                }
             }
+            return true;
         }
-        return result;
+        return false;
     }
 
     public void moveTo(int from, int to) {

@@ -19,6 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class TestGui extends ModularScreen {
 
@@ -40,7 +42,7 @@ public class TestGui extends ModularScreen {
     @Override
     public ModularPanel buildUI(GuiContext context) {
         if (lines == null) {
-            lines = Arrays.asList("Option 1", "Option 2", "Option 3", "Option 4", "Option 5", "Option 6", "Option 7", "Option 8", "Option 9");
+            lines = IntStream.range(0, 20).mapToObj(i -> "Option " + (i + 1)).collect(Collectors.toList());
             configuredOptions = lines;
             availableElements = new Object2ObjectOpenHashMap<>();
         }
@@ -85,15 +87,18 @@ public class TestGui extends ModularScreen {
                 s -> new SortableListWidget.Item<>(s, new SimpleWidget()
                         .background(GuiTextures.BUTTON, IKey.str(s).color(Color.WHITE.normal).shadow(true))
                         .left(0).right(10))
-                        .removeable());
+                        .removeable()).debugName("sortable list");
         ref.set(sortableListWidget);
         panel.child(sortableListWidget
-                .onChange(list -> {
+                .onRemove(stringItem -> {
+                    this.availableElements.get(stringItem.getValue()).available = true;
+                })
+                /*.onChange(list -> {
                     this.configuredOptions = list;
                     for (String value : this.lines) {
                         this.availableElements.get(value).available = !list.contains(value);
                     }
-                })
+                })*/
                 .pos(10, 10)
                 .bottom(23)
                 .width(100));
@@ -115,7 +120,7 @@ public class TestGui extends ModularScreen {
                                 .child(new Grid()
                                         .matrix(availableMatrix)
                                         .scrollable()
-                                        .pos(7, 7).right(7).bottom(7)));
+                                        .pos(7, 7).right(7).bottom(7).debugName("available list")));
                     }
                     return true;
                 }));

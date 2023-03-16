@@ -13,6 +13,7 @@ import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
@@ -31,7 +32,7 @@ public class GuiContext extends GuiViewportStack {
     private int timeHovered = 0;
     private final HoveredIterable hoveredWidgets;
 
-    private IDraggable draggable;
+    private LocatedElement<IDraggable> draggable;
     private int lastButton = -1;
     private long lastClickTime = 0;
     private int lastDragX, lastDragY;
@@ -95,14 +96,14 @@ public class GuiContext extends GuiViewportStack {
      * @return true if there is any focused widget
      */
     public boolean isFocused() {
-        return this.focusedWidget.getWidget() != null;
+        return this.focusedWidget.getElement() != null;
     }
 
     /**
      * @return true if there is any focused widget
      */
     public boolean isFocused(IFocusedWidget widget) {
-        return this.focusedWidget.getWidget() == widget;
+        return this.focusedWidget.getElement() == widget;
     }
 
     public LocatedWidget getFocusedWidget() {
@@ -129,16 +130,16 @@ public class GuiContext extends GuiViewportStack {
      * @param select true if the widget should also be selected (f.e. the text in a text field)
      */
     public void focus(@NotNull LocatedWidget widget, boolean select) {
-        if (this.focusedWidget.getWidget() == widget.getWidget()) {
+        if (this.focusedWidget.getElement() == widget.getElement()) {
             return;
         }
 
-        if (widget.getWidget() != null && !(widget.getWidget() instanceof IFocusedWidget)) {
+        if (widget.getElement() != null && !(widget.getElement() instanceof IFocusedWidget)) {
             throw new IllegalArgumentException();
         }
 
-        if (this.focusedWidget.getWidget() != null) {
-            IFocusedWidget focusedWidget = (IFocusedWidget) this.focusedWidget.getWidget();
+        if (this.focusedWidget.getElement() != null) {
+            IFocusedWidget focusedWidget = (IFocusedWidget) this.focusedWidget.getElement();
             focusedWidget.onRemoveFocus(this);
             this.screen.setFocused(false);
 
@@ -149,8 +150,8 @@ public class GuiContext extends GuiViewportStack {
 
         this.focusedWidget = widget;
 
-        if (this.focusedWidget.getWidget() != null) {
-            IFocusedWidget focusedWidget = (IFocusedWidget) this.focusedWidget.getWidget();
+        if (this.focusedWidget.getElement() != null) {
+            IFocusedWidget focusedWidget = (IFocusedWidget) this.focusedWidget.getElement();
             focusedWidget.onFocus(this);
             this.screen.setFocused(true);
 
@@ -253,11 +254,7 @@ public class GuiContext extends GuiViewportStack {
     @ApiStatus.Internal
     public boolean onMousePressed(int button) {
         if ((button == 0 || button == 1) && isMouseItemEmpty() && hasDraggable()) {
-            this.draggable.onDragEnd(this.draggable.canDropHere(getAbsMouseX(), getAbsMouseY(), this.hovered));
-            this.draggable.setMoving(false);
-            this.draggable = null;
-            this.lastButton = -1;
-            this.lastClickTime = 0;
+            dropDraggable();
             return true;
         }
         return false;
@@ -268,39 +265,49 @@ public class GuiContext extends GuiViewportStack {
         if (button == this.lastButton && isMouseItemEmpty() && hasDraggable()) {
             long time = Minecraft.getSystemTime();
             if (time - this.lastClickTime < 200) return false;
-            this.draggable.onDragEnd(this.draggable.canDropHere(getAbsMouseX(), getAbsMouseY(), this.hovered));
-            this.draggable.setMoving(false);
-            this.draggable = null;
-            this.lastButton = -1;
-            this.lastClickTime = 0;
+            dropDraggable();
             return true;
         }
         return false;
     }
 
+    private void dropDraggable() {
+        this.draggable.applyViewports(this);
+        this.draggable.getElement().onDragEnd(this.draggable.getElement().canDropHere(getAbsMouseX(), getAbsMouseY(), this.hovered));
+        this.draggable.getElement().setMoving(false);
+        this.draggable.unapplyViewports(this);
+        this.draggable = null;
+        this.lastButton = -1;
+        this.lastClickTime = 0;
+    }
+
     @ApiStatus.Internal
-    public boolean onHoveredClick(int button, IWidget hovered) {
+    public boolean onHoveredClick(int button, LocatedWidget hovered) {
         if ((button == 0 || button == 1) && isMouseItemEmpty() && !hasDraggable()) {
-            IDraggable draggable;
-            if (hovered instanceof IDraggable) {
-                draggable = (IDraggable) hovered;
-            } else if (hovered instanceof ModularPanel) {
-                ModularPanel panel = (ModularPanel) hovered;
+            IWidget widget = hovered.getElement();
+            LocatedElement<IDraggable> draggable;
+            if (widget instanceof IDraggable) {
+                draggable = new LocatedElement<>((IDraggable) widget, hovered.getViewports());
+            } else if (widget instanceof ModularPanel) {
+                ModularPanel panel = (ModularPanel) widget;
                 if (panel.isDraggable()) {
-                    draggable = new DraggablePanelWrapper(panel);
+                    draggable = new LocatedElement<>(new DraggablePanelWrapper(panel), Collections.emptyList());
                 } else {
                     return false;
                 }
             } else {
                 return false;
             }
-            if (draggable.onDragStart(button)) {
-                draggable.setMoving(true);
+            draggable.applyViewports(this);
+            if (draggable.getElement().onDragStart(button)) {
+                draggable.getElement().setMoving(true);
+                draggable.unapplyViewports(this);
                 this.draggable = draggable;
                 this.lastButton = button;
                 this.lastClickTime = Minecraft.getSystemTime();
                 return true;
             }
+            draggable.unapplyViewports(this);
         }
         return false;
     }
@@ -308,7 +315,11 @@ public class GuiContext extends GuiViewportStack {
     @ApiStatus.Internal
     public void drawDraggable() {
         if (hasDraggable()) {
-            this.draggable.drawMovingState(this.partialTicks);
+            this.draggable.applyViewports(this);
+            this.draggable.getElement().apply(this);
+            this.draggable.getElement().drawMovingState(this.partialTicks);
+            this.draggable.getElement().unapply(this);
+            this.draggable.unapplyViewports(this);
         }
     }
 
@@ -333,7 +344,9 @@ public class GuiContext extends GuiViewportStack {
         if (hasDraggable() && (this.lastDragX != this.mouseX || this.lastDragY != this.mouseY)) {
             this.lastDragX = this.mouseX;
             this.lastDragY = this.mouseY;
-            this.draggable.onDrag(this.lastButton, this.lastClickTime);
+            this.draggable.applyViewports(this);
+            this.draggable.getElement().onDrag(this.lastButton, this.lastClickTime);
+            this.draggable.unapplyViewports(this);
         }
         if (this.hovered != hovered) {
             if (this.hovered != null) {
@@ -500,7 +513,7 @@ public class GuiContext extends GuiViewportStack {
                     if (widgetIt == null || !widgetIt.hasNext()) {
                         widgetIt = panelIt.next().getHovering().iterator();
                     }
-                    return widgetIt.next().getWidget();
+                    return widgetIt.next().getElement();
                 }
             };
         }

@@ -56,7 +56,7 @@ public abstract class Widget<W extends Widget<W>> implements IWidget, IPositione
     @Override
     public void initialise(@NotNull IWidget parent) {
         if (this instanceof ModularPanel) {
-            getArea().z(1);
+            getArea().z(2);
         } else {
             this.parent = parent;
             this.panel = parent.getPanel();
@@ -77,6 +77,9 @@ public abstract class Widget<W extends Widget<W>> implements IWidget, IPositione
             for (IWidget child : getChildren()) {
                 child.initialise(this);
             }
+        }
+        if (getScreen().getMainPanel() == this) {
+            getArea().z(1);
         }
         afterInit();
     }
