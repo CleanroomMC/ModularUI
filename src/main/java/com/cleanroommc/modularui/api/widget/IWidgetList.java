@@ -11,4 +11,6 @@ public interface IWidgetList {
     IWidget peek();
 
     boolean isEmpty();
+
+    int size();
 }

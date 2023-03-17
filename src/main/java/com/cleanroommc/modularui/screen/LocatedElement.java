@@ -21,15 +21,23 @@ public class LocatedElement<T> {
         this.viewports = viewports;
     }
 
-    public void applyViewports(IViewportStack viewportStack) {
-        for (IViewport viewport : viewports) {
-            viewport.apply(viewportStack);
+    public void applyViewports(IViewportStack viewportStack, int context) {
+        applyViewports(viewportStack, context, 0);
+    }
+
+    public void applyViewports(IViewportStack viewportStack, int context, int start) {
+        for (int i = start, n = this.viewports.size(); i < n; i++) {
+            this.viewports.get(i).apply(viewportStack, context);
         }
     }
 
-    public void unapplyViewports(IViewportStack viewportStack) {
-        for (IViewport viewport : viewports) {
-            viewport.unapply(viewportStack);
+    public void unapplyViewports(IViewportStack viewportStack, int context) {
+        unapplyViewports(viewportStack, context, 0);
+    }
+
+    public void unapplyViewports(IViewportStack viewportStack, int context, int until) {
+        for (int i = this.viewports.size() - 1; i >= until; i--) {
+            this.viewports.get(i).unapply(viewportStack, context);
         }
     }
 

@@ -6,6 +6,8 @@ import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 
 public class ModularUIConfig {
 
+    public static boolean debug = false;
+
     public static int defaultScrollSpeed = 30;
     public static boolean smoothProgressBar = true;
 

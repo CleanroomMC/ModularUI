@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
-import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
 import java.util.ArrayList;
@@ -17,76 +16,80 @@ import java.util.Stack;
  */
 public class GuiViewportStack implements IViewportStack {
 
-    private final Stack<Area> viewportStack = new Stack<>();
+    private final Stack<IViewport> viewportStack = new Stack<>();
+    private final Stack<Area> viewportAreaStack = new Stack<>();
     private final List<Area> viewportAreas = new ArrayList<>();
     private int shiftX = 0;
     private int shiftY = 0;
-
-    public static GuiViewportStack fromElement(IWidget element) {
-        GuiViewportStack stack = new GuiViewportStack();
-
-        stack.applyFromElement(element);
-
-        return stack;
-    }
-
-    private void applyFromElement(IWidget element) {
-        List<IViewport> elements = new ArrayList<>();
-
-        while (element != null) {
-            if (element instanceof IViewport) {
-                elements.add((IViewport) element);
-            }
-
-            element = element.getParent();
-        }
-
-        for (int i = elements.size() - 1; i >= 0; i--) {
-            elements.get(i).apply(this);
-        }
-    }
 
     @Override
     public void reset() {
         this.shiftX = 0;
         this.shiftY = 0;
 
-        this.viewportStack.clear();
+        this.viewportAreaStack.clear();
     }
 
     @Override
     public Area getViewport() {
-        return this.viewportStack.peek();
+        return this.viewportAreaStack.peek();
     }
 
     @Override
-    public void pushViewport(Area area) {
-        if (this.viewportStack.isEmpty()) {
+    public void pushViewport(IViewport viewport, Area area) {
+        if (this.viewportAreaStack.isEmpty()) {
             Area child = this.getCurrentViewportArea();
 
             child.set(area);
-            this.viewportStack.push(child);
+            this.viewportAreaStack.push(child);
         } else {
-            Area current = this.viewportStack.peek();
+            Area current = this.viewportAreaStack.peek();
             Area child = this.getCurrentViewportArea();
 
             child.set(area);
             current.clamp(child);
-            this.viewportStack.push(child);
+            this.viewportAreaStack.push(child);
         }
+        this.viewportStack.push(viewport);
     }
 
     private Area getCurrentViewportArea() {
-        while (this.viewportAreas.size() < this.viewportStack.size() + 1) {
+        while (this.viewportAreas.size() < this.viewportAreaStack.size() + 1) {
             this.viewportAreas.add(new Area());
         }
 
-        return this.viewportAreas.get(this.viewportStack.size());
+        return this.viewportAreas.get(this.viewportAreaStack.size());
     }
 
     @Override
-    public void popViewport() {
+    public void popViewport(IViewport viewport) {
+        if (this.viewportStack.peek() != viewport) {
+            throw new IllegalStateException("Viewports must be popped in reverse order they were pushed. Tried to pop '" + viewport + "', but last pushed is '" + this.viewportStack.peek() + "'.");
+        }
         this.viewportStack.pop();
+        this.viewportAreaStack.pop();
+    }
+
+    @Override
+    public int getCurrentViewportIndex() {
+        return this.viewportStack.size();
+    }
+
+    @Override
+    public void popUntilIndex(int index) {
+        for (int i = this.viewportStack.size() - 1; i > index; i--) {
+            this.viewportStack.pop();
+            this.viewportAreaStack.pop();
+        }
+    }
+
+    @Override
+    public void popUntilViewport(IViewport viewport) {
+        int i = this.viewportStack.size();
+        while (--i >= 0 && this.viewportStack.peek() != viewport) {
+            this.viewportStack.pop();
+            this.viewportAreaStack.pop();
+        }
     }
 
     @Override
@@ -135,8 +138,8 @@ public class GuiViewportStack implements IViewportStack {
     public void shiftX(int x) {
         this.shiftX += x;
 
-        if (!this.viewportStack.isEmpty()) {
-            this.viewportStack.peek().x += x;
+        if (!this.viewportAreaStack.isEmpty()) {
+            this.viewportAreaStack.peek().x += x;
         }
     }
 
@@ -144,8 +147,8 @@ public class GuiViewportStack implements IViewportStack {
     public void shiftY(int y) {
         this.shiftY += y;
 
-        if (!this.viewportStack.isEmpty()) {
-            this.viewportStack.peek().y += y;
+        if (!this.viewportAreaStack.isEmpty()) {
+            this.viewportAreaStack.peek().y += y;
         }
     }
 }

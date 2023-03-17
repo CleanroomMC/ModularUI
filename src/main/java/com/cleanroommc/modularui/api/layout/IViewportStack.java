@@ -21,14 +21,21 @@ public interface IViewportStack {
     /**
      * Pushes a new viewport
      *
-     * @param area area of the viewport
+     * @param viewport viewport
+     * @param area     area of the viewport
      */
-    void pushViewport(Area area);
+    void pushViewport(IViewport viewport, Area area);
 
     /**
      * Pops the current viewport from the stack
      */
-    void popViewport();
+    void popViewport(IViewport viewport);
+
+    int getCurrentViewportIndex();
+
+    void popUntilIndex(int index);
+
+    void popUntilViewport(IViewport viewport);
 
     /**
      * The current total shift in x

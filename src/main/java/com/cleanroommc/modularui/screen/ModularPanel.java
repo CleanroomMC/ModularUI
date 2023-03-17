@@ -1,5 +1,7 @@
 package com.cleanroommc.modularui.screen;
 
+import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IFocusedWidget;
@@ -124,15 +126,24 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             public boolean isEmpty() {
                 return ModularPanel.this.hovering.isEmpty();
             }
+
+            @Override
+            public int size() {
+                return ModularPanel.this.hovering.size();
+            }
         };
+        if (ModularUIConfig.debug) {
+            ModularUI.LOGGER.info("Start collecting widgets");
+        }
         getContext().reset();
         Stack<IViewport> viewports = new Stack<>();
         viewports.push(this);
-        apply(getContext());
+        apply(getContext(), IViewport.COLLECT_WIDGETS);
         getWidgetsAt(viewports, widgetList, getContext().getAbsMouseX(), getContext().getAbsMouseY());
-        unapply(getContext());
+        unapply(getContext(), IViewport.COLLECT_WIDGETS);
         viewports.pop();
         getContext().reset();
+        ModularUIConfig.debug = false;
     }
 
     protected void validateName() {
@@ -178,15 +189,10 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 result = true;
             }
         } else {
+            int flag = IViewport.INTERACTION | IViewport.MOUSE | IViewport.PRESSED;
             loop:
             for (LocatedWidget widget : this.hovering) {
-                widget.applyViewports(getContext());
-                if (getContext().onHoveredClick(mouseButton, widget)) {
-                    pressed = LocatedWidget.EMPTY;
-                    result = true;
-                    widget.unapplyViewports(getContext());
-                    break;
-                }
+                widget.applyViewports(getContext(), flag);
                 if (widget.getElement() instanceof Interactable) {
                     Interactable interactable = (Interactable) widget.getElement();
                     switch (interactable.onMousePressed(mouseButton)) {
@@ -203,7 +209,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                         case STOP: {
                             pressed = LocatedWidget.EMPTY;
                             result = true;
-                            widget.unapplyViewports(getContext());
+                            widget.unapplyViewports(getContext(), flag);
                             break loop;
                         }
                         case SUCCESS: {
@@ -212,12 +218,18 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                             }
                             pressed = widget;
                             result = true;
-                            widget.unapplyViewports(getContext());
+                            widget.unapplyViewports(getContext(), flag);
                             break loop;
                         }
                     }
                 }
-                widget.unapplyViewports(getContext());
+                if (getContext().onHoveredClick(mouseButton, widget)) {
+                    pressed = LocatedWidget.EMPTY;
+                    result = true;
+                    widget.unapplyViewports(getContext(), flag | IViewport.DRAGGABLE | IViewport.START_DRAGGING);
+                    break;
+                }
+                widget.unapplyViewports(getContext(), flag);
             }
         }
 
@@ -234,13 +246,14 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             this.lastMouseButton = mouseButton;
             this.isMouseButtonHeld = true;
         }
-        return !this.hovering.isEmpty();
+        return result;
     }
 
     @ApiStatus.OverrideOnly
     public boolean onMouseRelease(int mouseButton) {
         if (!isValid() || !isEnabled()) return false;
-        if (interactFocused(widget -> widget.onMouseRelease(mouseButton), false)) {
+        int flag = IViewport.INTERACTION | IViewport.MOUSE | IViewport.RELEASED;
+        if (interactFocused(widget -> widget.onMouseRelease(mouseButton), false, flag)) {
             return true;
         }
         boolean result = false;
@@ -248,10 +261,10 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         for (LocatedWidget widget : this.hovering) {
             if (widget.getElement() instanceof Interactable) {
                 Interactable interactable = (Interactable) widget.getElement();
-                widget.applyViewports(getContext());
+                widget.applyViewports(getContext(), flag);
                 if (interactable.onMouseRelease(mouseButton)) {
                     result = true;
-                    widget.unapplyViewports(getContext());
+                    widget.unapplyViewports(getContext(), flag);
                     break;
                 }
                 if (tryTap && this.acceptedInteractions.remove(interactable)) {
@@ -262,20 +275,21 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                             tryTap = false;
                     }
                 }
-                widget.unapplyViewports(getContext());
+                widget.unapplyViewports(getContext(), flag);
             }
         }
         this.acceptedInteractions.clear();
         this.lastMouseButton = -1;
         this.timePressed = 0;
         this.isMouseButtonHeld = false;
-        return !this.hovering.isEmpty();
+        return result;
     }
 
     @ApiStatus.OverrideOnly
     public boolean onKeyPressed(char typedChar, int keyCode) {
         if (!isValid()) return false;
-        switch (interactFocused(widget -> widget.onKeyPressed(typedChar, keyCode), Interactable.Result.IGNORE)) {
+        int flag = IViewport.INTERACTION | IViewport.KEY | IViewport.PRESSED;
+        switch (interactFocused(widget -> widget.onKeyPressed(typedChar, keyCode), Interactable.Result.IGNORE, flag)) {
             case STOP:
             case SUCCESS:
                 if (!this.isKeyHeld && !this.isMouseButtonHeld) {
@@ -294,7 +308,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         for (LocatedWidget widget : this.hovering) {
             if (widget.getElement() instanceof Interactable) {
                 Interactable interactable = (Interactable) widget.getElement();
-                widget.applyViewports(getContext());
+                widget.applyViewports(getContext(), flag);
                 switch (interactable.onKeyPressed(typedChar, keyCode)) {
                     case IGNORE:
                         break;
@@ -309,7 +323,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                     case STOP: {
                         pressed = null;
                         result = true;
-                        widget.unapplyViewports(getContext());
+                        widget.unapplyViewports(getContext(), flag);
                         break loop;
                     }
                     case SUCCESS: {
@@ -318,7 +332,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                         }
                         pressed = widget;
                         result = true;
-                        widget.unapplyViewports(getContext());
+                        widget.unapplyViewports(getContext(), flag);
                         break loop;
                     }
                 }
@@ -332,13 +346,14 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             this.lastMouseButton = keyCode;
             this.isKeyHeld = true;
         }
-        return !this.hovering.isEmpty();
+        return result;
     }
 
     @ApiStatus.OverrideOnly
     public boolean onKeyRelease(char typedChar, int keyCode) {
         if (!isValid()) return false;
-        if (interactFocused(widget -> widget.onKeyRelease(typedChar, keyCode), false)) {
+        int flag = IViewport.INTERACTION | IViewport.KEY | IViewport.RELEASED;
+        if (interactFocused(widget -> widget.onKeyRelease(typedChar, keyCode), false, flag)) {
             return true;
         }
         boolean result = false;
@@ -346,10 +361,10 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         for (LocatedWidget widget : this.hovering) {
             if (widget.getElement() instanceof Interactable) {
                 Interactable interactable = (Interactable) widget.getElement();
-                widget.applyViewports(getContext());
+                widget.applyViewports(getContext(), flag);
                 if (interactable.onKeyRelease(typedChar, keyCode)) {
                     result = true;
-                    widget.unapplyViewports(getContext());
+                    widget.unapplyViewports(getContext(), flag);
                     break;
                 }
                 if (tryTap && this.acceptedInteractions.remove(interactable)) {
@@ -360,29 +375,30 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                             tryTap = false;
                     }
                 }
-                widget.unapplyViewports(getContext());
+                widget.unapplyViewports(getContext(), flag);
             }
         }
         this.acceptedInteractions.clear();
         this.lastMouseButton = -1;
         this.timePressed = 0;
         this.isKeyHeld = false;
-        return !this.hovering.isEmpty();
+        return result;
     }
 
     @ApiStatus.OverrideOnly
     public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
         if (!isValid()) return false;
-        if (interactFocused(widget -> widget.onMouseScroll(scrollDirection, amount), false)) {
+        int flag = IViewport.INTERACTION | IViewport.MOUSE | IViewport.SCROLL;
+        if (interactFocused(widget -> widget.onMouseScroll(scrollDirection, amount), false, flag)) {
             return true;
         }
         if (this.hovering.isEmpty()) return false;
         for (LocatedWidget widget : this.hovering) {
             if (widget.getElement() instanceof Interactable) {
                 Interactable interactable = (Interactable) widget.getElement();
-                widget.applyViewports(getContext());
+                widget.applyViewports(getContext(), flag);
                 boolean result = interactable.onMouseScroll(scrollDirection, amount);
-                widget.unapplyViewports(getContext());
+                widget.unapplyViewports(getContext(), flag);
                 if (result) return true;
             }
         }
@@ -399,14 +415,14 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return false;
     }
 
-    private <T, W extends IWidget & IFocusedWidget & Interactable> T interactFocused(Function<W, T> function, T defaultValue) {
+    private <T, W extends IWidget & IFocusedWidget & Interactable> T interactFocused(Function<W, T> function, T defaultValue, int context) {
         LocatedWidget focused = this.getContext().getFocusedWidget();
         T result = defaultValue;
         if (focused.getElement() instanceof Interactable) {
             Interactable interactable = (Interactable) focused.getElement();
-            focused.applyViewports(getContext());
+            focused.applyViewports(getContext(), context);
             result = function.apply((W) interactable);
-            focused.unapplyViewports(getContext());
+            focused.unapplyViewports(getContext(), context);
         }
         return result;
     }
@@ -471,13 +487,13 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     @Override
-    public void apply(IViewportStack stack) {
-        stack.pushViewport(getArea());
+    public void apply(IViewportStack stack, int context) {
+        stack.pushViewport(this, getArea());
     }
 
     @Override
-    public void unapply(IViewportStack stack) {
-        stack.popViewport();
+    public void unapply(IViewportStack stack, int context) {
+        stack.popViewport(this);
     }
 
     public ModularPanel bindPlayerInventory() {

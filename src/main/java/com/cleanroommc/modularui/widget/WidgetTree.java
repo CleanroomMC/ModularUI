@@ -126,7 +126,7 @@ public class WidgetTree {
         if (viewport != null) {
             viewport.preDraw(context, false);
             context.unapplyToOpenGl();
-            viewport.apply(context);
+            viewport.apply(context, IViewport.DRAWING | IViewport.PRE_DRAW);
             // update open gl transformation
             context.applyToOpenGl();
             viewport.preDraw(context, true);
@@ -145,7 +145,7 @@ public class WidgetTree {
             context.applyToOpenGl();
             viewport.postDraw(context, true);
             context.unapplyToOpenGl();
-            viewport.unapply(context);
+            viewport.unapply(context, IViewport.DRAWING | IViewport.POST_DRAW);
             // update open gl transformation
             context.applyToOpenGl();
             viewport.postDraw(context, false);

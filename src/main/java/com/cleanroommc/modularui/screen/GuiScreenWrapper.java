@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.GuiErrorHandler;
 import com.cleanroommc.modularui.ModularUIConfig;
+import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
@@ -201,7 +202,7 @@ public class GuiScreenWrapper extends GuiContainer {
         LocatedWidget locatedHovered = this.screen.getWindowManager().getTopWidgetLocated();
         if (locatedHovered != null) {
             IGuiElement hovered = locatedHovered.getElement();
-            locatedHovered.applyViewports(context);
+            locatedHovered.applyViewports(context, IViewport.DRAWING | IViewport.DEBUG);
 
             Area area = hovered.getArea();
             IGuiElement parent = hovered.getParent();
@@ -219,7 +220,7 @@ public class GuiScreenWrapper extends GuiContainer {
                 lineY -= 11;
             }
             GuiDraw.drawText("Class: " + hovered, 5, lineY, 1, color, false);
-            locatedHovered.unapplyViewports(context);
+            locatedHovered.unapplyViewports(context, IViewport.DRAWING | IViewport.DEBUG);
         }
         color = Color.withAlpha(color, 25);
         for (int i = 5; i < screenW; i += 5) {
@@ -294,6 +295,10 @@ public class GuiScreenWrapper extends GuiContainer {
 
         if (state) {
             this.lastChar = c0;
+            if (key == Keyboard.KEY_J) {
+                ModularUIConfig.debug = true;
+                return;
+            }
             if (this.screen.onKeyPressed(c0, key)) return;
             keyTyped(c0, key);
         } else {

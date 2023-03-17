@@ -82,16 +82,16 @@ public class DragHandle extends Widget<DragHandle> implements IDraggable {
     }
 
     @Override
-    public void apply(IViewportStack stack) {
+    public void apply(IViewportStack stack, int context) {
         if (this.parentDraggable != null) {
-            this.parentDraggable.apply(stack);
+            this.parentDraggable.apply(stack, context);
         }
     }
 
     @Override
-    public void unapply(IViewportStack stack) {
+    public void unapply(IViewportStack stack, int context) {
         if (this.parentDraggable != null) {
-            this.parentDraggable.unapply(stack);
+            this.parentDraggable.unapply(stack, context);
         }
     }
 

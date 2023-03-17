@@ -208,4 +208,13 @@ public class WindowManager {
     public boolean isClosed() {
         return closed;
     }
+
+    public boolean isAboutToClose(ModularPanel panel) {
+        for (ModularPanel panel1 : this.queueClosePanels) {
+            if (panel == panel1) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

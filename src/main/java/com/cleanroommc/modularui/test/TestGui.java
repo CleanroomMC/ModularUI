@@ -105,7 +105,7 @@ public class TestGui extends ModularScreen {
         panel.child(new ButtonWidget<>()
                 .bottom(7).size(12, 12).left(0.5f)
                 .background(GuiTextures.BUTTON, GuiTextures.ADD)
-                .onMousePressed(mouseButton -> {
+                .onMouseTapped(mouseButton -> {
                     if (!isPanelOpen("Option Selection")) {
                         ModularPanel panel1 = ModularPanel.defaultPanel(context, 150, 120).name("Option Selection");
                         openPanel(panel1
@@ -120,7 +120,7 @@ public class TestGui extends ModularScreen {
                                 .child(new Grid()
                                         .matrix(availableMatrix)
                                         .scrollable()
-                                        .pos(7, 7).right(7).bottom(7).debugName("available list")));
+                                        .pos(7, 7).right(14).bottom(7).debugName("available list")));
                     }
                     return true;
                 }));

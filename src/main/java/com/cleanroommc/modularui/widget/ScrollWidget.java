@@ -48,8 +48,8 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
     }
 
     @Override
-    public void apply(IViewportStack stack) {
-        stack.pushViewport(getArea());
+    public void apply(IViewportStack stack, int context) {
+        stack.pushViewport(this, getArea());
 
         if (this.scroll.getScrollX() != null) {
             stack.shiftX(this.scroll.getScrollX().scroll);
@@ -60,7 +60,7 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
     }
 
     @Override
-    public void unapply(IViewportStack stack) {
+    public void unapply(IViewportStack stack, int context) {
         if (this.scroll.getScrollX() != null) {
             stack.shiftX(-this.scroll.getScrollX().scroll);
         }
@@ -68,7 +68,7 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
             stack.shiftY(-this.scroll.getScrollY().scroll);
         }
 
-        stack.popViewport();
+        stack.popViewport(this);
     }
 
     @Override

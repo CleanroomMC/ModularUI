@@ -56,16 +56,16 @@ public interface IDraggable extends IViewport {
 
 
     @Override
-    default void apply(IViewportStack stack) {
+    default void apply(IViewportStack stack, int context) {
         if (isMoving()) {
-            stack.pushViewport(getMovingArea());
+            stack.pushViewport(this, getMovingArea());
         }
     }
 
     @Override
-    default void unapply(IViewportStack stack) {
+    default void unapply(IViewportStack stack, int context) {
         if (isMoving()) {
-            stack.popViewport();
+            stack.popViewport(this);
         }
     }
 

@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
 import net.minecraft.client.Minecraft;
@@ -32,7 +33,7 @@ public class GuiContext extends GuiViewportStack {
     private int timeHovered = 0;
     private final HoveredIterable hoveredWidgets;
 
-    private LocatedElement<IDraggable> draggable;
+    private LocatedElement<IDraggable> draggable, queuedDraggable;
     private int lastButton = -1;
     private long lastClickTime = 0;
     private int lastDragX, lastDragY;
@@ -272,10 +273,10 @@ public class GuiContext extends GuiViewportStack {
     }
 
     private void dropDraggable() {
-        this.draggable.applyViewports(this);
+        this.draggable.applyViewports(this, IViewport.INTERACTION | IViewport.MOUSE | IViewport.DRAGGABLE | IViewport.STOP_DRAGGING);
         this.draggable.getElement().onDragEnd(this.draggable.getElement().canDropHere(getAbsMouseX(), getAbsMouseY(), this.hovered));
         this.draggable.getElement().setMoving(false);
-        this.draggable.unapplyViewports(this);
+        this.draggable.unapplyViewports(this, IViewport.INTERACTION | IViewport.MOUSE | IViewport.DRAGGABLE | IViewport.STOP_DRAGGING);
         this.draggable = null;
         this.lastButton = -1;
         this.lastClickTime = 0;
@@ -290,7 +291,7 @@ public class GuiContext extends GuiViewportStack {
                 draggable = new LocatedElement<>((IDraggable) widget, hovered.getViewports());
             } else if (widget instanceof ModularPanel) {
                 ModularPanel panel = (ModularPanel) widget;
-                if (panel.isDraggable()) {
+                if (panel.isDraggable() && !this.screen.getWindowManager().isAboutToClose(panel)) {
                     draggable = new LocatedElement<>(new DraggablePanelWrapper(panel), Collections.emptyList());
                 } else {
                     return false;
@@ -298,16 +299,14 @@ public class GuiContext extends GuiViewportStack {
             } else {
                 return false;
             }
-            draggable.applyViewports(this);
             if (draggable.getElement().onDragStart(button)) {
                 draggable.getElement().setMoving(true);
-                draggable.unapplyViewports(this);
+
                 this.draggable = draggable;
                 this.lastButton = button;
                 this.lastClickTime = Minecraft.getSystemTime();
                 return true;
             }
-            draggable.unapplyViewports(this);
         }
         return false;
     }
@@ -315,11 +314,12 @@ public class GuiContext extends GuiViewportStack {
     @ApiStatus.Internal
     public void drawDraggable() {
         if (hasDraggable()) {
-            this.draggable.applyViewports(this);
-            this.draggable.getElement().apply(this);
+            int flag = IViewport.DRAWING | IViewport.DRAGGABLE;
+            this.draggable.applyViewports(this, flag);
+            this.draggable.getElement().apply(this, flag);
             this.draggable.getElement().drawMovingState(this.partialTicks);
-            this.draggable.getElement().unapply(this);
-            this.draggable.unapplyViewports(this);
+            this.draggable.getElement().unapply(this, flag);
+            this.draggable.unapplyViewports(this, flag);
         }
     }
 
@@ -344,9 +344,9 @@ public class GuiContext extends GuiViewportStack {
         if (hasDraggable() && (this.lastDragX != this.mouseX || this.lastDragY != this.mouseY)) {
             this.lastDragX = this.mouseX;
             this.lastDragY = this.mouseY;
-            this.draggable.applyViewports(this);
+            this.draggable.applyViewports(this, IViewport.INTERACTION | IViewport.DRAGGABLE | IViewport.MOUSE | IViewport.DRAG);
             this.draggable.getElement().onDrag(this.lastButton, this.lastClickTime);
-            this.draggable.unapplyViewports(this);
+            this.draggable.unapplyViewports(this, IViewport.INTERACTION | IViewport.DRAGGABLE | IViewport.MOUSE | IViewport.DRAG);
         }
         if (this.hovered != hovered) {
             if (this.hovered != null) {
