@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.GuiTextures;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
 import com.cleanroommc.modularui.sync.ItemSlotSH;
 import com.cleanroommc.modularui.theme.Theme;
@@ -396,7 +397,7 @@ public abstract class ModularScreen {
         return getSyncHandler() == null;
     }
 
-    protected ModularContainer getContainer() {
+    public ModularContainer getContainer() {
         return (ModularContainer) this.screenWrapper.inventorySlots;
     }
 

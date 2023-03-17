@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.screen;
+package com.cleanroommc.modularui.screen.viewport;
 
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;

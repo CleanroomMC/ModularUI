@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.IconRenderer;
 import com.cleanroommc.modularui.drawable.TextIcon;
 import com.cleanroommc.modularui.drawable.TextRenderer;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.sizer.Area;

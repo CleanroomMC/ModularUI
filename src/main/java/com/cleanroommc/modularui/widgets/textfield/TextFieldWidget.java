@@ -6,7 +6,7 @@ import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.sync.IStringSyncHandler;
 import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.api.sync.ValueSyncHandler;
-import com.cleanroommc.modularui.screen.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.math.Constant;
 import com.cleanroommc.modularui.utils.math.MathBuilder;
 import org.jetbrains.annotations.NotNull;

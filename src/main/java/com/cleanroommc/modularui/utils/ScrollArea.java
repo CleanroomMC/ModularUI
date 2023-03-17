@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.utils;
 
-import com.cleanroommc.modularui.drawable.GuiDraw;
-import com.cleanroommc.modularui.screen.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.GuiAxis;
 import net.minecraft.client.gui.GuiScreen;

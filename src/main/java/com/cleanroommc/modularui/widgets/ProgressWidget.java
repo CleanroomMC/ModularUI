@@ -3,7 +3,7 @@ package com.cleanroommc.modularui.widgets;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.drawable.UITexture;
-import com.cleanroommc.modularui.screen.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.sync.DoubleSyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 import net.minecraft.util.math.MathHelper;

@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
-import com.cleanroommc.modularui.screen.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.ScrollArea;
 import com.google.common.base.Joiner;
 import org.jetbrains.annotations.Nullable;

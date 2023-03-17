@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.api.widget;
 
-import com.cleanroommc.modularui.screen.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 
 /**
  * An interface for {@link IWidget} objects, that makes them focusable.
