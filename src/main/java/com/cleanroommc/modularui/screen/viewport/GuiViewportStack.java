@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.screen.viewport;
 
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
+import com.cleanroommc.modularui.api.layout.IViewportTransformation;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
 import java.util.ArrayList;
@@ -16,58 +17,50 @@ import java.util.Stack;
  */
 public class GuiViewportStack implements IViewportStack {
 
-    private final Stack<IViewport> viewportStack = new Stack<>();
-    private final Stack<Area> viewportAreaStack = new Stack<>();
+    private final Stack<Viewport> viewportStack = new Stack<>();
     private final List<Area> viewportAreas = new ArrayList<>();
-    private int shiftX = 0;
-    private int shiftY = 0;
 
     @Override
     public void reset() {
-        this.shiftX = 0;
-        this.shiftY = 0;
-
-        this.viewportAreaStack.clear();
+        this.viewportStack.clear();
     }
 
     @Override
     public Area getViewport() {
-        return this.viewportAreaStack.peek();
+        return this.viewportStack.peek().area;
     }
 
     @Override
     public void pushViewport(IViewport viewport, Area area) {
-        if (this.viewportAreaStack.isEmpty()) {
+        if (this.viewportStack.isEmpty()) {
             Area child = this.getCurrentViewportArea();
 
             child.set(area);
-            this.viewportAreaStack.push(child);
+            this.viewportStack.push(new Viewport(viewport, area));
         } else {
-            Area current = this.viewportAreaStack.peek();
+            Area current = this.viewportStack.peek().area;
             Area child = this.getCurrentViewportArea();
 
             child.set(area);
             current.clamp(child);
-            this.viewportAreaStack.push(child);
+            this.viewportStack.push(new Viewport(viewport, child));
         }
-        this.viewportStack.push(viewport);
     }
 
     private Area getCurrentViewportArea() {
-        while (this.viewportAreas.size() < this.viewportAreaStack.size() + 1) {
+        while (this.viewportAreas.size() < this.viewportStack.size() + 1) {
             this.viewportAreas.add(new Area());
         }
 
-        return this.viewportAreas.get(this.viewportAreaStack.size());
+        return this.viewportAreas.get(this.viewportStack.size());
     }
 
     @Override
     public void popViewport(IViewport viewport) {
-        if (this.viewportStack.peek() != viewport) {
+        if (this.viewportStack.peek().viewport != viewport) {
             throw new IllegalStateException("Viewports must be popped in reverse order they were pushed. Tried to pop '" + viewport + "', but last pushed is '" + this.viewportStack.peek() + "'.");
         }
         this.viewportStack.pop();
-        this.viewportAreaStack.pop();
     }
 
     @Override
@@ -79,27 +72,35 @@ public class GuiViewportStack implements IViewportStack {
     public void popUntilIndex(int index) {
         for (int i = this.viewportStack.size() - 1; i > index; i--) {
             this.viewportStack.pop();
-            this.viewportAreaStack.pop();
         }
     }
 
     @Override
     public void popUntilViewport(IViewport viewport) {
         int i = this.viewportStack.size();
-        while (--i >= 0 && this.viewportStack.peek() != viewport) {
+        while (--i >= 0 && this.viewportStack.peek().viewport != viewport) {
             this.viewportStack.pop();
-            this.viewportAreaStack.pop();
         }
     }
 
     @Override
+    public void transform(IViewportTransformation transformation) {
+        this.viewportStack.peek().transform(transformation);
+    }
+
+    @Override
+    public void translate(int x, int y) {
+        transform(new ViewportTranslation(x, y));
+    }
+
+    @Override
     public int getShiftX() {
-        return this.shiftX;
+        return localX(0);
     }
 
     @Override
     public int getShiftY() {
-        return this.shiftY;
+        return localY(0);
     }
 
     /**
@@ -107,7 +108,10 @@ public class GuiViewportStack implements IViewportStack {
      */
     @Override
     public int globalX(int x) {
-        return x - this.shiftX;
+        for (int i = this.viewportStack.size() - 1; i >= 0; i--) {
+            x = this.viewportStack.get(i).transformX(x, false);
+        }
+        return x;
     }
 
     /**
@@ -115,7 +119,10 @@ public class GuiViewportStack implements IViewportStack {
      */
     @Override
     public int globalY(int y) {
-        return y - this.shiftY;
+        for (int i = this.viewportStack.size() - 1; i >= 0; i--) {
+            y = this.viewportStack.get(i).transformY(y, false);
+        }
+        return y;
     }
 
     /**
@@ -123,7 +130,10 @@ public class GuiViewportStack implements IViewportStack {
      */
     @Override
     public int localX(int x) {
-        return x + this.shiftX;
+        for (Viewport viewport : this.viewportStack) {
+            x = viewport.transformX(x, true);
+        }
+        return x;
     }
 
     /**
@@ -131,24 +141,66 @@ public class GuiViewportStack implements IViewportStack {
      */
     @Override
     public int localY(int y) {
-        return y + this.shiftY;
+        for (Viewport viewport : this.viewportStack) {
+            y = viewport.transformY(y, true);
+        }
+        return y;
     }
 
     @Override
-    public void shiftX(int x) {
-        this.shiftX += x;
-
-        if (!this.viewportAreaStack.isEmpty()) {
-            this.viewportAreaStack.peek().x += x;
+    public void applyToOpenGl() {
+        for (Viewport viewport : this.viewportStack) {
+            viewport.transformation.applyOpenGlTransformation();
         }
     }
 
     @Override
-    public void shiftY(int y) {
-        this.shiftY += y;
+    public void applyTopToOpenGl() {
+        this.viewportStack.peek().transformation.applyOpenGlTransformation();
+    }
 
-        if (!this.viewportAreaStack.isEmpty()) {
-            this.viewportAreaStack.peek().y += y;
+    @Override
+    public void unapplyToOpenGl() {
+        for (int i = this.viewportStack.size() - 1; i >= 0; i--) {
+            this.viewportStack.peek().transformation.unapplyOpenGlTransformation();
+        }
+    }
+
+    @Override
+    public void unapplyTopToOpenGl() {
+        this.viewportStack.peek().transformation.unapplyOpenGlTransformation();
+    }
+
+    public static class Viewport {
+
+        private final IViewport viewport;
+        private final Area area;
+        private IViewportTransformation transformation = IViewportTransformation.EMPTY;
+        private TransformList transformations;
+
+        public Viewport(IViewport viewport, Area area) {
+            this.viewport = viewport;
+            this.area = area;
+        }
+
+        public void transform(IViewportTransformation transformation) {
+            if (this.transformation == IViewportTransformation.EMPTY) {
+                this.transformation = transformation;
+                return;
+            }
+            if (this.transformations == null) {
+                this.transformations = new TransformList(this.transformation);
+                this.transformation = this.transformations;
+            }
+            this.transformations.add(transformation);
+        }
+
+        public int transformX(int x, boolean toLocal) {
+            return this.transformation.transformX(x, this.area, toLocal);
+        }
+
+        public int transformY(int y, boolean toLocal) {
+            return this.transformation.transformY(y, this.area, toLocal);
         }
     }
 }

@@ -15,7 +15,6 @@ public class DraggableWidget<W extends DraggableWidget<W>> extends Widget<W> imp
     private boolean moving = false;
     private int relativeClickX, relativeClickY;
     private final Area movingArea;
-    private int shiftX, shiftY;
 
     public DraggableWidget() {
         this.movingArea = getArea().createCopy();
@@ -90,14 +89,8 @@ public class DraggableWidget<W extends DraggableWidget<W>> extends Widget<W> imp
         if (BitHelper.hasAnyBits(context, IViewport.DRAGGABLE | IViewport.COLLECT_WIDGETS)) {
             stack.pushViewport(this, getMovingArea());
             if (isMoving()) {
-                this.shiftX = -this.movingArea.x + getContext().globalX(getArea().x);
-                this.shiftY = -this.movingArea.y + getContext().globalY(getArea().y);
-            } else {
-                this.shiftX = 0;
-                this.shiftY = 0;
+                stack.translate(-this.movingArea.x + getContext().globalX(getArea().x), -this.movingArea.y + getContext().globalY(getArea().y));
             }
-            stack.shiftX(this.shiftX);
-            stack.shiftY(this.shiftY);
         }
     }
 
@@ -105,10 +98,6 @@ public class DraggableWidget<W extends DraggableWidget<W>> extends Widget<W> imp
     public void unapply(IViewportStack stack, int context) {
         if (BitHelper.hasNone(context, IViewport.START_DRAGGING) && BitHelper.hasAnyBits(context, IViewport.DRAGGABLE | IViewport.COLLECT_WIDGETS)) {
             stack.popViewport(this);
-            stack.shiftX(-this.shiftX);
-            stack.shiftY(-this.shiftY);
-            this.shiftX = 0;
-            this.shiftY = 0;
         }
     }
 }

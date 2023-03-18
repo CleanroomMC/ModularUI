@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.api.layout;
 
 import com.cleanroommc.modularui.widget.sizer.Area;
-import net.minecraft.client.renderer.GlStateManager;
 
 /**
  * This handles all viewports in a GUI.
@@ -37,6 +36,10 @@ public interface IViewportStack {
 
     void popUntilViewport(IViewport viewport);
 
+    void transform(IViewportTransformation transformation);
+
+    void translate(int x, int y);
+
     /**
      * The current total shift in x
      */
@@ -68,30 +71,22 @@ public interface IViewportStack {
     int localY(int y);
 
     /**
-     * Applies a shift transformation in x
-     *
-     * @param x shift amount in x
-     */
-    void shiftX(int x);
-
-    /**
-     * Applies a shift transformation in y
-     *
-     * @param y shift amount in y
-     */
-    void shiftY(int y);
-
-    /**
      * Applies the active transformation to open gl
      */
-    default void applyToOpenGl() {
-        GlStateManager.translate(-getShiftX(), -getShiftY(), 0);
-    }
+    void applyToOpenGl();
+
+    /**
+     * Applies the top viewport transformation to open gl
+     */
+    void applyTopToOpenGl();
 
     /**
      * Removes the active transformation to open gl
      */
-    default void unapplyToOpenGl() {
-        GlStateManager.translate(getShiftX(), getShiftY(), 0);
-    }
+    void unapplyToOpenGl();
+
+    /**
+     * Removes the top viewport transformation to open gl
+     */
+    void unapplyTopToOpenGl();
 }

@@ -125,10 +125,8 @@ public class WidgetTree {
         IViewport viewport = parent instanceof IViewport ? (IViewport) parent : null;
         if (viewport != null) {
             viewport.preDraw(context, false);
-            context.unapplyToOpenGl();
+            context.unapplyTopToOpenGl();
             viewport.apply(context, IViewport.DRAWING | IViewport.PRE_DRAW);
-            // update open gl transformation
-            context.applyToOpenGl();
             viewport.preDraw(context, true);
         }
         GlStateManager.popMatrix();
@@ -144,10 +142,8 @@ public class WidgetTree {
             GlStateManager.enableBlend();
             context.applyToOpenGl();
             viewport.postDraw(context, true);
-            context.unapplyToOpenGl();
+            context.unapplyTopToOpenGl();
             viewport.unapply(context, IViewport.DRAWING | IViewport.POST_DRAW);
-            // update open gl transformation
-            context.applyToOpenGl();
             viewport.postDraw(context, false);
             GlStateManager.popMatrix();
         }

@@ -15,7 +15,6 @@ public class DraggablePanelWrapper implements IDraggable {
     private final Area movingArea;
     private int relativeClickX, relativeClickY;
     private boolean moving;
-    private int shiftX, shiftY;
 
     public DraggablePanelWrapper(ModularPanel panel) {
         this.panel = panel;
@@ -24,7 +23,6 @@ public class DraggablePanelWrapper implements IDraggable {
 
     @Override
     public void drawMovingState(float partialTicks) {
-        GuiContext context = this.panel.getContext();
         WidgetTree.drawTree(this.panel, this.panel.getContext(), true, partialTicks);
     }
 
@@ -82,14 +80,8 @@ public class DraggablePanelWrapper implements IDraggable {
         if (BitHelper.hasAnyBits(context, IViewport.DRAGGABLE | IViewport.COLLECT_WIDGETS)) {
             stack.pushViewport(this, getMovingArea());
             if (isMoving()) {
-                this.shiftX = -this.movingArea.x + this.panel.getContext().globalX(this.panel.getArea().x);
-                this.shiftY = -this.movingArea.y + this.panel.getContext().globalY(this.panel.getArea().y);
-            } else {
-                this.shiftX = 0;
-                this.shiftY = 0;
+                stack.translate(-this.movingArea.x + this.panel.getContext().globalX(this.panel.getArea().x), -this.movingArea.y + this.panel.getContext().globalY(this.panel.getArea().y));
             }
-            stack.shiftX(this.shiftX);
-            stack.shiftY(this.shiftY);
         }
     }
 
@@ -97,10 +89,6 @@ public class DraggablePanelWrapper implements IDraggable {
     public void unapply(IViewportStack stack, int context) {
         if (BitHelper.hasNone(context, IViewport.START_DRAGGING) && BitHelper.hasAnyBits(context, IViewport.DRAGGABLE | IViewport.COLLECT_WIDGETS)) {
             stack.popViewport(this);
-            stack.shiftX(-this.shiftX);
-            stack.shiftY(-this.shiftY);
-            this.shiftX = 0;
-            this.shiftY = 0;
         }
     }
 }

@@ -6,8 +6,8 @@ import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.IWidgetList;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiDraw;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.ScrollArea;
 import com.cleanroommc.modularui.utils.ScrollData;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -50,24 +50,11 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
     @Override
     public void apply(IViewportStack stack, int context) {
         stack.pushViewport(this, getArea());
-
-        if (this.scroll.getScrollX() != null) {
-            stack.shiftX(this.scroll.getScrollX().scroll);
-        }
-        if (this.scroll.getScrollY() != null) {
-            stack.shiftY(this.scroll.getScrollY().scroll);
-        }
+        stack.translate(getScrollX(), getScrollY());
     }
 
     @Override
     public void unapply(IViewportStack stack, int context) {
-        if (this.scroll.getScrollX() != null) {
-            stack.shiftX(-this.scroll.getScrollX().scroll);
-        }
-        if (this.scroll.getScrollY() != null) {
-            stack.shiftY(-this.scroll.getScrollY().scroll);
-        }
-
         stack.popViewport(this);
     }
 
@@ -137,5 +124,13 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
             GuiDraw.unscissor(context);
             this.scroll.drawScrollbar();
         }
+    }
+
+    public int getScrollX() {
+        return this.scroll.getScrollX() != null ? this.scroll.getScrollX().scroll : 0;
+    }
+
+    public int getScrollY() {
+        return this.scroll.getScrollY() != null ? this.scroll.getScrollY().scroll : 0;
     }
 }
