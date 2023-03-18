@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TabContainer extends PageControlWidget<TabContainer> implements ILayoutWidget {
+public class TabContainer extends PagedWidget<TabContainer> implements ILayoutWidget {
 
     private final List<IWidget> allChildren = new ArrayList<>();
     private final List<TabButton> tabButtons = new ArrayList<>();

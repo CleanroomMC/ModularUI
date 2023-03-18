@@ -94,7 +94,7 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
     }
 
     @Override
-    public @NotNull Result onMouseTapped(int mouseButton) {
+    public @NotNull Result onMousePressed(int mouseButton) {
         switch (mouseButton) {
             case 0:
                 next();
