@@ -13,7 +13,7 @@
 
 * [X]  Phantom Item Slot
 * [X]  Phantom Fluid Slot
-* [ ]  Slider
+* [X]  Slider
 * [ ]  Trackpad
 * [ ]  Color picker (button for setting number which can be dragged)
 * [X]  List (column but scrollable)
@@ -27,10 +27,10 @@
 ## Low Priority
 
 - [X]  Item slot features (like shift click)
-- [ ]  Layout Widgets
+- [X]  Layout Widgets
 - [X]  Row
 - [X]  Column
-- [ ]  Grid
+- [X]  Grid
 - [X]  Scrollable
 - [ ]  Text editor
 - [ ]  Themes

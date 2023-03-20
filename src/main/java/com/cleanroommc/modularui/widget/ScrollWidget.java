@@ -84,6 +84,11 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
     }
 
     @Override
+    public boolean canHover() {
+        return super.canHover() || this.scroll.isInsideScrollbarArea(getContext().getMouseX(), getContext().getMouseY());
+    }
+
+    @Override
     public @NotNull Result onMousePressed(int mouseButton) {
         GuiContext context = getContext();
         if (this.scroll.mouseClicked(context)) {

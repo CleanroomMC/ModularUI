@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.utils.keys;
 
 import com.cleanroommc.modularui.api.drawable.IKey;
+import net.minecraft.client.Minecraft;
 
 public class CompoundKey implements IKey {
 

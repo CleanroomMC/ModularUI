@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.screen.DraggablePanelWrapper;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.WindowManager;
+import com.cleanroommc.modularui.widget.sizer.GuiAxis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import org.jetbrains.annotations.ApiStatus;
@@ -389,6 +390,10 @@ public class GuiContext extends GuiViewportStack {
         return localY(this.mouseY);
     }
 
+    public int getMouse(GuiAxis axis) {
+        return axis.isHorizontal() ? getMouseX() : getMouseY();
+    }
+
     /**
      * Get absolute X coordinate of the mouse without the
      * scrolling areas applied
@@ -403,6 +408,10 @@ public class GuiContext extends GuiViewportStack {
      */
     public int getAbsMouseY() {
         return this.mouseY;
+    }
+
+    public int getAbsMouse(GuiAxis axis) {
+        return axis.isHorizontal() ? getAbsMouseX() : getAbsMouseY();
     }
 
     public int getMouseButton() {
