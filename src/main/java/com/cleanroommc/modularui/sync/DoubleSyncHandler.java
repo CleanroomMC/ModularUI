@@ -19,7 +19,6 @@ public class DoubleSyncHandler extends ValueSyncHandler<Double> implements IStri
         this.cache = getter.getAsDouble();
     }
 
-
     @Override
     public Double getCachedValue() {
         return cache;
