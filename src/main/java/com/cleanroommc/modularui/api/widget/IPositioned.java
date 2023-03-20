@@ -32,6 +32,11 @@ public interface IPositioned<W extends IPositioned<W>> {
         return coverChildrenWidth().coverChildrenHeight();
     }
 
+    default W expanded() {
+        flex().expanded();
+        return getThis();
+    }
+
     default W relative(IGuiElement guiElement) {
         return relative(guiElement.getArea());
     }

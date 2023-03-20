@@ -4,10 +4,7 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.layout.CrossAxisAlignment;
-import com.cleanroommc.modularui.drawable.AnimatedText;
-import com.cleanroommc.modularui.drawable.Circle;
-import com.cleanroommc.modularui.drawable.GuiTextures;
-import com.cleanroommc.modularui.drawable.ItemDrawable;
+import com.cleanroommc.modularui.drawable.*;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
@@ -89,6 +86,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
 
     public ModularPanel createPanel(GuiContext context) {
         context.enableJei();
+        Rectangle colorPickerBackground = new Rectangle().setColor(Color.RED.normal);
         ModularPanel panel = new ModularPanel(context);
         panel.flex()                        // returns object which is responsible for sizing
                 .size(176, 220)       // set a static size for the main panel
@@ -216,7 +214,14 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                         .width(1f).height(16)
                                         .top(7)
                                         .stopper(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)
-                                        .background(GuiTextures.SLOT_DARK))));
+                                        .background(GuiTextures.SLOT_DARK))
+                                .child(new ButtonWidget<>()
+                                        .top(25)
+                                        .background(colorPickerBackground)
+                                        .onMousePressed(mouseButton -> {
+                                            panel.getScreen().openPanel(new ColorPickerDialog(context, colorPickerBackground::setColor, colorPickerBackground.getColor(), true));
+                                            return true;
+                                        }))));
         /*panel.child(new ButtonWidget<>()
                         .flex(flex -> flex.size(60, 20)
                                 .top(7)

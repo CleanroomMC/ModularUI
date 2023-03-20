@@ -26,13 +26,30 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
 
         int maxWidth = 0;
         int totalHeight = 0;
+        int expandedAmount = 0;
 
         // calculate total height and maximum width
         for (IWidget widget : getChildren()) {
             // exclude self positioned (Y) children
             if (widget.flex().hasYPos()) continue;
-            totalHeight += widget.getArea().requestedHeight();
             maxWidth = Math.max(maxWidth, widget.getArea().requestedWidth());
+            if (widget.flex().isExpanded()) {
+                expandedAmount++;
+                totalHeight += widget.getArea().getMargin().vertical();
+                continue;
+            }
+            totalHeight += widget.getArea().requestedHeight();
+        }
+
+        if (expandedAmount > 0) {
+            int newHeight = (height - totalHeight) / expandedAmount;
+            for (IWidget widget : getChildren()) {
+                // exclude self positioned (Y) children
+                if (widget.flex().hasYPos()) continue;
+                if (widget.flex().isExpanded()) {
+                    widget.getArea().h(newHeight);
+                }
+            }
         }
 
         // calculate start y

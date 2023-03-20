@@ -89,7 +89,12 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
         float sh = this.sliderHeight.getValue();
         if (this.sliderHeight.isRelative()) sh *= getArea().height;
         this.sliderArea.setSize((int) sw, (int) sh);
-        this.sliderArea.setPoint(this.axis.getOther(), 0);
+        GuiAxis other = this.axis.getOther();
+        this.sliderArea.setPoint(other, getArea().getSize(other) / 2 - this.sliderArea.getSize(other) / 2);
+    }
+
+    @Override
+    public void postResize() {
         setValue(getValue(), false);
     }
 

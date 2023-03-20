@@ -26,12 +26,29 @@ public class Row extends ParentWidget<Row> implements ILayoutWidget {
 
         int maxHeight = 0;
         int totalWidth = 0;
+        int expandedAmount = 0;
 
         for (IWidget widget : getChildren()) {
             // exclude self positioned (X) children
             if (widget.flex().hasXPos()) continue;
-            totalWidth += widget.getArea().requestedWidth();
             maxHeight = Math.max(maxHeight, widget.getArea().requestedHeight());
+            if (widget.flex().isExpanded()) {
+                expandedAmount++;
+                totalWidth += widget.getArea().getMargin().horizontal();
+                continue;
+            }
+            totalWidth += widget.getArea().requestedWidth();
+        }
+
+        if (expandedAmount > 0) {
+            int newWidth = (width - totalWidth) / expandedAmount;
+            for (IWidget widget : getChildren()) {
+                // exclude self positioned (X) children
+                if (widget.flex().hasXPos()) continue;
+                if (widget.flex().isExpanded()) {
+                    widget.getArea().w(newWidth);
+                }
+            }
         }
 
         // calculate start y

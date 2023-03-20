@@ -4,12 +4,12 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.GuiTextures;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
-import com.cleanroommc.modularui.widgets.SimpleWidget;
 import com.cleanroommc.modularui.widgets.SortableListWidget;
 import com.cleanroommc.modularui.widgets.layout.Grid;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -83,7 +83,7 @@ public class TestGui extends ModularScreen {
                 .scrollable()
                 .pos(10, 10).right(10).bottom(10))*/
         SortableListWidget<String, SortableListWidget.Item<String>> sortableListWidget = SortableListWidget.sortableBuilder(lines, this.configuredOptions,
-                s -> new SortableListWidget.Item<>(s, new SimpleWidget()
+                s -> new SortableListWidget.Item<>(s, new Widget<>()
                         .background(GuiTextures.BUTTON, IKey.str(s).color(Color.WHITE.normal).shadow(true))
                         .left(0).right(10))
                         .removeable()).debugName("sortable list");

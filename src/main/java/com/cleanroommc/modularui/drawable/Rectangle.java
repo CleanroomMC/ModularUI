@@ -23,6 +23,10 @@ public class Rectangle implements IDrawable {
         this.cornerSegments = 6;
     }
 
+    public int getColor() {
+        return colorTL;
+    }
+
     public Rectangle setCornerRadius(int cornerRadius) {
         this.cornerRadius = Math.max(0, cornerRadius);
         return this;

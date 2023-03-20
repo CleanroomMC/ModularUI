@@ -185,8 +185,16 @@ public interface IWidget extends IGuiElement {
         }
     }
 
+    default void postResize() {
+    }
+
     /**
      * @return flex of this widget
      */
     Flex getFlex();
+
+    default boolean isExpanded() {
+        Flex flex = getFlex();
+        return flex != null && flex.isExpanded();
+    }
 }

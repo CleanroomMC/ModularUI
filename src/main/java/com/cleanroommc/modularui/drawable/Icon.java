@@ -56,8 +56,14 @@ public class Icon implements IIcon {
 
     @Override
     public void draw(int x, int y, int width, int height) {
-        x += width * alignment.x - this.width * alignment.x;
-        y += height * alignment.y - this.height * alignment.y;
-        drawable.draw(x, y, this.width, this.height);
+        if (this.width > 0) {
+            x += width * alignment.x - this.width * alignment.x;
+            width = this.width;
+        }
+        if (this.height > 0) {
+            y += height * alignment.y - this.height * alignment.y;
+            height = this.height;
+        }
+        drawable.draw(x, y, width, height);
     }
 }

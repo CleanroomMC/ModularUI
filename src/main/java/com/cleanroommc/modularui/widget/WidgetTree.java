@@ -179,6 +179,10 @@ public class WidgetTree {
             }
             return true;
         }, true);
+        WidgetTree.foreachChildByLayer(parent, child -> {
+            child.postResize();
+            return true;
+        }, true);
         // make sure hovered widgets are updated
         parent.getPanel().markDirty();
     }

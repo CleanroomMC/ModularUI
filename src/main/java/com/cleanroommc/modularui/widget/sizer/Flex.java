@@ -14,6 +14,7 @@ public class Flex implements IResizeable {
 
     private final DimensionSizer x = new DimensionSizer(GuiAxis.X);
     private final DimensionSizer y = new DimensionSizer(GuiAxis.Y);
+    private boolean expanded = false;
     private final IGuiElement parent;
     private Area relativeTo;
     private boolean relativeToParent = true;
@@ -57,6 +58,11 @@ public class Flex implements IResizeable {
 
     public Flex cancelMovementY() {
         this.y.setCancelAutoMovement(true);
+        return this;
+    }
+
+    public Flex expanded() {
+        this.expanded = true;
         return this;
     }
 
@@ -297,6 +303,10 @@ public class Flex implements IResizeable {
     private Area getRelativeTo() {
         Area relativeTo = relativeToParent ? parent.getParentArea() : this.relativeTo;
         return relativeTo != null ? relativeTo : this.parent.getScreen().getViewport();
+    }
+
+    public boolean isExpanded() {
+        return expanded;
     }
 
     public boolean hasYPos() {

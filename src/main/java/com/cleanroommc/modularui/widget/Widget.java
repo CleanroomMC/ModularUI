@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public abstract class Widget<W extends Widget<W>> implements IWidget, IPositioned<W> {
+public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W> {
 
     public static final IDrawable[] EMPTY_BACKGROUND = {};
 
