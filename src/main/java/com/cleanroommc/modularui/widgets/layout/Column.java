@@ -69,9 +69,9 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
             if (!widget.flex().hasXPos()) {
                 int x = 0;
                 if (caa == CrossAxisAlignment.CENTER) {
-                    x = (int) (width / 2f - widget.getArea().width / 2f);
+                    x = (int) (width / 2f - widget.getArea().requestedWidth() / 2f);
                 } else if (caa == CrossAxisAlignment.END) {
-                    x = width - widget.getArea().width;
+                    x = width - widget.getArea().requestedWidth();
                 }
                 x = Math.max(x, padding.left + margin.left);
                 widget.getArea().rx = x;

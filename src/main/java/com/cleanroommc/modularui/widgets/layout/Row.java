@@ -68,9 +68,9 @@ public class Row extends ParentWidget<Row> implements ILayoutWidget {
             if (!widget.flex().hasYPos()) {
                 int y = 0;
                 if (caa == CrossAxisAlignment.CENTER) {
-                    y = (int) (height / 2f - widget.getArea().height / 2f);
+                    y = (int) (height / 2f - widget.getArea().requestedHeight() / 2f);
                 } else if (caa == CrossAxisAlignment.END) {
-                    y = height - widget.getArea().height;
+                    y = height - widget.getArea().requestedHeight();
                 }
                 y = Math.max(y, padding.top);
                 widget.getArea().ry = y;

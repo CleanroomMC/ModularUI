@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.api.drawable;
 
 import com.cleanroommc.modularui.drawable.Icon;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
@@ -53,8 +54,16 @@ public interface IDrawable {
     IDrawable EMPTY = (x, y, width, height) -> {};
 
     class DrawableWidget extends Widget<DrawableWidget> {
+
+        private final IDrawable drawable;
+
         public DrawableWidget(IDrawable drawable) {
-            background(drawable);
+            this.drawable = drawable;
+        }
+
+        @Override
+        public void draw(GuiContext context) {
+            this.drawable.drawAtZero(getArea());
         }
     }
 }

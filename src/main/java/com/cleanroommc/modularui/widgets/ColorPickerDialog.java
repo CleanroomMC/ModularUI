@@ -15,12 +15,18 @@ import com.cleanroommc.modularui.widgets.layout.Row;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
 import java.util.function.Consumer;
-import java.util.regex.Pattern;
 
 public class ColorPickerDialog extends Dialog<Integer> {
 
     private int color;
+    private final int alpha;
     private final boolean controlAlpha;
+
+    private final Rectangle preview = new Rectangle();
+    private final Rectangle sliderBackgroundR = new Rectangle();
+    private final Rectangle sliderBackgroundG = new Rectangle();
+    private final Rectangle sliderBackgroundB = new Rectangle();
+    private final Rectangle sliderBackgroundA = new Rectangle();
 
     public ColorPickerDialog(GuiContext context, Consumer<Integer> resultConsumer, int startColor) {
         this(context, resultConsumer, startColor, false);
@@ -29,21 +35,24 @@ public class ColorPickerDialog extends Dialog<Integer> {
     public ColorPickerDialog(GuiContext context, Consumer<Integer> resultConsumer, int startColor, boolean controlAlpha) {
         super(context, resultConsumer);
         name("color_picker");
-        this.color = startColor;
+        this.alpha = Color.getAlpha(startColor);
+        updateColor(startColor);
         this.controlAlpha = controlAlpha;
-        size(140, controlAlpha ? 116 : 102).background(GuiTextures.BACKGROUND);
+        size(140, controlAlpha ? 106 : 94).background(GuiTextures.BACKGROUND);
         align(Alignment.Center);
         PagedWidget.Controller controller = new PagedWidget.Controller();
-        int alpha = Color.getAlpha(startColor);
         child(new Column()
                 .left(5).right(5).top(5).bottom(5)
-                .child(new Row().width(1f).height(14)
+                .child(new Row()
+                        .left(5).right(5).height(14)
                         .child(new PageButton(0, controller)
                                 .size(0.5f, 1f)
-                                .background(GuiTextures.BUTTON, IKey.str("RGB").color(Color.WHITE.normal).shadow(true)))
+                                .background(true, GuiTextures.BUTTON, IKey.str("RGB").color(Color.WHITE.normal).shadow(true))
+                                .background(false, GuiTextures.SLOT_DARK, IKey.str("RGB").color(Color.WHITE.normal).shadow(true)))
                         .child(new PageButton(1, controller)
                                 .size(0.5f, 1f)
-                                .background(GuiTextures.BUTTON, IKey.str("HSV").color(Color.WHITE.normal).shadow(true))))
+                                .background(true, GuiTextures.BUTTON, IKey.str("HSV").color(Color.WHITE.normal).shadow(true))
+                                .background(false, GuiTextures.SLOT_DARK, IKey.str("HSV").color(Color.WHITE.normal).shadow(true))))
                 .child(new Row().width(1f).height(12).marginTop(4)
                         .child(IKey.str("Hex: ").asWidget().height(1f))
                         .child(new TextFieldWidget()
@@ -57,13 +66,11 @@ public class ColorPickerDialog extends Dialog<Integer> {
                                 })
                                 .setter(val -> {
                                     try {
-                                        this.color = Integer.decode(val);
+                                        updateColor(Integer.decode(val));
                                     } catch (NumberFormatException ignored) {
                                     }
-                                    if (!controlAlpha) {
-                                        this.color = Color.withAlpha(this.color, alpha);
-                                    }
-                                })))
+                                }))
+                        .child(this.preview.asWidget().background(GuiTextures.CHECKBOARD).size(10, 10).margin(1)))
                 .child(new PagedWidget<>()
                         .left(5).right(5)
                         .expanded()
@@ -90,7 +97,6 @@ public class ColorPickerDialog extends Dialog<Integer> {
     }
 
     private IWidget createRGBPage(GuiContext context) {
-        IDrawable sliderBackground = new Rectangle().setColor(Color.withAlpha(Color.BLACK.normal, 0.5f)).asIcon().size(0, 4);
         IDrawable handleBackground = new Rectangle().setColor(Color.WHITE.normal);
         Column parentWidget = new Column()
                 .size(1f, 1f)
@@ -100,13 +106,11 @@ public class ColorPickerDialog extends Dialog<Integer> {
                         .child(new SliderWidget()
                                 .expanded()
                                 .height(1f)
-                                .background(sliderBackground)
+                                .background(this.sliderBackgroundR.asIcon().size(0, 4))
                                 .sliderTexture(handleBackground)
                                 .sliderSize(2, 8)
                                 .bounds(0, 255)
-                                .setter(val -> {
-                                    this.color = Color.withRed(this.color, (int) val);
-                                })
+                                .setter(val -> updateColor(Color.withRed(this.color, (int) val)))
                                 .getter(() -> Color.getRed(this.color))))
                 .child(new Row()
                         .width(1f).height(12)
@@ -114,13 +118,11 @@ public class ColorPickerDialog extends Dialog<Integer> {
                         .child(new SliderWidget()
                                 .expanded()
                                 .height(1f)
-                                .background(sliderBackground)
+                                .background(this.sliderBackgroundG.asIcon().size(0, 4))
                                 .sliderTexture(handleBackground)
                                 .sliderSize(2, 8)
                                 .bounds(0, 255)
-                                .setter(val -> {
-                                    this.color = Color.withGreen(this.color, (int) val);
-                                })
+                                .setter(val -> updateColor(Color.withGreen(this.color, (int) val)))
                                 .getter(() -> Color.getGreen(this.color))))
                 .child(new Row()
                         .width(1f).height(12)
@@ -128,13 +130,11 @@ public class ColorPickerDialog extends Dialog<Integer> {
                         .child(new SliderWidget()
                                 .expanded()
                                 .height(1f)
-                                .background(sliderBackground)
+                                .background(this.sliderBackgroundB.asIcon().size(0, 4))
                                 .sliderTexture(handleBackground)
                                 .sliderSize(2, 8)
                                 .bounds(0, 255)
-                                .setter(val -> {
-                                    this.color = Color.withBlue(this.color, (int) val);
-                                })
+                                .setter(val -> updateColor(Color.withBlue(this.color, (int) val)))
                                 .getter(() -> Color.getBlue(this.color))));
 
         if (this.controlAlpha) {
@@ -144,13 +144,11 @@ public class ColorPickerDialog extends Dialog<Integer> {
                     .child(new SliderWidget()
                             .expanded()
                             .height(1f)
-                            .background(sliderBackground)
+                            .background(this.sliderBackgroundA.asIcon().size(0, 4))
                             .sliderTexture(handleBackground)
                             .sliderSize(2, 8)
                             .bounds(0, 255)
-                            .setter(val -> {
-                                this.color = Color.withAlpha(this.color, (int) val);
-                            })
+                            .setter(val -> updateColor(Color.withAlpha(this.color, (int) val)))
                             .getter(() -> Color.getAlpha(this.color))));
         }
         return parentWidget;
@@ -163,9 +161,29 @@ public class ColorPickerDialog extends Dialog<Integer> {
     }
 
     private String validateRawColor(String raw) {
-        if (!raw.startsWith("#") && Pattern.compile("[a-fA-F]").matcher(raw).find()) {
+        if (!raw.startsWith("#")) {
+            if (raw.startsWith("0x") || raw.startsWith("0X")) {
+                raw = raw.substring(2);
+            }
             return "#" + raw;
         }
         return raw;
+    }
+
+    public void updateColor(int color) {
+        this.color = color;
+        if (!this.controlAlpha) {
+            this.color = Color.withAlpha(this.color, this.alpha);
+        }
+        color = Color.withAlpha(color, 255);
+        int rs = Color.withRed(color, 0), re = Color.withRed(color, 255);
+        int gs = Color.withGreen(color, 0), ge = Color.withGreen(color, 255);
+        int bs = Color.withBlue(color, 0), be = Color.withBlue(color, 255);
+        int as = Color.withAlpha(color, 0), ae = Color.withAlpha(color, 255);
+        this.sliderBackgroundR.setHorizontalGradient(rs, re);
+        this.sliderBackgroundG.setHorizontalGradient(gs, ge);
+        this.sliderBackgroundB.setHorizontalGradient(bs, be);
+        this.sliderBackgroundA.setHorizontalGradient(as, ae);
+        this.preview.setColor(this.color);
     }
 }

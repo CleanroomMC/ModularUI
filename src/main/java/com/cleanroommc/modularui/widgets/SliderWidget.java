@@ -36,6 +36,8 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     private double min, max;
     private boolean dragging = false;
 
+    private double cache = Double.MIN_VALUE;
+
     public SliderWidget() {
         sliderHeight(1f).sliderWidth(6);
         listenGuiAction((IGuiAction.MouseReleased) button -> {
@@ -99,6 +101,15 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     }
 
     @Override
+    public void onFrameUpdate() {
+        if (this.dragging) return;
+        double val = getValue();
+        if (this.cache != val) {
+            setValue(val, false);
+        }
+    }
+
+    @Override
     public @NotNull Result onMousePressed(int mouseButton) {
         int p = getContext().getMouse(this.axis) - getArea().getPoint(this.axis);
         setValue(posToValue(p), true);
@@ -153,6 +164,7 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
             }
         }
         value = MathHelper.clamp(value, this.min, this.max);
+        this.cache = value;
         this.sliderArea.setPoint(this.axis, valueToPos(value));
         if (setSource) {
             if (this.syncHandler != null) {

@@ -54,7 +54,7 @@ public class Circle implements IDrawable {
     public void draw(int x0, int y0, int width, int height) {
         GlStateManager.disableTexture2D();
         GlStateManager.enableBlend();
-        GlStateManager.enableAlpha();
+        GlStateManager.disableAlpha();
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.shadeModel(7425);
         Tessellator tessellator = Tessellator.getInstance();
