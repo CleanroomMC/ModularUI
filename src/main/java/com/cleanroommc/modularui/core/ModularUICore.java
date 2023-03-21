@@ -15,7 +15,7 @@ public class ModularUICore implements IFMLLoadingPlugin, IEarlyMixinLoader {
 
     @Override
     public String[] getASMTransformerClass() {
-        return null;
+        return new String[0];
     }
 
     @Override
@@ -42,5 +42,4 @@ public class ModularUICore implements IFMLLoadingPlugin, IEarlyMixinLoader {
     public List<String> getMixinConfigs() {
         return Collections.singletonList("mixin.modularui.json");
     }
-
 }

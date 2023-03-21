@@ -70,6 +70,16 @@ public class ModularContainer extends Container implements ISortableContainer {
         this.shiftClickSlots.sort(Comparator.comparingInt(slot -> getSlotGroup(slot).getShiftClickPriority()));
     }
 
+    @Override
+    public void setAll(@NotNull List<ItemStack> items) {
+        if (this.inventorySlots.size() != items.size()) {
+            ModularUI.LOGGER.error("Here are {} slots, but expected {}", inventorySlots.size(), items.size());
+        }
+        for (int i = 0; i < Math.min(this.inventorySlots.size(), items.size()); ++i) {
+            this.getSlot(i).putStack(items.get(i));
+        }
+    }
+
     public void registerSlot(ItemSlotSH syncHandler) {
         Slot slot = syncHandler.getSlot();
         if (this.inventorySlots.contains(slot)) {

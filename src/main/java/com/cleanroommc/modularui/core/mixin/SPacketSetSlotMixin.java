@@ -19,7 +19,11 @@ public class SPacketSetSlotMixin {
 
     @Inject(method = "readPacketData", at = @At("TAIL"))
     public void readPacketData(PacketBuffer buf, CallbackInfo ci) throws IOException {
-        this.item.setCount(buf.readVarInt());
+        try {
+            this.item.setCount(buf.readVarInt());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Inject(method = "writePacketData", at = @At("TAIL"))

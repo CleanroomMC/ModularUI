@@ -11,6 +11,8 @@ import com.cleanroommc.modularui.screen.WindowManager;
 import com.cleanroommc.modularui.widget.sizer.GuiAxis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,6 +27,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+@SideOnly(Side.CLIENT)
 public class GuiContext extends GuiViewportStack {
 
     public final Minecraft mc;

@@ -13,6 +13,8 @@ import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.SortableListWidget;
 import com.cleanroommc.modularui.widgets.layout.Grid;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.List;
@@ -21,6 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+@SideOnly(Side.CLIENT)
 public class TestGui extends ModularScreen {
 
     private List<String> lines;

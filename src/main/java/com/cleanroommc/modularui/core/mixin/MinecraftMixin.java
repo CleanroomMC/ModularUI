@@ -20,10 +20,10 @@ public class MinecraftMixin {
                     ordinal = 2,
                     shift = At.Shift.AFTER))
     public void timer(CallbackInfo ci) {
-        ModularUI.TIMER_60_FPS.updateTimer();
+        ModularUI.getTimer60Fps().updateTimer();
         ModularScreen screen = ModularScreen.getCurrent();
         if (screen != null) {
-            for (int j = 0; j < Math.min(20, ModularUI.TIMER_60_FPS.elapsedTicks); ++j) {
+            for (int j = 0; j < Math.min(20, ModularUI.getTimer60Fps().elapsedTicks); ++j) {
                 screen.onFrameUpdate();
                 Animator.advance();
             }

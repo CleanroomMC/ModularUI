@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.widgets.slot;
 
 import com.cleanroommc.modularui.core.mixin.SlotAccessor;
+import com.cleanroommc.modularui.core.mixin.SlotAccessorClient;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.EntityPlayer;
@@ -156,7 +157,7 @@ public class SlotDelegate extends Slot implements ICustomSlot {
 
     @Override
     protected @NotNull TextureMap getBackgroundMap() {
-        return ((SlotAccessor) slot).invokeGetBackgroundMap();
+        return ((SlotAccessorClient) slot).invokeGetBackgroundMap();
     }
 
     @Override

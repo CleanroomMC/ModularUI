@@ -11,6 +11,9 @@ public class GuiInfos {
     public static final GuiInfo PLAYER_ITEM_OFF_HAND;
     public static final GuiInfo TILE_ENTITY;
 
+    public static void init() {
+    }
+
     static {
         PLAYER_ITEM_MAIN_HAND = GuiInfo.builder()
                 .clientGui(context -> {
