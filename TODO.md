@@ -15,7 +15,7 @@
 * [X]  Phantom Fluid Slot
 * [X]  Slider
 * [ ]  Trackpad
-* [ ]  Color picker (button for setting number which can be dragged)
+* [X]  Color picker (button for setting number which can be dragged)
 * [X]  List (column but scrollable)
 * [X]  Sortable List (for bogosorter)
 * [X]  Slot Group (Builder, sorting)
@@ -34,7 +34,7 @@
 - [X]  Scrollable
 - [ ]  Text editor
 - [ ]  Themes
-- [ ]  Animations
+- [X]  Animations
 - [ ]  Json Guis
 - [ ]  Inject to any mc gui
 - [ ]  Error handling with on screen reports

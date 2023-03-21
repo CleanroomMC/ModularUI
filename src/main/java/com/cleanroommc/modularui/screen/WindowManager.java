@@ -71,14 +71,18 @@ public class WindowManager {
         }
 
         if (!this.queueClosePanels.isEmpty()) {
-            for (ModularPanel panel : this.queueClosePanels) {
-                if (!this.panels.contains(panel)) throw new IllegalStateException();
-                if (this.panels.remove(panel)) {
-                    if (panel == this.mainPanel) {
-                        this.screen.close(true);
-                        return;
-                    }
+            if (this.queueClosePanels.contains(this.mainPanel)) {
+                this.panels.removeIf(panel -> {
                     panel.onClose();
+                    return true;
+                });
+                this.screen.close(true);
+            } else {
+                for (ModularPanel panel : this.queueClosePanels) {
+                    if (!this.panels.contains(panel)) throw new IllegalStateException();
+                    if (this.panels.remove(panel)) {
+                        panel.onClose();
+                    }
                 }
             }
             this.queueClosePanels.clear();
