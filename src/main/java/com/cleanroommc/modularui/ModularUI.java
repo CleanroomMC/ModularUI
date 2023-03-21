@@ -39,7 +39,6 @@ public class ModularUI {
 
         if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
             MinecraftForge.EVENT_BUS.register(ClientEventHandler.class);
-            MinecraftForge.EVENT_BUS.register(Animator.class);
             MinecraftForge.EVENT_BUS.register(KeyBindHandler.class);
         }
 

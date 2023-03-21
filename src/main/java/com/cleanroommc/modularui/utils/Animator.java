@@ -1,8 +1,7 @@
 package com.cleanroommc.modularui.utils;
 
 import com.cleanroommc.modularui.api.drawable.IInterpolation;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,11 +11,9 @@ public class Animator {
 
     private static final List<Animator> activeAnimators = new ArrayList<>();
 
-    @SubscribeEvent
-    public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.START) {
-            activeAnimators.removeIf(Animator::tick);
-        }
+    @ApiStatus.Internal
+    public static void advance() {
+        activeAnimators.removeIf(Animator::tick);
     }
 
     private final int duration;

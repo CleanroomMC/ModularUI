@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.core.mixin;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.utils.Animator;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,6 +25,7 @@ public class MinecraftMixin {
         if (screen != null) {
             for (int j = 0; j < Math.min(20, ModularUI.TIMER_60_FPS.elapsedTicks); ++j) {
                 screen.onFrameUpdate();
+                Animator.advance();
             }
         }
     }
