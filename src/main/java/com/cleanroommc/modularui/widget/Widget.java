@@ -4,13 +4,11 @@ import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.api.sync.ValueSyncHandler;
-import com.cleanroommc.modularui.api.widget.IGuiAction;
-import com.cleanroommc.modularui.api.widget.IPositioned;
-import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.Tooltip;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
 import com.cleanroommc.modularui.sync.MapKey;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -22,9 +20,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
-public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W> {
+public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITooltip<W>, ISynced<W> {
 
     public static final IDrawable[] EMPTY_BACKGROUND = {};
 
@@ -92,6 +89,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W> {
     public void afterInit() {
     }
 
+    @Override
     public void initialiseSyncHandler(GuiSyncHandler syncHandler) {
         if (this.syncKey != null) {
             this.syncHandler = syncHandler.getSyncHandler(this.syncKey);
@@ -104,17 +102,6 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W> {
                 ((ValueSyncHandler<?>) this.syncHandler).setChangeListener(this::markDirty);
             }
         }
-        if (hasChildren()) {
-            for (IWidget child : getChildren()) {
-                if (child instanceof Widget) {
-                    ((Widget<?>) child).initialiseSyncHandler(syncHandler);
-                }
-            }
-        }
-    }
-
-    public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        return true;
     }
 
     @Override
@@ -163,6 +150,12 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W> {
     @Override
     public Area getArea() {
         return area;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public W getThis() {
+        return (W) this;
     }
 
     @Override
@@ -240,6 +233,17 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W> {
     }
 
     @Override
+    public Tooltip tooltip() {
+        if (this.tooltip == null) {
+            this.tooltip = new Tooltip();
+            if (!ModularUIConfig.placeTooltipNextToPanel()) {
+                this.tooltip.excludeArea(getArea());
+            }
+        }
+        return this.tooltip;
+    }
+
+    @Override
     public Flex getFlex() {
         return flex;
     }
@@ -296,26 +300,6 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W> {
         return getThis();
     }
 
-    public Tooltip tooltip() {
-        if (this.tooltip == null) {
-            this.tooltip = new Tooltip();
-            if (!ModularUIConfig.placeTooltipNextToPanel()) {
-                this.tooltip.excludeArea(getArea());
-            }
-        }
-        return this.tooltip;
-    }
-
-    public W tooltip(Consumer<Tooltip> tooltipConsumer) {
-        tooltipConsumer.accept(tooltip());
-        return getThis();
-    }
-
-    public W tooltipBuilder(Consumer<Tooltip> tooltipBuilder) {
-        tooltip().tooltipBuilder(tooltipBuilder);
-        return getThis();
-    }
-
     public W listenGuiAction(IGuiAction action) {
         if (this.guiActionListeners == null) {
             this.guiActionListeners = new ArrayList<>();
@@ -332,21 +316,10 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W> {
         return getThis();
     }
 
+    @Override
     public W setSynced(MapKey key) {
         this.syncKey = key;
         return getThis();
-    }
-
-    public W setSynced(String name, int id) {
-        return setSynced(new MapKey(name, id));
-    }
-
-    public W setSynced(String name) {
-        return setSynced(new MapKey(name));
-    }
-
-    public W setSynced(int id) {
-        return setSynced(new MapKey(id));
     }
 
     @Override

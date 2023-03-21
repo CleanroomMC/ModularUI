@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widgets;
 
+import com.cleanroommc.modularui.api.widget.ISynced;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.Widget;
@@ -45,8 +46,8 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
         this.slotsKeyName = name;
         int i = 0;
         for (IWidget widget : getChildren()) {
-            if (widget instanceof Widget) {
-                ((Widget<?>) widget).setSynced(name, i);
+            if (widget instanceof ISynced) {
+                ((ISynced<?>) widget).setSynced(name, i);
             }
             i++;
         }
@@ -113,8 +114,8 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
                     }
                     widget.flex().left(x).top(y);
                     slotGroupWidget.child(widget);
-                    if (this.syncKey != null && widget instanceof Widget) {
-                        ((Widget<?>) widget).setSynced(this.syncKey, syncId++);
+                    if (this.syncKey != null && widget instanceof ISynced) {
+                        ((ISynced<?>) widget).setSynced(this.syncKey, syncId++);
                     }
                     x += 18;
                     maxWidth = Math.max(maxWidth, x);

@@ -263,6 +263,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
 
     public void buildDialog(Dialog<String> dialog) {
         AtomicReference<String> value = new AtomicReference<>("");
+        dialog.name("dialog");
         dialog.setDraggable(true);
         dialog.child(new TextFieldWidget()
                         .flex(flex -> flex.size(100, 20).align(Alignment.Center))
