@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.integration.jei;
 
-import com.cleanroommc.modularui.common.internal.wrapper.ModularGui;
+import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.IModRegistry;
 import mezz.jei.api.JEIPlugin;
@@ -13,7 +13,7 @@ public class ModularUIJeiPlugin implements IModPlugin {
     public void register(@NotNull IModRegistry registry) {
         ModularUIHandler uiHandler = new ModularUIHandler();
         registry.addAdvancedGuiHandlers(uiHandler);
-        registry.addGhostIngredientHandler(ModularGui.class, uiHandler);
-        registry.addGuiScreenHandler(ModularGui.class, uiHandler);
+        registry.addGhostIngredientHandler(GuiScreenWrapper.class, uiHandler);
+        registry.addGuiScreenHandler(GuiScreenWrapper.class, uiHandler);
     }
 }

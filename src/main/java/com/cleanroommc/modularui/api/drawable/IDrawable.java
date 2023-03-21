@@ -1,120 +1,69 @@
 package com.cleanroommc.modularui.api.drawable;
 
-import com.cleanroommc.modularui.api.math.Color;
-import com.cleanroommc.modularui.api.math.Pos2d;
-import com.cleanroommc.modularui.api.math.Size;
-import com.cleanroommc.modularui.common.internal.JsonHelper;
-import com.cleanroommc.modularui.common.widget.DrawableWidget;
-import com.google.gson.JsonObject;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import com.cleanroommc.modularui.drawable.Icon;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.widget.Widget;
+import com.cleanroommc.modularui.widget.sizer.Area;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
-
-@FunctionalInterface
+/**
+ * An object which can be drawn. This is mainly used for backgrounds in {@link com.cleanroommc.modularui.api.widget.IWidget}.
+ */
 public interface IDrawable {
 
     /**
-     * Empty drawable
-     */
-    IDrawable EMPTY = (x, y, width, height, partialTicks) -> {
-    };
-
-    /**
-     * Called ever frame
+     * Draws this drawable at the given position with the given size.
      *
-     * @param x            x position
-     * @param y            y position
-     * @param width        width of the drawable
-     * @param height       height of the drawable
-     * @param partialTicks ticks since last render
+     * @param x      x position
+     * @param y      y position
+     * @param width  width
+     * @param height height
      */
-    @SideOnly(Side.CLIENT)
-    void draw(float x, float y, float width, float height, float partialTicks);
+    void draw(int x, int y, int width, int height);
 
-    @SideOnly(Side.CLIENT)
-    default void draw(Pos2d pos, Size size, float partialTicks) {
-        draw(pos.x, pos.y, size.width, size.height, partialTicks);
-    }
-
-    default void tick() {
-    }
-
-    @SideOnly(Side.CLIENT)
-    default void applyThemeColor(int color) {
-        GlStateManager.color(Color.getRedF(color), Color.getGreenF(color), Color.getBlueF(color), Color.getAlphaF(color));
-    }
-
-    @SideOnly(Side.CLIENT)
-    default void applyThemeColor() {
-        applyThemeColor(Color.WHITE.normal);
+    default void draw(int width, int height) {
+        draw(0, 0, width, height);
     }
 
     /**
-     * @return a drawable that can be used in guis as a widget
-     */
-    default DrawableWidget asWidget() {
-        return new DrawableWidget().setDrawable(this);
-    }
-
-    /**
-     * This drawable with an offset pos.
-     * Useful if the background of a widget should be larger than the widget itself.
+     * Draws this drawable in a given area.
      *
-     * @param offsetX      offset in x
-     * @param offsetY      offset in y
-     * @param widthOffset  offset width (added to the width passed in {@link #draw(float, float, float, float, float)})
-     * @param heightOffset offset height (added to the height passed in {@link #draw(float, float, float, float, float)})
-     * @return this drawable with offset
+     * @param area area
      */
-    default IDrawable withOffset(float offsetX, float offsetY, float widthOffset, float heightOffset) {
-        return new OffsetDrawable(this, offsetX, offsetY, widthOffset, heightOffset);
+    default void draw(Area area) {
+        draw(area.x, area.y, area.width, area.height);
     }
 
-    default IDrawable withOffset(float offsetX, float offsetY) {
-        return new OffsetDrawable(this, offsetX, offsetY);
+    default void drawAtZero(Area area) {
+        draw(0, 0, area.width, area.height);
     }
 
     /**
-     * This drawable with a fixed size.
-     *
-     * @param fixedHeight fixed width (ignores width passed in {@link #draw(float, float, float, float, float)})
-     * @param fixedWidth  fixed height (ignores height passed in {@link #draw(float, float, float, float, float)})
-     * @param offsetX     offset in x
-     * @param offsetY     offset in y
-     * @return this drawable with offset
+     * @return a widget with this drawable as a background
      */
-    default IDrawable withFixedSize(float fixedWidth, float fixedHeight, float offsetX, float offsetY) {
-        return new SizedDrawable(this, fixedWidth, fixedHeight, offsetX, offsetY);
+    default Widget<?> asWidget() {
+        return new DrawableWidget(this);
     }
 
-    default IDrawable withFixedSize(float fixedWidth, float fixedHeight) {
-        return new SizedDrawable(this, fixedWidth, fixedHeight);
+    /**
+     * @return this drawable as an icon
+     */
+    default Icon asIcon() {
+        return new Icon(this);
     }
 
-    static final Map<String, Function<JsonObject, IDrawable>> JSON_DRAWABLE_MAP = new HashMap<>();
+    IDrawable EMPTY = (x, y, width, height) -> {};
 
-    static IDrawable ofJson(JsonObject json) {
-        IDrawable drawable = EMPTY;
-        if (json.has("type")) {
-            Function<JsonObject, IDrawable> function = JSON_DRAWABLE_MAP.get(json.get("type").getAsString());
-            if (function != null) {
-                drawable = function.apply(json);
-            }
-        }
-        Pos2d offset = JsonHelper.getElement(json, Pos2d.ZERO, Pos2d::ofJson, "offset");
-        Size offsetSize = JsonHelper.getElement(json, Size.ZERO, Size::ofJson, "offsetSize");
-        Size fixedSize = JsonHelper.getElement(json, Size.ZERO, Size::ofJson, "fixedSize");
-        if (!fixedSize.isZero()) {
-            return drawable.withFixedSize(fixedSize.width, fixedSize.height, offset.x, offset.y);
-        }
-        if (!offset.isZero() || !offsetSize.isZero()) {
-            return drawable.withOffset(offset.x, offset.y, offsetSize.width, offsetSize.height);
+    class DrawableWidget extends Widget<DrawableWidget> {
+
+        private final IDrawable drawable;
+
+        public DrawableWidget(IDrawable drawable) {
+            this.drawable = drawable;
         }
 
-        return drawable;
+        @Override
+        public void draw(GuiContext context) {
+            this.drawable.drawAtZero(getArea());
+        }
     }
 }

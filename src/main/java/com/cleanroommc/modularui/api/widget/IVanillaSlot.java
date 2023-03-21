@@ -1,15 +1,15 @@
 package com.cleanroommc.modularui.api.widget;
 
-import com.cleanroommc.modularui.common.internal.wrapper.BaseSlot;
+import net.minecraft.inventory.Slot;
 
-import java.util.Collections;
-import java.util.List;
-
+/**
+ * Marks a {@link IWidget}, that this is a vanilla item slot.
+ */
+@FunctionalInterface
 public interface IVanillaSlot {
 
-    BaseSlot getMcSlot();
-
-    default List<String> getExtraTooltip() {
-        return Collections.emptyList();
-    }
+    /**
+     * @return the item slot of this widget
+     */
+    Slot getVanillaSlot();
 }

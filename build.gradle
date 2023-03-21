@@ -73,13 +73,13 @@ repositories {
 }
 
 dependencies {
-    compile 'org.jetbrains:annotations:23.0.0'
+    compileOnly 'org.jetbrains:annotations:23.0.0'
 
     if (project.use_mixins.toBoolean()) {
         deobfCompile 'zone.rong:mixinbooter:5.0'
     }
 
-    compile 'mezz.jei:jei_1.12.2:4.15.0.293'
+    deobfCompile 'mezz.jei:jei_1.12.2:4.15.0.293'
 }
 
 sourceSets {

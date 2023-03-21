@@ -1,26 +1,24 @@
 package com.cleanroommc.modularui;
 
-import net.minecraftforge.common.config.Config;
+import com.cleanroommc.modularui.screen.Tooltip;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 
-@Config(modid = ModularUI.ID)
 public class ModularUIConfig {
 
-    @Config.Name("Enable Debug information")
-    public static boolean debug = FMLLaunchHandler.isDeobfuscatedEnvironment();
+    public static int defaultScrollSpeed = 30;
+    public static boolean smoothProgressBar = true;
 
-    @Config.Name("Smooth progress bars")
-    public static boolean smoothProgressbar = true;
+    public static int panelOpenCloseAnimationTime = 5;
 
-    @Config.Comment("Open/Close animations can be combined")
-    public static final Animations animations = new Animations();
+    // Tooltip
+    public static boolean placeNextToPanelByDefault = true;
+    // Default direction
+    public static Tooltip.Pos tooltipPos = Tooltip.Pos.VERTICAL;
 
-    public static class Animations {
-        @Config.RangeInt(min = 0, max = 3000)
-        public int openCloseDurationMs = 250;
-        public boolean openCloseFade = false;
-        public boolean openCloseScale = true;
-        public boolean openCloseTranslateFromBottom = true;
-        public boolean openCloseRotateFast = false;
+    public static boolean guiDebugMode = FMLLaunchHandler.isDeobfuscatedEnvironment();
+
+    public static boolean placeTooltipNextToPanel() {
+        return placeNextToPanelByDefault && Minecraft.getMinecraft().gameSettings.guiScale > 0;
     }
 }

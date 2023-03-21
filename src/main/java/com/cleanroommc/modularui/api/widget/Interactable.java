@@ -1,74 +1,110 @@
 package com.cleanroommc.modularui.api.widget;
 
+import com.cleanroommc.modularui.screen.ModularScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.init.SoundEvents;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 
 /**
- * An interface that handles user interactions.
+ * An interface that handles user interactions on {@link IWidget} objects.
  * These methods get called on the client
- * Can also be used as a listener.
  */
 public interface Interactable {
 
     /**
-     * called when clicked on the Interactable
+     * Called when this widget is pressed.
      *
-     * @param buttonId    the button id (Left == 0, right == 1)
-     * @param doubleClick if it is the second click within 400ms
-     * @return if further operations should abort
+     * @param mouseButton mouse button that was pressed.
+     * @return result that determines what happens to other widgets
+     * {@link #onMouseTapped(int)} is only called if this returns {@link Result#ACCEPT} or {@link Result#SUCCESS}
      */
-    @ApiStatus.OverrideOnly
-    default ClickResult onClick(int buttonId, boolean doubleClick) {
-        return ClickResult.IGNORE;
+    @NotNull
+    default Result onMousePressed(int mouseButton) {
+        return Result.ACCEPT;
     }
 
     /**
-     * called when released a click on the Interactable
+     * Called when a mouse button was released over this widget.
      *
-     * @param buttonId the button id (Left == 0, right == 1)
-     * @return if further operations should abort
+     * @param mouseButton mouse button that was released.
+     * @return whether other widgets should get called to. If this returns false, {@link #onMouseTapped(int)} will NOT be called.
      */
-    @ApiStatus.OverrideOnly
-    default boolean onClickReleased(int buttonId) {
+    default boolean onMouseRelease(int mouseButton) {
         return false;
     }
 
     /**
-     * called when the interactable is focused and the mouse gets dragged
+     * Called when this widget was pressed and then released within a certain time frame.
      *
-     * @param buttonId  the button id (Left == 0, right == 1)
-     * @param deltaTime milliseconds since last mouse event
+     * @param mouseButton mouse button that was pressed.
+     * @return result that determines if other widgets should get tapped to
+     * {@link Result#IGNORE} and {@link Result#ACCEPT} will both "ignore" the result and {@link Result#STOP} and {@link Result#SUCCESS} will both stop other widgets from getting tapped.
      */
-    @ApiStatus.OverrideOnly
-    default void onMouseDragged(int buttonId, long deltaTime) {
+    @NotNull
+    default Result onMouseTapped(int mouseButton) {
+        return Result.IGNORE;
     }
 
     /**
-     * Called the mouse wheel moved
+     * Called when a key over this widget is pressed.
      *
-     * @param direction -1 for down, 1 for up
+     * @param typedChar character that was typed
+     * @param keyCode   key that was pressed.
+     * @return result that determines what happens to other widgets
+     * {@link #onKeyTapped(char, int)} is only called if this returns {@link Result#ACCEPT} or {@link Result#SUCCESS}
      */
-    @ApiStatus.OverrideOnly
-    default boolean onMouseScroll(int direction) {
+    @NotNull
+    default Result onKeyPressed(char typedChar, int keyCode) {
+        return Result.IGNORE;
+    }
+
+    /**
+     * Called when a key was released over this widget.
+     *
+     * @param typedChar character that was typed
+     * @param keyCode   key that was pressed.
+     * @return whether other widgets should get called to. If this returns false, {@link #onKeyTapped(char, int)} will NOT be called.
+     */
+    default boolean onKeyRelease(char typedChar, int keyCode) {
         return false;
     }
 
     /**
-     * called when the interactable is focused and a key is pressed
+     * Called when this widget was pressed and then released within a certain time frame.
      *
-     * @param character the typed character. Is equal to {@link Character#MIN_VALUE} if it's not a char
-     * @param keyCode   code of the typed key. See {@link Keyboard}
-     * @return if further operations should abort
+     * @param typedChar character that was typed
+     * @param keyCode   key that was pressed.
+     * @return result that determines if other widgets should get tapped to
+     * {@link Result#IGNORE} and {@link Result#ACCEPT} will both "ignore" the result and {@link Result#STOP} and {@link Result#SUCCESS} will both stop other widgets from getting tapped.
      */
-    @ApiStatus.OverrideOnly
-    default boolean onKeyPressed(char character, int keyCode) {
+    @NotNull
+    default Result onKeyTapped(char typedChar, int keyCode) {
+        return Result.IGNORE;
+    }
+
+    /**
+     * Called when this widget is focused or when the mouse is above this widget
+     *
+     * @param scrollDirection up or down
+     * @param amount          usually irrelevant
+     * @return if other widgets should get called too
+     */
+    default boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
         return false;
+    }
+
+    /**
+     * Called when this widget was clicked and mouse is now dragging..
+     *
+     * @param mouseButton    mouse button that drags
+     * @param timeSinceClick time since drag began
+     */
+    default void onMouseDrag(int mouseButton, long timeSinceClick) {
     }
 
     /**
@@ -96,7 +132,7 @@ public interface Interactable {
     }
 
     /**
-     * @param key key id, see {@link org.lwjgl.input.Keyboard}
+     * @param key key id, see {@link Keyboard}
      * @return if the key is pressed
      */
     @SideOnly(Side.CLIENT)
@@ -112,25 +148,21 @@ public interface Interactable {
         Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
     }
 
-    enum ClickResult {
+    enum Result {
         /**
-         * Nothing happened on this click
+         * Nothing happens.
          */
         IGNORE,
         /**
-         * Nothing happened, but it was clicked
-         */
-        ACKNOWLEDGED,
-        /**
-         * Nothing happened and no other hovered should get interacted
-         */
-        REJECT,
-        /**
-         * Success, but don't try to get focus
+         * Interaction is accepted, but other widgets will get checked.
          */
         ACCEPT,
         /**
-         * Successfully clicked. Should be returned if it should try to receive focus
+         * Interaction is rejected and no other widgets will get checked.
+         */
+        STOP,
+        /**
+         * Interaction is accepted and no other widgets will get checked.
          */
         SUCCESS
     }

@@ -1,349 +1,319 @@
 package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.ModularUITextures;
-import com.cleanroommc.modularui.api.drawable.AdaptableUITexture;
-import com.cleanroommc.modularui.api.drawable.ItemDrawable;
-import com.cleanroommc.modularui.api.drawable.Text;
-import com.cleanroommc.modularui.api.drawable.UITexture;
-import com.cleanroommc.modularui.api.math.*;
-import com.cleanroommc.modularui.api.screen.ITileWithModularUI;
-import com.cleanroommc.modularui.api.screen.ModularWindow;
-import com.cleanroommc.modularui.api.screen.UIBuildContext;
-import com.cleanroommc.modularui.api.widget.IWidgetBuilder;
-import com.cleanroommc.modularui.api.widget.Widget;
-import com.cleanroommc.modularui.common.widget.*;
-import com.cleanroommc.modularui.common.widget.textfield.TextFieldWidget;
+import com.cleanroommc.modularui.api.IGuiHolder;
+import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.layout.CrossAxisAlignment;
+import com.cleanroommc.modularui.drawable.*;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.sync.GuiSyncHandler;
+import com.cleanroommc.modularui.sync.SyncHandlers;
+import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.widget.ParentWidget;
+import com.cleanroommc.modularui.widgets.*;
+import com.cleanroommc.modularui.widgets.layout.Column;
+import com.cleanroommc.modularui.widgets.layout.Row;
+import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
-public class TestTile extends SyncedTileEntityBase implements ITileWithModularUI, ITickable {
+public class TestTile extends TileEntity implements IGuiHolder, ITickable {
 
-    private int serverValue = 0;
-    private final FluidTank fluidTank1 = new FluidTank(10000);
-    private final FluidTank fluidTank2 = new FluidTank(Integer.MAX_VALUE);
-    private final ItemStackHandler phantomInventory = new ItemStackHandler(2) {
+    private final FluidTank fluidTank = new FluidTank(10000);
+    private final FluidTank fluidTankPhantom = new FluidTank(10000);
+    private long time = 0;
+    private int val, val2 = 0;
+    private String value = "";
+    private double doubleValue = 1;
+    private int duration = 80, progress = 0;
+    private int cycleState = 0;
+    private IItemHandlerModifiable inventory = new ItemStackHandler(2) {
         @Override
         public int getSlotLimit(int slot) {
-            return Integer.MAX_VALUE;
+            return slot == 0 ? Integer.MAX_VALUE : 64;
         }
     };
-    private final ItemStackHandler items = new ItemStackHandler(9);
-    private String textFieldValue = "";
-    private final int duration = 60;
-    private int progress = 0;
-    private int ticks = 0;
-    private float sliderValue = 0;
-    private int serverCounter = 0;
-    private static final AdaptableUITexture DISPLAY = AdaptableUITexture.of("modularui:gui/background/display", 143, 75, 2);
-    private static final AdaptableUITexture BACKGROUND = AdaptableUITexture.of("modularui:gui/background/background", 176, 166, 3);
-    private static final UITexture PROGRESS_BAR = UITexture.fullImage("modularui", "gui/widgets/progress_bar_arrow");
-    private static final UITexture PROGRESS_BAR_MIXER = UITexture.fullImage("modularui", "gui/widgets/progress_bar_mixer");
 
-    private final ItemStackHandler chestInventory = new ItemStackHandler(9 * 6);
+    private final ItemStackHandler bigInventory = new ItemStackHandler(9);
+
+    private final ItemStackHandler mixerItems = new ItemStackHandler(4);
+    private final FluidTank mixerFluids1 = new FluidTank(16000);
+    private final FluidTank mixerFluids2 = new FluidTank(16000);
 
 
     @Override
-    public ModularWindow createWindow(UIBuildContext buildContext) {
-        ModularWindow.Builder builder = ModularWindow.builder(new Size(176, 272));
-        builder.setBackground(ModularUITextures.VANILLA_BACKGROUND)
-                .bindPlayerInventory(buildContext.getPlayer());
-        return builder.widget(SlotGroup.ofItemHandler(chestInventory, 9, false, null)
-                .setPos(7, 10))
-                .build();
-    }
+    public void buildSyncHandler(GuiSyncHandler guiSyncHandler, EntityPlayer player) {
+        guiSyncHandler.syncValue(0, SyncHandlers.intNumber(() -> val, val -> this.val = val));
+        guiSyncHandler.syncValue(1, SyncHandlers.string(() -> this.value, val -> this.value = val));
+        guiSyncHandler.syncValue(2, SyncHandlers.doubleNumber(() -> this.doubleValue, val -> this.doubleValue = val));
+        guiSyncHandler.syncValue(3, SyncHandlers.intNumber(() -> this.cycleState, val -> this.cycleState = val));
+        guiSyncHandler.syncValue("phantom_item_slot", SyncHandlers.phantomItemSlot(this.inventory, 0).ignoreMaxStackSize(true));
+        guiSyncHandler.syncValue("fluid_slot", SyncHandlers.fluidSlot(fluidTank));
+        guiSyncHandler.syncValue("fluid_slot", 1, SyncHandlers.fluidSlot(fluidTankPhantom).phantom(true));
 
-    //@Override
-    public ModularWindow createWindow2(UIBuildContext buildContext) {
-        phantomInventory.setStackInSlot(1, new ItemStack(Items.DIAMOND, Integer.MAX_VALUE));
-        Text[] TEXT = {new Text("Blue \u00a7nUnderlined\u00a7rBlue ").color(0x3058B8), new Text("Mint").color(0x469E8F)};
-        ModularWindow.Builder builder = ModularWindow.builder(new Size(176, 272));
-        //.addFromJson("modularui:test", buildContext);
-        /*buildContext.applyToWidget("background", DrawableWidget.class, widget -> {
-            widget.addTooltip("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.")
-                    .addTooltip("Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.")
-                    .addTooltip("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet");
-        });*/
-        List<Integer> nums = IntStream.range(1, 101).boxed().collect(Collectors.toList());
-        builder.setBackground(ModularUITextures.VANILLA_BACKGROUND)
-                .bindPlayerInventory(buildContext.getPlayer());
-        Column column = new Column();
-        addInfo(column);
-        ChangeableWidget changeableWidget = new ChangeableWidget(this::dynamicWidget);
-        buildContext.addSyncedWindow(1, this::createAnotherWindow);
-        return builder
-                .widget(new TabContainer()
-                        .setButtonSize(new Size(28, 32))
-                        .addTabButton(new TabButton(0)
-                                .setBackground(false, ModularUITextures.VANILLA_TAB_TOP_START.getSubArea(0, 0, 1f, 0.5f))
-                                .setBackground(true, ModularUITextures.VANILLA_TAB_TOP_START.getSubArea(0, 0.5f, 1f, 1f))
-                                .setPos(0, -28))
-                        .addTabButton(new TabButton(1)
-                                .setBackground(false, ModularUITextures.VANILLA_TAB_TOP_MIDDLE.getSubArea(0, 0, 1f, 0.5f))
-                                .setBackground(true, ModularUITextures.VANILLA_TAB_TOP_MIDDLE.getSubArea(0, 0.5f, 1f, 1f))
-                                .setPos(28, -28))
-                        .addTabButton(new TabButton(2)
-                                .setBackground(false, ModularUITextures.VANILLA_TAB_TOP_MIDDLE.getSubArea(0, 0, 1f, 0.5f))
-                                .setBackground(true, ModularUITextures.VANILLA_TAB_TOP_MIDDLE.getSubArea(0, 0.5f, 1f, 1f))
-                                .setPos(56, -28))
-                        .addTabButton(new TabButton(3)
-                                .setBackground(false, ModularUITextures.VANILLA_TAB_TOP_MIDDLE.getSubArea(0, 0, 1f, 0.5f))
-                                .setBackground(true, ModularUITextures.VANILLA_TAB_TOP_MIDDLE.getSubArea(0, 0.5f, 1f, 1f))
-                                .setPos(84, -28))
-                        .addPage(new MultiChildWidget()
-                                .addChild(new TextWidget("Page 1"))
-                                .addChild(new SlotWidget(phantomInventory, 0)
-                                        .setChangeListener(() -> {
-                                            serverCounter = 0;
-                                            changeableWidget.notifyChangeServer();
-                                        }).setShiftClickPrio(0)
-                                        .setPos(10, 30))
-                                .addChild(SlotWidget.phantom(phantomInventory, 1)
-                                        .setShiftClickPrio(1)
-                                        .setIgnoreStackSizeLimit(true)
-                                        .setPos(28, 30))
-                                .addChild(changeableWidget
-                                        .setPos(12, 55))
-                                .addChild(SlotGroup.ofItemHandler(items, 3, false, "inv")
-                                        .setPos(12, 80))
-                                .setPos(10, 10)
-                                .setDebugLabel("Page1"))
-                        .addPage(new MultiChildWidget()
-                                .addChild(new TextWidget("Page 2")
-                                        .setPos(10, 10))
-                                .addChild(column.setPos(7, 19))
-                                .addChild(new ButtonWidget()
-                                        .setOnClick((clickData, widget) -> {
-                                            if (!widget.isClient())
-                                                widget.getContext().openSyncedWindow(1);
-                                        })
-                                        .setBackground(ModularUITextures.VANILLA_BACKGROUND, new Text("Window"))
-                                        .setSize(80, 20)
-                                        .setPos(20, 100))
-                                .addChild(new ItemDrawable(new ItemStack(Blocks.COMMAND_BLOCK)).asWidget()
-                                        .setSize(32, 16)
-                                        .setPos(20, 80))
-                                .addChild(new SliderWidget()
-                                        .setBounds(0, 15)
-                                        .setGetter(() -> sliderValue)
-                                        .setSetter(val -> sliderValue = val)
-                                        .setSize(120, 20)
-                                        .setPos(7, 130))
-                                .addChild(TextWidget.dynamicString(() -> String.valueOf((int) (sliderValue + 0.5f)))
-                                        .setTextAlignment(Alignment.CenterLeft)
-                                        .setSize(30, 20)
-                                        .setPos(135, 130))
-                                .setDebugLabel("Page2"))
-                        .addPage(new MultiChildWidget()
-                                .addChild(new TextWidget("Page 3"))
-                                .addChild(new CycleButtonWidget()
-                                        .setLength(3)
-                                        .setGetter(() -> serverValue)
-                                        .setSetter(val -> this.serverValue = val)
-                                        .setTexture(UITexture.fullImage("modularui", "gui/widgets/cycle_button_demo"))
-                                        .addTooltip(0, "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.")
-                                        .addTooltip(1, "Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.")
-                                        .addTooltip(2, "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet")
-                                        .setPos(new Pos2d(68, 0)))
-                                .addChild(new TextFieldWidget()
-                                        .setGetter(() -> textFieldValue)
-                                        .setSetter(val -> textFieldValue = val)
-                                        .setTextColor(Color.WHITE.dark(1))
-                                        .setTextAlignment(Alignment.Center)
-                                        .setScrollBar()
-                                        .setBackground(DISPLAY.withOffset(-2, -2, 4, 4))
-                                        .setSize(92, 20)
-                                        .setPos(20, 25))
-                                .addChild(new ProgressBar()
-                                        .setProgress(() -> progress * 1f / duration)
-                                        .setDirection(ProgressBar.Direction.LEFT)
-                                        .setTexture(PROGRESS_BAR_MIXER, 20)
-                                        .setPos(7, 85))
-                                .addChild(new ProgressBar()
-                                        .setProgress(() -> progress * 1f / duration)
-                                        .setDirection(ProgressBar.Direction.RIGHT)
-                                        .setTexture(PROGRESS_BAR_MIXER, 20)
-                                        .setPos(30, 85))
-                                .addChild(new ProgressBar()
-                                        .setProgress(() -> progress * 1f / duration)
-                                        .setDirection(ProgressBar.Direction.UP)
-                                        .setTexture(PROGRESS_BAR_MIXER, 20)
-                                        .setPos(53, 85))
-                                .addChild(new ProgressBar()
-                                        .setProgress(() -> progress * 1f / duration)
-                                        .setDirection(ProgressBar.Direction.DOWN)
-                                        .setTexture(PROGRESS_BAR_MIXER, 20)
-                                        .setPos(76, 85))
-                                .addChild(new ProgressBar()
-                                        .setProgress(() -> progress * 1f / duration)
-                                        .setDirection(ProgressBar.Direction.CIRCULAR_CW)
-                                        .setTexture(PROGRESS_BAR_MIXER, 20)
-                                        .setPos(99, 85))
-                                .addChild(FluidSlotWidget.phantom(fluidTank2, true).setPos(38, 47))
-                                .addChild(new FluidSlotWidget(fluidTank1).setPos(20, 47))
-                                .addChild(new ButtonWidget()
-                                        .setOnClick((clickData, widget) -> {
-                                            if (++serverValue == 3) {
-                                                serverValue = 0;
-                                            }
-                                        })
-                                        .setSynced(true, false)
-                                        .setBackground(DISPLAY, new Text("jTest Textg"))
-                                        .setSize(80, 20)
-                                        .setPos(10, 65))
-                                .addChild(new TextWidget(new Text("modularui.test").localise()).setPos(10, 110))
-                                .addChild(new Row()
-                                        .setAlignment(MainAxisAlignment.SPACE_BETWEEN, CrossAxisAlignment.CENTER)
-                                        .widget(new TextWidget(new Text("Some Text")))
-                                        .widget(new ButtonWidget().setBackground(DISPLAY))
-                                        .widget(new TextWidget(new Text("More Text")))
-                                        .setMaxWidth(156)
-                                        .setPos(0, 130))
-                                .setPos(10, 10))
-                        .addPage(new MultiChildWidget()
-                                .addChild(new Scrollable()
-                                        .setHorizontalScroll()
-                                        .setVerticalScroll()
-                                        .widget(ModularUITextures.ICON_INFO.asWidget().setSize(20, 20).setPos(0, 0))
-                                        .widget(ModularUITextures.ICON_INFO.asWidget().setSize(20, 20).setPos(20, 20))
-                                        .widget(ModularUITextures.ICON_INFO.asWidget().setSize(20, 20).setPos(40, 40))
-                                        .widget(ModularUITextures.ICON_INFO.asWidget().setSize(20, 20).setPos(60, 60))
-                                        .widget(ModularUITextures.ICON_INFO.asWidget().setSize(20, 20).setPos(80, 80))
-                                        .widget(ModularUITextures.ICON_INFO.asWidget().setSize(20, 20).setPos(100, 100))
-                                        .widget(ModularUITextures.ICON_INFO.asWidget().setSize(20, 20).setPos(120, 120))
-                                        .widget(ModularUITextures.ICON_INFO.asWidget().setSize(20, 20).setPos(140, 140))
-                                        .widget(ModularUITextures.ICON_INFO.asWidget().setSize(20, 20).setPos(160, 160))
-                                        .widget(ModularUITextures.ICON_INFO.asWidget().setSize(20, 20).setPos(180, 180))
-                                        .widget(ModularUITextures.ICON_INFO.asWidget().setSize(20, 20).setPos(200, 200))
-                                        .widget(ModularUITextures.ICON_INFO.asWidget().setSize(20, 20).setPos(220, 220))
-                                        .widget(ModularUITextures.ICON_INFO.asWidget().setSize(20, 20).setPos(240, 240))
-                                        .widget(ModularUITextures.ICON_INFO.asWidget().setSize(20, 20).setPos(260, 260))
-                                        .widget(ModularUITextures.ICON_INFO.asWidget().setSize(20, 20).setPos(280, 280))
-                                        .widget(new TextFieldWidget()
-                                                .setGetter(() -> textFieldValue)
-                                                .setSetter(val -> textFieldValue = val)
-                                                .setNumbers(val -> val)
-                                                .setTextColor(Color.WHITE.dark(1))
-                                                .setTextAlignment(Alignment.CenterLeft)
-                                                .setScrollBar()
-                                                .setBackground(DISPLAY.withOffset(-2, -2, 4, 4))
-                                                .setSize(92, 20)
-                                                .setPos(20, 25))
-                                        .setSize(156, 150))
-                                .setPos(10, 10)))
-                .widget(new ExpandTab()
-                        .setNormalTexture(ModularUITextures.ICON_INFO.withFixedSize(14, 14, 3, 3))
-                        .widget(new DrawableWidget()
-                                .setDrawable(ModularUITextures.ICON_INFO)
-                                .setSize(14, 14)
-                                .setPos(3, 3))
-                        .widget(new SortableListWidget<>(nums)
-                                .setWidgetCreator(integer -> new TextWidget(integer.toString()).setSize(20, 20).addTooltip(integer.toString()))
-                                .setSize(50, 135)
-                                .setPos(5, 20))
-                        .setExpandedSize(60, 160)
-                        .setBackground(BACKGROUND)
-                        .setSize(20, 20)
-                        .setPos(177, 5)
-                        .respectAreaInJei())
-                .build();
-    }
-
-    public ModularWindow createAnotherWindow(EntityPlayer player) {
-        return ModularWindow.builder(100, 100)
-                .setBackground(ModularUITextures.VANILLA_BACKGROUND)
-                .widget(ButtonWidget.closeWindowButton(true).setPos(85, 5))
-                .widget(SlotWidget.phantom(phantomInventory, 0)
-                        .setShiftClickPrio(0)
-                        .setPos(30, 30))
-                .build();
-    }
-
-    public <T extends Widget & IWidgetBuilder<T>> void addInfo(T builder) {
-        builder.widget(new TextWidget(new Text("Probably a Machine Name").color(0x13610C)))
-                .widget(new TextWidget("Invalid Structure or whatever")
-                        .addTooltip("This has a tooltip"));
-        if (true) {
-            builder.widget(new TextWidget("Maintanance Problems"));
+        for (int i = 0; i < bigInventory.getSlots(); i++) {
+            guiSyncHandler.syncValue("item_inv", i, SyncHandlers.itemSlot(bigInventory, i).slotGroup("item_inv"));
         }
-        builder.widget(new Row()
-                .widget(new TextWidget("Here you can click a button"))
-                .widget(new ButtonWidget()
-                        .setOnClick(((clickData, widget) -> ModularUI.LOGGER.info("Clicked Button")))
-                        .setSize(20, 9)
-                        .setBackground(new Text("[O]"))));
-    }
 
-    public Widget dynamicWidget() {
-        ItemStack stack = phantomInventory.getStackInSlot(0);
-        if (stack.isEmpty()) {
-            return null;
+        guiSyncHandler.registerSlotGroup("item_inv", 3);
+
+        // mixer
+        guiSyncHandler.registerSlotGroup("mixer_items", 2);
+        for (int i = 0; i < 4; i++) {
+            guiSyncHandler.syncValue("mixer_items", i, SyncHandlers.itemSlot(mixerItems, i).slotGroup("mixer_items"));
         }
-        MultiChildWidget widget = new MultiChildWidget();
-        widget.addChild(new TextWidget(new Text("Item: " + stack.getDisplayName()).format(TextFormatting.BLUE)))
-                .addChild(new CycleButtonWidget()
-                        .setGetter(() -> serverCounter)
-                        .setSetter(value -> serverCounter = value)
-                        .setLength(10)
-                        .setTextureGetter(value -> new Text(value + ""))
-                        .setPos(5, 11));
-
-        return widget;
-    }
-
-    @Override
-    public void writeInitialSyncData(PacketBuffer buf) {
-        buf.writeVarInt(serverValue);
-    }
-
-    @Override
-    public void receiveInitialSyncData(PacketBuffer buf) {
-        serverValue = buf.readVarInt();
-    }
-
-    @Override
-    public void receiveCustomData(int discriminator, PacketBuffer buf) {
+        guiSyncHandler.syncValue("mixer_fluids", 0, SyncHandlers.fluidSlot(mixerFluids1));
+        guiSyncHandler.syncValue("mixer_fluids", 1, SyncHandlers.fluidSlot(mixerFluids2));
 
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-        super.writeToNBT(nbt);
-        nbt.setInteger("Val", serverValue);
-        return nbt;
+    public ModularScreen createClientGui(EntityPlayer player) {
+        return ModularScreen.simple("test_gui", this::createPanel);
     }
 
-    @Override
-    public void readFromNBT(NBTTagCompound nbt) {
-        super.readFromNBT(nbt);
-        this.serverValue = nbt.getInteger("Val");
+    public ModularPanel createPanel(GuiContext context) {
+        context.enableJei();
+        Rectangle colorPickerBackground = new Rectangle().setColor(Color.RED.normal);
+        ModularPanel panel = new ModularPanel(context);
+        panel.flex()                        // returns object which is responsible for sizing
+                .size(176, 220)       // set a static size for the main panel
+                .align(Alignment.Center);    // center the panel in the screen
+        panel.background(GuiTextures.BACKGROUND)
+                .bindPlayerInventory()
+                .child(new TabContainer()
+                        .size(1f, 1f)
+                        .tabButton(new TabButton(0))
+                        .tabButton(new TabButton(1))
+                        .tabButton(new TabButton(2))
+                        .addPage(new ParentWidget<>()
+                                .size(1f, 1f)
+                                //.child(SlotGroupWidget.playerInventory())
+                                .child(new Row()
+                                        .height(137)
+                                        .padding(7)
+                                        .child(new Column()
+                                                .coverChildren()
+                                                //.flex(flex -> flex.height(0.5f))
+                                                .width(0.5f)
+                                                .crossAxisAlignment(CrossAxisAlignment.CENTER)
+                                                .child(new ButtonWidget<>()
+                                                        .size(60, 18)
+                                                        .background(GuiTextures.BUTTON, IKey.dynamic(() -> "Button " + this.val)))
+                                                .child(new FluidSlot()
+                                                        .margin(2)
+                                                        .setSynced("fluid_slot"))
+                                                .child(new ButtonWidget<>()
+                                                        .size(60, 18)
+                                                        .tooltip(tooltip -> {
+                                                            tooltip.showUpTimer(10);
+                                                            tooltip.addLine(IKey.str("Test Line g"));
+                                                            tooltip.addLine(IKey.str("An image inside of a tooltip:"));
+                                                            tooltip.addLine(GuiTextures.LOGO.asIcon().size(50).alignment(Alignment.TopCenter));
+                                                            tooltip.addLine(IKey.str("And here a circle:"));
+                                                            tooltip.addLine(new Circle()
+                                                                            .setColor(Color.RED.dark(2), Color.RED.bright(2))
+                                                                            .asIcon()
+                                                                            .size(20))
+                                                                    .addLine(new ItemDrawable(new ItemStack(Items.DIAMOND)).asIcon());
+                                                        })
+                                                        .onMousePressed(mouseButton -> {
+                                                            panel.getScreen().openDialog(this::buildDialog, ModularUI.LOGGER::info);
+                                                            //openSecondWindow(context).openIn(panel.getScreen());
+                                                            return true;
+                                                        })
+                                                        //.flex(flex -> flex.left(3)) // ?
+                                                        .background(GuiTextures.BUTTON, IKey.str("Button 2")))
+                                                .child(new TextFieldWidget()
+                                                        .setTextColor(Color.WHITE.normal)
+                                                        .background(GuiTextures.DISPLAY)
+                                                        .size(60, 20)
+                                                        .setSynced(1)
+                                                        .margin(0, 3))
+                                                .child(new TextFieldWidget()
+                                                        .setTextColor(Color.WHITE.normal)
+                                                        .background(GuiTextures.DISPLAY)
+                                                        .size(60, 20)
+                                                        .setSynced(2)
+                                                        .setNumbersDouble(Function.identity()))
+                                                .child(IKey.str("Test string").asWidget().padding(2)))
+                                        .child(new Column()
+                                                .coverChildren()
+                                                .width(0.5f)
+                                                .crossAxisAlignment(CrossAxisAlignment.CENTER)
+                                                .child(new ProgressWidget()
+                                                        .progress(() -> progress / (double) duration)
+                                                        .texture(GuiTextures.PROGRESS_ARROW, 20))
+                                                .child(new ProgressWidget()
+                                                        .progress(() -> progress / (double) duration)
+                                                        .texture(GuiTextures.PROGRESS_CYCLE, 20)
+                                                        .direction(ProgressWidget.Direction.CIRCULAR_CW))
+                                                .child(new CycleButtonWidget()
+                                                        .length(3)
+                                                        .texture(GuiTextures.CYCLE_BUTTON_DEMO)
+                                                        .addTooltip(0, "State 1")
+                                                        .addTooltip(1, "State 2")
+                                                        .addTooltip(2, "State 3")
+                                                        .background(GuiTextures.BUTTON)
+                                                        .setSynced(3))
+                                                .child(new ItemSlot()
+                                                        .setSynced("phantom_item_slot"))
+                                                .child(new FluidSlot()
+                                                        .margin(2)
+                                                        .setSynced("fluid_slot", 1))
+                                        )))
+                        .addPage(new Column()
+                                        //.coverChildren()
+                                        .padding(7)
+                                        .child(SlotGroupWidget.builder()
+                                                .matrix("III", "III", "III")
+                                                .key('I', index -> new ItemSlot())
+                                                .synced("item_inv")
+                                                .build()
+                                                .marginBottom(2))
+                                        .child(SlotGroupWidget.builder()
+                                                .row("FII")
+                                                .row("FII")
+                                                .key('F', index -> new FluidSlot().setSynced("mixer_fluids", index))
+                                                .key('I', index -> new ItemSlot().setSynced("mixer_items", index))
+                                                .build())
+                                        .child(new Row()
+                                                .coverChildrenHeight()
+                                                .child(new CycleButtonWidget()
+                                                        .size(14, 14)
+                                                        .length(3)
+                                                        .texture(GuiTextures.CYCLE_BUTTON_DEMO)
+                                                        .background(GuiTextures.BUTTON)
+                                                        .getter(() -> val2)
+                                                        .setter(val -> this.val2 = val)
+                                                        .margin(8, 0))
+                                                .child(IKey.str("Hello World").asWidget().height(18)))
+                                        .child(new SpecialButton(IKey.str("A very long string that looks cool when animated").withAnimation())
+                                                .height(14)
+                                                .width(1f))
+                                /*GuiTextures.LOGO.asIcon()
+                                .size(80, 80)
+                                .asWidget()
+                                .flex(flex -> flex.width(1f).height(1f))*/)
+                        .addPage(new ParentWidget<>()
+                                .size(1f, 1f)
+                                .padding(7)
+                                .child(new SliderWidget()
+                                        .width(1f).height(16)
+                                        .top(7)
+                                        .stopper(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)
+                                        .background(GuiTextures.SLOT_DARK))
+                                .child(new ButtonWidget<>()
+                                        .top(25)
+                                        .background(colorPickerBackground)
+                                        .onMousePressed(mouseButton -> {
+                                            panel.getScreen().openPanel(new ColorPickerDialog(context, colorPickerBackground::setColor, colorPickerBackground.getColor(), true));
+                                            return true;
+                                        }))));
+        /*panel.child(new ButtonWidget<>()
+                        .flex(flex -> flex.size(60, 20)
+                                .top(7)
+                                .left(0.5f))
+                        .background(GuiTextures.BUTTON, IKey.dynamic(() -> "Button " + this.val)))
+                .child(SlotGroup.playerInventory())
+                .child(new FluidSlot().flex(flex -> flex
+                                .top(30)
+                                .left(0.5f))
+                        .setSynced("fluid_slot"));*/
+        return panel;
+    }
+
+    public ModularPanel openSecondWindow(GuiContext context) {
+        ModularPanel panel = new ModularPanel(context) {
+            @Override
+            public boolean disablePanelsBelow() {
+                return true;
+            }
+
+            @Override
+            public boolean closeOnOutOfBoundsClick() {
+                return true;
+            }
+        }.flex(flex -> flex.size(100, 100).align(Alignment.Center))
+                .background(GuiTextures.BACKGROUND);
+        panel.child(new ButtonWidget<>()
+                        .flex(flex -> flex.size(8, 8).top(5).right(5))
+                        .background(GuiTextures.BUTTON, IKey.str("x"))
+                        .onMousePressed(mouseButton -> {
+                            panel.animateClose();
+                            return true;
+                        }))
+                .child(IKey.str("2nd Panel")
+                        .asWidget()
+                        .flex(flex -> flex.align(Alignment.Center)));
+        return panel;
+    }
+
+    public void buildDialog(Dialog<String> dialog) {
+        AtomicReference<String> value = new AtomicReference<>("");
+        dialog.name("dialog");
+        dialog.setDraggable(true);
+        dialog.child(new TextFieldWidget()
+                        .flex(flex -> flex.size(100, 20).align(Alignment.Center))
+                        .setTextColor(Color.WHITE.normal)
+                        .background(GuiTextures.DISPLAY)
+                        .getter(value::get)
+                        .setter(value::set))
+                .child(new ButtonWidget<>()
+                        .flex(flex -> flex.size(8, 8).top(5).right(5))
+                        .background(GuiTextures.BUTTON, IKey.str("x"))
+                        .onMousePressed(mouseButton -> {
+                            dialog.closeWith(value.get());
+                            return true;
+                        }));
     }
 
     @Override
     public void update() {
-        if (!world.isRemote) {
-            ticks++;
-            if (ticks % 20 == 0) {
-                if (++serverCounter == 10) {
-                    serverCounter = 0;
-                }
+        if (world.isRemote) {
+            if (time++ % 20 == 0) {
+                val++;
             }
-        } else {
-            if (++progress == duration) {
-                progress = 0;
-            }
+        }
+        if (++progress == duration) {
+            progress = 0;
+        }
+    }
+
+    private static class SpecialButton extends ButtonWidget<SpecialButton> {
+
+        private final AnimatedText animatedKey;
+
+        private SpecialButton(AnimatedText animatedKey) {
+            this.animatedKey = animatedKey.stopAnimation().forward(true);
+            this.animatedKey.reset();
+        }
+
+        @Override
+        public void draw(GuiContext context) {
+            animatedKey.draw(0, 0, getArea().w(), getArea().h());
+        }
+
+        @Override
+        public void onMouseStartHover() {
+            this.animatedKey.startAnimation().forward(true);
+        }
+
+        @Override
+        public void onMouseEndHover() {
+            this.animatedKey.forward(false);
         }
     }
 }

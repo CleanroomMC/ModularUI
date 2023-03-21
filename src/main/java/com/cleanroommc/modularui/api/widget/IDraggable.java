@@ -1,20 +1,23 @@
 package com.cleanroommc.modularui.api.widget;
 
-import org.jetbrains.annotations.ApiStatus;
+import com.cleanroommc.modularui.api.layout.IViewport;
+import com.cleanroommc.modularui.api.layout.IViewportStack;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.widget.sizer.Area;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
+import java.util.Stack;
 
-@ApiStatus.Experimental
-public interface IDraggable {
+public interface IDraggable extends IViewport {
 
     /**
-     * Get's called from the cursor
-     * Usually you just call {@link Widget#drawInternal(float)}
+     * Gets called every frame after everything else is rendered.
+     * Is only called when {@link #isMoving()} is true.
+     * Translate to the mouse pos and draw with {@link com.cleanroommc.modularui.widget.WidgetTree#drawTree(IWidget, GuiContext, boolean, float)}.
      *
      * @param partialTicks difference from last from
      */
-    void renderMovingState(float partialTicks);
+    void drawMovingState(float partialTicks);
 
     /**
      * @param button the mouse button that's holding down
@@ -34,25 +37,39 @@ public interface IDraggable {
     /**
      * Gets called when the mouse is released
      *
-     * @param widget     current top most widget below the mouse
-     * @param isInBounds if the mouse is in the gui bounds
+     * @param widget current top most widget below the mouse
      * @return if the location is valid
      */
-    default boolean canDropHere(@Nullable Widget widget, boolean isInBounds) {
-        return isInBounds;
+    default boolean canDropHere(int x, int y, @Nullable IGuiElement widget) {
+        return true;
     }
 
     /**
      * @return the size and pos during move
      */
     @Nullable
-    Rectangle getArea();
-
-    default boolean shouldRenderChildren() {
-        return true;
-    }
+    Area getMovingArea();
 
     boolean isMoving();
 
     void setMoving(boolean moving);
+
+
+    @Override
+    default void apply(IViewportStack stack, int context) {
+        if (isMoving()) {
+            stack.pushViewport(this, getMovingArea());
+        }
+    }
+
+    @Override
+    default void unapply(IViewportStack stack, int context) {
+        if (isMoving()) {
+            stack.popViewport(this);
+        }
+    }
+
+    @Override
+    default void getWidgetsAt(Stack<IViewport> viewports, IWidgetList widgets, int x, int y) {
+    }
 }
