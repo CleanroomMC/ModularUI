@@ -144,8 +144,13 @@ public abstract class ModularScreen {
 
     public void close(boolean force) {
         if (isActive()) {
-            //if(!force /*TODO check for animation and stuff*/)
-            context.mc.player.closeScreen();
+            if (force) {
+                this.context.mc.player.closeScreen();
+                return;
+            }
+            if (!getMainPanel().isOpening() && !getMainPanel().isClosing()) {
+                getMainPanel().animateClose();
+            }
         }
     }
 

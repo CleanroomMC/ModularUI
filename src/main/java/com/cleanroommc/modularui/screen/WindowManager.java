@@ -75,7 +75,7 @@ public class WindowManager {
                 if (!this.panels.contains(panel)) throw new IllegalStateException();
                 if (this.panels.remove(panel)) {
                     if (panel == this.mainPanel) {
-                        this.screen.close();
+                        this.screen.close(true);
                         return;
                     }
                     panel.onClose();
@@ -147,19 +147,21 @@ public class WindowManager {
     }
 
     public void openPanel(@NotNull ModularPanel panel) {
-        this.queueOpenPanels.add(panel);
+        if (!this.queueOpenPanels.contains(panel)) {
+            this.queueOpenPanels.add(panel);
+        }
     }
 
     public void closePanel(@NotNull ModularPanel panel) {
-        this.queueClosePanels.add(panel);
+        if (!this.queueClosePanels.contains(panel)) {
+            this.queueClosePanels.add(panel);
+        }
     }
 
     public void closeAll() {
         for (ModularPanel panel : this.panels) {
             panel.onClose();
         }
-        //this.panels.clear();
-        //this.closed = true;
     }
 
     public void pushUp(@NotNull ModularPanel window) {

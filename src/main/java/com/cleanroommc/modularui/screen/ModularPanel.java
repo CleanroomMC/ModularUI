@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.screen;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
@@ -12,6 +11,8 @@ import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.Animator;
+import com.cleanroommc.modularui.utils.Interpolation;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
@@ -52,6 +53,10 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     private long timePressed;
     private int lastMouseButton;
 
+    private Animator animator;
+    private float scale = 1f;
+    private float alpha = 1f;
+
     public ModularPanel(GuiContext context) {
         setContext(context);
         context.addJeiExclusionArea(this);
@@ -89,6 +94,19 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     public void closeIfOpen() {
         if (isOpen()) {
             this.screen.closePanel(this);
+        }
+    }
+
+    public void animateClose() {
+        if (ModularUIConfig.panelOpenCloseAnimationTime <= 0) {
+            closeIfOpen();
+            return;
+        }
+        if (isOpen() && !isOpening() && !isClosing()) {
+            this.animator.setEndCallback(val -> {
+                this.screen.closePanel(this);
+            });
+            this.animator.backward();
         }
     }
 
@@ -134,9 +152,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 return ModularPanel.this.hovering.size();
             }
         };
-        if (ModularUIConfig.debug) {
-            ModularUI.LOGGER.info("Start collecting widgets");
-        }
         getContext().reset();
         Stack<IViewport> viewports = new Stack<>();
         viewports.push(this);
@@ -145,7 +160,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         unapply(getContext(), IViewport.COLLECT_WIDGETS);
         viewports.pop();
         getContext().reset();
-        ModularUIConfig.debug = false;
     }
 
     protected void validateName() {
@@ -165,6 +179,22 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             }
         }
         initialise(this);
+        if (ModularUIConfig.panelOpenCloseAnimationTime <= 0) return;
+        this.scale = 0.75f;
+        this.alpha = 0f;
+        if (this.animator == null) {
+            this.animator = new Animator(ModularUIConfig.panelOpenCloseAnimationTime, Interpolation.QUINT_OUT)
+                    .setValueBounds(0.0, 1.0)
+                    .setCallback(val -> {
+                        this.alpha = (float) val;
+                        this.scale = (float) val * 0.25f + 0.75f;
+                    });
+        }
+        this.animator.setEndCallback(value -> {
+            this.scale = 1f;
+            this.alpha = 1f;
+        });
+        this.animator.forward();
     }
 
     @MustBeInvokedByOverriders
@@ -187,7 +217,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
         if (this.hovering.isEmpty()) {
             if (closeOnOutOfBoundsClick()) {
-                closeIfOpen();
+                animateClose();
                 result = true;
             }
         } else {
@@ -491,6 +521,22 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             }
         }
         return null;
+    }
+
+    public boolean isOpening() {
+        return this.animator != null && this.animator.isRunningForwards();
+    }
+
+    public boolean isClosing() {
+        return this.animator != null && this.animator.isRunningBackwards();
+    }
+
+    public float getScale() {
+        return scale;
+    }
+
+    public float getAlpha() {
+        return alpha;
     }
 
     @Override

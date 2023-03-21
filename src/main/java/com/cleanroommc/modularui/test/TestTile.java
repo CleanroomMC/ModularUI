@@ -252,7 +252,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                         .flex(flex -> flex.size(8, 8).top(5).right(5))
                         .background(GuiTextures.BUTTON, IKey.str("x"))
                         .onMousePressed(mouseButton -> {
-                            panel.closeIfOpen();
+                            panel.animateClose();
                             return true;
                         }))
                 .child(IKey.str("2nd Panel")

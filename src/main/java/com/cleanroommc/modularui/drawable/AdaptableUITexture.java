@@ -27,7 +27,7 @@ public class AdaptableUITexture extends UITexture {
             super.draw(x, y, width, height);
             return;
         }
-        GlStateManager.enableAlpha();
+        GlStateManager.disableAlpha();
         GlStateManager.enableBlend();
         GlStateManager.enableTexture2D();
         Minecraft.getMinecraft().renderEngine.bindTexture(location);
@@ -88,6 +88,6 @@ public class AdaptableUITexture extends UITexture {
             GuiDraw.drawBillboard(x + borderX, y + borderY, x1 - borderX, y1 - borderY, uB, vB, u1 - uB, v1 - vB);
         }
         GlStateManager.disableBlend();
-        GlStateManager.disableAlpha();
+        GlStateManager.enableAlpha();
     }
 }

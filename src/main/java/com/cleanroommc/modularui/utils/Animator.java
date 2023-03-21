@@ -65,7 +65,15 @@ public class Animator {
     }
 
     public boolean isRunning() {
-        return dir != 0 && dir > 0 ? progress < duration : progress > 0;
+        return dir != 0 && (dir > 0 ? progress < duration : progress > 0);
+    }
+
+    public boolean isRunningForwards() {
+        return dir > 0 && progress < duration;
+    }
+
+    public boolean isRunningBackwards() {
+        return dir < 0 && progress > 0;
     }
 
     public double getValue() {

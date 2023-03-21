@@ -14,6 +14,9 @@ public interface GuiContainerAccessor {
     void setHoveredSlot(Slot slot);
 
     @Accessor
+    Slot getHoveredSlot();
+
+    @Accessor
     Slot getClickedSlot();
 
     @Accessor

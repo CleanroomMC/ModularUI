@@ -3,8 +3,8 @@ package com.cleanroommc.modularui.widget;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.IResizeable;
 import net.minecraft.client.renderer.GlStateManager;
@@ -108,14 +108,26 @@ public class WidgetTree {
         if (!parent.isEnabled() && !ignoreEnabled) return;
 
         GlStateManager.pushMatrix();
-        Area screen = context.getViewport();
-        int alpha = 1;//getWindow().getAlpha();
-        float scale = 1;//getWindow().getScale();
+        Area panel = parent.getPanel().getArea();
+        float alpha = parent.getPanel().getAlpha();
+        float scale = parent.getPanel().getScale();
         float sf = 1 / scale;
-        // translate to center according to scale
-        float x = parent.getArea().x;//(screen.x + screen.w / 2f * (1 - scale) + (parent.getArea().x - screen.x) * scale) * sf;
-        float y = parent.getArea().y;//(screen.y + screen.h / 2f * (1 - scale) + (parent.getArea().y - screen.y) * scale) * sf;
-        GlStateManager.translate(x, y, 0);
+        float x, y;
+        if (parent instanceof ModularPanel) {
+            GlStateManager.translate(parent.getArea().x, parent.getArea().y, 0);
+            x = parent.getArea().width / 2f;
+            y = parent.getArea().height / 2f;
+            GlStateManager.translate(x, y, 0);
+            GlStateManager.scale(scale, scale, 1);
+            GlStateManager.translate(-x, -y, 0);
+        } else {
+            GlStateManager.scale(scale, scale, 1);
+            // translate to center according to scale
+            x = (panel.x + panel.w() / 2f * (1 - scale) + (parent.getArea().x - panel.x) * scale) * sf;
+            y = (panel.y + panel.h() / 2f * (1 - scale) + (parent.getArea().y - panel.y) * scale) * sf;
+            GlStateManager.translate(x, y, 0);
+        }
+
         GlStateManager.color(1, 1, 1, alpha);
         GlStateManager.enableBlend();
         context.applyToOpenGl();
@@ -137,7 +149,15 @@ public class WidgetTree {
         }
         if (viewport != null) {
             GlStateManager.pushMatrix();
-            GlStateManager.translate(x, y, 0);
+            if (parent instanceof ModularPanel) {
+                GlStateManager.translate(parent.getArea().x, parent.getArea().y, 0);
+                GlStateManager.translate(x, y, 0);
+                GlStateManager.scale(scale, scale, 1);
+                GlStateManager.translate(-x, -y, 0);
+            } else {
+                GlStateManager.scale(scale, scale, 1);
+                GlStateManager.translate(x, y, 0);
+            }
             GlStateManager.color(1, 1, 1, alpha);
             GlStateManager.enableBlend();
             context.applyToOpenGl();

@@ -40,6 +40,8 @@ public interface IViewportStack {
 
     void translate(int x, int y);
 
+    void scale(float x, float y);
+
     /**
      * The current total shift in x
      */

@@ -94,6 +94,11 @@ public class GuiViewportStack implements IViewportStack {
     }
 
     @Override
+    public void scale(float x, float y) {
+        transform(new ViewportScale(x, y));
+    }
+
+    @Override
     public int getShiftX() {
         return localX(0);
     }

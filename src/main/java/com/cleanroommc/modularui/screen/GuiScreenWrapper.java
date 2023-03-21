@@ -21,6 +21,7 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
@@ -297,10 +298,6 @@ public class GuiScreenWrapper extends GuiContainer {
 
         if (state) {
             this.lastChar = c0;
-            if (key == Keyboard.KEY_J) {
-                ModularUIConfig.debug = true;
-                return;
-            }
             if (this.screen.onKeyPressed(c0, key)) return;
             keyTyped(c0, key);
         } else {
@@ -321,7 +318,19 @@ public class GuiScreenWrapper extends GuiContainer {
             ModularUIConfig.guiDebugMode = !ModularUIConfig.guiDebugMode;
             return;
         }
-        super.keyTyped(typedChar, keyCode);
+        if (keyCode == 1 || this.mc.gameSettings.keyBindInventory.isActiveAndMatches(keyCode)) {
+            this.screen.close();
+        }
+
+        this.checkHotbarKeys(keyCode);
+        Slot hoveredSlot = getAccessor().getHoveredSlot();
+        if (hoveredSlot != null && hoveredSlot.getHasStack()) {
+            if (this.mc.gameSettings.keyBindPickBlock.isActiveAndMatches(keyCode)) {
+                this.handleMouseClick(hoveredSlot, hoveredSlot.slotNumber, 0, ClickType.CLONE);
+            } else if (this.mc.gameSettings.keyBindDrop.isActiveAndMatches(keyCode)) {
+                this.handleMouseClick(hoveredSlot, hoveredSlot.slotNumber, isCtrlKeyDown() ? 1 : 0, ClickType.THROW);
+            }
+        }
     }
 
     public boolean isDragSplitting() {

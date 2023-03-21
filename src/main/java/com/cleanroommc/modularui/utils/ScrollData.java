@@ -86,7 +86,7 @@ public class ScrollData {
 
     public void animateTo(ScrollArea area, int x) {
         if (scrollAnimator == null) {
-            scrollAnimator = new Animator(10, Interpolation.QUAD_OUT)
+            scrollAnimator = new Animator(30, Interpolation.QUAD_OUT)
                     .setCallback(value -> scrollTo(area, (int) value));
         }
 

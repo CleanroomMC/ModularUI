@@ -84,7 +84,7 @@ public class ColorPickerDialog extends Dialog<Integer> {
                                 .height(1f).width(50)
                                 .background(GuiTextures.BUTTON, IKey.str("Cancel").color(Color.WHITE.normal).shadow(true))
                                 .onMousePressed(button -> {
-                                    closeIfOpen();
+                                    animateClose();
                                     return true;
                                 }))
                         .child(new ButtonWidget<>()
