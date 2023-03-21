@@ -20,6 +20,7 @@ public class MinecraftMixin {
                     ordinal = 2,
                     shift = At.Shift.AFTER))
     public void timer(CallbackInfo ci) {
+        if (ModularUI.getTimer60Fps() == null) return;
         ModularUI.getTimer60Fps().updateTimer();
         ModularScreen screen = ModularScreen.getCurrent();
         if (screen != null) {
