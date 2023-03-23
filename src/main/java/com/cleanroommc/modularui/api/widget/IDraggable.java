@@ -13,7 +13,7 @@ public interface IDraggable extends IViewport {
     /**
      * Gets called every frame after everything else is rendered.
      * Is only called when {@link #isMoving()} is true.
-     * Translate to the mouse pos and draw with {@link com.cleanroommc.modularui.widget.WidgetTree#drawTree(IWidget, GuiContext, boolean, float)}.
+     * Translate to the mouse pos and draw with {@link com.cleanroommc.modularui.widget.WidgetTree#drawTree(IWidget, GuiContext, boolean)}.
      *
      * @param partialTicks difference from last from
      */

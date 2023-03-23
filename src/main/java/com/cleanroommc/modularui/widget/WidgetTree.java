@@ -101,10 +101,10 @@ public class WidgetTree {
     }
 
     public static void drawTree(IWidget parent, GuiContext context, float partialTicks) {
-        drawTree(parent, context, false, partialTicks);
+        drawTree(parent, context, false);
     }
 
-    public static void drawTree(IWidget parent, GuiContext context, boolean ignoreEnabled, float partialTicks) {
+    public static void drawTree(IWidget parent, GuiContext context, boolean ignoreEnabled) {
         if (!parent.isEnabled() && !ignoreEnabled) return;
 
         GlStateManager.pushMatrix();
@@ -145,7 +145,7 @@ public class WidgetTree {
 
         List<IWidget> children = parent.getChildren();
         if (!children.isEmpty()) {
-            children.forEach(widget -> drawTree(widget, context, false, partialTicks));
+            children.forEach(widget -> drawTree(widget, context, false));
         }
         if (viewport != null) {
             GlStateManager.pushMatrix();

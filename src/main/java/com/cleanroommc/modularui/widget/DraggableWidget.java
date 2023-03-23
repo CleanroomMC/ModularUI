@@ -22,7 +22,7 @@ public class DraggableWidget<W extends DraggableWidget<W>> extends Widget<W> imp
 
     @Override
     public void drawMovingState(float partialTicks) {
-        WidgetTree.drawTree(this, getContext(), true, partialTicks);
+        WidgetTree.drawTree(this, getContext(), true);
     }
 
     @Override
