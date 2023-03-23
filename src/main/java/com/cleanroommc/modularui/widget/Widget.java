@@ -233,7 +233,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     @Override
-    public Tooltip tooltip() {
+    public @NotNull Tooltip tooltip() {
         if (this.tooltip == null) {
             this.tooltip = new Tooltip();
             if (!ModularUIConfig.placeTooltipNextToPanel()) {

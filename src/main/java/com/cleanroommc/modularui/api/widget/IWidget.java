@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Flex;
@@ -61,19 +60,6 @@ public interface IWidget extends IGuiElement {
      * @param context gui context
      */
     void drawForeground(GuiContext context);
-
-    /**
-     * @return if this widget has a tooltip
-     */
-    default boolean hasTooltip() {
-        return getTooltip() != null && !getTooltip().isEmpty();
-    }
-
-    /**
-     * @return the tooltip of this widget
-     */
-    @Nullable
-    Tooltip getTooltip();
 
     /**
      * Called approximately 60 times per second.

@@ -5,7 +5,7 @@ import net.minecraft.inventory.Slot;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(value = Slot.class)
+@Mixin(value = Slot.class, remap = false)
 public interface SlotAccessorClient {
 
     @Invoker

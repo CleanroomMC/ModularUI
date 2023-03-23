@@ -5,14 +5,28 @@ import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
 public interface ITooltip<W extends IWidget> {
 
+    /**
+     * @return the current tooltip of this widget. Null if there is none
+     */
+    @Nullable
     Tooltip getTooltip();
 
+    /**
+     * @return the current tooltip of this widget. Creates a new one if there is none
+     */
+    @NotNull
     Tooltip tooltip();
+
+    default boolean hasTooltip() {
+        return getTooltip() != null && !getTooltip().isEmpty();
+    }
 
     @SuppressWarnings("unchecked")
     default W getThis() {

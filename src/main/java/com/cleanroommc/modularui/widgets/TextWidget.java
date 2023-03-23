@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Box;
+import com.cleanroommc.modularui.widget.sizer.Flex;
 
 public class TextWidget extends Widget<TextWidget> {
 
@@ -33,9 +34,11 @@ public class TextWidget extends Widget<TextWidget> {
 
     @Override
     public int getDefaultHeight() {
+        Flex parentFlex = getParent().getFlex();
+        float maxWidth = parentFlex != null && !parentFlex.xAxisDependsOnChildren() ? getParent().getArea().width : Float.MAX_VALUE;
         Box padding = getArea().getPadding();
         TextRenderer renderer = TextRenderer.SHARED;
-        renderer.setAlignment(Alignment.TopLeft, Integer.MAX_VALUE);
+        renderer.setAlignment(Alignment.TopLeft, maxWidth);
         renderer.setPos(padding.left, padding.top);
         renderer.setScale(this.scale);
         renderer.setSimulate(true);
@@ -45,9 +48,11 @@ public class TextWidget extends Widget<TextWidget> {
 
     @Override
     public int getDefaultWidth() {
+        Flex parentFlex = getParent().getFlex();
+        float maxWidth = parentFlex != null && !parentFlex.xAxisDependsOnChildren() ? getParent().getArea().width : Float.MAX_VALUE;
         Box padding = getArea().getPadding();
         TextRenderer renderer = TextRenderer.SHARED;
-        renderer.setAlignment(Alignment.TopLeft, Integer.MAX_VALUE);
+        renderer.setAlignment(Alignment.TopLeft, maxWidth);
         renderer.setPos(padding.left, padding.top);
         renderer.setScale(this.scale);
         renderer.setSimulate(true);

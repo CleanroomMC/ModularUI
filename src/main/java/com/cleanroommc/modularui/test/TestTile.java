@@ -7,6 +7,7 @@ import com.cleanroommc.modularui.api.layout.CrossAxisAlignment;
 import com.cleanroommc.modularui.drawable.*;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
 import com.cleanroommc.modularui.sync.SyncHandlers;
@@ -129,7 +130,8 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                                                             .setColor(Color.RED.dark(2), Color.RED.bright(2))
                                                                             .asIcon()
                                                                             .size(20))
-                                                                    .addLine(new ItemDrawable(new ItemStack(Items.DIAMOND)).asIcon());
+                                                                    .addLine(new ItemDrawable(new ItemStack(Items.DIAMOND)).asIcon())
+                                                                    .pos(Tooltip.Pos.LEFT);
                                                         })
                                                         .onMousePressed(mouseButton -> {
                                                             panel.getScreen().openDialog(this::buildDialog, ModularUI.LOGGER::info);

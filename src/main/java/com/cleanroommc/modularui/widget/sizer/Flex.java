@@ -325,6 +325,14 @@ public class Flex implements IResizeable {
         return this.x.hasSize();
     }
 
+    public boolean xAxisDependsOnChildren() {
+        return this.x.dependsOnChildren();
+    }
+
+    public boolean yAxisDependsOnChildren() {
+        return this.y.dependsOnChildren();
+    }
+
     @ApiStatus.Internal
     public void skip() {
         this.skip = true;
