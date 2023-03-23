@@ -92,7 +92,7 @@ public class GuiDraw {
     }
 
     public static void unscissor(GuiContext context) {
-        unscissor(context.getViewport().width, context.getViewport().height);
+        unscissor(context.screen.getViewport().width, context.screen.getViewport().height);
     }
 
     public static void unscissor(int sw, int sh) {
