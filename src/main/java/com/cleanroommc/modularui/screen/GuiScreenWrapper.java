@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.GuiErrorHandler;
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
@@ -169,6 +170,20 @@ public class GuiScreenWrapper extends GuiContainer {
         GlStateManager.enableDepth();
         GlStateManager.enableRescaleNormal();
         RenderHelper.enableStandardItemLighting();
+    }
+
+    @Override
+    public void drawWorldBackground(int tint) {
+        if (ModularUI.isBlurLoaded() || this.mc.world == null) {
+            super.drawWorldBackground(tint);
+            return;
+        }
+        float alpha = this.screen.getMainPanel().getAlpha();
+        // vanilla color values as hex
+        int color = 0x101010;
+        int startAlpha = 0xc0;
+        int endAlpha = 0xd0;
+        this.drawGradientRect(0, 0, this.width, this.height, Color.withAlpha(color, (int) (startAlpha * alpha)), Color.withAlpha(color, (int) (endAlpha * alpha)));
     }
 
     private void drawItemStack(ItemStack stack, int x, int y, String altText) {

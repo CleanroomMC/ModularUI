@@ -36,10 +36,14 @@ public class ModularUI {
     @SideOnly(Side.CLIENT)
     private static Timer timer60Fps;
 
+    private static boolean blurLoaded = false;
+
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         NetworkRegistry.INSTANCE.registerGuiHandler(ID, GuiManager.INSTANCE);
         GuiInfos.init();
+
+        blurLoaded = Loader.isModLoaded("blur");
 
         if (FMLCommonHandler.instance().getSide().isClient()) {
             timer60Fps = new Timer(60f);
@@ -71,5 +75,9 @@ public class ModularUI {
     @SideOnly(Side.CLIENT)
     public static Timer getTimer60Fps() {
         return timer60Fps;
+    }
+
+    public static boolean isBlurLoaded() {
+        return blurLoaded;
     }
 }
