@@ -15,6 +15,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
 
+/**
+ * Helper class to apply actions to each widget in a tree.
+ */
 public class WidgetTree {
 
     private WidgetTree() {
@@ -100,7 +103,7 @@ public class WidgetTree {
         return !includeSelf || consumer.test(parent);
     }
 
-    public static void drawTree(IWidget parent, GuiContext context, float partialTicks) {
+    public static void drawTree(IWidget parent, GuiContext context) {
         drawTree(parent, context, false);
     }
 
@@ -109,11 +112,13 @@ public class WidgetTree {
 
         GlStateManager.pushMatrix();
         Area panel = parent.getPanel().getArea();
+        // get alpha and scale for open/close animation
         float alpha = parent.getPanel().getAlpha();
         float scale = parent.getPanel().getScale();
         float sf = 1 / scale;
         float x, y;
         if (parent instanceof ModularPanel) {
+            // panels just need to be translated to its center, scaled translated back to its top left corner
             GlStateManager.translate(parent.getArea().x, parent.getArea().y, 0);
             x = parent.getArea().width / 2f;
             y = parent.getArea().height / 2f;
@@ -121,8 +126,9 @@ public class WidgetTree {
             GlStateManager.scale(scale, scale, 1);
             GlStateManager.translate(-x, -y, 0);
         } else {
+            // all other needs to be scaled first
             GlStateManager.scale(scale, scale, 1);
-            // translate to center according to scale
+            // then calculate translation with this complicated looking formula
             x = (panel.x + panel.w() / 2f * (1 - scale) + (parent.getArea().x - panel.x) * scale) * sf;
             y = (panel.y + panel.h() / 2f * (1 - scale) + (parent.getArea().y - panel.y) * scale) * sf;
             GlStateManager.translate(x, y, 0);
@@ -130,24 +136,36 @@ public class WidgetTree {
 
         GlStateManager.color(1, 1, 1, alpha);
         GlStateManager.enableBlend();
+        // now apply all active viewports to opengl
         context.applyToOpenGl();
+        // draw the current widget
         parent.drawBackground(context);
         parent.draw(context);
 
         IViewport viewport = parent instanceof IViewport ? (IViewport) parent : null;
         if (viewport != null) {
+            // if this is a viewport we call some extra methods
+            // first a normal draw call
             viewport.preDraw(context, false);
+            // now push this viewport
             viewport.apply(context, IViewport.DRAWING | IViewport.PRE_DRAW);
+            // apply only that viewport to opengl (since all others are already applied)
             context.applyTopToOpenGl();
+            // draw again with the transformation
             viewport.preDraw(context, true);
         }
+        // get rid of all opengl transformations for children
+        // all widgets transform themselves on their own
         GlStateManager.popMatrix();
 
+        // render all children if there are any
         List<IWidget> children = parent.getChildren();
         if (!children.isEmpty()) {
             children.forEach(widget -> drawTree(widget, context, false));
         }
+
         if (viewport != null) {
+            // now apply the same transformations as above for open/close animation
             GlStateManager.pushMatrix();
             if (parent instanceof ModularPanel) {
                 GlStateManager.translate(parent.getArea().x, parent.getArea().y, 0);
@@ -160,11 +178,17 @@ public class WidgetTree {
             }
             GlStateManager.color(1, 1, 1, alpha);
             GlStateManager.enableBlend();
+            // now apply all active viewports to opengl again
             context.applyToOpenGl();
+            // draw this viewport with active transformation
             viewport.postDraw(context, true);
+            // only remove transformation of the top viewport
             context.unapplyTopToOpenGl();
+            // pop the top viewport from the stack
             viewport.unapply(context, IViewport.DRAWING | IViewport.POST_DRAW);
+            // draw again but without the top viewport transformation
             viewport.postDraw(context, false);
+            // finally get rid of all opengl transformations
             GlStateManager.popMatrix();
         }
     }
@@ -203,8 +227,6 @@ public class WidgetTree {
             child.postResize();
             return true;
         }, true);
-        // make sure hovered widgets are updated
-        parent.getPanel().markDirty();
     }
 
     public static IGuiElement findParent(IGuiElement parent, Predicate<IGuiElement> filter) {

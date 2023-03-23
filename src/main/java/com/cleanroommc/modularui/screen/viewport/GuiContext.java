@@ -41,7 +41,7 @@ public class GuiContext extends GuiViewportStack {
     private int timeHovered = 0;
     private final HoveredIterable hoveredWidgets;
 
-    private LocatedElement<IDraggable> draggable, queuedDraggable;
+    private LocatedElement<IDraggable> draggable;
     private int lastButton = -1;
     private long lastClickTime = 0;
     private int lastDragX, lastDragY;

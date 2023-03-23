@@ -1,9 +1,9 @@
 package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.Tooltip;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Flex;
 import com.cleanroommc.modularui.widget.sizer.IResizeable;
@@ -46,7 +46,8 @@ public interface IWidget extends IGuiElement {
     void drawBackground(GuiContext context);
 
     /**
-     * Draws additional stuff in this widget
+     * Draws additional stuff in this widget.
+     * x = 0 and y = 0 is now in the top left corner of this widget
      *
      * @param context gui context
      */
@@ -55,6 +56,7 @@ public interface IWidget extends IGuiElement {
 
     /**
      * Draws foreground elements of this widget. For example tooltips.
+     * No transformations are applied here.
      *
      * @param context gui context
      */

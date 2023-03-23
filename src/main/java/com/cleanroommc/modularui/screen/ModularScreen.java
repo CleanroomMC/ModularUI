@@ -205,7 +205,7 @@ public abstract class ModularScreen {
                 // TODO
                 GuiDraw.drawSolidRect(0, 0, this.viewport.w(), this.viewport.h(), Color.argb(16, 16, 16, 125));
             }
-            WidgetTree.drawTree(panel, this.context, partialTicks);
+            WidgetTree.drawTree(panel, this.context);
         }
         this.context.popViewport(null);
 

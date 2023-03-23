@@ -1,10 +1,9 @@
 package com.cleanroommc.modularui.api.widget;
 
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Base interface for gui elements. For example widgets.
@@ -46,14 +45,12 @@ public interface IGuiElement {
     /**
      * Called when the mouse enters the area of this element
      */
-    @ApiStatus.OverrideOnly
     default void onMouseStartHover() {
     }
 
     /**
      * Called when the mouse leaves the area of this element
      */
-    @ApiStatus.OverrideOnly
     default void onMouseEndHover() {
     }
 

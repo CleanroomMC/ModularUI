@@ -9,7 +9,7 @@ public class ModularUIConfig {
     public static int defaultScrollSpeed = 30;
     public static boolean smoothProgressBar = true;
 
-    public static int panelOpenCloseAnimationTime = 5;
+    public static int panelOpenCloseAnimationTime = 8;
 
     // Tooltip
     public static boolean placeNextToPanelByDefault = true;
