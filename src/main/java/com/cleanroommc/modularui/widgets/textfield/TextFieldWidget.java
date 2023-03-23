@@ -129,6 +129,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             handler.getText().add(validator.apply(""));
         } else if (handler.getText().size() == 1) {
             handler.getText().set(0, validator.apply(handler.getText().get(0)));
+            markDirty();
         } else {
             throw new IllegalStateException("TextFieldWidget can only have one line!");
         }

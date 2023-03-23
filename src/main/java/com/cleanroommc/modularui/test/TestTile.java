@@ -5,9 +5,9 @@ import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.layout.CrossAxisAlignment;
 import com.cleanroommc.modularui.drawable.*;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
 import com.cleanroommc.modularui.sync.SyncHandlers;
 import com.cleanroommc.modularui.utils.Alignment;
@@ -52,6 +52,8 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
     private final FluidTank mixerFluids1 = new FluidTank(16000);
     private final FluidTank mixerFluids2 = new FluidTank(16000);
 
+    private boolean bool = false, bool2 = true;
+    private int num = 2;
 
     @Override
     public void buildSyncHandler(GuiSyncHandler guiSyncHandler, EntityPlayer player) {
@@ -221,7 +223,48 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                         .onMousePressed(mouseButton -> {
                                             panel.getScreen().openPanel(new ColorPickerDialog(context, colorPickerBackground::setColor, colorPickerBackground.getColor(), true));
                                             return true;
-                                        }))));
+                                        }))
+                                .child(new ListWidget<>()
+                                        .width(1f).top(50).bottom(2)
+                                        /*.child(new Rectangle().setColor(0xFF606060).asWidget()
+                                                .top(1)
+                                                .left(32)
+                                                .size(1, 40))*/
+                                        .child(new Row()
+                                                .width(1f).height(14)
+                                                .child(new CycleButtonWidget()
+                                                        .toggle(() -> bool, val -> bool = val)
+                                                        .texture(GuiTextures.CHECK_BOX)
+                                                        .size(14, 14)
+                                                        .margin(8, 4))
+                                                .child(IKey.lang("bogosort.gui.enable_refill").asWidget()
+                                                        .height(14)
+                                                        .marginLeft(10)))
+                                        .child(new Row()
+                                                .width(1f).height(14)
+                                                .child(new TextFieldWidget()
+                                                        .getterLong(() -> num)
+                                                        .setterLong(val -> num = (int) val)
+                                                        .setNumbers(1, Short.MAX_VALUE)
+                                                        .setTextAlignment(Alignment.Center)
+                                                        .background(new Rectangle().setColor(0xFFb1b1b1))
+                                                        .size(30, 14))
+                                                .child(IKey.lang("bogosort.gui.refill_threshold").asWidget()
+                                                        .height(14)))
+                                        .child(IKey.lang("bogosort.gui.hotbar_scrolling").asWidget()
+                                                .color(0xFF404040)
+                                                .alignment(Alignment.CenterLeft)
+                                                .left(5).height(14)
+                                                .tooltip(tooltip -> tooltip.showUpTimer(10)
+                                                        .addLine(IKey.lang("bogosort.gui.hotbar_scrolling.tooltip"))))
+                                        .child(new Row()
+                                                .width(1f).height(14)
+                                                .child(new CycleButtonWidget()
+                                                        .toggle(() -> bool2, val -> bool2 = val)
+                                                        .texture(GuiTextures.CHECK_BOX)
+                                                        .size(14, 14))
+                                                .child(IKey.lang("bogosort.gui.enabled").asWidget()
+                                                        .height(14))))));
         /*panel.child(new ButtonWidget<>()
                         .flex(flex -> flex.size(60, 20)
                                 .top(7)

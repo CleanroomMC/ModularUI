@@ -137,8 +137,8 @@ public class WidgetTree {
         IViewport viewport = parent instanceof IViewport ? (IViewport) parent : null;
         if (viewport != null) {
             viewport.preDraw(context, false);
-            context.unapplyTopToOpenGl();
             viewport.apply(context, IViewport.DRAWING | IViewport.PRE_DRAW);
+            context.applyTopToOpenGl();
             viewport.preDraw(context, true);
         }
         GlStateManager.popMatrix();
