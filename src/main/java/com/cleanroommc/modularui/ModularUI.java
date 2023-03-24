@@ -25,7 +25,7 @@ public class ModularUI {
 
     public static final String ID = "modularui";
     public static final String NAME = "Modular UI";
-    public static final String VERSION = "2.0.0";
+    public static final String VERSION = "2.0.0-cursed";
     public static final Logger LOGGER = LogManager.getLogger(ID);
 
     public static final String BOGO_SORT = "bogosorter";
