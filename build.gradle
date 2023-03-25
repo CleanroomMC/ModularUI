@@ -55,6 +55,10 @@ minecraft {
     }
     clientJvmArgs.addAll(args)
     serverJvmArgs.addAll(args)
+
+    replaceIn("src/main/java/${project.mod_ref_path.replace('.', '/')}.java")
+    replace("@VERSION@", project.mod_version)
+    replace("@MODID@", project.archivesBaseName)
 }
 
 repositories {
@@ -98,7 +102,7 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
         // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+        expand 'version': project.version, 'mcversion': project.minecraft.version
     }
     // copy everything else except the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
