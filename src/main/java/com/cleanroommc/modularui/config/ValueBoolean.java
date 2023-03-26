@@ -4,43 +4,35 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.network.PacketBuffer;
 
-public class ValueInt extends Value {
+public class ValueBoolean extends Value {
 
-    private int value;
-    private final int defaultValue;
-    private final int min;
-    private final int max;
+    private final boolean defaultValue;
+    private boolean value;
 
-    public ValueInt(String key, int defaultValue) {
-        this(key, defaultValue, Integer.MIN_VALUE, Integer.MAX_VALUE);
-    }
-
-    public ValueInt(String key, int defaultValue, int min, int max) {
+    public ValueBoolean(String key, boolean defaultValue) {
         super(key);
         this.defaultValue = defaultValue;
         this.value = defaultValue;
-        this.min = min;
-        this.max = max;
     }
 
     @Override
     public JsonElement writeJson() {
-        return new JsonPrimitive(value);
+        return new JsonPrimitive(this.value);
     }
 
     @Override
     public void readJson(JsonElement json) {
-        this.value = json.getAsInt();
+        this.value = json.getAsBoolean();
     }
 
     @Override
     public void writeToPacket(PacketBuffer buffer) {
-        buffer.writeVarInt(this.value);
+        buffer.writeBoolean(this.value);
     }
 
     @Override
     public void readFromPacket(PacketBuffer buffer) {
-        this.value = buffer.readVarInt();
+        this.value = buffer.readBoolean();
     }
 
     @Override
@@ -48,11 +40,7 @@ public class ValueInt extends Value {
         this.value = this.defaultValue;
     }
 
-    public int getValue() {
+    public boolean getValue() {
         return value;
-    }
-
-    public int getDefaultValue() {
-        return defaultValue;
     }
 }

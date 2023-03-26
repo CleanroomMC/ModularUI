@@ -27,7 +27,7 @@ public abstract class Value {
 
     public abstract void writeToPacket(PacketBuffer buffer);
 
-    public abstract void writeFromPacket(PacketBuffer buffer);
+    public abstract void readFromPacket(PacketBuffer buffer);
 
     public abstract void resetToDefault();
 

@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.network;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.network.packets.PacketSyncHandler;
+import com.cleanroommc.modularui.network.packets.SyncConfig;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetHandlerPlayServer;
@@ -21,6 +22,7 @@ public class NetworkHandler {
     public static void init() {
         registerS2C(PacketSyncHandler.class);
         registerC2S(PacketSyncHandler.class);
+        registerC2S(SyncConfig.class);
     }
 
     private static void registerC2S(Class<? extends IPacket> clazz) {

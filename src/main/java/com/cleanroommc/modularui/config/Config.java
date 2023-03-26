@@ -1,22 +1,27 @@
 package com.cleanroommc.modularui.config;
 
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.network.NetworkHandler;
+import com.cleanroommc.modularui.network.packets.SyncConfig;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.common.Loader;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 public class Config {
 
-    private static final Object2ObjectOpenHashMap<String, Config> configs = new Object2ObjectOpenHashMap<>();
+    private static final Map<String, Config> configs = new Object2ObjectLinkedOpenHashMap<>();
     private static final Path configPath = Loader.instance().getConfigDir().toPath();
 
     @NotNull
@@ -37,11 +42,12 @@ public class Config {
 
     private final String name;
     private final String basePath;
-    private final Object2ObjectOpenHashMap<String, Config> categories = new Object2ObjectOpenHashMap<>();
-    private final Object2ObjectOpenHashMap<String, Value> values = new Object2ObjectOpenHashMap<>();
+    private final Map<String, Config> categories = new Object2ObjectLinkedOpenHashMap<>();
+    private final Map<String, Value> values = new Object2ObjectLinkedOpenHashMap<>();
     private final File filePath;
+    private final boolean synced;
 
-    public Config(String name, Map<String, Config> categories, Map<String, Value> values, String basePath) {
+    public Config(String name, Map<String, Config> categories, Map<String, Value> values, String basePath, boolean synced) {
         this.name = name;
         this.basePath = basePath;
         this.categories.putAll(categories);
@@ -53,6 +59,21 @@ public class Config {
         path += File.separator + this.name + ".json";
         this.filePath = new File(path);
         configs.put(name, this);
+        this.synced = synced && determineSynced();
+    }
+
+    private boolean determineSynced() {
+        for (Config category : this.categories.values()) {
+            if (category.isSynced()) {
+                return true;
+            }
+        }
+        for (Value value : this.values.values()) {
+            if (value.isSynced()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public ModularScreen createScreen() {
@@ -93,6 +114,37 @@ public class Config {
         }
     }
 
+    public void syncToServer() {
+        if (!this.synced) return;
+        NetworkHandler.sendToServer(new SyncConfig(this));
+    }
+
+    public void writeToBuffer(PacketBuffer buffer) {
+        List<Config> categories = this.categories.values().stream().filter(Config::isSynced).collect(Collectors.toList());
+        List<Value> values = this.values.values().stream().filter(Value::isSynced).collect(Collectors.toList());
+        buffer.writeVarInt(categories.size());
+        for (Config category : categories) {
+            buffer.writeString(category.getName());
+            category.writeToBuffer(buffer);
+        }
+        buffer.writeVarInt(values.size());
+        for (Value value : values) {
+            buffer.writeString(value.getKey());
+            value.writeToPacket(buffer);
+        }
+    }
+
+    public void readFromBuffer(PacketBuffer buffer) {
+        for (int i = 0, n = buffer.readVarInt(); i < n; i++) {
+            Config category = this.categories.get(buffer.readString(64));
+            category.readFromBuffer(buffer);
+        }
+        for (int i = 0, n = buffer.readVarInt(); i < n; i++) {
+            Value value = this.values.get(buffer.readString(64));
+            value.readFromPacket(buffer);
+        }
+    }
+
     public String getName() {
         return name;
     }
@@ -101,13 +153,18 @@ public class Config {
         return filePath;
     }
 
+    public boolean isSynced() {
+        return synced;
+    }
+
     public static class Builder {
 
         private final String name;
         private final Builder parent;
         private String basePath = "modularui";
-        private final Object2ObjectOpenHashMap<String, Config> categories = new Object2ObjectOpenHashMap<>();
-        private final Object2ObjectOpenHashMap<String, Value> values = new Object2ObjectOpenHashMap<>();
+        private final Map<String, Config> categories = new Object2ObjectLinkedOpenHashMap<>();
+        private final Map<String, Value> values = new Object2ObjectLinkedOpenHashMap<>();
+        private boolean synced = true;
 
         private Builder(String name, Builder parent) {
             this.name = name;
@@ -116,6 +173,11 @@ public class Config {
 
         public Builder basePath(String basePath) {
             this.basePath = basePath;
+            return this;
+        }
+
+        public Builder synced(boolean synced) {
+            this.synced = synced;
             return this;
         }
 
@@ -129,7 +191,7 @@ public class Config {
         }
 
         public Builder buildCategory() {
-            if (parent != null) {
+            if (parent == null) {
                 throw new IllegalStateException("Call 'build' on root config");
             }
             Config config = buildInternal();
@@ -145,7 +207,7 @@ public class Config {
         }
 
         private Config buildInternal() {
-            return new Config(name, categories, values, basePath);
+            return new Config(name, categories, values, basePath, synced);
         }
     }
 }
