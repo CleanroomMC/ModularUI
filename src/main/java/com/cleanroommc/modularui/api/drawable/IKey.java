@@ -3,12 +3,14 @@ package com.cleanroommc.modularui.api.drawable;
 import com.cleanroommc.modularui.drawable.AnimatedText;
 import com.cleanroommc.modularui.drawable.StyledText;
 import com.cleanroommc.modularui.drawable.TextRenderer;
+import com.cleanroommc.modularui.drawable.keys.CompoundKey;
+import com.cleanroommc.modularui.drawable.keys.DynamicKey;
+import com.cleanroommc.modularui.drawable.keys.LangKey;
+import com.cleanroommc.modularui.drawable.keys.StringKey;
 import com.cleanroommc.modularui.utils.Alignment;
-import com.cleanroommc.modularui.utils.keys.CompoundKey;
-import com.cleanroommc.modularui.utils.keys.DynamicKey;
-import com.cleanroommc.modularui.utils.keys.LangKey;
-import com.cleanroommc.modularui.utils.keys.StringKey;
+import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widgets.TextWidget;
+import com.google.gson.JsonObject;
 
 import java.util.function.Supplier;
 
@@ -117,5 +119,18 @@ public interface IKey extends IDrawable {
 
     default StyledText shadow(boolean shadow) {
         return withStyle().shadow(shadow);
+    }
+
+    @Override
+    default void loadFromJson(JsonObject json) {
+        if (json.has("color") || json.has("shadow") || json.has("align") || json.has("alignment") || json.has("scale")) {
+            StyledText styledText = this instanceof StyledText ? (StyledText) this : withStyle();
+            if (json.has("color")) {
+                styledText.color(JsonHelper.getInt(json, 0, "color"));
+            }
+            styledText.shadow(JsonHelper.getBoolean(json, false, "shadow"));
+            styledText.alignment(JsonHelper.deserialize(json, Alignment.class, styledText.getAlignment(), "align", "alignment"));
+            styledText.scale(JsonHelper.getFloat(json, 1, "scale"));
+        }
     }
 }

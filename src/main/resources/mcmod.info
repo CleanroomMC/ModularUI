@@ -13,7 +13,7 @@
       "CleanroomMC"
     ],
     "credits": "GTCE Autor for the idea and concept, Kila Bash for improvements in GTCEu",
-    "logoFile": "assets/modular_ui_logo.png",
+    "logoFile": "assets/modularui/textures/modular_ui_logo.png",
     "screenshots": [],
     "dependencies": []
   }

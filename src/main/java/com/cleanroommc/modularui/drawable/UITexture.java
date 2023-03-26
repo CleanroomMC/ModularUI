@@ -1,7 +1,11 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -132,23 +136,38 @@ public class UITexture implements IDrawable {
         tessellator.draw();
     }
 
-    /*public static UITexture ofJson(JsonObject json) {
-        if (!json.has("src")) {
-            return DEFAULT;
+    public static IDrawable parseFromJson(JsonObject json) {
+        String name = JsonHelper.getString(json, null, "name", "id");
+        if (name != null) {
+            UITexture drawable = GuiTextures.get(name);
+            if (drawable != null) return drawable;
         }
-        ResourceLocation rl = new ResourceLocation(json.get("src").getAsString());
-        if (JSON_TEXTURES.containsKey(rl)) {
-            return JSON_TEXTURES.get(rl);
+        Builder builder = builder();
+        builder.location(JsonHelper.getString(json, ModularUI.ID + ":gui/widgets/error", "location"))
+                .imageSize(JsonHelper.getInt(json, defaultImageWidth, "imageWidth", "iw"), JsonHelper.getInt(json, defaultImageHeight, "imageHeight", "ih"));
+        boolean mode1 = json.has("x") || json.has("y") || json.has("w") || json.has("h") || json.has("width") || json.has("height");
+        boolean mode2 = json.has("u0") || json.has("v0") || json.has("u1") || json.has("u1");
+        if (mode1) {
+            if (mode2) {
+                throw new JsonParseException("Tried to specify x, y, w, h and u0, v0, u1, v1!");
+            }
+            builder.uv(JsonHelper.getInt(json, 0, "x"),
+                    JsonHelper.getInt(json, 0, "y"),
+                    JsonHelper.getInt(json, builder.iw, "w", "width"),
+                    JsonHelper.getInt(json, builder.ih, "h", "height"));
+        } else if (mode2) {
+            builder.uv(JsonHelper.getFloat(json, 0, "u0"),
+                    JsonHelper.getFloat(json, 0, "v0"),
+                    JsonHelper.getFloat(json, 1, "u1"),
+                    JsonHelper.getFloat(json, 1, "v1"));
         }
-        float u0 = JsonHelper.getFloat(json, 0, "u", "u0"), v0 = JsonHelper.getFloat(json, 0, "v", "v0");
-        float u1 = JsonHelper.getFloat(json, 1, "u1"), v1 = JsonHelper.getFloat(json, 1, "v1");
-        Size imageSize = JsonHelper.getElement(json, Size.ZERO, Size::ofJson, "imageSize");
-        int borderWidth = JsonHelper.getInt(json, -1, "borderWidth");
-        if (imageSize.width > 0 && imageSize.height > 0 && borderWidth >= 0) {
-            return AdaptableUITexture.of(rl, imageSize.width, imageSize.height, borderWidth).getSubArea(u0, v0, u1, v1);
+        int borderX = JsonHelper.getInt(json, 0, "borderX", "border");
+        int borderY = JsonHelper.getInt(json, 0, "borderY", "border");
+        if (borderX > 0 || borderY > 0) {
+            builder.adaptable(borderX, borderY);
         }
-        return new UITexture(rl, u0, v0, u1, v1);
-    }*/
+        return builder.build();
+    }
 
     private static int defaultImageWidth = 16, defaultImageHeight = 16;
 

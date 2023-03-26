@@ -6,12 +6,18 @@ import com.cleanroommc.modularui.manager.GuiManager;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.test.EventHandler;
 import com.cleanroommc.modularui.test.TestBlock;
+import com.cleanroommc.modularui.theme.ThemeHandler;
+import com.cleanroommc.modularui.theme.ThemeReloadCommand;
+import com.cleanroommc.modularui.utils.AssetHelper;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.util.Timer;
+import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
@@ -61,6 +67,14 @@ public class ModularUI {
         }
 
         NetworkHandler.init();
+    }
+
+    @Mod.EventHandler
+    public void postInit(FMLPostInitializationEvent event) {
+        if (FMLCommonHandler.instance().getSide().isClient()) {
+            ClientCommandHandler.instance.registerCommand(new ThemeReloadCommand());
+            ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new ThemeHandler());
+        }
     }
 
     public static boolean isSortModLoaded() {

@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.drawable.Icon;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import com.google.gson.JsonObject;
 
 /**
  * An object which can be drawn. This is mainly used for backgrounds in {@link com.cleanroommc.modularui.api.widget.IWidget}.
@@ -49,6 +50,9 @@ public interface IDrawable {
      */
     default Icon asIcon() {
         return new Icon(this);
+    }
+
+    default void loadFromJson(JsonObject json) {
     }
 
     IDrawable EMPTY = (x, y, width, height) -> {};
