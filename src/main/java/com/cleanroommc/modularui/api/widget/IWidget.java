@@ -1,8 +1,10 @@
 package com.cleanroommc.modularui.api.widget;
 
+import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Flex;
 import com.cleanroommc.modularui.widget.sizer.IResizeable;
@@ -60,6 +62,10 @@ public interface IWidget extends IGuiElement {
      * @param context gui context
      */
     void drawForeground(GuiContext context);
+
+    default WidgetTheme getWidgetTheme(ITheme theme) {
+        return theme.getFallback();
+    }
 
     /**
      * Called approximately 60 times per second.

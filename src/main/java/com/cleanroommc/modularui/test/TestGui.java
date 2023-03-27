@@ -1,12 +1,14 @@
 package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.theme.Theme;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
@@ -33,6 +35,7 @@ public class TestGui extends ModularScreen {
 
     public TestGui() {
         super("test");
+        this.context.setTheme("vanilla");
     }
 
     @Override
@@ -50,7 +53,7 @@ public class TestGui extends ModularScreen {
         }
         AtomicReference<SortableListWidget<String, SortableListWidget.Item<String>>> ref = new AtomicReference<>(null);
         List<List<AvailableElement>> availableMatrix = Grid.mapToMatrix(2, lines, (index, value) -> {
-            AvailableElement availableElement = new AvailableElement().background(IKey.str(value).color(Color.WHITE.normal).shadow(true))
+            AvailableElement availableElement = new AvailableElement().background(IKey.str(value))
                     .size(60, 14)
                     .onMousePressed(mouseButton1 -> {
                         if (this.availableElements.get(value).available) {
@@ -87,7 +90,7 @@ public class TestGui extends ModularScreen {
                 .pos(10, 10).right(10).bottom(10))*/
         SortableListWidget<String, SortableListWidget.Item<String>> sortableListWidget = SortableListWidget.sortableBuilder(lines, this.configuredOptions,
                 s -> new SortableListWidget.Item<>(s, new Widget<>()
-                        .background(GuiTextures.BUTTON, IKey.str(s).color(Color.WHITE.normal).shadow(true))
+                        .background(GuiTextures.BUTTON, IKey.str(s))
                         .left(0).right(10))
                         .removeable()).debugName("sortable list");
         ref.set(sortableListWidget);
@@ -106,7 +109,7 @@ public class TestGui extends ModularScreen {
                 .width(100));
         panel.child(new ButtonWidget<>()
                 .bottom(7).size(12, 12).left(0.5f)
-                .background(GuiTextures.BUTTON, GuiTextures.ADD)
+                .background(GuiTextures.ADD)
                 .onMouseTapped(mouseButton -> {
                     if (!isPanelOpen("Option Selection")) {
                         ModularPanel panel1 = ModularPanel.defaultPanel(context, 150, 120).name("Option Selection");
@@ -114,7 +117,7 @@ public class TestGui extends ModularScreen {
                                 .child(new ButtonWidget<>()
                                         .size(8, 8)
                                         .top(7).right(7)
-                                        .background(GuiTextures.BUTTON, GuiTextures.CLOSE)
+                                        .background(GuiTextures.CLOSE)
                                         .onMousePressed(mouseButton1 -> {
                                             closePanel(panel1);
                                             return true;

@@ -1,146 +1,104 @@
 package com.cleanroommc.modularui.theme;
 
 import com.cleanroommc.modularui.api.ITheme;
-import com.cleanroommc.modularui.api.drawable.IDrawable;
-import com.cleanroommc.modularui.drawable.GuiTextures;
-import com.cleanroommc.modularui.utils.Color;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import com.google.gson.JsonObject;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
-import java.util.Set;
+import java.util.Map;
+import java.util.function.BiFunction;
 
 public class Theme implements ITheme {
 
-    public static final Theme DEFAULT;
+    public static final ITheme DEFAULT_DEFAULT = new ThemeHandler.DefaultTheme();
 
-    public static ITheme get(String id) {
-        return ThemeHandler.get(id);
+    /**
+     * If you have a custom widget type and want a custom theme for the type you can register a parser here.
+     *
+     * @param id           the id of the widget theme. This how json finds this parser.
+     * @param defaultTheme this will be used for {@link #DEFAULT_DEFAULT}.
+     * @param function     a function that creates an instance of the widget theme with the parent theme and a json.
+     */
+    public static void registerWidgetTheme(String id, WidgetTheme defaultTheme, BiFunction<WidgetTheme, JsonObject, WidgetTheme> function) {
+        ThemeHandler.registerWidgetTheme(id, defaultTheme, function);
     }
+
+    public static final String FALLBACK = "default";
+    public static final String PANEL = "panel";
+    public static final String BUTTON = "button";
+    public static final String ITEM_SLOT = "itemSlot";
+    public static final String FLUID_SLOT = "fluidSlot";
+
+    private final Map<String, WidgetTheme> widgetThemes = new Object2ObjectOpenHashMap<>();
 
     private final String id;
-    private Theme parentTheme;
-    private final IDrawable panelBackground;
-    private final IDrawable buttonBackground;
-    private final IDrawable disabledButtonBackground;
-    private final Integer textColor;
-    private final Integer buttonTextColor;
-    private final Boolean textShadow;
-    private final Boolean buttonTextShadow;
-    private final Integer panelColor;
-    private final Integer buttonColor;
+    private final ITheme parentTheme;
+    private final WidgetTheme fallback;
+    private final WidgetTheme panelTheme;
+    private final WidgetTheme buttonTheme;
+    private final WidgetSlotTheme itemSlotTheme;
+    private final WidgetSlotTheme fluidSlotTheme;
 
-    Theme(String id, IDrawable panelBackground, IDrawable buttonBackground,
-          IDrawable disabledButtonBackground, Integer textColor, Integer buttonTextColor,
-          Boolean textShadow, Boolean buttonTextShadow, Integer panelColor, Integer buttonColor) {
+    Theme(String id, ITheme parent, Map<String, WidgetTheme> widgetThemes) {
         this.id = id;
-        this.panelBackground = panelBackground;
-        this.buttonBackground = buttonBackground;
-        this.disabledButtonBackground = disabledButtonBackground;
-        this.textColor = textColor;
-        this.buttonTextColor = buttonTextColor;
-        this.textShadow = textShadow;
-        this.buttonTextShadow = buttonTextShadow;
-        this.panelColor = panelColor;
-        this.buttonColor = buttonColor;
-    }
-
-    boolean lateInitThemeParent(Theme parentTheme) {
-        Set<Theme> parents = new ObjectOpenHashSet<>();
-        parents.add(this);
-        Theme parent = parentTheme;
-        while (parent != null) {
-            if (parents.contains(parent)) {
-                return false;
+        this.parentTheme = parent;
+        this.widgetThemes.putAll(widgetThemes);
+        if (parent instanceof Theme) {
+            for (Map.Entry<String, WidgetTheme> entry : ((Theme) parent).widgetThemes.entrySet()) {
+                if (!this.widgetThemes.containsKey(entry.getKey())) {
+                    this.widgetThemes.put(entry.getKey(), entry.getValue());
+                }
             }
-            parents.add(parent);
-            parent = parent.getParentTheme();
+        } else if (parent == DEFAULT_DEFAULT) {
+            if (!this.widgetThemes.containsKey(FALLBACK)) {
+                this.widgetThemes.put(FALLBACK, ThemeHandler.defaultdefaultWidgetTheme);
+            }
+            for (Map.Entry<String, WidgetTheme> entry : ThemeHandler.defaultWidgetThemes.entrySet()) {
+                if (!this.widgetThemes.containsKey(entry.getKey())) {
+                    this.widgetThemes.put(entry.getKey(), entry.getValue());
+                }
+            }
         }
-        this.parentTheme = parentTheme;
-        return true;
+        this.panelTheme = this.widgetThemes.get(PANEL);
+        this.fallback = this.widgetThemes.get(FALLBACK);
+        this.buttonTheme = this.widgetThemes.get(BUTTON);
+        this.itemSlotTheme = (WidgetSlotTheme) this.widgetThemes.get(ITEM_SLOT);
+        this.fluidSlotTheme = (WidgetSlotTheme) this.widgetThemes.get(FLUID_SLOT);
     }
 
-    @Override
     public String getId() {
         return id;
     }
 
-    @Override
-    public Theme getParentTheme() {
+    public ITheme getParentTheme() {
         return parentTheme;
     }
 
-    @Override
-    public IDrawable getPanelBackground() {
-        if (this.panelBackground == null) {
-            return getParentTheme().getPanelBackground();
-        }
-        return panelBackground;
+    public WidgetTheme getFallback() {
+        return fallback;
+    }
+
+    public WidgetTheme getPanelTheme() {
+        return panelTheme;
+    }
+
+    public WidgetTheme getButtonTheme() {
+        return buttonTheme;
     }
 
     @Override
-    public IDrawable getButtonBackground() {
-        if (this.buttonBackground == null) {
-            return getParentTheme().getButtonBackground();
-        }
-        return buttonBackground;
+    public WidgetSlotTheme getItemSlotTheme() {
+        return itemSlotTheme;
     }
 
     @Override
-    public IDrawable getDisabledButtonBackground() {
-        if (this.disabledButtonBackground == null) {
-            return getParentTheme().getDisabledButtonBackground();
-        }
-        return disabledButtonBackground;
+    public WidgetSlotTheme getFluidSlotTheme() {
+        return fluidSlotTheme;
     }
 
-    @Override
-    public int getTextColor() {
-        if (this.textColor == null) {
-            return getParentTheme().getTextColor();
+    public WidgetTheme getWidgetTheme(String id) {
+        if (this.widgetThemes.containsKey(id)) {
+            return this.widgetThemes.get(id);
         }
-        return textColor;
-    }
-
-    @Override
-    public int getButtonTextColor() {
-        if (this.buttonTextColor == null) {
-            return getParentTheme().getButtonTextColor();
-        }
-        return buttonTextColor;
-    }
-
-    @Override
-    public boolean isTextShadow() {
-        if (this.textShadow == null) {
-            return getParentTheme().isTextShadow();
-        }
-        return textShadow;
-    }
-
-    @Override
-    public boolean isButtonTextShadow() {
-        if (this.buttonTextShadow == null) {
-            return getParentTheme().isButtonTextShadow();
-        }
-        return buttonTextShadow;
-    }
-
-    @Override
-    public int getPanelColor() {
-        if (this.panelColor == null) {
-            return getParentTheme().getPanelColor();
-        }
-        return panelColor;
-    }
-
-    @Override
-    public int getButtonColor() {
-        if (this.buttonColor == null) {
-            return getParentTheme().getButtonColor();
-        }
-        return buttonColor;
-    }
-
-    static {
-        DEFAULT = new Theme("DEFAULT", GuiTextures.BACKGROUND, GuiTextures.BUTTON, GuiTextures.SLOT_DARK, 0xFF404040, Color.WHITE.normal, false, true, 0, 0);
+        return getFallback();
     }
 }

@@ -1,7 +1,10 @@
 package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.google.gson.JsonObject;
@@ -134,6 +137,11 @@ public class UITexture implements IDrawable {
         bufferbuilder.pos(x1, y0, 0.0f).tex(u1, v0).endVertex();
         bufferbuilder.pos(x0, y0, 0.0f).tex(u0, v0).endVertex();
         tessellator.draw();
+    }
+
+    @Override
+    public void applyThemeColor(ITheme theme, WidgetTheme widgetTheme) {
+        Color.setGlColorOpaque(widgetTheme.getColor());
     }
 
     public static IDrawable parseFromJson(JsonObject json) {

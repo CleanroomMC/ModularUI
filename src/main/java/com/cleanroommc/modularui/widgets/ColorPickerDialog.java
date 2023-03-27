@@ -47,12 +47,12 @@ public class ColorPickerDialog extends Dialog<Integer> {
                         .left(5).right(5).height(14)
                         .child(new PageButton(0, controller)
                                 .size(0.5f, 1f)
-                                .background(true, GuiTextures.BUTTON, IKey.str("RGB").color(Color.WHITE.normal).shadow(true))
-                                .background(false, GuiTextures.SLOT_DARK, IKey.str("RGB").color(Color.WHITE.normal).shadow(true)))
+                                .background(true, GuiTextures.BUTTON, IKey.str("RGB"))
+                                .background(false, GuiTextures.SLOT_DARK, IKey.str("RGB")))
                         .child(new PageButton(1, controller)
                                 .size(0.5f, 1f)
-                                .background(true, GuiTextures.BUTTON, IKey.str("HSV").color(Color.WHITE.normal).shadow(true))
-                                .background(false, GuiTextures.SLOT_DARK, IKey.str("HSV").color(Color.WHITE.normal).shadow(true))))
+                                .background(true, GuiTextures.BUTTON, IKey.str("HSV"))
+                                .background(false, GuiTextures.SLOT_DARK, IKey.str("HSV"))))
                 .child(new Row().width(1f).height(12).marginTop(4)
                         .child(IKey.str("Hex: ").asWidget().height(1f))
                         .child(new TextFieldWidget()
@@ -82,14 +82,14 @@ public class ColorPickerDialog extends Dialog<Integer> {
                         .mainAxisAlignment(MainAxisAlignment.SPACE_BETWEEN)
                         .child(new ButtonWidget<>()
                                 .height(1f).width(50)
-                                .background(GuiTextures.BUTTON, IKey.str("Cancel").color(Color.WHITE.normal).shadow(true))
+                                .background(IKey.str("Cancel"))
                                 .onMousePressed(button -> {
                                     animateClose();
                                     return true;
                                 }))
                         .child(new ButtonWidget<>()
                                 .height(1f).width(50)
-                                .background(GuiTextures.BUTTON, IKey.str("Confirm").color(Color.WHITE.normal).shadow(true))
+                                .background(IKey.str("Confirm"))
                                 .onMousePressed(button -> {
                                     closeWith(this.color);
                                     return true;

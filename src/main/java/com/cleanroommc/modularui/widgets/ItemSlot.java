@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widgets;
 
+import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
@@ -11,6 +12,7 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.sync.ItemSlotSH;
+import com.cleanroommc.modularui.theme.WidgetSlotTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.ClickData;
 import com.cleanroommc.modularui.utils.Color;
@@ -37,9 +39,6 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     @Override
     public void onInit() {
         size(18, 18);
-        if (getBackground().length == 0) {
-            background(GuiTextures.SLOT);
-        }
     }
 
     @Override
@@ -60,9 +59,14 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         GlStateManager.disableLighting();
         if (isHovering()) {
             GlStateManager.colorMask(true, true, true, false);
-            GuiDraw.drawSolidRect(1, 1, 16, 16, Color.withAlpha(Color.WHITE.normal, 0x80)/*Theme.INSTANCE.getSlotHighlight()*/);
+            GuiDraw.drawSolidRect(1, 1, 16, 16, getWidgetTheme(context.getTheme()).getSlotHoverColor());
             GlStateManager.colorMask(true, true, true, true);
         }
+    }
+
+    @Override
+    public WidgetSlotTheme getWidgetTheme(ITheme theme) {
+        return theme.getItemSlotTheme();
     }
 
     @Override

@@ -1,3 +1,4 @@
 {
-  "vanilla": "modularui:vanilla"
+  "vanilla": "modularui:vanilla",
+  "vanilla_dark": "modularui:vanilla_dark"
 }

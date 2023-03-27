@@ -1,8 +1,12 @@
 package com.cleanroommc.modularui.widgets;
 
+import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.Widget;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,6 +19,11 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends Widget<W> implement
     private IGuiAction.KeyPressed keyPressed;
     private IGuiAction.KeyReleased keyReleased;
     private IGuiAction.KeyPressed keyTapped;
+
+    @Override
+    public WidgetTheme getWidgetTheme(ITheme theme) {
+        return theme.getButtonTheme();
+    }
 
     @Override
     public @NotNull Result onMousePressed(int mouseButton) {

@@ -1,10 +1,13 @@
 package com.cleanroommc.modularui.utils;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -252,21 +255,29 @@ public class Color implements Iterable<Integer> {
             return;
         }
         float a = getAlphaF(color);
-        float r = getRedF(color);
-        float g = getGreenF(color);
-        float b = getBlueF(color);
         if (a == 0) a = 1f;
-        GlStateManager.color(r, g, b, a);
+        GlStateManager.color(getRedF(color), getGreenF(color), getBlueF(color), a);
     }
 
-    // TODO
-    /*@Nullable
+    @SideOnly(Side.CLIENT)
+    public static void setGlColorOpaque(int color) {
+        if (color == 0) {
+            GlStateManager.color(0, 0, 0, 0);
+            return;
+        }
+        GlStateManager.color(getRedF(color), getGreenF(color), getBlueF(color), 1f);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static void resetGlColor() {
+        GlStateManager.colorMask(true, true, true, true);
+        setGlColorOpaque(WHITE.normal);
+    }
+
+    @Nullable
     public static Integer ofJson(JsonElement jsonElement) {
         if (jsonElement.isJsonPrimitive()) {
-            return jsonElement.getAsInt();
-        }
-        if (jsonElement.isJsonArray()) {
-            return null;
+            return Integer.decode(jsonElement.getAsString());
         }
         if (jsonElement.isJsonObject()) {
             JsonObject json = jsonElement.getAsJsonObject();
@@ -276,19 +287,8 @@ public class Color implements Iterable<Integer> {
             int alpha = JsonHelper.getInt(json, 255, "a", "alpha");
             return Color.argb(red, green, blue, alpha);
         }
-        String string = jsonElement.getAsString();
-        if (string.startsWith("#")) {
-            string = string.substring(1);
-        } else if (string.startsWith("0x")) {
-            string = string.substring(2);
-        }
-        try {
-            return Integer.parseInt(string, 16);
-        } catch (NumberFormatException e) {
-            ModularUI.LOGGER.error("Error parsing json color {}", jsonElement);
-        }
         return null;
-    }*/
+    }
 
     public static final Color WHITE = new Color(0xFFFFFF, new int[]{},
             0xF7F7F7,

@@ -1,7 +1,10 @@
 package com.cleanroommc.modularui.api.drawable;
 
+import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.drawable.Icon;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.google.gson.JsonObject;
@@ -36,6 +39,10 @@ public interface IDrawable {
 
     default void drawAtZero(Area area) {
         draw(0, 0, area.width, area.height);
+    }
+
+    default void applyThemeColor(ITheme theme, WidgetTheme widgetTheme) {
+        Color.setGlColorOpaque(Color.WHITE.normal);
     }
 
     /**

@@ -1,16 +1,18 @@
 package com.cleanroommc.modularui.widgets;
 
+import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiDraw;
-import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.TextRenderer;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.Tooltip;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.sync.FluidSlotSyncHandler;
+import com.cleanroommc.modularui.theme.WidgetSlotTheme;
+import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.ClickData;
 import com.cleanroommc.modularui.utils.Color;
@@ -23,7 +25,6 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
@@ -85,7 +86,6 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable {
         });
     }
 
-    @ApiStatus.OverrideOnly
     public void addAdditionalFluidInfo(Tooltip tooltip, FluidStack fluidStack) {
     }
 
@@ -94,10 +94,6 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable {
         textRenderer.setShadow(true);
         textRenderer.setScale(0.5f);
         textRenderer.setColor(Color.WHITE.normal);
-
-        if (getBackground().length == 0) {
-            background(GuiTextures.SLOT_DARK);
-        }
     }
 
     @Override
@@ -134,9 +130,14 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable {
         }
         if (isHovering()) {
             GlStateManager.colorMask(true, true, true, false);
-            GuiDraw.drawSolidRect(1, 1, 16, 16, Color.withAlpha(Color.WHITE.normal, 0x80)/*TODO Theme.INSTANCE.getSlotHighlight()*/);
+            GuiDraw.drawSolidRect(1, 1, 16, 16, getWidgetTheme(context.getTheme()).getSlotHoverColor());
             GlStateManager.colorMask(true, true, true, true);
         }
+    }
+
+    @Override
+    public WidgetSlotTheme getWidgetTheme(ITheme theme) {
+        return theme.getFluidSlotTheme();
     }
 
     @NotNull

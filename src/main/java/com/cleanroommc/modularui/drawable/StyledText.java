@@ -12,6 +12,8 @@ public class StyledText implements IKey {
     private boolean shadow = false;
     private float scale = 1f;
 
+    protected boolean colorChanged = false, shadowChanged = false;
+
     public StyledText(IKey key) {
         this.key = key;
     }
@@ -28,10 +30,14 @@ public class StyledText implements IKey {
     @Override
     public void draw(int x, int y, int width, int height) {
         renderer.setAlignment(this.alignment, width, height);
-        renderer.setColor(this.color);
+        if (colorChanged) {
+            renderer.setColor(this.color);
+        }
         renderer.setScale(this.scale);
         renderer.setPos(x, y);
-        renderer.setShadow(this.shadow);
+        if (shadowChanged) {
+            renderer.setShadow(this.shadow);
+        }
         renderer.draw(get());
     }
 
@@ -60,6 +66,7 @@ public class StyledText implements IKey {
     @Override
     public StyledText color(int color) {
         this.color = color;
+        this.colorChanged = true;
         return this;
     }
 
@@ -72,24 +79,31 @@ public class StyledText implements IKey {
     @Override
     public StyledText shadow(boolean shadow) {
         this.shadow = shadow;
+        this.shadowChanged = true;
         return this;
     }
 
     @Override
     public TextWidget asWidget() {
-        return new TextWidget(this.key)
+        TextWidget textWidget = new TextWidget(this.key)
                 .alignment(this.alignment)
                 .color(this.color)
                 .scale(this.scale)
                 .shadow(this.shadow);
+        textWidget.colorChanged = colorChanged;
+        textWidget.shadowChanged = shadowChanged;
+        return textWidget;
     }
 
     @Override
     public AnimatedText withAnimation() {
-        return new AnimatedText(this)
+        AnimatedText animatedText = new AnimatedText(this)
                 .alignment(this.alignment)
                 .color(this.color)
                 .scale(this.scale)
                 .shadow(this.shadow);
+        animatedText.colorChanged = colorChanged;
+        animatedText.shadowChanged = shadowChanged;
+        return animatedText;
     }
 }

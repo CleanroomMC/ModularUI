@@ -15,6 +15,10 @@ public class TabContainer extends PagedWidget<TabContainer> implements ILayoutWi
     private Side buttonBarSide = Side.TOP;
     private int tabButtonWidth = 0, tabButtonHeight = 0;
 
+    public TabContainer() {
+        useThemeBackground(false).useThemeHoverBackground(false);
+    }
+
     @Override
     public void onInit() {
         this.allChildren.addAll(getPages());

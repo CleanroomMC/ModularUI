@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.api.drawable;
 
+import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.drawable.AnimatedText;
 import com.cleanroommc.modularui.drawable.StyledText;
 import com.cleanroommc.modularui.drawable.TextRenderer;
@@ -7,10 +8,13 @@ import com.cleanroommc.modularui.drawable.keys.CompoundKey;
 import com.cleanroommc.modularui.drawable.keys.DynamicKey;
 import com.cleanroommc.modularui.drawable.keys.LangKey;
 import com.cleanroommc.modularui.drawable.keys.StringKey;
+import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widgets.TextWidget;
 import com.google.gson.JsonObject;
+import net.minecraft.client.renderer.GlStateManager;
 
 import java.util.function.Supplier;
 
@@ -85,11 +89,15 @@ public interface IKey extends IDrawable {
     @Override
     default void draw(int x, int y, int width, int height) {
         renderer.setAlignment(Alignment.Center, width, height);
-        renderer.setColor(0);
         renderer.setScale(1f);
         renderer.setPos(x, y);
-        renderer.setShadow(false);
         renderer.draw(get());
+    }
+
+    @Override
+    default void applyThemeColor(ITheme theme, WidgetTheme widgetTheme) {
+        renderer.setColor(widgetTheme.getTextColor());
+        renderer.setShadow(widgetTheme.getTextShadow());
     }
 
     @Override

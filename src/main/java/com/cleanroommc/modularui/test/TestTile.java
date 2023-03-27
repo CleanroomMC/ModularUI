@@ -89,13 +89,13 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
 
     public ModularPanel createPanel(GuiContext context) {
         context.enableJei();
+        context.setTheme("vanilla_dark");
         Rectangle colorPickerBackground = new Rectangle().setColor(Color.RED.normal);
         ModularPanel panel = new ModularPanel(context);
         panel.flex()                        // returns object which is responsible for sizing
                 .size(176, 220)       // set a static size for the main panel
                 .align(Alignment.Center);    // center the panel in the screen
-        panel.background(GuiTextures.BACKGROUND)
-                .bindPlayerInventory()
+        panel.bindPlayerInventory()
                 .child(new TabContainer()
                         .size(1f, 1f)
                         .tabButton(new TabButton(0))
@@ -139,7 +139,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                                             return true;
                                                         })
                                                         //.flex(flex -> flex.left(3)) // ?
-                                                        .background(GuiTextures.BUTTON, IKey.str("Button 2")))
+                                                        .background(IKey.str("Button 2")))
                                                 .child(new TextFieldWidget()
                                                         .setTextColor(Color.WHITE.normal)
                                                         .background(GuiTextures.DISPLAY)
@@ -199,7 +199,6 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                                         .size(14, 14)
                                                         .length(3)
                                                         .texture(GuiTextures.CYCLE_BUTTON_DEMO)
-                                                        .background(GuiTextures.BUTTON)
                                                         .getter(() -> val2)
                                                         .setter(val -> this.val2 = val)
                                                         .margin(8, 0))
@@ -295,7 +294,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                 .background(GuiTextures.BACKGROUND);
         panel.child(new ButtonWidget<>()
                         .flex(flex -> flex.size(8, 8).top(5).right(5))
-                        .background(GuiTextures.BUTTON, IKey.str("x"))
+                        .background(IKey.str("x"))
                         .onMousePressed(mouseButton -> {
                             panel.animateClose();
                             return true;
@@ -318,7 +317,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                         .setter(value::set))
                 .child(new ButtonWidget<>()
                         .flex(flex -> flex.size(8, 8).top(5).right(5))
-                        .background(GuiTextures.BUTTON, IKey.str("x"))
+                        .background(IKey.str("x"))
                         .onMousePressed(mouseButton -> {
                             dialog.closeWith(value.get());
                             return true;

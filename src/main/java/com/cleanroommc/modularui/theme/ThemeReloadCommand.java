@@ -14,7 +14,7 @@ public class ThemeReloadCommand extends CommandBase {
     }
 
     @Override
-    public String getUsage(@NotNull ICommandSender sender) {
+    public @NotNull String getUsage(@NotNull ICommandSender sender) {
         return "/reloadThemes";
     }
 

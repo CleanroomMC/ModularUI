@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.utils;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.drawable.DrawableSerialization;
-import com.cleanroommc.modularui.theme.Theme;
 import com.google.gson.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -107,20 +106,20 @@ public class JsonHelper {
         return defaultValue;
     }
 
-    public static @Nullable Integer getBoxedInt(JsonObject json, String @NotNull ... keys) {
+    public static @Nullable Integer getBoxedInt(JsonObject json, Integer defaultValue, String @NotNull ... keys) {
         for (String key : keys) {
             if (json.has(key)) {
                 JsonElement jsonElement = json.get(key);
                 if (jsonElement.isJsonPrimitive()) {
                     return jsonElement.getAsInt();
                 }
-                return null;
+                return defaultValue;
             }
         }
-        return null;
+        return defaultValue;
     }
 
-    public static @Nullable Boolean getBoxedBool(JsonObject json, String @NotNull ... keys) {
+    public static @Nullable Boolean getBoxedBool(JsonObject json, Boolean defaultValue, String @NotNull ... keys) {
         for (String key : keys) {
             if (json.has(key)) {
                 JsonElement jsonElement = json.get(key);
@@ -131,6 +130,17 @@ public class JsonHelper {
             }
         }
         return null;
+    }
+
+    public static int getColor(JsonObject json, int defaultValue, String... keys) {
+        JsonElement element = getJsonElement(json, keys);
+        if (element != null) {
+            Integer color = Color.ofJson(element);
+            if (color != null) {
+                return color;
+            }
+        }
+        return defaultValue;
     }
 
     public static @Nullable JsonElement getJsonElement(JsonObject json, String @NotNull ... keys) {

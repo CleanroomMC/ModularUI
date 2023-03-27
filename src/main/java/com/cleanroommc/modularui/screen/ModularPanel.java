@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUIConfig;
+import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IFocusedWidget;
@@ -10,6 +11,7 @@ import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
+import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Animator;
 import com.cleanroommc.modularui.utils.Interpolation;
@@ -37,7 +39,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     public static ModularPanel defaultPanel(GuiContext context, int width, int height) {
         ModularPanel panel = new ModularPanel(context);
         panel.flex().size(width, height).align(Alignment.Center);
-        panel.background(GuiTextures.BACKGROUND);
         return panel;
     }
 
@@ -108,6 +109,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             });
             this.animator.backward();
         }
+    }
+
+    @Override
+    public WidgetTheme getWidgetTheme(ITheme theme) {
+        return theme.getPanelTheme();
     }
 
     @Override

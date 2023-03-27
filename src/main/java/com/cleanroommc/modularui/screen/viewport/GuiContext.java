@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.screen.viewport;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
@@ -35,6 +36,7 @@ public class GuiContext extends GuiViewportStack {
 
     /* GUI elements */
     public final ModularScreen screen;
+    private ITheme currentTheme;
     private LocatedWidget focusedWidget = LocatedWidget.EMPTY;
     @Nullable
     private IGuiElement hovered;
@@ -72,6 +74,7 @@ public class GuiContext extends GuiViewportStack {
         this.hoveredWidgets = new HoveredIterable(this.screen.getWindowManager());
         this.mc = ModularUI.getMC();
         this.font = this.mc.fontRenderer;
+        setTheme("vanilla");
     }
 
     public boolean isAbove(IGuiElement widget) {
@@ -495,6 +498,18 @@ public class GuiContext extends GuiViewportStack {
                 .map(IWidget::getArea)
                 .collect(Collectors.toList()));
         return areas;
+    }
+
+    public ITheme getTheme() {
+        return currentTheme;
+    }
+
+    public void setTheme(ITheme theme) {
+        this.currentTheme = theme != null ? theme : ITheme.getDefault();
+    }
+
+    public void setTheme(String theme) {
+        this.currentTheme = ITheme.get(theme);
     }
 
     private static class HoveredIterable implements Iterable<IGuiElement> {

@@ -8,7 +8,6 @@ import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
 import com.cleanroommc.modularui.sync.ItemSlotSH;
-import com.cleanroommc.modularui.theme.Theme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.WidgetTree;
@@ -65,14 +64,11 @@ public abstract class ModularScreen {
         return null;
     }
 
-    private static GuiContext current;
-
     private final String owner;
     private final String name;
     private final WindowManager windowManager;
     public final GuiContext context;
     private final Area viewport = new Area();
-    private Theme currentTheme; // = Theme.VANILLA;
     private final Map<Class<?>, List<IGuiAction>> guiActionListeners = new Object2ObjectOpenHashMap<>();
 
     private GuiScreenWrapper screenWrapper;
@@ -106,7 +102,6 @@ public abstract class ModularScreen {
     }
 
     public void onResize(int width, int height) {
-        current = this.context;
 
         this.viewport.set(0, 0, width, height);
         this.viewport.z(0);
@@ -140,7 +135,6 @@ public abstract class ModularScreen {
 
     @MustBeInvokedByOverriders
     public void onClose() {
-        current = null;
         this.windowManager.closeAll();
     }
 
@@ -394,14 +388,6 @@ public abstract class ModularScreen {
 
     public Area getViewport() {
         return viewport;
-    }
-
-    public Theme getTheme() {
-        return currentTheme;
-    }
-
-    public void setTheme(Theme theme) {
-        this.currentTheme = theme;
     }
 
     public void registerItemSlot(ItemSlotSH syncHandler) {

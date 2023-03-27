@@ -1,8 +1,11 @@
 package com.cleanroommc.modularui.widgets;
 
+import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.widget.Interactable;
+import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.widget.Widget;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
 public class PageButton extends Widget<PageButton> implements Interactable {
@@ -14,6 +17,20 @@ public class PageButton extends Widget<PageButton> implements Interactable {
     public PageButton(int index, PagedWidget.Controller controller) {
         this.index = index;
         this.controller = controller;
+    }
+
+    @Override
+    public void applyTheme(ITheme theme) {
+        super.applyTheme(theme);
+        /*applyThemeBackground(theme.getButtonBackground());
+        if (isUseThemeBackground()) {
+            this.inactiveTexture = ArrayUtils.addAll(new IDrawable[]{theme.getDisabledButtonBackground()}, this.inactiveTexture);
+        }*/
+    }
+
+    @Override
+    public WidgetTheme getWidgetTheme(ITheme theme) {
+        return theme.getButtonTheme();
     }
 
     @Override

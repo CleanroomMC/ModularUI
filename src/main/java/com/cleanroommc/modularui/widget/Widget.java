@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.widget;
 
 import com.cleanroommc.modularui.ModularUIConfig;
+import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.api.sync.ValueSyncHandler;
@@ -11,9 +12,12 @@ import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
 import com.cleanroommc.modularui.sync.MapKey;
+import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Flex;
 import com.cleanroommc.modularui.widget.sizer.IResizeable;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,6 +47,9 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @Nullable
     private SyncHandler syncHandler;
 
+    private boolean useThemeBackground = true;
+    private boolean useThemeHoverBackground = true;
+
     @NotNull
     private IDrawable[] background = EMPTY_BACKGROUND;
     private IDrawable[] hoverBackground = EMPTY_BACKGROUND;
@@ -66,6 +73,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
             }
         }
         this.valid = true;
+        applyTheme(this.context.getTheme());
         onInit();
         if (this.tooltip != null && this.tooltip.getExcludeArea() == null && ModularUIConfig.placeTooltipNextToPanel()) {
             this.tooltip.excludeArea(getPanel().getArea());
@@ -126,8 +134,14 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
 
     @Override
     public void drawBackground(GuiContext context) {
-        for (IDrawable drawable : getCurrentBackground()) {
-            drawable.drawAtZero(getArea());
+        IDrawable[] background = getCurrentBackground();
+        if (background.length > 0) {
+            WidgetTheme widgetTheme = getWidgetTheme(context.getTheme());
+            for (IDrawable drawable : background) {
+                drawable.applyThemeColor(context.getTheme(), widgetTheme);
+                drawable.drawAtZero(getArea());
+            }
+            Color.resetGlColor();
         }
     }
 
@@ -141,6 +155,13 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         if (tooltip != null && isHoveringFor(tooltip.getShowUpTimer())) {
             tooltip.draw(getContext());
         }
+    }
+
+    @Override
+    public void applyTheme(ITheme theme) {
+        WidgetTheme widgetTheme = getWidgetTheme(theme);
+        applyThemeBackground(widgetTheme.getBackground());
+        applyThemeHoverBackground(widgetTheme.getHoverBackground());
     }
 
     @Override
@@ -211,6 +232,26 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
 
     protected final void setContext(GuiContext context) {
         this.context = context;
+    }
+
+    protected void applyThemeBackground(IDrawable drawable) {
+        if (this.useThemeBackground && drawable != null) {
+            this.background = ArrayUtils.addAll(new IDrawable[]{drawable}, this.background);
+        }
+    }
+
+    protected void applyThemeHoverBackground(IDrawable drawable) {
+        if (this.useThemeHoverBackground && drawable != null) {
+            this.hoverBackground = ArrayUtils.addAll(new IDrawable[]{drawable}, this.hoverBackground);
+        }
+    }
+
+    public boolean isUseThemeBackground() {
+        return useThemeBackground;
+    }
+
+    public boolean isUseThemeHoverBackground() {
+        return useThemeHoverBackground;
     }
 
     public IDrawable[] getBackground() {
@@ -287,6 +328,16 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
 
     public W disabled() {
         setEnabled(false);
+        return getThis();
+    }
+
+    public W useThemeBackground(boolean useThemeBackground) {
+        this.useThemeBackground = useThemeBackground;
+        return getThis();
+    }
+
+    public W useThemeHoverBackground(boolean useThemeHoverBackground) {
+        this.useThemeHoverBackground = useThemeHoverBackground;
         return getThis();
     }
 

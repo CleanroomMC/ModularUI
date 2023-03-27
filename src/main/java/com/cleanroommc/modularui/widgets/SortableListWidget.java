@@ -199,7 +199,7 @@ public class SortableListWidget<T, I extends SortableListWidget.Item<T>> extends
         public Item<T> removeable() {
             this.removeButton = new ButtonWidget<>()
                     .onMousePressed(mouseButton -> this.listWidget.remove(this.index))
-                    .background(GuiTextures.BUTTON, GuiTextures.CLOSE.asIcon())
+                    .background(GuiTextures.CLOSE.asIcon())
                     .width(10).height(1f)
                     .right(0);
             return this;
