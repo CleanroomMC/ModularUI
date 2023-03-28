@@ -33,7 +33,7 @@
 - [X]  Grid
 - [X]  Scrollable
 - [ ]  Text editor
-- [ ]  Themes
+- [X]  Themes
 - [X]  Animations
 - [ ]  Json Guis
 - [ ]  Inject to any mc gui
