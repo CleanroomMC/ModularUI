@@ -141,14 +141,10 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                                         //.flex(flex -> flex.left(3)) // ?
                                                         .overlay(IKey.str("Button 2")))
                                                 .child(new TextFieldWidget()
-                                                        .setTextColor(Color.WHITE.normal)
-                                                        .background(GuiTextures.DISPLAY)
                                                         .size(60, 20)
                                                         .setSynced(1)
                                                         .margin(0, 3))
                                                 .child(new TextFieldWidget()
-                                                        .setTextColor(Color.WHITE.normal)
-                                                        .background(GuiTextures.DISPLAY)
                                                         .size(60, 20)
                                                         .setSynced(2)
                                                         .setNumbersDouble(Function.identity()))
@@ -311,8 +307,6 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
         dialog.setDraggable(true);
         dialog.child(new TextFieldWidget()
                         .flex(flex -> flex.size(100, 20).align(Alignment.Center))
-                        .setTextColor(Color.WHITE.normal)
-                        .background(GuiTextures.DISPLAY)
                         .getter(value::get)
                         .setter(value::set))
                 .child(new ButtonWidget<>()

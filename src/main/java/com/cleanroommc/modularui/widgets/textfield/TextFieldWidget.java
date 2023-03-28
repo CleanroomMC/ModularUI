@@ -30,6 +30,8 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     @Nullable
     private Consumer<String> setter;
 
+    protected boolean changedMarkedColor = false;
+
     public static IValue parse(String num) {
         try {
             return MathBuilder.INSTANCE.parse(num);
@@ -50,6 +52,9 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             tooltipBuilder(tooltip -> {
                 tooltip.addLine(IKey.str(getText()));
             });
+        }
+        if (!this.changedMarkedColor) {
+            this.renderer.setMarkedColor(getWidgetTheme(getContext().getTheme()).getMarkedColor());
         }
     }
 
@@ -162,11 +167,13 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
     public TextFieldWidget setTextColor(int textColor) {
         this.renderer.setColor(textColor);
+        this.changedTextColor = true;
         return this;
     }
 
     public TextFieldWidget setMarkedColor(int color) {
         this.renderer.setMarkedColor(color);
+        this.changedMarkedColor = true;
         return this;
     }
 

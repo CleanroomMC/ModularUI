@@ -1,9 +1,6 @@
 package com.cleanroommc.modularui.api;
 
-import com.cleanroommc.modularui.theme.Theme;
-import com.cleanroommc.modularui.theme.ThemeHandler;
-import com.cleanroommc.modularui.theme.WidgetSlotTheme;
-import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.*;
 
 public interface ITheme {
 
@@ -28,6 +25,8 @@ public interface ITheme {
     WidgetSlotTheme getItemSlotTheme();
 
     WidgetSlotTheme getFluidSlotTheme();
+
+    WidgetTextFieldTheme getTextFieldTheme();
 
     WidgetTheme getWidgetTheme(String id);
 

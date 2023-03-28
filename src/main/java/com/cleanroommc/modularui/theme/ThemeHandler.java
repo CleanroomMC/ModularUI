@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 @ApiStatus.Internal
@@ -35,10 +34,10 @@ public class ThemeHandler implements ISelectiveResourceReloadListener {
 
     private static final Map<String, ITheme> THEMES = new Object2ObjectOpenHashMap<>();
     protected static final Map<String, WidgetTheme> defaultWidgetThemes = new Object2ObjectOpenHashMap<>();
-    private static final Map<String, BiFunction<WidgetTheme, JsonObject, WidgetTheme>> widgetThemeFunctions = new Object2ObjectOpenHashMap<>();
+    private static final Map<String, WidgetThemeParser> widgetThemeFunctions = new Object2ObjectOpenHashMap<>();
     protected static final WidgetTheme defaultdefaultWidgetTheme = new WidgetTheme(null, null, Color.WHITE.normal, 0xFF404040, false);
 
-    public static void registerWidgetTheme(String id, WidgetTheme defaultTheme, BiFunction<WidgetTheme, JsonObject, WidgetTheme> function) {
+    public static void registerWidgetTheme(String id, WidgetTheme defaultTheme, WidgetThemeParser function) {
         if (widgetThemeFunctions.containsKey(id)) {
             throw new IllegalStateException();
         }
@@ -49,8 +48,9 @@ public class ThemeHandler implements ISelectiveResourceReloadListener {
     static {
         registerWidgetTheme(Theme.PANEL, new WidgetTheme(GuiTextures.BACKGROUND, null, Color.WHITE.normal, 0xFF404040, false), WidgetTheme::new);
         registerWidgetTheme(Theme.BUTTON, new WidgetTheme(GuiTextures.BUTTON, null, Color.WHITE.normal, Color.WHITE.normal, true), WidgetTheme::new);
-        registerWidgetTheme(Theme.ITEM_SLOT, new WidgetSlotTheme(GuiTextures.SLOT, null, Color.withAlpha(Color.WHITE.normal, 0x80)), WidgetSlotTheme::new);
-        registerWidgetTheme(Theme.FLUID_SLOT, new WidgetSlotTheme(GuiTextures.SLOT_DARK, null, Color.withAlpha(Color.WHITE.normal, 0x80)), WidgetSlotTheme::new);
+        registerWidgetTheme(Theme.ITEM_SLOT, new WidgetSlotTheme(GuiTextures.SLOT, Color.withAlpha(Color.WHITE.normal, 0x80)), WidgetSlotTheme::new);
+        registerWidgetTheme(Theme.FLUID_SLOT, new WidgetSlotTheme(GuiTextures.SLOT_DARK, Color.withAlpha(Color.WHITE.normal, 0x80)), WidgetSlotTheme::new);
+        registerWidgetTheme(Theme.TEXT_FIELD, new WidgetTextFieldTheme(0xFF2F72A8), WidgetTextFieldTheme::new);
     }
 
     public static ITheme get(String id) {
@@ -199,6 +199,7 @@ public class ThemeHandler implements ISelectiveResourceReloadListener {
         private WidgetTheme button;
         private WidgetSlotTheme itemSlot;
         private WidgetSlotTheme fluidSlot;
+        private WidgetTextFieldTheme textField;
 
         @Override
         public String getId() {
@@ -248,6 +249,14 @@ public class ThemeHandler implements ISelectiveResourceReloadListener {
         }
 
         @Override
+        public WidgetTextFieldTheme getTextFieldTheme() {
+            if (this.textField == null) {
+                this.textField = (WidgetTextFieldTheme) getWidgetTheme(Theme.TEXT_FIELD);
+            }
+            return textField;
+        }
+
+        @Override
         public WidgetTheme getWidgetTheme(String id) {
             return defaultWidgetThemes.get(id);
         }
@@ -274,14 +283,16 @@ public class ThemeHandler implements ISelectiveResourceReloadListener {
 
 
             WidgetTheme parentWidgetTheme = parent.getFallback();
-            widgetThemes.put(Theme.FALLBACK, new WidgetTheme(parentWidgetTheme, this.json));
+            WidgetTheme fallback = new WidgetTheme(parentWidgetTheme, parentWidgetTheme, this.json, true);
+            widgetThemes.put(Theme.FALLBACK, fallback);
 
-            for (Map.Entry<String, BiFunction<WidgetTheme, JsonObject, WidgetTheme>> entry : widgetThemeFunctions.entrySet()) {
+            for (Map.Entry<String, WidgetThemeParser> entry : widgetThemeFunctions.entrySet()) {
                 if (this.json.has(entry.getKey())) {
                     JsonElement element = this.json.get(entry.getKey());
                     if (element.isJsonObject()) {
+                        boolean fallbackToParent = JsonHelper.getBoolean(element.getAsJsonObject(), false, "fallbackParent");
                         parentWidgetTheme = parent.getWidgetTheme(entry.getKey());
-                        widgetThemes.put(entry.getKey(), entry.getValue().apply(parentWidgetTheme, element.getAsJsonObject()));
+                        widgetThemes.put(entry.getKey(), entry.getValue().parse(parentWidgetTheme, fallback, element.getAsJsonObject(), fallbackToParent));
                     }
                 }
             }

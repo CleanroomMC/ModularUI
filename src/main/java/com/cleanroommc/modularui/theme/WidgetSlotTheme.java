@@ -9,13 +9,13 @@ public class WidgetSlotTheme extends WidgetTheme {
 
     private final int slotHoverColor;
 
-    public WidgetSlotTheme(IDrawable background, IDrawable hoverBackground, int slotHoverColor) {
-        super(background, hoverBackground, Color.WHITE.normal, 0xFF404040, false);
+    public WidgetSlotTheme(IDrawable background, int slotHoverColor) {
+        super(background, null, Color.WHITE.normal, 0xFF404040, false);
         this.slotHoverColor = slotHoverColor;
     }
 
-    public WidgetSlotTheme(WidgetTheme parent, JsonObject json) {
-        super(parent, json);
+    public WidgetSlotTheme(WidgetTheme parent, WidgetTheme fallback, JsonObject json, boolean fallbackToParent) {
+        super(parent, fallback, json, fallbackToParent);
         this.slotHoverColor = JsonHelper.getColor(json, ((WidgetSlotTheme) parent).getSlotHoverColor(), "slotHoverColor");
     }
 

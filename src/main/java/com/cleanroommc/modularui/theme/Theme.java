@@ -1,11 +1,9 @@
 package com.cleanroommc.modularui.theme;
 
 import com.cleanroommc.modularui.api.ITheme;
-import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.util.Map;
-import java.util.function.BiFunction;
 
 public class Theme implements ITheme {
 
@@ -18,7 +16,7 @@ public class Theme implements ITheme {
      * @param defaultTheme this will be used for {@link #DEFAULT_DEFAULT}.
      * @param function     a function that creates an instance of the widget theme with the parent theme and a json.
      */
-    public static void registerWidgetTheme(String id, WidgetTheme defaultTheme, BiFunction<WidgetTheme, JsonObject, WidgetTheme> function) {
+    public static void registerWidgetTheme(String id, WidgetTheme defaultTheme, WidgetThemeParser function) {
         ThemeHandler.registerWidgetTheme(id, defaultTheme, function);
     }
 
@@ -27,6 +25,7 @@ public class Theme implements ITheme {
     public static final String BUTTON = "button";
     public static final String ITEM_SLOT = "itemSlot";
     public static final String FLUID_SLOT = "fluidSlot";
+    public static final String TEXT_FIELD = "textField";
 
     private final Map<String, WidgetTheme> widgetThemes = new Object2ObjectOpenHashMap<>();
 
@@ -37,6 +36,7 @@ public class Theme implements ITheme {
     private final WidgetTheme buttonTheme;
     private final WidgetSlotTheme itemSlotTheme;
     private final WidgetSlotTheme fluidSlotTheme;
+    private final WidgetTextFieldTheme textFieldTheme;
 
     Theme(String id, ITheme parent, Map<String, WidgetTheme> widgetThemes) {
         this.id = id;
@@ -63,6 +63,7 @@ public class Theme implements ITheme {
         this.buttonTheme = this.widgetThemes.get(BUTTON);
         this.itemSlotTheme = (WidgetSlotTheme) this.widgetThemes.get(ITEM_SLOT);
         this.fluidSlotTheme = (WidgetSlotTheme) this.widgetThemes.get(FLUID_SLOT);
+        this.textFieldTheme = (WidgetTextFieldTheme) this.widgetThemes.get(TEXT_FIELD);
     }
 
     public String getId() {
@@ -93,6 +94,10 @@ public class Theme implements ITheme {
     @Override
     public WidgetSlotTheme getFluidSlotTheme() {
         return fluidSlotTheme;
+    }
+
+    public WidgetTextFieldTheme getTextFieldTheme() {
+        return textFieldTheme;
     }
 
     public WidgetTheme getWidgetTheme(String id) {

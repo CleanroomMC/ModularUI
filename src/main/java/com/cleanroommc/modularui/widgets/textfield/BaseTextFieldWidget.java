@@ -1,9 +1,12 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
+import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.widget.IFocusedWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
+import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.ScrollData;
 import com.cleanroommc.modularui.utils.ScrollDirection;
@@ -40,6 +43,8 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     protected float scale = 1f;
     private int cursorTimer;
 
+    protected boolean changedTextColor = false;
+
     public BaseTextFieldWidget() {
         super(new ScrollData(ScrollDirection.HORIZONTAL));
         this.handler.setRenderer(renderer);
@@ -62,6 +67,9 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     public void onInit() {
         super.onInit();
         this.handler.setGuiContext(getContext());
+        if (!this.changedTextColor) {
+            this.renderer.setColor(getWidgetTheme(getContext().getTheme()).getTextColor());
+        }
     }
 
     @Override
@@ -87,6 +95,11 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
         renderer.setAlignment(textAlignment, -2, getArea().height);
         renderer.draw(handler.getText());
         getScrollArea().getScrollX().scrollSize = Math.max(0, (int) (renderer.getLastWidth() + 0.5f));
+    }
+
+    @Override
+    public WidgetTextFieldTheme getWidgetTheme(ITheme theme) {
+        return theme.getTextFieldTheme();
     }
 
     @Override
@@ -243,6 +256,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
 
     public W setTextColor(int color) {
         this.renderer.setColor(color);
+        this.changedTextColor = true;
         return getThis();
     }
 

@@ -1,15 +1,5 @@
 {
-  "color": "0x444444",
+  "color": "0xFF444444",
   "textColor": "0xEEEEEE",
   "textShadow": false,
-  "panel": {
-    "color": "0x444444",
-    "textColor": "0xEEEEEE",
-    "textShadow": false
-  },
-  "button": {
-    "color": "0x444444",
-    "textColor": "0xEEEEEE",
-    "textShadow": false
-  }
 }
