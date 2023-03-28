@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.api.sync.ValueSyncHandler;
 import com.cleanroommc.modularui.api.widget.*;
+import com.cleanroommc.modularui.drawable.DrawableArray;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.Tooltip;
@@ -13,11 +14,9 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
 import com.cleanroommc.modularui.sync.MapKey;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Flex;
 import com.cleanroommc.modularui.widget.sizer.IResizeable;
-import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,12 +46,14 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @Nullable
     private SyncHandler syncHandler;
 
-    private boolean useThemeBackground = true;
-    private boolean useThemeHoverBackground = true;
-
-    @NotNull
-    private IDrawable[] background = EMPTY_BACKGROUND;
-    private IDrawable[] hoverBackground = EMPTY_BACKGROUND;
+    @Nullable
+    private IDrawable background = null;
+    @Nullable
+    private IDrawable overlay = null;
+    @Nullable
+    private IDrawable hoverBackground = null;
+    @Nullable
+    private IDrawable hoverOverlay = null;
     @Nullable
     private Tooltip tooltip;
 
@@ -134,14 +135,16 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
 
     @Override
     public void drawBackground(GuiContext context) {
-        IDrawable[] background = getCurrentBackground();
-        if (background.length > 0) {
-            WidgetTheme widgetTheme = getWidgetTheme(context.getTheme());
-            for (IDrawable drawable : background) {
-                drawable.applyThemeColor(context.getTheme(), widgetTheme);
-                drawable.drawAtZero(getArea());
-            }
-            Color.resetGlColor();
+        WidgetTheme widgetTheme = getWidgetTheme(context.getTheme());
+        IDrawable bg = getCurrentBackground();
+        if (bg != null) {
+            bg.applyThemeColor(context.getTheme(), widgetTheme);
+            bg.drawAtZero(context, getArea());
+        }
+        bg = getCurrentOverlay();
+        if (bg != null) {
+            bg.applyThemeColor(context.getTheme(), widgetTheme);
+            bg.drawAtZero(context, getArea());
         }
     }
 
@@ -160,8 +163,8 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @Override
     public void applyTheme(ITheme theme) {
         WidgetTheme widgetTheme = getWidgetTheme(theme);
-        applyThemeBackground(widgetTheme.getBackground());
-        applyThemeHoverBackground(widgetTheme.getHoverBackground());
+        applyThemeBackground(false, widgetTheme.getBackground());
+        applyThemeBackground(true, widgetTheme.getBackground());
     }
 
     @Override
@@ -234,37 +237,42 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         this.context = context;
     }
 
-    protected void applyThemeBackground(IDrawable drawable) {
-        if (this.useThemeBackground && drawable != null) {
-            this.background = ArrayUtils.addAll(new IDrawable[]{drawable}, this.background);
+    protected void applyThemeBackground(boolean hover, IDrawable drawable) {
+        if (hover) {
+            if (this.hoverBackground == null) {
+                this.hoverBackground = drawable;
+            }
+        } else {
+            if (this.background == null) {
+                this.background = drawable;
+            }
         }
     }
 
-    protected void applyThemeHoverBackground(IDrawable drawable) {
-        if (this.useThemeHoverBackground && drawable != null) {
-            this.hoverBackground = ArrayUtils.addAll(new IDrawable[]{drawable}, this.hoverBackground);
-        }
-    }
-
-    public boolean isUseThemeBackground() {
-        return useThemeBackground;
-    }
-
-    public boolean isUseThemeHoverBackground() {
-        return useThemeHoverBackground;
-    }
-
-    public IDrawable[] getBackground() {
+    public IDrawable getBackground() {
         return background;
     }
 
-    public IDrawable[] getHoverBackground() {
+    public IDrawable getOverlay() {
+        return overlay;
+    }
+
+    public IDrawable getHoverBackground() {
         return hoverBackground;
     }
 
-    public IDrawable[] getCurrentBackground() {
-        IDrawable[] hoverBackground = getHoverBackground();
-        return hoverBackground.length > 0 && isHovering() ? hoverBackground : getBackground();
+    public IDrawable getHoverOverlay() {
+        return hoverOverlay;
+    }
+
+    public IDrawable getCurrentBackground() {
+        IDrawable hoverBackground = getHoverBackground();
+        return hoverBackground != null && isHovering() ? hoverBackground : getBackground();
+    }
+
+    public IDrawable getCurrentOverlay() {
+        IDrawable hoverBackground = getHoverOverlay();
+        return hoverBackground != null && isHovering() ? hoverBackground : getOverlay();
     }
 
     @Nullable
@@ -331,23 +339,47 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         return getThis();
     }
 
-    public W useThemeBackground(boolean useThemeBackground) {
-        this.useThemeBackground = useThemeBackground;
-        return getThis();
-    }
-
-    public W useThemeHoverBackground(boolean useThemeHoverBackground) {
-        this.useThemeHoverBackground = useThemeHoverBackground;
-        return getThis();
-    }
-
     public W background(IDrawable... background) {
-        this.background = background == null ? EMPTY_BACKGROUND : background;
+        if (background.length == 0) {
+            this.background = null;
+        } else if (background.length == 1) {
+            this.background = background[0];
+        } else {
+            this.background = new DrawableArray(background);
+        }
+        return getThis();
+    }
+
+    public W overlay(IDrawable... overlay) {
+        if (overlay.length == 0) {
+            this.overlay = null;
+        } else if (overlay.length == 1) {
+            this.overlay = overlay[0];
+        } else {
+            this.overlay = new DrawableArray(overlay);
+        }
         return getThis();
     }
 
     public W hoverBackground(IDrawable... background) {
-        this.hoverBackground = background == null ? EMPTY_BACKGROUND : background;
+        if (background.length == 0) {
+            this.hoverBackground = null;
+        } else if (background.length == 1) {
+            this.hoverBackground = background[0];
+        } else {
+            this.hoverBackground = new DrawableArray(background);
+        }
+        return getThis();
+    }
+
+    public W hoverOverlay(IDrawable... overlay) {
+        if (overlay.length == 0) {
+            this.hoverOverlay = null;
+        } else if (overlay.length == 1) {
+            this.hoverOverlay = overlay[0];
+        } else {
+            this.hoverOverlay = new DrawableArray(overlay);
+        }
         return getThis();
     }
 

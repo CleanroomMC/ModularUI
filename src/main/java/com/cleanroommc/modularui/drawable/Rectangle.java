@@ -1,6 +1,9 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -13,6 +16,7 @@ public class Rectangle implements IDrawable {
     public static final double PI_2 = Math.PI / 2;
 
     private int cornerRadius, colorTL, colorTR, colorBL, colorBR, cornerSegments;
+    private boolean background = false;
 
     public Rectangle() {
         this.cornerRadius = 0;
@@ -57,15 +61,21 @@ public class Rectangle implements IDrawable {
         return this;
     }
 
-    /*@Override
-    public void applyThemeColor(int color) {
-        if (colorTL == 0 && colorBL == 0 && colorBR == 0 && colorTR == 0) {
-            IDrawable.super.applyThemeColor(color == 0 ? 0xFFFFFFFF : color);
-        }
-    }*/
+    public void setBackground(boolean background) {
+        this.background = background;
+    }
 
     @Override
-    public void draw(int x0, int y0, int width, int height) {
+    public void applyThemeColor(ITheme theme, WidgetTheme widgetTheme) {
+        if (isBackground()) {
+            Color.setGlColor(widgetTheme.getColor());
+        } else {
+            Color.setGlColorOpaque(Color.WHITE.normal);
+        }
+    }
+
+    @Override
+    public void draw(GuiContext context, int x0, int y0, int width, int height) {
         GlStateManager.disableTexture2D();
         GlStateManager.enableBlend();
         GlStateManager.disableAlpha();
@@ -117,5 +127,10 @@ public class Rectangle implements IDrawable {
         GlStateManager.disableBlend();
         GlStateManager.enableAlpha();
         GlStateManager.enableTexture2D();
+    }
+
+    @Override
+    public boolean isBackground() {
+        return background;
     }
 }

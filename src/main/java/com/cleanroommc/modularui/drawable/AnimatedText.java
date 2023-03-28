@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import net.minecraft.client.Minecraft;
 
@@ -61,7 +62,7 @@ public class AnimatedText extends StyledText {
     }
 
     @Override
-    public void draw(int x, int y, int width, int height) {
+    public void draw(GuiContext context, int x, int y, int width, int height) {
         if (this.fullString == null || !this.fullString.equals(super.get())) {
             if (this.isAnimating) {
                 this.fullString = super.get();
@@ -74,7 +75,7 @@ public class AnimatedText extends StyledText {
         }
         advance();
         if (this.currentString.isEmpty()) return;
-        super.draw(x, y, width, height);
+        super.draw(context, x, y, width, height);
     }
 
     public AnimatedText startAnimation() {

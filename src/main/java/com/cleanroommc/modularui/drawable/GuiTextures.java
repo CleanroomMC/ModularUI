@@ -176,12 +176,12 @@ public class GuiTextures {
             .imageSize(18, 54)
             .build();
 
-    public static final UITexture CHECK_BOX = UITexture.fullImage(ModularUI.ID, "gui/widgets/toggle_config");
+    public static final UITexture CHECK_BOX = UITexture.fullImage(ModularUI.ID, "gui/widgets/toggle_config", false);
 
-    public static final TabTexture TAB_TOP = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_top"), TabContainer.Side.TOP, 28, 32, 4);
-    public static final TabTexture TAB_BOTTOM = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_bottom"), TabContainer.Side.BOTTOM, 28, 32, 4);
-    public static final TabTexture TAB_LEFT = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_left"), TabContainer.Side.LEFT, 32, 28, 4);
-    public static final TabTexture TAB_RIGHT = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_right"), TabContainer.Side.RIGHT, 32, 28, 4);;
+    public static final TabTexture TAB_TOP = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_top", true), TabContainer.Side.TOP, 28, 32, 4);
+    public static final TabTexture TAB_BOTTOM = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_bottom", true), TabContainer.Side.BOTTOM, 28, 32, 4);
+    public static final TabTexture TAB_LEFT = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_left", true), TabContainer.Side.LEFT, 32, 28, 4);
+    public static final TabTexture TAB_RIGHT = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_right", true), TabContainer.Side.RIGHT, 32, 28, 4);;
 
     private static UITexture icon(String name, int x, int y, int w, int h) {
         return UITexture.builder()

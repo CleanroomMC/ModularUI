@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
@@ -8,8 +9,8 @@ public class AdaptableUITexture extends UITexture {
 
     private final int imageWidth, imageHeight, borderX, borderY;
 
-    public AdaptableUITexture(ResourceLocation location, float u0, float v0, float u1, float v1, int imageWidth, int imageHeight, int borderX, int borderY) {
-        super(location, u0, v0, u1, v1);
+    public AdaptableUITexture(ResourceLocation location, float u0, float v0, float u1, float v1, boolean background, int imageWidth, int imageHeight, int borderX, int borderY) {
+        super(location, u0, v0, u1, v1, background);
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;
         this.borderX = borderX;
@@ -18,13 +19,13 @@ public class AdaptableUITexture extends UITexture {
 
     @Override
     public AdaptableUITexture getSubArea(float uStart, float vStart, float uEnd, float vEnd) {
-        return new AdaptableUITexture(location, calcU(uStart), calcV(vStart), calcU(uEnd), calcV(vEnd), imageWidth, imageHeight, borderX, borderY);
+        return new AdaptableUITexture(location, calcU(uStart), calcV(vStart), calcU(uEnd), calcV(vEnd), background, imageWidth, imageHeight, borderX, borderY);
     }
 
     @Override
-    public void draw(int x, int y, int width, int height) {
+    public void draw(GuiContext context, int x, int y, int width, int height) {
         if (width == imageWidth && height == imageHeight) {
-            super.draw(x, y, width, height);
+            super.draw(context, x, y, width, height);
             return;
         }
         GlStateManager.disableAlpha();

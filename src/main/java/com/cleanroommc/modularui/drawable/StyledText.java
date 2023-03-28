@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widgets.TextWidget;
 
@@ -28,7 +29,7 @@ public class StyledText implements IKey {
     }
 
     @Override
-    public void draw(int x, int y, int width, int height) {
+    public void draw(GuiContext context, int x, int y, int width, int height) {
         renderer.setAlignment(this.alignment, width, height);
         if (colorChanged) {
             renderer.setColor(this.color);

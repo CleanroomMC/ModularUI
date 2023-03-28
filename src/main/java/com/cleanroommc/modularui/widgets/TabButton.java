@@ -29,7 +29,7 @@ public class TabButton extends Widget<TabButton> implements Interactable {
     }
 
     public void updateDefaultTexture() {
-        if (getBackground().length == 0 && this.activeTexture == null) {
+        if (getBackground() == null && this.activeTexture == null) {
             switch (this.tabContainer.getButtonBarSide()) {
                 case TOP:
                     background(GuiTextures.TAB_TOP);
@@ -51,7 +51,7 @@ public class TabButton extends Widget<TabButton> implements Interactable {
     public void drawBackground(GuiContext context) {
         if (isActive() && this.activeTexture != null) {
             for (IDrawable drawable : this.activeTexture) {
-                drawable.draw(0, 0, getArea().width, getArea().height);
+                drawable.draw(context, 0, 0, getArea().width, getArea().height);
             }
             return;
         }

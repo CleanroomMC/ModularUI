@@ -66,11 +66,11 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
                 if (this.axis.isHorizontal()) {
                     pos -= this.stopperWidth / 2;
                     int crossAxisPos = (int) (getArea().height / 2D - this.stopperHeight / 2D);
-                    this.stopperDrawable.draw(pos, crossAxisPos, this.stopperWidth, this.stopperHeight);
+                    this.stopperDrawable.draw(context, pos, crossAxisPos, this.stopperWidth, this.stopperHeight);
                 } else {
                     pos -= this.stopperHeight / 2;
                     int crossAxisPos = (int) (getArea().width / 2D - this.stopperWidth / 2D);
-                    this.stopperDrawable.draw(crossAxisPos, pos, this.stopperWidth, this.stopperHeight);
+                    this.stopperDrawable.draw(context, crossAxisPos, pos, this.stopperWidth, this.stopperHeight);
                 }
             }
         }
@@ -79,7 +79,7 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     @Override
     public void draw(GuiContext context) {
         if (this.handleDrawable != null) {
-            this.handleDrawable.draw(this.sliderArea);
+            this.handleDrawable.draw(context, this.sliderArea);
         }
     }
 

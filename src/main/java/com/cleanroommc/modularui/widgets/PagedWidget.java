@@ -19,11 +19,6 @@ public class PagedWidget<W extends PagedWidget<W>> extends Widget<W> {
         setPage(0);
     }
 
-    @Override
-    public boolean canHover() {
-        return getBackground().length > 0;
-    }
-
     public void setPage(int page) {
         if (page < 0 || page >= this.pages.size()) {
             throw new IndexOutOfBoundsException();

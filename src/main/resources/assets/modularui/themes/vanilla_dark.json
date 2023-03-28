@@ -1,9 +1,7 @@
 {
-  "default": {
-    "color": "0x444444",
-    "textColor": "0xEEEEEE",
-    "textShadow": false
-  },
+  "color": "0x444444",
+  "textColor": "0xEEEEEE",
+  "textShadow": false,
   "panel": {
     "color": "0x444444",
     "textColor": "0xEEEEEE",

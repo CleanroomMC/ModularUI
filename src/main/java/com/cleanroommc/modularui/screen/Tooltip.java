@@ -84,9 +84,9 @@ public class Tooltip {
         renderer.setPos(0, 0);
 
         //List<IIcon> icons = renderer.measureLines(this.lines);
-        renderer.draw(this.lines);
+        renderer.draw(context, this.lines);
 
-        Rectangle area = determineTooltipArea(this.lines, renderer, screenWidth, screenHeight, mouseX, mouseY);
+        Rectangle area = determineTooltipArea(context, this.lines, renderer, screenWidth, screenHeight, mouseX, mouseY);
 
         GlStateManager.disableRescaleNormal();
         RenderHelper.disableStandardItemLighting();
@@ -103,12 +103,12 @@ public class Tooltip {
         renderer.setSimulate(false);
         //renderer.setAlignment(Alignment.TopLeft, area.width, area.height);
         renderer.setPos(area.x, area.y);
-        renderer.draw(this.lines);
+        renderer.draw(context, this.lines);
 
         MinecraftForge.EVENT_BUS.post(new RenderTooltipEvent.PostText(ItemStack.EMPTY, textLines, area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height));
     }
 
-    public Rectangle determineTooltipArea(List<IDrawable> lines, IconRenderer renderer, int screenWidth, int screenHeight, int mouseX, int mouseY) {
+    public Rectangle determineTooltipArea(GuiContext context, List<IDrawable> lines, IconRenderer renderer, int screenWidth, int screenHeight, int mouseX, int mouseY) {
         int width = (int) renderer.getLastWidth();
         int height = (int) renderer.getLastHeight();
 
@@ -150,7 +150,7 @@ public class Tooltip {
                 } else if (x + width > screenWidth - borderSpace) {
                     int maxWidth = Math.max(minWidth, screenWidth - x - borderSpace);
                     renderer.setAlignment(this.alignment, maxWidth);
-                    renderer.draw(lines);
+                    renderer.draw(context, lines);
                     width = (int) renderer.getLastWidth();
                     height = (int) renderer.getLastHeight();
                 }
@@ -199,7 +199,7 @@ public class Tooltip {
                 }
                 usedMoreSpaceSide = true;
                 renderer.setAlignment(this.alignment, maxWidth);
-                renderer.draw(lines);
+                renderer.draw(context, lines);
                 width = (int) renderer.getLastWidth();
                 height = (int) renderer.getLastHeight();
             }

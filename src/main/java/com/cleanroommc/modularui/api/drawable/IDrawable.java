@@ -17,32 +17,38 @@ public interface IDrawable {
     /**
      * Draws this drawable at the given position with the given size.
      *
-     * @param x      x position
-     * @param y      y position
-     * @param width  width
-     * @param height height
+     * @param context current context to draw with
+     * @param x       x position
+     * @param y       y position
+     * @param width   width
+     * @param height  height
      */
-    void draw(int x, int y, int width, int height);
+    void draw(GuiContext context, int x, int y, int width, int height);
 
-    default void draw(int width, int height) {
-        draw(0, 0, width, height);
+    default void draw(GuiContext context, int width, int height) {
+        draw(context, 0, 0, width, height);
     }
 
     /**
      * Draws this drawable in a given area.
      *
-     * @param area area
+     * @param context current context to draw with
+     * @param area    area
      */
-    default void draw(Area area) {
-        draw(area.x, area.y, area.width, area.height);
+    default void draw(GuiContext context, Area area) {
+        draw(context, area.x, area.y, area.width, area.height);
     }
 
-    default void drawAtZero(Area area) {
-        draw(0, 0, area.width, area.height);
+    default void drawAtZero(GuiContext context, Area area) {
+        draw(context, 0, 0, area.width, area.height);
     }
 
     default void applyThemeColor(ITheme theme, WidgetTheme widgetTheme) {
         Color.setGlColorOpaque(Color.WHITE.normal);
+    }
+
+    default boolean isBackground() {
+        return false;
     }
 
     /**
@@ -62,7 +68,8 @@ public interface IDrawable {
     default void loadFromJson(JsonObject json) {
     }
 
-    IDrawable EMPTY = (x, y, width, height) -> {};
+    IDrawable EMPTY = (context, x, y, width, height) -> {
+    };
 
     class DrawableWidget extends Widget<DrawableWidget> {
 
@@ -74,7 +81,7 @@ public interface IDrawable {
 
         @Override
         public void draw(GuiContext context) {
-            this.drawable.drawAtZero(getArea());
+            this.drawable.drawAtZero(context, getArea());
         }
     }
 }

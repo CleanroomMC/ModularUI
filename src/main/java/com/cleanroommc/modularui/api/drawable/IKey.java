@@ -8,13 +8,12 @@ import com.cleanroommc.modularui.drawable.keys.CompoundKey;
 import com.cleanroommc.modularui.drawable.keys.DynamicKey;
 import com.cleanroommc.modularui.drawable.keys.LangKey;
 import com.cleanroommc.modularui.drawable.keys.StringKey;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
-import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widgets.TextWidget;
 import com.google.gson.JsonObject;
-import net.minecraft.client.renderer.GlStateManager;
 
 import java.util.function.Supplier;
 
@@ -87,7 +86,7 @@ public interface IKey extends IDrawable {
     void set(String string);
 
     @Override
-    default void draw(int x, int y, int width, int height) {
+    default void draw(GuiContext context, int x, int y, int width, int height) {
         renderer.setAlignment(Alignment.Center, width, height);
         renderer.setScale(1f);
         renderer.setPos(x, y);

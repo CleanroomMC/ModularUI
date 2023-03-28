@@ -18,7 +18,10 @@ public class ParentWidget<W extends ParentWidget<W>> extends Widget<W> {
 
     @Override
     public boolean canHover() {
-        return getBackground().length > 0 || getTooltip() != null;
+        return getBackground() != null ||
+                getHoverBackground() != null ||
+                getHoverOverlay() != null ||
+                getTooltip() != null;
     }
 
     public boolean addChild(IWidget child, int index) {

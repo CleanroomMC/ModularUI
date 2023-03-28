@@ -114,7 +114,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                                 .crossAxisAlignment(CrossAxisAlignment.CENTER)
                                                 .child(new ButtonWidget<>()
                                                         .size(60, 18)
-                                                        .background(GuiTextures.BUTTON, IKey.dynamic(() -> "Button " + this.val)))
+                                                        .overlay(IKey.dynamic(() -> "Button " + this.val)))
                                                 .child(new FluidSlot()
                                                         .margin(2)
                                                         .setSynced("fluid_slot"))
@@ -139,7 +139,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                                             return true;
                                                         })
                                                         //.flex(flex -> flex.left(3)) // ?
-                                                        .background(IKey.str("Button 2")))
+                                                        .overlay(IKey.str("Button 2")))
                                                 .child(new TextFieldWidget()
                                                         .setTextColor(Color.WHITE.normal)
                                                         .background(GuiTextures.DISPLAY)
@@ -294,7 +294,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                 .background(GuiTextures.BACKGROUND);
         panel.child(new ButtonWidget<>()
                         .flex(flex -> flex.size(8, 8).top(5).right(5))
-                        .background(IKey.str("x"))
+                        .overlay(IKey.str("x"))
                         .onMousePressed(mouseButton -> {
                             panel.animateClose();
                             return true;
@@ -317,7 +317,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                         .setter(value::set))
                 .child(new ButtonWidget<>()
                         .flex(flex -> flex.size(8, 8).top(5).right(5))
-                        .background(IKey.str("x"))
+                        .overlay(IKey.str("x"))
                         .onMousePressed(mouseButton -> {
                             dialog.closeWith(value.get());
                             return true;
@@ -347,7 +347,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
 
         @Override
         public void draw(GuiContext context) {
-            animatedKey.draw(0, 0, getArea().w(), getArea().h());
+            animatedKey.draw(context, 0, 0, getArea().w(), getArea().h());
         }
 
         @Override

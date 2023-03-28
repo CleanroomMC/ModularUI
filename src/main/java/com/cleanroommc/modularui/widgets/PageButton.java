@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.widgets;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.widget.Interactable;
+import com.cleanroommc.modularui.drawable.DrawableArray;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.widget.Widget;
 import org.apache.commons.lang3.ArrayUtils;
@@ -12,7 +13,7 @@ public class PageButton extends Widget<PageButton> implements Interactable {
 
     private final int index;
     private final PagedWidget.Controller controller;
-    private IDrawable[] inactiveTexture = EMPTY_BACKGROUND;
+    private IDrawable inactiveTexture = null;
 
     public PageButton(int index, PagedWidget.Controller controller) {
         this.index = index;
@@ -43,8 +44,8 @@ public class PageButton extends Widget<PageButton> implements Interactable {
     }
 
     @Override
-    public IDrawable[] getBackground() {
-        return isActive() || this.inactiveTexture.length == 0 ? super.getBackground() : this.inactiveTexture;
+    public IDrawable getBackground() {
+        return isActive() || this.inactiveTexture == null ? super.getBackground() : this.inactiveTexture;
     }
 
     public boolean isActive() {
@@ -55,7 +56,13 @@ public class PageButton extends Widget<PageButton> implements Interactable {
         if (active) {
             return background(background);
         }
-        this.inactiveTexture = background;
+        if (background.length == 0) {
+            this.inactiveTexture = null;
+        } else if (background.length == 1) {
+            this.inactiveTexture = background[0];
+        } else {
+            this.inactiveTexture = new DrawableArray(background);
+        }
         return this;
     }
 }

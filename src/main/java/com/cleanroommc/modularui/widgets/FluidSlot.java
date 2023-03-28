@@ -12,7 +12,6 @@ import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.sync.FluidSlotSyncHandler;
 import com.cleanroommc.modularui.theme.WidgetSlotTheme;
-import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.ClickData;
 import com.cleanroommc.modularui.utils.Color;
@@ -120,7 +119,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable {
             GuiDraw.drawFluidTexture(content, contentOffsetX, y, getArea().width - contentOffsetX * 2, height, 0);
         }
         if (overlayTexture != null) {
-            overlayTexture.draw(getArea());
+            overlayTexture.draw(context, getArea());
         }
         if (content != null && syncHandler.controlsAmount()) {
             String s = NumberFormat.format(content.amount);

@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.drawable;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -57,15 +58,15 @@ public class IconRenderer {
         this.simulate = simulate;
     }
 
-    public void draw(IDrawable text) {
-        draw(Collections.singletonList(text));
+    public void draw(GuiContext context, IDrawable text) {
+        draw(context, Collections.singletonList(text));
     }
 
-    public void draw(List<IDrawable> lines) {
-        drawMeasuredLines(measureLines(lines));
+    public void draw(GuiContext context, List<IDrawable> lines) {
+        drawMeasuredLines(context, measureLines(lines));
     }
 
-    public void drawMeasuredLines(List<IIcon> lines) {
+    public void drawMeasuredLines(GuiContext context, List<IIcon> lines) {
         TextRenderer.SHARED.setColor(this.color);
         TextRenderer.SHARED.setShadow(this.shadow);
         TextRenderer.SHARED.setScale(this.scale);
@@ -79,7 +80,7 @@ public class IconRenderer {
         for (IIcon icon : lines) {
             int x = getStartX(icon.getWidth());
             if (!simulate) {
-                icon.draw(x, y, maxWidth, icon.getHeight());
+                icon.draw(context, x, y, maxWidth, icon.getHeight());
             }
             y += icon.getHeight() * scale;
         }

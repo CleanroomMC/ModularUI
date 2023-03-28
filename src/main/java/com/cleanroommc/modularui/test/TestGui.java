@@ -53,7 +53,7 @@ public class TestGui extends ModularScreen {
         }
         AtomicReference<SortableListWidget<String, SortableListWidget.Item<String>>> ref = new AtomicReference<>(null);
         List<List<AvailableElement>> availableMatrix = Grid.mapToMatrix(2, lines, (index, value) -> {
-            AvailableElement availableElement = new AvailableElement().background(IKey.str(value))
+            AvailableElement availableElement = new AvailableElement().overlay(IKey.str(value))
                     .size(60, 14)
                     .onMousePressed(mouseButton1 -> {
                         if (this.availableElements.get(value).available) {
@@ -90,7 +90,8 @@ public class TestGui extends ModularScreen {
                 .pos(10, 10).right(10).bottom(10))*/
         SortableListWidget<String, SortableListWidget.Item<String>> sortableListWidget = SortableListWidget.sortableBuilder(lines, this.configuredOptions,
                 s -> new SortableListWidget.Item<>(s, new Widget<>()
-                        .background(GuiTextures.BUTTON, IKey.str(s))
+                        .background(GuiTextures.BUTTON)
+                        .overlay(IKey.str(s))
                         .left(0).right(10))
                         .removeable()).debugName("sortable list");
         ref.set(sortableListWidget);
@@ -109,7 +110,7 @@ public class TestGui extends ModularScreen {
                 .width(100));
         panel.child(new ButtonWidget<>()
                 .bottom(7).size(12, 12).left(0.5f)
-                .background(GuiTextures.ADD)
+                .overlay(GuiTextures.ADD)
                 .onMouseTapped(mouseButton -> {
                     if (!isPanelOpen("Option Selection")) {
                         ModularPanel panel1 = ModularPanel.defaultPanel(context, 150, 120).name("Option Selection");
@@ -117,7 +118,7 @@ public class TestGui extends ModularScreen {
                                 .child(new ButtonWidget<>()
                                         .size(8, 8)
                                         .top(7).right(7)
-                                        .background(GuiTextures.CLOSE)
+                                        .overlay(GuiTextures.CLOSE)
                                         .onMousePressed(mouseButton1 -> {
                                             closePanel(panel1);
                                             return true;
@@ -158,17 +159,16 @@ public class TestGui extends ModularScreen {
     private static class AvailableElement extends ButtonWidget<AvailableElement> {
 
         private boolean available = true;
-        private IDrawable[] activeBackground = {GuiTextures.BUTTON}, background = {GuiTextures.SLOT_DARK};
+        private final IDrawable activeBackground = GuiTextures.BUTTON;
+        private final IDrawable background = GuiTextures.SLOT_DARK;
 
         @Override
         public AvailableElement background(IDrawable... background) {
-            activeBackground = ArrayUtils.addAll(activeBackground, background);
-            this.background = ArrayUtils.addAll(this.background, background);
-            return this;
+            throw new UnsupportedOperationException("Use overlay()");
         }
 
         @Override
-        public IDrawable[] getBackground() {
+        public IDrawable getBackground() {
             return this.available ? activeBackground : background;
         }
     }

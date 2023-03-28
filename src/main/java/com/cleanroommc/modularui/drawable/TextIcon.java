@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.api.drawable.IIcon;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 
 public class TextIcon implements IIcon {
 
@@ -14,7 +15,7 @@ public class TextIcon implements IIcon {
     }
 
     @Override
-    public void draw(int x, int y, int width, int height) {
+    public void draw(GuiContext context, int x, int y, int width, int height) {
         TextRenderer.SHARED.setPos(x, y);
         TextRenderer.SHARED.drawSimple(text);
     }

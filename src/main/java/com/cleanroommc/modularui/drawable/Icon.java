@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 
 /**
@@ -55,7 +56,7 @@ public class Icon implements IIcon {
     }
 
     @Override
-    public void draw(int x, int y, int width, int height) {
+    public void draw(GuiContext context, int x, int y, int width, int height) {
         if (this.width > 0) {
             x += width * alignment.x - this.width * alignment.x;
             width = this.width;
@@ -64,6 +65,6 @@ public class Icon implements IIcon {
             y += height * alignment.y - this.height * alignment.y;
             height = this.height;
         }
-        drawable.draw(x, y, width, height);
+        drawable.draw(context, x, y, width, height);
     }
 }

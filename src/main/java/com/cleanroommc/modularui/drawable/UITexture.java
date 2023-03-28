@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.drawable;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.JsonHelper;
@@ -23,21 +24,24 @@ public class UITexture implements IDrawable {
 
     public static final Map<ResourceLocation, UITexture> JSON_TEXTURES = new HashMap<>();
 
-    public static final UITexture DEFAULT = fullImage("gui/options_background");
+    public static final UITexture DEFAULT = fullImage("gui/options_background", true);
 
     public final ResourceLocation location;
     public final float u0, v0, u1, v1;
+    public final boolean background;
 
     /**
      * Creates a drawable texture
      *
-     * @param location location of the texture
-     * @param u0       x offset of the image (0-1)
-     * @param v0       y offset of the image (0-1)
-     * @param u1       x end offset of the image (0-1)
-     * @param v1       y end offset of the image (0-1)
+     * @param location   location of the texture
+     * @param u0         x offset of the image (0-1)
+     * @param v0         y offset of the image (0-1)
+     * @param u1         x end offset of the image (0-1)
+     * @param v1         y end offset of the image (0-1)
+     * @param background
      */
-    public UITexture(ResourceLocation location, float u0, float v0, float u1, float v1) {
+    public UITexture(ResourceLocation location, float u0, float v0, float u1, float v1, boolean background) {
+        this.background = background;
         if (!location.getPath().endsWith(".png")) {
             location = new ResourceLocation(location.getNamespace(), location.getPath() + ".png");
         }
@@ -55,16 +59,16 @@ public class UITexture implements IDrawable {
         return new Builder();
     }
 
-    public static UITexture fullImage(ResourceLocation location) {
-        return new UITexture(location, 0, 0, 1, 1);
+    public static UITexture fullImage(ResourceLocation location, boolean background) {
+        return new UITexture(location, 0, 0, 1, 1, background);
     }
 
-    public static UITexture fullImage(String location) {
-        return fullImage(new ResourceLocation(location));
+    public static UITexture fullImage(String location, boolean background) {
+        return fullImage(new ResourceLocation(location), background);
     }
 
-    public static UITexture fullImage(String mod, String location) {
-        return fullImage(new ResourceLocation(mod, location));
+    public static UITexture fullImage(String mod, String location, boolean background) {
+        return fullImage(new ResourceLocation(mod, location), background);
     }
 
     public UITexture getSubArea(Area bounds) {
@@ -81,18 +85,8 @@ public class UITexture implements IDrawable {
      * @return relative sub area
      */
     public UITexture getSubArea(float uStart, float vStart, float uEnd, float vEnd) {
-        return new UITexture(location, calcU(uStart), calcV(vStart), calcU(uEnd), calcV(vEnd));
+        return new UITexture(location, calcU(uStart), calcV(vStart), calcU(uEnd), calcV(vEnd), background);
     }
-
-    /*public UITexture exposeToJson() {
-        if (JSON_TEXTURES.containsKey(location)) {
-            UITexture texture = JSON_TEXTURES.get(location);
-            ModularUI.LOGGER.error("{} '{}' is already exposed to json with uv {}, {}, {}, {}!", texture.getClass().getSimpleName(), location, texture.u0, texture.v0, texture.u1, texture.v1);
-        } else {
-            JSON_TEXTURES.put(location, this);
-        }
-        return this;
-    }*/
 
     public ResourceLocation getLocation() {
         return location;
@@ -107,7 +101,7 @@ public class UITexture implements IDrawable {
     }
 
     @Override
-    public void draw(int x, int y, int width, int height) {
+    public void draw(GuiContext context, int x, int y, int width, int height) {
         draw((float) x, y, width, height);
     }
 
@@ -141,7 +135,16 @@ public class UITexture implements IDrawable {
 
     @Override
     public void applyThemeColor(ITheme theme, WidgetTheme widgetTheme) {
-        Color.setGlColorOpaque(widgetTheme.getColor());
+        if (isBackground()) {
+            Color.setGlColor(widgetTheme.getColor());
+        } else {
+            Color.setGlColorOpaque(Color.WHITE.normal);
+        }
+    }
+
+    @Override
+    public boolean isBackground() {
+        return background;
     }
 
     public static IDrawable parseFromJson(JsonObject json) {
@@ -194,6 +197,7 @@ public class UITexture implements IDrawable {
         private int borderX = 0, borderY = 0;
         private Type type;
         private String name;
+        private boolean background = false;
 
         public Builder location(ResourceLocation loc) {
             this.location = loc;
@@ -249,6 +253,11 @@ public class UITexture implements IDrawable {
             return adaptable(border, border);
         }
 
+        public Builder background() {
+            this.background = true;
+            return this;
+        }
+
         public Builder registerAs(Type type, String name) {
             this.type = type;
             this.name = name;
@@ -260,7 +269,7 @@ public class UITexture implements IDrawable {
         }
 
         public Builder registerAsBackground(String name) {
-            return registerAs(Type.BACKGROUND, name);
+            return registerAs(Type.BACKGROUND, name).background();
         }
 
         public UITexture build() {
@@ -297,9 +306,9 @@ public class UITexture implements IDrawable {
             if (mode == 2) {
                 if (u0 < 0 || v0 < 0 || u1 > 1 || v1 > 1) throw new IllegalArgumentException("UV values must be 0 - 1");
                 if (borderX > 0 || borderY > 0) {
-                    return new AdaptableUITexture(location, u0, v0, u1, v1, iw, ih, borderX, borderY);
+                    return new AdaptableUITexture(location, u0, v0, u1, v1, background, iw, ih, borderX, borderY);
                 }
-                return new UITexture(location, u0, v0, u1, v1);
+                return new UITexture(location, u0, v0, u1, v1, background);
             }
             throw new IllegalStateException();
         }
