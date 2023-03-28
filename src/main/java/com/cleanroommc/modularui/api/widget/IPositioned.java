@@ -76,6 +76,11 @@ public interface IPositioned<W extends IPositioned<W>> {
         return getThis();
     }
 
+    default W left(float x, int offset, float anchor) {
+        flex().left(x, offset, anchor, Unit.Measure.RELATIVE, false);
+        return getThis();
+    }
+
     default W left(float x, int offset, float anchor, Unit.Measure measure) {
         flex().left(x, offset, anchor, measure, false);
         return getThis();
@@ -98,6 +103,11 @@ public interface IPositioned<W extends IPositioned<W>> {
 
     default W right(float x, float anchor) {
         flex().right(x, 0, anchor, Unit.Measure.RELATIVE, false);
+        return getThis();
+    }
+
+    default W right(float x, int offset, float anchor) {
+        flex().right(x, offset, anchor, Unit.Measure.RELATIVE, true);
         return getThis();
     }
 
@@ -126,6 +136,11 @@ public interface IPositioned<W extends IPositioned<W>> {
         return getThis();
     }
 
+    default W top(float y, int offset, float anchor) {
+        flex().top(y, offset, anchor, Unit.Measure.RELATIVE, false);
+        return getThis();
+    }
+
     default W top(float y, int offset, float anchor, Unit.Measure measure) {
         flex().top(y, offset, anchor, measure, false);
         return getThis();
@@ -148,6 +163,11 @@ public interface IPositioned<W extends IPositioned<W>> {
 
     default W bottom(float y, float anchor) {
         flex().bottom(y, 0, anchor, Unit.Measure.RELATIVE, false);
+        return getThis();
+    }
+
+    default W bottom(float y, int offset, float anchor) {
+        flex().bottom(y, offset, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
 

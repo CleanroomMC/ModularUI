@@ -164,7 +164,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     public void applyTheme(ITheme theme) {
         WidgetTheme widgetTheme = getWidgetTheme(theme);
         applyThemeBackground(false, widgetTheme.getBackground());
-        applyThemeBackground(true, widgetTheme.getBackground());
+        applyThemeBackground(true, widgetTheme.getHoverBackground());
     }
 
     @Override

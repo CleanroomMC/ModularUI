@@ -151,7 +151,8 @@ public class DimensionSizer {
         float anchor = p.getAnchor();
         if (width > 0 && anchor != 0) {
             val -= width * anchor;
-        } else if (p.getOffset() != 0) {
+        }
+        if (p.getOffset() != 0) {
             val += p.getOffset();
         }
         return (int) val;

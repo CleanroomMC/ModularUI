@@ -92,15 +92,23 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
         context.setTheme("vanilla_dark");
         Rectangle colorPickerBackground = new Rectangle().setColor(Color.RED.normal);
         ModularPanel panel = new ModularPanel(context);
+        PagedWidget.Controller tabController = new PagedWidget.Controller();
         panel.flex()                        // returns object which is responsible for sizing
                 .size(176, 220)       // set a static size for the main panel
                 .align(Alignment.Center);    // center the panel in the screen
         panel.bindPlayerInventory()
-                .child(new TabContainer()
+                .child(new Row()
+                        .coverChildren()
+                        .top(0f, 4, 1f)
+                        .child(new PageButton(0, tabController)
+                                .tab(GuiTextures.TAB_TOP, -1))
+                        .child(new PageButton(1, tabController)
+                                .tab(GuiTextures.TAB_TOP, 0))
+                        .child(new PageButton(2, tabController)
+                                .tab(GuiTextures.TAB_TOP, 0)))
+                .child(new PagedWidget<>()
                         .size(1f, 1f)
-                        .tabButton(new TabButton(0))
-                        .tabButton(new TabButton(1))
-                        .tabButton(new TabButton(2))
+                        .controller(tabController)
                         .addPage(new ParentWidget<>()
                                 .size(1f, 1f)
                                 //.child(SlotGroupWidget.playerInventory())

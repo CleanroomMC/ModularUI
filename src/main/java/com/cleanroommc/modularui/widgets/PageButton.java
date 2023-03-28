@@ -4,9 +4,9 @@ import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.DrawableArray;
+import com.cleanroommc.modularui.drawable.TabTexture;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.widget.Widget;
-import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
 public class PageButton extends Widget<PageButton> implements Interactable {
@@ -18,15 +18,6 @@ public class PageButton extends Widget<PageButton> implements Interactable {
     public PageButton(int index, PagedWidget.Controller controller) {
         this.index = index;
         this.controller = controller;
-    }
-
-    @Override
-    public void applyTheme(ITheme theme) {
-        super.applyTheme(theme);
-        /*applyThemeBackground(theme.getButtonBackground());
-        if (isUseThemeBackground()) {
-            this.inactiveTexture = ArrayUtils.addAll(new IDrawable[]{theme.getDisabledButtonBackground()}, this.inactiveTexture);
-        }*/
     }
 
     @Override
@@ -64,5 +55,11 @@ public class PageButton extends Widget<PageButton> implements Interactable {
             this.inactiveTexture = new DrawableArray(background);
         }
         return this;
+    }
+
+    public PageButton tab(TabTexture texture, int location) {
+        return background(false, texture.get(location, false))
+                .background(true, texture.get(location, true))
+                .size(texture.getWidth(), texture.getHeight());
     }
 }

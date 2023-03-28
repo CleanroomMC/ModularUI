@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.widgets.TabContainer;
+import com.cleanroommc.modularui.widget.sizer.GuiAxis;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
@@ -136,8 +136,15 @@ public class GuiTextures {
     public static final UITexture DISPLAY = UITexture.builder()
             .location(ModularUI.ID, "gui/background/display")
             .imageSize(143, 75)
-            .adaptable(1)
+            .adaptable(2)
             .registerAsBackground("display", false)
+            .build();
+
+    public static final UITexture DISPLAY_SMALL = UITexture.builder()
+            .location(ModularUI.ID, "gui/background/display_small")
+            .imageSize(18, 18)
+            .adaptable(1)
+            .registerAsBackground("display_small", false)
             .build();
 
     public static final UITexture BUTTON = UITexture.builder()
@@ -178,10 +185,10 @@ public class GuiTextures {
 
     public static final UITexture CHECK_BOX = UITexture.fullImage(ModularUI.ID, "gui/widgets/toggle_config", false);
 
-    public static final TabTexture TAB_TOP = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_top", true), TabContainer.Side.TOP, 28, 32, 4);
-    public static final TabTexture TAB_BOTTOM = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_bottom", true), TabContainer.Side.BOTTOM, 28, 32, 4);
-    public static final TabTexture TAB_LEFT = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_left", true), TabContainer.Side.LEFT, 32, 28, 4);
-    public static final TabTexture TAB_RIGHT = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_right", true), TabContainer.Side.RIGHT, 32, 28, 4);;
+    public static final TabTexture TAB_TOP = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_top", true), GuiAxis.Y, false, 28, 32, 4);
+    public static final TabTexture TAB_BOTTOM = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_bottom", true), GuiAxis.Y, true, 28, 32, 4);
+    public static final TabTexture TAB_LEFT = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_left", true), GuiAxis.X, false, 32, 28, 4);
+    public static final TabTexture TAB_RIGHT = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_right", true), GuiAxis.X, true, 32, 28, 4);;
 
     private static UITexture icon(String name, int x, int y, int w, int h) {
         return UITexture.builder()

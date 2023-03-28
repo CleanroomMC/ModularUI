@@ -10,7 +10,7 @@ public class WidgetTextFieldTheme extends WidgetTheme {
     private final int markedColor;
 
     public WidgetTextFieldTheme(int markedColor) {
-        super(GuiTextures.DISPLAY, null, Color.WHITE.normal, Color.WHITE.normal, false);
+        super(GuiTextures.DISPLAY_SMALL, null, Color.WHITE.normal, Color.WHITE.normal, false);
         this.markedColor = markedColor;
     }
 

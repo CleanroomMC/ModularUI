@@ -59,16 +59,16 @@ public class UITexture implements IDrawable {
         return new Builder();
     }
 
-    public static UITexture fullImage(ResourceLocation location, boolean background) {
-        return new UITexture(location, 0, 0, 1, 1, background);
+    public static UITexture fullImage(ResourceLocation location, boolean canApplyTheme) {
+        return new UITexture(location, 0, 0, 1, 1, canApplyTheme);
     }
 
-    public static UITexture fullImage(String location, boolean background) {
-        return fullImage(new ResourceLocation(location), background);
+    public static UITexture fullImage(String location, boolean canApplyTheme) {
+        return fullImage(new ResourceLocation(location), canApplyTheme);
     }
 
-    public static UITexture fullImage(String mod, String location, boolean background) {
-        return fullImage(new ResourceLocation(mod, location), background);
+    public static UITexture fullImage(String mod, String location, boolean canApplyTheme) {
+        return fullImage(new ResourceLocation(mod, location), canApplyTheme);
     }
 
     public UITexture getSubArea(Area bounds) {
