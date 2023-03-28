@@ -277,7 +277,10 @@ public class Color implements Iterable<Integer> {
     @Nullable
     public static Integer ofJson(JsonElement jsonElement) {
         if (jsonElement.isJsonPrimitive()) {
-            return Integer.decode(jsonElement.getAsString());
+            int color = (int) (long) Long.decode(jsonElement.getAsString()); // bruh
+            if (color != 0 && getAlpha(color) == 0) {
+                return withAlpha(color, 255);
+            }
         }
         if (jsonElement.isJsonObject()) {
             JsonObject json = jsonElement.getAsJsonObject();
@@ -285,6 +288,9 @@ public class Color implements Iterable<Integer> {
             int green = JsonHelper.getInt(json, 255, "g", "green");
             int blue = JsonHelper.getInt(json, 255, "b", "blue");
             int alpha = JsonHelper.getInt(json, 255, "a", "alpha");
+            if ((red | green | blue) != 0 && alpha == 0) {
+                alpha = 255;
+            }
             return Color.argb(red, green, blue, alpha);
         }
         return null;

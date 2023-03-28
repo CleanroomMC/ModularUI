@@ -34,6 +34,11 @@ public class JsonHelper {
         return defaultValue;
     }
 
+    public static <T> T deserializeWithFallback(JsonObject json, JsonObject fallback, Class<T> clazz, T defaultValue, String... keys) {
+        T t = deserialize(json, clazz, null, keys);
+        return t != null ? t : deserialize(fallback, clazz, defaultValue, keys);
+    }
+
     public static float getFloat(JsonObject json, float defaultValue, String @NotNull ... keys) {
         for (String key : keys) {
             if (json.has(key)) {
@@ -60,6 +65,11 @@ public class JsonHelper {
         return defaultValue;
     }
 
+    public static int getIntWithFallback(JsonObject json, JsonObject fallback, int defaultValue, String @NotNull ... keys) {
+        Integer i = getBoxedInt(json, null, keys);
+        return i != null ? i : getInt(json, defaultValue, keys);
+    }
+
     public static boolean getBoolean(JsonObject json, boolean defaultValue, String @NotNull ... keys) {
         for (String key : keys) {
             if (json.has(key)) {
@@ -71,6 +81,11 @@ public class JsonHelper {
             }
         }
         return defaultValue;
+    }
+
+    public static boolean getBoolWithFallback(JsonObject json, JsonObject fallback, boolean defaultValue, String @NotNull ... keys) {
+        Boolean i = getBoxedBool(json, null, keys);
+        return i != null ? i : getBoolean(json, defaultValue, keys);
     }
 
     public static String getString(JsonObject json, String defaultValue, String @NotNull ... keys) {
@@ -141,6 +156,17 @@ public class JsonHelper {
             }
         }
         return defaultValue;
+    }
+
+    public static int getColorWithFallback(JsonObject json, JsonObject fallback, int defaultValue, String @NotNull ... keys) {
+        JsonElement element = getJsonElement(json, keys);
+        if (element != null) {
+            Integer color = Color.ofJson(element);
+            if (color != null) {
+                return color;
+            }
+        }
+        return getColor(fallback, defaultValue, keys);
     }
 
     public static @Nullable JsonElement getJsonElement(JsonObject json, String @NotNull ... keys) {

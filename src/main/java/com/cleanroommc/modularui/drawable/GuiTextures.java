@@ -137,7 +137,7 @@ public class GuiTextures {
             .location(ModularUI.ID, "gui/background/display")
             .imageSize(143, 75)
             .adaptable(1)
-            //.registerAsBackground("display")
+            .registerAsBackground("display", false)
             .build();
 
     public static final UITexture BUTTON = UITexture.builder()

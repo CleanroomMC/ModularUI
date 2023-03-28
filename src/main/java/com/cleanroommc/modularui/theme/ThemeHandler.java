@@ -281,20 +281,25 @@ public class ThemeHandler implements ISelectiveResourceReloadListener {
             }
             Map<String, WidgetTheme> widgetThemes = new Object2ObjectOpenHashMap<>();
 
-
             WidgetTheme parentWidgetTheme = parent.getFallback();
-            WidgetTheme fallback = new WidgetTheme(parentWidgetTheme, parentWidgetTheme, this.json, true);
+            WidgetTheme fallback = new WidgetTheme(parentWidgetTheme, this.json, this.json);
             widgetThemes.put(Theme.FALLBACK, fallback);
 
+            JsonObject emptyJson = new JsonObject();
             for (Map.Entry<String, WidgetThemeParser> entry : widgetThemeFunctions.entrySet()) {
+                JsonObject json;
                 if (this.json.has(entry.getKey())) {
                     JsonElement element = this.json.get(entry.getKey());
                     if (element.isJsonObject()) {
-                        boolean fallbackToParent = JsonHelper.getBoolean(element.getAsJsonObject(), false, "fallbackParent");
-                        parentWidgetTheme = parent.getWidgetTheme(entry.getKey());
-                        widgetThemes.put(entry.getKey(), entry.getValue().parse(parentWidgetTheme, fallback, element.getAsJsonObject(), fallbackToParent));
+                        json = element.getAsJsonObject();
+                    } else {
+                        json = emptyJson;
                     }
+                } else {
+                    json = emptyJson;
                 }
+                parentWidgetTheme = parent.getWidgetTheme(entry.getKey());
+                widgetThemes.put(entry.getKey(), entry.getValue().parse(parentWidgetTheme, this.json, json));
             }
             return new Theme(this.id, parent, widgetThemes);
         }

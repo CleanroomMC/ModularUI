@@ -23,12 +23,12 @@ public class WidgetTheme {
         this.textShadow = textShadow;
     }
 
-    public WidgetTheme(WidgetTheme parent, WidgetTheme fallback, JsonObject json, boolean fallbackToParent) {
-        this.background = JsonHelper.deserialize(json, IDrawable.class, fallbackToParent ? parent.getBackground() : fallback.getBackground(), "background", "bg");
-        this.hoverBackground = JsonHelper.deserialize(json, IDrawable.class, fallbackToParent ? parent.getHoverBackground() : fallback.getHoverBackground(), "hoverBackground", "hbg");
-        this.color = JsonHelper.getColor(json, fallbackToParent ? parent.getColor() : fallback.getColor(), "color");
-        this.textColor = JsonHelper.getColor(json, fallbackToParent ? parent.getTextColor() : fallback.getTextColor(), "textColor");
-        this.textShadow = JsonHelper.getBoolean(json, fallbackToParent ? parent.getTextShadow() : fallback.getTextShadow(), "textShadow");
+    public WidgetTheme(WidgetTheme parent, JsonObject fallback, JsonObject json) {
+        this.background = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, parent.getBackground(), "background", "bg");
+        this.hoverBackground = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, parent.getHoverBackground(), "hoverBackground", "hbg");
+        this.color = JsonHelper.getColorWithFallback(json, fallback, parent.getColor(), "color");
+        this.textColor = JsonHelper.getColorWithFallback(json, fallback, parent.getTextColor(), "textColor");
+        this.textShadow = JsonHelper.getBoolWithFallback(json, fallback, parent.getTextShadow(), "textShadow");
     }
 
     public @Nullable IDrawable getBackground() {

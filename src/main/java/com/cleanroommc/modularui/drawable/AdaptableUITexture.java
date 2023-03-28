@@ -19,7 +19,7 @@ public class AdaptableUITexture extends UITexture {
 
     @Override
     public AdaptableUITexture getSubArea(float uStart, float vStart, float uEnd, float vEnd) {
-        return new AdaptableUITexture(location, calcU(uStart), calcV(vStart), calcU(uEnd), calcV(vEnd), background, imageWidth, imageHeight, borderX, borderY);
+        return new AdaptableUITexture(location, calcU(uStart), calcV(vStart), calcU(uEnd), calcV(vEnd), canApplyTheme, imageWidth, imageHeight, borderX, borderY);
     }
 
     @Override

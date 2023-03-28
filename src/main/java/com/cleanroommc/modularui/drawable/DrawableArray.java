@@ -33,9 +33,9 @@ public class DrawableArray implements IDrawable {
     }
 
     @Override
-    public boolean isBackground() {
+    public boolean canApplyTheme() {
         for (IDrawable drawable : this.drawables) {
-            if (drawable.isBackground()) {
+            if (drawable.canApplyTheme()) {
                 return true;
             }
         }

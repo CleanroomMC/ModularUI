@@ -47,7 +47,7 @@ public interface IDrawable {
         Color.setGlColorOpaque(Color.WHITE.normal);
     }
 
-    default boolean isBackground() {
+    default boolean canApplyTheme() {
         return false;
     }
 

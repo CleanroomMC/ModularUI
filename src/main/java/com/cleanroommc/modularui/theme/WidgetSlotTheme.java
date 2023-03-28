@@ -14,9 +14,9 @@ public class WidgetSlotTheme extends WidgetTheme {
         this.slotHoverColor = slotHoverColor;
     }
 
-    public WidgetSlotTheme(WidgetTheme parent, WidgetTheme fallback, JsonObject json, boolean fallbackToParent) {
-        super(parent, fallback, json, fallbackToParent);
-        this.slotHoverColor = JsonHelper.getColor(json, ((WidgetSlotTheme) parent).getSlotHoverColor(), "slotHoverColor");
+    public WidgetSlotTheme(WidgetTheme parent, JsonObject fallback, JsonObject json) {
+        super(parent, fallback, json);
+        this.slotHoverColor = JsonHelper.getColorWithFallback(json, fallback, ((WidgetSlotTheme) parent).getSlotHoverColor(), "slotHoverColor");
     }
 
     public int getSlotHoverColor() {

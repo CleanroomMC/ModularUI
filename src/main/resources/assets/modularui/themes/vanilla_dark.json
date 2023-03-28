@@ -1,5 +1,5 @@
 {
-  "color": "0xFF444444",
+  "color": "0x444444",
   "textColor": "0xEEEEEE",
-  "textShadow": false,
+  "textShadow": false
 }

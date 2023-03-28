@@ -28,20 +28,20 @@ public class UITexture implements IDrawable {
 
     public final ResourceLocation location;
     public final float u0, v0, u1, v1;
-    public final boolean background;
+    public final boolean canApplyTheme;
 
     /**
      * Creates a drawable texture
      *
-     * @param location   location of the texture
-     * @param u0         x offset of the image (0-1)
-     * @param v0         y offset of the image (0-1)
-     * @param u1         x end offset of the image (0-1)
-     * @param v1         y end offset of the image (0-1)
-     * @param background
+     * @param location      location of the texture
+     * @param u0            x offset of the image (0-1)
+     * @param v0            y offset of the image (0-1)
+     * @param u1            x end offset of the image (0-1)
+     * @param v1            y end offset of the image (0-1)
+     * @param canApplyTheme if theme colors can modify how this texture is drawn
      */
-    public UITexture(ResourceLocation location, float u0, float v0, float u1, float v1, boolean background) {
-        this.background = background;
+    public UITexture(ResourceLocation location, float u0, float v0, float u1, float v1, boolean canApplyTheme) {
+        this.canApplyTheme = canApplyTheme;
         if (!location.getPath().endsWith(".png")) {
             location = new ResourceLocation(location.getNamespace(), location.getPath() + ".png");
         }
@@ -85,7 +85,7 @@ public class UITexture implements IDrawable {
      * @return relative sub area
      */
     public UITexture getSubArea(float uStart, float vStart, float uEnd, float vEnd) {
-        return new UITexture(location, calcU(uStart), calcV(vStart), calcU(uEnd), calcV(vEnd), background);
+        return new UITexture(location, calcU(uStart), calcV(vStart), calcU(uEnd), calcV(vEnd), canApplyTheme);
     }
 
     public ResourceLocation getLocation() {
@@ -135,7 +135,7 @@ public class UITexture implements IDrawable {
 
     @Override
     public void applyThemeColor(ITheme theme, WidgetTheme widgetTheme) {
-        if (isBackground()) {
+        if (canApplyTheme()) {
             Color.setGlColor(widgetTheme.getColor());
         } else {
             Color.setGlColorOpaque(Color.WHITE.normal);
@@ -143,8 +143,8 @@ public class UITexture implements IDrawable {
     }
 
     @Override
-    public boolean isBackground() {
-        return background;
+    public boolean canApplyTheme() {
+        return canApplyTheme;
     }
 
     public static IDrawable parseFromJson(JsonObject json) {
@@ -197,7 +197,7 @@ public class UITexture implements IDrawable {
         private int borderX = 0, borderY = 0;
         private Type type;
         private String name;
-        private boolean background = false;
+        private boolean canApplyTheme = false;
 
         public Builder location(ResourceLocation loc) {
             this.location = loc;
@@ -253,8 +253,8 @@ public class UITexture implements IDrawable {
             return adaptable(border, border);
         }
 
-        public Builder background() {
-            this.background = true;
+        public Builder canApplyTheme() {
+            this.canApplyTheme = true;
             return this;
         }
 
@@ -269,7 +269,12 @@ public class UITexture implements IDrawable {
         }
 
         public Builder registerAsBackground(String name) {
-            return registerAs(Type.BACKGROUND, name).background();
+            return registerAsBackground(name, true);
+        }
+
+        public Builder registerAsBackground(String name, boolean canApplyTheme) {
+            if (canApplyTheme) canApplyTheme();
+            return registerAs(Type.BACKGROUND, name);
         }
 
         public UITexture build() {
@@ -306,9 +311,9 @@ public class UITexture implements IDrawable {
             if (mode == 2) {
                 if (u0 < 0 || v0 < 0 || u1 > 1 || v1 > 1) throw new IllegalArgumentException("UV values must be 0 - 1");
                 if (borderX > 0 || borderY > 0) {
-                    return new AdaptableUITexture(location, u0, v0, u1, v1, background, iw, ih, borderX, borderY);
+                    return new AdaptableUITexture(location, u0, v0, u1, v1, canApplyTheme, iw, ih, borderX, borderY);
                 }
-                return new UITexture(location, u0, v0, u1, v1, background);
+                return new UITexture(location, u0, v0, u1, v1, canApplyTheme);
             }
             throw new IllegalStateException();
         }

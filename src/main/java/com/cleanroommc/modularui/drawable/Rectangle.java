@@ -16,7 +16,7 @@ public class Rectangle implements IDrawable {
     public static final double PI_2 = Math.PI / 2;
 
     private int cornerRadius, colorTL, colorTR, colorBL, colorBR, cornerSegments;
-    private boolean background = false;
+    private boolean canApplyTheme = false;
 
     public Rectangle() {
         this.cornerRadius = 0;
@@ -61,13 +61,13 @@ public class Rectangle implements IDrawable {
         return this;
     }
 
-    public void setBackground(boolean background) {
-        this.background = background;
+    public void setCanApplyTheme(boolean canApplyTheme) {
+        this.canApplyTheme = canApplyTheme;
     }
 
     @Override
     public void applyThemeColor(ITheme theme, WidgetTheme widgetTheme) {
-        if (isBackground()) {
+        if (canApplyTheme()) {
             Color.setGlColor(widgetTheme.getColor());
         } else {
             Color.setGlColorOpaque(Color.WHITE.normal);
@@ -130,7 +130,7 @@ public class Rectangle implements IDrawable {
     }
 
     @Override
-    public boolean isBackground() {
-        return background;
+    public boolean canApplyTheme() {
+        return canApplyTheme;
     }
 }
