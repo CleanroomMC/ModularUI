@@ -24,6 +24,7 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
     protected final Function<I, T> widgetToValueMapper;
 
     private ScrollData scrollData;
+    private boolean keepScrollBarInArea = false;
 
     public ListWidget() {
         this(v -> null, w -> null);
@@ -63,6 +64,7 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
     @Override
     public void resize() {
         super.resize();
+        if (this.keepScrollBarInArea) return;
         if (this.scrollData.direction == ScrollDirection.VERTICAL) {
             getArea().width += this.scrollData.getScrollbarThickness();
         } else {
@@ -127,6 +129,11 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
             getScrollArea().setScrollDataX(null);
             getScrollArea().setScrollData(this.scrollData);
         }
+        return getThis();
+    }
+
+    public W keepScrollBarInArea() {
+        this.keepScrollBarInArea = true;
         return getThis();
     }
 }

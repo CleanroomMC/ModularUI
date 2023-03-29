@@ -196,7 +196,6 @@ public abstract class ModularScreen {
         this.context.pushViewport(null, this.viewport);
         for (ModularPanel panel : this.windowManager.getReverseOpenPanels()) {
             if (panel.disablePanelsBelow()) {
-                // TODO
                 GuiDraw.drawSolidRect(0, 0, this.viewport.w(), this.viewport.h(), Color.argb(16, 16, 16, (int) (125 * panel.getAlpha())));
             }
             WidgetTree.drawTree(panel, this.context);

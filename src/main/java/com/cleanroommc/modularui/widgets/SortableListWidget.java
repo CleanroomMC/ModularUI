@@ -54,6 +54,7 @@ public class SortableListWidget<T, I extends SortableListWidget.Item<T>> extends
 
     @Override
     public void onFrameUpdate() {
+        super.onFrameUpdate();
         this.timeSinceLastMove++;
     }
 
