@@ -7,18 +7,7 @@ import java.util.Map;
 
 public class Theme implements ITheme {
 
-    public static final ITheme DEFAULT_DEFAULT = new ThemeHandler.DefaultTheme();
-
-    /**
-     * If you have a custom widget type and want a custom theme for the type you can register a parser here.
-     *
-     * @param id           the id of the widget theme. This how json finds this parser.
-     * @param defaultTheme this will be used for {@link #DEFAULT_DEFAULT}.
-     * @param function     a function that creates an instance of the widget theme with the parent theme and a json.
-     */
-    public static void registerWidgetTheme(String id, WidgetTheme defaultTheme, WidgetThemeParser function) {
-        ThemeHandler.registerWidgetTheme(id, defaultTheme, function);
-    }
+    public static final ITheme DEFAULT_DEFAULT = new ThemeManager.DefaultTheme();
 
     public static final String FALLBACK = "default";
     public static final String PANEL = "panel";
@@ -50,9 +39,9 @@ public class Theme implements ITheme {
             }
         } else if (parent == DEFAULT_DEFAULT) {
             if (!this.widgetThemes.containsKey(FALLBACK)) {
-                this.widgetThemes.put(FALLBACK, ThemeHandler.defaultdefaultWidgetTheme);
+                this.widgetThemes.put(FALLBACK, ThemeManager.defaultdefaultWidgetTheme);
             }
-            for (Map.Entry<String, WidgetTheme> entry : ThemeHandler.defaultWidgetThemes.entrySet()) {
+            for (Map.Entry<String, WidgetTheme> entry : ThemeManager.defaultWidgetThemes.entrySet()) {
                 if (!this.widgetThemes.containsKey(entry.getKey())) {
                     this.widgetThemes.put(entry.getKey(), entry.getValue());
                 }

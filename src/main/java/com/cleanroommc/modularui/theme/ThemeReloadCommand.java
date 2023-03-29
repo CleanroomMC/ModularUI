@@ -20,7 +20,7 @@ public class ThemeReloadCommand extends CommandBase {
 
     @Override
     public void execute(@NotNull MinecraftServer server, @NotNull ICommandSender sender, String @NotNull [] args) throws CommandException {
-        ThemeHandler.reload();
+        ThemeManager.reload();
     }
 
     @Override

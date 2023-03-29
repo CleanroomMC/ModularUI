@@ -35,7 +35,6 @@ public class TestGui extends ModularScreen {
 
     public TestGui() {
         super("test");
-        this.context.setTheme("vanilla_dark");
     }
 
     @Override

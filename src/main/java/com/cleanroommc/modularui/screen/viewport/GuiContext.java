@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.screen.DraggablePanelWrapper;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.WindowManager;
+import com.cleanroommc.modularui.theme.ThemeManager;
 import com.cleanroommc.modularui.widget.sizer.GuiAxis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -74,7 +75,7 @@ public class GuiContext extends GuiViewportStack {
         this.hoveredWidgets = new HoveredIterable(this.screen.getWindowManager());
         this.mc = ModularUI.getMC();
         this.font = this.mc.fontRenderer;
-        setTheme("vanilla");
+        this.currentTheme = ThemeManager.getThemeFor(screen.getOwner(), screen.getName());
     }
 
     public boolean isAbove(IGuiElement widget) {
@@ -504,12 +505,9 @@ public class GuiContext extends GuiViewportStack {
         return currentTheme;
     }
 
-    public void setTheme(ITheme theme) {
-        this.currentTheme = theme != null ? theme : ITheme.getDefault();
-    }
-
-    public void setTheme(String theme) {
-        this.currentTheme = ITheme.get(theme);
+    public void useTheme(String theme) {
+        ITheme.registerDefaultScreenTheme(this.screen.getOwner(), this.screen.getName(), ITheme.get(theme));
+        this.currentTheme = ThemeManager.getThemeFor(this.screen.getOwner(), this.screen.getName());
     }
 
     private static class HoveredIterable implements Iterable<IGuiElement> {

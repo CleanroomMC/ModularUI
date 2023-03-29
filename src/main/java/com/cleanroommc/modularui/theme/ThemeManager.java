@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.theme;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.utils.AssetHelper;
@@ -21,14 +22,11 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 
 @ApiStatus.Internal
-public class ThemeHandler implements ISelectiveResourceReloadListener {
+public class ThemeManager implements ISelectiveResourceReloadListener {
 
     private static final String DEFAULT = "DEFAULT";
 
@@ -36,14 +34,8 @@ public class ThemeHandler implements ISelectiveResourceReloadListener {
     protected static final Map<String, WidgetTheme> defaultWidgetThemes = new Object2ObjectOpenHashMap<>();
     private static final Map<String, WidgetThemeParser> widgetThemeFunctions = new Object2ObjectOpenHashMap<>();
     protected static final WidgetTheme defaultdefaultWidgetTheme = new WidgetTheme(null, null, Color.WHITE.normal, 0xFF404040, false);
-
-    public static void registerWidgetTheme(String id, WidgetTheme defaultTheme, WidgetThemeParser function) {
-        if (widgetThemeFunctions.containsKey(id)) {
-            throw new IllegalStateException();
-        }
-        widgetThemeFunctions.put(id, function);
-        defaultWidgetThemes.put(id, defaultTheme);
-    }
+    private static final Map<String, ITheme> jsonScreenThemes = new Object2ObjectOpenHashMap<>();
+    private static final Map<String, ITheme> screenThemes = new Object2ObjectOpenHashMap<>();
 
     static {
         registerWidgetTheme(Theme.PANEL, new WidgetTheme(GuiTextures.BACKGROUND, null, Color.WHITE.normal, 0xFF404040, false), WidgetTheme::new);
@@ -53,8 +45,18 @@ public class ThemeHandler implements ISelectiveResourceReloadListener {
         registerWidgetTheme(Theme.TEXT_FIELD, new WidgetTextFieldTheme(0xFF2F72A8), WidgetTextFieldTheme::new);
     }
 
-    public static ITheme get(String id) {
-        return THEMES.getOrDefault(id, Theme.DEFAULT_DEFAULT);
+    public static void registerWidgetTheme(String id, WidgetTheme defaultTheme, WidgetThemeParser function) {
+        if (widgetThemeFunctions.containsKey(id)) {
+            throw new IllegalStateException();
+        }
+        widgetThemeFunctions.put(id, function);
+        defaultWidgetThemes.put(id, defaultTheme);
+    }
+
+    public static void registerDefaultTheme(String screenId, ITheme theme) {
+        Objects.requireNonNull(screenId);
+        Objects.requireNonNull(theme);
+        screenThemes.put(screenId, theme);
     }
 
     private static void registerTheme(ITheme theme) {
@@ -64,10 +66,27 @@ public class ThemeHandler implements ISelectiveResourceReloadListener {
         THEMES.put(theme.getId(), theme);
     }
 
+
+    public static ITheme get(String id) {
+        return THEMES.getOrDefault(id, Theme.DEFAULT_DEFAULT);
+    }
+
+    public static ITheme getThemeFor(String mod, String name) {
+        ITheme theme = jsonScreenThemes.get(mod + ":" + name);
+        if (theme != null) return theme;
+        theme = jsonScreenThemes.get(mod);
+        if (theme != null) return theme;
+        theme = screenThemes.get(mod + ":" + name);
+        if (theme != null) return theme;
+        return jsonScreenThemes.getOrDefault(mod, get(ModularUIConfig.useDarkThemeByDefault ? "vanilla_dark" : "vanilla"));
+    }
+
     public static void reload() {
         THEMES.clear();
+        jsonScreenThemes.clear();
         registerTheme(Theme.DEFAULT_DEFAULT);
         loadThemes();
+        loadScreenThemes();
     }
 
     public static void loadThemes() {
@@ -171,6 +190,9 @@ public class ThemeHandler implements ISelectiveResourceReloadListener {
                 }
                 definitions = element.getAsJsonObject();
                 for (Map.Entry<String, JsonElement> entry : definitions.entrySet()) {
+                    if (entry.getKey().equals("screens")) {
+                        continue;
+                    }
                     if (entry.getValue().isJsonObject() || entry.getValue().isJsonArray() || entry.getValue().isJsonNull()) {
                         ModularUI.LOGGER.throwing(new JsonParseException("Theme must be a string!"));
                         continue;
@@ -185,6 +207,36 @@ public class ThemeHandler implements ISelectiveResourceReloadListener {
         return themes;
     }
 
+    private static void loadScreenThemes() {
+        for (IResource resource : AssetHelper.findAssets(ModularUI.ID, "themes.json")) {
+            try {
+                JsonElement element = JsonHelper.parse(resource.getInputStream());
+                JsonObject definitions;
+                if (!element.isJsonObject()) {
+                    resource.close();
+                    continue;
+                }
+                definitions = element.getAsJsonObject();
+                if (definitions.has("screens")) {
+                    element = definitions.get("screens");
+                    if (element.isJsonObject()) {
+                        for (Map.Entry<String, JsonElement> entry : element.getAsJsonObject().entrySet()) {
+                            if (entry.getValue().isJsonPrimitive()) {
+                                ITheme theme = THEMES.get(entry.getValue().getAsString());
+                                if (theme != null) {
+                                    jsonScreenThemes.put(entry.getKey(), theme);
+                                }
+                            }
+                        }
+                    }
+                }
+                resource.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     @Override
     public void onResourceManagerReload(@NotNull IResourceManager resourceManager, @NotNull Predicate<IResourceType> resourcePredicate) {
         if (resourcePredicate.test(VanillaResourceType.TEXTURES)) {
@@ -193,13 +245,7 @@ public class ThemeHandler implements ISelectiveResourceReloadListener {
         }
     }
 
-    public static class DefaultTheme implements ITheme {
-
-        private WidgetTheme panel;
-        private WidgetTheme button;
-        private WidgetSlotTheme itemSlot;
-        private WidgetSlotTheme fluidSlot;
-        private WidgetTextFieldTheme textField;
+    public static class DefaultTheme extends AbstractDefaultTheme {
 
         @Override
         public String getId() {
@@ -207,53 +253,8 @@ public class ThemeHandler implements ISelectiveResourceReloadListener {
         }
 
         @Override
-        public ITheme getParentTheme() {
-            return null;
-        }
-
-        @Override
         public WidgetTheme getFallback() {
             return defaultdefaultWidgetTheme;
-        }
-
-        @Override
-        public WidgetTheme getPanelTheme() {
-            if (this.panel == null) {
-                this.panel = getWidgetTheme(Theme.PANEL);
-            }
-            return panel;
-        }
-
-        @Override
-        public WidgetTheme getButtonTheme() {
-            if (this.button == null) {
-                this.button = getWidgetTheme(Theme.BUTTON);
-            }
-            return button;
-        }
-
-        @Override
-        public WidgetSlotTheme getItemSlotTheme() {
-            if (this.itemSlot == null) {
-                this.itemSlot = (WidgetSlotTheme) getWidgetTheme(Theme.ITEM_SLOT);
-            }
-            return itemSlot;
-        }
-
-        @Override
-        public WidgetSlotTheme getFluidSlotTheme() {
-            if (this.fluidSlot == null) {
-                this.fluidSlot = (WidgetSlotTheme) getWidgetTheme(Theme.FLUID_SLOT);
-            }
-            return fluidSlot;
-        }
-
-        @Override
-        public WidgetTextFieldTheme getTextFieldTheme() {
-            if (this.textField == null) {
-                this.textField = (WidgetTextFieldTheme) getWidgetTheme(Theme.TEXT_FIELD);
-            }
-            return textField;
         }
 
         @Override

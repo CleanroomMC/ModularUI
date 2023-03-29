@@ -22,6 +22,8 @@ import java.util.function.Supplier;
  */
 public interface IKey extends IDrawable {
 
+    int TEXT_COLOR = 0xFF404040;
+
     TextRenderer renderer = new TextRenderer();
 
     IKey EMPTY = new StringKey("");

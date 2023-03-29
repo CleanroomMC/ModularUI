@@ -18,6 +18,8 @@ public class ModularUIConfig {
 
     public static boolean guiDebugMode = FMLLaunchHandler.isDeobfuscatedEnvironment();
 
+    public static boolean useDarkThemeByDefault = false;
+
     public static boolean placeTooltipNextToPanel() {
         return placeNextToPanelByDefault && Minecraft.getMinecraft().gameSettings.guiScale > 0;
     }

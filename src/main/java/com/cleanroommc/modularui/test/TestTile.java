@@ -89,7 +89,6 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
 
     public ModularPanel createPanel(GuiContext context) {
         context.enableJei();
-        context.setTheme("vanilla_dark");
         Rectangle colorPickerBackground = new Rectangle().setColor(Color.RED.normal);
         ModularPanel panel = new ModularPanel(context);
         PagedWidget.Controller tabController = new PagedWidget.Controller();
@@ -253,6 +252,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                                         .setNumbers(1, Short.MAX_VALUE)
                                                         .setTextAlignment(Alignment.Center)
                                                         .background(new Rectangle().setColor(0xFFb1b1b1))
+                                                        .setTextColor(IKey.TEXT_COLOR)
                                                         .size(30, 14))
                                                 .child(IKey.lang("bogosort.gui.refill_threshold").asWidget()
                                                         .height(14)))

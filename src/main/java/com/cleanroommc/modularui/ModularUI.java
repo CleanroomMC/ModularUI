@@ -6,9 +6,8 @@ import com.cleanroommc.modularui.manager.GuiManager;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.test.EventHandler;
 import com.cleanroommc.modularui.test.TestBlock;
-import com.cleanroommc.modularui.theme.ThemeHandler;
+import com.cleanroommc.modularui.theme.ThemeManager;
 import com.cleanroommc.modularui.theme.ThemeReloadCommand;
-import com.cleanroommc.modularui.utils.AssetHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.util.Timer;
@@ -73,7 +72,7 @@ public class ModularUI {
     public void postInit(FMLPostInitializationEvent event) {
         if (FMLCommonHandler.instance().getSide().isClient()) {
             ClientCommandHandler.instance.registerCommand(new ThemeReloadCommand());
-            ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new ThemeHandler());
+            ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new ThemeManager());
         }
     }
 
