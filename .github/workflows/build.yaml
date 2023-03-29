@@ -72,7 +72,7 @@ jobs:
 
           files-primary: build/libs/!(*-@(dev|sources|javadoc)).jar
           files-secondary: build/libs/*-@(dev|sources|javadoc).jar
-          name: GroovyScript-${{ github.event.inputs.version }}
+          name: ModularUI-${{ github.event.inputs.version }}
           version: ${{ github.event.inputs.version }}
           version-type: ${{ github.event.inputs.release_type }}
           changelog: "[Click here](https://github.com/CleanroomMC/ModularUI/releases/tag/v${{ github.event.inputs.version }})"
