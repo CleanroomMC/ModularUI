@@ -12,3 +12,5 @@ modularui.item.phantom.control=§7Scroll wheel up increases amount, down decreas
 modularui.fluid.click_to_fill=§bLeft §7Click with a Fluid Container to §bfill §7the tank (Shift-click for a full stack).
 modularui.fluid.click_combined=§cRight §7or §bLeft §7Click with a Fluid Container to §cempty §7or §bfill §7the tank (Shift-click for a full stack).
 modularui.fluid.click_to_empty=§cRight §7Click with a Fluid Container to §cempty §7the tank (Shift-click for a full stack).
+
+item.modularui.tablet.name=Tablet

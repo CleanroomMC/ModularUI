@@ -74,11 +74,13 @@ public class IconRenderer {
         int totalHeight = 0, maxWidth = 0;
         for (IIcon icon : lines) {
             totalHeight += icon.getHeight();
-            maxWidth = Math.max(maxWidth, icon.getWidth());
+            if (icon.getWidth() > 0) {
+                maxWidth = Math.max(maxWidth, icon.getWidth());
+            }
         }
         int y = getStartY(totalHeight);
         for (IIcon icon : lines) {
-            int x = getStartX(icon.getWidth());
+            int x = icon.getWidth() > 0 ? getStartX(icon.getWidth()) : this.x;
             if (!simulate) {
                 icon.draw(context, x, y, maxWidth, icon.getHeight());
             }

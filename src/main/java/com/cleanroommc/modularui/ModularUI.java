@@ -4,6 +4,8 @@ import com.cleanroommc.modularui.keybind.KeyBindHandler;
 import com.cleanroommc.modularui.manager.GuiInfos;
 import com.cleanroommc.modularui.manager.GuiManager;
 import com.cleanroommc.modularui.network.NetworkHandler;
+import com.cleanroommc.modularui.terminal.ItemTablet;
+import com.cleanroommc.modularui.terminal.guide.GuideManager;
 import com.cleanroommc.modularui.test.EventHandler;
 import com.cleanroommc.modularui.test.TestBlock;
 import com.cleanroommc.modularui.theme.ThemeManager;
@@ -64,6 +66,7 @@ public class ModularUI {
             MinecraftForge.EVENT_BUS.register(TestBlock.class);
             TestBlock.preInit();
         }
+        MinecraftForge.EVENT_BUS.register(ItemTablet.class);
 
         NetworkHandler.init();
     }
@@ -73,6 +76,7 @@ public class ModularUI {
         if (FMLCommonHandler.instance().getSide().isClient()) {
             ClientCommandHandler.instance.registerCommand(new ThemeReloadCommand());
             ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new ThemeManager());
+            GuideManager.load();
         }
     }
 
