@@ -76,7 +76,7 @@ public class ModularUI {
         if (FMLCommonHandler.instance().getSide().isClient()) {
             ClientCommandHandler.instance.registerCommand(new ThemeReloadCommand());
             ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new ThemeManager());
-            GuideManager.load();
+            GuideManager.reload();
         }
     }
 

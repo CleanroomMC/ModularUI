@@ -15,6 +15,7 @@ import com.cleanroommc.modularui.sync.GuiSyncHandler;
 import com.cleanroommc.modularui.sync.MapKey;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import com.cleanroommc.modularui.widget.sizer.Box;
 import com.cleanroommc.modularui.widget.sizer.Flex;
 import com.cleanroommc.modularui.widget.sizer.IResizeable;
 import org.jetbrains.annotations.ApiStatus;
@@ -144,7 +145,8 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         bg = getCurrentOverlay();
         if (bg != null) {
             bg.applyThemeColor(context.getTheme(), widgetTheme);
-            bg.drawAtZero(context, getArea());
+            Box padding = getArea().getPadding();
+            bg.draw(context, padding.left, padding.top, getArea().width - padding.horizontal(), getArea().height - padding.vertical());
         }
     }
 

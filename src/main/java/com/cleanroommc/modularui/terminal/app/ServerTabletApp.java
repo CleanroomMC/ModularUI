@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.terminal;
+package com.cleanroommc.modularui.terminal.app;
 
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
 

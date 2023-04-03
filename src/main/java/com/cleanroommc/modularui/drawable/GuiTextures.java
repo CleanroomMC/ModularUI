@@ -47,7 +47,7 @@ public class GuiTextures {
     }
 
     /**
-     * Icons texture used across all dashboard panels
+     * Icons copied from mclib
      */
     public static final ResourceLocation ICONS_LOCATION = new ResourceLocation(ModularUI.ID, "textures/gui/icons.png");
     public static final UITexture GEAR = icon("gear", 0, 0);

@@ -216,15 +216,19 @@ public class WidgetTree {
         // resize each widget and calculate their relative pos
         parent.resize();
         // now apply the calculated pos
+        applyPos(parent);
+        WidgetTree.foreachChildByLayer(parent, child -> {
+            child.postResize();
+            return true;
+        }, true);
+    }
+
+    public static void applyPos(IWidget parent) {
         WidgetTree.foreachChildByLayer(parent, child -> {
             IResizeable resizer = child.resizer();
             if (resizer != null) {
                 resizer.applyPos(child);
             }
-            return true;
-        }, true);
-        WidgetTree.foreachChildByLayer(parent, child -> {
-            child.postResize();
             return true;
         }, true);
     }
@@ -249,5 +253,17 @@ public class WidgetTree {
             parent = parent.getParent();
         }
         return filter.test(parent) ? parent : null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends IWidget> T findParent(IWidget parent, Class<T> type) {
+        if (parent == null) return null;
+        while (!(parent instanceof ModularPanel)) {
+            if (type.isAssignableFrom(parent.getClass())) {
+                return (T) parent;
+            }
+            parent = parent.getParent();
+        }
+        return type.isAssignableFrom(parent.getClass()) ? (T) parent : null;
     }
 }
