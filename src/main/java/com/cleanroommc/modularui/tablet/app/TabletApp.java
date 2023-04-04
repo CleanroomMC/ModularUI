@@ -1,10 +1,9 @@
-package com.cleanroommc.modularui.terminal.app;
+package com.cleanroommc.modularui.tablet.app;
 
-import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.terminal.TabletDesktop;
-import com.cleanroommc.modularui.terminal.TabletScreen;
+import com.cleanroommc.modularui.tablet.TabletDesktop;
+import com.cleanroommc.modularui.tablet.TabletScreen;
 
 public abstract class TabletApp extends ModularPanel {
 

@@ -83,7 +83,7 @@ public class TextRenderer {
     }
 
     public void drawSimple(String text) {
-        float w = getFontRenderer().getStringWidth(text);
+        float w = getFontRenderer().getStringWidth(text) * scale;
         int y = getStartY(1), x = getStartX(w);
         draw(text, x, y);
         this.lastWidth = w;

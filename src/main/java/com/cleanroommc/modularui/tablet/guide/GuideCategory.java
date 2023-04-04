@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.terminal.guide;
+package com.cleanroommc.modularui.tablet.guide;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;

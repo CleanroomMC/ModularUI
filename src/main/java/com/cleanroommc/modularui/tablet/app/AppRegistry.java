@@ -1,8 +1,8 @@
-package com.cleanroommc.modularui.terminal.app;
+package com.cleanroommc.modularui.tablet.app;
 
 import com.cleanroommc.modularui.drawable.ItemDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.terminal.guide.GuideApp;
+import com.cleanroommc.modularui.tablet.guide.GuideApp;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;

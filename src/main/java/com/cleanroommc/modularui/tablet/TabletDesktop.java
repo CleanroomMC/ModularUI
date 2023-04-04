@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.terminal;
+package com.cleanroommc.modularui.tablet;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
@@ -7,9 +7,9 @@ import com.cleanroommc.modularui.drawable.Rectangle;
 import com.cleanroommc.modularui.drawable.UITexture;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.terminal.app.AppRegistry;
-import com.cleanroommc.modularui.terminal.app.IApp;
-import com.cleanroommc.modularui.terminal.app.TabletApp;
+import com.cleanroommc.modularui.tablet.app.AppRegistry;
+import com.cleanroommc.modularui.tablet.app.IApp;
+import com.cleanroommc.modularui.tablet.app.TabletApp;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widgets.ButtonWidget;

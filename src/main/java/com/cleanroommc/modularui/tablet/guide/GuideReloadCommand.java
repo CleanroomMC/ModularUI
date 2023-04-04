@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.terminal.guide;
+package com.cleanroommc.modularui.tablet.guide;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;

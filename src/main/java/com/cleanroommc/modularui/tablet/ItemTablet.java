@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.terminal;
+package com.cleanroommc.modularui.tablet;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IItemGuiHolder;

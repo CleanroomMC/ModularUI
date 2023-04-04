@@ -26,6 +26,7 @@ public class IconRenderer {
     protected int color = 0;//Theme.INSTANCE.getText();
     protected boolean simulate;
     protected float lastWidth = 0, lastHeight = 0;
+    protected boolean useWholeWidth = false;
 
     public void setAlignment(Alignment alignment, float maxWidth) {
         setAlignment(alignment, maxWidth, -1);
@@ -58,6 +59,10 @@ public class IconRenderer {
         this.simulate = simulate;
     }
 
+    public void setUseWholeWidth(boolean useWholeWidth) {
+        this.useWholeWidth = useWholeWidth;
+    }
+
     public void draw(GuiContext context, IDrawable text) {
         draw(context, Collections.singletonList(text));
     }
@@ -72,9 +77,12 @@ public class IconRenderer {
         TextRenderer.SHARED.setScale(this.scale);
         TextRenderer.SHARED.setAlignment(this.alignment, this.maxWidth);
         int totalHeight = 0, maxWidth = 0;
+        if(this.useWholeWidth) {
+            maxWidth = (int) this.maxWidth;
+        }
         for (IIcon icon : lines) {
             totalHeight += icon.getHeight();
-            if (icon.getWidth() > 0) {
+            if (!this.useWholeWidth && icon.getWidth() > 0) {
                 maxWidth = Math.max(maxWidth, icon.getWidth());
             }
         }
@@ -98,11 +106,17 @@ public class IconRenderer {
             if (element instanceof IIcon) {
                 icons.add((IIcon) element);
             } else if (element instanceof IKey) {
+                float scale = this.scale;
+                Alignment alignment1 = this.alignment;
+                if (element instanceof StyledText) {
+                    scale = ((StyledText) element).getScale();
+                    alignment1 = ((StyledText) element).getAlignment();
+                }
                 String text = ((IKey) element).get();
                 for (String subLine : text.split("\\\\n")) {
-                    for (String subSubLine : wrapLine(subLine)) {
+                    for (String subSubLine : wrapLine(subLine, scale)) {
                         int width = (int) (getFontRenderer().getStringWidth(subSubLine) * scale);
-                        icons.add(new TextIcon(subSubLine, width, (int) (getFontRenderer().FONT_HEIGHT + scale)));
+                        icons.add(new TextIcon(subSubLine, width, (int) (getFontRenderer().FONT_HEIGHT * scale + scale), scale, alignment1));
                     }
                 }
             } else {
@@ -112,7 +126,7 @@ public class IconRenderer {
         return icons;
     }
 
-    public List<String> wrapLine(String line) {
+    public List<String> wrapLine(String line, float scale) {
         return maxWidth > 0 ? getFontRenderer().listFormattedStringToWidth(line, (int) (maxWidth / scale)) : Collections.singletonList(line);
     }
 

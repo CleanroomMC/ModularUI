@@ -1,6 +1,5 @@
-package com.cleanroommc.modularui.terminal.guide;
+package com.cleanroommc.modularui.tablet.guide;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widgets.CategoryList;
@@ -12,7 +11,6 @@ import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 
-import java.io.File;
 import java.util.Map;
 
 public class GuideManager {

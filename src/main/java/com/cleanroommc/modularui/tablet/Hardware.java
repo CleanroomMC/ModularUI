@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.terminal;
+package com.cleanroommc.modularui.tablet;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.item.ItemStack;

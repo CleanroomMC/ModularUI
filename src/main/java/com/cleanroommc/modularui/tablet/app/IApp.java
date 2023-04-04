@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.terminal.app;
+package com.cleanroommc.modularui.tablet.app;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
