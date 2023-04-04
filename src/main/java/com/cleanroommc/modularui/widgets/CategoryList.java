@@ -132,6 +132,12 @@ public class CategoryList extends ParentWidget<CategoryList> implements Interact
         }
 
         private void updateHeight() {
+            layoutWidgets();
+            WidgetTree.applyPos(this);
+        }
+
+        @Override
+        public void layoutWidgets() {
             int y = 0;
             for (IWidget widget : getChildren()) {
                 widget.getArea().ry = y;
@@ -139,7 +145,6 @@ public class CategoryList extends ParentWidget<CategoryList> implements Interact
                         ((CategoryList) widget).totalHeight : widget.getArea().height;
             }
             getScrollArea().getScrollY().scrollSize = y;
-            WidgetTree.applyPos(this);
         }
 
         public Root setCollapsedOverlay(IDrawable collapsedOverlay) {
