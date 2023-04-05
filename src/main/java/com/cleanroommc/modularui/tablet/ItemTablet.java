@@ -50,11 +50,7 @@ public class ItemTablet extends Item implements IItemGuiHolder {
 
     @Override
     public @NotNull ActionResult<ItemStack> onItemRightClick(@NotNull World worldIn, @NotNull EntityPlayer playerIn, @NotNull EnumHand handIn) {
-        if (handIn == EnumHand.MAIN_HAND) {
-            GuiInfos.PLAYER_ITEM_MAIN_HAND.open(playerIn);
-        } else {
-            GuiInfos.PLAYER_ITEM_OFF_HAND.open(playerIn);
-        }
+        GuiInfos.getForHand(handIn).open(playerIn);
         return new ActionResult<>(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
     }
 

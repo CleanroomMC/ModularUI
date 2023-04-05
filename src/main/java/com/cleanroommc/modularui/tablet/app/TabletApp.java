@@ -9,7 +9,6 @@ public abstract class TabletApp extends ModularPanel {
 
     public TabletApp(GuiContext context) {
         super(context);
-        background(TabletDesktop.BACKGROUND);
     }
 
     @Override

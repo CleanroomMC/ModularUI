@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui;
 
+import com.cleanroommc.modularui.drawable.DrawableSerialization;
 import com.cleanroommc.modularui.keybind.KeyBindHandler;
 import com.cleanroommc.modularui.manager.GuiInfos;
 import com.cleanroommc.modularui.manager.GuiManager;
@@ -84,6 +85,8 @@ public class ModularUI {
         if (FMLLaunchHandler.isDeobfuscatedEnvironment()) {
             MinecraftForge.EVENT_BUS.register(EventHandler.class);
         }
+
+        DrawableSerialization.init();
     }
 
     @SideOnly(Side.CLIENT)

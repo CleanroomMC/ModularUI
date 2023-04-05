@@ -1,9 +1,11 @@
 package com.cleanroommc.modularui.tablet.guide;
 
+import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.IconRenderer;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.ScrollData;
 import com.cleanroommc.modularui.utils.ScrollDirection;
@@ -23,7 +25,6 @@ public class GuideWidget extends ScrollWidget<GuideWidget> {
 
     private GuidePage currentGuidePage;
     private List<IIcon> textCache;
-    private int left = 0, width = 0;
 
     public GuideWidget() {
         getScrollArea().setScrollData(new ScrollData(ScrollDirection.VERTICAL));
@@ -33,19 +34,20 @@ public class GuideWidget extends ScrollWidget<GuideWidget> {
     public void preDraw(GuiContext context, boolean transformed) {
         super.preDraw(context, transformed);
         if (transformed && this.currentGuidePage != null) {
-            textRenderer.setPos(this.left + 20, 10);
-            textRenderer.setAlignment(Alignment.TopLeft, getArea().width - this.width - 40);
+            textRenderer.setColor(getWidgetTheme().getTextColor());
+            textRenderer.setPos(20, 10);
+            textRenderer.setAlignment(Alignment.TopLeft, getArea().width - 40);
             if (this.textCache == null) {
                 this.textCache = textRenderer.measureLines(this.currentGuidePage.getDrawables());
-                getScrollArea().getScrollY().scrollSize = (int) (textRenderer.getLastHeight() + 10.5);
             }
             textRenderer.drawMeasuredLines(context, this.textCache);
+            getScrollArea().getScrollY().scrollSize = (int) (textRenderer.getLastHeight() + 10.5);
         }
     }
 
-    public void setArea(int left, int width) {
-        this.left = left;
-        this.width = width;
+    @Override
+    public WidgetTheme getWidgetTheme(ITheme theme) {
+        return theme.getPanelTheme();
     }
 
     public void clearCache() {

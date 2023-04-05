@@ -20,7 +20,6 @@ public class TabletDesktop extends ModularPanel {
     private static final UITexture FRAME = UITexture.fullImage(ModularUI.ID, "gui/tablet/tablet_frame", false);
     private static final int taskbarHeight = 11;
     private static final int screenWidth = 307, screenHeight = 230;
-    public static final IDrawable BACKGROUND = new Rectangle().setVerticalGradient(0xFFDDDDDD, 0xFFAAAAAA);
 
     private final TabletTaskbar tabletTaskbar;
 
@@ -28,7 +27,7 @@ public class TabletDesktop extends ModularPanel {
 
     public TabletDesktop(GuiContext context) {
         super(context);
-        align(Alignment.Center).size(screenWidth, screenHeight).background(BACKGROUND);
+        align(Alignment.Center).size(screenWidth, screenHeight) ;
 
         this.tabletTaskbar = new TabletTaskbar()
                 .height(taskbarHeight).width(1f)

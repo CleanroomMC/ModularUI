@@ -1,0 +1,19 @@
+{
+  "panel": {
+    "background": {
+      "type": "rectangle",
+      "colorTop": "#445069",
+      "colorBottom": "#445069"
+    },
+    "textColor": "#d4d4d4"
+  },
+  "button": {
+    "background": {
+      "type": "rectangle",
+      "color": "#cc8500"
+    },
+    "color": "#ffffff",
+    "textColor": "#404040",
+    "textShadow": false
+  }
+}

@@ -36,7 +36,7 @@ public class GuideApp extends TabletApp {
                 .left(() -> listRightSide - categoryListWidth - 4, Unit.Measure.PIXEL)
                 .width(categoryListWidth).height(1f)
                 .paddingLeft(0)
-                .background(new Rectangle().setColor(Color.withAlpha(0, 0.65f)));
+                .background(new Rectangle().setColor(Color.withAlpha(0, 0.5f)));
 
         this.expandButton = new ButtonWidget<>()
                 .top(0).left(() -> listRightSide, Unit.Measure.PIXEL)
@@ -49,9 +49,10 @@ public class GuideApp extends TabletApp {
         this.guideWidget = new GuideWidget()
                 .left(() -> listRightSide, Unit.Measure.PIXEL).right(0)
                 .height(1f);
+        // make sure the guide widget is in the back so other stuff can be drawn on top
+        child(this.guideWidget);
         child(this.categoryList);
         child(this.expandButton);
-        child(this.guideWidget);
         this.listAnimator.setValueBounds(0, categoryListWidth + 4);
         this.listAnimator.setCallback(val -> {
             this.listRightSide = (int) val;

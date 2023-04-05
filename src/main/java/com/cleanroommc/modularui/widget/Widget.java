@@ -235,6 +235,13 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         return context;
     }
 
+    /**
+     * Do not override this. Override {@link IWidget#getWidgetTheme(ITheme)} instead.
+     */
+    public final WidgetTheme getWidgetTheme() {
+        return getWidgetTheme(getContext().getTheme());
+    }
+
     protected final void setContext(GuiContext context) {
         this.context = context;
     }
@@ -251,19 +258,19 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         }
     }
 
-    public IDrawable getBackground() {
+    public @Nullable IDrawable getBackground() {
         return background;
     }
 
-    public IDrawable getOverlay() {
+    public @Nullable IDrawable getOverlay() {
         return overlay;
     }
 
-    public IDrawable getHoverBackground() {
+    public @Nullable IDrawable getHoverBackground() {
         return hoverBackground;
     }
 
-    public IDrawable getHoverOverlay() {
+    public @Nullable IDrawable getHoverOverlay() {
         return hoverOverlay;
     }
 

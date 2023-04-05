@@ -15,7 +15,6 @@ import net.minecraft.item.ItemStack;
 
 public class TabletScreen extends ModularScreen {
 
-
     private final ItemStack tabletItem;
     private TabletDesktop desktop;
     private Area frameArea;
@@ -23,6 +22,7 @@ public class TabletScreen extends ModularScreen {
     public TabletScreen(ItemStack tabletItem) {
         super(ModularUI.ID, "tablet");
         this.tabletItem = tabletItem;
+        this.context.useTheme("tablet");
     }
 
     @Override

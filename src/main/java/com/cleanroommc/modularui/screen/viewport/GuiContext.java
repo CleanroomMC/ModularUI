@@ -75,7 +75,9 @@ public class GuiContext extends GuiViewportStack {
         this.hoveredWidgets = new HoveredIterable(this.screen.getWindowManager());
         this.mc = ModularUI.getMC();
         this.font = this.mc.fontRenderer;
-        this.currentTheme = ThemeManager.getThemeFor(screen.getOwner(), screen.getName());
+        if (this.currentTheme == null) {
+            this.currentTheme = ThemeManager.getThemeFor(screen.getOwner(), screen.getName(), null);
+        }
     }
 
     public boolean isAbove(IGuiElement widget) {
@@ -506,8 +508,7 @@ public class GuiContext extends GuiViewportStack {
     }
 
     public void useTheme(String theme) {
-        ITheme.registerDefaultScreenTheme(this.screen.getOwner(), this.screen.getName(), ITheme.get(theme));
-        this.currentTheme = ThemeManager.getThemeFor(this.screen.getOwner(), this.screen.getName());
+        this.currentTheme = ThemeManager.getThemeFor(this.screen.getOwner(), this.screen.getName(), theme);
     }
 
     private static class HoveredIterable implements Iterable<IGuiElement> {

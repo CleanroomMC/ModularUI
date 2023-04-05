@@ -16,7 +16,8 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 
 public class GuideCategory {
 
-    private static final IDrawable pageListBackground = new Rectangle().setColor(0xFFDDDDDD);
+    private static final IDrawable categoryBackground = new Rectangle().setColor(0xFF404040);
+    private static final IDrawable categoryElementBackground = new Rectangle().setColor(0xFF757575);
 
     private final String name;
     private final Object2ObjectLinkedOpenHashMap<String, GuidePage> pages = new Object2ObjectLinkedOpenHashMap<>();
@@ -71,15 +72,15 @@ public class GuideCategory {
                 .left(0)
                 .width(1f).height(16)
                 .paddingLeft(4)
-                .background(GuiTextures.BUTTON)
-                .overlay(IKey.str(this.name).color(Color.WHITE.normal).shadow(true).alignment(Alignment.CenterLeft));
+                .background(categoryBackground)
+                .overlay(IKey.str(this.name).color(Color.WHITE.normal).alignment(Alignment.CenterLeft));
         for (GuideCategory category : this.categories.values()) {
             categoryList.child(category.buildGui(context, app));
         }
         for (GuidePage page : this.pages.values()) {
             categoryList.child(new ButtonWidget<>()
                     .width(1f).height(16)
-                    .background(pageListBackground)
+                    .background(categoryElementBackground)
                     .overlay(page.getIcon().asIcon()
                                     .size(14)
                                     .alignment(Alignment.CenterLeft)
