@@ -1,7 +1,10 @@
 package com.cleanroommc.modularui.theme;
 
 import com.cleanroommc.modularui.api.ITheme;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public abstract class AbstractDefaultTheme implements ITheme {
 
     private WidgetTheme panel;

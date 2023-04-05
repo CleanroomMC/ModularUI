@@ -2,9 +2,12 @@ package com.cleanroommc.modularui.theme;
 
 import com.cleanroommc.modularui.api.ITheme;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Map;
 
+@SideOnly(Side.CLIENT)
 public class Theme implements ITheme {
 
     public static final ITheme DEFAULT_DEFAULT = new ThemeManager.DefaultTheme();
