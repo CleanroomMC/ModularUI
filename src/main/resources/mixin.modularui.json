@@ -12,7 +12,7 @@
     "SlotAccessorClient"
   ],
   "mixins": [
-    "SlotAccessor",
+    "SlotMixin",
     "SPacketSetSlotMixin"
   ]
 }

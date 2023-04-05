@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.keybind.KeyBindHandler;
 import com.cleanroommc.modularui.manager.GuiInfos;
 import com.cleanroommc.modularui.manager.GuiManager;
 import com.cleanroommc.modularui.network.NetworkHandler;
+import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.tablet.ItemTablet;
 import com.cleanroommc.modularui.tablet.guide.GuideManager;
 import com.cleanroommc.modularui.test.EventHandler;
@@ -44,6 +45,7 @@ public class ModularUI {
     private static Timer timer60Fps;
 
     private static boolean blurLoaded = false;
+    private static boolean sorterLoaded = false;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -51,15 +53,10 @@ public class ModularUI {
         GuiInfos.init();
 
         blurLoaded = Loader.isModLoaded("blur");
+        sorterLoaded = Loader.isModLoaded(BOGO_SORT);
 
-        if (FMLCommonHandler.instance().getSide().isClient()) {
-            timer60Fps = new Timer(60f);
-            MinecraftForge.EVENT_BUS.register(ClientEventHandler.class);
-            MinecraftForge.EVENT_BUS.register(KeyBindHandler.class);
-
-            if (FMLLaunchHandler.isDeobfuscatedEnvironment()) {
-                MinecraftForge.EVENT_BUS.register(EventHandler.class);
-            }
+        if (NetworkUtils.isDedicatedClient()) {
+            preInitClient();
         }
 
         if (FMLLaunchHandler.isDeobfuscatedEnvironment()) {
@@ -73,15 +70,27 @@ public class ModularUI {
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-        if (FMLCommonHandler.instance().getSide().isClient()) {
-            ClientCommandHandler.instance.registerCommand(new ThemeReloadCommand());
-            ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new ThemeManager());
-            GuideManager.reload();
+        if (NetworkUtils.isDedicatedClient()) {
+            postInitClient();
         }
     }
 
-    public static boolean isSortModLoaded() {
-        return Loader.isModLoaded(BOGO_SORT);
+    @SideOnly(Side.CLIENT)
+    private void preInitClient() {
+        timer60Fps = new Timer(60f);
+        MinecraftForge.EVENT_BUS.register(ClientEventHandler.class);
+        MinecraftForge.EVENT_BUS.register(KeyBindHandler.class);
+
+        if (FMLLaunchHandler.isDeobfuscatedEnvironment()) {
+            MinecraftForge.EVENT_BUS.register(EventHandler.class);
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    private void postInitClient() {
+        ClientCommandHandler.instance.registerCommand(new ThemeReloadCommand());
+        ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new ThemeManager());
+        GuideManager.reload();
     }
 
     @SideOnly(Side.CLIENT)
@@ -96,5 +105,9 @@ public class ModularUI {
 
     public static boolean isBlurLoaded() {
         return blurLoaded;
+    }
+
+    public static boolean isSortModLoaded() {
+        return sorterLoaded;
     }
 }

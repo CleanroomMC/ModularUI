@@ -1,7 +1,10 @@
 package com.cleanroommc.modularui.api;
 
 import com.cleanroommc.modularui.theme.*;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public interface ITheme {
 
     /**
