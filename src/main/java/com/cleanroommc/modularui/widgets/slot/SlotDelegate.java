@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.widgets.slot;
 
-import com.cleanroommc.modularui.core.mixin.SlotAccessor;
+import com.cleanroommc.modularui.api.SlotAccessor;
 import com.cleanroommc.modularui.core.mixin.SlotAccessorClient;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
