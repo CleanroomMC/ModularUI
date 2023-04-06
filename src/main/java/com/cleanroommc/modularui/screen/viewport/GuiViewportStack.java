@@ -58,7 +58,7 @@ public class GuiViewportStack implements IViewportStack {
     @Override
     public void popViewport(IViewport viewport) {
         if (this.viewportStack.peek().viewport != viewport) {
-            throw new IllegalStateException("Viewports must be popped in reverse order they were pushed. Tried to pop '" + viewport + "', but last pushed is '" + this.viewportStack.peek() + "'.");
+            throw new IllegalStateException("Viewports must be popped in reverse order they were pushed. Tried to pop '" + viewport + "', but last pushed is '" + this.viewportStack.peek().viewport + "'.");
         }
         this.viewportStack.pop();
     }

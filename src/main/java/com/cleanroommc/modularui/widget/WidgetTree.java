@@ -171,7 +171,11 @@ public class WidgetTree {
             children.forEach(widget -> drawTree(widget, context, false));
         }
 
-        if (canBeSeen && viewport != null) {
+        if (viewport != null) {
+            if (!canBeSeen) {
+                viewport.unapply(context, IViewport.DRAWING | IViewport.POST_DRAW);
+                return;
+            }
             // now apply the same transformations as above for open/close animation
             GlStateManager.pushMatrix();
             if (parent instanceof ModularPanel) {
