@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 public class GuideCategory {
 
     private static final IDrawable categoryBackground = new Rectangle().setColor(Color.withAlpha(0x838AA6, 0.75f));
-    private static final IDrawable categoryElementBackground = new Rectangle().setColor(0xFF9DA4BF);
+    private static final IDrawable categoryElementBackground = new Rectangle().setVerticalGradient(0xFFA7AFCC, 0xFF9DA4BF);
 
     private final String name;
     private final Object2ObjectLinkedOpenHashMap<String, GuidePage> pages = new Object2ObjectLinkedOpenHashMap<>();

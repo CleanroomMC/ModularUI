@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.drawable;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.widget.sizer.Area;

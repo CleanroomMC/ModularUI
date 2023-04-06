@@ -2,8 +2,7 @@
   "panel": {
     "background": {
       "type": "rectangle",
-      "colorTop": "#445069",
-      "colorBottom": "#445069"
+      "color": "#445069"
     },
     "textColor": "#d4d4d4"
   },
