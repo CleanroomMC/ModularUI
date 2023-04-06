@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widget.sizer;
 
+import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.utils.MathUtils;
 import org.jetbrains.annotations.ApiStatus;
@@ -297,6 +298,14 @@ public class Area extends Rectangle implements IResizeable {
 
     public void set(Rectangle area) {
         setBounds(area.x, area.y, area.width, area.height);
+    }
+
+    public void setLocal(Rectangle area, IViewportStack viewportStack) {
+        setBounds(viewportStack.localX(area.x), viewportStack.localY(area.y), area.width, area.height);
+    }
+
+    public void setGlobal(Rectangle area, IViewportStack viewportStack) {
+        setBounds(viewportStack.globalX(area.x), viewportStack.globalY(area.y), area.width, area.height);
     }
 
     public Box getMargin() {

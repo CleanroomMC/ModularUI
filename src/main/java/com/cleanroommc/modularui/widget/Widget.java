@@ -208,11 +208,6 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     @Override
-    public boolean canBeSeen() {
-        return true; // TODO
-    }
-
-    @Override
     public void markDirty() {
         if (this.tooltip != null) {
             this.tooltip.markDirty();

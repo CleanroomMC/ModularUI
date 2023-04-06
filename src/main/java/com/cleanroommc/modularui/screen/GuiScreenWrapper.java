@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
+import com.cleanroommc.modularui.drawable.Scissor;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
 import com.cleanroommc.modularui.utils.Color;
@@ -83,6 +84,8 @@ public class GuiScreenWrapper extends GuiContainer {
             frameCount = 0;
             timer += 1000;
         }
+
+        Scissor.scissorTransformed(this.screen.getViewport(), this.screen.context);
         drawDefaultBackground();
         int i = this.guiLeft;
         int j = this.guiTop;
@@ -170,6 +173,8 @@ public class GuiScreenWrapper extends GuiContainer {
         GlStateManager.enableDepth();
         GlStateManager.enableRescaleNormal();
         RenderHelper.enableStandardItemLighting();
+
+        Scissor.unscissor(this.screen.context);
     }
 
     @Override

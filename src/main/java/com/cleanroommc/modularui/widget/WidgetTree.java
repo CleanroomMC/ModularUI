@@ -109,54 +109,61 @@ public class WidgetTree {
 
     public static void drawTree(IWidget parent, GuiContext context, boolean ignoreEnabled) {
         if (!parent.isEnabled() && !ignoreEnabled) return;
+        boolean canBeSeen = parent.canBeSeen();
 
-        GlStateManager.pushMatrix();
         Area panel = parent.getPanel().getArea();
-        // get alpha and scale for open/close animation
-        float alpha = parent.getPanel().getAlpha();
-        float scale = parent.getPanel().getScale();
-        float sf = 1 / scale;
-        float x, y;
-        if (parent instanceof ModularPanel) {
-            // panels just need to be translated to its center, scaled translated back to its top left corner
-            GlStateManager.translate(parent.getArea().x, parent.getArea().y, 0);
-            x = parent.getArea().width / 2f;
-            y = parent.getArea().height / 2f;
-            GlStateManager.translate(x, y, 0);
-            GlStateManager.scale(scale, scale, 1);
-            GlStateManager.translate(-x, -y, 0);
-        } else {
-            // all other needs to be scaled first
-            GlStateManager.scale(scale, scale, 1);
-            // then calculate translation with this complicated looking formula
-            x = (panel.x + panel.w() / 2f * (1 - scale) + (parent.getArea().x - panel.x) * scale) * sf;
-            y = (panel.y + panel.h() / 2f * (1 - scale) + (parent.getArea().y - panel.y) * scale) * sf;
-            GlStateManager.translate(x, y, 0);
-        }
-
-        GlStateManager.color(1, 1, 1, alpha);
-        GlStateManager.enableBlend();
-        // now apply all active viewports to opengl
-        context.applyToOpenGl();
-        // draw the current widget
-        parent.drawBackground(context);
-        parent.draw(context);
-
         IViewport viewport = parent instanceof IViewport ? (IViewport) parent : null;
-        if (viewport != null) {
-            // if this is a viewport we call some extra methods
-            // first a normal draw call
-            viewport.preDraw(context, false);
-            // now push this viewport
+        float alpha = 1f;
+        float scale = 1f;
+        float x = 0, y = 0;
+        if (canBeSeen) {
+            GlStateManager.pushMatrix();
+            // get alpha and scale for open/close animation
+            alpha = parent.getPanel().getAlpha();
+            scale = parent.getPanel().getScale();
+            float sf = 1 / scale;
+            if (parent instanceof ModularPanel) {
+                // panels just need to be translated to its center, scaled translated back to its top left corner
+                GlStateManager.translate(parent.getArea().x, parent.getArea().y, 0);
+                x = parent.getArea().width / 2f;
+                y = parent.getArea().height / 2f;
+                GlStateManager.translate(x, y, 0);
+                GlStateManager.scale(scale, scale, 1);
+                GlStateManager.translate(-x, -y, 0);
+            } else {
+                // all other needs to be scaled first
+                GlStateManager.scale(scale, scale, 1);
+                // then calculate translation with this complicated looking formula
+                x = (panel.x + panel.w() / 2f * (1 - scale) + (parent.getArea().x - panel.x) * scale) * sf;
+                y = (panel.y + panel.h() / 2f * (1 - scale) + (parent.getArea().y - panel.y) * scale) * sf;
+                GlStateManager.translate(x, y, 0);
+            }
+
+            GlStateManager.color(1, 1, 1, alpha);
+            GlStateManager.enableBlend();
+            // now apply all active viewports to opengl
+            context.applyToOpenGl();
+            // draw the current widget
+            parent.drawBackground(context);
+            parent.draw(context);
+
+            if (viewport != null) {
+                // if this is a viewport we call some extra methods
+                // first a normal draw call
+                viewport.preDraw(context, false);
+                // now push this viewport
+                viewport.apply(context, IViewport.DRAWING | IViewport.PRE_DRAW);
+                // apply only that viewport to opengl (since all others are already applied)
+                context.applyTopToOpenGl();
+                // draw again with the transformation
+                viewport.preDraw(context, true);
+            }
+            // get rid of all opengl transformations for children
+            // all widgets transform themselves on their own
+            GlStateManager.popMatrix();
+        } else if (viewport != null) {
             viewport.apply(context, IViewport.DRAWING | IViewport.PRE_DRAW);
-            // apply only that viewport to opengl (since all others are already applied)
-            context.applyTopToOpenGl();
-            // draw again with the transformation
-            viewport.preDraw(context, true);
         }
-        // get rid of all opengl transformations for children
-        // all widgets transform themselves on their own
-        GlStateManager.popMatrix();
 
         // render all children if there are any
         List<IWidget> children = parent.getChildren();
@@ -164,7 +171,7 @@ public class WidgetTree {
             children.forEach(widget -> drawTree(widget, context, false));
         }
 
-        if (viewport != null) {
+        if (canBeSeen && viewport != null) {
             // now apply the same transformations as above for open/close animation
             GlStateManager.pushMatrix();
             if (parent instanceof ModularPanel) {

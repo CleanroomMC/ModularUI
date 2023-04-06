@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.tablet;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.drawable.GuiDraw;
+import com.cleanroommc.modularui.drawable.Scissor;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -55,7 +56,7 @@ public class TabletScreen extends ModularScreen {
         this.context.pushViewport(null, getViewport());
 
         Area desktopArea = this.desktop.getArea();
-        GuiDraw.scissorTransformed(desktopArea.x, desktopArea.y, desktopArea.width, desktopArea.height, this.context);
+        Scissor.scissorTransformed(desktopArea.x, desktopArea.y, desktopArea.width, desktopArea.height, this.context);
         for (ModularPanel panel : getWindowManager().getReverseOpenPanels()) {
             if (panel.disablePanelsBelow()) {
                 GuiDraw.drawSolidRect(0, 0, getViewport().w(), getViewport().h(), Color.argb(16, 16, 16, (int) (125 * panel.getAlpha())));
@@ -63,7 +64,7 @@ public class TabletScreen extends ModularScreen {
             WidgetTree.drawTree(panel, this.context);
         }
 
-        GuiDraw.unscissor(this.context);
+        Scissor.unscissor(this.context);
 
         this.context.popViewport(null);
         this.context.postRenderCallbacks.forEach(element -> element.accept(this.context));
