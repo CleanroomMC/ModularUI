@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.tablet.guide;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
-import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.Rectangle;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -13,16 +12,17 @@ import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.CategoryList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
 
 public class GuideCategory {
 
-    private static final IDrawable categoryBackground = new Rectangle().setColor(0xFF404040);
-    private static final IDrawable categoryElementBackground = new Rectangle().setColor(0xFF757575);
+    private static final IDrawable categoryBackground = new Rectangle().setColor(Color.withAlpha(0x838AA6, 0.75f));
+    private static final IDrawable categoryElementBackground = new Rectangle().setColor(0xFF9DA4BF);
 
     private final String name;
     private final Object2ObjectLinkedOpenHashMap<String, GuidePage> pages = new Object2ObjectLinkedOpenHashMap<>();
     private final Object2ObjectLinkedOpenHashMap<String, GuideCategory> categories = new Object2ObjectLinkedOpenHashMap<>();
-    private IWidget guiCategory;
 
     public GuideCategory(String name) {
         this.name = name;
@@ -41,10 +41,12 @@ public class GuideCategory {
         return category == null ? null : category.pages.get(name);
     }
 
+    @Nullable
     public GuideCategory findCategory(String[] path) {
         return findCategory(path, false);
     }
 
+    @Contract("_, true -> !null")
     protected GuideCategory findCategory(String[] path, boolean makePath) {
         if (path.length == 0) {
             return this;
@@ -72,7 +74,7 @@ public class GuideCategory {
                 .left(0)
                 .width(1f).height(16)
                 .paddingLeft(4)
-                .background(categoryBackground)
+                .background(GuiTextures.BUTTON, categoryBackground)
                 .overlay(IKey.str(this.name).color(Color.WHITE.normal).alignment(Alignment.CenterLeft));
         for (GuideCategory category : this.categories.values()) {
             categoryList.child(category.buildGui(context, app));
@@ -96,10 +98,6 @@ public class GuideCategory {
                     }));
         }
         return categoryList;
-    }
-
-    public void disposeGui() {
-        this.guiCategory = null;
     }
 
     public String getName() {
