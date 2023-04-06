@@ -318,6 +318,18 @@ public interface IPositioned<W extends IPositioned<W>> {
         return getThis();
     }
 
+    default W size(int val) {
+        return width(val).height(val);
+    }
+
+    default W size(float val) {
+        return width(val).height(val);
+    }
+
+    default W full() {
+        return width(1f).height(1f);
+    }
+
     default W anchorLeft(float val) {
         flex().anchorLeft(val);
         return getThis();

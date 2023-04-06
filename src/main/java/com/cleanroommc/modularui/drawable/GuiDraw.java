@@ -677,7 +677,7 @@ public class GuiDraw {
         renderer.setScale(scale);
         renderer.setShadow(forceShadow);
         renderer.setSimulate(true);
-        List<Pair<String, Float>> measuredLines = renderer.measureLines(lines);
+        List<TextRenderer.Line> measuredLines = renderer.measureLines(lines);
         if (mouseOnRightSide && measuredLines.size() > lines.size()) {
             putOnLeft = true;
             maxTextWidth = Math.min(maxWidth, mouseX - 16);

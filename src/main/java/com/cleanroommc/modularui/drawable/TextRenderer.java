@@ -1,6 +1,8 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.widget.sizer.Area;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -24,6 +26,7 @@ public class TextRenderer {
     protected int color = 0;//Theme.INSTANCE.getText();
     protected boolean simulate;
     protected float lastWidth = 0, lastHeight = 0;
+    protected boolean scrollOnOverflow = false;
 
     public void setAlignment(Alignment alignment, float maxWidth) {
         setAlignment(alignment, maxWidth, -1);
@@ -68,12 +71,12 @@ public class TextRenderer {
         drawMeasuredLines(measureLines(lines));
     }
 
-    protected void drawMeasuredLines(List<Pair<String, Float>> measuredLines) {
+    protected void drawMeasuredLines(List<Line> measuredLines) {
         float maxW = 0;
         int y0 = getStartY(measuredLines.size());
-        for (Pair<String, Float> measuredLine : measuredLines) {
-            int x0 = getStartX(measuredLine.getRight());
-            maxW = Math.max(draw(measuredLine.getLeft(), x0, y0), maxW);
+        for (Line measuredLine : measuredLines) {
+            int x0 = getStartX(measuredLine.width);
+            maxW = Math.max(draw(measuredLine.text, x0, y0), maxW);
             y0 += getFontHeight();
         }
         this.lastWidth = maxWidth > 0 ? Math.min(maxW, maxWidth) : maxW;
@@ -92,15 +95,45 @@ public class TextRenderer {
         this.lastHeight = Math.max(0, this.lastHeight - scale);
     }
 
-    public List<Pair<String, Float>> measureLines(List<String> lines) {
-        List<Pair<String, Float>> measuredLines = new ArrayList<>();
+    public List<Line> measureLines(List<String> lines) {
+        List<Line> measuredLines = new ArrayList<>();
         for (String line : lines) {
             for (String subLine : wrapLine(line)) {
-                float width = getFontRenderer().getStringWidth(subLine) * scale;
-                measuredLines.add(Pair.of(subLine, width));
+                measuredLines.add(line(subLine));
             }
         }
         return measuredLines;
+    }
+
+    public void drawCut(String text) {
+        if (text.contains("\n")) {
+            throw new IllegalArgumentException("Scrolling text can't wrap!");
+        }
+        drawCut(line(text));
+    }
+
+    public void drawCut(Line line) {
+        if (line.width > this.maxWidth) {
+            String cutText = getFontRenderer().trimStringToWidth(line.getText(), (int) (this.maxWidth - 6)) + "...";
+            drawMeasuredLines(Collections.singletonList(line(cutText)));
+        } else {
+            drawMeasuredLines(Collections.singletonList(line));
+        }
+    }
+
+    public void drawScrolling(Line line, int scroll, Area area, GuiContext context) {
+        if (line.getWidth() <= this.maxWidth) {
+            drawMeasuredLines(Collections.singletonList(line));
+            return;
+        }
+        scroll = scroll % (int) (line.width + 1) ;
+        String drawString = getFontRenderer().trimStringToWidth(line.getText(), (int) (this.maxWidth + scroll));
+        Area.SHARED.set(area.x + this.x, Integer.MIN_VALUE, (int) this.maxWidth, Integer.MAX_VALUE);
+        Scissor.scissor(Area.SHARED, context);
+        GlStateManager.translate(-scroll, 0, 0);
+        drawMeasuredLines(Collections.singletonList(line(drawString)));
+        GlStateManager.translate(scroll, 0, 0);
+        Scissor.unscissor(context);
     }
 
     public List<String> wrapLine(String line) {
@@ -125,10 +158,10 @@ public class TextRenderer {
         if (lines.isEmpty()) {
             return 0;
         }
-        List<Pair<String, Float>> measuredLines = measureLines(lines);
+        List<Line> measuredLines = measureLines(lines);
         float w = 0;
-        for (Pair<String, Float> measuredLine : measuredLines) {
-            w = Math.max(w, measuredLine.getRight());
+        for (Line measuredLine : measuredLines) {
+            w = Math.max(w, measuredLine.getWidth());
         }
         return (int) Math.ceil(w);
     }
@@ -176,5 +209,36 @@ public class TextRenderer {
     @SideOnly(Side.CLIENT)
     public static FontRenderer getFontRenderer() {
         return Minecraft.getMinecraft().fontRenderer;
+    }
+
+    public Line line(String text) {
+        return new Line(text, getFontRenderer().getStringWidth(text) * this.scale);
+    }
+
+    public static class Line {
+
+        private final String text;
+        private final float width;
+
+        public Line(String text, float width) {
+            this.text = text;
+            this.width = width;
+        }
+
+        public String getText() {
+            return text;
+        }
+
+        public float getWidth() {
+            return width;
+        }
+
+        public int upperWidth() {
+            return (int) (width + 1);
+        }
+
+        public int lowerWidth() {
+            return (int) (width + 1);
+        }
     }
 }

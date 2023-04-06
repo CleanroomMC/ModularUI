@@ -41,7 +41,7 @@ public class Row extends ParentWidget<Row> implements ILayoutWidget {
         }
 
         if (expandedAmount > 0) {
-            int newWidth = (width - totalWidth) / expandedAmount;
+            int newWidth = (width - totalWidth - padding.horizontal()) / expandedAmount;
             for (IWidget widget : getChildren()) {
                 // exclude self positioned (X) children
                 if (widget.flex().hasXPos()) continue;

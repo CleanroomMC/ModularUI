@@ -2,15 +2,19 @@ package com.cleanroommc.modularui.tablet.guide;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.layout.CrossAxisAlignment;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.Rectangle;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.theme.Theme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.CategoryList;
+import com.cleanroommc.modularui.widgets.ScrollingTextWidget;
+import com.cleanroommc.modularui.widgets.layout.Row;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
@@ -83,19 +87,21 @@ public class GuideCategory {
             categoryList.child(new ButtonWidget<>()
                     .width(1f).height(16)
                     .background(categoryElementBackground)
-                    .overlay(page.getIcon().asIcon()
-                                    .size(14)
-                                    .alignment(Alignment.CenterLeft)
-                                    .marginLeft(2),
-                            IKey.str(page.getName())
-                                    .alignment(Alignment.CenterLeft)
-                                    .asIcon()
-                                    .size(0, 0)
-                                    .marginLeft(18))
                     .onMousePressed(mouseButton -> {
                         app.setCurrentGuidePage(page);
                         return true;
-                    }));
+                    })
+                    .child(new Row()
+                            .full()
+                            .crossAxisAlignment(CrossAxisAlignment.CENTER)
+                            .padding(2, 0)
+                            .child(new Widget<>()
+                                    .background(page.getIcon())
+                                    .size(14, 14))
+                            .child(new ScrollingTextWidget(IKey.str(page.getName()))
+                                    .widgetTheme(Theme.BUTTON)
+                                    .expanded()
+                                    .marginLeft(4))));
         }
         return categoryList;
     }
