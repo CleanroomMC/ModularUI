@@ -1,10 +1,10 @@
 package com.cleanroommc.modularui.widgets.slot;
 
+import com.cleanroommc.modularui.api.future.IItemHandler;
+import com.cleanroommc.modularui.api.future.SlotItemHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.SlotItemHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Predicate;
@@ -20,7 +20,7 @@ public class SlotCustomSlot extends SlotItemHandler implements ICustomSlot {
         super(itemHandler, index, xPosition, yPosition);
     }
 
-    @Override
+    // @Override // nh todo
     public boolean isEnabled() {
         return enabled;
     }

@@ -5,11 +5,11 @@ import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.network.packets.PacketSyncHandler;
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
 import com.cleanroommc.modularui.sync.MapKey;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
@@ -42,7 +42,7 @@ public abstract class SyncHandler {
      */
     public final void syncToClient(int id, Consumer<PacketBuffer> bufferConsumer) {
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
-        buffer.writeVarInt(id);
+        buffer.writeVarIntToBuffer(id);
         bufferConsumer.accept(buffer);
         sendToClient(buffer, this);
     }
@@ -56,7 +56,7 @@ public abstract class SyncHandler {
     @SideOnly(Side.CLIENT)
     public final void syncToServer(int id, Consumer<PacketBuffer> bufferConsumer) {
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
-        buffer.writeVarInt(id);
+        buffer.writeVarIntToBuffer(id);
         bufferConsumer.accept(buffer);
         sendToServer(buffer, this);
     }
@@ -69,7 +69,7 @@ public abstract class SyncHandler {
      */
     public final void sync(int id, Consumer<PacketBuffer> bufferConsumer) {
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
-        buffer.writeVarInt(id);
+        buffer.writeVarIntToBuffer(id);
         bufferConsumer.accept(buffer);
         if (NetworkUtils.isClient(getSyncHandler().getPlayer())) {
             sendToServer(buffer, this);

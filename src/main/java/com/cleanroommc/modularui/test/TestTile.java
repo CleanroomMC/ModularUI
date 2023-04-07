@@ -3,6 +3,8 @@ package com.cleanroommc.modularui.test;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.future.IItemHandlerModifiable;
+import com.cleanroommc.modularui.api.future.ItemStackHandler;
 import com.cleanroommc.modularui.api.layout.CrossAxisAlignment;
 import com.cleanroommc.modularui.drawable.*;
 import com.cleanroommc.modularui.screen.ModularPanel;
@@ -22,15 +24,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ITickable;
 import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.ItemStackHandler;
 
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
-public class TestTile extends TileEntity implements IGuiHolder, ITickable {
+public class TestTile extends TileEntity implements IGuiHolder {
 
     private final FluidTank fluidTank = new FluidTank(10000);
     private final FluidTank fluidTankPhantom = new FluidTank(10000);
@@ -137,7 +136,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                                                             .setColor(Color.RED.dark(2), Color.RED.bright(2))
                                                                             .asIcon()
                                                                             .size(20))
-                                                                    .addLine(new ItemDrawable(new ItemStack(Items.DIAMOND)).asIcon())
+                                                                    .addLine(new ItemDrawable(new ItemStack(Items.diamond)).asIcon())
                                                                     .pos(Tooltip.Pos.LEFT);
                                                         })
                                                         .onMousePressed(mouseButton -> {
@@ -327,8 +326,8 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
     }
 
     @Override
-    public void update() {
-        if (world.isRemote) {
+    public void updateEntity() {
+        if (worldObj.isRemote) {
             if (time++ % 20 == 0) {
                 val++;
             }

@@ -1,11 +1,11 @@
 [
   {
-    "modid": "modularui",
-    "name": "ModularUI",
+    "modid": "${modId}",
+    "name": "${modName}",
     "description": "A GUI library to ease the process of creating vanilla style GUIs. Heavily inspired by GTCE's ModularUI",
-    "version": "${version}",
-    "mcversion": "${mcversion}",
-    "url": "",
+    "version": "${modVersion}",
+    "mcversion": "${minecraftVersion}",
+    "url": "https://github.com/CleanroomMC/ModularUI/tree/1.7.10",
     "updateUrl": "",
     "authorList": [
       "brachy84",

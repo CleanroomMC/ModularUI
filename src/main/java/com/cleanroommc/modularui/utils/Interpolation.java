@@ -1,9 +1,9 @@
 package com.cleanroommc.modularui.utils;
 
 import com.cleanroommc.modularui.api.drawable.IInterpolation;
-import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.util.MathHelper;
 
 public enum Interpolation implements IInterpolation {
 
@@ -497,7 +497,7 @@ public enum Interpolation implements IInterpolation {
     CIRCLE_IN("circle_in") {
         @Override
         public float interpolate(float a, float b, float x) {
-            x = MathHelper.clamp(x, 0, 1);
+            x = MathHelper.clamp_float(x, 0, 1);
 
             float factor = 1 - (float) Math.sqrt(1 - Math.pow(x, 2));
 
@@ -506,7 +506,7 @@ public enum Interpolation implements IInterpolation {
 
         @Override
         public double interpolate(double a, double b, double x) {
-            x = MathHelper.clamp(x, 0, 1);
+            x = MathHelper.clamp_double(x, 0, 1);
 
             double factor = 1 - (float) Math.sqrt(1 - Math.pow(x, 2));
 
@@ -516,7 +516,7 @@ public enum Interpolation implements IInterpolation {
     CIRCLE_OUT("circle_out") {
         @Override
         public float interpolate(float a, float b, float x) {
-            x = MathHelper.clamp(x, 0, 1);
+            x = MathHelper.clamp_float(x, 0, 1);
 
             float factor = (float) Math.sqrt(1 - Math.pow(x - 1, 2));
 
@@ -525,7 +525,7 @@ public enum Interpolation implements IInterpolation {
 
         @Override
         public double interpolate(double a, double b, double x) {
-            x = MathHelper.clamp(x, 0, 1);
+            x = MathHelper.clamp_double(x, 0, 1);
 
             double factor = Math.sqrt(1 - Math.pow(x - 1, 2));
 
@@ -535,7 +535,7 @@ public enum Interpolation implements IInterpolation {
     CIRCLE_INOUT("circle_inout") {
         @Override
         public float interpolate(float a, float b, float x) {
-            x = MathHelper.clamp(x, 0, 1);
+            x = MathHelper.clamp_float(x, 0, 1);
 
             float factor = x < 0.5
                     ? (float) (1 - Math.sqrt(1 - Math.pow(2 * x, 2))) / 2
@@ -546,7 +546,7 @@ public enum Interpolation implements IInterpolation {
 
         @Override
         public double interpolate(double a, double b, double x) {
-            x = MathHelper.clamp(x, 0, 1);
+            x = MathHelper.clamp_double(x, 0, 1);
 
             double factor = x < 0.5
                     ? (1 - Math.sqrt(1 - Math.pow(2 * x, 2))) / 2

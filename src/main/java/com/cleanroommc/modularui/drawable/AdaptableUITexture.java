@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.api.future.GlStateManager;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 
 public class AdaptableUITexture extends UITexture {

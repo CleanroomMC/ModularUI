@@ -1,16 +1,13 @@
 package com.cleanroommc.modularui.widgets.slot;
 
 import com.cleanroommc.modularui.api.SlotAccessor;
-import com.cleanroommc.modularui.core.mixin.SlotAccessorClient;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -32,15 +29,15 @@ public class SlotDelegate extends Slot implements ICustomSlot {
             delegated = ((SlotDelegate) delegated).getDelegate();
         }
         SlotDelegate newDelegate = new SlotDelegate(delegated);
-        newDelegate.xPos = slot.xPos;
-        newDelegate.yPos = slot.yPos;
+        newDelegate.xDisplayPosition = slot.xDisplayPosition;
+        newDelegate.yDisplayPosition = slot.yDisplayPosition;
         return newDelegate;
     }
 
     private final Slot slot;
 
     private SlotDelegate(Slot slot) {
-        super(slot.inventory, slot.slotNumber, slot.xPos, slot.yPos);
+        super(slot.inventory, slot.slotNumber, slot.xDisplayPosition, slot.yDisplayPosition);
         this.slot = slot;
     }
 
@@ -55,18 +52,13 @@ public class SlotDelegate extends Slot implements ICustomSlot {
     }
 
     @Override
-    protected void onSwapCraft(int p_190900_1_) {
-        ((SlotAccessor) slot).invokeOnSwapCraft(p_190900_1_);
-    }
-
-    @Override
     protected void onCrafting(@NotNull ItemStack stack) {
         ((SlotAccessor) slot).invokeOnCrafting(stack);
     }
 
     @Override
-    public @NotNull ItemStack onTake(@NotNull EntityPlayer thePlayer, @NotNull ItemStack stack) {
-        return slot.onTake(thePlayer, stack);
+    public void onPickupFromSlot(@NotNull EntityPlayer thePlayer, @NotNull ItemStack stack) {
+        slot.onPickupFromSlot(thePlayer, stack);
     }
 
     @Override
@@ -75,7 +67,8 @@ public class SlotDelegate extends Slot implements ICustomSlot {
     }
 
     @Override
-    public @NotNull ItemStack getStack() {
+    @NotNull
+    public ItemStack getStack() {
         return slot.getStack();
     }
 
@@ -100,24 +93,14 @@ public class SlotDelegate extends Slot implements ICustomSlot {
     }
 
     @Override
-    public int getItemStackLimit(@NotNull ItemStack stack) {
-        return slot.getItemStackLimit(stack);
-    }
-
-    @Nullable
-    @Override
-    public String getSlotTexture() {
-        return slot.getSlotTexture();
-    }
-
-    @Override
-    public @NotNull ItemStack decrStackSize(int amount) {
+    @NotNull
+    public ItemStack decrStackSize(int amount) {
         return slot.decrStackSize(amount);
     }
 
     @Override
-    public boolean isHere(@NotNull IInventory inv, int slotIn) {
-        return slot.isHere(inv, slotIn);
+    public boolean isSlotInInventory(@NotNull IInventory inv, int slotIn) {
+        return slot.isSlotInInventory(inv, slotIn);
     }
 
     @Override
@@ -126,8 +109,13 @@ public class SlotDelegate extends Slot implements ICustomSlot {
     }
 
     @Override
-    public boolean isEnabled() {
-        return this.enabled && slot.isEnabled();
+    public IIcon getBackgroundIconIndex() {
+        return slot.getBackgroundIconIndex();
+    }
+
+    @Override
+    public boolean func_111238_b() {
+        return this.enabled && slot.func_111238_b();
     }
 
     public void setEnabled(boolean enabled) {
@@ -135,39 +123,24 @@ public class SlotDelegate extends Slot implements ICustomSlot {
     }
 
     @Override
-    public @NotNull ResourceLocation getBackgroundLocation() {
-        return slot.getBackgroundLocation();
+    @NotNull
+    public ResourceLocation getBackgroundIconTexture() {
+        return slot.getBackgroundIconTexture();
     }
 
     @Override
-    public void setBackgroundLocation(@NotNull ResourceLocation texture) {
-        slot.setBackgroundLocation(texture);
+    public void setBackgroundIcon(IIcon icon) {
+        slot.setBackgroundIcon(icon);
     }
 
     @Override
-    public void setBackgroundName(@Nullable String name) {
-        slot.setBackgroundName(name);
-    }
-
-    @Nullable
-    @Override
-    public TextureAtlasSprite getBackgroundSprite() {
-        return slot.getBackgroundSprite();
-    }
-
-    @Override
-    protected @NotNull TextureMap getBackgroundMap() {
-        return ((SlotAccessorClient) slot).invokeGetBackgroundMap();
+    public void setBackgroundIconTexture(ResourceLocation texture) {
+        slot.setBackgroundIconTexture(texture);
     }
 
     @Override
     public int getSlotIndex() {
         return slot.getSlotIndex();
-    }
-
-    @Override
-    public boolean isSameInventory(@NotNull Slot other) {
-        return slot.isSameInventory(other);
     }
 
     public Slot getDelegate() {

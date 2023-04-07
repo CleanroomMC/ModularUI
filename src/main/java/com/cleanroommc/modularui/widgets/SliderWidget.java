@@ -15,7 +15,7 @@ import com.cleanroommc.modularui.widget.sizer.GuiAxis;
 import com.cleanroommc.modularui.widget.sizer.Unit;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.MathHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.DoubleConsumer;
@@ -163,7 +163,7 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
                 value = this.stopper.get(this.stopper.size() - 1);
             }
         }
-        value = MathHelper.clamp(value, this.min, this.max);
+        value = MathHelper.clamp_double(value, this.min, this.max);
         this.cache = value;
         this.sliderArea.setPoint(this.axis, valueToPos(value));
         if (setSource) {

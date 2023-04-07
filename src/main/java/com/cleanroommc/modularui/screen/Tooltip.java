@@ -4,19 +4,16 @@ import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.future.GlStateManager;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.IconRenderer;
 import com.cleanroommc.modularui.drawable.TextIcon;
-import com.cleanroommc.modularui.drawable.TextRenderer;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.client.event.RenderTooltipEvent;
-import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
@@ -66,15 +63,12 @@ public class Tooltip {
         IconRenderer renderer = IconRenderer.SHARED;
         //List<IIcon> icons = renderer.measureLines(this.lines);
         List<String> textLines = Collections.emptyList();//icons.stream().filter(iIcon -> iIcon instanceof TextIcon).map(icon -> ((TextIcon) icon).getText()).collect(Collectors.toList());
-        RenderTooltipEvent.Pre event = new RenderTooltipEvent.Pre(ItemStack.EMPTY, Collections.emptyList(), mouseX, mouseY, screen.width, screen.height, maxWidth, TextRenderer.getFontRenderer());
-        if (MinecraftForge.EVENT_BUS.post(event)) {
-            return;
-        }
         //lines = event.getLines();
-        mouseX = event.getX();
-        mouseY = event.getY();
-        int screenWidth = event.getScreenWidth(), screenHeight = event.getScreenHeight();
-        maxWidth = event.getMaxWidth();
+        //mouseX = event.getX();
+        //mouseY = event.getY();
+        //int screenWidth = event.getScreenWidth(), screenHeight = event.getScreenHeight();
+        int screenWidth = Minecraft.getMinecraft().displayWidth, screenHeight = Minecraft.getMinecraft().displayHeight;
+        //maxWidth = event.getMaxWidth();
 
         renderer.setShadow(this.textShadow);
         renderer.setColor(this.textColor);
@@ -96,16 +90,12 @@ public class Tooltip {
 
         GuiDraw.drawTooltipBackground(textLines, area.x, area.y, area.width, area.height, 300);
 
-        MinecraftForge.EVENT_BUS.post(new RenderTooltipEvent.PostBackground(ItemStack.EMPTY, textLines, area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height));
-
         GlStateManager.color(1f, 1f, 1f, 1f);
 
         renderer.setSimulate(false);
         //renderer.setAlignment(Alignment.TopLeft, area.width, area.height);
         renderer.setPos(area.x, area.y);
         renderer.draw(context, this.lines);
-
-        MinecraftForge.EVENT_BUS.post(new RenderTooltipEvent.PostText(ItemStack.EMPTY, textLines, area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height));
     }
 
     public Rectangle determineTooltipArea(GuiContext context, List<IDrawable> lines, IconRenderer renderer, int screenWidth, int screenHeight, int mouseX, int mouseY) {
@@ -321,6 +311,14 @@ public class Tooltip {
         Pos(boolean horizontal, boolean vertical) {
             this.horizontal = horizontal;
             this.vertical = vertical;
+        }
+
+        public static Pos fromString(String name) {
+            try {
+                return Pos.valueOf(name);
+            } catch (IllegalArgumentException ignored) {
+                return VERTICAL;
+            }
         }
     }
 }

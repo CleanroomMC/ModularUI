@@ -2,7 +2,7 @@ package com.cleanroommc.modularui.utils.math.functions.limit;
 
 import com.cleanroommc.modularui.api.IValue;
 import com.cleanroommc.modularui.utils.math.functions.NNFunction;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.MathHelper;
 
 public class Clamp extends NNFunction {
 
@@ -17,6 +17,6 @@ public class Clamp extends NNFunction {
 
     @Override
     public double doubleValue() {
-        return MathHelper.clamp(this.getArg(0).doubleValue(), this.getArg(1).doubleValue(), this.getArg(2).doubleValue());
+        return MathHelper.clamp_double(this.getArg(0).doubleValue(), this.getArg(1).doubleValue(), this.getArg(2).doubleValue());
     }
 }

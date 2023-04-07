@@ -44,12 +44,12 @@ public class IntSyncHandler extends ValueSyncHandler<Integer> implements INumber
     @Override
     public void updateAndWrite(PacketBuffer buffer) {
         this.cache = getter.getAsInt();
-        buffer.writeVarInt(this.cache);
+        buffer.writeVarIntToBuffer(this.cache);
     }
 
     @Override
     public void read(PacketBuffer buffer) {
-        cache = buffer.readVarInt();
+        cache = buffer.readVarIntFromBuffer();
         if (setter != null) {
             setter.accept(cache);
         }

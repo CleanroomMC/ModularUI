@@ -1,5 +1,7 @@
 package com.cleanroommc.modularui.sync;
 
+import com.cleanroommc.modularui.api.future.IItemHandlerModifiable;
+import com.cleanroommc.modularui.api.future.ItemStackHandler;
 import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.utils.ClickData;
 import com.cleanroommc.modularui.widgets.slot.ICustomSlot;
@@ -8,9 +10,8 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
 
@@ -22,7 +23,8 @@ public class ItemSlotSH extends SyncHandler {
     private String slotGroup;
 
     private boolean phantom = false;
-    private ItemStack lastStoredPhantomItem = ItemStack.EMPTY;
+    @Nullable
+    private ItemStack lastStoredPhantomItem = null;
 
     public static ItemSlotSH phantom(Slot slot) {
         return new ItemSlotSH(slot).phantom(true);
@@ -96,9 +98,9 @@ public class ItemSlotSH extends SyncHandler {
         ItemStack cursorStack = getSyncHandler().getCursorItem();
         ItemStack slotStack = getSlot().getStack();
         ItemStack stackToPut;
-        if (slotStack.isEmpty()) {
-            if (cursorStack.isEmpty()) {
-                if (clickData.mouseButton == 1 && !this.lastStoredPhantomItem.isEmpty()) {
+        if (slotStack == null) {
+            if (cursorStack == null) {
+                if (clickData.mouseButton == 1 && this.lastStoredPhantomItem != null) {
                     stackToPut = this.lastStoredPhantomItem.copy();
                 } else {
                     return;
@@ -107,14 +109,14 @@ public class ItemSlotSH extends SyncHandler {
                 stackToPut = cursorStack.copy();
             }
             if (clickData.mouseButton == 1) {
-                stackToPut.setCount(1);
+                stackToPut.stackSize = 1;
             }
             slot.putStack(stackToPut);
             this.lastStoredPhantomItem = stackToPut.copy();
         } else {
             if (clickData.mouseButton == 0) {
                 if (clickData.shift) {
-                    this.slot.putStack(ItemStack.EMPTY);
+                    this.slot.putStack(null);
                 } else {
                     incrementStackCount(-1);
                 }
@@ -136,9 +138,9 @@ public class ItemSlotSH extends SyncHandler {
         if (clickData.alt) {
             amount *= 64;
         }
-        if (amount > 0 && currentItem.isEmpty() && !lastStoredPhantomItem.isEmpty()) {
+        if (amount > 0 && currentItem == null && lastStoredPhantomItem != null) {
             ItemStack stackToPut = this.lastStoredPhantomItem.copy();
-            stackToPut.setCount(amount);
+            stackToPut.stackSize = amount;
             this.slot.putStack(stackToPut);
         } else {
             incrementStackCount(amount);
@@ -147,10 +149,10 @@ public class ItemSlotSH extends SyncHandler {
 
     public void incrementStackCount(int amount) {
         ItemStack stack = getSlot().getStack();
-        if (stack.isEmpty()) {
+        if (stack == null) {
             return;
         }
-        int oldAmount = stack.getCount();
+        int oldAmount = stack.stackSize;
         if (amount < 0) {
             amount = Math.max(0, oldAmount + amount);
         } else {
@@ -165,7 +167,7 @@ public class ItemSlotSH extends SyncHandler {
             }
         }
         if (oldAmount != amount) {
-            stack.setCount(amount);
+            stack.stackSize = amount;
             getSlot().onSlotChanged();
         }
     }

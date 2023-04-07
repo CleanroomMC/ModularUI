@@ -43,7 +43,7 @@ public class StringSyncHandler extends ValueSyncHandler<String> implements IStri
 
     @Override
     public void read(PacketBuffer buffer) {
-        setValue(buffer.readString(Short.MAX_VALUE));
+        setValue(NetworkUtils.readStringSafe(buffer, Short.MAX_VALUE));
         this.setter.accept(getCachedValue());
     }
 

@@ -2,9 +2,9 @@ package com.cleanroommc.modularui.api;
 
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public interface IGuiHolder {
 

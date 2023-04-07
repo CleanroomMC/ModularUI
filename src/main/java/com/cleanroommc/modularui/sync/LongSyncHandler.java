@@ -57,12 +57,12 @@ public class LongSyncHandler extends ValueSyncHandler<Long> implements INumberSy
     @Override
     public void updateAndWrite(PacketBuffer buffer) {
         setValue(this.getter.getAsLong());
-        buffer.writeVarLong(getLong());
+        buffer.writeLong(getLong());
     }
 
     @Override
     public void read(PacketBuffer buffer) {
-        setValue(buffer.readVarLong());
+        setValue(buffer.readLong());
         this.setter.accept(getLong());
     }
 

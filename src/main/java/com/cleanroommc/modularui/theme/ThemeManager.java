@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.theme;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
+import com.cleanroommc.modularui.Tags;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.utils.AssetHelper;
@@ -10,26 +11,21 @@ import com.cleanroommc.modularui.utils.JsonHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.resource.IResourceType;
-import net.minecraftforge.client.resource.ISelectiveResourceReloadListener;
-import net.minecraftforge.client.resource.VanillaResourceType;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.*;
-import java.util.function.Predicate;
 
 @ApiStatus.Internal
 @SideOnly(Side.CLIENT)
-public class ThemeManager implements ISelectiveResourceReloadListener {
+public class ThemeManager implements IResourceManagerReloadListener {
 
     private static final String DEFAULT = "DEFAULT";
 
@@ -169,11 +165,6 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
             return null;
         }
         JsonElement element = JsonHelper.parse(resource.getInputStream());
-        try {
-            resource.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         if (element.isJsonObject()) {
             return new ThemeJson(id, element.getAsJsonObject());
         }
@@ -183,12 +174,11 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
 
     private static Map<String, String> findRegisteredThemes() {
         Map<String, String> themes = new Object2ObjectOpenHashMap<>();
-        for (IResource resource : AssetHelper.findAssets(ModularUI.ID, "themes.json")) {
+        for (IResource resource : AssetHelper.findAssets(Tags.MODID, "themes.json")) {
             try {
                 JsonElement element = JsonHelper.parse(resource.getInputStream());
                 JsonObject definitions;
                 if (!element.isJsonObject()) {
-                    resource.close();
                     continue;
                 }
                 definitions = element.getAsJsonObject();
@@ -202,7 +192,6 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
                     }
                     themes.put(entry.getKey(), entry.getValue().getAsString());
                 }
-                resource.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -211,12 +200,11 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
     }
 
     private static void loadScreenThemes() {
-        for (IResource resource : AssetHelper.findAssets(ModularUI.ID, "themes.json")) {
+        for (IResource resource : AssetHelper.findAssets(Tags.MODID, "themes.json")) {
             try {
                 JsonElement element = JsonHelper.parse(resource.getInputStream());
                 JsonObject definitions;
                 if (!element.isJsonObject()) {
-                    resource.close();
                     continue;
                 }
                 definitions = element.getAsJsonObject();
@@ -233,7 +221,6 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
                         }
                     }
                 }
-                resource.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -241,11 +228,9 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
     }
 
     @Override
-    public void onResourceManagerReload(@NotNull IResourceManager resourceManager, @NotNull Predicate<IResourceType> resourcePredicate) {
-        if (resourcePredicate.test(VanillaResourceType.TEXTURES)) {
-            ModularUI.LOGGER.info("Reloading Themes...");
-            reload();
-        }
+    public void onResourceManagerReload(IResourceManager resourceManager) {
+        ModularUI.LOGGER.info("Reloading Themes...");
+        reload();
     }
 
     public static class DefaultTheme extends AbstractDefaultTheme {

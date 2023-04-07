@@ -1,8 +1,9 @@
 package com.cleanroommc.modularui.drawable;
 
-import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.Tags;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.future.GlStateManager;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
@@ -11,14 +12,13 @@ import com.cleanroommc.modularui.widget.sizer.Area;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.cleanroommc.modularui.drawable.BufferBuilder.bufferbuilder;
 
 public class UITexture implements IDrawable {
 
@@ -42,11 +42,11 @@ public class UITexture implements IDrawable {
      */
     public UITexture(ResourceLocation location, float u0, float v0, float u1, float v1, boolean canApplyTheme) {
         this.canApplyTheme = canApplyTheme;
-        if (!location.getPath().endsWith(".png")) {
-            location = new ResourceLocation(location.getNamespace(), location.getPath() + ".png");
+        if (!location.getResourcePath().endsWith(".png")) {
+            location = new ResourceLocation(location.getResourceDomain(), location.getResourcePath() + ".png");
         }
-        if (!location.getPath().startsWith("textures/")) {
-            location = new ResourceLocation(location.getNamespace(), "textures/" + location.getPath());
+        if (!location.getResourcePath().startsWith("textures/")) {
+            location = new ResourceLocation(location.getResourceDomain(), "textures/" + location.getResourcePath());
         }
         this.location = location;
         this.u0 = u0;
@@ -123,14 +123,11 @@ public class UITexture implements IDrawable {
 
     public static void draw(ResourceLocation location, float x0, float y0, float width, float height, float u0, float v0, float u1, float v1) {
         float x1 = x0 + width, y1 = y0 + height;
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
-        bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
         bufferbuilder.pos(x0, y1, 0.0f).tex(u0, v1).endVertex();
         bufferbuilder.pos(x1, y1, 0.0f).tex(u1, v1).endVertex();
         bufferbuilder.pos(x1, y0, 0.0f).tex(u1, v0).endVertex();
         bufferbuilder.pos(x0, y0, 0.0f).tex(u0, v0).endVertex();
-        tessellator.draw();
+        Tessellator.instance.draw();
     }
 
     @Override
@@ -154,7 +151,7 @@ public class UITexture implements IDrawable {
             if (drawable != null) return drawable;
         }
         Builder builder = builder();
-        builder.location(JsonHelper.getString(json, ModularUI.ID + ":gui/widgets/error", "location"))
+        builder.location(JsonHelper.getString(json, Tags.MODID + ":gui/widgets/error", "location"))
                 .imageSize(JsonHelper.getInt(json, defaultImageWidth, "imageWidth", "iw"), JsonHelper.getInt(json, defaultImageHeight, "imageHeight", "ih"));
         boolean mode1 = json.has("x") || json.has("y") || json.has("w") || json.has("h") || json.has("width") || json.has("height");
         boolean mode2 = json.has("u0") || json.has("v0") || json.has("u1") || json.has("u1");

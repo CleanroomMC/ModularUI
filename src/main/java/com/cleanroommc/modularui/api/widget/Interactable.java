@@ -1,12 +1,12 @@
 package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.screen.ModularScreen;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.init.SoundEvents;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 
@@ -128,7 +128,23 @@ public interface Interactable {
      */
     @SideOnly(Side.CLIENT)
     static boolean hasAltDown() {
-        return GuiScreen.isAltKeyDown();
+        return Keyboard.isKeyDown(Keyboard.KEY_LMENU) || Keyboard.isKeyDown(Keyboard.KEY_RMENU);
+    }
+
+    static boolean isKeyComboCtrlX(int keyID) {
+        return keyID == Keyboard.KEY_X && hasControlDown() && !hasShiftDown() && !hasAltDown();
+    }
+
+    static boolean isKeyComboCtrlV(int keyID) {
+        return keyID == Keyboard.KEY_V && hasControlDown() && !hasShiftDown() && !hasAltDown();
+    }
+
+    static boolean isKeyComboCtrlC(int keyID) {
+        return keyID == Keyboard.KEY_C && hasControlDown() && !hasShiftDown() && !hasAltDown();
+    }
+
+    public static boolean isKeyComboCtrlA(int keyID) {
+        return keyID == Keyboard.KEY_A && hasControlDown() && !hasShiftDown() && !hasAltDown();
     }
 
     /**
@@ -140,12 +156,14 @@ public interface Interactable {
         return Keyboard.isKeyDown(key);
     }
 
+    ResourceLocation PRESS_SOUND = new ResourceLocation("gui.button.press");
+
     /**
      * Plays the default button click sound
      */
     @SideOnly(Side.CLIENT)
     static void playButtonClickSound() {
-        Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+        Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.func_147674_a(PRESS_SOUND, 1.0F));
     }
 
     enum Result {

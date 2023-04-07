@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.sync;
 
+import com.cleanroommc.modularui.network.NetworkUtils;
 import net.minecraft.network.PacketBuffer;
 import org.apache.commons.lang3.StringUtils;
 
@@ -26,12 +27,12 @@ public class MapKey {
     }
 
     public static MapKey fromPacket(PacketBuffer buffer) {
-        return new MapKey(buffer.readString(20), buffer.readVarInt());
+        return new MapKey(NetworkUtils.readStringSafe(buffer, 20), buffer.readVarIntFromBuffer());
     }
 
     public void writeToPacket(PacketBuffer buffer) {
-        buffer.writeString(name);
-        buffer.writeVarInt(id);
+        NetworkUtils.writeStringSafe(buffer, name);
+        buffer.writeVarIntToBuffer(id);
     }
 
     @Override

@@ -2,8 +2,8 @@ package com.cleanroommc.modularui.drawable.keys;
 
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.google.gson.*;
+import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

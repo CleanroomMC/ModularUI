@@ -434,8 +434,8 @@ public class Flex implements IResizeable {
         parent.getArea().applyPos(relativeTo.x, relativeTo.y);
         if (parent instanceof IVanillaSlot) {
             Slot slot = ((IVanillaSlot) parent).getVanillaSlot();
-            slot.xPos = parent.getArea().x;
-            slot.yPos = parent.getArea().y;
+            slot.xDisplayPosition = parent.getArea().x;
+            slot.yDisplayPosition = parent.getArea().y;
         }
     }
 

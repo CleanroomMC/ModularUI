@@ -6,7 +6,6 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
-import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.ScrollData;
 import com.cleanroommc.modularui.utils.ScrollDirection;
@@ -194,20 +193,20 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
             return Result.STOP;
         }
 
-        if (GuiScreen.isKeyComboCtrlC(keyCode)) {
+        if (Interactable.isKeyComboCtrlC(keyCode)) {
             // copy marked text
             GuiScreen.setClipboardString(handler.getSelectedText());
             return Result.SUCCESS;
-        } else if (GuiScreen.isKeyComboCtrlV(keyCode)) {
+        } else if (Interactable.isKeyComboCtrlV(keyCode)) {
             // paste copied text in marked text
             handler.insert(GuiScreen.getClipboardString());
             return Result.SUCCESS;
-        } else if (GuiScreen.isKeyComboCtrlX(keyCode) && handler.hasTextMarked()) {
+        } else if (Interactable.isKeyComboCtrlX(keyCode) && handler.hasTextMarked()) {
             // copy and delete copied text
             GuiScreen.setClipboardString(handler.getSelectedText());
             handler.delete();
             return Result.SUCCESS;
-        } else if (GuiScreen.isKeyComboCtrlA(keyCode)) {
+        } else if (Interactable.isKeyComboCtrlA(keyCode)) {
             // mark whole text
             handler.markAll();
             return Result.SUCCESS;

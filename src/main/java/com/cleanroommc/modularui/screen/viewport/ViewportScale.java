@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.screen.viewport;
 
+import com.cleanroommc.modularui.api.future.GlStateManager;
 import com.cleanroommc.modularui.api.layout.IViewportTransformation;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import net.minecraft.client.renderer.GlStateManager;
 
 public class ViewportScale implements IViewportTransformation {
 

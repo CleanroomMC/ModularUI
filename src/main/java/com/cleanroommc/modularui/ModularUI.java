@@ -1,92 +1,56 @@
 package com.cleanroommc.modularui;
 
-import com.cleanroommc.modularui.keybind.KeyBindHandler;
-import com.cleanroommc.modularui.manager.GuiInfos;
-import com.cleanroommc.modularui.manager.GuiManager;
-import com.cleanroommc.modularui.network.NetworkHandler;
-import com.cleanroommc.modularui.network.NetworkUtils;
-import com.cleanroommc.modularui.test.EventHandler;
-import com.cleanroommc.modularui.test.TestBlock;
-import com.cleanroommc.modularui.theme.ThemeManager;
-import com.cleanroommc.modularui.theme.ThemeReloadCommand;
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.SidedProxy;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.IReloadableResourceManager;
+import net.minecraft.launchwrapper.Launch;
 import net.minecraft.util.Timer;
-import net.minecraftforge.client.ClientCommandHandler;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod(modid = ModularUI.ID, name = ModularUI.NAME, version = ModularUI.VERSION, dependencies = "required-after:mixinbooter@[5.0,);")
+@Mod(modid = Tags.MODID, name = Tags.MODNAME, version = Tags.VERSION, dependencies = ModularUI.DEPENDENCIES, guiFactory = ModularUI.GUI_FACTORY)
 public class ModularUI {
 
-    public static final String ID = "@MODID@";
-    public static final String NAME = "Modular UI";
-    public static final String VERSION = "@VERSION@";
-    public static final Logger LOGGER = LogManager.getLogger(ID);
+    public static final String DEPENDENCIES = "required-after:gtnhmixins@[2.0.1,); "
+        + "required-after:NotEnoughItems@[2.3.27-GTNH,);"
+        + "after:hodgepodge@[2.0.0,);"
+        + "before:gregtech";
+    public static final String GUI_FACTORY = Tags.GROUPNAME + ".config.GuiFactory";
 
-    public static final String BOGO_SORT = "bogosorter";
+    public static final Logger LOGGER = LogManager.getLogger(Tags.MODID);
+
+    public static final String MODID_GT5U = "gregtech";
+    public static final String MODID_GT6 = "gregapi_post";
+    public static final boolean isGT5ULoaded = Loader.isModLoaded(MODID_GT5U) && !Loader.isModLoaded(MODID_GT6);
+    public static final boolean isHodgepodgeLoaded = Loader.isModLoaded("hodgepodge");
+
+    @SidedProxy(
+        modId = Tags.MODID,
+        clientSide = Tags.GROUPNAME + ".ClientProxy",
+        serverSide = Tags.GROUPNAME + ".CommonProxy")
+    public static CommonProxy proxy;
 
     @Mod.Instance
     public static ModularUI INSTANCE;
 
     @SideOnly(Side.CLIENT)
-    private static Timer timer60Fps;
+    static Timer timer60Fps;
 
-    private static boolean blurLoaded = false;
-    private static boolean sorterLoaded = false;
+    public static final boolean isDevEnv = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        NetworkRegistry.INSTANCE.registerGuiHandler(ID, GuiManager.INSTANCE);
-        GuiInfos.init();
-
-        blurLoaded = Loader.isModLoaded("blur");
-        sorterLoaded = Loader.isModLoaded(BOGO_SORT);
-
-        if (NetworkUtils.isDedicatedClient()) {
-            preInitClient();
-        }
-
-        if (FMLLaunchHandler.isDeobfuscatedEnvironment()) {
-            MinecraftForge.EVENT_BUS.register(TestBlock.class);
-            TestBlock.preInit();
-        }
-
-        NetworkHandler.init();
+        proxy.preInit(event);
     }
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-        if (NetworkUtils.isDedicatedClient()) {
-            postInitClient();
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
-    private void preInitClient() {
-        timer60Fps = new Timer(60f);
-        MinecraftForge.EVENT_BUS.register(ClientEventHandler.class);
-        MinecraftForge.EVENT_BUS.register(KeyBindHandler.class);
-
-        if (FMLLaunchHandler.isDeobfuscatedEnvironment()) {
-            MinecraftForge.EVENT_BUS.register(EventHandler.class);
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
-    private void postInitClient() {
-        ClientCommandHandler.instance.registerCommand(new ThemeReloadCommand());
-        ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new ThemeManager());
+        proxy.postInit(event);
     }
 
     @SideOnly(Side.CLIENT)
@@ -97,13 +61,5 @@ public class ModularUI {
     @SideOnly(Side.CLIENT)
     public static Timer getTimer60Fps() {
         return timer60Fps;
-    }
-
-    public static boolean isBlurLoaded() {
-        return blurLoaded;
-    }
-
-    public static boolean isSortModLoaded() {
-        return sorterLoaded;
     }
 }

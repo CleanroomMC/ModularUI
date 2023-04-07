@@ -10,19 +10,23 @@ public class CursorSlotSyncHandler extends SyncHandler {
 
     public void sync() {
         if (NetworkUtils.isClient(getSyncHandler().getPlayer())) {
-            syncToServer(0, buffer -> buffer.writeItemStack(getSyncHandler().getPlayer().inventory.getItemStack()));
+            syncToServer(0, buffer -> {
+                NetworkUtils.writeItemStack(buffer, getSyncHandler().getPlayer().inventory.getItemStack());
+            });
         } else {
-            syncToClient(0, buffer -> buffer.writeItemStack(getSyncHandler().getPlayer().inventory.getItemStack()));
+            syncToClient(0, buffer -> {
+                NetworkUtils.writeItemStack(buffer, getSyncHandler().getPlayer().inventory.getItemStack());
+            });
         }
     }
 
     @Override
     public void readOnClient(int id, PacketBuffer buf) throws IOException {
-        getSyncHandler().getPlayer().inventory.setItemStack(buf.readItemStack());
+        getSyncHandler().getPlayer().inventory.setItemStack(buf.readItemStackFromBuffer());
     }
 
     @Override
     public void readOnServer(int id, PacketBuffer buf) throws IOException {
-        getSyncHandler().getPlayer().inventory.setItemStack(buf.readItemStack());
+        getSyncHandler().getPlayer().inventory.setItemStack(buf.readItemStackFromBuffer());
     }
 }

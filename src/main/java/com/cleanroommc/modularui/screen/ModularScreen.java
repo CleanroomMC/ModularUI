@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.screen;
 
-import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.Tags;
+import com.cleanroommc.modularui.api.future.GlStateManager;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.ISynced;
 import com.cleanroommc.modularui.drawable.GuiDraw;
@@ -13,19 +14,19 @@ import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.Dialog;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnegative;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,7 +46,7 @@ public abstract class ModularScreen {
     }
 
     public static boolean isScreen(@Nullable GuiScreen guiScreen, String name) {
-        return isScreen(guiScreen, ModularUI.ID, name);
+        return isScreen(guiScreen, Tags.MODID, name);
     }
 
     public static boolean isActive(String owner, String name) {
@@ -53,7 +54,7 @@ public abstract class ModularScreen {
     }
 
     public static boolean isActive(String name) {
-        return isActive(ModularUI.ID, name);
+        return isActive(Tags.MODID, name);
     }
 
     @Nullable
@@ -88,7 +89,7 @@ public abstract class ModularScreen {
     }
 
     public ModularScreen(@NotNull String name) {
-        this(ModularUI.ID, name);
+        this(Tags.MODID, name);
     }
 
     @ApiStatus.Internal
@@ -145,7 +146,7 @@ public abstract class ModularScreen {
     public void close(boolean force) {
         if (isActive()) {
             if (force) {
-                this.context.mc.player.closeScreen();
+                this.context.mc.thePlayer.closeScreen();
                 return;
             }
             if (!getMainPanel().isOpening() && !getMainPanel().isClosing()) {
@@ -302,7 +303,7 @@ public abstract class ModularScreen {
         return false;
     }
 
-    public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
+    public boolean onMouseScroll(UpOrDown scrollDirection, @Nonnegative int amount) {
         this.context.updateEventState();
         for (IGuiAction.MouseScroll action : getGuiActionListeners(IGuiAction.MouseScroll.class)) {
             action.scroll(scrollDirection, amount);
@@ -348,7 +349,7 @@ public abstract class ModularScreen {
 
     @ApiStatus.Internal
     public void setFocused(boolean focus) {
-        this.screenWrapper.setFocused(focus);
+        //this.screenWrapper.setFocused(focus);
     }
 
     public boolean isActive() {
@@ -426,7 +427,7 @@ public abstract class ModularScreen {
     }
 
     public static ModularScreen simple(@NotNull String name, Function<GuiContext, ModularPanel> panel) {
-        return simple(ModularUI.ID, name, panel);
+        return simple(Tags.MODID, name, panel);
     }
 
     public static ModularScreen simple(@NotNull String owner, @NotNull String name, Function<GuiContext, ModularPanel> panel) {

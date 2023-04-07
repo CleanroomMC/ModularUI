@@ -1,9 +1,9 @@
 package com.cleanroommc.modularui.utils;
 
 import com.cleanroommc.modularui.api.widget.Interactable;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ClickData {
 
@@ -21,7 +21,7 @@ public class ClickData {
     }
 
     public void writeToPacket(PacketBuffer buffer) {
-        buffer.writeVarInt(mouseButton);
+        buffer.writeVarIntToBuffer(mouseButton);
         byte data = 0;
         if (shift) data |= 1;
         if (ctrl) data |= 2;
@@ -30,7 +30,7 @@ public class ClickData {
     }
 
     public static ClickData readPacket(PacketBuffer buffer) {
-        int button = buffer.readVarInt();
+        int button = buffer.readVarIntFromBuffer();
         byte data = buffer.readByte();
         return new ClickData(button, (data & 1) != 0, (data & 2) != 0, (data & 4) != 0);
     }

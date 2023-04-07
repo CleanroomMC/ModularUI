@@ -1,39 +1,35 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.GuiErrorHandler;
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
+import com.cleanroommc.modularui.api.future.GlStateManager;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
-import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
+import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiDraw;
+import com.cleanroommc.modularui.mixins.GuiContainerAccessor;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiLabel;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.client.event.GuiContainerEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.MathHelper;
 import org.lwjgl.input.Keyboard;
 
-import java.io.IOException;
 import java.util.Set;
 
 @SideOnly(Side.CLIENT)
@@ -115,41 +111,40 @@ public class GuiScreenWrapper extends GuiContainer {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.pushMatrix();
         GlStateManager.translate(i, j, 0);
-        MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.DrawForeground(this, mouseX, mouseY));
         GlStateManager.popMatrix();
 
-        InventoryPlayer inventoryplayer = this.mc.player.inventory;
-        ItemStack itemstack = getAccessor().getDraggedStack().isEmpty() ? inventoryplayer.getItemStack() : getAccessor().getDraggedStack();
+        InventoryPlayer inventoryplayer = this.mc.thePlayer.inventory;
+        ItemStack itemstack = getAccessor().getDraggedStack() == null ? inventoryplayer.getItemStack() : getAccessor().getDraggedStack();
         GlStateManager.translate((float) i, (float) j, 0.0F);
-        if (!itemstack.isEmpty()) {
-            int k2 = getAccessor().getDraggedStack().isEmpty() ? 8 : 16;
+        if (itemstack != null) {
+            int k2 = getAccessor().getDraggedStack() == null ? 8 : 16;
             String s = null;
 
-            if (!getAccessor().getDraggedStack().isEmpty() && getAccessor().getIsRightMouseClick()) {
+            if (getAccessor().getDraggedStack() != null && getAccessor().getIsRightMouseClick()) {
                 itemstack = itemstack.copy();
-                itemstack.setCount(MathHelper.ceil((float) itemstack.getCount() / 2.0F));
-            } else if (this.dragSplitting && this.dragSplittingSlots.size() > 1) {
+                itemstack.stackSize = MathHelper.ceiling_double_int((float) itemstack.stackSize / 2.0F);
+            } else if (this.isDragSplitting() && this.getDragSlots().size() > 1) {
                 itemstack = itemstack.copy();
-                itemstack.setCount(getAccessor().getDragSplittingRemnant());
+                itemstack.stackSize = getAccessor().getDragSplittingRemnant();
 
-                if (itemstack.isEmpty()) {
-                    s = "" + TextFormatting.YELLOW + "0";
+                if (itemstack.stackSize < 1) {
+                    s = EnumChatFormatting.YELLOW + "0";
                 }
             }
 
             this.drawItemStack(itemstack, mouseX - i - 8, mouseY - j - k2, s);
         }
 
-        if (!getAccessor().getReturningStack().isEmpty()) {
+        if (getAccessor().getReturningStack() != null) {
             float f = (float) (Minecraft.getSystemTime() - getAccessor().getReturningStackTime()) / 100.0F;
 
             if (f >= 1.0F) {
                 f = 1.0F;
-                getAccessor().setReturningStack(ItemStack.EMPTY);
+                getAccessor().setReturningStack(null);
             }
 
-            int l2 = getAccessor().getReturningStackDestSlot().xPos - getAccessor().getTouchUpX();
-            int i3 = getAccessor().getReturningStackDestSlot().yPos - getAccessor().getTouchUpY();
+            int l2 = getAccessor().getReturningStackDestSlot().xDisplayPosition - getAccessor().getTouchUpX();
+            int i3 = getAccessor().getReturningStackDestSlot().yDisplayPosition - getAccessor().getTouchUpY();
             int l1 = getAccessor().getTouchUpX() + (int) ((float) l2 * f);
             int i2 = getAccessor().getTouchUpY() + (int) ((float) i3 * f);
             this.drawItemStack(getAccessor().getReturningStack(), l1, i2, null);
@@ -174,7 +169,7 @@ public class GuiScreenWrapper extends GuiContainer {
 
     @Override
     public void drawWorldBackground(int tint) {
-        if (ModularUI.isBlurLoaded() || this.mc.world == null) {
+        if (this.mc.theWorld == null) {
             super.drawWorldBackground(tint);
             return;
         }
@@ -189,21 +184,21 @@ public class GuiScreenWrapper extends GuiContainer {
     private void drawItemStack(ItemStack stack, int x, int y, String altText) {
         GlStateManager.translate(0.0F, 0.0F, 32.0F);
         this.zLevel = 200.0F;
-        this.itemRender.zLevel = 200.0F;
+        itemRender.zLevel = 200.0F;
         FontRenderer font = stack.getItem().getFontRenderer(stack);
-        if (font == null) font = fontRenderer;
-        this.itemRender.renderItemAndEffectIntoGUI(stack, x, y);
-        this.itemRender.renderItemOverlayIntoGUI(font, stack, x, y - (getAccessor().getDraggedStack().isEmpty() ? 0 : 8), altText);
+        if (font == null) font = getFontRenderer();
+        itemRender.renderItemAndEffectIntoGUI(font, mc.getTextureManager(), stack, x, y);
+        itemRender.renderItemOverlayIntoGUI(font, mc.getTextureManager(), stack, x, y - (getAccessor().getDraggedStack() == null ? 0 : 8), altText);
         this.zLevel = 0.0F;
-        this.itemRender.zLevel = 0.0F;
+        itemRender.zLevel = 0.0F;
     }
 
     protected void drawVanillaElements(int mouseX, int mouseY, float partialTicks) {
-        for (GuiButton guiButton : this.buttonList) {
-            guiButton.drawButton(this.mc, mouseX, mouseY, partialTicks);
+        for (Object guiButton : this.buttonList) {
+            ((GuiButton) guiButton).drawButton(this.mc, mouseX, mouseY);
         }
-        for (GuiLabel guiLabel : this.labelList) {
-            guiLabel.drawLabel(this.mc, mouseX, mouseY);
+        for (Object guiLabel : this.labelList) {
+            ((GuiLabel) guiLabel).func_146159_a(this.mc, mouseX, mouseY);
         }
     }
 
@@ -213,9 +208,9 @@ public class GuiScreenWrapper extends GuiContainer {
         int screenW = this.screen.getViewport().width, screenH = this.screen.getViewport().height;
         int color = Color.rgb(180, 40, 115);
         int lineY = screenH - 13;
-        drawString(fontRenderer, "Mouse Pos: " + mouseX + ", " + mouseY, 5, lineY, color);
+        drawString(getFontRenderer(), "Mouse Pos: " + mouseX + ", " + mouseY, 5, lineY, color);
         lineY -= 11;
-        drawString(fontRenderer, "FPS: " + fps, 5, screenH - 24, color);
+        drawString(getFontRenderer(), "FPS: " + fps, 5, screenH - 24, color);
         lineY -= 11;
         LocatedWidget locatedHovered = this.screen.getWindowManager().getTopWidgetLocated();
         if (locatedHovered != null) {
@@ -273,27 +268,24 @@ public class GuiScreenWrapper extends GuiContainer {
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (this.screen.onMousePressed(mouseButton)) return;
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     public void clickSlot() {
-        try {
-            super.mouseClicked(screen.context.getAbsMouseX(), screen.context.getAbsMouseY(), screen.context.getMouseButton());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        super.mouseClicked(screen.context.getAbsMouseX(), screen.context.getAbsMouseY(), screen.context.getMouseButton());
     }
 
     @Override
-    protected void mouseReleased(int mouseX, int mouseY, int state) {
+    protected void mouseMovedOrUp(int mouseX, int mouseY, int state) {
+        // nh todo does this get fired when non-release?
         if (this.screen.onMouseRelease(state)) return;
-        super.mouseReleased(mouseX, mouseY, state);
+        super.mouseMovedOrUp(mouseX, mouseY, state);
     }
 
     public void releaseSlot() {
-        super.mouseReleased(screen.context.getAbsMouseX(), screen.context.getAbsMouseY(), screen.context.getMouseButton());
+        super.mouseMovedOrUp(screen.context.getAbsMouseX(), screen.context.getAbsMouseY(), screen.context.getMouseButton());
     }
 
     @Override
@@ -306,7 +298,7 @@ public class GuiScreenWrapper extends GuiContainer {
      * This replicates vanilla behavior while also injecting custom behavior for consistency
      */
     @Override
-    public void handleKeyboardInput() throws IOException {
+    public void handleKeyboardInput() {
         char c0 = Keyboard.getEventCharacter();
         int key = Keyboard.getEventKey();
         boolean state = Keyboard.getEventKeyState();
@@ -323,40 +315,40 @@ public class GuiScreenWrapper extends GuiContainer {
             }
         }
 
-        this.mc.dispatchKeypresses();
+        this.mc.func_152348_aa();
     }
 
     @Override
-    protected void keyTyped(char typedChar, int keyCode) throws IOException {
+    protected void keyTyped(char typedChar, int keyCode) {
         // debug mode C + CTRL + SHIFT + ALT
-        if (keyCode == 46 && isCtrlKeyDown() && isShiftKeyDown() && isAltKeyDown()) {
+        if (keyCode == Keyboard.KEY_C && isCtrlKeyDown() && isShiftKeyDown() && Interactable.hasAltDown()) {
             ModularUIConfig.guiDebugMode = !ModularUIConfig.guiDebugMode;
             return;
         }
-        if (keyCode == 1 || this.mc.gameSettings.keyBindInventory.isActiveAndMatches(keyCode)) {
+        if (keyCode == Keyboard.KEY_ESCAPE || keyCode == this.mc.gameSettings.keyBindInventory.getKeyCode()) {
             this.screen.close();
         }
 
         this.checkHotbarKeys(keyCode);
         Slot hoveredSlot = getAccessor().getHoveredSlot();
         if (hoveredSlot != null && hoveredSlot.getHasStack()) {
-            if (this.mc.gameSettings.keyBindPickBlock.isActiveAndMatches(keyCode)) {
-                this.handleMouseClick(hoveredSlot, hoveredSlot.slotNumber, 0, ClickType.CLONE);
-            } else if (this.mc.gameSettings.keyBindDrop.isActiveAndMatches(keyCode)) {
-                this.handleMouseClick(hoveredSlot, hoveredSlot.slotNumber, isCtrlKeyDown() ? 1 : 0, ClickType.THROW);
+            if (keyCode == this.mc.gameSettings.keyBindPickBlock.getKeyCode()) {
+                this.handleMouseClick(hoveredSlot, hoveredSlot.slotNumber, 0, 3);
+            } else if (keyCode == this.mc.gameSettings.keyBindDrop.getKeyCode()) {
+                this.handleMouseClick(hoveredSlot, hoveredSlot.slotNumber, isCtrlKeyDown() ? 1 : 0, 4);
             }
         }
     }
 
     public boolean isDragSplitting() {
-        return dragSplitting;
+        return getAccessor().isDragSplitting();
     }
 
     public Set<Slot> getDragSlots() {
-        return dragSplittingSlots;
+        return getAccessor().getDragSplittingSlots();
     }
 
-    public RenderItem getItemRenderer() {
+    public static RenderItem getItemRenderer() {
         return itemRender;
     }
 
@@ -369,6 +361,6 @@ public class GuiScreenWrapper extends GuiContainer {
     }
 
     public FontRenderer getFontRenderer() {
-        return fontRenderer;
+        return Minecraft.getMinecraft().fontRenderer;
     }
 }

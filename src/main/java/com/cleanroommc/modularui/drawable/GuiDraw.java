@@ -2,36 +2,34 @@ package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.future.GlStateManager;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.event.RenderTooltipEvent;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraft.util.IIcon;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
 import java.util.Stack;
 import java.util.stream.Collectors;
+
+import static com.cleanroommc.modularui.drawable.BufferBuilder.buffer;
+import static com.cleanroommc.modularui.drawable.BufferBuilder.bufferbuilder;
 
 public class GuiDraw {
 
@@ -131,16 +129,12 @@ public class GuiDraw {
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
         buffer.pos(right, top, zLevel).color(r2, g2, b2, a2).endVertex();
         buffer.pos(left, top, zLevel).color(r1, g1, b1, a1).endVertex();
         buffer.pos(left, bottom, zLevel).color(r1, g1, b1, a1).endVertex();
         buffer.pos(right, bottom, zLevel).color(r2, g2, b2, a2).endVertex();
 
-        tessellator.draw();
+        Tessellator.instance.draw();
 
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.disableBlend();
@@ -172,16 +166,12 @@ public class GuiDraw {
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
         buffer.pos(right, top, zLevel).color(r1, g1, b1, a1).endVertex();
         buffer.pos(left, top, zLevel).color(r1, g1, b1, a1).endVertex();
         buffer.pos(left, bottom, zLevel).color(r2, g2, b2, a2).endVertex();
         buffer.pos(right, bottom, zLevel).color(r2, g2, b2, a2).endVertex();
 
-        tessellator.draw();
+        Tessellator.instance.draw();
 
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.disableBlend();
@@ -197,12 +187,8 @@ public class GuiDraw {
      * Draw a textured quad with given UV, dimensions and custom texture size
      */
     public static void drawBillboard(int x, int y, int u, int v, int w, int h, int textureW, int textureH, float z) {
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         drawBillboard(buffer, x, y, u, v, w, h, textureW, textureH, z);
-        tessellator.draw();
+        Tessellator.instance.draw();
     }
 
     public static void drawBillboard(BufferBuilder buffer, int x, int y, int u, int v, int w, int h, int textureW, int textureH, float z) {
@@ -223,12 +209,8 @@ public class GuiDraw {
      * Draw a textured quad with given UV, dimensions and custom texture size
      */
     public static void drawBillboard(int x, int y, int u, int v, int w, int h, int textureW, int textureH, int tu, int tv, float z) {
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         drawBillboard(buffer, x, y, u, v, w, h, textureW, textureH, tu, tv, z);
-        tessellator.draw();
+        Tessellator.instance.draw();
     }
 
     public static void drawBillboard(BufferBuilder buffer, int x, int y, int u, int v, int w, int h, int textureW, int textureH, int tu, int tv, float z) {
@@ -246,12 +228,8 @@ public class GuiDraw {
     }
 
     public static void drawBillboard(int x0, int y0, int x1, int y1, float u0, float v0, float u1, float v1, float z) {
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         drawBillboard(buffer, x0, y0, x1, y1, u0, v0, u1, v1, z);
-        tessellator.draw();
+        Tessellator.instance.draw();
     }
 
     public static void drawBillboard(BufferBuilder buffer, int x0, int y0, int x1, int y1, float u0, float v0, float u1, float v1, float z) {
@@ -351,11 +329,6 @@ public class GuiDraw {
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-
         /* Draw opaque part */
         buffer.pos(right - offset, top + offset, 0).color(r1, g1, b1, a1).endVertex();
         buffer.pos(left + offset, top + offset, 0).color(r1, g1, b1, a1).endVertex();
@@ -386,7 +359,7 @@ public class GuiDraw {
         buffer.pos(right - offset, bottom - offset, 0).color(r1, g1, b1, a1).endVertex();
         buffer.pos(right, bottom, 0).color(r2, g2, b2, a2).endVertex();
 
-        tessellator.draw();
+        Tessellator.instance.draw();
 
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.disableBlend();
@@ -410,11 +383,6 @@ public class GuiDraw {
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-
-        buffer.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_COLOR);
-
         buffer.pos(x, y, 0).color(r1, g1, b1, a1).endVertex();
 
         for (int i = 0; i <= segments; i++) {
@@ -423,7 +391,7 @@ public class GuiDraw {
             buffer.pos(x - Math.cos(a) * radius, y + Math.sin(a) * radius, 0).color(r2, g2, b2, a2).endVertex();
         }
 
-        tessellator.draw();
+        Tessellator.instance.draw();
 
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.disableBlend();
@@ -453,11 +421,7 @@ public class GuiDraw {
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-
         /* Draw opaque base */
-        buffer.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_COLOR);
         buffer.pos(x, y, 0).color(r1, g1, b1, a1).endVertex();
 
         for (int i = 0; i <= segments; i++) {
@@ -466,11 +430,9 @@ public class GuiDraw {
             buffer.pos(x - Math.cos(a) * offset, y + Math.sin(a) * offset, 0).color(r1, g1, b1, a1).endVertex();
         }
 
-        tessellator.draw();
+        Tessellator.instance.draw();
 
         /* Draw outer shadow */
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-
         for (int i = 0; i < segments; i++) {
             double alpha1 = i / (double) segments * Math.PI * 2 - Math.PI / 2;
             double alpha2 = (i + 1) / (double) segments * Math.PI * 2 - Math.PI / 2;
@@ -481,7 +443,7 @@ public class GuiDraw {
             buffer.pos(x - Math.cos(alpha2) * radius, y + Math.sin(alpha2) * radius, 0).color(r2, g2, b2, a2).endVertex();
         }
 
-        tessellator.draw();
+        Tessellator.instance.draw();
 
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.disableBlend();
@@ -504,7 +466,7 @@ public class GuiDraw {
         y -= h * ay;
 
         for (String string : list) {
-            font.drawStringWithShadow(string, x + (width - font.getStringWidth(string)) * ax, y, color);
+            font.drawStringWithShadow(string, (int) (x + (width - font.getStringWidth(string)) * ax), y, color);
 
             y += lineHeight;
         }
@@ -555,11 +517,6 @@ public class GuiDraw {
         int fillerX = w - (countX - 1) * tileW;
         int fillerY = h - (countY - 1) * tileH;
 
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-
         for (int i = 0, c = countX * countY; i < c; i++) {
             int ix = i % countX;
             int iy = i / countX;
@@ -571,7 +528,7 @@ public class GuiDraw {
             drawBillboard(buffer, xx, yy, u, v, xw, yh, tw, th, 0);
         }
 
-        tessellator.draw();
+        Tessellator.instance.draw();
     }
 
     @SideOnly(Side.CLIENT)
@@ -596,7 +553,7 @@ public class GuiDraw {
         GlStateManager.pushMatrix();
         GlStateManager.scale(scale, scale, 0f);
         float sf = 1 / scale;
-        fontRenderer.drawString(text, x * sf, y * sf, color, shadow);
+        fontRenderer.drawString(text, (int) (x * sf), (int) (y * sf), color, shadow);
         GlStateManager.popMatrix();
         GlStateManager.enableBlend();
     }
@@ -618,18 +575,15 @@ public class GuiDraw {
         float r = (float) (color >> 16 & 255) / 255.0F;
         float g = (float) (color >> 8 & 255) / 255.0F;
         float b = (float) (color & 255) / 255.0F;
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
         GlStateManager.enableBlend();
         GlStateManager.disableTexture2D();
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.color(r, g, b, a);
-        bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
         bufferbuilder.pos(left, bottom, 0.0D).endVertex();
         bufferbuilder.pos(right, bottom, 0.0D).endVertex();
         bufferbuilder.pos(right, top, 0.0D).endVertex();
         bufferbuilder.pos(left, top, 0.0D).endVertex();
-        tessellator.draw();
+        Tessellator.instance.draw();
         GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();
     }
@@ -639,24 +593,22 @@ public class GuiDraw {
             return;
         }
         Fluid fluid = content.getFluid();
-        ResourceLocation fluidStill = fluid.getStill(content);
+        IIcon fluidStill = fluid.getIcon(content);
         TextureAtlasSprite sprite = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(fluidStill.toString());
         int fluidColor = fluid.getColor(content);
+
         GlStateManager.enableBlend();
-        Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationBlocksTexture);
 
         float u0 = sprite.getMinU(), u1 = sprite.getMaxU(), v0 = sprite.getMinV(), v1 = sprite.getMaxV();
         float x1 = x0 + width, y1 = y0 + height;
         float r = Color.getRedF(fluidColor), g = Color.getGreenF(fluidColor), b = Color.getBlueF(fluidColor), a = Color.getAlphaF(fluidColor);
 
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
         buffer.pos(x0, y1, z).tex(u0, v1).color(r, g, b, a).endVertex();
         buffer.pos(x1, y1, z).tex(u1, v1).color(r, g, b, a).endVertex();
         buffer.pos(x1, y0, z).tex(u1, v0).color(r, g, b, a).endVertex();
         buffer.pos(x0, y0, z).tex(u0, v0).color(r, g, b, a).endVertex();
-        tessellator.draw();
+        Tessellator.instance.draw();
         GlStateManager.disableBlend();
     }
 
@@ -678,14 +630,11 @@ public class GuiDraw {
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
         buffer.pos(right, top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
         buffer.pos(left, top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
         buffer.pos(left, bottom, zLevel).color(endRed, endGreen, endBlue, endAlpha).endVertex();
         buffer.pos(right, bottom, zLevel).color(endRed, endGreen, endBlue, endAlpha).endVertex();
-        tessellator.draw();
+        Tessellator.instance.draw();
 
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.disableBlend();
@@ -720,15 +669,9 @@ public class GuiDraw {
         }
         Area screen = context.screen.getViewport();
         int mouseX = context.getMouseX(), mouseY = context.getMouseY();
-        RenderTooltipEvent.Pre event = new RenderTooltipEvent.Pre(ItemStack.EMPTY, lines, mouseX, mouseY, screen.width, screen.height, maxWidth, TextRenderer.getFontRenderer());
-        if (MinecraftForge.EVENT_BUS.post(event)) {
-            return;
-        }
-        lines = event.getLines();
-        mouseX = event.getX();
-        mouseY = event.getY();
-        int screenWidth = event.getScreenWidth(), screenHeight = event.getScreenHeight();
-        maxWidth = event.getMaxWidth();
+        //int screenWidth = event.getScreenWidth(), screenHeight = event.getScreenHeight();
+        int screenWidth = Minecraft.getMinecraft().displayWidth, screenHeight = Minecraft.getMinecraft().displayHeight;
+        //maxWidth = event.getMaxWidth();
 
         int maxTextWidth = maxWidth;
 
@@ -774,15 +717,11 @@ public class GuiDraw {
 
         drawTooltipBackground(lines, tooltipX, tooltipY, tooltipTextWidth, tooltipHeight, 300);
 
-        MinecraftForge.EVENT_BUS.post(new RenderTooltipEvent.PostBackground(ItemStack.EMPTY, lines, tooltipX, tooltipY, TextRenderer.getFontRenderer(), tooltipTextWidth, tooltipHeight));
-
         renderer.setSimulate(false);
         renderer.setPos(tooltipX, tooltipY);
         renderer.setAlignment(alignment, maxTextWidth);
         renderer.setColor(color);
         renderer.drawMeasuredLines(measuredLines);
-
-        MinecraftForge.EVENT_BUS.post(new RenderTooltipEvent.PostText(ItemStack.EMPTY, lines, tooltipX, tooltipY, TextRenderer.getFontRenderer(), tooltipTextWidth, tooltipHeight));
 
         GlStateManager.enableLighting();
         GlStateManager.enableDepth();
@@ -795,11 +734,6 @@ public class GuiDraw {
         int backgroundColor = 0xF0100010;
         int borderColorStart = 0x505000FF;
         int borderColorEnd = (borderColorStart & 0xFEFEFE) >> 1 | borderColorStart & 0xFF000000;
-        RenderTooltipEvent.Color colorEvent = new RenderTooltipEvent.Color(ItemStack.EMPTY, lines, x, y, TextRenderer.getFontRenderer(), backgroundColor, borderColorStart, borderColorEnd);
-        MinecraftForge.EVENT_BUS.post(colorEvent);
-        backgroundColor = colorEvent.getBackground();
-        borderColorStart = colorEvent.getBorderStart();
-        borderColorEnd = colorEvent.getBorderEnd();
         drawGradientRect(z, x - 3, y - 4, x + textWidth + 3, y - 3, backgroundColor, backgroundColor);
         drawGradientRect(z, x - 3, y + height + 3, x + textWidth + 3, y + height + 4, backgroundColor, backgroundColor);
         drawGradientRect(z, x - 3, y - 3, x + textWidth + 3, y + height + 3, backgroundColor, backgroundColor);
@@ -810,4 +744,5 @@ public class GuiDraw {
         drawGradientRect(z, x - 3, y - 3, x + textWidth + 3, y - 3 + 1, borderColorStart, borderColorStart);
         drawGradientRect(z, x - 3, y + height + 2, x + textWidth + 3, y + height + 3, borderColorEnd, borderColorEnd);
     }
+
 }

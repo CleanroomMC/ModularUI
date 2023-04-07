@@ -35,12 +35,12 @@ public class ValueInt extends Value {
 
     @Override
     public void writeToPacket(PacketBuffer buffer) {
-        buffer.writeVarInt(this.value);
+        buffer.writeVarIntToBuffer(this.value);
     }
 
     @Override
     public void readFromPacket(PacketBuffer buffer) {
-        this.value = buffer.readVarInt();
+        this.value = buffer.readVarIntFromBuffer();
     }
 
     @Override

@@ -1,9 +1,9 @@
 package com.cleanroommc.modularui.sync;
 
+import com.cleanroommc.modularui.api.future.IItemHandlerModifiable;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraftforge.fluids.IFluidTank;
-import net.minecraftforge.items.IItemHandlerModifiable;
 
 import java.util.function.*;
 

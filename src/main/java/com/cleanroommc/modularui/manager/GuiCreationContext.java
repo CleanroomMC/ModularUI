@@ -1,10 +1,8 @@
 package com.cleanroommc.modularui.manager;
 
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class GuiCreationContext {
@@ -42,28 +40,10 @@ public class GuiCreationContext {
     }
 
     public ItemStack getMainHandItem() {
-        return player.getHeldItemMainhand();
-    }
-
-    public ItemStack getOffHandItem() {
-        return player.getHeldItemOffhand();
-    }
-
-    public BlockPos getBlockPos() {
-        return new BlockPos(x, y, z);
-    }
-
-    public IBlockState getBlockState() {
-        BlockPos.PooledMutableBlockPos pos = BlockPos.PooledMutableBlockPos.retain(x, y, z);
-        IBlockState blockState = world.getBlockState(pos);
-        pos.release();
-        return blockState;
+        return player.getHeldItem();
     }
 
     public TileEntity getTileEntity() {
-        BlockPos.PooledMutableBlockPos pos = BlockPos.PooledMutableBlockPos.retain(x, y, z);
-        TileEntity tile = world.getTileEntity(pos);
-        pos.release();
-        return tile;
+        return world.getTileEntity(x, y, z);
     }
 }

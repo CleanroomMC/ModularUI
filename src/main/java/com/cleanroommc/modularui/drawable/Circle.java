@@ -1,14 +1,13 @@
 package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.future.GlStateManager;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Color;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.jetbrains.annotations.Contract;
-import org.lwjgl.opengl.GL11;
+
+import static com.cleanroommc.modularui.drawable.BufferBuilder.bufferbuilder;
 
 public class Circle implements IDrawable {
 
@@ -58,10 +57,7 @@ public class Circle implements IDrawable {
         GlStateManager.disableAlpha();
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.shadeModel(7425);
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
         float x_2 = x0 + width / 2f, y_2 = y0 + height / 2f;
-        bufferbuilder.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_COLOR);
         bufferbuilder.pos(x_2, y_2, 0.0f).color(Color.getRed(colorInner), Color.getGreen(colorInner), Color.getBlue(colorInner), Color.getAlpha(colorInner)).endVertex();
         float incr = (float) (PI2 / segments);
         for (int i = 0; i <= segments; i++) {
@@ -70,7 +66,7 @@ public class Circle implements IDrawable {
             float y = (float) (Math.cos(angle) * (height / 2) + y_2);
             bufferbuilder.pos(x, y, 0.0f).color(Color.getRed(colorOuter), Color.getGreen(colorOuter), Color.getBlue(colorOuter), Color.getAlpha(colorOuter)).endVertex();
         }
-        tessellator.draw();
+        Tessellator.instance.draw();
         GlStateManager.shadeModel(7424);
         GlStateManager.disableBlend();
         GlStateManager.enableAlpha();

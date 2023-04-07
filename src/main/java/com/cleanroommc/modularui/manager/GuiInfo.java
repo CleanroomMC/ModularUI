@@ -1,14 +1,13 @@
 package com.cleanroommc.modularui.manager;
 
-import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.Tags;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
+import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -36,15 +35,11 @@ public class GuiInfo {
     }
 
     public void open(EntityPlayer player) {
-        FMLNetworkHandler.openGui(player, ModularUI.ID, this.id, player.world, (int) player.posX, (int) player.posY, (int) player.posZ);
-    }
-
-    public void open(EntityPlayer player, World world, BlockPos pos) {
-        FMLNetworkHandler.openGui(player, ModularUI.ID, this.id, world, pos.getX(), pos.getY(), pos.getZ());
+        open(player, player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
     }
 
     public void open(EntityPlayer player, World world, int x, int y, int z) {
-        FMLNetworkHandler.openGui(player, ModularUI.ID, this.id, world, x, y, z);
+        FMLNetworkHandler.openGui(player, Tags.MODID, this.id, world, x, y, z);
     }
 
     public void createServerGuiManager(GuiCreationContext context, GuiSyncHandler guiSyncHandler) {

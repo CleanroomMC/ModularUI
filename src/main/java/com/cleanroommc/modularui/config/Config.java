@@ -1,15 +1,16 @@
 package com.cleanroommc.modularui.config;
 
 import com.cleanroommc.modularui.network.NetworkHandler;
+import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.network.packets.SyncConfig;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import cpw.mods.fml.common.Loader;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.common.Loader;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -122,25 +123,25 @@ public class Config {
     public void writeToBuffer(PacketBuffer buffer) {
         List<Config> categories = this.categories.values().stream().filter(Config::isSynced).collect(Collectors.toList());
         List<Value> values = this.values.values().stream().filter(Value::isSynced).collect(Collectors.toList());
-        buffer.writeVarInt(categories.size());
+        buffer.writeVarIntToBuffer(categories.size());
         for (Config category : categories) {
-            buffer.writeString(category.getName());
+            NetworkUtils.writeStringSafe(buffer, category.getName());
             category.writeToBuffer(buffer);
         }
-        buffer.writeVarInt(values.size());
+        buffer.writeVarIntToBuffer(values.size());
         for (Value value : values) {
-            buffer.writeString(value.getKey());
+            NetworkUtils.writeStringSafe(buffer, value.getKey());
             value.writeToPacket(buffer);
         }
     }
 
     public void readFromBuffer(PacketBuffer buffer) {
-        for (int i = 0, n = buffer.readVarInt(); i < n; i++) {
-            Config category = this.categories.get(buffer.readString(64));
+        for (int i = 0, n = buffer.readVarIntFromBuffer(); i < n; i++) {
+            Config category = this.categories.get(NetworkUtils.readStringSafe(buffer, 64));
             category.readFromBuffer(buffer);
         }
-        for (int i = 0, n = buffer.readVarInt(); i < n; i++) {
-            Value value = this.values.get(buffer.readString(64));
+        for (int i = 0, n = buffer.readVarIntFromBuffer(); i < n; i++) {
+            Value value = this.values.get(NetworkUtils.readStringSafe(buffer, 64));
             value.readFromPacket(buffer);
         }
     }

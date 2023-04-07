@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.sync;
 
 import com.cleanroommc.modularui.api.sync.INumberSyncHandler;
 import com.cleanroommc.modularui.api.sync.ValueSyncHandler;
+import com.cleanroommc.modularui.network.NetworkUtils;
 import net.minecraft.network.PacketBuffer;
 
 import java.util.function.Consumer;
@@ -49,12 +50,12 @@ public class EnumSyncHandler<T extends Enum<T>> extends ValueSyncHandler<T> impl
     @Override
     public void updateAndWrite(PacketBuffer buffer) {
         setValue(this.getter.get());
-        buffer.writeEnumValue(getCachedValue());
+        NetworkUtils.writeEnumValue(buffer, getCachedValue());
     }
 
     @Override
     public void read(PacketBuffer buffer) {
-        setValue(buffer.readEnumValue(this.enumCLass));
+        setValue(NetworkUtils.readEnumValue(buffer, this.enumCLass));
         this.setter.accept(getCachedValue());
     }
 

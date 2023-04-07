@@ -43,7 +43,7 @@ public class PacketSyncHandler implements IPacket {
         ModularScreen screen = ModularScreen.getCurrent();
         if (screen != null) {
             try {
-                screen.getSyncHandler().receiveWidgetUpdate(this.key, this.packet.readVarInt(), this.packet);
+                screen.getSyncHandler().receiveWidgetUpdate(this.key, this.packet.readVarIntFromBuffer(), this.packet);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -53,10 +53,10 @@ public class PacketSyncHandler implements IPacket {
 
     @Override
     public @Nullable IPacket executeServer(NetHandlerPlayServer handler) {
-        Container container = handler.player.openContainer;
+        Container container = handler.playerEntity.openContainer;
         if (container instanceof ModularContainer) {
             try {
-                ((ModularContainer) container).getSyncHandler().receiveWidgetUpdate(this.key, this.packet.readVarInt(), this.packet);
+                ((ModularContainer) container).getSyncHandler().receiveWidgetUpdate(this.key, this.packet.readVarIntFromBuffer(), this.packet);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

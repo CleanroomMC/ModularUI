@@ -8,7 +8,6 @@ import net.minecraft.tileentity.TileEntity;
 public class GuiInfos {
 
     public static final GuiInfo PLAYER_ITEM_MAIN_HAND;
-    public static final GuiInfo PLAYER_ITEM_OFF_HAND;
     public static final GuiInfo TILE_ENTITY;
 
     public static void init() {
@@ -25,24 +24,6 @@ public class GuiInfos {
                 })
                 .serverGui((context, guiSyncHandler) -> {
                     ItemStack itemStack = context.getMainHandItem();
-                    if (itemStack.getItem() instanceof IItemGuiHolder) {
-                        ((IItemGuiHolder) itemStack.getItem()).buildSyncHandler(guiSyncHandler, context.getPlayer(), itemStack);
-                        return;
-                    }
-                    throw new UnsupportedOperationException();
-                })
-                .build();
-
-        PLAYER_ITEM_OFF_HAND = GuiInfo.builder()
-                .clientGui(context -> {
-                    ItemStack itemStack = context.getOffHandItem();
-                    if (itemStack.getItem() instanceof IItemGuiHolder) {
-                        return ((IItemGuiHolder) itemStack.getItem()).createGuiScreen(context.getPlayer(), itemStack);
-                    }
-                    throw new UnsupportedOperationException();
-                })
-                .serverGui((context, guiSyncHandler) -> {
-                    ItemStack itemStack = context.getOffHandItem();
                     if (itemStack.getItem() instanceof IItemGuiHolder) {
                         ((IItemGuiHolder) itemStack.getItem()).buildSyncHandler(guiSyncHandler, context.getPlayer(), itemStack);
                         return;

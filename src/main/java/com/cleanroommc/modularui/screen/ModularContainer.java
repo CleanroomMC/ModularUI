@@ -1,34 +1,30 @@
 package com.cleanroommc.modularui.screen;
 
-import com.cleanroommc.bogosorter.api.ISortableContainer;
-import com.cleanroommc.bogosorter.api.ISortingContextBuilder;
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.future.IItemHandler;
+import com.cleanroommc.modularui.api.future.ItemHandlerHelper;
+import com.cleanroommc.modularui.api.future.PlayerMainInvWrapper;
+import com.cleanroommc.modularui.api.future.SlotItemHandler;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
 import com.cleanroommc.modularui.sync.ItemSlotSH;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.Optional;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.items.SlotItemHandler;
-import net.minecraftforge.items.wrapper.PlayerInvWrapper;
-import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-@Optional.Interface(modid = ModularUI.BOGO_SORT, iface = "com.cleanroommc.bogosorter.api.ISortableContainer")
-public class ModularContainer extends Container implements ISortableContainer {
+public class ModularContainer extends Container {
 
     public static ModularContainer getCurrent(EntityPlayer player) {
         Container container = player.openContainer;
@@ -71,12 +67,12 @@ public class ModularContainer extends Container implements ISortableContainer {
     }
 
     @Override
-    public void setAll(@NotNull List<ItemStack> items) {
-        if (this.inventorySlots.size() != items.size()) {
-            ModularUI.LOGGER.error("Here are {} slots, but expected {}", inventorySlots.size(), items.size());
+    public void putStacksInSlots(ItemStack[] items) {
+        if (this.inventorySlots.size() != items.length) {
+            ModularUI.LOGGER.error("Here are {} slots, but expected {}", inventorySlots.size(), items.length);
         }
-        for (int i = 0; i < Math.min(this.inventorySlots.size(), items.size()); ++i) {
-            this.getSlot(i).putStack(items.get(i));
+        for (int i = 0; i < Math.min(this.inventorySlots.size(), items.length); ++i) {
+            this.getSlot(i).putStack(items[i]);
         }
     }
 
@@ -124,17 +120,18 @@ public class ModularContainer extends Container implements ISortableContainer {
     }
 
     @Override
-    public @NotNull ItemStack transferStackInSlot(@NotNull EntityPlayer playerIn, int index) {
+    @Nullable
+    public ItemStack transferStackInSlot(@NotNull EntityPlayer playerIn, int index) {
         ItemSlotSH slot = this.slots.get(index);
         if (!slot.isPhantom()) {
             ItemStack stack = slot.getSlot().getStack();
-            if (!stack.isEmpty()) {
+            if (stack != null) {
                 ItemStack remainder = transferItem(slot, stack.copy());
-                stack.setCount(remainder.getCount());
-                return ItemStack.EMPTY;
+                stack.stackSize = remainder.stackSize;
+                return null;
             }
         }
-        return ItemStack.EMPTY;
+        return null;
     }
 
     protected ItemStack transferItem(ItemSlotSH fromSlot, ItemStack stack) {
@@ -142,28 +139,29 @@ public class ModularContainer extends Container implements ISortableContainer {
         for (ItemSlotSH slot : this.shiftClickSlots) {
             SlotGroup slotGroup = getSlotGroup(slot);
             boolean valid = slotGroup != null && slotGroup != fromSlotGroup;
-            if (valid && slot.getSlot().isEnabled() && slot.isItemValid(stack)) {
+            // nh todo slot is enabled
+            if (valid && slot.getSlot().func_111238_b() && slot.isItemValid(stack)) {
                 ItemStack itemstack = slot.getSlot().getStack();
                 if (slot.isPhantom()) {
-                    if (itemstack.isEmpty() || (ItemHandlerHelper.canItemStacksStackRelaxed(stack, itemstack) && itemstack.getCount() < slot.getSlot().getItemStackLimit(itemstack))) {
+                    if (itemstack == null || (ItemHandlerHelper.canItemStacksStackRelaxed(stack, itemstack) && itemstack.stackSize < slot.getSlot().getSlotStackLimit())) {
                         slot.getSlot().putStack(stack.copy());
                         return stack;
                     }
                 } else if (ItemHandlerHelper.canItemStacksStackRelaxed(stack, itemstack)) {
-                    int j = itemstack.getCount() + stack.getCount();
+                    int j = itemstack.stackSize + stack.stackSize;
                     int maxSize = Math.min(slot.getSlot().getSlotStackLimit(), stack.getMaxStackSize());
 
                     if (j <= maxSize) {
-                        stack.setCount(0);
-                        itemstack.setCount(j);
+                        stack.stackSize = 0;
+                        itemstack.stackSize = j;
                         slot.getSlot().onSlotChanged();
-                    } else if (itemstack.getCount() < maxSize) {
-                        stack.shrink(maxSize - itemstack.getCount());
-                        itemstack.setCount(maxSize);
+                    } else if (itemstack.stackSize < maxSize) {
+                        stack.stackSize -= maxSize - itemstack.stackSize;
+                        itemstack.stackSize = maxSize;
                         slot.getSlot().onSlotChanged();
                     }
 
-                    if (stack.isEmpty()) {
+                    if (stack.stackSize < 1) {
                         return stack;
                     }
                 }
@@ -174,11 +172,12 @@ public class ModularContainer extends Container implements ISortableContainer {
             ItemStack itemstack = slot.getStack();
             SlotGroup slotGroup = getSlotGroup(syncHandler);
             boolean valid = slotGroup != null && slotGroup != fromSlotGroup;
-            if (valid && slot.isEnabled() && itemstack.isEmpty() && slot.isItemValid(stack)) {
-                if (stack.getCount() > slot.getSlotStackLimit()) {
+            // nh todo slot is enabled
+            if (valid && slot.func_111238_b() && itemstack == null && slot.isItemValid(stack)) {
+                if (stack.stackSize > slot.getSlotStackLimit()) {
                     slot.putStack(stack.splitStack(slot.getSlotStackLimit()));
                 } else {
-                    slot.putStack(stack.splitStack(stack.getCount()));
+                    slot.putStack(stack.splitStack(stack.stackSize));
                 }
                 break;
             }
@@ -193,19 +192,10 @@ public class ModularContainer extends Container implements ISortableContainer {
         }
         if (slot instanceof SlotItemHandler) {
             IItemHandler iItemHandler = ((SlotItemHandler) slot).getItemHandler();
-            if (iItemHandler instanceof PlayerMainInvWrapper || iItemHandler instanceof PlayerInvWrapper) {
+            if (iItemHandler instanceof PlayerMainInvWrapper) {
                 return slot.getSlotIndex() >= 0 && slot.getSlotIndex() < 36;
             }
         }
         return false;
-    }
-
-    @Override
-    public void buildSortingContext(ISortingContextBuilder builder) {
-        for (SlotGroup slotGroup : this.getSyncHandler().getSlotGroups()) {
-            if (slotGroup.isAllowSorting()) {
-                builder.addSlotGroup(slotGroup.getRowSize(), slotGroup.getSlots());
-            }
-        }
     }
 }

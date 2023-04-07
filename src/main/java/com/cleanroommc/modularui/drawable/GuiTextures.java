@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.drawable;
 
-import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.Tags;
 import com.cleanroommc.modularui.widget.sizer.GuiAxis;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.util.ResourceLocation;
@@ -49,7 +49,7 @@ public class GuiTextures {
     /**
      * Icons texture used across all dashboard panels
      */
-    public static final ResourceLocation ICONS_LOCATION = new ResourceLocation(ModularUI.ID, "textures/gui/icons.png");
+    public static final ResourceLocation ICONS_LOCATION = new ResourceLocation(Tags.MODID, "textures/gui/icons.png");
     public static final UITexture GEAR = icon("gear", 0, 0);
     public static final UITexture MORE = icon("more", 16, 0);
     public static final UITexture SAVED = icon("saved", 32, 0);
@@ -121,74 +121,74 @@ public class GuiTextures {
     public static final UITexture CURSOR = icon("cursor", 32, 240);
 
     public static final UITexture LOGO = UITexture.builder()
-            .location(ModularUI.ID, "modular_ui_logo")
+            .location(Tags.MODID, "modular_ui_logo")
             .imageSize(603, 603)
             .registerAsIcon("logo")
             .build();
 
     public static final UITexture BACKGROUND = UITexture.builder()
-            .location(ModularUI.ID, "gui/background/vanilla_background")
+            .location(Tags.MODID, "gui/background/vanilla_background")
             .imageSize(195, 136)
             .adaptable(4)
             .registerAsBackground("vanilla_background")
             .build();
 
     public static final UITexture DISPLAY = UITexture.builder()
-            .location(ModularUI.ID, "gui/background/display")
+            .location(Tags.MODID, "gui/background/display")
             .imageSize(143, 75)
             .adaptable(2)
             .registerAsBackground("display", false)
             .build();
 
     public static final UITexture DISPLAY_SMALL = UITexture.builder()
-            .location(ModularUI.ID, "gui/background/display_small")
+            .location(Tags.MODID, "gui/background/display_small")
             .imageSize(18, 18)
             .adaptable(1)
             .registerAsBackground("display_small", false)
             .build();
 
     public static final UITexture BUTTON = UITexture.builder()
-            .location(ModularUI.ID, "gui/widgets/base_button")
+            .location(Tags.MODID, "gui/widgets/base_button")
             .imageSize(18, 18)
             .adaptable(1)
             .registerAsBackground("vanilla_button")
             .build();
 
     public static final UITexture SLOT = UITexture.builder()
-            .location(ModularUI.ID, "gui/slot/item")
+            .location(Tags.MODID, "gui/slot/item")
             .imageSize(18, 18)
             .adaptable(1)
             .registerAsBackground("slot_item")
             .build();
 
     public static final UITexture SLOT_DARK = UITexture.builder()
-            .location(ModularUI.ID, "gui/slot/fluid")
+            .location(Tags.MODID, "gui/slot/fluid")
             .imageSize(18, 18)
             .adaptable(1)
             .registerAsBackground("slot_fluid")
             .build();
 
     public static final UITexture PROGRESS_ARROW = UITexture.builder()
-            .location(ModularUI.ID, "gui/widgets/progress_bar_arrow")
+            .location(Tags.MODID, "gui/widgets/progress_bar_arrow")
             .imageSize(20, 40)
             .build();
 
     public static final UITexture PROGRESS_CYCLE = UITexture.builder()
-            .location(ModularUI.ID, "gui/widgets/progress_bar_mixer")
+            .location(Tags.MODID, "gui/widgets/progress_bar_mixer")
             .imageSize(20, 40)
             .build();
 
     public static final UITexture CYCLE_BUTTON_DEMO = UITexture.builder()
-            .location(ModularUI.ID, "gui/widgets/cycle_button_demo")
+            .location(Tags.MODID, "gui/widgets/cycle_button_demo")
             .imageSize(18, 54)
             .build();
 
-    public static final UITexture CHECK_BOX = UITexture.fullImage(ModularUI.ID, "gui/widgets/toggle_config", false);
+    public static final UITexture CHECK_BOX = UITexture.fullImage(Tags.MODID, "gui/widgets/toggle_config", false);
 
-    public static final TabTexture TAB_TOP = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_top", true), GuiAxis.Y, false, 28, 32, 4);
-    public static final TabTexture TAB_BOTTOM = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_bottom", true), GuiAxis.Y, true, 28, 32, 4);
-    public static final TabTexture TAB_LEFT = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_left", true), GuiAxis.X, false, 32, 28, 4);
-    public static final TabTexture TAB_RIGHT = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_right", true), GuiAxis.X, true, 32, 28, 4);;
+    public static final TabTexture TAB_TOP = TabTexture.of(UITexture.fullImage(Tags.MODID, "gui/tab/tabs_top", true), GuiAxis.Y, false, 28, 32, 4);
+    public static final TabTexture TAB_BOTTOM = TabTexture.of(UITexture.fullImage(Tags.MODID, "gui/tab/tabs_bottom", true), GuiAxis.Y, true, 28, 32, 4);
+    public static final TabTexture TAB_LEFT = TabTexture.of(UITexture.fullImage(Tags.MODID, "gui/tab/tabs_left", true), GuiAxis.X, false, 32, 28, 4);
+    public static final TabTexture TAB_RIGHT = TabTexture.of(UITexture.fullImage(Tags.MODID, "gui/tab/tabs_right", true), GuiAxis.X, true, 32, 28, 4);;
 
     private static UITexture icon(String name, int x, int y, int w, int h) {
         return UITexture.builder()

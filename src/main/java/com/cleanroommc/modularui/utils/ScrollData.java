@@ -2,10 +2,10 @@ package com.cleanroommc.modularui.utils;
 
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.drawable.GuiDraw;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.util.MathHelper;
 
 public class ScrollData {
 
@@ -119,7 +119,7 @@ public class ScrollData {
         if (this.scrollSize <= size) {
             this.scroll = 0;
         } else {
-            this.scroll = MathHelper.clamp(this.scroll, 0, this.scrollSize - size);
+            this.scroll = MathHelper.clamp_int(this.scroll, 0, this.scrollSize - size);
         }
     }
 

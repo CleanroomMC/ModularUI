@@ -12,3 +12,21 @@ modularui.item.phantom.control=§7Scroll wheel up increases amount, down decreas
 modularui.fluid.click_to_fill=§bLeft §7Click with a Fluid Container to §bfill §7the tank (Shift-click for a full stack).
 modularui.fluid.click_combined=§cRight §7or §bLeft §7Click with a Fluid Container to §cempty §7or §bfill §7the tank (Shift-click for a full stack).
 modularui.fluid.click_to_empty=§cRight §7Click with a Fluid Container to §cempty §7the tank (Shift-click for a full stack).
+
+modularui.config.rendering=Rendering
+modularui.config.debug=Debug
+
+modularui.config.animations.defaultScrollSpeed=Default scroll speed
+modularui.config.animations.defaultScrollSpeed.tooltip=Amount of pixels scrolled.
+modularui.config.animations.smoothProgressBar=Smooth progressbar
+modularui.config.animations.smoothProgressBar.tooltip=If progress bar should step in texture pixels or screen pixels. (Screen pixels are way smaller and therefore smoother)
+modularui.config.animations.panelOpenCloseAnimationTime=Duration of open/close animations
+modularui.config.animations.panelOpenCloseAnimationTime.tooltip=Time in 1/60 sec to open and close panels.
+modularui.config.animations.placeTooltipNextToPanelByDefault=Place tooltip next to panel
+modularui.config.animations.placeTooltipNextToPanelByDefault.tooltip=If tooltips should be placed next to a widget's panel or the widget by default.
+modularui.config.animations.tooltipPos=Default tooltip position
+modularui.config.animations.tooltipPos.tooltip=Default tooltip position around the widget or its panel. Select: ABOVE, BELOW, LEFT, RIGHT, VERTICAL, HORIZONTAL, NEXT_TO_MOUSE
+modularui.config.animations.useDarkThemeByDefault=Dark theme
+modularui.config.animations.useDarkThemeByDefault.tooltip=If true and not specified otherwise, screens will try to use the 'vanilla_dark' theme.
+modularui.config.debug.guiDebugMode=GUI debug mode
+modularui.config.debug.guiDebugMode.tooltip=If true, widget outlines and widget information will be drawn.

@@ -1,11 +1,11 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.api.future.GlStateManager;
 import com.cleanroommc.modularui.utils.Alignment;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -155,7 +155,7 @@ public class TextRenderer {
         GlStateManager.disableBlend();
         GlStateManager.pushMatrix();
         GlStateManager.scale(scale, scale, 0f);
-        int width = getFontRenderer().drawString(text, x / scale, y / scale, color, shadow);
+        int width = getFontRenderer().drawString(text, (int) (x / scale), (int) (y / scale), color, shadow);
         GlStateManager.popMatrix();
         GlStateManager.enableBlend();
         return width * scale;

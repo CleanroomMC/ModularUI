@@ -1,11 +1,11 @@
 package com.cleanroommc.modularui.utils;
 
+import com.cleanroommc.modularui.api.future.GlStateManager;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.util.MathHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -234,7 +234,7 @@ public class Color implements Iterable<Integer> {
     }
 
     public static int interpolate(int color1, int color2, double value) {
-        value = MathHelper.clamp(value, 0, 1);
+        value = MathHelper.clamp_double(value, 0, 1);
         int r = (int) ((Color.getRed(color2) - Color.getRed(color1)) * value + Color.getRed(color1));
         int g = (int) ((Color.getGreen(color2) - Color.getGreen(color1)) * value + Color.getGreen(color1));
         int b = (int) ((Color.getBlue(color2) - Color.getBlue(color1)) * value + Color.getBlue(color1));
