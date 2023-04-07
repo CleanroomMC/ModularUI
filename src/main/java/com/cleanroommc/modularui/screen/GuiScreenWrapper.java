@@ -341,7 +341,7 @@ public class GuiScreenWrapper extends GuiContainer {
     }
 
     public boolean isDragSplitting() {
-        return getAccessor().isDragSplitting();
+        return getAccessor().isDragSplittingInternal();
     }
 
     public Set<Slot> getDragSlots() {

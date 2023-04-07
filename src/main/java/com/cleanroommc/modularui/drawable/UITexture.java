@@ -123,6 +123,7 @@ public class UITexture implements IDrawable {
 
     public static void draw(ResourceLocation location, float x0, float y0, float width, float height, float u0, float v0, float u1, float v1) {
         float x1 = x0 + width, y1 = y0 + height;
+        Tessellator.instance.startDrawingQuads();
         bufferbuilder.pos(x0, y1, 0.0f).tex(u0, v1).endVertex();
         bufferbuilder.pos(x1, y1, 0.0f).tex(u1, v1).endVertex();
         bufferbuilder.pos(x1, y0, 0.0f).tex(u1, v0).endVertex();

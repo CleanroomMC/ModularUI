@@ -21,7 +21,8 @@ public enum Mixin {
     GuiContainerMixin("GuiContainerMixin", Side.CLIENT, VANILLA),
     MinecraftMixin("MinecraftMixin", Side.CLIENT, VANILLA),
     SlotMixin("SlotMixin", Side.CLIENT, VANILLA),
-    PacketBufferMixin("PacketBufferMixin", Side.BOTH, VANILLA);
+    PacketBufferMixin("PacketBufferMixin", Side.BOTH, VANILLA),
+    SimpleNetworkWrapperMixin("SimpleNetworkWrapperMixin", Side.BOTH, VANILLA);
 
     public final String mixinClass;
     public final List<TargetedMod> targetedMods;

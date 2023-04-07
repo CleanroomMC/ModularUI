@@ -134,6 +134,7 @@ public class TextFieldRenderer extends TextRenderer {
         float alpha = Color.getAlphaF(markedColor);
         if (alpha == 0)
             alpha = 1f;
+        Tessellator.instance.startDrawingQuads();
         GlStateManager.color(red, green, blue, alpha);
         GlStateManager.disableTexture2D();;
         bufferbuilder.pos(x0, y1, 0.0D).endVertex();

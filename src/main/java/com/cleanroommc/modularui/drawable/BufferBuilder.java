@@ -7,25 +7,48 @@ import net.minecraft.client.renderer.Tessellator;
  */
 public class BufferBuilder {
 
+    private Double x, y, z;
+    private Double u, v;
+    private Float r, g, b, a;
+
     public static final BufferBuilder buffer = new BufferBuilder();
     public static final BufferBuilder bufferbuilder = buffer;
 
     private BufferBuilder() {}
 
     public BufferBuilder pos(double x, double y, double z) {
-        Tessellator.instance.addVertex(x, y, z);
+        this.x = x;
+        this.y = y;
+        this.z = z;
         return this;
     }
 
     public BufferBuilder tex(double u, double v) {
-        Tessellator.instance.setTextureUV(u, v);
+        this.u = u;
+        this.v = v;
         return this;
     }
 
     public BufferBuilder color(float r, float g, float b, float a) {
-        Tessellator.instance.setColorRGBA_F(r, g, b, a);
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.a = a;
         return this;
     }
 
-    public void endVertex() {}
+    public void endVertex() {
+        if (r != null) {
+            Tessellator.instance.setColorRGBA_F(r, g, b, a);
+            r = g = b = a = null;
+        }
+        if (u != null) {
+            Tessellator.instance.setTextureUV(u, v);
+            u = v = null;
+        }
+        if (x != null) {
+            Tessellator.instance.addVertex(x, y, z);
+            x = y = z = null;
+        }
+    }
 }

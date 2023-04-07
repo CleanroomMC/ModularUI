@@ -37,7 +37,7 @@ public interface GuiContainerAccessor {
     Set<Slot> getDragSplittingSlots();
 
     @Accessor("field_147007_t")
-    boolean isDragSplitting();
+    boolean isDragSplittingInternal();
 
     @Accessor("field_146996_I")
     int getDragSplittingRemnant();

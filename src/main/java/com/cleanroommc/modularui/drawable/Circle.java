@@ -60,6 +60,7 @@ public class Circle implements IDrawable {
         float x_2 = x0 + width / 2f, y_2 = y0 + height / 2f;
         bufferbuilder.pos(x_2, y_2, 0.0f).color(Color.getRed(colorInner), Color.getGreen(colorInner), Color.getBlue(colorInner), Color.getAlpha(colorInner)).endVertex();
         float incr = (float) (PI2 / segments);
+        Tessellator.instance.startDrawingQuads();
         for (int i = 0; i <= segments; i++) {
             float angle = incr * i;
             float x = (float) (Math.sin(angle) * (width / 2) + x_2);

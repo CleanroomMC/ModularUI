@@ -5,6 +5,8 @@
  Please check https://github.com/GTNewHorizons/ExampleMod1.7.10/blob/master/build.gradle for updates.
  */
 
+
+import com.diffplug.blowdryer.Blowdryer
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.gtnewhorizons.retrofuturagradle.ObfuscationAttribute
@@ -15,18 +17,18 @@ import com.matthewprenger.cursegradle.CurseRelation
 import com.modrinth.minotaur.dependencies.ModDependency
 import com.modrinth.minotaur.dependencies.VersionDependency
 import cpw.mods.fml.relauncher.Side
+import org.gradle.api.tasks.options.Option;
 import org.gradle.internal.logging.text.StyledTextOutput.Style
 import org.gradle.internal.logging.text.StyledTextOutputFactory
 import org.gradle.internal.xml.XmlTransformer
-import org.jetbrains.gradle.ext.Application
-import org.jetbrains.gradle.ext.Gradle
+import org.jetbrains.gradle.ext.*
 
-import javax.inject.Inject
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import javax.inject.Inject
 
 buildscript {
     repositories {

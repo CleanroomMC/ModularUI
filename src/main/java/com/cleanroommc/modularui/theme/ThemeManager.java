@@ -37,6 +37,7 @@ public class ThemeManager implements IResourceManagerReloadListener {
     private static final Map<String, ITheme> screenThemes = new Object2ObjectOpenHashMap<>();
 
     static {
+        registerWidgetTheme(Theme.FALLBACK, new WidgetTheme(null, null, Color.WHITE.normal, 0xFF404040, false), WidgetTheme::new);
         registerWidgetTheme(Theme.PANEL, new WidgetTheme(GuiTextures.BACKGROUND, null, Color.WHITE.normal, 0xFF404040, false), WidgetTheme::new);
         registerWidgetTheme(Theme.BUTTON, new WidgetTheme(GuiTextures.BUTTON, null, Color.WHITE.normal, Color.WHITE.normal, true), WidgetTheme::new);
         registerWidgetTheme(Theme.ITEM_SLOT, new WidgetSlotTheme(GuiTextures.SLOT, Color.withAlpha(Color.WHITE.normal, 0x80)), WidgetSlotTheme::new);

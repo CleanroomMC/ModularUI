@@ -129,6 +129,8 @@ public class GuiDraw {
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
+        Tessellator.instance.startDrawingQuads();
+
         buffer.pos(right, top, zLevel).color(r2, g2, b2, a2).endVertex();
         buffer.pos(left, top, zLevel).color(r1, g1, b1, a1).endVertex();
         buffer.pos(left, bottom, zLevel).color(r1, g1, b1, a1).endVertex();
@@ -166,6 +168,8 @@ public class GuiDraw {
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
+        Tessellator.instance.startDrawingQuads();
+
         buffer.pos(right, top, zLevel).color(r1, g1, b1, a1).endVertex();
         buffer.pos(left, top, zLevel).color(r1, g1, b1, a1).endVertex();
         buffer.pos(left, bottom, zLevel).color(r2, g2, b2, a2).endVertex();
@@ -187,6 +191,7 @@ public class GuiDraw {
      * Draw a textured quad with given UV, dimensions and custom texture size
      */
     public static void drawBillboard(int x, int y, int u, int v, int w, int h, int textureW, int textureH, float z) {
+        Tessellator.instance.startDrawingQuads();
         drawBillboard(buffer, x, y, u, v, w, h, textureW, textureH, z);
         Tessellator.instance.draw();
     }
@@ -209,6 +214,7 @@ public class GuiDraw {
      * Draw a textured quad with given UV, dimensions and custom texture size
      */
     public static void drawBillboard(int x, int y, int u, int v, int w, int h, int textureW, int textureH, int tu, int tv, float z) {
+        Tessellator.instance.startDrawingQuads();
         drawBillboard(buffer, x, y, u, v, w, h, textureW, textureH, tu, tv, z);
         Tessellator.instance.draw();
     }
@@ -228,6 +234,7 @@ public class GuiDraw {
     }
 
     public static void drawBillboard(int x0, int y0, int x1, int y1, float u0, float v0, float u1, float v1, float z) {
+        Tessellator.instance.startDrawingQuads();
         drawBillboard(buffer, x0, y0, x1, y1, u0, v0, u1, v1, z);
         Tessellator.instance.draw();
     }
@@ -329,6 +336,8 @@ public class GuiDraw {
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
+        Tessellator.instance.startDrawingQuads();
+
         /* Draw opaque part */
         buffer.pos(right - offset, top + offset, 0).color(r1, g1, b1, a1).endVertex();
         buffer.pos(left + offset, top + offset, 0).color(r1, g1, b1, a1).endVertex();
@@ -383,6 +392,8 @@ public class GuiDraw {
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
+        Tessellator.instance.startDrawingQuads();
+
         buffer.pos(x, y, 0).color(r1, g1, b1, a1).endVertex();
 
         for (int i = 0; i <= segments; i++) {
@@ -421,6 +432,8 @@ public class GuiDraw {
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
+        Tessellator.instance.startDrawingQuads();
+
         /* Draw opaque base */
         buffer.pos(x, y, 0).color(r1, g1, b1, a1).endVertex();
 
@@ -431,6 +444,8 @@ public class GuiDraw {
         }
 
         Tessellator.instance.draw();
+
+        Tessellator.instance.startDrawingQuads();
 
         /* Draw outer shadow */
         for (int i = 0; i < segments; i++) {
@@ -517,6 +532,8 @@ public class GuiDraw {
         int fillerX = w - (countX - 1) * tileW;
         int fillerY = h - (countY - 1) * tileH;
 
+        Tessellator.instance.startDrawingQuads();
+
         for (int i = 0, c = countX * countY; i < c; i++) {
             int ix = i % countX;
             int iy = i / countX;
@@ -579,6 +596,7 @@ public class GuiDraw {
         GlStateManager.disableTexture2D();
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.color(r, g, b, a);
+        Tessellator.instance.startDrawingQuads();
         bufferbuilder.pos(left, bottom, 0.0D).endVertex();
         bufferbuilder.pos(right, bottom, 0.0D).endVertex();
         bufferbuilder.pos(right, top, 0.0D).endVertex();
@@ -604,6 +622,7 @@ public class GuiDraw {
         float x1 = x0 + width, y1 = y0 + height;
         float r = Color.getRedF(fluidColor), g = Color.getGreenF(fluidColor), b = Color.getBlueF(fluidColor), a = Color.getAlphaF(fluidColor);
 
+        Tessellator.instance.startDrawingQuads();
         buffer.pos(x0, y1, z).tex(u0, v1).color(r, g, b, a).endVertex();
         buffer.pos(x1, y1, z).tex(u1, v1).color(r, g, b, a).endVertex();
         buffer.pos(x1, y0, z).tex(u1, v0).color(r, g, b, a).endVertex();
@@ -630,6 +649,7 @@ public class GuiDraw {
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
+        Tessellator.instance.startDrawingQuads();
         buffer.pos(right, top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
         buffer.pos(left, top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
         buffer.pos(left, bottom, zLevel).color(endRed, endGreen, endBlue, endAlpha).endVertex();
