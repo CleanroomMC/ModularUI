@@ -118,6 +118,10 @@ public class ModularUIConfig {
         )
             .setLanguageKey(LANG_PREFIX + CATEGORY_DEBUG + ".guiDebugMode")
             .getBoolean();
+
+        if (config.hasChanged()) {
+            config.save();
+        }
     }
 
     public static boolean placeTooltipNextToPanel() {
