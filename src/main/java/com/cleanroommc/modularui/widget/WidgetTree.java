@@ -110,6 +110,69 @@ public class WidgetTree {
     public static void drawTree(IWidget parent, GuiContext context, boolean ignoreEnabled) {
         if (!parent.isEnabled() && !ignoreEnabled) return;
         boolean canBeSeen = parent.canBeSeen();
+        float alpha = parent.getPanel().getAlpha();
+        IViewport viewport = parent instanceof IViewport ? (IViewport) parent : null;
+
+        context.pushMatrix();
+        parent.transform(context);
+
+        GlStateManager.pushMatrix();
+        context.applyToOpenGl();
+
+        if (canBeSeen) {
+            GlStateManager.color(1f, 1f, 1f, alpha);
+            GlStateManager.enableBlend();
+            parent.drawBackground(context);
+            parent.draw(context);
+        }
+
+        if (viewport != null) {
+            if (canBeSeen) {
+                GlStateManager.color(1f, 1f, 1f, alpha);
+                GlStateManager.enableBlend();
+                viewport.preDraw(context, false);
+                GlStateManager.popMatrix();
+                context.pushViewport(viewport, parent.getArea());
+                viewport.transformChildren(context);
+                GlStateManager.pushMatrix();
+                context.applyToOpenGl();
+                viewport.preDraw(context, true);
+            } else {
+                context.pushViewport(viewport, parent.getArea());
+                viewport.transformChildren(context);
+            }
+        }
+        GlStateManager.popMatrix();
+
+        // render all children if there are any
+        List<IWidget> children = parent.getChildren();
+        if (!children.isEmpty()) {
+            children.forEach(widget -> drawTree(widget, context, false));
+        }
+
+        if (viewport != null) {
+            if (canBeSeen) {
+                GlStateManager.color(1f, 1f, 1f, alpha);
+                GlStateManager.enableBlend();
+                GlStateManager.pushMatrix();
+                context.applyToOpenGl();
+                viewport.postDraw(context, true);
+                context.popViewport(viewport);
+                GlStateManager.popMatrix();
+                GlStateManager.pushMatrix();
+                context.applyToOpenGl();
+                viewport.postDraw(context, false);
+                GlStateManager.popMatrix();
+            } else {
+                context.popViewport(viewport);
+            }
+        }
+        context.popMatrix();
+    }
+
+    /*public static void drawTreeOld(IWidget parent, GuiContext context, boolean ignoreEnabled) {
+        if (!parent.isEnabled() && !ignoreEnabled) return;
+        boolean canBeSeen = true;//parent.canBeSeen();
 
         Area panel = parent.getPanel().getArea();
         IViewport viewport = parent instanceof IViewport ? (IViewport) parent : null;
@@ -202,7 +265,7 @@ public class WidgetTree {
             // finally get rid of all opengl transformations
             GlStateManager.popMatrix();
         }
-    }
+    }*/
 
     public static void drawTreeForeground(IWidget parent, GuiContext context) {
         GlStateManager.color(1, 1, 1, 1);

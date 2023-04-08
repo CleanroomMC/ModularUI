@@ -1,9 +1,10 @@
 package com.cleanroommc.modularui.tablet.guide;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widgets.CategoryList;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
@@ -11,11 +12,9 @@ import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 
-import java.util.Map;
-
 public class GuideManager {
 
-    private static final Map<String, GuidePage> allGuides = new Object2ObjectOpenHashMap<>();
+    private static final Object2ObjectLinkedOpenHashMap<String, GuidePage> allGuides = new Object2ObjectLinkedOpenHashMap<>();
 
     private static GuideCategory guideCategory = new GuideCategoryRoot();
 
@@ -39,7 +38,10 @@ public class GuideManager {
                     String mod = container != null ? container.getName() : page.getLocation().getNamespace();
                     category[i] = mod;
                 } else {
-                    category[i] = I18n.format(category[i]);
+                    String key = ModularUI.ID + ".tablet.guides.category." + category[i];
+                    if (I18n.hasKey(key)) {
+                        category[i] = I18n.format(key);
+                    }
                 }
             }
             GuideCategory category1 = guideCategory.findCategory(category, true);
@@ -49,6 +51,10 @@ public class GuideManager {
 
     public static GuideCategory getCategory() {
         return guideCategory;
+    }
+
+    public static GuidePage getFirst() {
+        return allGuides.get(allGuides.firstKey());
     }
 
     private static class GuideCategoryRoot extends GuideCategory {

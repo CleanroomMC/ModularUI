@@ -45,6 +45,15 @@ public class GuidePage {
         }
     }
 
+    public GuidePage(ResourceLocation location, String name, ItemStack stack, IDrawable icon, String category, JsonElement contentJson) {
+        this.location = location;
+        this.name = name;
+        this.item = stack;
+        this.icon = icon;
+        this.category = category;
+        this.contentJson = contentJson;
+    }
+
     private void parse(JsonElement element) {
         if (element.isJsonObject()) {
             JsonObject json = element.getAsJsonObject();

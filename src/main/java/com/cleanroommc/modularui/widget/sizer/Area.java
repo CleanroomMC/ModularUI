@@ -165,7 +165,8 @@ public class Area extends Rectangle implements IResizeable {
     }
 
     /**
-     * Check whether given position is inside of the rect
+     * Check whether given position is inside the rect.
+     * Use {@link com.cleanroommc.modularui.api.widget.IWidget#isInside(IViewportStack, int, int)} rather than this!
      */
     public boolean isInside(int x, int y) {
         return x >= this.x && x < this.x + this.width && y >= this.y && y < this.y + this.height;
@@ -176,7 +177,7 @@ public class Area extends Rectangle implements IResizeable {
      */
     public boolean intersects(Rectangle2D area) {
         return this.x < area.getX() + area.getWidth() && this.y < area.getY() + area.getHeight()
-               && area.getX() < this.x + this.width && area.getY() < this.y + this.height;
+                && area.getX() < this.x + this.width && area.getY() < this.y + this.height;
     }
 
     /**
@@ -301,11 +302,11 @@ public class Area extends Rectangle implements IResizeable {
     }
 
     public void setLocal(Rectangle area, IViewportStack viewportStack) {
-        setBounds(viewportStack.localX(area.x), viewportStack.localY(area.y), area.width, area.height);
+        setBounds(viewportStack.transformX(area.x, area.y), viewportStack.transformY(area.x, area.y), area.width, area.height);
     }
 
     public void setGlobal(Rectangle area, IViewportStack viewportStack) {
-        setBounds(viewportStack.globalX(area.x), viewportStack.globalY(area.y), area.width, area.height);
+        setBounds(viewportStack.unTransformX(area.x, area.y), viewportStack.unTransformY(area.x, area.y), area.width, area.height);
     }
 
     public Box getMargin() {

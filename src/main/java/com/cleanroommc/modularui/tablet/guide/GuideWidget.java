@@ -33,7 +33,10 @@ public class GuideWidget extends ScrollWidget<GuideWidget> {
     @Override
     public void preDraw(GuiContext context, boolean transformed) {
         super.preDraw(context, transformed);
-        if (transformed && this.currentGuidePage != null) {
+        if (transformed) {
+            if (this.currentGuidePage == null) {
+                setCurrentGuidePage(GuideManager.getFirst());
+            }
             textRenderer.setColor(getWidgetTheme().getTextColor());
             textRenderer.setPos(20, 10);
             textRenderer.setAlignment(Alignment.TopLeft, getArea().width - 40);
@@ -58,5 +61,8 @@ public class GuideWidget extends ScrollWidget<GuideWidget> {
         this.currentGuidePage = currentGuidePage;
         getScrollArea().getScrollY().scroll = 0;
         clearCache();
+        if (currentGuidePage.getDrawables() == null) {
+            currentGuidePage.load();
+        }
     }
 }

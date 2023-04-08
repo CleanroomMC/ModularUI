@@ -17,7 +17,7 @@ public class Scissor {
     }
 
     public static void scissor(int x, int y, int w, int h, GuiContext context) {
-        scissor(context.globalX(x), context.globalY(y), w, h, context.screen.getViewport().width, context.screen.getViewport().height);
+        scissor(context.transformX(x, y), context.transformY(x, y), w, h, context.screen.getViewport().width, context.screen.getViewport().height);
     }
 
     public static void scissorTransformed(Area area, GuiContext context) {

@@ -8,8 +8,6 @@ import com.cleanroommc.modularui.utils.BitHelper;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Stack;
-
 public class DraggableWidget<W extends DraggableWidget<W>> extends Widget<W> implements IDraggable {
 
     private boolean moving = false;
@@ -71,33 +69,26 @@ public class DraggableWidget<W extends DraggableWidget<W>> extends Widget<W> imp
     }
 
     @Override
-    public void getWidgetsBeforeApply(Stack<IViewport> viewports, IWidgetList widgets, int x, int y) {
-        if (!isMoving() && getArea().isInside(getContext().localX(x), getContext().localY(y))) {
-            widgets.add(this, viewports);
+    public void getSelfAt(IViewportStack stack, IWidgetList widgets, int x, int y) {
+        if (!isMoving() && isInside(stack, x, y)) {
+            widgets.add(this, stack.peek());
         }
     }
 
     @Override
-    public void getWidgetsAt(Stack<IViewport> viewports, IWidgetList widgets, int x, int y) {
+    public void getWidgetsAt(IViewportStack stack, IWidgetList widgets, int x, int y) {
         if (!isMoving() && hasChildren()) {
-            IViewport.getChildrenAt(this, viewports, widgets, x, y);
+            IViewport.getChildrenAt(this, stack, widgets, x, y);
         }
     }
 
     @Override
-    public void apply(IViewportStack stack, int context) {
-        if (BitHelper.hasAnyBits(context, IViewport.DRAGGABLE | IViewport.COLLECT_WIDGETS)) {
-            stack.pushViewport(this, getMovingArea());
-            if (isMoving()) {
-                stack.translate(-this.movingArea.x + getContext().globalX(getArea().x), -this.movingArea.y + getContext().globalY(getArea().y));
-            }
-        }
-    }
-
-    @Override
-    public void unapply(IViewportStack stack, int context) {
-        if (BitHelper.hasNone(context, IViewport.START_DRAGGING) && BitHelper.hasAnyBits(context, IViewport.DRAGGABLE | IViewport.COLLECT_WIDGETS)) {
-            stack.popViewport(this);
+    public void transform(IViewportStack stack) {
+        super.transform(stack);
+        if (isMoving()) {
+            stack.translate(-getArea().x, -getArea().y);
+            stack.translate(this.movingArea.x, this.movingArea.y);
+            //stack.translate(-this.movingArea.x + getContext().unTransformX(getArea().x, getArea().y), -this.movingArea.y + getContext().unTransformY(getArea().x, getArea().y));
         }
     }
 }

@@ -15,7 +15,7 @@ import com.cleanroommc.modularui.widgets.ButtonWidget;
 
 public class GuideApp extends TabletApp {
 
-    private static final int categoryListWidth = 100;
+    private static final int categoryListWidth = 130;
 
     private final Widget<?> categoryList;
     private final ButtonWidget<?> expandButton;
@@ -78,8 +78,5 @@ public class GuideApp extends TabletApp {
 
     public void setCurrentGuidePage(GuidePage currentGuidePage) {
         this.guideWidget.setCurrentGuidePage(currentGuidePage);
-        if (currentGuidePage.getDrawables() == null) {
-            currentGuidePage.load();
-        }
     }
 }
