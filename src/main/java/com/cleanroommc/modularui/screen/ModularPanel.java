@@ -59,7 +59,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     public ModularPanel(GuiContext context) {
         setContext(context);
-        context.addJeiExclusionArea(this);
+        context.addNEIExclusionArea(this);
     }
 
     public ModularPanel name(String name) {
@@ -209,7 +209,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @Override
     public void dispose() {
-        getContext().removeJeiExclusionArea(this);
+        getContext().removeNEIExclusionArea(this);
         super.dispose();
         this.screen = null;
     }

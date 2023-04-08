@@ -1,5 +1,10 @@
 package com.cleanroommc.modularui.screen;
 
+import codechicken.nei.VisiblityData;
+import codechicken.nei.api.INEIGuiHandler;
+import codechicken.nei.api.TaggedInventoryArea;
+import codechicken.nei.guihook.GuiContainerManager;
+import codechicken.nei.guihook.IContainerDrawHandler;
 import com.cleanroommc.modularui.GuiErrorHandler;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.future.GlStateManager;
@@ -30,10 +35,12 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import org.lwjgl.input.Keyboard;
 
+import java.awt.*;
+import java.util.List;
 import java.util.Set;
 
 @SideOnly(Side.CLIENT)
-public class GuiScreenWrapper extends GuiContainer {
+public class GuiScreenWrapper extends GuiContainer implements INEIGuiHandler {
 
     private final ModularScreen screen;
     private boolean init = true;
@@ -101,6 +108,22 @@ public class GuiScreenWrapper extends GuiContainer {
         this.drawGuiContainerForegroundLayer(mouseX, mouseY);
         this.screen.drawForeground(partialTicks);
         RenderHelper.enableGUIStandardItemLighting();
+
+        if (this.screen.context.isNEIEnabled()) {
+            // Copied from GuiContainerManager#renderObjects but without translation
+            for (IContainerDrawHandler drawHandler : GuiContainerManager.drawHandlers) {
+                drawHandler.renderObjects(this, mouseX, mouseY);
+            }
+            for (IContainerDrawHandler drawHandler : GuiContainerManager.drawHandlers) {
+                drawHandler.postRenderObjects(this, mouseX, mouseY);
+            }
+
+//            if (!shouldRenderOurTooltip()) {
+            // nh todo?
+            if (true) {
+                GuiContainerManager.getManager().renderToolTips(mouseX, mouseY);
+            }
+        }
 
         getAccessor().setHoveredSlot(null);
         IGuiElement hovered = this.screen.context.getHovered();
@@ -207,10 +230,10 @@ public class GuiScreenWrapper extends GuiContainer {
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
         int screenW = this.screen.getViewport().width, screenH = this.screen.getViewport().height;
         int color = Color.rgb(180, 40, 115);
-        int lineY = screenH - 13;
+        int lineY = screenH - 13 - (this.screen.context.isNEIEnabled() ? 20 : 0);
         drawString(getFontRenderer(), "Mouse Pos: " + mouseX + ", " + mouseY, 5, lineY, color);
         lineY -= 11;
-        drawString(getFontRenderer(), "FPS: " + fps, 5, screenH - 24, color);
+        drawString(getFontRenderer(), "FPS: " + fps, 5, lineY, color);
         lineY -= 11;
         LocatedWidget locatedHovered = this.screen.getWindowManager().getTopWidgetLocated();
         if (locatedHovered != null) {
@@ -362,5 +385,37 @@ public class GuiScreenWrapper extends GuiContainer {
 
     public FontRenderer getFontRenderer() {
         return Minecraft.getMinecraft().fontRenderer;
+    }
+
+    // === NEI overrides ===
+
+    @Override
+    public VisiblityData modifyVisiblity(GuiContainer gui, VisiblityData currentVisibility) {
+        return null;
+    }
+
+    @Override
+    public Iterable<Integer> getItemSpawnSlots(GuiContainer gui, ItemStack item) {
+        return null;
+    }
+
+    @Override
+    public List<TaggedInventoryArea> getInventoryAreas(GuiContainer gui) {
+        return null;
+    }
+
+    @Override
+    public boolean handleDragNDrop(GuiContainer gui, int mousex, int mousey, ItemStack draggedStack, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean hideItemPanelSlot(GuiContainer gui, int x, int y, int w, int h) {
+        if (!(gui instanceof GuiScreenWrapper)) return false;
+        if (!this.screen.context.isNEIEnabled()) return false;
+        // nh todo dragged things
+        return this.screen.context.getAllNEIExclusionAreas().stream().anyMatch(
+            a -> a.intersects(new Rectangle(x, y, w, h))
+        );
     }
 }

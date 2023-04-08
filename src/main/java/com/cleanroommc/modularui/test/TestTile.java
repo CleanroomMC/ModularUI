@@ -87,7 +87,7 @@ public class TestTile extends TileEntity implements IGuiHolder {
     }
 
     public ModularPanel createPanel(GuiContext context) {
-        context.enableJei();
+        context.enableNEI();
         Rectangle colorPickerBackground = new Rectangle().setColor(Color.RED.normal);
         ModularPanel panel = new ModularPanel(context);
         PagedWidget.Controller tabController = new PagedWidget.Controller();

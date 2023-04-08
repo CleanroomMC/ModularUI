@@ -63,12 +63,12 @@ public class GuiContext extends GuiViewportStack {
     private float partialTicks;
     private long tick;
 
-    private byte jeiState = 0;
+    private byte neiState = 0;
 
     public List<Consumer<GuiContext>> postRenderCallbacks = new ArrayList<>();
 
-    private final List<IWidget> jeiExclusionWidgets = new ArrayList<>();
-    private final List<Rectangle> jeiExclusionAreas = new ArrayList<>();
+    private final List<IWidget> neiExclusionWidgets = new ArrayList<>();
+    private final List<Rectangle> neiExclusionAreas = new ArrayList<>();
 
     public GuiContext(ModularScreen screen) {
         this.screen = screen;
@@ -441,20 +441,20 @@ public class GuiContext extends GuiViewportStack {
         return partialTicks;
     }
 
-    public void enableJei() {
-        this.jeiState = 1;
+    public void enableNEI() {
+        this.neiState = 1;
     }
 
-    public void disableJei() {
-        this.jeiState = 2;
+    public void disableNEI() {
+        this.neiState = 2;
     }
 
-    public void defaultJei() {
-        this.jeiState = 0;
+    public void defaultNEI() {
+        this.neiState = 0;
     }
 
-    public boolean isJeiEnabled() {
-        switch (this.jeiState) {
+    public boolean isNEIEnabled() {
+        switch (this.neiState) {
             case 1:
                 return true;
             case 2:
@@ -464,37 +464,37 @@ public class GuiContext extends GuiViewportStack {
         }
     }
 
-    public void addJeiExclusionArea(Rectangle area) {
-        if (!this.jeiExclusionAreas.contains(area)) {
-            this.jeiExclusionAreas.add(area);
+    public void addNEIExclusionArea(Rectangle area) {
+        if (!this.neiExclusionAreas.contains(area)) {
+            this.neiExclusionAreas.add(area);
         }
     }
 
-    public void removeJeiExclusionArea(Rectangle area) {
-        this.jeiExclusionAreas.remove(area);
+    public void removeNEIExclusionArea(Rectangle area) {
+        this.neiExclusionAreas.remove(area);
     }
 
-    public void addJeiExclusionArea(IWidget area) {
-        if (!this.jeiExclusionWidgets.contains(area)) {
-            this.jeiExclusionWidgets.add(area);
+    public void addNEIExclusionArea(IWidget area) {
+        if (!this.neiExclusionWidgets.contains(area)) {
+            this.neiExclusionWidgets.add(area);
         }
     }
 
-    public void removeJeiExclusionArea(IWidget area) {
-        this.jeiExclusionWidgets.remove(area);
+    public void removeNEIExclusionArea(IWidget area) {
+        this.neiExclusionWidgets.remove(area);
     }
 
-    public List<Rectangle> getJeiExclusionAreas() {
-        return jeiExclusionAreas;
+    public List<Rectangle> getNEIExclusionAreas() {
+        return neiExclusionAreas;
     }
 
-    public List<IWidget> getJeiExclusionWidgets() {
-        return jeiExclusionWidgets;
+    public List<IWidget> getNEIExclusionWidgets() {
+        return neiExclusionWidgets;
     }
 
-    public List<Rectangle> getAllJeiExclusionAreas() {
-        List<Rectangle> areas = new ArrayList<>(this.jeiExclusionAreas);
-        areas.addAll(this.jeiExclusionWidgets.stream()
+    public List<Rectangle> getAllNEIExclusionAreas() {
+        List<Rectangle> areas = new ArrayList<>(this.neiExclusionAreas);
+        areas.addAll(this.neiExclusionWidgets.stream()
                 .filter(IWidget::isEnabled)
                 .map(IWidget::getArea)
                 .collect(Collectors.toList()));

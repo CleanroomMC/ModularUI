@@ -164,6 +164,7 @@ public class TextFieldRenderer extends TextRenderer {
         GlStateManager.scale(scale, scale, 0);
         GlStateManager.color(red, green, blue, alpha);
         GlStateManager.disableTexture2D();
+        Tessellator.instance.startDrawingQuads();
         bufferbuilder.pos(x0, y1, 0.0D).endVertex();
         bufferbuilder.pos(x1, y1, 0.0D).endVertex();
         bufferbuilder.pos(x1, y0, 0.0D).endVertex();
