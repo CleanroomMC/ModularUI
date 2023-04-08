@@ -12,7 +12,7 @@ public class ModularUIConfig {
 
     public static int defaultScrollSpeed = 30;
     public static boolean smoothProgressBar = true;
-    public static int panelOpenCloseAnimationTime = 8;
+    public static int panelOpenCloseAnimationTime = 0;
     public static boolean placeTooltipNextToPanelByDefault = true;
     public static Tooltip.Pos tooltipPos = Tooltip.Pos.VERTICAL;
     public static boolean useDarkThemeByDefault = false;
@@ -65,7 +65,7 @@ public class ModularUIConfig {
         panelOpenCloseAnimationTime = config.get(
             CATEGORY_RENDERING,
             "panelOpenCloseAnimationTime",
-            8,
+            0,
             "Time in 1/60 sec to open and close panels."
         )
             .setLanguageKey(LANG_PREFIX + CATEGORY_RENDERING + ".panelOpenCloseAnimationTime")
