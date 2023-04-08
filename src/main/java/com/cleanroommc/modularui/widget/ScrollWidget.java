@@ -5,9 +5,11 @@ import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.IWidgetList;
 import com.cleanroommc.modularui.api.widget.Interactable;
+import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.Scissor;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.ScrollArea;
 import com.cleanroommc.modularui.utils.ScrollData;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -108,10 +110,10 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
     @Override
     public void preDraw(GuiContext context, boolean transformed) {
         if (!transformed) {
-            Scissor.scissor(this.scroll.x + this.scroll.getPadding().left,
-                    this.scroll.y + this.scroll.getPadding().top,
-                    this.scroll.width - this.scroll.getPadding().horizontal(),
-                    this.scroll.height - this.scroll.getPadding().vertical(), getContext());
+            Scissor.scissor(0,
+                    0,
+                    this.scroll.width,
+                    this.scroll.height, getContext());
         }
     }
 

@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IPositioned;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.utils.Alignment;
 import net.minecraft.inventory.Slot;
 import org.jetbrains.annotations.ApiStatus;
@@ -382,7 +383,11 @@ public class Flex implements IResizeable, IPositioned<Flex> {
     public void applyPos(IGuiElement parent) {
         // after all widgets x, y, width and height have been calculated when can now calculate the absolute position
         Area relativeTo = getRelativeTo();
-        parent.getArea().applyPos(relativeTo.x, relativeTo.y);
+        Area area = parent.getArea();
+        area.applyPos(relativeTo.x, relativeTo.y);
+        Area parentArea = parent.getParentArea();
+        area.rx = area.x - parentArea.x;
+        area.ry = area.y - parentArea.y;
         if (parent instanceof IVanillaSlot) {
             Slot slot = ((IVanillaSlot) parent).getVanillaSlot();
             slot.xPos = parent.getArea().x;

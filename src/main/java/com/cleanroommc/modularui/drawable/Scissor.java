@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
@@ -32,19 +31,10 @@ public class Scissor {
      * Scissor (clip) the screen
      */
     public static void scissor(int x, int y, int w, int h, int sw, int sh) {
-        Area scissor = scissors.isEmpty() ? null : scissors.peek();
-
-        /* If it was scissored before, then clamp to the bounds of the last one */
-        if (scissor != null) {
-            w += Math.min(x - scissor.x, 0);
-            h += Math.min(y - scissor.y, 0);
-            x = MathUtils.clamp(x, scissor.x, scissor.ex());
-            y = MathUtils.clamp(y, scissor.y, scissor.ey());
-            w = MathUtils.clamp(w, 0, scissor.ex() - x);
-            h = MathUtils.clamp(h, 0, scissor.ey() - y);
+        Area scissor = new Area(x, y, w, h);
+        if (!scissors.isEmpty()) {
+            scissors.peek().clamp(scissor);
         }
-
-        scissor = new Area(x, y, w, h);
         scissorArea(x, y, w, h, sw, sh);
         scissors.add(scissor);
     }

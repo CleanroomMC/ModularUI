@@ -109,7 +109,7 @@ public class WidgetTree {
 
     public static void drawTree(IWidget parent, GuiContext context, boolean ignoreEnabled) {
         if (!parent.isEnabled() && !ignoreEnabled) return;
-        boolean canBeSeen = parent.canBeSeen();
+        boolean canBeSeen = true;//parent.canBeSeen();
         float alpha = parent.getPanel().getAlpha();
         IViewport viewport = parent instanceof IViewport ? (IViewport) parent : null;
 
