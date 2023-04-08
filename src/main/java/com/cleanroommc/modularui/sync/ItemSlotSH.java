@@ -168,6 +168,9 @@ public class ItemSlotSH extends SyncHandler {
         }
         if (oldAmount != amount) {
             stack.stackSize = amount;
+            if (stack.stackSize < 1) {
+                slot.putStack(null);
+            }
             getSlot().onSlotChanged();
         }
     }
