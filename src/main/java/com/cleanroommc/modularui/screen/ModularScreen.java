@@ -192,6 +192,7 @@ public abstract class ModularScreen {
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
         GlStateManager.disableAlpha();
+        //GlStateManager.disableAlpha(); // nh todo
 
         this.context.reset();
         this.context.pushViewport(null, this.viewport);
@@ -208,6 +209,7 @@ public abstract class ModularScreen {
         GlStateManager.enableLighting();
         RenderHelper.enableStandardItemLighting();
         GlStateManager.enableAlpha();
+        //GlStateManager.enableAlpha();
     }
 
     public void drawForeground(float partialTicks) {
@@ -216,6 +218,7 @@ public abstract class ModularScreen {
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
         GlStateManager.disableAlpha();
+        //GlStateManager.disableAlpha(); // nh todo
 
         this.context.reset();
         this.context.pushViewport(null, this.viewport);
@@ -231,6 +234,7 @@ public abstract class ModularScreen {
         GlStateManager.enableLighting();
         RenderHelper.enableStandardItemLighting();
         GlStateManager.enableAlpha();
+        //GlStateManager.enableAlpha();
     }
 
     public boolean onMousePressed(int mouseButton) {

@@ -28,6 +28,7 @@ public class ItemDrawable implements IDrawable {
         GlStateManager.enableDepth();
         GlStateManager.scale(width / 16f, height / 16f, 1);
         GuiScreenWrapper.getItemRenderer().renderItemAndEffectIntoGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), item, x, y);
+        GuiDraw.afterRenderItemAndEffectIntoGUI(item);
         GlStateManager.disableDepth();
         RenderHelper.enableStandardItemLighting();
         GlStateManager.disableLighting();

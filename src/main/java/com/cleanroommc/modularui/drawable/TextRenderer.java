@@ -7,6 +7,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import org.apache.commons.lang3.tuple.Pair;
+import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -155,7 +156,9 @@ public class TextRenderer {
         GlStateManager.disableBlend();
         GlStateManager.pushMatrix();
         GlStateManager.scale(scale, scale, 0f);
+        GL11.glDisable(GL11.GL_LIGHTING);
         int width = getFontRenderer().drawString(text, (int) (x / scale), (int) (y / scale), color, shadow);
+        GL11.glEnable(GL11.GL_LIGHTING);
         GlStateManager.popMatrix();
         GlStateManager.enableBlend();
         return width * scale;

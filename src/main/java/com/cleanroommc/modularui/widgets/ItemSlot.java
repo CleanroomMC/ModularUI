@@ -27,6 +27,8 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable {
 
@@ -58,9 +60,12 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         RenderHelper.enableStandardItemLighting();
         GlStateManager.disableLighting();
         if (isHovering()) {
+            GL11.glDisable(GL11.GL_LIGHTING);
+            GL11.glEnable(GL11.GL_BLEND);
             GlStateManager.colorMask(true, true, true, false);
             GuiDraw.drawSolidRect(1, 1, 16, 16, getWidgetTheme(context.getTheme()).getSlotHoverColor());
             GlStateManager.colorMask(true, true, true, true);
+            GL11.glDisable(GL11.GL_BLEND);
         }
     }
 
@@ -159,9 +164,15 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             }
 
             if (itemstack != null) {
+                GlStateManager.enableRescaleNormal();
+                GlStateManager.enableLighting();
+                RenderHelper.enableGUIStandardItemLighting();
                 GlStateManager.enableDepth();
+                GL11.glEnable(GL12.GL_RESCALE_NORMAL);
                 // render the item itself
                 GuiScreenWrapper.getItemRenderer().renderItemAndEffectIntoGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), itemstack, 1, 1);
+                GuiDraw.afterRenderItemAndEffectIntoGUI(itemstack);
+                GL11.glDisable(GL12.GL_RESCALE_NORMAL);
                 if (amount < 0) {
                     amount = itemstack.stackSize;
                 }

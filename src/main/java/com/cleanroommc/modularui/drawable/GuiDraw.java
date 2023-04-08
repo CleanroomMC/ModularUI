@@ -14,10 +14,12 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
@@ -765,4 +767,22 @@ public class GuiDraw {
         drawGradientRect(z, x - 3, y + height + 2, x + textWidth + 3, y + height + 3, borderColorEnd, borderColorEnd);
     }
 
+    public static void afterRenderItemAndEffectIntoGUI(ItemStack stack) {
+        // asked by Forge :shrug:
+        // see RenderItem#L627
+        if (stack.hasEffect(0)) {
+            GL11.glDepthFunc(GL11.GL_EQUAL);
+            GL11.glDisable(GL11.GL_LIGHTING);
+            GL11.glDepthMask(false);
+            GL11.glEnable(GL11.GL_ALPHA_TEST);
+            GL11.glEnable(GL11.GL_BLEND);
+            GL11.glColor4f(0.5F, 0.25F, 0.8F, 1.0F);
+            OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            GL11.glDepthMask(true);
+            GL11.glEnable(GL11.GL_LIGHTING);
+            GL11.glDepthFunc(GL11.GL_LEQUAL);
+            GL11.glDisable(GL11.GL_BLEND);
+        }
+    }
 }

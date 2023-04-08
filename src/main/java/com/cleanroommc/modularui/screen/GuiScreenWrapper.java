@@ -34,6 +34,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.List;
@@ -104,11 +105,7 @@ public class GuiScreenWrapper extends GuiContainer implements INEIGuiHandler {
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
         GlStateManager.enableRescaleNormal();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderHelper.disableStandardItemLighting();
-        this.drawGuiContainerForegroundLayer(mouseX, mouseY);
-        this.screen.drawForeground(partialTicks);
         RenderHelper.enableGUIStandardItemLighting();
-
         if (this.screen.context.isNEIEnabled()) {
             // Copied from GuiContainerManager#renderObjects but without translation
             for (IContainerDrawHandler drawHandler : GuiContainerManager.drawHandlers) {
@@ -124,6 +121,12 @@ public class GuiScreenWrapper extends GuiContainer implements INEIGuiHandler {
                 GuiContainerManager.getManager().renderToolTips(mouseX, mouseY);
             }
         }
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderHelper.disableStandardItemLighting();
+        this.drawGuiContainerForegroundLayer(mouseX, mouseY);
+        this.screen.drawForeground(partialTicks);
+        RenderHelper.enableGUIStandardItemLighting();
 
         getAccessor().setHoveredSlot(null);
         IGuiElement hovered = this.screen.context.getHovered();
@@ -212,6 +215,7 @@ public class GuiScreenWrapper extends GuiContainer implements INEIGuiHandler {
         if (font == null) font = getFontRenderer();
         itemRender.renderItemAndEffectIntoGUI(font, mc.getTextureManager(), stack, x, y);
         itemRender.renderItemOverlayIntoGUI(font, mc.getTextureManager(), stack, x, y - (getAccessor().getDraggedStack() == null ? 0 : 8), altText);
+        GuiDraw.afterRenderItemAndEffectIntoGUI(stack);
         this.zLevel = 0.0F;
         itemRender.zLevel = 0.0F;
     }
