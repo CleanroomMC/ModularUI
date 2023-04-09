@@ -771,18 +771,8 @@ public class GuiDraw {
         // asked by Forge :shrug:
         // see RenderItem#L627
         if (stack.hasEffect(0)) {
-            GL11.glDepthFunc(GL11.GL_EQUAL);
-            GL11.glDisable(GL11.GL_LIGHTING);
-            GL11.glDepthMask(false);
-            GL11.glEnable(GL11.GL_ALPHA_TEST);
-            GL11.glEnable(GL11.GL_BLEND);
-            GL11.glColor4f(0.5F, 0.25F, 0.8F, 1.0F);
             OpenGlHelper.glBlendFunc(770, 771, 1, 0);
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-            GL11.glDepthMask(true);
-            GL11.glEnable(GL11.GL_LIGHTING);
-            GL11.glDepthFunc(GL11.GL_LEQUAL);
-            GL11.glDisable(GL11.GL_BLEND);
         }
     }
 }
