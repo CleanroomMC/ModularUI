@@ -127,8 +127,8 @@ public class TextRenderer {
             return;
         }
         scroll = scroll % (int) (line.width + 1) ;
-        String drawString = getFontRenderer().trimStringToWidth(line.getText(), (int) (this.maxWidth + scroll));
-        Area.SHARED.set(area.x + this.x, Integer.MIN_VALUE, (int) this.maxWidth, Integer.MAX_VALUE);
+        String drawString = line.getText();//getFontRenderer().trimStringToWidth(line.getText(), (int) (this.maxWidth + scroll));
+        Area.SHARED.set(this.x, Integer.MIN_VALUE, this.x + (int) this.maxWidth, Integer.MAX_VALUE);
         Scissor.scissor(Area.SHARED, context);
         GlStateManager.translate(-scroll, 0, 0);
         drawMeasuredLines(Collections.singletonList(line(drawString)));
