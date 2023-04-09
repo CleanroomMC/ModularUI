@@ -301,12 +301,12 @@ public class Area extends Rectangle implements IResizeable {
         setBounds(area.x, area.y, area.width, area.height);
     }
 
-    public void setLocal(Rectangle area, IViewportStack viewportStack) {
-        setBounds(viewportStack.transformX(area.x, area.y), viewportStack.transformY(area.x, area.y), area.width, area.height);
+    public void setTransformed(int width, int height, IViewportStack stack) {
+        setPos(stack.transformX(0, 0), stack.transformY(0, 0), stack.transformX(width, height), stack.transformY(width, height));
     }
 
-    public void setGlobal(Rectangle area, IViewportStack viewportStack) {
-        setBounds(viewportStack.unTransformX(area.x, area.y), viewportStack.unTransformY(area.x, area.y), area.width, area.height);
+    public void setTransformed(Rectangle r, IViewportStack stack) {
+        setPos(stack.transformX(r.x, r.y), stack.transformY(r.x, r.y), stack.transformX(r.x + r.width, r.y + r.height), stack.transformY(r.x + r.width, r.y + r.height));
     }
 
     public Box getMargin() {

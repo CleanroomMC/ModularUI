@@ -109,17 +109,23 @@ public class WidgetTree {
 
     public static void drawTree(IWidget parent, GuiContext context, boolean ignoreEnabled) {
         if (!parent.isEnabled() && !ignoreEnabled) return;
-        boolean canBeSeen = true;//parent.canBeSeen();
+
         float alpha = parent.getPanel().getAlpha();
         IViewport viewport = parent instanceof IViewport ? (IViewport) parent : null;
 
+        // transform stack according to the widget
         context.pushMatrix();
         parent.transform(context);
 
+        boolean canBeSeen = parent.canBeSeen(context);
+
+        // apply transformations to opengl
         GlStateManager.pushMatrix();
         context.applyToOpenGl();
 
         if (canBeSeen) {
+            // draw widget
+            GlStateManager.colorMask(true, true, true, true);
             GlStateManager.color(1f, 1f, 1f, alpha);
             GlStateManager.enableBlend();
             parent.drawBackground(context);
@@ -128,20 +134,25 @@ public class WidgetTree {
 
         if (viewport != null) {
             if (canBeSeen) {
+                // draw viewport without children transformation
                 GlStateManager.color(1f, 1f, 1f, alpha);
                 GlStateManager.enableBlend();
                 viewport.preDraw(context, false);
                 GlStateManager.popMatrix();
+                // apply children transformation of the viewport
                 context.pushViewport(viewport, parent.getArea());
                 viewport.transformChildren(context);
+                // apply to opengl and draw with transformation
                 GlStateManager.pushMatrix();
                 context.applyToOpenGl();
                 viewport.preDraw(context, true);
             } else {
+                // only transform stack
                 context.pushViewport(viewport, parent.getArea());
                 viewport.transformChildren(context);
             }
         }
+        // remove all opengl transformations
         GlStateManager.popMatrix();
 
         // render all children if there are any
@@ -152,120 +163,28 @@ public class WidgetTree {
 
         if (viewport != null) {
             if (canBeSeen) {
+                // apply opengl transformations again and draw
                 GlStateManager.color(1f, 1f, 1f, alpha);
                 GlStateManager.enableBlend();
                 GlStateManager.pushMatrix();
                 context.applyToOpenGl();
                 viewport.postDraw(context, true);
+                // remove children transformation of this viewport
                 context.popViewport(viewport);
                 GlStateManager.popMatrix();
+                // apply transformation again to opengl and draw
                 GlStateManager.pushMatrix();
                 context.applyToOpenGl();
                 viewport.postDraw(context, false);
                 GlStateManager.popMatrix();
             } else {
+                // only remove transformation
                 context.popViewport(viewport);
             }
         }
+        // remove all widget transformations
         context.popMatrix();
     }
-
-    /*public static void drawTreeOld(IWidget parent, GuiContext context, boolean ignoreEnabled) {
-        if (!parent.isEnabled() && !ignoreEnabled) return;
-        boolean canBeSeen = true;//parent.canBeSeen();
-
-        Area panel = parent.getPanel().getArea();
-        IViewport viewport = parent instanceof IViewport ? (IViewport) parent : null;
-        float alpha = 1f;
-        float scale = 1f;
-        float x = 0, y = 0;
-        if (canBeSeen) {
-            GlStateManager.pushMatrix();
-            // get alpha and scale for open/close animation
-            alpha = parent.getPanel().getAlpha();
-            scale = parent.getPanel().getScale();
-            float sf = 1 / scale;
-            if (parent instanceof ModularPanel) {
-                // panels just need to be translated to its center, scaled translated back to its top left corner
-                GlStateManager.translate(parent.getArea().x, parent.getArea().y, 0);
-                x = parent.getArea().width / 2f;
-                y = parent.getArea().height / 2f;
-                GlStateManager.translate(x, y, 0);
-                GlStateManager.scale(scale, scale, 1);
-                GlStateManager.translate(-x, -y, 0);
-            } else {
-                // all other needs to be scaled first
-                GlStateManager.scale(scale, scale, 1);
-                // then calculate translation with this complicated looking formula
-                x = (panel.x + panel.w() / 2f * (1 - scale) + (parent.getArea().x - panel.x) * scale) * sf;
-                y = (panel.y + panel.h() / 2f * (1 - scale) + (parent.getArea().y - panel.y) * scale) * sf;
-                GlStateManager.translate(x, y, 0);
-            }
-
-            GlStateManager.color(1, 1, 1, alpha);
-            GlStateManager.enableBlend();
-            // now apply all active viewports to opengl
-            context.applyToOpenGl();
-            // draw the current widget
-            parent.drawBackground(context);
-            parent.draw(context);
-
-            if (viewport != null) {
-                // if this is a viewport we call some extra methods
-                // first a normal draw call
-                viewport.preDraw(context, false);
-                // now push this viewport
-                viewport.apply(context, IViewport.DRAWING | IViewport.PRE_DRAW);
-                // apply only that viewport to opengl (since all others are already applied)
-                context.applyTopToOpenGl();
-                // draw again with the transformation
-                viewport.preDraw(context, true);
-            }
-            // get rid of all opengl transformations for children
-            // all widgets transform themselves on their own
-            GlStateManager.popMatrix();
-        } else if (viewport != null) {
-            viewport.apply(context, IViewport.DRAWING | IViewport.PRE_DRAW);
-        }
-
-        // render all children if there are any
-        List<IWidget> children = parent.getChildren();
-        if (!children.isEmpty()) {
-            children.forEach(widget -> drawTree(widget, context, false));
-        }
-
-        if (viewport != null) {
-            if (!canBeSeen) {
-                viewport.unapply(context, IViewport.DRAWING | IViewport.POST_DRAW);
-                return;
-            }
-            // now apply the same transformations as above for open/close animation
-            GlStateManager.pushMatrix();
-            if (parent instanceof ModularPanel) {
-                GlStateManager.translate(parent.getArea().x, parent.getArea().y, 0);
-                GlStateManager.translate(x, y, 0);
-                GlStateManager.scale(scale, scale, 1);
-                GlStateManager.translate(-x, -y, 0);
-            } else {
-                GlStateManager.scale(scale, scale, 1);
-                GlStateManager.translate(x, y, 0);
-            }
-            GlStateManager.color(1, 1, 1, alpha);
-            GlStateManager.enableBlend();
-            // now apply all active viewports to opengl again
-            context.applyToOpenGl();
-            // draw this viewport with active transformation
-            viewport.postDraw(context, true);
-            // only remove transformation of the top viewport
-            context.unapplyTopToOpenGl();
-            // pop the top viewport from the stack
-            viewport.unapply(context, IViewport.DRAWING | IViewport.POST_DRAW);
-            // draw again but without the top viewport transformation
-            viewport.postDraw(context, false);
-            // finally get rid of all opengl transformations
-            GlStateManager.popMatrix();
-        }
-    }*/
 
     public static void drawTreeForeground(IWidget parent, GuiContext context) {
         GlStateManager.color(1, 1, 1, 1);

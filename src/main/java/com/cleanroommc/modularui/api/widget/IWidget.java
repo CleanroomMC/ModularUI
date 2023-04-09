@@ -130,8 +130,8 @@ public interface IWidget extends IGuiElement {
 
     void setEnabled(boolean enabled);
 
-    default boolean canBeSeen() {
-        return Scissor.isInsideScissorArea(getArea(), getContext());
+    default boolean canBeSeen(IViewportStack stack) {
+        return Scissor.isInsideScissorArea(getArea(), stack);
     }
 
     default boolean canHover() {

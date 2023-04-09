@@ -239,7 +239,7 @@ public class GuiContext extends GuiViewportStack {
         IWidget grandparent = parent.getParent();
         boolean isRoot = grandparent instanceof ModularPanel;//grandparent == this.screen.getRoot();
 
-        if (grandparent != null && !stop && (isRoot || grandparent.canBeSeen())) {
+        if (grandparent != null && !stop && (isRoot || grandparent.canBeSeen(this))) {
             /* Forgive me for this heresy, but I have no idea what other name I could give
              * to this variable */
             List<IWidget> childs = grandparent.getChildren();

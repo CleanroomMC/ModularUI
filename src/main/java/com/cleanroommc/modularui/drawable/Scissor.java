@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import net.minecraft.client.Minecraft;
@@ -76,8 +77,8 @@ public class Scissor {
         }
     }
 
-    public static boolean isInsideScissorArea(Area area, GuiContext context) {
-        Area.SHARED.setGlobal(area, context);
+    public static boolean isInsideScissorArea(Area area, IViewportStack stack) {
+        Area.SHARED.setTransformed(area.w(), area.h(), stack);
         return scissors.isEmpty() || scissors.peek().intersects(Area.SHARED);
     }
 }
