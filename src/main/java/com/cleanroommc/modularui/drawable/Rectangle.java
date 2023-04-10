@@ -9,13 +9,11 @@ import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 
-import static com.cleanroommc.modularui.drawable.BufferBuilder.bufferbuilder;
-
 import java.util.function.IntConsumer;
+
+import static com.cleanroommc.modularui.drawable.BufferBuilder.bufferbuilder;
 
 public class Rectangle implements IDrawable {
 

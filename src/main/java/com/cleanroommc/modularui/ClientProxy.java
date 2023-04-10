@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui;
 
+import com.cleanroommc.modularui.drawable.DrawableSerialization;
 import com.cleanroommc.modularui.test.EventHandler;
 import com.cleanroommc.modularui.theme.ThemeManager;
 import com.cleanroommc.modularui.theme.ThemeReloadCommand;
@@ -23,6 +24,8 @@ public class ClientProxy extends CommonProxy {
         if (ModularUI.isDevEnv) {
             MinecraftForge.EVENT_BUS.register(EventHandler.class);
         }
+
+        DrawableSerialization.init();
     }
 
     @Override

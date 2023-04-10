@@ -4,6 +4,8 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 import org.jetbrains.annotations.NotNull;
 
 @SideOnly(Side.CLIENT)
@@ -23,10 +25,10 @@ public class ThemeReloadCommand extends CommandBase {
     public void processCommand(@NotNull ICommandSender sender, String @NotNull [] args) {
         try {
             ThemeManager.reload();
-            sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Successfully reloaded themes"));
+            sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Successfully reloaded themes"));
         } catch (Exception e) {
-            sender.sendMessage(new TextComponentString(TextFormatting.RED + "Error reloaded themes:"));
-            sender.sendMessage(new TextComponentString(TextFormatting.RED + e.getMessage()));
+            sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Error reloaded themes:"));
+            sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + e.getMessage()));
         }
     }
 
