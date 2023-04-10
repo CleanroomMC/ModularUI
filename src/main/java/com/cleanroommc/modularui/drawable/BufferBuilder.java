@@ -7,9 +7,11 @@ import net.minecraft.client.renderer.Tessellator;
  */
 public class BufferBuilder {
 
-    private Double x, y, z;
-    private Double u, v;
-    private Integer r, g, b, a;
+    private boolean isPosSet = false, isTexSet = false, isColorSet = false;
+
+    private double x, y, z;
+    private double u, v;
+    private int r, g, b, a;
 
     public static final BufferBuilder buffer = new BufferBuilder();
     public static final BufferBuilder bufferbuilder = buffer;
@@ -20,12 +22,14 @@ public class BufferBuilder {
         this.x = x;
         this.y = y;
         this.z = z;
+        isPosSet = true;
         return this;
     }
 
     public BufferBuilder tex(double u, double v) {
         this.u = u;
         this.v = v;
+        isTexSet = true;
         return this;
     }
 
@@ -34,6 +38,7 @@ public class BufferBuilder {
         this.g = g;
         this.b = b;
         this.a = a;
+        isColorSet = true;
         return this;
     }
 
@@ -42,17 +47,17 @@ public class BufferBuilder {
     }
 
     public void endVertex() {
-        if (r != null) {
+        if (isColorSet) {
             Tessellator.instance.setColorRGBA(r, g, b, a);
-            r = g = b = a = null;
+            isColorSet = false;
         }
-        if (u != null) {
+        if (isTexSet) {
             Tessellator.instance.setTextureUV(u, v);
-            u = v = null;
+            isTexSet = false;
         }
-        if (x != null) {
+        if (isPosSet) {
             Tessellator.instance.addVertex(x, y, z);
-            x = y = z = null;
+            isPosSet = false;
         }
     }
 }
