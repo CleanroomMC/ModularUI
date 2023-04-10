@@ -105,6 +105,11 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         return false;
     }
 
+    @Override
+    public void onMouseDrag(int mouseButton, long timeSinceClick) {
+        getScreen().getScreenWrapper().dragSlot(timeSinceClick);
+    }
+
     public Slot getSlot() {
         return syncHandler.getSlot();
     }

@@ -306,7 +306,6 @@ public class GuiScreenWrapper extends GuiContainer implements INEIGuiHandler {
 
     @Override
     protected void mouseMovedOrUp(int mouseX, int mouseY, int state) {
-        // nh todo does this get fired when non-release?
         if (this.screen.onMouseRelease(state)) return;
         super.mouseMovedOrUp(mouseX, mouseY, state);
     }
@@ -319,6 +318,10 @@ public class GuiScreenWrapper extends GuiContainer implements INEIGuiHandler {
     protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
         if (this.screen.onMouseDrag(clickedMouseButton, timeSinceLastClick)) return;
         super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+    }
+
+    public void dragSlot(long timeSinceLastClick) {
+        super.mouseClickMove(screen.context.getAbsMouseX(), screen.context.getAbsMouseY(), screen.context.getMouseButton(), timeSinceLastClick);
     }
 
     /**
