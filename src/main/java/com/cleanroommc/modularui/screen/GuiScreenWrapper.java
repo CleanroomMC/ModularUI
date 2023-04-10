@@ -3,11 +3,11 @@ package com.cleanroommc.modularui.screen;
 import com.cleanroommc.modularui.GuiErrorHandler;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
-import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
+import com.cleanroommc.modularui.drawable.Scissor;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
 import com.cleanroommc.modularui.utils.Color;
@@ -83,6 +83,8 @@ public class GuiScreenWrapper extends GuiContainer {
             frameCount = 0;
             timer += 1000;
         }
+
+        Scissor.scissorTransformed(this.screen.getViewport(), this.screen.context);
         drawDefaultBackground();
         int i = this.guiLeft;
         int j = this.guiTop;
@@ -170,6 +172,8 @@ public class GuiScreenWrapper extends GuiContainer {
         GlStateManager.enableDepth();
         GlStateManager.enableRescaleNormal();
         RenderHelper.enableStandardItemLighting();
+
+        Scissor.unscissor(this.screen.context);
     }
 
     @Override
@@ -220,15 +224,19 @@ public class GuiScreenWrapper extends GuiContainer {
         LocatedWidget locatedHovered = this.screen.getWindowManager().getTopWidgetLocated();
         if (locatedHovered != null) {
             IGuiElement hovered = locatedHovered.getElement();
-            locatedHovered.applyViewports(context, IViewport.DRAWING | IViewport.DEBUG);
+            locatedHovered.applyMatrix(context);
+            GlStateManager.pushMatrix();
+            context.applyToOpenGl();
 
             Area area = hovered.getArea();
             IGuiElement parent = hovered.getParent();
 
-            GuiDraw.drawBorder(area.x - context.getShiftX(), area.y - context.getShiftY(), area.width, area.height, color, 1f);
+            GuiDraw.drawBorder(0, 0, area.width, area.height, color, 1f);
             if (parent != null) {
-                GuiDraw.drawBorder(parent.getArea().x, parent.getArea().y, parent.getArea().width, parent.getArea().height, Color.withAlpha(color, 0.3f), 1f);
+                GuiDraw.drawBorder(-area.rx, -area.ry, parent.getArea().width, parent.getArea().height, Color.withAlpha(color, 0.3f), 1f);
             }
+            GlStateManager.popMatrix();
+            locatedHovered.unapplyMatrix(context);
             GuiDraw.drawText("Pos: " + area.x + ", " + area.y, 5, lineY, 1, color, false);
             lineY -= 11;
             GuiDraw.drawText("Size: " + area.width + ", " + area.height, 5, lineY, 1, color, false);
@@ -238,7 +246,6 @@ public class GuiScreenWrapper extends GuiContainer {
                 lineY -= 11;
             }
             GuiDraw.drawText("Class: " + hovered, 5, lineY, 1, color, false);
-            locatedHovered.unapplyViewports(context, IViewport.DRAWING | IViewport.DEBUG);
         }
         color = Color.withAlpha(color, 25);
         for (int i = 5; i < screenW; i += 5) {

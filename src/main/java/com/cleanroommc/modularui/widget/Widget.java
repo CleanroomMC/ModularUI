@@ -15,6 +15,7 @@ import com.cleanroommc.modularui.sync.GuiSyncHandler;
 import com.cleanroommc.modularui.sync.MapKey;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import com.cleanroommc.modularui.widget.sizer.Box;
 import com.cleanroommc.modularui.widget.sizer.Flex;
 import com.cleanroommc.modularui.widget.sizer.IResizeable;
 import org.jetbrains.annotations.ApiStatus;
@@ -144,7 +145,8 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         bg = getCurrentOverlay();
         if (bg != null) {
             bg.applyThemeColor(context.getTheme(), widgetTheme);
-            bg.drawAtZero(context, getArea());
+            Box padding = getArea().getPadding();
+            bg.draw(context, padding.left, padding.top, getArea().width - padding.horizontal(), getArea().height - padding.vertical());
         }
     }
 
@@ -206,11 +208,6 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     @Override
-    public boolean canBeSeen() {
-        return true; // TODO
-    }
-
-    @Override
     public void markDirty() {
         if (this.tooltip != null) {
             this.tooltip.markDirty();
@@ -233,6 +230,13 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         return context;
     }
 
+    /**
+     * Do not override this. Override {@link IWidget#getWidgetTheme(ITheme)} instead.
+     */
+    public final WidgetTheme getWidgetTheme() {
+        return getWidgetTheme(getContext().getTheme());
+    }
+
     protected final void setContext(GuiContext context) {
         this.context = context;
     }
@@ -249,19 +253,19 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         }
     }
 
-    public IDrawable getBackground() {
+    public @Nullable IDrawable getBackground() {
         return background;
     }
 
-    public IDrawable getOverlay() {
+    public @Nullable IDrawable getOverlay() {
         return overlay;
     }
 
-    public IDrawable getHoverBackground() {
+    public @Nullable IDrawable getHoverBackground() {
         return hoverBackground;
     }
 
-    public IDrawable getHoverOverlay() {
+    public @Nullable IDrawable getHoverOverlay() {
         return hoverOverlay;
     }
 

@@ -2,15 +2,18 @@ package com.cleanroommc.modularui.widget.sizer;
 
 import com.cleanroommc.modularui.GuiError;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
+import com.cleanroommc.modularui.api.widget.IPositioned;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.utils.Alignment;
 import net.minecraft.inventory.Slot;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
+import java.util.function.DoubleSupplier;
 
-public class Flex implements IResizeable {
+public class Flex implements IResizeable, IPositioned<Flex> {
 
     private final DimensionSizer x = new DimensionSizer(GuiAxis.X);
     private final DimensionSizer y = new DimensionSizer(GuiAxis.Y);
@@ -39,6 +42,16 @@ public class Flex implements IResizeable {
         this.x.setDefaultMode(false);
         this.y.setDefaultMode(false);
         return this;
+    }
+
+    @Override
+    public Flex flex() {
+        return this;
+    }
+
+    @Override
+    public Area getArea() {
+        return parent.getArea();
     }
 
     public Flex coverChildrenWidth() {
@@ -91,54 +104,44 @@ public class Flex implements IResizeable {
         return this;
     }
 
-    public Flex left(int x) {
-        return left(x, 0, 0, Unit.Measure.PIXEL, true);
-    }
-
-    public Flex left(float x) {
-        return left(x, 0, 0, Unit.Measure.RELATIVE, true);
-    }
-
-    public Flex left(float x, int offset) {
-        return left(x, offset, 0, Unit.Measure.RELATIVE, true);
-    }
-
-    public Flex left(float x, float anchor) {
-        return left(x, 0, anchor, Unit.Measure.RELATIVE, false);
-    }
-
-    public Flex left(float x, int offset, float anchor, Unit.Measure measure) {
-        return left(x, offset, anchor, measure, false);
-    }
-
     @ApiStatus.Internal
     public Flex left(float x, int offset, float anchor, Unit.Measure measure, boolean autoAnchor) {
         return unit(getLeft(), x, offset, anchor, measure, autoAnchor);
     }
 
-    public Flex right(int x) {
-        return right(x, 0, 0, Unit.Measure.PIXEL, true);
-    }
-
-    public Flex right(float x) {
-        return right(x, 0, 0, Unit.Measure.RELATIVE, true);
-    }
-
-    public Flex right(float x, int offset) {
-        return right(x, offset, 0, Unit.Measure.RELATIVE, true);
-    }
-
-    public Flex right(float x, float anchor) {
-        return right(x, 0, anchor, Unit.Measure.RELATIVE, false);
-    }
-
-    public Flex right(float x, int offset, float anchor, Unit.Measure measure) {
-        return right(x, offset, anchor, measure, false);
+    @ApiStatus.Internal
+    public Flex left(DoubleSupplier x, int offset, float anchor, Unit.Measure measure, boolean autoAnchor) {
+        return unit(getLeft(), x, offset, anchor, measure, autoAnchor);
     }
 
     @ApiStatus.Internal
     public Flex right(float x, int offset, float anchor, Unit.Measure measure, boolean autoAnchor) {
         return unit(getRight(), x, offset, anchor, measure, autoAnchor);
+    }
+
+    @ApiStatus.Internal
+    public Flex right(DoubleSupplier x, int offset, float anchor, Unit.Measure measure, boolean autoAnchor) {
+        return unit(getRight(), x, offset, anchor, measure, autoAnchor);
+    }
+
+    @ApiStatus.Internal
+    public Flex top(float y, int offset, float anchor, Unit.Measure measure, boolean autoAnchor) {
+        return unit(getTop(), y, offset, anchor, measure, autoAnchor);
+    }
+
+    @ApiStatus.Internal
+    public Flex top(DoubleSupplier y, int offset, float anchor, Unit.Measure measure, boolean autoAnchor) {
+        return unit(getTop(), y, offset, anchor, measure, autoAnchor);
+    }
+
+    @ApiStatus.Internal
+    public Flex bottom(float y, int offset, float anchor, Unit.Measure measure, boolean autoAnchor) {
+        return unit(getBottom(), y, offset, anchor, measure, autoAnchor);
+    }
+
+    @ApiStatus.Internal
+    public Flex bottom(DoubleSupplier y, int offset, float anchor, Unit.Measure measure, boolean autoAnchor) {
+        return unit(getBottom(), y, offset, anchor, measure, autoAnchor);
     }
 
     private Flex unit(Unit u, float val, int offset, float anchor, Unit.Measure measure, boolean autoAnchor) {
@@ -150,89 +153,38 @@ public class Flex implements IResizeable {
         return this;
     }
 
-    public Flex top(int y) {
-        return top(y, 0, 0, Unit.Measure.PIXEL, true);
-    }
-
-    public Flex top(float y) {
-        return top(y, 0, 0, Unit.Measure.RELATIVE, true);
-    }
-
-    public Flex top(float y, int offset) {
-        return top(y, offset, 0, Unit.Measure.RELATIVE, true);
-    }
-
-    public Flex top(float y, float anchor) {
-        return top(y, 0, anchor, Unit.Measure.RELATIVE, false);
-    }
-
-    public Flex top(float y, int offset, float anchor, Unit.Measure measure) {
-        return top(y, offset, anchor, measure, false);
-    }
-
-    @ApiStatus.Internal
-    public Flex top(float y, int offset, float anchor, Unit.Measure measure, boolean autoAnchor) {
-        return unit(getTop(), y, offset, anchor, measure, autoAnchor);
-    }
-
-    public Flex bottom(int y) {
-        return bottom(y, 0, 0, Unit.Measure.PIXEL, true);
-    }
-
-    public Flex bottom(float y) {
-        return bottom(y, 0, 0, Unit.Measure.RELATIVE, true);
-    }
-
-    public Flex bottom(float y, int offset) {
-        return bottom(y, offset, 0, Unit.Measure.RELATIVE, true);
-    }
-
-    public Flex bottom(float y, float anchor) {
-        return bottom(y, 0, anchor, Unit.Measure.RELATIVE, false);
-    }
-
-    public Flex bottom(float y, int offset, float anchor, Unit.Measure measure) {
-        return bottom(y, offset, anchor, measure, false);
-    }
-
-    @ApiStatus.Internal
-    public Flex bottom(float y, int offset, float anchor, Unit.Measure measure, boolean autoAnchor) {
-        return unit(getBottom(), y, offset, anchor, measure, autoAnchor);
-    }
-
-    public Flex pos(int x, int y) {
-        return left(x).top(y);
-    }
-
-    public Flex pos(float x, float y) {
-        return left(x).top(y);
-    }
-
-    public Flex width(int w) {
-        return width(w, Unit.Measure.PIXEL);
-    }
-
-    public Flex width(float w) {
-        return width(w, Unit.Measure.RELATIVE);
+    private Flex unit(Unit u, DoubleSupplier val, int offset, float anchor, Unit.Measure measure, boolean autoAnchor) {
+        u.setValue(val);
+        u.setMeasure(measure);
+        u.setOffset(offset);
+        u.setAnchor(anchor);
+        u.setAutoAnchor(autoAnchor);
+        return this;
     }
 
     public Flex width(float w, Unit.Measure measure) {
         return unitSize(getWidth(), w, measure);
     }
 
-    public Flex height(int h) {
-        return height(h, Unit.Measure.PIXEL);
-    }
-
-    public Flex height(float h) {
-        return height(h, Unit.Measure.RELATIVE);
+    public Flex width(DoubleSupplier w, Unit.Measure measure) {
+        return unitSize(getWidth(), w, measure);
     }
 
     public Flex height(float h, Unit.Measure measure) {
         return unitSize(getHeight(), h, measure);
     }
 
+    public Flex height(DoubleSupplier h, Unit.Measure measure) {
+        return unitSize(getHeight(), h, measure);
+    }
+
     private Flex unitSize(Unit u, float val, Unit.Measure measure) {
+        u.setValue(val);
+        u.setMeasure(measure);
+        return this;
+    }
+
+    private Flex unitSize(Unit u, DoubleSupplier val, Unit.Measure measure) {
         u.setValue(val);
         u.setMeasure(measure);
         return this;
@@ -431,7 +383,11 @@ public class Flex implements IResizeable {
     public void applyPos(IGuiElement parent) {
         // after all widgets x, y, width and height have been calculated when can now calculate the absolute position
         Area relativeTo = getRelativeTo();
-        parent.getArea().applyPos(relativeTo.x, relativeTo.y);
+        Area area = parent.getArea();
+        area.applyPos(relativeTo.x, relativeTo.y);
+        Area parentArea = parent.getParentArea();
+        area.rx = area.x - parentArea.x;
+        area.ry = area.y - parentArea.y;
         if (parent instanceof IVanillaSlot) {
             Slot slot = ((IVanillaSlot) parent).getVanillaSlot();
             slot.xPos = parent.getArea().x;

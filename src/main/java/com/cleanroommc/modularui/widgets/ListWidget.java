@@ -99,10 +99,6 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
 
     @Override
     public void layoutWidgets() {
-    }
-
-    @Override
-    public void postLayoutWidgets() {
         GuiAxis axis = this.scrollData.direction.axis;
         int p = 0;
         int lastMargin = getArea().getPadding().getStart(axis);

@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,7 +27,10 @@ public class ItemDrawable implements IDrawable {
         RenderHelper.enableGUIStandardItemLighting();
         GlStateManager.enableDepth();
         GlStateManager.scale(width / 16f, height / 16f, 1);
-        Minecraft.getMinecraft().getRenderItem().renderItemAndEffectIntoGUI(Minecraft.getMinecraft().player, item, x, y);
+        RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
+        renderItem.zLevel = 200;
+        renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().player, item, x, y);
+        renderItem.zLevel = 0;
         GlStateManager.disableDepth();
         RenderHelper.enableStandardItemLighting();
         GlStateManager.disableLighting();

@@ -6,15 +6,15 @@ import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.IWidgetList;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiDraw;
+import com.cleanroommc.modularui.drawable.Scissor;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.ScrollArea;
 import com.cleanroommc.modularui.utils.ScrollData;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Stack;
 
 public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> implements IViewport, Interactable {
 
@@ -48,27 +48,21 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
     }
 
     @Override
-    public void apply(IViewportStack stack, int context) {
-        stack.pushViewport(this, getArea());
-        stack.translate(getScrollX(), getScrollY());
+    public void transformChildren(IViewportStack stack) {
+        stack.translate(-getScrollX(), -getScrollY());
     }
 
     @Override
-    public void unapply(IViewportStack stack, int context) {
-        stack.popViewport(this);
-    }
-
-    @Override
-    public void getWidgetsBeforeApply(Stack<IViewport> viewports, IWidgetList widgets, int x, int y) {
-        if (getArea().isInside(x, y)) {
-            widgets.add(this, viewports);
+    public void getSelfAt(IViewportStack stack, IWidgetList widgets, int x, int y) {
+        if (isInside(stack, x, y)) {
+            widgets.add(this, stack.peek());
         }
     }
 
     @Override
-    public void getWidgetsAt(Stack<IViewport> viewports, IWidgetList widgets, int x, int y) {
+    public void getWidgetsAt(IViewportStack stack, IWidgetList widgets, int x, int y) {
         if (getArea().isInside(x, y) && !getScrollArea().isInsideScrollbarArea(x, y) && hasChildren()) {
-            IViewport.getChildrenAt(this, viewports, widgets, x, y);
+            IViewport.getChildrenAt(this, stack, widgets, x, y);
         }
     }
 
@@ -116,17 +110,17 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
     @Override
     public void preDraw(GuiContext context, boolean transformed) {
         if (!transformed) {
-            GuiDraw.scissor(this.scroll.x + this.scroll.getPadding().left,
-                    this.scroll.y + this.scroll.getPadding().top,
-                    this.scroll.width - this.scroll.getPadding().horizontal(),
-                    this.scroll.height - this.scroll.getPadding().vertical(), getContext());
+            Scissor.scissor(0,
+                    0,
+                    this.scroll.width,
+                    this.scroll.height, getContext());
         }
     }
 
     @Override
     public void postDraw(GuiContext context, boolean transformed) {
         if (!transformed) {
-            GuiDraw.unscissor(context);
+            Scissor.unscissor(context);
             this.scroll.drawScrollbar();
         }
     }
