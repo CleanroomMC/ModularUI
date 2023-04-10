@@ -75,7 +75,7 @@ public class ItemSlotSH extends SyncHandler {
     }
 
     @Override
-    public void init(MapKey key, GuiSyncHandler syncHandler) {
+    public void init(String key, GuiSyncHandler syncHandler) {
         super.init(key, syncHandler);
         syncHandler.getContainer().registerSlot(this);
     }
