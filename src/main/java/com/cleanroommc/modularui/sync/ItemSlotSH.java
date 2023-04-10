@@ -12,8 +12,14 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.function.Predicate;
 
+/**
+ * This does NOT sync items between server and client. It makes sure there is a
+ * mc slot in the container class, which will handle syncing.
+ * This will also handle interaction in case this is a phantom slot.
+ */
 public class ItemSlotSH extends SyncHandler {
 
     private final SlotCustomSlot customSlot;
@@ -82,13 +88,16 @@ public class ItemSlotSH extends SyncHandler {
     }
 
     @Override
-    public void readOnServer(int id, PacketBuffer buf) {
+    public void readOnServer(int id, PacketBuffer buf) throws IOException {
         if (id == 2) {
             phantomClick(ClickData.readPacket(buf));
         } else if (id == 3) {
             phantomScroll(ClickData.readPacket(buf));
         } else if (id == 4) {
             setEnabled(buf.readBoolean(), false);
+        } else if (id == 5) {
+            ItemStack stack = buf.readItemStack();
+            this.slot.putStack(stack);
         }
     }
 
@@ -177,6 +186,10 @@ public class ItemSlotSH extends SyncHandler {
                 sync(4, buffer -> buffer.writeBoolean(enabled));
             }
         }
+    }
+
+    public void updateFromClient(ItemStack stack) {
+        syncToServer(5, buf -> buf.writeItemStack(stack));
     }
 
     public Slot getSlot() {

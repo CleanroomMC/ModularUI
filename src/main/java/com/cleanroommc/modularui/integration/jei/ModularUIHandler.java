@@ -1,19 +1,21 @@
 package com.cleanroommc.modularui.integration.jei;
 
+import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
-import mezz.jei.api.gui.IAdvancedGuiHandler;
-import mezz.jei.api.gui.IGhostIngredientHandler;
-import mezz.jei.api.gui.IGuiProperties;
-import mezz.jei.api.gui.IGuiScreenHandler;
+import com.cleanroommc.modularui.screen.ModularContainer;
+import com.cleanroommc.modularui.screen.ModularScreen;
+import mezz.jei.api.gui.*;
+import mezz.jei.api.recipe.transfer.IRecipeTransferError;
+import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
 import mezz.jei.gui.overlay.GuiProperties;
+import net.minecraft.entity.player.EntityPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
-import java.util.Collections;
 import java.util.List;
 
-public class ModularUIHandler implements IAdvancedGuiHandler<GuiScreenWrapper>, IGhostIngredientHandler<GuiScreenWrapper>, IGuiScreenHandler<GuiScreenWrapper> {
+public class ModularUIHandler implements IAdvancedGuiHandler<GuiScreenWrapper>, IGhostIngredientHandler<GuiScreenWrapper>, IGuiScreenHandler<GuiScreenWrapper>, IRecipeTransferHandler<ModularContainer> {
 
     @Override
     public @NotNull Class<GuiScreenWrapper> getGuiContainerClass() {
@@ -29,27 +31,13 @@ public class ModularUIHandler implements IAdvancedGuiHandler<GuiScreenWrapper>, 
     @Nullable
     @Override
     public Object getIngredientUnderMouse(@NotNull GuiScreenWrapper guiContainer, int mouseX, int mouseY) {
-        //Widget hovered = guiContainer.getContext().getCursor().getHovered();
-        //return hovered instanceof IIngredientProvider ? ((IIngredientProvider) hovered).getIngredient() : null;
-        return null;
+        IGuiElement hovered = guiContainer.getScreen().context.getHovered();
+        return hovered instanceof JeiIngredientProvider ? ((JeiIngredientProvider) hovered).getIngredient() : null;
     }
 
     @Override
     public <I> @NotNull List<Target<I>> getTargets(GuiScreenWrapper gui, @NotNull I ingredient, boolean doStart) {
-        /*LinkedList<Target<I>> targets = new LinkedList<>();
-        for (ModularWindow window : gui.getContext().getOpenWindowsReversed()) {
-            IWidgetParent.forEachByLayer(window, true, widget -> {
-                if (widget instanceof IGhostIngredientTarget) {
-                    Target<?> target = ((IGhostIngredientTarget<?>) widget).getTarget(ingredient);
-                    if (target != null) {
-                        targets.addFirst((Target<I>) target);
-                    }
-                }
-                return false;
-            });
-        }
-        return targets;*/
-        return Collections.emptyList();
+        return gui.getScreen().context.getAllGhostIngredientTargets(ingredient);
     }
 
     @Override
@@ -60,5 +48,20 @@ public class ModularUIHandler implements IAdvancedGuiHandler<GuiScreenWrapper>, 
     @Override
     public IGuiProperties apply(@NotNull GuiScreenWrapper guiScreen) {
         return guiScreen.getScreen().context.isJeiEnabled() ? GuiProperties.create(guiScreen) : null;
+    }
+
+    @Override
+    public @NotNull Class<ModularContainer> getContainerClass() {
+        return ModularContainer.class;
+    }
+
+    @Nullable
+    @Override
+    public IRecipeTransferError transferRecipe(@NotNull ModularContainer container, @NotNull IRecipeLayout recipeLayout, @NotNull EntityPlayer player, boolean maxTransfer, boolean doTransfer) {
+        ModularScreen screen = ModularScreen.getCurrent();
+        if (screen instanceof JeiRecipeTransferHandler) {
+            return ((JeiRecipeTransferHandler) screen).transferRecipe(recipeLayout, maxTransfer, !doTransfer);
+        }
+        return null;
     }
 }

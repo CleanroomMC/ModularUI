@@ -15,5 +15,6 @@ public class ModularUIJeiPlugin implements IModPlugin {
         registry.addAdvancedGuiHandlers(uiHandler);
         registry.addGhostIngredientHandler(GuiScreenWrapper.class, uiHandler);
         registry.addGuiScreenHandler(GuiScreenWrapper.class, uiHandler);
+        registry.getRecipeTransferRegistry().addUniversalRecipeTransferHandler(uiHandler);
     }
 }

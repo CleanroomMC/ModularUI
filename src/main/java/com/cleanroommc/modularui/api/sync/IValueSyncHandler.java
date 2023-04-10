@@ -1,6 +1,8 @@
 package com.cleanroommc.modularui.api.sync;
 
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * A helper interface for syncing an object value.
@@ -19,5 +21,6 @@ public interface IValueSyncHandler<T> {
 
     void read(PacketBuffer buffer);
 
+    @SideOnly(Side.CLIENT)
     void updateFromClient(T value);
 }

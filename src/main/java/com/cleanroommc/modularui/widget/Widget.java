@@ -75,6 +75,9 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
             }
         }
         this.valid = true;
+        if (!getScreen().isClientOnly()) {
+            initialiseSyncHandler(getScreen().getSyncHandler());
+        }
         applyTheme(this.context.getTheme());
         onInit();
         if (this.tooltip != null && this.tooltip.getExcludeArea() == null && ModularUIConfig.placeTooltipNextToPanel()) {
