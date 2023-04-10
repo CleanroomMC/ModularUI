@@ -35,9 +35,7 @@ public class TransformationTestGui extends ModularScreen {
         @Override
         public void transform(IViewportStack stack) {
             super.transform(stack);
-            //stack.translate(50, -75);
             stack.translate(50, 50);
-            //stack.scale(0.5f, 0.5f);
             float angle = (float) ((Minecraft.getSystemTime() % 4000) / 4000f * 2 * Math.PI);
             stack.rotateZ(angle);
             stack.translate(-50, -50);
