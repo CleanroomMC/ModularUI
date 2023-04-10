@@ -302,6 +302,10 @@ public class GuiScreenWrapper extends GuiContainer {
         super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
     }
 
+    public void dragSlot(long timeSinceLastClick) {
+        super.mouseClickMove(screen.context.getAbsMouseX(), screen.context.getAbsMouseY(), screen.context.getMouseButton(), timeSinceLastClick);
+    }
+
     /**
      * This replicates vanilla behavior while also injecting custom behavior for consistency
      */
