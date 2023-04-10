@@ -1,9 +1,7 @@
 package com.cleanroommc.modularui.screen;
 
-import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IDraggable;
-import com.cleanroommc.modularui.utils.BitHelper;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import org.jetbrains.annotations.Nullable;
@@ -75,19 +73,19 @@ public class DraggablePanelWrapper implements IDraggable {
     }
 
     @Override
-    public void apply(IViewportStack stack, int context) {
-        if (BitHelper.hasAnyBits(context, IViewport.DRAGGABLE | IViewport.COLLECT_WIDGETS)) {
-            stack.pushViewport(this, getMovingArea());
-            if (isMoving()) {
-                stack.translate(-this.movingArea.x + this.panel.getContext().globalX(this.panel.getArea().x), -this.movingArea.y + this.panel.getContext().globalY(this.panel.getArea().y));
-            }
+    public void transform(IViewportStack stack) {
+        Area area = this.panel.getArea();
+        stack.translate(area.rx, area.ry);
+        if (isMoving()) {
+            stack.translate(-area.x, -area.y);
+            stack.translate(this.movingArea.x, this.movingArea.y);
         }
     }
 
     @Override
-    public void unapply(IViewportStack stack, int context) {
-        if (BitHelper.hasNone(context, IViewport.START_DRAGGING) && BitHelper.hasAnyBits(context, IViewport.DRAGGABLE | IViewport.COLLECT_WIDGETS)) {
-            stack.popViewport(this);
+    public void transformChildren(IViewportStack stack) {
+        if (isMoving()) {
+            stack.translate(-this.movingArea.x + this.panel.getContext().unTransformX(this.panel.getArea().x, this.panel.getArea().y), -this.movingArea.y + this.panel.getContext().unTransformY(this.panel.getArea().x, this.panel.getArea().y));
         }
     }
 }

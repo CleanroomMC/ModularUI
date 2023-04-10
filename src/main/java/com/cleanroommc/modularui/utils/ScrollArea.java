@@ -108,7 +108,13 @@ public class ScrollArea extends Area {
             return false;
         }
 
-        int scrollTo = data.scroll - (int) Math.copySign(data.scrollSpeed, scroll);
+        int scrollAmount = (int) Math.copySign(data.scrollSpeed, scroll);
+        int scrollTo;
+        if (data.isAnimating()) {
+            scrollTo = data.getAnimatingTo() - scrollAmount;
+        } else {
+            scrollTo = data.scroll - scrollAmount;
+        }
 
         // simulate scroll to determine whether event should be canceled
         int oldScroll = data.scroll;

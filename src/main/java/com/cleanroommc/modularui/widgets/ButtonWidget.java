@@ -5,10 +5,10 @@ import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.widget.Widget;
+import com.cleanroommc.modularui.widget.SingleChildWidget;
 import org.jetbrains.annotations.NotNull;
 
-public class ButtonWidget<W extends ButtonWidget<W>> extends Widget<W> implements Interactable {
+public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W> implements Interactable {
 
     private IGuiAction.MousePressed mousePressed;
     private IGuiAction.MouseReleased mouseReleased;

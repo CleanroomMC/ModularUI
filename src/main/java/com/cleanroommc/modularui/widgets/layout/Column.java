@@ -42,7 +42,7 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
         }
 
         if (expandedAmount > 0) {
-            int newHeight = (height - totalHeight) / expandedAmount;
+            int newHeight = (height - totalHeight - padding.vertical()) / expandedAmount;
             for (IWidget widget : getChildren()) {
                 // exclude self positioned (Y) children
                 if (widget.flex().hasYPos()) continue;

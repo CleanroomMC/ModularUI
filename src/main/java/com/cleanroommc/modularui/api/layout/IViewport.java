@@ -4,7 +4,6 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.IWidgetList;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 
-import java.util.Stack;
 import java.util.function.Predicate;
 
 /**
@@ -31,39 +30,31 @@ public interface IViewport {
     /**
      * Apply shifts of this viewport.
      *
-     * @param stack   viewport stack
-     * @param context the current context
+     * @param stack viewport stack
      */
-    void apply(IViewportStack stack, int context);
-
-    /**
-     * Undo shifts of this viewport.
-     *
-     * @param stack   viewport stack
-     * @param context the current context
-     */
-    void unapply(IViewportStack stack, int context);
+    default void transformChildren(IViewportStack stack) {
+    }
 
     /**
      * Gathers all children at a position. Transformations from this viewport are already applied.
      *
-     * @param viewports current viewport stack. Should not be modified.
-     * @param widgets   widget list of already gathered widgets. Add children here.
-     * @param x         x position
-     * @param y         y position
+     * @param stack   current viewport stack. Should not be modified.
+     * @param widgets widget list of already gathered widgets. Add children here.
+     * @param x       x position
+     * @param y       y position
      */
-    void getWidgetsAt(Stack<IViewport> viewports, IWidgetList widgets, int x, int y);
+    void getWidgetsAt(IViewportStack stack, IWidgetList widgets, int x, int y);
 
     /**
      * Gathers all children at a position. Transformations from this viewport are not applied.
-     * Called before {@link #getWidgetsAt(Stack, IWidgetList, int, int)}
+     * Called before {@link #getWidgetsAt(IViewportStack, IWidgetList, int, int)}
      *
-     * @param viewports current viewport stack. Should not be modified.
-     * @param widgets   widget list of already gathered widgets. Add children here.
-     * @param x         x position
-     * @param y         y position
+     * @param stack   current viewport stack. Should not be modified.
+     * @param widgets widget list of already gathered widgets. Add children here.
+     * @param x       x position
+     * @param y       y position
      */
-    default void getWidgetsBeforeApply(Stack<IViewport> viewports, IWidgetList widgets, int x, int y) {
+    default void getSelfAt(IViewportStack stack, IWidgetList widgets, int x, int y) {
     }
 
     /**
@@ -84,59 +75,78 @@ public interface IViewport {
     default void postDraw(GuiContext context, boolean transformed) {
     }
 
-    static void getChildrenAt(IWidget parent, Stack<IViewport> viewports, IWidgetList widgetList, int x, int y) {
-        final int currentX = parent.getContext().localX(x);
-        final int currentY = parent.getContext().localY(y);
-
+    static void getChildrenAt(IWidget parent, IViewportStack stack, IWidgetList widgetList, int x, int y) {
         for (IWidget child : parent.getChildren()) {
             if (!child.isEnabled()) {
                 continue;
             }
             if (child instanceof IViewport) {
                 IViewport viewport = (IViewport) child;
-                viewport.getWidgetsBeforeApply(viewports, widgetList, x, y);
-                viewports.push(viewport);
-                viewport.apply(parent.getContext(), COLLECT_WIDGETS);
-                viewport.getWidgetsAt(viewports, widgetList, x, y);
-                viewport.unapply(parent.getContext(), COLLECT_WIDGETS);
-                viewports.pop();
+                stack.pushViewport(viewport, parent.getArea());
+                child.transform(stack);
+                viewport.getSelfAt(stack, widgetList, x, y);
+                viewport.transformChildren(stack);
+                viewport.getWidgetsAt(stack, widgetList, x, y);
+                stack.popViewport(viewport);
             } else {
-                if (child.getArea().isInside(currentX, currentY)) {
-                    widgetList.add(child, viewports);
+                stack.pushMatrix();
+                child.transform(stack);
+                if (child.isInside(stack, x, y)) {
+                    widgetList.add(child, stack.peek());
                 }
                 if (child.hasChildren()) {
-                    getChildrenAt(child, viewports, widgetList, x, y);
+                    getChildrenAt(child, stack, widgetList, x, y);
                 }
+                stack.popMatrix();
             }
         }
     }
 
-    static boolean foreachChild(IWidget parent, Predicate<IWidget> predicate, int context) {
+    static boolean foreachChild(IViewportStack stack, IWidget parent, Predicate<IWidget> predicate, int context) {
         for (IWidget child : parent.getChildren()) {
             if (!child.isEnabled()) {
                 continue;
             }
+            stack.popMatrix();
             if (child instanceof IViewport) {
                 IViewport viewport = (IViewport) child;
-                viewport.apply(parent.getContext(), context);
+                stack.pushViewport(viewport, parent.getArea());
+                parent.transform(stack);
                 if (!predicate.test(child)) {
-                    viewport.unapply(parent.getContext(), context);
+                    stack.popViewport(viewport);
                     return false;
                 }
-                if (child.hasChildren() && !foreachChild(child, predicate, context)) {
-                    viewport.unapply(parent.getContext(), context);
+                viewport.transformChildren(parent.getContext());
+                if (child.hasChildren() && !foreachChild(stack, child, predicate, context)) {
+                    stack.popViewport(viewport);
                     return false;
                 }
-                viewport.unapply(parent.getContext(), context);
+                stack.popViewport(viewport);
             } else {
+                stack.pushMatrix();
+                parent.transform(stack);
                 if (!predicate.test(child)) {
+                    stack.popMatrix();
                     return false;
                 }
-                if (child.hasChildren() && !foreachChild(child, predicate, context)) {
+                if (child.hasChildren() && !foreachChild(stack, child, predicate, context)) {
+                    stack.popMatrix();
                     return false;
                 }
+                stack.popMatrix();
             }
         }
         return true;
     }
+
+    IViewport EMPTY = new IViewport() {
+
+        @Override
+        public void transformChildren(IViewportStack stack) {
+        }
+
+        @Override
+        public void getWidgetsAt(IViewportStack viewports, IWidgetList widgets, int x, int y) {
+        }
+    };
 }

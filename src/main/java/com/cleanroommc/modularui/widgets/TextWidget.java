@@ -81,6 +81,26 @@ public class TextWidget extends Widget<TextWidget> {
         return (int) (renderer.getLastWidth() + padding.horizontal() + 0.5f);
     }
 
+    public IKey getKey() {
+        return key;
+    }
+
+    public Alignment getAlignment() {
+        return alignment;
+    }
+
+    public float getScale() {
+        return scale;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public boolean isShadow() {
+        return shadow;
+    }
+
     public TextWidget alignment(Alignment alignment) {
         this.alignment = alignment;
         return this;

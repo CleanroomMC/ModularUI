@@ -1,5 +1,7 @@
 package com.cleanroommc.modularui.api.drawable;
 
+import com.cleanroommc.modularui.widget.sizer.Box;
+
 /**
  * A {@link IDrawable} but with a fixed size.
  */
@@ -14,4 +16,6 @@ public interface IIcon extends IDrawable {
      * @return height of this icon
      */
     int getHeight();
+
+    Box getMargin();
 }

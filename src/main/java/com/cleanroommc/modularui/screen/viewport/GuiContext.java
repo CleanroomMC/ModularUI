@@ -75,7 +75,9 @@ public class GuiContext extends GuiViewportStack {
         this.hoveredWidgets = new HoveredIterable(this.screen.getWindowManager());
         this.mc = ModularUI.getMC();
         this.font = this.mc.fontRenderer;
-        this.currentTheme = ThemeManager.getThemeFor(screen.getOwner(), screen.getName());
+        if (this.currentTheme == null) {
+            this.currentTheme = ThemeManager.getThemeFor(screen.getOwner(), screen.getName(), null);
+        }
     }
 
     public boolean isAbove(IGuiElement widget) {
@@ -237,7 +239,7 @@ public class GuiContext extends GuiViewportStack {
         IWidget grandparent = parent.getParent();
         boolean isRoot = grandparent instanceof ModularPanel;//grandparent == this.screen.getRoot();
 
-        if (grandparent != null && !stop && (isRoot || grandparent.canBeSeen())) {
+        if (grandparent != null && !stop && (isRoot || grandparent.canBeSeen(this))) {
             /* Forgive me for this heresy, but I have no idea what other name I could give
              * to this variable */
             List<IWidget> childs = grandparent.getChildren();
@@ -285,10 +287,10 @@ public class GuiContext extends GuiViewportStack {
     }
 
     private void dropDraggable() {
-        this.draggable.applyViewports(this, IViewport.INTERACTION | IViewport.MOUSE | IViewport.DRAGGABLE | IViewport.STOP_DRAGGING);
+        this.draggable.applyMatrix(this);
         this.draggable.getElement().onDragEnd(this.draggable.getElement().canDropHere(getAbsMouseX(), getAbsMouseY(), this.hovered));
         this.draggable.getElement().setMoving(false);
-        this.draggable.unapplyViewports(this, IViewport.INTERACTION | IViewport.MOUSE | IViewport.DRAGGABLE | IViewport.STOP_DRAGGING);
+        this.draggable.unapplyMatrix(this);
         this.draggable = null;
         this.lastButton = -1;
         this.lastClickTime = 0;
@@ -300,11 +302,11 @@ public class GuiContext extends GuiViewportStack {
             IWidget widget = hovered.getElement();
             LocatedElement<IDraggable> draggable;
             if (widget instanceof IDraggable) {
-                draggable = new LocatedElement<>((IDraggable) widget, hovered.getViewports());
+                draggable = new LocatedElement<>((IDraggable) widget, hovered.getTransformationMatrix());
             } else if (widget instanceof ModularPanel) {
                 ModularPanel panel = (ModularPanel) widget;
                 if (panel.isDraggable() && !this.screen.getWindowManager().isAboutToClose(panel)) {
-                    draggable = new LocatedElement<>(new DraggablePanelWrapper(panel), Collections.emptyList());
+                    draggable = new LocatedElement<>(new DraggablePanelWrapper(panel), TransformationMatrix.EMPTY);
                 } else {
                     return false;
                 }
@@ -327,11 +329,9 @@ public class GuiContext extends GuiViewportStack {
     public void drawDraggable() {
         if (hasDraggable()) {
             int flag = IViewport.DRAWING | IViewport.DRAGGABLE;
-            this.draggable.applyViewports(this, flag);
-            this.draggable.getElement().apply(this, flag);
+            this.draggable.applyMatrix(this);
             this.draggable.getElement().drawMovingState(this.partialTicks);
-            this.draggable.getElement().unapply(this, flag);
-            this.draggable.unapplyViewports(this, flag);
+            this.draggable.unapplyMatrix(this);
         }
     }
 
@@ -356,9 +356,9 @@ public class GuiContext extends GuiViewportStack {
         if (hasDraggable() && (this.lastDragX != this.mouseX || this.lastDragY != this.mouseY)) {
             this.lastDragX = this.mouseX;
             this.lastDragY = this.mouseY;
-            this.draggable.applyViewports(this, IViewport.INTERACTION | IViewport.DRAGGABLE | IViewport.MOUSE | IViewport.DRAG);
+            this.draggable.applyMatrix(this);
             this.draggable.getElement().onDrag(this.lastButton, this.lastClickTime);
-            this.draggable.unapplyViewports(this, IViewport.INTERACTION | IViewport.DRAGGABLE | IViewport.MOUSE | IViewport.DRAG);
+            this.draggable.unapplyMatrix(this);
         }
         if (this.hovered != hovered) {
             if (this.hovered != null) {
@@ -390,11 +390,11 @@ public class GuiContext extends GuiViewportStack {
     /* Viewport */
 
     public int getMouseX() {
-        return localX(this.mouseX);
+        return transformX(this.mouseX, this.mouseY);
     }
 
     public int getMouseY() {
-        return localY(this.mouseY);
+        return transformY(this.mouseX, this.mouseY);
     }
 
     public int getMouse(GuiAxis axis) {
@@ -506,8 +506,7 @@ public class GuiContext extends GuiViewportStack {
     }
 
     public void useTheme(String theme) {
-        ITheme.registerDefaultScreenTheme(this.screen.getOwner(), this.screen.getName(), ITheme.get(theme));
-        this.currentTheme = ThemeManager.getThemeFor(this.screen.getOwner(), this.screen.getName());
+        this.currentTheme = ThemeManager.getThemeFor(this.screen.getOwner(), this.screen.getName(), theme);
     }
 
     private static class HoveredIterable implements Iterable<IGuiElement> {

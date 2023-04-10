@@ -47,7 +47,7 @@ public class GuiTextures {
     }
 
     /**
-     * Icons texture used across all dashboard panels
+     * Icons copied from mclib
      */
     public static final ResourceLocation ICONS_LOCATION = new ResourceLocation(Tags.MODID, "textures/gui/icons.png");
     public static final UITexture GEAR = icon("gear", 0, 0);
@@ -151,7 +151,7 @@ public class GuiTextures {
             .location(Tags.MODID, "gui/widgets/base_button")
             .imageSize(18, 18)
             .adaptable(1)
-            .registerAsBackground("vanilla_button")
+            .registerAsBackground("vanilla_button", false)
             .build();
 
     public static final UITexture SLOT = UITexture.builder()

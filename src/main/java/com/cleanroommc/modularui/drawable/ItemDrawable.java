@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +28,10 @@ public class ItemDrawable implements IDrawable {
         RenderHelper.enableGUIStandardItemLighting();
         GlStateManager.enableDepth();
         GlStateManager.scale(width / 16f, height / 16f, 1);
-        GuiScreenWrapper.getItemRenderer().renderItemAndEffectIntoGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), item, x, y);
+        RenderItem renderItem = GuiScreenWrapper.getItemRenderer();
+        renderItem.zLevel = 200;
+        renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), item, x, y);
+        renderItem.zLevel = 0;
         GuiDraw.afterRenderItemAndEffectIntoGUI(item);
         GlStateManager.disableDepth();
         RenderHelper.enableStandardItemLighting();

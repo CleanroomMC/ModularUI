@@ -20,6 +20,7 @@ import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -33,8 +34,8 @@ public class ThemeManager implements IResourceManagerReloadListener {
     protected static final Map<String, WidgetTheme> defaultWidgetThemes = new Object2ObjectOpenHashMap<>();
     private static final Map<String, WidgetThemeParser> widgetThemeFunctions = new Object2ObjectOpenHashMap<>();
     protected static final WidgetTheme defaultdefaultWidgetTheme = new WidgetTheme(null, null, Color.WHITE.normal, 0xFF404040, false);
-    private static final Map<String, ITheme> jsonScreenThemes = new Object2ObjectOpenHashMap<>();
-    private static final Map<String, ITheme> screenThemes = new Object2ObjectOpenHashMap<>();
+    private static final Map<String, String> jsonScreenThemes = new Object2ObjectOpenHashMap<>();
+    private static final Map<String, String> screenThemes = new Object2ObjectOpenHashMap<>();
 
     static {
         registerWidgetTheme(Theme.FALLBACK, new WidgetTheme(null, null, Color.WHITE.normal, 0xFF404040, false), WidgetTheme::new);
@@ -53,7 +54,7 @@ public class ThemeManager implements IResourceManagerReloadListener {
         defaultWidgetThemes.put(id, defaultTheme);
     }
 
-    public static void registerDefaultTheme(String screenId, ITheme theme) {
+    public static void registerDefaultTheme(String screenId, String theme) {
         Objects.requireNonNull(screenId);
         Objects.requireNonNull(theme);
         screenThemes.put(screenId, theme);
@@ -71,14 +72,21 @@ public class ThemeManager implements IResourceManagerReloadListener {
         return THEMES.getOrDefault(id, Theme.DEFAULT_DEFAULT);
     }
 
-    public static ITheme getThemeFor(String mod, String name) {
-        ITheme theme = jsonScreenThemes.get(mod + ":" + name);
+    public static ITheme getThemeFor(String mod, String name, @Nullable String fallback) {
+        String theme = getThemeIdFor(mod, name);
+        if (theme != null) return get(theme);
+        if (fallback != null) return get(fallback);
+        return get(ModularUIConfig.useDarkThemeByDefault ? "vanilla_dark" : "vanilla");
+    }
+
+    @Nullable
+    public static String getThemeIdFor(String mod, String name) {
+        String theme = jsonScreenThemes.get(mod + ":" + name);
         if (theme != null) return theme;
         theme = jsonScreenThemes.get(mod);
         if (theme != null) return theme;
         theme = screenThemes.get(mod + ":" + name);
-        if (theme != null) return theme;
-        return jsonScreenThemes.getOrDefault(mod, get(ModularUIConfig.useDarkThemeByDefault ? "vanilla_dark" : "vanilla"));
+        return theme;
     }
 
     public static void reload() {
@@ -214,8 +222,8 @@ public class ThemeManager implements IResourceManagerReloadListener {
                     if (element.isJsonObject()) {
                         for (Map.Entry<String, JsonElement> entry : element.getAsJsonObject().entrySet()) {
                             if (entry.getValue().isJsonPrimitive()) {
-                                ITheme theme = THEMES.get(entry.getValue().getAsString());
-                                if (theme != null) {
+                                String theme = entry.getValue().getAsString();
+                                if (THEMES.containsKey(theme)) {
                                     jsonScreenThemes.put(entry.getKey(), theme);
                                 }
                             }

@@ -6,9 +6,16 @@ import com.cleanroommc.modularui.api.future.GlStateManager;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.JsonHelper;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 
 import static com.cleanroommc.modularui.drawable.BufferBuilder.bufferbuilder;
+
+import java.util.function.IntConsumer;
 
 public class Rectangle implements IDrawable {
 
@@ -128,5 +135,59 @@ public class Rectangle implements IDrawable {
     @Override
     public boolean canApplyTheme() {
         return canApplyTheme;
+    }
+
+    @Override
+    public void loadFromJson(JsonObject json) {
+        if (json.has("color")) {
+            Integer c = Color.ofJson(json.get("color"));
+            if (c != null) {
+                setColor(c);
+            }
+        }
+        if (json.has("colorTop")) {
+            Integer c = Color.ofJson(json.get("colorTop"));
+            if (c != null) {
+                this.colorTL = c;
+                this.colorTR = c;
+            }
+        }
+        if (json.has("colorBottom")) {
+            Integer c = Color.ofJson(json.get("colorBottom"));
+            if (c != null) {
+                this.colorBL = c;
+                this.colorBR = c;
+            }
+        }
+        if (json.has("colorLeft")) {
+            Integer c = Color.ofJson(json.get("colorLeft"));
+            if (c != null) {
+                this.colorTL = c;
+                this.colorBL = c;
+            }
+        }
+        if (json.has("colorRight")) {
+            Integer c = Color.ofJson(json.get("colorRight"));
+            if (c != null) {
+                this.colorTR = c;
+                this.colorBR = c;
+            }
+        }
+        setColor(json, val -> colorTL = val, "colorTopLeft", "colorTL");
+        setColor(json, val -> colorTR = val, "colorTopRight", "colorTR");
+        setColor(json, val -> colorBL = val, "colorBottomLeft", "colorBL");
+        setColor(json, val -> colorBR = val, "colorBottomRight", "colorBR");
+        this.cornerRadius = JsonHelper.getInt(json, 0, "cornerRadius");
+        this.cornerSegments = JsonHelper.getInt(json, 10, "cornerSegments");
+    }
+
+    private void setColor(JsonObject json, IntConsumer color, String... keys) {
+        JsonElement element = JsonHelper.getJsonElement(json, keys);
+        if (element != null) {
+            Integer c = Color.ofJson(element);
+            if (c != null) {
+                color.accept(c);
+            }
+        }
     }
 }

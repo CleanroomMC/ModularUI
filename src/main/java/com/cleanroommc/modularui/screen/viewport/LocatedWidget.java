@@ -5,7 +5,6 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class LocatedWidget extends LocatedElement<IWidget> {
@@ -14,27 +13,35 @@ public class LocatedWidget extends LocatedElement<IWidget> {
         if (widget == null) {
             return EMPTY;
         }
+        // first make a list of all parents
         IWidget parent = widget;
-        List<IViewport> viewports = new ArrayList<>();
+        List<IWidget> ancestors = new ArrayList<>();
         while (true) {
-            if (parent instanceof IViewport) {
-                viewports.add((IViewport) parent);
-            }
+            ancestors.add(0, parent);
             if (parent instanceof ModularPanel) {
                 break;
             }
             parent = parent.getParent();
         }
-        return new LocatedWidget(widget, viewports, false);
+        // iterate through each parent starting at the root and apply each transformation
+        GuiViewportStack stack = new GuiViewportStack();
+        for (IWidget widget1 : ancestors) {
+            if (widget1 instanceof IViewport) {
+                IViewport viewport = (IViewport) widget1;
+                stack.pushViewport(viewport, widget1.getArea());
+                widget1.transform(stack);
+                viewport.transformChildren(stack);
+            } else {
+                stack.pushMatrix();
+                widget1.transform(stack);
+            }
+        }
+        return new LocatedWidget(widget, stack.peek());
     }
 
-    public static final LocatedWidget EMPTY = new LocatedWidget(null, Collections.emptyList(), false);
+    public static final LocatedWidget EMPTY = new LocatedWidget(null, TransformationMatrix.EMPTY);
 
-    public LocatedWidget(IWidget element, List<IViewport> viewports) {
-        super(element, viewports);
-    }
-
-    LocatedWidget(IWidget element, List<IViewport> viewports, boolean copy) {
-        super(element, viewports, copy);
+    public LocatedWidget(IWidget element, TransformationMatrix transformationMatrix) {
+        super(element, transformationMatrix);
     }
 }

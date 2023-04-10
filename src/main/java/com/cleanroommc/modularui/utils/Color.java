@@ -281,6 +281,7 @@ public class Color implements Iterable<Integer> {
             if (color != 0 && getAlpha(color) == 0) {
                 return withAlpha(color, 255);
             }
+            return color;
         }
         if (jsonElement.isJsonObject()) {
             JsonObject json = jsonElement.getAsJsonObject();

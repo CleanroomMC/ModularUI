@@ -109,7 +109,7 @@ public abstract class ModularScreen {
         this.viewportSet();
 
         this.context.pushViewport(null, this.viewport);
-        for (ModularPanel panel : this.windowManager.getOpenPanels()) {
+        for (ModularPanel panel : this.windowManager.getReverseOpenPanels()) {
             WidgetTree.resize(panel);
         }
 

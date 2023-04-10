@@ -6,8 +6,6 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Stack;
-
 public interface IDraggable extends IViewport {
 
     /**
@@ -54,22 +52,13 @@ public interface IDraggable extends IViewport {
 
     void setMoving(boolean moving);
 
+    void transform(IViewportStack viewportStack);
 
     @Override
-    default void apply(IViewportStack stack, int context) {
-        if (isMoving()) {
-            stack.pushViewport(this, getMovingArea());
-        }
+    default void transformChildren(IViewportStack stack) {
     }
 
     @Override
-    default void unapply(IViewportStack stack, int context) {
-        if (isMoving()) {
-            stack.popViewport(this);
-        }
-    }
-
-    @Override
-    default void getWidgetsAt(Stack<IViewport> viewports, IWidgetList widgets, int x, int y) {
+    default void getWidgetsAt(IViewportStack stack, IWidgetList widgets, int x, int y) {
     }
 }

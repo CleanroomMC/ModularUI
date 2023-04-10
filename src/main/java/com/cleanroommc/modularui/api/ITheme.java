@@ -40,7 +40,7 @@ public interface ITheme {
      * @param theme    theme
      */
     static void registerDefaultScreenTheme(String screenId, ITheme theme) {
-        ThemeManager.registerDefaultTheme(screenId, theme);
+        ThemeManager.registerDefaultTheme(screenId, theme.getId());
     }
 
     /**
@@ -51,7 +51,7 @@ public interface ITheme {
      * @param theme theme
      */
     static void registerDefaultScreenTheme(String mod, String id, ITheme theme) {
-        ThemeManager.registerDefaultTheme(mod + ":" + id, theme);
+        ThemeManager.registerDefaultTheme(mod + ":" + id, theme.getId());
     }
 
     String getId();

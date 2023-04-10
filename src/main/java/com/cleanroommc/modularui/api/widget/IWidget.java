@@ -2,6 +2,8 @@ package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
+import com.cleanroommc.modularui.api.layout.IViewportStack;
+import com.cleanroommc.modularui.drawable.Scissor;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -63,6 +65,10 @@ public interface IWidget extends IGuiElement {
      */
     void drawForeground(GuiContext context);
 
+    default void transform(IViewportStack stack) {
+        stack.translate(getArea().rx, getArea().ry);
+    }
+
     default WidgetTheme getWidgetTheme(ITheme theme) {
         return theme.getFallback();
     }
@@ -77,6 +83,21 @@ public interface IWidget extends IGuiElement {
      */
     @Override
     Area getArea();
+
+    /**
+     * Calculates if a given pos is inside this widgets area.
+     * This should be used over {@link Area#isInside(int, int)}, since this accounts for transformations.
+     *
+     * @param stack viewport stack
+     * @param mx    x pos
+     * @param my    y pos
+     * @return if pos is inside this widgets area
+     */
+    default boolean isInside(IViewportStack stack, int mx, int my) {
+        int x = stack.unTransformX(mx, my);
+        int y = stack.unTransformY(mx, my);
+        return x >= 0 && x < getArea().w() && y >= 0 && y < getArea().h();
+    }
 
     /**
      * @return all children of this widget
@@ -109,8 +130,9 @@ public interface IWidget extends IGuiElement {
 
     void setEnabled(boolean enabled);
 
-    // TODO: Really needed?
-    boolean canBeSeen();
+    default boolean canBeSeen(IViewportStack stack) {
+        return Scissor.isInsideScissorArea(getArea(), stack);
+    }
 
     default boolean canHover() {
         return true;

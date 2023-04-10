@@ -4,11 +4,19 @@ import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.api.IItemGuiHolder;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumHand;
 
 public class GuiInfos {
 
     public static final GuiInfo PLAYER_ITEM_MAIN_HAND;
     public static final GuiInfo TILE_ENTITY;
+
+    public static GuiInfo getForHand(EnumHand hand) {
+        if (hand == EnumHand.OFF_HAND) {
+            return PLAYER_ITEM_OFF_HAND;
+        }
+        return PLAYER_ITEM_MAIN_HAND;
+    }
 
     public static void init() {
     }

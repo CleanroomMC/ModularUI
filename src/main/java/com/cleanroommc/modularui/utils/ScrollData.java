@@ -53,7 +53,9 @@ public class ScrollData {
      */
     public boolean cancelScrollEdge = false;
 
-    private Animator scrollAnimator;
+    private int animatingTo = 0;
+
+    private Animator scrollAnimator = new Animator(30, Interpolation.QUAD_OUT);
 
     public ScrollData(ScrollDirection direction) {
         this.direction = direction;
@@ -85,13 +87,10 @@ public class ScrollData {
     }
 
     public void animateTo(ScrollArea area, int x) {
-        if (scrollAnimator == null) {
-            scrollAnimator = new Animator(30, Interpolation.QUAD_OUT)
-                    .setCallback(value -> scrollTo(area, (int) value));
-        }
-
-        scrollAnimator.setValueBounds(this.scroll, x);
-        scrollAnimator.forward();
+        this.scrollAnimator.setCallback(value -> scrollTo(area, (int) value));
+        this.scrollAnimator.setValueBounds(this.scroll, x);
+        this.scrollAnimator.forward();
+        this.animatingTo = x;
     }
 
     public void scrollIntoView(ScrollArea area, int x) {
@@ -178,6 +177,14 @@ public class ScrollData {
 
     public boolean isScrollBarActive(ScrollArea area, boolean isOtherActive) {
         return this.scrollSize > this.direction.getSide(area, isOtherActive);
+    }
+
+    public boolean isAnimating() {
+        return this.scrollAnimator.isRunning();
+    }
+
+    public int getAnimatingTo() {
+        return animatingTo;
     }
 
     @SideOnly(Side.CLIENT)

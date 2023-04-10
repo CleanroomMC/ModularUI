@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.widget.sizer.Flex;
 import com.cleanroommc.modularui.widget.sizer.Unit;
 
 import java.util.function.Consumer;
+import java.util.function.DoubleSupplier;
 
 public interface IPositioned<W extends IPositioned<W>> {
 
@@ -56,123 +57,244 @@ public interface IPositioned<W extends IPositioned<W>> {
         return getThis();
     }
 
-    default W left(int x) {
-        flex().left(x, 0, 0, Unit.Measure.PIXEL, true);
+    default W left(int val) {
+        flex().left(val, 0, 0, Unit.Measure.PIXEL, true);
         return getThis();
     }
 
-    default W left(float x) {
-        flex().left(x, 0, 0, Unit.Measure.RELATIVE, true);
+    default W left(float val) {
+        flex().left(val, 0, 0, Unit.Measure.RELATIVE, true);
         return getThis();
     }
 
-    default W left(float x, int offset) {
-        flex().left(x, offset, 0, Unit.Measure.RELATIVE, true);
+    default W left(float val, int offset) {
+        flex().left(val, offset, 0, Unit.Measure.RELATIVE, true);
         return getThis();
     }
 
-    default W left(float x, float anchor) {
-        flex().left(x, 0, anchor, Unit.Measure.RELATIVE, false);
+    default W left(float val, float anchor) {
+        flex().left(val, 0, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
 
-    default W left(float x, int offset, float anchor) {
-        flex().left(x, offset, anchor, Unit.Measure.RELATIVE, false);
+    default W left(float val, int offset, float anchor) {
+        flex().left(val, offset, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
 
-    default W left(float x, int offset, float anchor, Unit.Measure measure) {
-        flex().left(x, offset, anchor, measure, false);
+    default W left(float val, int offset, float anchor, Unit.Measure measure) {
+        flex().left(val, offset, anchor, measure, false);
         return getThis();
     }
 
-    default W right(int x) {
-        flex().right(x, 0, 0, Unit.Measure.PIXEL, true);
+    default W left(DoubleSupplier val, Unit.Measure measure) {
+        flex().left(val, 0, 0, measure, true);
         return getThis();
     }
 
-    default W right(float x) {
-        flex().right(x, 0, 0, Unit.Measure.RELATIVE, true);
+    default W left(DoubleSupplier val, int offset) {
+        flex().left(val, offset, 0, Unit.Measure.RELATIVE, true);
         return getThis();
     }
 
-    default W right(float x, int offset) {
-        flex().right(x, offset, 0, Unit.Measure.RELATIVE, true);
+    default W left(DoubleSupplier val, float anchor) {
+        flex().left(val, 0, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
 
-    default W right(float x, float anchor) {
-        flex().right(x, 0, anchor, Unit.Measure.RELATIVE, false);
+    default W left(DoubleSupplier val, int offset, float anchor) {
+        flex().left(val, offset, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
 
-    default W right(float x, int offset, float anchor) {
-        flex().right(x, offset, anchor, Unit.Measure.RELATIVE, true);
+    default W right(int val) {
+        flex().right(val, 0, 0, Unit.Measure.PIXEL, true);
         return getThis();
     }
 
-    default W right(float x, int offset, float anchor, Unit.Measure measure) {
-        flex().right(x, offset, anchor, measure, false);
+    default W right(float val) {
+        flex().right(val, 0, 0, Unit.Measure.RELATIVE, true);
         return getThis();
     }
 
-    default W top(int y) {
-        flex().top(y, 0, 0, Unit.Measure.PIXEL, true);
+    default W right(float val, int offset) {
+        flex().right(val, offset, 0, Unit.Measure.RELATIVE, true);
         return getThis();
     }
 
-    default W top(float y) {
-        flex().top(y, 0, 0, Unit.Measure.RELATIVE, true);
+    default W right(float val, float anchor) {
+        flex().right(val, 0, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
 
-    default W top(float y, int offset) {
-        flex().top(y, offset, 0, Unit.Measure.RELATIVE, true);
+    default W right(float val, int offset, float anchor) {
+        flex().right(val, offset, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
 
-    default W top(float y, float anchor) {
-        flex().top(y, 0, anchor, Unit.Measure.RELATIVE, false);
+    default W right(float val, int offset, float anchor, Unit.Measure measure) {
+        flex().right(val, offset, anchor, measure, false);
         return getThis();
     }
 
-    default W top(float y, int offset, float anchor) {
-        flex().top(y, offset, anchor, Unit.Measure.RELATIVE, false);
+    default W right(DoubleSupplier val, Unit.Measure measure) {
+        flex().right(val, 0, 0, measure, true);
         return getThis();
     }
 
-    default W top(float y, int offset, float anchor, Unit.Measure measure) {
-        flex().top(y, offset, anchor, measure, false);
+    default W right(DoubleSupplier val, int offset) {
+        flex().right(val, offset, 0, Unit.Measure.RELATIVE, true);
         return getThis();
     }
 
-    default W bottom(int y) {
-        flex().bottom(y, 0, 0, Unit.Measure.PIXEL, true);
+    default W right(DoubleSupplier val, float anchor) {
+        flex().right(val, 0, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
 
-    default W bottom(float y) {
-        flex().bottom(y, 0, 0, Unit.Measure.RELATIVE, true);
+    default W right(DoubleSupplier val, int offset, float anchor) {
+        flex().right(val, offset, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
 
-    default W bottom(float y, int offset) {
-        flex().bottom(y, offset, 0, Unit.Measure.RELATIVE, true);
+    default W top(int val) {
+        flex().top(val, 0, 0, Unit.Measure.PIXEL, true);
         return getThis();
     }
 
-    default W bottom(float y, float anchor) {
-        flex().bottom(y, 0, anchor, Unit.Measure.RELATIVE, false);
+    default W top(float val) {
+        flex().top(val, 0, 0, Unit.Measure.RELATIVE, true);
         return getThis();
     }
 
-    default W bottom(float y, int offset, float anchor) {
-        flex().bottom(y, offset, anchor, Unit.Measure.RELATIVE, false);
+    default W top(float val, int offset) {
+        flex().top(val, offset, 0, Unit.Measure.RELATIVE, true);
         return getThis();
     }
 
-    default W bottom(float y, int offset, float anchor, Unit.Measure measure) {
-        flex().bottom(y, offset, anchor, measure, false);
+    default W top(float val, float anchor) {
+        flex().top(val, 0, anchor, Unit.Measure.RELATIVE, false);
+        return getThis();
+    }
+
+    default W top(float val, int offset, float anchor) {
+        flex().top(val, offset, anchor, Unit.Measure.RELATIVE, false);
+        return getThis();
+    }
+
+    default W top(float val, int offset, float anchor, Unit.Measure measure) {
+        flex().top(val, offset, anchor, measure, false);
+        return getThis();
+    }
+
+    default W top(DoubleSupplier val, Unit.Measure measure) {
+        flex().top(val, 0, 0, measure, true);
+        return getThis();
+    }
+
+    default W top(DoubleSupplier val, int offset) {
+        flex().top(val, offset, 0, Unit.Measure.RELATIVE, true);
+        return getThis();
+    }
+
+    default W top(DoubleSupplier val, float anchor) {
+        flex().top(val, 0, anchor, Unit.Measure.RELATIVE, false);
+        return getThis();
+    }
+
+    default W top(DoubleSupplier val, int offset, float anchor) {
+        flex().top(val, offset, anchor, Unit.Measure.RELATIVE, false);
+        return getThis();
+    }
+
+    default W bottom(int val) {
+        flex().bottom(val, 0, 0, Unit.Measure.PIXEL, true);
+        return getThis();
+    }
+
+    default W bottom(float val) {
+        flex().bottom(val, 0, 0, Unit.Measure.RELATIVE, true);
+        return getThis();
+    }
+
+    default W bottom(float val, int offset) {
+        flex().bottom(val, offset, 0, Unit.Measure.RELATIVE, true);
+        return getThis();
+    }
+
+    default W bottom(float val, float anchor) {
+        flex().bottom(val, 0, anchor, Unit.Measure.RELATIVE, false);
+        return getThis();
+    }
+
+    default W bottom(float val, int offset, float anchor) {
+        flex().bottom(val, offset, anchor, Unit.Measure.RELATIVE, false);
+        return getThis();
+    }
+
+    default W bottom(float val, int offset, float anchor, Unit.Measure measure) {
+        flex().bottom(val, offset, anchor, measure, false);
+        return getThis();
+    }
+
+    default W bottom(DoubleSupplier val, Unit.Measure measure) {
+        flex().bottom(val, 0, 0, measure, true);
+        return getThis();
+    }
+
+    default W bottom(DoubleSupplier val, int offset) {
+        flex().bottom(val, offset, 0, Unit.Measure.RELATIVE, true);
+        return getThis();
+    }
+
+    default W bottom(DoubleSupplier val, float anchor) {
+        flex().bottom(val, 0, anchor, Unit.Measure.RELATIVE, false);
+        return getThis();
+    }
+
+    default W bottom(DoubleSupplier val, int offset, float anchor) {
+        flex().bottom(val, offset, anchor, Unit.Measure.RELATIVE, false);
+        return getThis();
+    }
+
+
+    default W width(int val) {
+        flex().width(val, Unit.Measure.PIXEL);
+        return getThis();
+    }
+
+    default W width(float val) {
+        flex().width(val, Unit.Measure.RELATIVE);
+        return getThis();
+    }
+
+    default W width(float val, Unit.Measure measure) {
+        flex().width(val, measure);
+        return getThis();
+    }
+
+    default W width(DoubleSupplier val, Unit.Measure measure) {
+        flex().width(val, measure);
+        return getThis();
+    }
+
+    default W height(int val) {
+        flex().height(val, Unit.Measure.PIXEL);
+        return getThis();
+    }
+
+    default W height(float val) {
+        flex().height(val, Unit.Measure.RELATIVE);
+        return getThis();
+    }
+
+    default W height(float val, Unit.Measure measure) {
+        flex().height(val, measure);
+        return getThis();
+    }
+
+    default W height(DoubleSupplier val, Unit.Measure measure) {
+        flex().height(val, measure);
         return getThis();
     }
 
@@ -186,36 +308,6 @@ public interface IPositioned<W extends IPositioned<W>> {
         return getThis();
     }
 
-    default W width(int w) {
-        width(w, Unit.Measure.PIXEL);
-        return getThis();
-    }
-
-    default W width(float w) {
-        width(w, Unit.Measure.RELATIVE);
-        return getThis();
-    }
-
-    default W width(float w, Unit.Measure measure) {
-        flex().width(w, measure);
-        return getThis();
-    }
-
-    default W height(int h) {
-        height(h, Unit.Measure.PIXEL);
-        return getThis();
-    }
-
-    default W height(float h) {
-        height(h, Unit.Measure.RELATIVE);
-        return getThis();
-    }
-
-    default W height(float h, Unit.Measure measure) {
-        flex().height(h, measure);
-        return getThis();
-    }
-
     default W size(int w, int h) {
         width(w).height(h);
         return getThis();
@@ -224,6 +316,18 @@ public interface IPositioned<W extends IPositioned<W>> {
     default W size(float w, float h) {
         width(w).height(h);
         return getThis();
+    }
+
+    default W size(int val) {
+        return width(val).height(val);
+    }
+
+    default W size(float val) {
+        return width(val).height(val);
+    }
+
+    default W full() {
+        return width(1f).height(1f);
     }
 
     default W anchorLeft(float val) {

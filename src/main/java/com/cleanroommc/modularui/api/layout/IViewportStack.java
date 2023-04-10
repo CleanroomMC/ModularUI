@@ -1,6 +1,8 @@
 package com.cleanroommc.modularui.api.layout;
 
+import com.cleanroommc.modularui.screen.viewport.TransformationMatrix;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import org.lwjgl.util.vector.Vector3f;
 
 /**
  * This handles all viewports in a GUI.
@@ -17,18 +19,13 @@ public interface IViewportStack {
      */
     Area getViewport();
 
-    /**
-     * Pushes a new viewport
-     *
-     * @param viewport viewport
-     * @param area     area of the viewport
-     */
     void pushViewport(IViewport viewport, Area area);
 
-    /**
-     * Pops the current viewport from the stack
-     */
+    void pushMatrix();
+
     void popViewport(IViewport viewport);
+
+    void popMatrix();
 
     int getCurrentViewportIndex();
 
@@ -36,59 +33,39 @@ public interface IViewportStack {
 
     void popUntilViewport(IViewport viewport);
 
-    void transform(IViewportTransformation transformation);
+    void translate(float x, float y);
 
-    void translate(int x, int y);
+    void translate(float x, float y, float z);
+
+    void rotate(float angle, float x, float y, float z);
+
+    void rotateZ(float angle);
 
     void scale(float x, float y);
 
-    /**
-     * The current total shift in x
-     */
-    int getShiftX();
+    void resetCurrent();
 
-    /**
-     * The current total shift in y
-     */
-    int getShiftY();
+    int transformX(float x, float y);
 
-    /**
-     * Get global X (relative to root element/screen)
-     */
-    int globalX(int x);
+    int transformY(float x, float y);
 
-    /**
-     * Get global Y (relative to root element/screen)
-     */
-    int globalY(int y);
+    int unTransformX(float x, float y);
 
-    /**
-     * Get current local X (relative to current viewport)
-     */
-    int localX(int x);
+    int unTransformY(float x, float y);
 
-    /**
-     * Get current local Y (relative to current viewport)
-     */
-    int localY(int y);
+    default Vector3f transform(Vector3f vec) {
+        return transform(vec, vec);
+    }
 
-    /**
-     * Applies the active transformation to open gl
-     */
+    Vector3f transform(Vector3f vec, Vector3f dest);
+
+    default Vector3f unTransform(Vector3f vec) {
+        return unTransform(vec, vec);
+    }
+
+    Vector3f unTransform(Vector3f vec, Vector3f dest);
+
     void applyToOpenGl();
 
-    /**
-     * Applies the top viewport transformation to open gl
-     */
-    void applyTopToOpenGl();
-
-    /**
-     * Removes the active transformation to open gl
-     */
-    void unapplyToOpenGl();
-
-    /**
-     * Removes the top viewport transformation to open gl
-     */
-    void unapplyTopToOpenGl();
+    TransformationMatrix peek();
 }

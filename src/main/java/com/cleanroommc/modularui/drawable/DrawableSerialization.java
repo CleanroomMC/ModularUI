@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.utils.JsonHelper;
@@ -8,6 +9,8 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -24,6 +27,8 @@ public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDes
 
     @ApiStatus.Internal
     public static void init() {
+        registerDrawableType("empty", json -> IDrawable.EMPTY);
+        registerDrawableType("null", json -> IDrawable.EMPTY);
         registerDrawableType("texture", UITexture::parseFromJson);
         registerDrawableType("color", json -> new Rectangle());
         registerDrawableType("rectangle", json -> new Rectangle());
@@ -34,13 +39,37 @@ public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDes
 
     @Override
     public IDrawable deserialize(JsonElement element, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        if (element.isJsonNull()) {
+            return IDrawable.EMPTY;
+        }
+        if (element.isJsonArray()) {
+            List<IDrawable> list = new ArrayList<>();
+            for (JsonElement element1 : element.getAsJsonArray()) {
+                IDrawable drawable = context.deserialize(element1, IDrawable.class);
+                if (drawable != null) {
+                    list.add(drawable);
+                }
+            }
+            if (list.isEmpty()) {
+                return IDrawable.EMPTY;
+            }
+            if (list.size() == 1) {
+                return list.get(0);
+            }
+            return new DrawableArray(list.toArray(new IDrawable[0]));
+        }
         if (!element.isJsonObject()) {
-            throw new JsonParseException("Drawable json should be an object.");
+            ModularUI.LOGGER.throwing(new JsonParseException("Drawable json should be an object or an array."));
+            return IDrawable.EMPTY;
         }
         JsonObject json = element.getAsJsonObject();
+        if (json.entrySet().isEmpty()) {
+            return IDrawable.EMPTY;
+        }
         String type = JsonHelper.getString(json, "empty", "type");
         if (!DRAWABLE_TYPES.containsKey(type)) {
-            throw new JsonParseException("Drawable type '" + type + "' is either not specified or invalid!");
+            ModularUI.LOGGER.throwing(new JsonParseException("Drawable type '" + type + "' is either not specified or invalid!"));
+            return IDrawable.EMPTY;
         }
         IDrawable drawable = DRAWABLE_TYPES.get(type).apply(json);
         drawable.loadFromJson(json);

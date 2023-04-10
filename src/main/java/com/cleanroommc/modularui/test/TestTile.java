@@ -105,7 +105,7 @@ public class TestTile extends TileEntity implements IGuiHolder {
                         .child(new PageButton(2, tabController)
                                 .tab(GuiTextures.TAB_TOP, 0)))
                 .child(new PagedWidget<>()
-                        .size(1f, 1f)
+                        .size(1f)
                         .controller(tabController)
                         .addPage(new ParentWidget<>()
                                 .size(1f, 1f)

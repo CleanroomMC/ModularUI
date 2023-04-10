@@ -6,7 +6,6 @@ import com.cleanroommc.modularui.utils.Color;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.renderer.Tessellator;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -38,7 +37,7 @@ public class TextFieldRenderer extends TextRenderer {
     }
 
     @Override
-    protected void drawMeasuredLines(List<Pair<String, Float>> measuredLines) {
+    protected void drawMeasuredLines(List<Line> measuredLines) {
         drawCursors(measuredLines);
         super.drawMeasuredLines(measuredLines);
     }
@@ -48,7 +47,7 @@ public class TextFieldRenderer extends TextRenderer {
         return Collections.singletonList(line);
     }
 
-    protected void drawCursors(List<Pair<String, Float>> measuredLines) {
+    protected void drawCursors(List<Line> measuredLines) {
         if (!simulate) {
             Point2D.Float start;
             if (handler.hasTextMarked()) {
@@ -61,20 +60,20 @@ public class TextFieldRenderer extends TextRenderer {
                 } else {
                     int min = handler.getStartCursor().y;
                     int max = handler.getEndCursor().y;
-                    Pair<String, Float> line = measuredLines.get(min);
-                    int startX = getStartX(line.getValue());
-                    drawMarked(start.y, start.x, startX + line.getValue());
+                    Line line = measuredLines.get(min);
+                    int startX = getStartX(line.getWidth());
+                    drawMarked(start.y, start.x, startX + line.getWidth());
                     start.y += getFontHeight();
                     if (max - min > 1) {
                         for (int i = min + 1; i < max; i++) {
                             line = measuredLines.get(i);
-                            startX = getStartX(line.getValue());
-                            drawMarked(start.y, startX, startX + line.getValue());
+                            startX = getStartX(line.getWidth());
+                            drawMarked(start.y, startX, startX + line.getWidth());
                             start.y += getFontHeight();
                         }
                     }
                     line = measuredLines.get(max);
-                    startX = getStartX(line.getValue());
+                    startX = getStartX(line.getWidth());
                     drawMarked(start.y, startX, end.x);
                 }
             }
@@ -94,19 +93,19 @@ public class TextFieldRenderer extends TextRenderer {
         if (lines.isEmpty()) {
             return new Point();
         }
-        List<Pair<String, Float>> measuredLines = measureLines(lines);
+        List<Line> measuredLines = measureLines(lines);
         y -= getStartY(measuredLines.size()) + this.y;
         int index = (int) (y / (getFontHeight()));
         if (index < 0) return new Point();
         if (index >= measuredLines.size())
-            return new Point(measuredLines.get(measuredLines.size() - 1).getKey().length(), measuredLines.size() - 1);
-        Pair<String, Float> line = measuredLines.get(index);
-        x -= getStartX(line.getValue()) + this.x;
-        if (line.getValue() <= 0) return new Point(0, index);
-        if (line.getValue() < x) return new Point(line.getKey().length(), index);
+            return new Point(measuredLines.get(measuredLines.size() - 1).getText().length(), measuredLines.size() - 1);
+        Line line = measuredLines.get(index);
+        x -= getStartX(line.getWidth()) + this.x;
+        if (line.getWidth() <= 0) return new Point(0, index);
+        if (line.getWidth() < x) return new Point(line.getText().length(), index);
         float currentX = 0;
-        for (int i = 0; i < line.getKey().length(); i++) {
-            char c = line.getKey().charAt(i);
+        for (int i = 0; i < line.getText().length(); i++) {
+            char c = line.getText().charAt(i);
             currentX += getFontRenderer().getCharWidth(c) * scale;
             if (currentX >= x) {
                 return new Point(i, index);
@@ -115,13 +114,13 @@ public class TextFieldRenderer extends TextRenderer {
         return new Point();
     }
 
-    public Point2D.Float getPosOf(List<Pair<String, Float>> measuredLines, Point cursorPos) {
+    public Point2D.Float getPosOf(List<Line> measuredLines, Point cursorPos) {
         if (measuredLines.isEmpty()) {
             return new Point2D.Float(getStartX(0), getStartY(1));
         }
-        Pair<String, Float> line = measuredLines.get(cursorPos.y);
-        String sub = line.getKey().substring(0, Math.min(line.getKey().length(), cursorPos.x));
-        return new Point2D.Float(getStartX(line.getRight()) + getFontRenderer().getStringWidth(sub) * scale, getStartY(measuredLines.size()) + cursorPos.y * getFontHeight());
+        Line line = measuredLines.get(cursorPos.y);
+        String sub = line.getText().substring(0, Math.min(line.getText().length(), cursorPos.x));
+        return new Point2D.Float(getStartX(line.getWidth()) + getFontRenderer().getStringWidth(sub) * scale, getStartY(measuredLines.size()) + cursorPos.y * getFontHeight());
     }
 
     @SideOnly(Side.CLIENT)

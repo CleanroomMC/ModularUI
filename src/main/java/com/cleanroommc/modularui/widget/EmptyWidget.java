@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widget;
 
+import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
@@ -72,7 +73,7 @@ public class EmptyWidget implements IWidget {
     }
 
     @Override
-    public boolean canBeSeen() {
+    public boolean canBeSeen(IViewportStack stack) {
         return false;
     }
 
