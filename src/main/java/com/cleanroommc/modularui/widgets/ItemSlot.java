@@ -118,6 +118,19 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         return syncHandler.getSlot();
     }
 
+    @Override
+    public boolean isSynced() {
+        return syncHandler != null;
+    }
+
+    @Override
+    public ItemSlotSH getSyncHandler() {
+        if (this.syncHandler == null) {
+            throw new IllegalStateException("Widget is not initialised!");
+        }
+        return syncHandler;
+    }
+
     @SideOnly(Side.CLIENT)
     private void drawSlot(Slot slotIn) {
         GuiScreenWrapper guiScreen = getScreen().getScreenWrapper();
