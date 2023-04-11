@@ -323,6 +323,10 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         this.resizer = resizer;
     }
 
+    public boolean isSynced() {
+        return syncKey != null && syncHandler != null;
+    }
+
     public SyncHandler getSyncHandler() {
         if (this.syncKey == null) {
             throw new IllegalStateException("Widget is not synced!");

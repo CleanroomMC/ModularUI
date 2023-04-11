@@ -12,6 +12,8 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import com.cleanroommc.modularui.widgets.ItemSlot;
+import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -196,8 +198,10 @@ public class GuiScreenWrapper extends GuiContainer {
         this.itemRender.zLevel = 200.0F;
         FontRenderer font = stack.getItem().getFontRenderer(stack);
         if (font == null) font = fontRenderer;
+        GlStateManager.enableDepth();
         this.itemRender.renderItemAndEffectIntoGUI(stack, x, y);
         this.itemRender.renderItemOverlayIntoGUI(font, stack, x, y - (getAccessor().getDraggedStack().isEmpty() ? 0 : 8), altText);
+        GlStateManager.disableDepth();
         this.zLevel = 0.0F;
         this.itemRender.zLevel = 0.0F;
     }
@@ -246,6 +250,20 @@ public class GuiScreenWrapper extends GuiContainer {
                 lineY -= 11;
             }
             GuiDraw.drawText("Class: " + hovered, 5, lineY, 1, color, false);
+            lineY -= 11;
+            if (hovered instanceof ItemSlot) {
+                ItemSlot slotWidget = (ItemSlot) hovered;
+                Slot slot = slotWidget.getSlot();
+                GuiDraw.drawText("Slot Index: " + slot.getSlotIndex(), 5, lineY, 1, color, false);
+                lineY -= 11;
+                GuiDraw.drawText("Slot Number: " + slot.slotNumber, 5, lineY, 1, color, false);
+                lineY -= 11;
+                if (slotWidget.isSynced()) {
+                    SlotGroup slotGroup = ((ModularContainer) inventorySlots).getSlotGroup(slotWidget.getSyncHandler());
+                    boolean allowShiftTransfer = slotGroup != null && slotGroup.allowShiftTransfer();
+                    GuiDraw.drawText("Shift-Click Priority: " + (allowShiftTransfer ? slotGroup.getShiftClickPriority() : "DISABLED"), 5, lineY, 1, color, false);
+                }
+            }
         }
         color = Color.withAlpha(color, 25);
         for (int i = 5; i < screenW; i += 5) {
