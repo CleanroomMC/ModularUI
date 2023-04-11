@@ -198,8 +198,10 @@ public class GuiScreenWrapper extends GuiContainer {
         this.itemRender.zLevel = 200.0F;
         FontRenderer font = stack.getItem().getFontRenderer(stack);
         if (font == null) font = fontRenderer;
+        GlStateManager.enableDepth();
         this.itemRender.renderItemAndEffectIntoGUI(stack, x, y);
         this.itemRender.renderItemOverlayIntoGUI(font, stack, x, y - (getAccessor().getDraggedStack().isEmpty() ? 0 : 8), altText);
+        GlStateManager.disableDepth();
         this.zLevel = 0.0F;
         this.itemRender.zLevel = 0.0F;
     }
