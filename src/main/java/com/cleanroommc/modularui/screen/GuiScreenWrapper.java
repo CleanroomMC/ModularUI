@@ -219,8 +219,10 @@ public class GuiScreenWrapper extends GuiContainer implements INEIGuiHandler {
         itemRender.zLevel = 200.0F;
         FontRenderer font = stack.getItem().getFontRenderer(stack);
         if (font == null) font = getFontRenderer();
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
         itemRender.renderItemAndEffectIntoGUI(font, mc.getTextureManager(), stack, x, y);
         itemRender.renderItemOverlayIntoGUI(font, mc.getTextureManager(), stack, x, y - (getAccessor().getDraggedStack() == null ? 0 : 8), altText);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
         GuiDraw.afterRenderItemAndEffectIntoGUI(stack);
         this.zLevel = 0.0F;
         itemRender.zLevel = 0.0F;
