@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.ITheme;
-import com.cleanroommc.modularui.api.future.GlStateManager;
 import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
@@ -61,9 +60,9 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         if (isHovering()) {
             GL11.glDisable(GL11.GL_LIGHTING);
             GL11.glEnable(GL11.GL_BLEND);
-            GlStateManager.colorMask(true, true, true, false);
+            GL11.glColorMask(true, true, true, false);
             GuiDraw.drawSolidRect(1, 1, 16, 16, getWidgetTheme(context.getTheme()).getSlotHoverColor());
-            GlStateManager.colorMask(true, true, true, true);
+            GL11.glColorMask(true, true, true, true);
             GL11.glDisable(GL11.GL_BLEND);
         }
     }
@@ -168,10 +167,10 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             }
 
             if (itemstack != null) {
-                GlStateManager.enableRescaleNormal();
-                GlStateManager.enableLighting();
+                GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+                GL11.glEnable(GL11.GL_LIGHTING);
                 RenderHelper.enableGUIStandardItemLighting();
-                GlStateManager.enableDepth();
+                GL11.glEnable(GL11.GL_DEPTH_TEST);
                 GL11.glEnable(GL12.GL_RESCALE_NORMAL);
                 // render the item itself
                 GuiScreenWrapper.getItemRenderer().renderItemAndEffectIntoGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), itemstack, 1, 1);
@@ -199,13 +198,13 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                     textRenderer.setColor(Color.WHITE.normal);
                     textRenderer.setAlignment(Alignment.BottomRight, getArea().width - 1, getArea().height - 1);
                     textRenderer.setPos(1, 1);
-                    GlStateManager.disableLighting();
-                    GlStateManager.disableDepth();
-                    GlStateManager.disableBlend();
+                    GL11.glDisable(GL11.GL_LIGHTING);
+                    GL11.glDisable(GL11.GL_DEPTH_TEST);
+                    GL11.glDisable(GL11.GL_BLEND);
                     textRenderer.draw(amountText);
-                    GlStateManager.enableLighting();
-                    GlStateManager.enableDepth();
-                    GlStateManager.enableBlend();
+                    GL11.glEnable(GL11.GL_LIGHTING);
+                    GL11.glEnable(GL11.GL_DEPTH_TEST);
+                    GL11.glEnable(GL11.GL_BLEND);
                 }
 
                 int cachedCount = itemstack.stackSize;
@@ -213,7 +212,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 // render other overlays like durability bar
                 GuiScreenWrapper.getItemRenderer().renderItemOverlayIntoGUI(guiScreen.getFontRenderer(), Minecraft.getMinecraft().getTextureManager(), itemstack, 1, 1, null);
                 itemstack.stackSize = cachedCount;
-                GlStateManager.disableDepth();
+                GL11.glDisable(GL11.GL_DEPTH_TEST);
             }
         }
 

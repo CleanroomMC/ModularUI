@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.drawable;
 
-import com.cleanroommc.modularui.api.future.GlStateManager;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -130,9 +129,9 @@ public class TextRenderer {
         String drawString = line.getText();//getFontRenderer().trimStringToWidth(line.getText(), (int) (this.maxWidth + scroll));
         Area.SHARED.set(this.x, Integer.MIN_VALUE, this.x + (int) this.maxWidth, Integer.MAX_VALUE);
         Scissor.scissor(Area.SHARED, context);
-        GlStateManager.translate(-scroll, 0, 0);
+        GL11.glTranslatef(-scroll, 0, 0);
         drawMeasuredLines(Collections.singletonList(line(drawString)));
-        GlStateManager.translate(scroll, 0, 0);
+        GL11.glTranslatef(scroll, 0, 0);
         Scissor.unscissor(context);
     }
 
@@ -185,14 +184,14 @@ public class TextRenderer {
         if (simulate) {
             return getFontRenderer().getStringWidth(text);
         }
-        GlStateManager.disableBlend();
-        GlStateManager.pushMatrix();
-        GlStateManager.scale(scale, scale, 0f);
+        GL11.glDisable(GL11.GL_BLEND);
+        GL11.glPushMatrix();
+        GL11.glScalef(scale, scale, 0f);
         GL11.glDisable(GL11.GL_LIGHTING);
         int width = getFontRenderer().drawString(text, (int) (x / scale), (int) (y / scale), color, shadow);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager.popMatrix();
-        GlStateManager.enableBlend();
+        GL11.glPopMatrix();
+        GL11.glEnable(GL11.GL_BLEND);
         return width * scale;
     }
 

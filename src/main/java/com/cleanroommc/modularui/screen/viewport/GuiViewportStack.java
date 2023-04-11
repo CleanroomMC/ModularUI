@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.screen.viewport;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.widget.sizer.Area;

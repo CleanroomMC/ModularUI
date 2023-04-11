@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.utils;
 
-import com.cleanroommc.modularui.api.future.GlStateManager;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import cpw.mods.fml.relauncher.Side;
@@ -8,6 +7,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.util.MathHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.opengl.GL11;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -251,26 +251,26 @@ public class Color implements Iterable<Integer> {
     @SideOnly(Side.CLIENT)
     public static void setGlColor(int color) {
         if (color == 0) {
-            GlStateManager.color(0, 0, 0, 0);
+            GL11.glColor4f(0, 0, 0, 0);
             return;
         }
         float a = getAlphaF(color);
         if (a == 0) a = 1f;
-        GlStateManager.color(getRedF(color), getGreenF(color), getBlueF(color), a);
+        GL11.glColor4f(getRedF(color), getGreenF(color), getBlueF(color), a);
     }
 
     @SideOnly(Side.CLIENT)
     public static void setGlColorOpaque(int color) {
         if (color == 0) {
-            GlStateManager.color(0, 0, 0, 0);
+            GL11.glColor4f(0, 0, 0, 0);
             return;
         }
-        GlStateManager.color(getRedF(color), getGreenF(color), getBlueF(color), 1f);
+        GL11.glColor4f(getRedF(color), getGreenF(color), getBlueF(color), 1f);
     }
 
     @SideOnly(Side.CLIENT)
     public static void resetGlColor() {
-        GlStateManager.colorMask(true, true, true, true);
+        GL11.glColorMask(true, true, true, true);
         setGlColorOpaque(WHITE.normal);
     }
 

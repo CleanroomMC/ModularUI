@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.Tags;
-import com.cleanroommc.modularui.api.future.GlStateManager;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.ISynced;
 import com.cleanroommc.modularui.drawable.GuiDraw;
@@ -25,6 +24,8 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 import javax.annotation.Nonnegative;
 import java.util.ArrayList;
@@ -187,11 +188,11 @@ public abstract class ModularScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.context.updateState(mouseX, mouseY, partialTicks);
 
-        GlStateManager.disableRescaleNormal();
+        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
         RenderHelper.disableStandardItemLighting();
-        GlStateManager.disableLighting();
-        GlStateManager.disableDepth();
-        GlStateManager.disableAlpha();
+        GL11.glDisable(GL11.GL_LIGHTING);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GL11.glDisable(GL11.GL_ALPHA_TEST);
 
         this.context.reset();
         this.context.pushViewport(null, this.viewport);
@@ -204,18 +205,18 @@ public abstract class ModularScreen {
         this.context.popViewport(null);
 
         this.context.postRenderCallbacks.forEach(element -> element.accept(this.context));
-        GlStateManager.enableRescaleNormal();
-        GlStateManager.enableLighting();
+        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        GL11.glEnable(GL11.GL_LIGHTING);
         RenderHelper.enableStandardItemLighting();
-        GlStateManager.enableAlpha();
+        GL11.glEnable(GL11.GL_ALPHA_TEST);
     }
 
     public void drawForeground(float partialTicks) {
-        GlStateManager.disableRescaleNormal();
+        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
         RenderHelper.disableStandardItemLighting();
-        GlStateManager.disableLighting();
-        GlStateManager.disableDepth();
-        GlStateManager.disableAlpha();
+        GL11.glDisable(GL11.GL_LIGHTING);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GL11.glDisable(GL11.GL_ALPHA_TEST);
 
         this.context.reset();
         this.context.pushViewport(null, this.viewport);
@@ -227,10 +228,10 @@ public abstract class ModularScreen {
         this.context.drawDraggable();
         this.context.popViewport(null);
 
-        GlStateManager.enableRescaleNormal();
-        GlStateManager.enableLighting();
+        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        GL11.glEnable(GL11.GL_LIGHTING);
         RenderHelper.enableStandardItemLighting();
-        GlStateManager.enableAlpha();
+        GL11.glEnable(GL11.GL_ALPHA_TEST);
     }
 
     public boolean onMousePressed(int mouseButton) {

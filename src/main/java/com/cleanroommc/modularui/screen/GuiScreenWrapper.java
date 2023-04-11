@@ -7,8 +7,6 @@ import codechicken.nei.guihook.GuiContainerManager;
 import codechicken.nei.guihook.IContainerDrawHandler;
 import com.cleanroommc.modularui.GuiErrorHandler;
 import com.cleanroommc.modularui.ModularUIConfig;
-import com.cleanroommc.modularui.api.future.GlStateManager;
-import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
@@ -36,6 +34,7 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 import java.awt.*;
 import java.util.List;
@@ -97,17 +96,17 @@ public class GuiScreenWrapper extends GuiContainer implements INEIGuiHandler {
         this.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
         this.screen.drawScreen(mouseX, mouseY, partialTicks);
 
-        GlStateManager.disableLighting();
-        GlStateManager.disableDepth();
+        GL11.glDisable(GL11.GL_LIGHTING);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
         // mainly for invtweaks compat
         drawVanillaElements(mouseX, mouseY, partialTicks);
-        GlStateManager.pushMatrix();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager.enableRescaleNormal();
+        GL11.glPushMatrix();
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         getAccessor().setHoveredSlot(null);
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
-        GlStateManager.enableRescaleNormal();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         RenderHelper.enableGUIStandardItemLighting();
         if (this.screen.context.isNEIEnabled()) {
             // Copied from GuiContainerManager#renderObjects but without translation
@@ -125,7 +124,7 @@ public class GuiScreenWrapper extends GuiContainer implements INEIGuiHandler {
             }
         }
         GL11.glDisable(GL11.GL_DEPTH_TEST);
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         RenderHelper.disableStandardItemLighting();
         this.drawGuiContainerForegroundLayer(mouseX, mouseY);
         this.screen.drawForeground(partialTicks);
@@ -137,14 +136,14 @@ public class GuiScreenWrapper extends GuiContainer implements INEIGuiHandler {
             getAccessor().setHoveredSlot(((IVanillaSlot) hovered).getVanillaSlot());
         }
 
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(i, j, 0);
-        GlStateManager.popMatrix();
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glPushMatrix();
+        GL11.glTranslatef(i, j, 0);
+        GL11.glPopMatrix();
 
         InventoryPlayer inventoryplayer = this.mc.thePlayer.inventory;
         ItemStack itemstack = getAccessor().getDraggedStack() == null ? inventoryplayer.getItemStack() : getAccessor().getDraggedStack();
-        GlStateManager.translate((float) i, (float) j, 0.0F);
+        GL11.glTranslatef(i, j, 0.0F);
         if (itemstack != null) {
             int k2 = getAccessor().getDraggedStack() == null ? 8 : 16;
             String s = null;
@@ -179,20 +178,20 @@ public class GuiScreenWrapper extends GuiContainer implements INEIGuiHandler {
             this.drawItemStack(getAccessor().getReturningStack(), l1, i2, null);
         }
 
-        GlStateManager.popMatrix();
+        GL11.glPopMatrix();
 
         if (ModularUIConfig.guiDebugMode) {
-            GlStateManager.disableDepth();
-            GlStateManager.disableLighting();
-            GlStateManager.enableBlend();
+            GL11.glDisable(GL11.GL_DEPTH_TEST);
+            GL11.glDisable(GL11.GL_LIGHTING);
+            GL11.glEnable(GL11.GL_BLEND);
             drawDebugScreen();
-            GlStateManager.color(1f, 1f, 1f, 1f);
+            GL11.glColor4f(1f, 1f, 1f, 1f);
         }
         GuiErrorHandler.INSTANCE.drawErrors(0, 0);
 
-        GlStateManager.enableLighting();
-        GlStateManager.enableDepth();
-        GlStateManager.enableRescaleNormal();
+        GL11.glEnable(GL11.GL_LIGHTING);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         RenderHelper.enableStandardItemLighting();
 
         Scissor.unscissor(this.screen.context);
@@ -213,7 +212,7 @@ public class GuiScreenWrapper extends GuiContainer implements INEIGuiHandler {
     }
 
     private void drawItemStack(ItemStack stack, int x, int y, String altText) {
-        GlStateManager.translate(0.0F, 0.0F, 32.0F);
+        GL11.glTranslatef(0.0F, 0.0F, 32.0F);
         this.zLevel = 200.0F;
         itemRender.zLevel = 200.0F;
         FontRenderer font = stack.getItem().getFontRenderer(stack);
@@ -248,7 +247,7 @@ public class GuiScreenWrapper extends GuiContainer implements INEIGuiHandler {
         if (locatedHovered != null) {
             IGuiElement hovered = locatedHovered.getElement();
             locatedHovered.applyMatrix(context);
-            GlStateManager.pushMatrix();
+            GL11.glPushMatrix();
             context.applyToOpenGl();
 
             Area area = hovered.getArea();
@@ -258,7 +257,7 @@ public class GuiScreenWrapper extends GuiContainer implements INEIGuiHandler {
             if (parent != null) {
                 GuiDraw.drawBorder(-area.rx, -area.ry, parent.getArea().width, parent.getArea().height, Color.withAlpha(color, 0.3f), 1f);
             }
-            GlStateManager.popMatrix();
+            GL11.glPopMatrix();
             locatedHovered.unapplyMatrix(context);
             GuiDraw.drawText("Pos: " + area.x + ", " + area.y, 5, lineY, 1, color, false);
             lineY -= 11;

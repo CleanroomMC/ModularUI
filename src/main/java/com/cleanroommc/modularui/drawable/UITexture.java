@@ -3,7 +3,6 @@ package com.cleanroommc.modularui.drawable;
 import com.cleanroommc.modularui.Tags;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
-import com.cleanroommc.modularui.api.future.GlStateManager;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
@@ -14,6 +13,7 @@ import com.google.gson.JsonParseException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -106,26 +106,26 @@ public class UITexture implements IDrawable {
     }
 
     public void draw(float x, float y, float width, float height) {
-        GlStateManager.enableBlend();
-        GlStateManager.enableTexture2D();
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
         Minecraft.getMinecraft().renderEngine.bindTexture(location);
         draw(location, x, y, width, height, u0, v0, u1, v1);
-        GlStateManager.disableBlend();
+        GL11.glDisable(GL11.GL_BLEND);
     }
 
     public void drawSubArea(float x, float y, float width, float height, float uStart, float vStart, float uEnd, float vEnd) {
-        GlStateManager.enableBlend();
-        GlStateManager.enableTexture2D();
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
         Minecraft.getMinecraft().renderEngine.bindTexture(location);
         draw(location, x, y, width, height, calcU(uStart), calcV(vStart), calcU(uEnd), calcV(vEnd));
-        GlStateManager.disableBlend();
+        GL11.glDisable(GL11.GL_BLEND);
     }
 
     public static void draw(ResourceLocation location, float x0, float y0, float width, float height, float u0, float v0, float u1, float v1) {
         float x1 = x0 + width, y1 = y0 + height;
         Tessellator.instance.startDrawingQuads();
-        GlStateManager.disableLighting();
-        GlStateManager.enableAlpha();
+        GL11.glDisable(GL11.GL_LIGHTING);
+        GL11.glEnable(GL11.GL_ALPHA_TEST);
         bufferbuilder.pos(x0, y1, 0.0f).tex(u0, v1).endVertex();
         bufferbuilder.pos(x1, y1, 0.0f).tex(u1, v1).endVertex();
         bufferbuilder.pos(x1, y0, 0.0f).tex(u1, v0).endVertex();

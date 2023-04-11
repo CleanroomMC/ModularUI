@@ -1,9 +1,9 @@
 package com.cleanroommc.modularui.drawable;
 
-import com.cleanroommc.modularui.api.future.GlStateManager;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 
 public class AdaptableUITexture extends UITexture {
 
@@ -28,9 +28,9 @@ public class AdaptableUITexture extends UITexture {
             super.draw(context, x, y, width, height);
             return;
         }
-        GlStateManager.disableAlpha();
-        GlStateManager.enableBlend();
-        GlStateManager.enableTexture2D();
+        GL11.glDisable(GL11.GL_ALPHA_TEST);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
         Minecraft.getMinecraft().renderEngine.bindTexture(location);
 
         float uB = borderX * 1f / imageWidth;
@@ -88,7 +88,7 @@ public class AdaptableUITexture extends UITexture {
             // center
             GuiDraw.drawBillboard(x + borderX, y + borderY, x1 - borderX, y1 - borderY, uB, vB, u1 - uB, v1 - vB);
         }
-        GlStateManager.disableBlend();
-        GlStateManager.enableAlpha();
+        GL11.glDisable(GL11.GL_BLEND);
+        GL11.glEnable(GL11.GL_ALPHA_TEST);
     }
 }

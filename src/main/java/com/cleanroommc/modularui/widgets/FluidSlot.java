@@ -3,7 +3,6 @@ package com.cleanroommc.modularui.widgets;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
-import com.cleanroommc.modularui.api.future.GlStateManager;
 import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiDraw;
@@ -26,6 +25,7 @@ import net.minecraftforge.fluids.IFluidTank;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 
 public class FluidSlot extends Widget<FluidSlot> implements Interactable {
 
@@ -127,9 +127,9 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable {
             textRenderer.draw(s);
         }
         if (isHovering()) {
-            GlStateManager.colorMask(true, true, true, false);
+            GL11.glColorMask(true, true, true, false);
             GuiDraw.drawSolidRect(1, 1, 16, 16, getWidgetTheme(context.getTheme()).getSlotHoverColor());
-            GlStateManager.colorMask(true, true, true, true);
+            GL11.glColorMask(true, true, true, true);
         }
     }
 
