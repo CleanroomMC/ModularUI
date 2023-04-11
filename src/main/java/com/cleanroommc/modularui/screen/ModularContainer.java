@@ -128,6 +128,9 @@ public class ModularContainer extends Container {
             if (stack != null) {
                 ItemStack remainder = transferItem(slot, stack.copy());
                 stack.stackSize = remainder.stackSize;
+                if (stack.stackSize < 1) {
+                    slot.getSlot().putStack(null);
+                }
                 return null;
             }
         }
