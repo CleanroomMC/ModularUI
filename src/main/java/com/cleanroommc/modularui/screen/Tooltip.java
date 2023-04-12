@@ -38,6 +38,7 @@ public class Tooltip {
     private int textColor = Color.WHITE.normal;
     private float scale = 1.0f;
     private Alignment alignment = Alignment.TopLeft;
+    private boolean updateTooltipEveryTick = false;
 
     private boolean dirty = true;
 
@@ -54,6 +55,9 @@ public class Tooltip {
     }
 
     public void draw(GuiContext context) {
+        if (updateTooltipEveryTick) {
+            markDirty();
+        }
         if (isEmpty()) return;
 
         if (maxWidth <= 0) {
@@ -288,6 +292,11 @@ public class Tooltip {
         return this;
     }
 
+    public Tooltip setUpdateTooltipEveryTick(boolean update) {
+        this.updateTooltipEveryTick = update;
+        return this;
+    }
+
     public Tooltip addLine(IDrawable drawable) {
         this.additionalLines.add(drawable);
         return this;
@@ -295,6 +304,20 @@ public class Tooltip {
 
     public Tooltip addLine(String line) {
         return addLine(IKey.str(line));
+    }
+
+    public Tooltip addDrawableLines(Iterable<IDrawable> lines) {
+        for (IDrawable line : lines) {
+            addLine(line);
+        }
+        return this;
+    }
+
+    public Tooltip addStringLines(Iterable<String> lines) {
+        for (String line : lines) {
+            addLine(IKey.str(line));
+        }
+        return this;
     }
 
     public enum Pos {

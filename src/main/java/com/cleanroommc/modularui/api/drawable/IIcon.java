@@ -18,4 +18,6 @@ public interface IIcon extends IDrawable {
     int getHeight();
 
     Box getMargin();
+
+    IIcon EMPTY_2PX = EMPTY.asIcon().height(2);
 }

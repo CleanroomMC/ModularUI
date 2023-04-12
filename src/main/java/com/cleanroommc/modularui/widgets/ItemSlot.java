@@ -1,6 +1,9 @@
 package com.cleanroommc.modularui.widgets;
 
+import codechicken.nei.guihook.GuiContainerManager;
+import codechicken.nei.guihook.IContainerTooltipHandler;
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
@@ -29,12 +32,27 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import java.util.List;
+
 public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable {
 
     private static final TextRenderer textRenderer = new TextRenderer();
     private ItemSlotSH syncHandler;
 
     public ItemSlot() {
+        tooltipBuilder(tooltip -> {
+            tooltip.setUpdateTooltipEveryTick(true);
+            if (!isSynced()) return;
+            ItemStack stack = getSlot().getStack();
+            if (stack == null) return;
+            List<String> lines = getItemTooltip(stack);
+            for (int i = 0; i < lines.size(); i++) {
+                tooltip.addLine(lines.get(i));
+                if (i == 0 && lines.size() > 1) {
+                    tooltip.addLine(IIcon.EMPTY_2PX);
+                }
+            }
+        });
     }
 
     @Override
@@ -129,6 +147,19 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             throw new IllegalStateException("Widget is not initialised!");
         }
         return syncHandler;
+    }
+
+    protected List<String> getItemTooltip(ItemStack stack) {
+        List<String> tooltips = GuiContainerManager.itemDisplayNameMultiline(stack, getScreen().getScreenWrapper(), true);
+
+        GuiContainerManager.applyItemCountDetails(tooltips, stack);
+
+        if (GuiContainerManager.getManager() != null && GuiContainerManager.shouldShowTooltip(getScreen().getScreenWrapper())) {
+            for (IContainerTooltipHandler handler : GuiContainerManager.getManager().instanceTooltipHandlers)
+                tooltips = handler.handleItemTooltip(getScreen().getScreenWrapper(), stack, getContext().getMouseX(), getContext().getMouseY(), tooltips);
+        }
+
+        return tooltips;
     }
 
     @SideOnly(Side.CLIENT)
