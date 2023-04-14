@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.screen;
 
+import codechicken.lib.math.MathHelper;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
@@ -11,7 +12,6 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
@@ -72,7 +72,8 @@ public class Tooltip {
         //mouseX = event.getX();
         //mouseY = event.getY();
         //int screenWidth = event.getScreenWidth(), screenHeight = event.getScreenHeight();
-        int screenWidth = Minecraft.getMinecraft().displayWidth, screenHeight = Minecraft.getMinecraft().displayHeight;
+        Dimension displaySize = codechicken.lib.gui.GuiDraw.displaySize();
+        int screenWidth = displaySize.width, screenHeight = displaySize.height;
         //maxWidth = event.getMaxWidth();
 
         renderer.setShadow(this.textShadow);
@@ -112,9 +113,20 @@ public class Tooltip {
         }
 
         if (this.pos == Pos.NEXT_TO_MOUSE) {
-            // TODO
-            boolean isOnRightSide = mouseX > screenWidth / 2;
-            return new Rectangle();
+            final int PADDING = 8;
+            // magic number to place tooltip nicer. Look at GuiScreen#L178
+            final int MOUSE_OFFSET = 12;
+            int x = mouseX + MOUSE_OFFSET, y = mouseY - MOUSE_OFFSET;
+            if (x < PADDING) {
+                x = PADDING;
+            } else if (x + width + PADDING > screenWidth) {
+                x -= MOUSE_OFFSET * 2 + width; // flip side of cursor
+                if (x < PADDING) {
+                    x = PADDING;
+                }
+            }
+            y = (int) MathHelper.clip(y, PADDING, screenHeight - PADDING - height);
+            return new Rectangle(x, y, width, height);
         }
 
         if (this.excludeArea == null) {

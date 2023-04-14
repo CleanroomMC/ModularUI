@@ -44,6 +44,7 @@ public class Scissor {
         /* Clipping area around scroll area */
         Minecraft mc = Minecraft.getMinecraft();
 
+        // nh todo maybe this should be codechicken.lib.gui.GuiDraw.displaySize()?
         float rx = (float) Math.ceil(mc.displayWidth / (double) sw);
         float ry = (float) Math.ceil(mc.displayHeight / (double) sh);
 
