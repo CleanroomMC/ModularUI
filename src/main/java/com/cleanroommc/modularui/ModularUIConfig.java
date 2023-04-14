@@ -14,7 +14,7 @@ public class ModularUIConfig {
     public static boolean smoothProgressBar = true;
     public static int panelOpenCloseAnimationTime = 0;
     public static boolean placeTooltipNextToPanelByDefault = true;
-    public static Tooltip.Pos tooltipPos = Tooltip.Pos.VERTICAL;
+    public static Tooltip.Pos tooltipPos = Tooltip.Pos.NEXT_TO_MOUSE;
     public static boolean useDarkThemeByDefault = false;
 
     public static boolean guiDebugMode = ModularUI.isDevEnv;
@@ -84,7 +84,7 @@ public class ModularUIConfig {
             config.get(
                 CATEGORY_RENDERING,
                 "tooltipPos",
-                "VERTICAL",
+                "NEXT_TO_MOUSE",
                 "Default tooltip position around the widget or its panel. Select: ABOVE, BELOW, LEFT, RIGHT, VERTICAL, HORIZONTAL, NEXT_TO_MOUSE",
                 new String[] {
                     "ABOVE",
