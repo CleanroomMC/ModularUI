@@ -38,6 +38,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     public ItemSlot() {
         tooltipBuilder(tooltip -> {
             tooltip.setUpdateTooltipEveryTick(true).setHasSpaceAfterFirstLine(true);
+            tooltip.excludeArea(getArea());
             if (!isSynced()) return;
             ItemStack stack = getSlot().getStack();
             if (stack.isEmpty()) return;
