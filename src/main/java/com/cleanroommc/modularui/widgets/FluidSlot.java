@@ -45,6 +45,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable {
                 .endDefaultMode();
 
         tooltipBuilder(tooltip -> {
+            tooltip.setHasSpaceAfterFirstLine(true);
             IFluidTank fluidTank = getFluidTank();
             FluidStack fluid = this.syncHandler.getCachedValue();
             if (this.syncHandler.isPhantom()) {
