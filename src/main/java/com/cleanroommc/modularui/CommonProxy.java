@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.manager.GuiManager;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.test.TestBlock;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -24,6 +25,8 @@ public class CommonProxy {
         }
 
         NetworkHandler.init();
+
+        FMLCommonHandler.instance().bus().register(this);
     }
 
     public void postInit(FMLPostInitializationEvent event) {}
