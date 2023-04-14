@@ -3,7 +3,6 @@ package com.cleanroommc.modularui.widgets;
 import codechicken.nei.guihook.GuiContainerManager;
 import codechicken.nei.guihook.IContainerTooltipHandler;
 import com.cleanroommc.modularui.api.ITheme;
-import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
@@ -41,17 +40,11 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     public ItemSlot() {
         tooltipBuilder(tooltip -> {
-            tooltip.setUpdateTooltipEveryTick(true);
+            tooltip.setUpdateTooltipEveryTick(true).setHasSpaceAfterFirstLine(true);
             if (!isSynced()) return;
             ItemStack stack = getSlot().getStack();
             if (stack == null) return;
-            List<String> lines = getItemTooltip(stack);
-            for (int i = 0; i < lines.size(); i++) {
-                tooltip.addLine(lines.get(i));
-                if (i == 0 && lines.size() > 1) {
-                    tooltip.addLine(IIcon.EMPTY_2PX);
-                }
-            }
+            tooltip.addStringLines(getItemTooltip(stack));
         });
     }
 

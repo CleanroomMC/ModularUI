@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.GuiDraw;
+import com.cleanroommc.modularui.drawable.Icon;
 import com.cleanroommc.modularui.drawable.IconRenderer;
 import com.cleanroommc.modularui.drawable.TextIcon;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -39,6 +40,7 @@ public class Tooltip {
     private float scale = 1.0f;
     private Alignment alignment = Alignment.TopLeft;
     private boolean updateTooltipEveryTick = false;
+    private boolean hasSpaceAfterFirstLine = false;
 
     private boolean dirty = true;
 
@@ -52,6 +54,9 @@ public class Tooltip {
         }
         this.lines.addAll(additionalLines);
         this.additionalLines = additionalLines;
+        if (hasSpaceAfterFirstLine && lines.size() > 1) {
+            lines.add(1, Icon.EMPTY_2PX);
+        }
     }
 
     public void draw(GuiContext context) {
@@ -306,6 +311,11 @@ public class Tooltip {
 
     public Tooltip setUpdateTooltipEveryTick(boolean update) {
         this.updateTooltipEveryTick = update;
+        return this;
+    }
+
+    public Tooltip setHasSpaceAfterFirstLine(boolean hasSpaceAfterFirstLine) {
+        this.hasSpaceAfterFirstLine = hasSpaceAfterFirstLine;
         return this;
     }
 
