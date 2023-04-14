@@ -15,6 +15,7 @@ import com.cleanroommc.modularui.widget.sizer.Area;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.Nullable;
@@ -121,9 +122,20 @@ public class Tooltip {
         }
 
         if (this.pos == Pos.NEXT_TO_MOUSE) {
-            // TODO
-            boolean isOnRightSide = mouseX > screenWidth / 2;
-            return new Rectangle();
+            final int PADDING = 8;
+            // magic number to place tooltip nicer. Look at GuiScreen#L237
+            final int MOUSE_OFFSET = 12;
+            int x = mouseX + MOUSE_OFFSET, y = mouseY - MOUSE_OFFSET;
+            if (x < PADDING) {
+                x = PADDING;
+            } else if (x + width + PADDING > screenWidth) {
+                x -= MOUSE_OFFSET * 2 + width; // flip side of cursor
+                if (x < PADDING) {
+                    x = PADDING;
+                }
+            }
+            y = MathHelper.clamp(y, PADDING, screenHeight - PADDING - height);
+            return new Rectangle(x, y, width, height);
         }
 
         if (this.excludeArea == null) {
