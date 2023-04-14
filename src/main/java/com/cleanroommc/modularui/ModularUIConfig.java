@@ -23,7 +23,7 @@ public class ModularUIConfig {
     public static boolean placeNextToPanelByDefault = true;
     // Default direction
     @Config.Comment("Default tooltip position around the widget or its panel.")
-    public static Tooltip.Pos tooltipPos = Tooltip.Pos.VERTICAL;
+    public static Tooltip.Pos tooltipPos = Tooltip.Pos.NEXT_TO_MOUSE;
 
     @Config.Comment("If true, widget outlines and widget information will be drawn.")
     public static boolean guiDebugMode = FMLLaunchHandler.isDeobfuscatedEnvironment();
