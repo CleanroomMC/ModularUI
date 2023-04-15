@@ -3,14 +3,14 @@ package com.cleanroommc.modularui.api;
 import com.cleanroommc.modularui.manager.GuiInfos;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * An interface to implement on {@link net.minecraft.item.Item}
- * to use with {@link GuiInfos#PLAYER_ITEM_MAIN_HAND} or {@link GuiInfos#PLAYER_ITEM_OFF_HAND}.
+ * to use with {@link GuiInfos#PLAYER_ITEM_MAIN_HAND}.
  */
 public interface IItemGuiHolder {
 

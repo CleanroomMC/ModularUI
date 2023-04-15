@@ -33,8 +33,6 @@ import org.lwjgl.opengl.GL12;
 
 import java.util.List;
 
-import java.util.List;
-
 public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable {
 
     private static final TextRenderer textRenderer = new TextRenderer();
