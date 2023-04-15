@@ -41,6 +41,7 @@ public class Tooltip {
     private Alignment alignment = Alignment.TopLeft;
     private boolean updateTooltipEveryTick = false;
     private boolean hasSpaceAfterFirstLine = false;
+    private int linePadding = 1;
 
     private boolean dirty = true;
 
@@ -79,6 +80,7 @@ public class Tooltip {
         renderer.setColor(this.textColor);
         renderer.setScale(this.scale);
         renderer.setAlignment(this.alignment, this.maxWidth);
+        renderer.setLinePadding(linePadding);
         renderer.setSimulate(true);
         renderer.setPos(0, 0);
 
@@ -310,6 +312,14 @@ public class Tooltip {
 
     public Tooltip setHasSpaceAfterFirstLine(boolean hasSpaceAfterFirstLine) {
         this.hasSpaceAfterFirstLine = hasSpaceAfterFirstLine;
+        return this;
+    }
+
+    /**
+     * By default, tooltips have 1px of space between lines. Set to 0 if you want to disable it.
+     */
+    public Tooltip setLinePadding(int linePadding) {
+        this.linePadding = linePadding;
         return this;
     }
 
