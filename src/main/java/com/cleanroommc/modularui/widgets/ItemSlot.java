@@ -28,12 +28,22 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable {
 
     private static final TextRenderer textRenderer = new TextRenderer();
     private ItemSlotSH syncHandler;
 
     public ItemSlot() {
+        tooltipBuilder(tooltip -> {
+            tooltip.setUpdateTooltipEveryTick(true).setHasSpaceAfterFirstLine(true);
+            tooltip.excludeArea(getArea());
+            if (!isSynced()) return;
+            ItemStack stack = getSlot().getStack();
+            if (stack.isEmpty()) return;
+            tooltip.addStringLines(getItemTooltip(stack));
+        });
     }
 
     @Override
@@ -126,6 +136,11 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             throw new IllegalStateException("Widget is not initialised!");
         }
         return syncHandler;
+    }
+
+    protected List<String> getItemTooltip(ItemStack stack) {
+        // todo: JEI seems to be getting tooltip from IngredientRenderer#getTooltip
+        return getScreen().getScreenWrapper().getItemToolTip(stack);
     }
 
     @SideOnly(Side.CLIENT)
