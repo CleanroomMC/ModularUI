@@ -300,7 +300,6 @@ public class GuiScreenWrapper extends GuiContainer implements INEIGuiHandler {
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-
     }
 
     @Override

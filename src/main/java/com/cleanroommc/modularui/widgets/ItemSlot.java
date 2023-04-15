@@ -33,6 +33,8 @@ import org.lwjgl.opengl.GL12;
 
 import java.util.List;
 
+import java.util.List;
+
 public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable {
 
     private static final TextRenderer textRenderer = new TextRenderer();
@@ -41,6 +43,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     public ItemSlot() {
         tooltipBuilder(tooltip -> {
             tooltip.setUpdateTooltipEveryTick(true).setHasSpaceAfterFirstLine(true);
+            tooltip.excludeArea(getArea());
             if (!isSynced()) return;
             ItemStack stack = getSlot().getStack();
             if (stack == null) return;

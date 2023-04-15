@@ -4,6 +4,9 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.resources.I18n;
 
+/**
+ * A function which interpolates between two values.
+ */
 public interface IInterpolation {
 
     float interpolate(float a, float b, float x);

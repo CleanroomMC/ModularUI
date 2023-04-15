@@ -112,7 +112,7 @@ public class GuiViewportStack implements IViewportStack {
     }
 
     @Override
-    public int getCurrentViewportIndex() {
+    public int getStackSize() {
         return this.viewportStack.size();
     }
 
@@ -165,7 +165,8 @@ public class GuiViewportStack implements IViewportStack {
 
     public void resetCurrent() {
         checkViewport();
-        this.top.getMatrix().setIdentity();
+        Matrix4f belowTop = this.viewportStack.size() > 1 ? this.viewportStack.get(this.viewportStack.size() - 2).getMatrix() : new Matrix4f();
+        this.top.getMatrix().load(belowTop);
         this.top.markDirty();
     }
 

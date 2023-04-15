@@ -144,7 +144,7 @@ public class Tooltip {
         }
 
         int shiftAmount = 10;
-        int borderSpace = 7;
+        int padding = 7;
 
         int x = 0, y = 0;
         if (this.pos.vertical) {
@@ -153,10 +153,10 @@ public class Tooltip {
                 x = xArea + shiftAmount;
             } else {
                 x = xArea - shiftAmount;
-                if (x < borderSpace) {
-                    x = borderSpace;
-                } else if (x + width > screenWidth - borderSpace) {
-                    int maxWidth = Math.max(minWidth, screenWidth - x - borderSpace);
+                if (x < padding) {
+                    x = padding;
+                } else if (x + width > screenWidth - padding) {
+                    int maxWidth = Math.max(minWidth, screenWidth - x - padding);
                     renderer.setAlignment(this.alignment, maxWidth);
                     renderer.draw(context, lines);
                     width = (int) renderer.getLastWidth();
@@ -166,14 +166,14 @@ public class Tooltip {
 
             Pos pos = this.pos;
             if (this.pos == Pos.VERTICAL) {
-                int bottomSpace = screenHeight - this.excludeArea.y - this.excludeArea.height;
-                pos = bottomSpace < height && bottomSpace < this.excludeArea.y ? Pos.ABOVE : Pos.BELOW;
+                int bottomSpace = screenHeight - this.excludeArea.ey();
+                pos = bottomSpace < height + padding && bottomSpace < this.excludeArea.y ? Pos.ABOVE : Pos.BELOW;
             }
 
             if (pos == Pos.BELOW) {
-                y = this.excludeArea.y + this.excludeArea.height + borderSpace;
+                y = this.excludeArea.y + this.excludeArea.height + padding;
             } else if (pos == Pos.ABOVE) {
-                y = this.excludeArea.y - height - borderSpace;
+                y = this.excludeArea.y - height - padding;
             }
         } else if (this.pos.horizontal) {
             boolean usedMoreSpaceSide = false;
@@ -184,7 +184,7 @@ public class Tooltip {
                     x = 0;
                 } else {
                     pos = Pos.RIGHT;
-                    x = screenWidth - this.excludeArea.x - this.excludeArea.width + borderSpace;
+                    x = screenWidth - this.excludeArea.x - this.excludeArea.width + padding;
                 }
             }
 
@@ -193,17 +193,17 @@ public class Tooltip {
                 y = yArea + shiftAmount;
             } else {
                 y = yArea - shiftAmount;
-                if (y < borderSpace) {
-                    y = borderSpace;
+                if (y < padding) {
+                    y = padding;
                 }
             }
 
-            if (x + width > screenWidth - borderSpace) {
+            if (x + width > screenWidth - padding) {
                 int maxWidth;
                 if (pos == Pos.LEFT) {
-                    maxWidth = Math.max(minWidth, this.excludeArea.x - borderSpace * 2);
+                    maxWidth = Math.max(minWidth, this.excludeArea.x - padding * 2);
                 } else {
-                    maxWidth = Math.max(minWidth, screenWidth - this.excludeArea.x - this.excludeArea.width - borderSpace * 2);
+                    maxWidth = Math.max(minWidth, screenWidth - this.excludeArea.x - this.excludeArea.width - padding * 2);
                 }
                 usedMoreSpaceSide = true;
                 renderer.setAlignment(this.alignment, maxWidth);
@@ -214,13 +214,13 @@ public class Tooltip {
 
             if (this.pos == Pos.HORIZONTAL && !usedMoreSpaceSide) {
                 int rightSpace = screenWidth - this.excludeArea.x - this.excludeArea.width;
-                pos = rightSpace < width && rightSpace < this.excludeArea.x ? Pos.LEFT : Pos.RIGHT;
+                pos = rightSpace < width + padding && rightSpace < this.excludeArea.x ? Pos.LEFT : Pos.RIGHT;
             }
 
             if (pos == Pos.RIGHT) {
-                x = this.excludeArea.x + this.excludeArea.width + borderSpace;
+                x = this.excludeArea.x + this.excludeArea.width + padding;
             } else if (pos == Pos.LEFT) {
-                x = this.excludeArea.x - width - borderSpace;
+                x = this.excludeArea.x - width - padding;
             }
         }
         return new Rectangle(x, y, width, height);

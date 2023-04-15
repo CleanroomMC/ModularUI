@@ -137,6 +137,7 @@ public class ModularContainer extends Container {
         return null;
     }
 
+    // TODO: Don't insert to slot when a parent is disabled
     protected ItemStack transferItem(ItemSlotSH fromSlot, ItemStack stack) {
         SlotGroup fromSlotGroup = getSlotGroup(fromSlot);
         for (ItemSlotSH slot : this.shiftClickSlots) {
@@ -146,11 +147,11 @@ public class ModularContainer extends Container {
             if (valid && slot.getSlot().func_111238_b() && slot.isItemValid(stack)) {
                 ItemStack itemstack = slot.getSlot().getStack();
                 if (slot.isPhantom()) {
-                    if (itemstack == null || (ItemHandlerHelper.canItemStacksStackRelaxed(stack, itemstack) && itemstack.stackSize < slot.getSlot().getSlotStackLimit())) {
+                    if (itemstack == null || (ItemHandlerHelper.canItemStacksStack(stack, itemstack) && itemstack.stackSize < slot.getSlot().getSlotStackLimit())) {
                         slot.getSlot().putStack(stack.copy());
                         return stack;
                     }
-                } else if (ItemHandlerHelper.canItemStacksStackRelaxed(stack, itemstack)) {
+                } else if (ItemHandlerHelper.canItemStacksStack(stack, itemstack)) {
                     int j = itemstack.stackSize + stack.stackSize;
                     int maxSize = Math.min(slot.getSlot().getSlotStackLimit(), stack.getMaxStackSize());
 
