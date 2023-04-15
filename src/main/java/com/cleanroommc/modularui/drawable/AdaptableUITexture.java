@@ -68,25 +68,25 @@ public class AdaptableUITexture extends UITexture {
             GuiDraw.drawBillboard(x, y + borderY, this.x, this.y + borderY, w, h - borderY - borderY, imageWidth, imageHeight);*/
         } else {
             // top left corner
-            GuiDraw.drawBillboard(x, y, x + borderX, y + borderY, u0, v0, u0 + uB, v0 + vB);
+            GuiDraw.drawTexture(x, y, x + borderX, y + borderY, u0, v0, u0 + uB, v0 + vB);
             // top right corner
-            GuiDraw.drawBillboard(x1 - borderX, y, x1, y + borderY, u1 - uB, v0, u1, vB);
+            GuiDraw.drawTexture(x1 - borderX, y, x1, y + borderY, u1 - uB, v0, u1, vB);
             // bottom left corner
-            GuiDraw.drawBillboard(x, y1 - borderY, x + borderX, y1, u0, v1 - vB, uB, v1);
+            GuiDraw.drawTexture(x, y1 - borderY, x + borderX, y1, u0, v1 - vB, uB, v1);
             // bottom right corner
-            GuiDraw.drawBillboard(x1 - borderX, y1 - borderY, x1, y1, u1 - uB, v1 - vB, u1, v1);
+            GuiDraw.drawTexture(x1 - borderX, y1 - borderY, x1, y1, u1 - uB, v1 - vB, u1, v1);
 
             // left border
-            GuiDraw.drawBillboard(x, y + borderY, x + borderX, y1 - borderY, u0, vB, uB, v1 - vB);
+            GuiDraw.drawTexture(x, y + borderY, x + borderX, y1 - borderY, u0, vB, uB, v1 - vB);
             // top border
-            GuiDraw.drawBillboard(x + borderX, y, x1 - borderX, y + borderY, uB, v0, u1 - uB, vB);
+            GuiDraw.drawTexture(x + borderX, y, x1 - borderX, y + borderY, uB, v0, u1 - uB, vB);
             // right border
-            GuiDraw.drawBillboard(x1 - borderX, y + borderY, x1, y1 - borderY, u1 - uB, vB, u1, v1 - vB);
+            GuiDraw.drawTexture(x1 - borderX, y + borderY, x1, y1 - borderY, u1 - uB, vB, u1, v1 - vB);
             // bottom border
-            GuiDraw.drawBillboard(x + borderX, y1 - borderY, x1 - borderX, y1, uB, v1 - vB, u1 - uB, v1);
+            GuiDraw.drawTexture(x + borderX, y1 - borderY, x1 - borderX, y1, uB, v1 - vB, u1 - uB, v1);
 
             // center
-            GuiDraw.drawBillboard(x + borderX, y + borderY, x1 - borderX, y1 - borderY, uB, vB, u1 - uB, v1 - vB);
+            GuiDraw.drawTexture(x + borderX, y + borderY, x1 - borderX, y1 - borderY, uB, vB, u1 - uB, v1 - vB);
         }
         GlStateManager.disableBlend();
         GlStateManager.enableAlpha();

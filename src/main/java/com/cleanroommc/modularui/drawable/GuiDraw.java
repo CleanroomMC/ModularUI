@@ -165,33 +165,33 @@ public class GuiDraw {
         GlStateManager.enableTexture2D();
     }
 
-    public static void drawTexture(ResourceLocation location, int x, int y, int w, int h, int u, int v, int textureWidth, int textureHeight) {
+    public static void drawTexture(ResourceLocation location, float x, float y, float w, float h, int u, int v, int textureWidth, int textureHeight) {
         GlStateManager.disableAlpha();
         GlStateManager.enableBlend();
         GlStateManager.enableTexture2D();
         Minecraft.getMinecraft().renderEngine.bindTexture(location);
-        drawBillboard(x, y, u, v, w, h, textureWidth, textureHeight);
+        drawTexture(x, y, u, v, w, h, textureWidth, textureHeight);
         GlStateManager.disableBlend();
         GlStateManager.enableAlpha();
     }
 
-    public static void drawBillboard(int x, int y, int u, int v, int w, int h, int textureW, int textureH) {
-        drawBillboard(x, y, u, v, w, h, textureW, textureH, 0);
+    public static void drawTexture(float x, float y, int u, int v, float w, float h, int textureW, int textureH) {
+        drawTexture(x, y, u, v, w, h, textureW, textureH, 0);
     }
 
     /**
      * Draw a textured quad with given UV, dimensions and custom texture size
      */
-    public static void drawBillboard(int x, int y, int u, int v, int w, int h, int textureW, int textureH, float z) {
+    public static void drawTexture(float x, float y, int u, int v, float w, float h, int textureW, int textureH, float z) {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
 
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        drawBillboard(buffer, x, y, u, v, w, h, textureW, textureH, z);
+        drawTexture(buffer, x, y, u, v, w, h, textureW, textureH, z);
         tessellator.draw();
     }
 
-    public static void drawBillboard(BufferBuilder buffer, int x, int y, int u, int v, int w, int h, int textureW, int textureH, float z) {
+    public static void drawTexture(BufferBuilder buffer, float x, float y, int u, int v, float w, float h, int textureW, int textureH, float z) {
         float tw = 1F / textureW;
         float th = 1F / textureH;
 
@@ -201,23 +201,23 @@ public class GuiDraw {
         buffer.pos(x, y, z).tex(u * tw, v * th).endVertex();
     }
 
-    public static void drawBillboard(int x, int y, int u, int v, int w, int h, int textureW, int textureH, int tu, int tv) {
-        drawBillboard(x, y, u, v, w, h, textureW, textureH, tu, tv, 0);
+    public static void drawTexture(float x, float y, int u, int v, float w, float h, int textureW, int textureH, int tu, int tv) {
+        drawTexture(x, y, u, v, w, h, textureW, textureH, tu, tv, 0);
     }
 
     /**
      * Draw a textured quad with given UV, dimensions and custom texture size
      */
-    public static void drawBillboard(int x, int y, int u, int v, int w, int h, int textureW, int textureH, int tu, int tv, float z) {
+    public static void drawTexture(float x, float y, int u, int v, float w, float h, int textureW, int textureH, int tu, int tv, float z) {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
 
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        drawBillboard(buffer, x, y, u, v, w, h, textureW, textureH, tu, tv, z);
+        drawTexture(buffer, x, y, u, v, w, h, textureW, textureH, tu, tv, z);
         tessellator.draw();
     }
 
-    public static void drawBillboard(BufferBuilder buffer, int x, int y, int u, int v, int w, int h, int textureW, int textureH, int tu, int tv, float z) {
+    public static void drawTexture(BufferBuilder buffer, float x, float y, int u, int v, float w, float h, int textureW, int textureH, int tu, int tv, float z) {
         float tw = 1F / textureW;
         float th = 1F / textureH;
 
@@ -227,24 +227,107 @@ public class GuiDraw {
         buffer.pos(x, y, z).tex(u * tw, v * th).endVertex();
     }
 
-    public static void drawBillboard(int x0, int y0, int x1, int y1, float u0, float v0, float u1, float v1) {
-        drawBillboard(x0, y0, x1, y1, u0, v0, u1, v1, 0);
+    public static void drawTexture(float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1) {
+        drawTexture(x0, y0, x1, y1, u0, v0, u1, v1, 0);
     }
 
-    public static void drawBillboard(int x0, int y0, int x1, int y1, float u0, float v0, float u1, float v1, float z) {
+    public static void drawTexture(float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1, float z) {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
 
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        drawBillboard(buffer, x0, y0, x1, y1, u0, v0, u1, v1, z);
+        drawTexture(buffer, x0, y0, x1, y1, u0, v0, u1, v1, z);
         tessellator.draw();
     }
 
-    public static void drawBillboard(BufferBuilder buffer, int x0, int y0, int x1, int y1, float u0, float v0, float u1, float v1, float z) {
+    public static void drawTexture(BufferBuilder buffer, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1, float z) {
         buffer.pos(x0, y1, z).tex(u0, v1).endVertex();
         buffer.pos(x1, y1, z).tex(u1, v1).endVertex();
         buffer.pos(x1, y0, z).tex(u1, v0).endVertex();
         buffer.pos(x0, y0, z).tex(u0, v0).endVertex();
+    }
+
+    public static void drawTiledTexture(ResourceLocation location, float x, float y, float w, float h, int u, int v, int tileW, int tileH, int tw, int th, float z) {
+        GlStateManager.disableAlpha();
+        GlStateManager.enableBlend();
+        GlStateManager.enableTexture2D();
+        Minecraft.getMinecraft().renderEngine.bindTexture(location);
+        drawTiledTexture(x, y, w, h, u, v, tileW, tileH, tw, th, z);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+    }
+
+    public static void drawTiledTexture(float x, float y, float w, float h, int u, int v, int tileW, int tileH, int tw, int th, float z) {
+        int countX = (((int) w - 1) / tileW) + 1;
+        int countY = (((int) h - 1) / tileH) + 1;
+        float fillerX = w - (countX - 1) * tileW;
+        float fillerY = h - (countY - 1) * tileH;
+
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+
+        for (int i = 0, c = countX * countY; i < c; i++) {
+            int ix = i % countX;
+            int iy = i / countX;
+            float xx = x + ix * tileW;
+            float yy = y + iy * tileH;
+            float xw = ix == countX - 1 ? fillerX : tileW;
+            float yh = iy == countY - 1 ? fillerY : tileH;
+
+            drawTexture(buffer, xx, yy, u, v, xw, yh, tw, th, z);
+        }
+
+        tessellator.draw();
+    }
+
+    public static void drawTiledTexture(ResourceLocation location, float x, float y, float w, float h, float u0, float v0, float u1, float v1, int textureWidth, int textureHeight, float z) {
+        GlStateManager.disableAlpha();
+        GlStateManager.enableBlend();
+        GlStateManager.enableTexture2D();
+        Minecraft.getMinecraft().renderEngine.bindTexture(location);
+        drawTiledTexture(x, y, w, h, u0, v0, u1, v1, textureWidth, textureHeight, z);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+    }
+
+    public static void drawTiledTexture(float x, float y, float w, float h, float u0, float v0, float u1, float v1, int tileWidth, int tileHeight, float z) {
+        int countX = (((int) w - 1) / tileWidth) + 1;
+        int countY = (((int) h - 1) / tileHeight) + 1;
+        float fillerX = w - (countX - 1) * tileWidth;
+        float fillerY = h - (countY - 1) * tileHeight;
+
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+
+        for (int i = 0, c = countX * countY; i < c; i++) {
+            int ix = i % countX;
+            int iy = i / countX;
+            float xx = x + ix * tileWidth;
+            float yy = y + iy * tileHeight;
+            float xw = ix == countX - 1 ? fillerX : tileWidth;
+            float yh = iy == countY - 1 ? fillerY : tileHeight;
+
+            drawTexture(buffer, xx, yy, xx + xw, yy + yh, u0, v0, u1, v1, z);
+        }
+
+        tessellator.draw();
+    }
+
+    public static void drawFluidTexture(FluidStack content, float x0, float y0, float width, float height, float z) {
+        if (content == null) {
+            return;
+        }
+        Fluid fluid = content.getFluid();
+        ResourceLocation fluidStill = fluid.getStill(content);
+        TextureAtlasSprite sprite = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(fluidStill.toString());
+        int fluidColor = fluid.getColor(content);
+        GlStateManager.color(Color.getRedF(fluidColor), Color.getGreenF(fluidColor), Color.getBlueF(fluidColor), Color.getAlphaF(fluidColor));
+        drawTiledTexture(TextureMap.LOCATION_BLOCKS_TEXTURE, x0, y0, width, height, sprite.getMinU(), sprite.getMinV(), sprite.getMaxU(), sprite.getMaxV(), sprite.getIconWidth(), sprite.getIconHeight(), z);
+        GlStateManager.color(1f, 1f, 1f, 1f);
     }
 
     public static void drawOutlineCenter(int x, int y, int offset, int color) {
@@ -428,31 +511,6 @@ public class GuiDraw {
         GlStateManager.enableTexture2D();
     }
 
-    public static void drawRepeatBillboard(int x, int y, int w, int h, int u, int v, int tileW, int tileH, int tw, int th) {
-        int countX = ((w - 1) / tileW) + 1;
-        int countY = ((h - 1) / tileH) + 1;
-        int fillerX = w - (countX - 1) * tileW;
-        int fillerY = h - (countY - 1) * tileH;
-
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-
-        for (int i = 0, c = countX * countY; i < c; i++) {
-            int ix = i % countX;
-            int iy = i / countX;
-            int xx = x + ix * tileW;
-            int yy = y + iy * tileH;
-            int xw = ix == countX - 1 ? fillerX : tileW;
-            int yh = iy == countY - 1 ? fillerY : tileH;
-
-            drawBillboard(buffer, xx, yy, u, v, xw, yh, tw, th, 0);
-        }
-
-        tessellator.draw();
-    }
-
     @SideOnly(Side.CLIENT)
     public static void drawBorder(float x, float y, float width, float height, int color, float border) {
         drawRect(x - border, y - border, width + 2 * border, border, color);
@@ -471,32 +529,6 @@ public class GuiDraw {
         fontRenderer.drawString(text, x * sf, y * sf, color, shadow);
         GlStateManager.popMatrix();
         GlStateManager.enableBlend();
-    }
-
-    public static void drawFluidTexture(FluidStack content, float x0, float y0, float width, float height, float z) {
-        if (content == null) {
-            return;
-        }
-        Fluid fluid = content.getFluid();
-        ResourceLocation fluidStill = fluid.getStill(content);
-        TextureAtlasSprite sprite = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(fluidStill.toString());
-        int fluidColor = fluid.getColor(content);
-        GlStateManager.enableBlend();
-        Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-
-        float u0 = sprite.getMinU(), u1 = sprite.getMaxU(), v0 = sprite.getMinV(), v1 = sprite.getMaxV();
-        float x1 = x0 + width, y1 = y0 + height;
-        float r = Color.getRedF(fluidColor), g = Color.getGreenF(fluidColor), b = Color.getBlueF(fluidColor), a = Color.getAlphaF(fluidColor);
-
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-        buffer.pos(x0, y1, z).tex(u0, v1).color(r, g, b, a).endVertex();
-        buffer.pos(x1, y1, z).tex(u1, v1).color(r, g, b, a).endVertex();
-        buffer.pos(x1, y0, z).tex(u1, v0).color(r, g, b, a).endVertex();
-        buffer.pos(x0, y0, z).tex(u0, v0).color(r, g, b, a).endVertex();
-        tessellator.draw();
-        GlStateManager.disableBlend();
     }
 
     public static void drawTooltipBackground(List<String> lines, int x, int y, int textWidth, int height) {
