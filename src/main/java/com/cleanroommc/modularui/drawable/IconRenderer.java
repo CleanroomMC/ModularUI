@@ -24,6 +24,7 @@ public class IconRenderer {
     protected float scale = 1f;
     protected boolean shadow = false;
     protected int color = 0;//Theme.INSTANCE.getText();
+    protected int linePadding = 1;
     protected boolean simulate;
     protected float lastWidth = 0, lastHeight = 0;
     protected boolean useWholeWidth = false;
@@ -55,6 +56,10 @@ public class IconRenderer {
         this.color = color;
     }
 
+    public void setLinePadding(int linePadding) {
+        this.linePadding = linePadding;
+    }
+
     public void setSimulate(boolean simulate) {
         this.simulate = simulate;
     }
@@ -81,10 +86,14 @@ public class IconRenderer {
             maxWidth = (int) this.maxWidth;
         }
         for (IIcon icon : lines) {
-            totalHeight += icon.getHeight();
+            totalHeight += icon.getHeight() + linePadding;
             if (!this.useWholeWidth && icon.getWidth() > 0) {
                 maxWidth = Math.max(maxWidth, icon.getWidth());
             }
+        }
+        if (lines.size() > 0) {
+            // don't add padding to last line
+            totalHeight -= linePadding;
         }
         int y = getStartY(totalHeight);
         for (IIcon icon : lines) {
@@ -92,12 +101,10 @@ public class IconRenderer {
             if (!simulate) {
                 icon.draw(context, x, y, maxWidth, icon.getHeight());
             }
-            y += icon.getHeight() * scale;
+            y += (icon.getHeight() + linePadding) * scale;
         }
         this.lastWidth = this.maxWidth > 0 ? Math.min(this.maxWidth, maxWidth) : maxWidth;
         this.lastHeight = totalHeight * scale;
-        this.lastWidth = Math.max(0, this.lastWidth - scale);
-        this.lastHeight = Math.max(0, this.lastHeight - scale);
     }
 
     public List<IIcon> measureLines(List<IDrawable> lines) {
@@ -116,7 +123,7 @@ public class IconRenderer {
                 for (String subLine : text.split("\\\\n")) {
                     for (String subSubLine : wrapLine(subLine, scale)) {
                         int width = (int) (getFontRenderer().getStringWidth(subSubLine) * scale);
-                        icons.add(new TextIcon(subSubLine, width, (int) (getFontRenderer().FONT_HEIGHT * scale + scale), scale, alignment1));
+                        icons.add(new TextIcon(subSubLine, width, (int) (getFontRenderer().FONT_HEIGHT * scale), scale, alignment1));
                     }
                 }
             } else {
