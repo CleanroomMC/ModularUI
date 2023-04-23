@@ -4,6 +4,9 @@ import com.cleanroommc.modularui.theme.*;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+/**
+ * A theme is parsed from json and contains style information like color or background texture.
+ */
 @SideOnly(Side.CLIENT)
 public interface ITheme {
 

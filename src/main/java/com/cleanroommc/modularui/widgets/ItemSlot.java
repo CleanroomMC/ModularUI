@@ -8,6 +8,8 @@ import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.TextRenderer;
+import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
+import com.cleanroommc.modularui.integration.jei.JeiIngredientProvider;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import com.cleanroommc.modularui.screen.ModularScreen;
@@ -27,18 +29,30 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable {
+import java.util.List;
+
+public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable, JeiGhostIngredientSlot<ItemStack>, JeiIngredientProvider {
 
     private static final TextRenderer textRenderer = new TextRenderer();
     private ItemSlotSH syncHandler;
 
     public ItemSlot() {
+        tooltipBuilder(tooltip -> {
+            tooltip.setUpdateTooltipEveryTick(true).setHasSpaceAfterFirstLine(true);
+            tooltip.excludeArea(getArea());
+            if (!isSynced()) return;
+            ItemStack stack = getSlot().getStack();
+            if (stack.isEmpty()) return;
+            tooltip.addStringLines(getItemTooltip(stack));
+        });
     }
 
     @Override
     public void onInit() {
         size(18, 18);
+        getContext().addJeiGhostIngredientSlot(this);
     }
 
     @Override
@@ -59,7 +73,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         GlStateManager.disableLighting();
         if (isHovering()) {
             GlStateManager.colorMask(true, true, true, false);
-            GuiDraw.drawSolidRect(1, 1, 16, 16, getWidgetTheme(context.getTheme()).getSlotHoverColor());
+            GuiDraw.drawRect(1, 1, 16, 16, getWidgetTheme(context.getTheme()).getSlotHoverColor());
             GlStateManager.colorMask(true, true, true, true);
         }
     }
@@ -115,12 +129,28 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         return syncHandler.getSlot();
     }
 
+    @Override
+    public boolean isSynced() {
+        return syncHandler != null;
+    }
+
+    @Override
+    public ItemSlotSH getSyncHandler() {
+        if (this.syncHandler == null) {
+            throw new IllegalStateException("Widget is not initialised!");
+        }
+        return syncHandler;
+    }
+
+    protected List<String> getItemTooltip(ItemStack stack) {
+        // todo: JEI seems to be getting tooltip from IngredientRenderer#getTooltip
+        return getScreen().getScreenWrapper().getItemToolTip(stack);
+    }
+
     @SideOnly(Side.CLIENT)
     private void drawSlot(Slot slotIn) {
         GuiScreenWrapper guiScreen = getScreen().getScreenWrapper();
         GuiContainerAccessor accessor = guiScreen.getAccessor();
-        int x = slotIn.xPos;
-        int y = slotIn.yPos;
         ItemStack itemstack = slotIn.getStack();
         boolean flag = false;
         boolean flag1 = slotIn == accessor.getClickedSlot() && !accessor.getDraggedStack().isEmpty() && !accessor.getIsRightMouseClick();
@@ -158,7 +188,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
         if (!flag1) {
             if (flag) {
-                GuiDraw.drawSolidRect(1, 1, 16, 16, -2130706433);
+                GuiDraw.drawRect(1, 1, 16, 16, -2130706433);
             }
 
             if (!itemstack.isEmpty()) {
@@ -207,5 +237,20 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
         guiScreen.getItemRenderer().zLevel = 0.0F;
         guiScreen.setZ(0f);
+    }
+
+    @Override
+    public void setGhostIngredient(@NotNull ItemStack ingredient) {
+        this.syncHandler.updateFromClient(ingredient);
+    }
+
+    @Override
+    public @Nullable ItemStack castGhostIngredientIfValid(@NotNull Object ingredient) {
+        return this.syncHandler.isPhantom() && ingredient instanceof ItemStack ? (ItemStack) ingredient : null;
+    }
+
+    @Override
+    public @Nullable Object getIngredient() {
+        return this.syncHandler.getSlot().getStack();
     }
 }

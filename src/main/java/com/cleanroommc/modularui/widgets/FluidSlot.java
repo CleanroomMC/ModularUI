@@ -7,6 +7,8 @@ import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.TextRenderer;
+import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
+import com.cleanroommc.modularui.integration.jei.JeiIngredientProvider;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -28,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
 
-public class FluidSlot extends Widget<FluidSlot> implements Interactable {
+public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGhostIngredientSlot<FluidStack>, JeiIngredientProvider {
 
     private static final IFluidTank EMPTY = new FluidTank(0);
 
@@ -45,6 +47,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable {
                 .endDefaultMode();
 
         tooltipBuilder(tooltip -> {
+            tooltip.setHasSpaceAfterFirstLine(true);
             IFluidTank fluidTank = getFluidTank();
             FluidStack fluid = this.syncHandler.getCachedValue();
             if (this.syncHandler.isPhantom()) {
@@ -93,6 +96,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable {
         textRenderer.setShadow(true);
         textRenderer.setScale(0.5f);
         textRenderer.setColor(Color.WHITE.normal);
+        getContext().addJeiGhostIngredientSlot(this);
     }
 
     @Override
@@ -129,7 +133,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable {
         }
         if (isHovering()) {
             GlStateManager.colorMask(true, true, true, false);
-            GuiDraw.drawSolidRect(1, 1, 16, 16, getWidgetTheme(context.getTheme()).getSlotHoverColor());
+            GuiDraw.drawRect(1, 1, 16, 16, getWidgetTheme(context.getTheme()).getSlotHoverColor());
             GlStateManager.colorMask(true, true, true, true);
         }
     }
@@ -182,11 +186,13 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable {
         return Interactable.super.onKeyRelease(typedChar, keyCode);
     }
 
+    @Nullable
+    public FluidStack getFluidStack() {
+        return this.syncHandler == null ? null : this.syncHandler.getCachedValue();
+    }
+
     public IFluidTank getFluidTank() {
-        if (this.syncHandler == null) {
-            return EMPTY;
-        }
-        return this.syncHandler.getFluidTank();
+        return this.syncHandler == null ? EMPTY : this.syncHandler.getFluidTank();
     }
 
     /**
@@ -216,5 +222,22 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable {
     public FluidSlot overlayTexture(@Nullable IDrawable overlayTexture) {
         this.overlayTexture = overlayTexture;
         return this;
+    }
+
+    /* === Jei ghost slot === */
+
+    @Override
+    public void setGhostIngredient(@NotNull FluidStack ingredient) {
+        this.syncHandler.updateFromClient(ingredient);
+    }
+
+    @Override
+    public @Nullable FluidStack castGhostIngredientIfValid(@NotNull Object ingredient) {
+        return this.syncHandler.isPhantom() && ingredient instanceof FluidStack ? (FluidStack) ingredient : null;
+    }
+
+    @Override
+    public @Nullable Object getIngredient() {
+        return getFluidStack();
     }
 }

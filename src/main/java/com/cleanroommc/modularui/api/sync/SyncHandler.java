@@ -4,7 +4,6 @@ import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.network.packets.PacketSyncHandler;
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
-import com.cleanroommc.modularui.sync.MapKey;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
@@ -25,11 +24,11 @@ import java.util.function.Consumer;
 public abstract class SyncHandler {
 
     private GuiSyncHandler syncHandler;
-    private MapKey key;
+    private String key;
 
     @ApiStatus.OverrideOnly
     @MustBeInvokedByOverriders
-    public void init(MapKey key, GuiSyncHandler syncHandler) {
+    public void init(String key, GuiSyncHandler syncHandler) {
         this.key = key;
         this.syncHandler = syncHandler;
     }
@@ -111,7 +110,7 @@ public abstract class SyncHandler {
     /**
      * @return the key that belongs to this sync handler
      */
-    public final MapKey getKey() {
+    public final String getKey() {
         return key;
     }
 

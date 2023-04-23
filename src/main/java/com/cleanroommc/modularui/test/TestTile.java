@@ -179,6 +179,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                                         .setSynced("phantom_item_slot"))
                                                 .child(new FluidSlot()
                                                         .margin(2)
+                                                        .width(30)
                                                         .setSynced("fluid_slot", 1))
                                         )))
                         .addPage(new Column()

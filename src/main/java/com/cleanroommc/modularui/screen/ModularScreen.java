@@ -123,14 +123,6 @@ public abstract class ModularScreen {
 
     public void onOpen() {
         windowManager.init();
-        if (!getContainer().isClientOnly()) {
-            windowManager.getOpenPanels().forEach(panel -> WidgetTree.foreachChildByLayer(panel, widget -> {
-                if (widget instanceof ISynced) {
-                    ((ISynced<?>) widget).initialiseSyncHandler(this.syncHandler);
-                }
-                return true;
-            }));
-        }
     }
 
     @MustBeInvokedByOverriders
@@ -166,7 +158,7 @@ public abstract class ModularScreen {
         return this.windowManager.isPanelOpen(name);
     }
 
-    @ApiStatus.OverrideOnly
+    @MustBeInvokedByOverriders
     public void onUpdate() {
         this.context.tick();
     }
@@ -196,7 +188,7 @@ public abstract class ModularScreen {
         this.context.pushViewport(null, this.viewport);
         for (ModularPanel panel : this.windowManager.getReverseOpenPanels()) {
             if (panel.disablePanelsBelow()) {
-                GuiDraw.drawSolidRect(0, 0, this.viewport.w(), this.viewport.h(), Color.argb(16, 16, 16, (int) (125 * panel.getAlpha())));
+                GuiDraw.drawRect(0, 0, this.viewport.w(), this.viewport.h(), Color.argb(16, 16, 16, (int) (125 * panel.getAlpha())));
             }
             WidgetTree.drawTree(panel, this.context);
         }
@@ -414,6 +406,8 @@ public abstract class ModularScreen {
     public void removeGuiActionListener(IGuiAction action) {
         this.guiActionListeners.getOrDefault(getGuiActionClass(action), Collections.emptyList()).remove(action);
     }
+
+
 
     private static Class<?> getGuiActionClass(IGuiAction action) {
         Class<?>[] classes = action.getClass().getInterfaces();

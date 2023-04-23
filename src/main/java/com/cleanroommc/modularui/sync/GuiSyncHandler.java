@@ -20,10 +20,10 @@ public class GuiSyncHandler {
 
     private static final String PLAYER_INVENTORY = "player_inventory";
 
-    private static final MapKey CURSOR_KEY = new MapKey("cursor_slot", 255255);
+    private static final String CURSOR_KEY = makeSyncKey("cursor_slot", 255255);
     private final CursorSlotSyncHandler cursorSlotSyncHandler = new CursorSlotSyncHandler();
     private final EntityPlayer player;
-    private final Map<MapKey, SyncHandler> syncedValues = new Object2ObjectLinkedOpenHashMap<>();
+    private final Map<String, SyncHandler> syncedValues = new Object2ObjectLinkedOpenHashMap<>();
     private final Map<String, SlotGroup> slotGroups = new Object2ObjectOpenHashMap<>();
     private ModularContainer container;
     private boolean frozen;
@@ -80,7 +80,7 @@ public class GuiSyncHandler {
         }
     }
 
-    public void receiveWidgetUpdate(MapKey mapKey, int id, PacketBuffer buf) throws IOException {
+    public void receiveWidgetUpdate(String mapKey, int id, PacketBuffer buf) throws IOException {
         SyncHandler syncHandler = syncedValues.get(mapKey);
         if (NetworkUtils.isClient(this.player)) {
             syncHandler.readOnClient(id, buf);
@@ -89,7 +89,7 @@ public class GuiSyncHandler {
         }
     }
 
-    public GuiSyncHandler syncValue(MapKey key, SyncHandler syncHandler) {
+    public GuiSyncHandler syncValue(String key, SyncHandler syncHandler) {
         if (key == null) throw new NullPointerException("Key must not be null");
         if (syncHandler == null) throw new NullPointerException("Sync Handler must not be null");
         if (this.syncedValues.containsKey(key)) {
@@ -100,15 +100,11 @@ public class GuiSyncHandler {
     }
 
     public GuiSyncHandler syncValue(String name, int id, SyncHandler syncHandler) {
-        return syncValue(new MapKey(name, id), syncHandler);
-    }
-
-    public GuiSyncHandler syncValue(String name, SyncHandler syncHandler) {
-        return syncValue(new MapKey(name), syncHandler);
+        return syncValue(makeSyncKey(name, id), syncHandler);
     }
 
     public GuiSyncHandler syncValue(int id, SyncHandler syncHandler) {
-        return syncValue(new MapKey(id), syncHandler);
+        return syncValue(makeSyncKey(id), syncHandler);
     }
 
     public GuiSyncHandler registerSlotGroup(SlotGroup slotGroup) {
@@ -136,7 +132,7 @@ public class GuiSyncHandler {
         return this.slotGroups.values();
     }
 
-    public SyncHandler getSyncHandler(MapKey mapKey) {
+    public SyncHandler getSyncHandler(String mapKey) {
         return this.syncedValues.get(mapKey);
     }
 
@@ -146,5 +142,13 @@ public class GuiSyncHandler {
 
     public ModularContainer getContainer() {
         return container;
+    }
+
+    public static String makeSyncKey(String name, int id) {
+        return name + ":" + id;
+    }
+
+    public static String makeSyncKey(int id) {
+        return String.valueOf(id);
     }
 }

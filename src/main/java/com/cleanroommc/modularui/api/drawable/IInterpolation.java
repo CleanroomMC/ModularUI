@@ -4,6 +4,9 @@ import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+/**
+ * A function which interpolates between two values.
+ */
 public interface IInterpolation {
 
     float interpolate(float a, float b, float x);

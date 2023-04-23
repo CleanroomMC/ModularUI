@@ -27,7 +27,7 @@ public class Icon implements IIcon {
 
     @Override
     public int getHeight() {
-        return height + 1;
+        return height;
     }
 
     @Override

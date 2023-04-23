@@ -5,12 +5,15 @@ import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
+import com.cleanroommc.modularui.integration.jei.GhostIngredientTarget;
+import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
 import com.cleanroommc.modularui.screen.DraggablePanelWrapper;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.WindowManager;
 import com.cleanroommc.modularui.theme.ThemeManager;
 import com.cleanroommc.modularui.widget.sizer.GuiAxis;
+import mezz.jei.api.gui.IGhostIngredientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraftforge.fml.relauncher.Side;
@@ -23,7 +26,6 @@ import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
@@ -69,6 +71,7 @@ public class GuiContext extends GuiViewportStack {
 
     private final List<IWidget> jeiExclusionWidgets = new ArrayList<>();
     private final List<Rectangle> jeiExclusionAreas = new ArrayList<>();
+    private final List<JeiGhostIngredientSlot<?>> jeiGhostIngredientSlots = new ArrayList<>();
 
     public GuiContext(ModularScreen screen) {
         this.screen = screen;
@@ -484,6 +487,14 @@ public class GuiContext extends GuiViewportStack {
         this.jeiExclusionWidgets.remove(area);
     }
 
+    public <W extends IWidget & JeiGhostIngredientSlot> void addJeiGhostIngredientSlot(W slot) {
+        this.jeiGhostIngredientSlots.add(slot);
+    }
+
+    public <W extends IWidget & JeiGhostIngredientSlot> void removeJeiGhostIngredientSlot(W slot) {
+        this.jeiGhostIngredientSlots.remove(slot);
+    }
+
     public List<Rectangle> getJeiExclusionAreas() {
         return jeiExclusionAreas;
     }
@@ -493,12 +504,26 @@ public class GuiContext extends GuiViewportStack {
     }
 
     public List<Rectangle> getAllJeiExclusionAreas() {
+        this.jeiExclusionWidgets.removeIf(widget -> !widget.isValid());
         List<Rectangle> areas = new ArrayList<>(this.jeiExclusionAreas);
         areas.addAll(this.jeiExclusionWidgets.stream()
                 .filter(IWidget::isEnabled)
                 .map(IWidget::getArea)
                 .collect(Collectors.toList()));
         return areas;
+    }
+
+    public List<JeiGhostIngredientSlot<?>> getJeiGhostIngredientSlots() {
+        return jeiGhostIngredientSlots;
+    }
+
+    public <I> List<IGhostIngredientHandler.Target<I>> getAllGhostIngredientTargets(@NotNull I ingredient) {
+        this.jeiGhostIngredientSlots.removeIf(widget -> !((IWidget) widget).isValid());
+        return this.jeiGhostIngredientSlots.stream()
+                .filter(slot -> ((IWidget) slot).isEnabled())
+                .filter(slot -> slot.castGhostIngredientIfValid(ingredient) != null)
+                .map(slot -> (IGhostIngredientHandler.Target<I>) GhostIngredientTarget.of(slot))
+                .collect(Collectors.toList());
     }
 
     public ITheme getTheme() {
