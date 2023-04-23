@@ -47,6 +47,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
                 .endDefaultMode();
 
         tooltipBuilder(tooltip -> {
+            tooltip.setHasSpaceAfterFirstLine(true);
             IFluidTank fluidTank = getFluidTank();
             FluidStack fluid = this.syncHandler.getCachedValue();
             if (this.syncHandler.isPhantom()) {
@@ -132,7 +133,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
         }
         if (isHovering()) {
             GlStateManager.colorMask(true, true, true, false);
-            GuiDraw.drawSolidRect(1, 1, 16, 16, getWidgetTheme(context.getTheme()).getSlotHoverColor());
+            GuiDraw.drawRect(1, 1, 16, 16, getWidgetTheme(context.getTheme()).getSlotHoverColor());
             GlStateManager.colorMask(true, true, true, true);
         }
     }

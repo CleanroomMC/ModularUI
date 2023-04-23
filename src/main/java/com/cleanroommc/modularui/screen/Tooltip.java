@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.GuiDraw;
+import com.cleanroommc.modularui.drawable.Icon;
 import com.cleanroommc.modularui.drawable.IconRenderer;
 import com.cleanroommc.modularui.drawable.TextIcon;
 import com.cleanroommc.modularui.drawable.TextRenderer;
@@ -15,6 +16,7 @@ import com.cleanroommc.modularui.widget.sizer.Area;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.Nullable;
@@ -40,6 +42,9 @@ public class Tooltip {
     private int textColor = Color.WHITE.normal;
     private float scale = 1.0f;
     private Alignment alignment = Alignment.TopLeft;
+    private boolean updateTooltipEveryTick = false;
+    private boolean hasSpaceAfterFirstLine = false;
+    private int linePadding = 1;
 
     private boolean dirty = true;
 
@@ -53,9 +58,15 @@ public class Tooltip {
         }
         this.lines.addAll(additionalLines);
         this.additionalLines = additionalLines;
+        if (hasSpaceAfterFirstLine && lines.size() > 1) {
+            lines.add(1, Icon.EMPTY_2PX);
+        }
     }
 
     public void draw(GuiContext context) {
+        if (updateTooltipEveryTick) {
+            markDirty();
+        }
         if (isEmpty()) return;
 
         if (maxWidth <= 0) {
@@ -80,6 +91,7 @@ public class Tooltip {
         renderer.setColor(this.textColor);
         renderer.setScale(this.scale);
         renderer.setAlignment(this.alignment, this.maxWidth);
+        renderer.setLinePadding(linePadding);
         renderer.setSimulate(true);
         renderer.setPos(0, 0);
 
@@ -94,7 +106,7 @@ public class Tooltip {
         GlStateManager.disableDepth();
         GlStateManager.disableBlend();
 
-        GuiDraw.drawTooltipBackground(textLines, area.x, area.y, area.width, area.height, 300);
+        GuiDraw.drawTooltipBackground(textLines, area.x, area.y, area.width, area.height);
 
         MinecraftForge.EVENT_BUS.post(new RenderTooltipEvent.PostBackground(ItemStack.EMPTY, textLines, area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height));
 
@@ -117,9 +129,20 @@ public class Tooltip {
         }
 
         if (this.pos == Pos.NEXT_TO_MOUSE) {
-            // TODO
-            boolean isOnRightSide = mouseX > screenWidth / 2;
-            return new Rectangle();
+            final int PADDING = 8;
+            // magic number to place tooltip nicer. Look at GuiScreen#L237
+            final int MOUSE_OFFSET = 12;
+            int x = mouseX + MOUSE_OFFSET, y = mouseY - MOUSE_OFFSET;
+            if (x < PADDING) {
+                x = PADDING;
+            } else if (x + width + PADDING > screenWidth) {
+                x -= MOUSE_OFFSET * 2 + width; // flip side of cursor
+                if (x < PADDING) {
+                    x = PADDING;
+                }
+            }
+            y = MathHelper.clamp(y, PADDING, screenHeight - PADDING - height);
+            return new Rectangle(x, y, width, height);
         }
 
         if (this.excludeArea == null) {
@@ -136,7 +159,7 @@ public class Tooltip {
         }
 
         int shiftAmount = 10;
-        int borderSpace = 7;
+        int padding = 7;
 
         int x = 0, y = 0;
         if (this.pos.vertical) {
@@ -145,10 +168,10 @@ public class Tooltip {
                 x = xArea + shiftAmount;
             } else {
                 x = xArea - shiftAmount;
-                if (x < borderSpace) {
-                    x = borderSpace;
-                } else if (x + width > screenWidth - borderSpace) {
-                    int maxWidth = Math.max(minWidth, screenWidth - x - borderSpace);
+                if (x < padding) {
+                    x = padding;
+                } else if (x + width > screenWidth - padding) {
+                    int maxWidth = Math.max(minWidth, screenWidth - x - padding);
                     renderer.setAlignment(this.alignment, maxWidth);
                     renderer.draw(context, lines);
                     width = (int) renderer.getLastWidth();
@@ -158,14 +181,14 @@ public class Tooltip {
 
             Pos pos = this.pos;
             if (this.pos == Pos.VERTICAL) {
-                int bottomSpace = screenHeight - this.excludeArea.y - this.excludeArea.height;
-                pos = bottomSpace < height && bottomSpace < this.excludeArea.y ? Pos.ABOVE : Pos.BELOW;
+                int bottomSpace = screenHeight - this.excludeArea.ey();
+                pos = bottomSpace < height + padding && bottomSpace < this.excludeArea.y ? Pos.ABOVE : Pos.BELOW;
             }
 
             if (pos == Pos.BELOW) {
-                y = this.excludeArea.y + this.excludeArea.height + borderSpace;
+                y = this.excludeArea.y + this.excludeArea.height + padding;
             } else if (pos == Pos.ABOVE) {
-                y = this.excludeArea.y - height - borderSpace;
+                y = this.excludeArea.y - height - padding;
             }
         } else if (this.pos.horizontal) {
             boolean usedMoreSpaceSide = false;
@@ -176,7 +199,7 @@ public class Tooltip {
                     x = 0;
                 } else {
                     pos = Pos.RIGHT;
-                    x = screenWidth - this.excludeArea.x - this.excludeArea.width + borderSpace;
+                    x = screenWidth - this.excludeArea.x - this.excludeArea.width + padding;
                 }
             }
 
@@ -185,17 +208,17 @@ public class Tooltip {
                 y = yArea + shiftAmount;
             } else {
                 y = yArea - shiftAmount;
-                if (y < borderSpace) {
-                    y = borderSpace;
+                if (y < padding) {
+                    y = padding;
                 }
             }
 
-            if (x + width > screenWidth - borderSpace) {
+            if (x + width > screenWidth - padding) {
                 int maxWidth;
                 if (pos == Pos.LEFT) {
-                    maxWidth = Math.max(minWidth, this.excludeArea.x - borderSpace * 2);
+                    maxWidth = Math.max(minWidth, this.excludeArea.x - padding * 2);
                 } else {
-                    maxWidth = Math.max(minWidth, screenWidth - this.excludeArea.x - this.excludeArea.width - borderSpace * 2);
+                    maxWidth = Math.max(minWidth, screenWidth - this.excludeArea.x - this.excludeArea.width - padding * 2);
                 }
                 usedMoreSpaceSide = true;
                 renderer.setAlignment(this.alignment, maxWidth);
@@ -206,13 +229,13 @@ public class Tooltip {
 
             if (this.pos == Pos.HORIZONTAL && !usedMoreSpaceSide) {
                 int rightSpace = screenWidth - this.excludeArea.x - this.excludeArea.width;
-                pos = rightSpace < width && rightSpace < this.excludeArea.x ? Pos.LEFT : Pos.RIGHT;
+                pos = rightSpace < width + padding && rightSpace < this.excludeArea.x ? Pos.LEFT : Pos.RIGHT;
             }
 
             if (pos == Pos.RIGHT) {
-                x = this.excludeArea.x + this.excludeArea.width + borderSpace;
+                x = this.excludeArea.x + this.excludeArea.width + padding;
             } else if (pos == Pos.LEFT) {
-                x = this.excludeArea.x - width - borderSpace;
+                x = this.excludeArea.x - width - padding;
             }
         }
         return new Rectangle(x, y, width, height);
@@ -297,6 +320,24 @@ public class Tooltip {
         return this;
     }
 
+    public Tooltip setUpdateTooltipEveryTick(boolean update) {
+        this.updateTooltipEveryTick = update;
+        return this;
+    }
+
+    public Tooltip setHasSpaceAfterFirstLine(boolean hasSpaceAfterFirstLine) {
+        this.hasSpaceAfterFirstLine = hasSpaceAfterFirstLine;
+        return this;
+    }
+
+    /**
+     * By default, tooltips have 1px of space between lines. Set to 0 if you want to disable it.
+     */
+    public Tooltip setLinePadding(int linePadding) {
+        this.linePadding = linePadding;
+        return this;
+    }
+
     public Tooltip addLine(IDrawable drawable) {
         this.additionalLines.add(drawable);
         return this;
@@ -304,6 +345,20 @@ public class Tooltip {
 
     public Tooltip addLine(String line) {
         return addLine(IKey.str(line));
+    }
+
+    public Tooltip addDrawableLines(Iterable<IDrawable> lines) {
+        for (IDrawable line : lines) {
+            addLine(line);
+        }
+        return this;
+    }
+
+    public Tooltip addStringLines(Iterable<String> lines) {
+        for (String line : lines) {
+            addLine(IKey.str(line));
+        }
+        return this;
     }
 
     public enum Pos {

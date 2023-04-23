@@ -1,5 +1,10 @@
 package com.cleanroommc.modularui.api.sync;
 
+/**
+ * A helper interface for sync values which can be turned into a string.
+ *
+ * @param <T> value type
+ */
 public interface IStringSyncHandler<T> extends IValueSyncHandler<T> {
 
     default String asString(T value) {
