@@ -106,7 +106,7 @@ public class Tooltip {
         GlStateManager.disableDepth();
         GlStateManager.disableBlend();
 
-        GuiDraw.drawTooltipBackground(textLines, area.x, area.y, area.width, area.height, 300);
+        GuiDraw.drawTooltipBackground(textLines, area.x, area.y, area.width, area.height);
 
         MinecraftForge.EVENT_BUS.post(new RenderTooltipEvent.PostBackground(ItemStack.EMPTY, textLines, area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height));
 
