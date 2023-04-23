@@ -227,6 +227,16 @@ public class GuiDraw {
         buffer.pos(x, y, z).tex(u * tw, v * th).endVertex();
     }
 
+    public static void drawTexture(ResourceLocation location, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1) {
+        GlStateManager.disableAlpha();
+        GlStateManager.enableBlend();
+        GlStateManager.enableTexture2D();
+        Minecraft.getMinecraft().renderEngine.bindTexture(location);
+        drawTexture(x0, y0, x1, y1, u0, v0, u1, v1, 0);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+    }
+
     public static void drawTexture(float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1) {
         drawTexture(x0, y0, x1, y1, u0, v0, u1, v1, 0);
     }
@@ -297,6 +307,8 @@ public class GuiDraw {
         int countY = (((int) h - 1) / tileHeight) + 1;
         float fillerX = w - (countX - 1) * tileWidth;
         float fillerY = h - (countY - 1) * tileHeight;
+        float fillerU = u0 + (u1 - u0) * fillerX / tileWidth;
+        float fillerV = v0 + (v1 - v0) * fillerY / tileHeight;
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
@@ -308,10 +320,17 @@ public class GuiDraw {
             int iy = i / countX;
             float xx = x + ix * tileWidth;
             float yy = y + iy * tileHeight;
-            float xw = ix == countX - 1 ? fillerX : tileWidth;
-            float yh = iy == countY - 1 ? fillerY : tileHeight;
+            float xw = tileWidth, yh = tileHeight, uEnd = u1, vEnd = v1;
+            if (ix == countX - 1) {
+                xw = fillerX;
+                uEnd = fillerU;
+            }
+            if (iy == countY - 1) {
+                yh = fillerY;
+                vEnd = fillerV;
+            }
 
-            drawTexture(buffer, xx, yy, xx + xw, yy + yh, u0, v0, u1, v1, z);
+            drawTexture(buffer, xx, yy, xx + xw, yy + yh, u0, v0, uEnd, vEnd, z);
         }
 
         tessellator.draw();

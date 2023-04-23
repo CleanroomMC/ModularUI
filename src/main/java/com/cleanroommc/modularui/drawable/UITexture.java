@@ -10,11 +10,6 @@ import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.HashMap;
@@ -106,31 +101,11 @@ public class UITexture implements IDrawable {
     }
 
     public void draw(float x, float y, float width, float height) {
-        GlStateManager.enableBlend();
-        GlStateManager.enableTexture2D();
-        Minecraft.getMinecraft().renderEngine.bindTexture(location);
-        draw(location, x, y, width, height, u0, v0, u1, v1);
-        GlStateManager.disableBlend();
+        GuiDraw.drawTexture(this.location, x, y, x + width, y + height, u0, v0, u1, v1);
     }
 
     public void drawSubArea(float x, float y, float width, float height, float uStart, float vStart, float uEnd, float vEnd) {
-        GlStateManager.enableBlend();
-        GlStateManager.enableTexture2D();
-        Minecraft.getMinecraft().renderEngine.bindTexture(location);
-        draw(location, x, y, width, height, calcU(uStart), calcV(vStart), calcU(uEnd), calcV(vEnd));
-        GlStateManager.disableBlend();
-    }
-
-    public static void draw(ResourceLocation location, float x0, float y0, float width, float height, float u0, float v0, float u1, float v1) {
-        float x1 = x0 + width, y1 = y0 + height;
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
-        bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
-        bufferbuilder.pos(x0, y1, 0.0f).tex(u0, v1).endVertex();
-        bufferbuilder.pos(x1, y1, 0.0f).tex(u1, v1).endVertex();
-        bufferbuilder.pos(x1, y0, 0.0f).tex(u1, v0).endVertex();
-        bufferbuilder.pos(x0, y0, 0.0f).tex(u0, v0).endVertex();
-        tessellator.draw();
+        GuiDraw.drawTexture(this.location, x, y, x + width, y + height, calcU(uStart), calcV(vStart), calcU(uEnd), calcV(vEnd));
     }
 
     @Override
@@ -187,6 +162,9 @@ public class UITexture implements IDrawable {
         defaultImageHeight = h;
     }
 
+    /**
+     * A builder class to help create image textures.
+     */
     public static class Builder {
 
         private ResourceLocation location;
@@ -197,34 +175,80 @@ public class UITexture implements IDrawable {
         private int borderX = 0, borderY = 0;
         private Type type;
         private String name;
+        private boolean tiled = false;
         private boolean canApplyTheme = false;
 
+        /**
+         * @param loc location of the image to draw
+         */
         public Builder location(ResourceLocation loc) {
             this.location = loc;
             return this;
         }
 
+        /**
+         * @param mod  mod location of the image to draw
+         * @param path path of the image to draw
+         */
         public Builder location(String mod, String path) {
             this.location = new ResourceLocation(mod, path);
             return this;
         }
 
+        /**
+         * @param path path of the image to draw in minecraft asset folder
+         */
         public Builder location(String path) {
             this.location = new ResourceLocation(path);
             return this;
         }
 
+        /**
+         * Set the image size. Required for {@link #tiled()}, {@link #adaptable(int, int)} and {@link #uv(int, int, int, int)}
+         *
+         * @param w image width
+         * @param h image height
+         */
         public Builder imageSize(int w, int h) {
             this.iw = w;
             this.ih = h;
             return this;
         }
 
+        /**
+         * This will make the image be drawn tiled rather than stretched.
+         *
+         * @param imageWidth  image width
+         * @param imageHeight image height
+         */
+        public Builder tiled(int imageWidth, int imageHeight) {
+            return tiled().imageSize(imageWidth, imageHeight);
+        }
+
+        /**
+         * This will make the image be drawn tiled rather than stretched.
+         */
+        public Builder tiled() {
+            this.tiled = true;
+            return this;
+        }
+
+        /**
+         * Will draw the whole image file.
+         */
         public Builder fullImage() {
             this.mode = 0;
             return this;
         }
 
+        /**
+         * Specify a sub area of the image in pixels.
+         *
+         * @param x x in pixels
+         * @param y y in pixels
+         * @param w width in pixels
+         * @param h height in pixels
+         */
         public Builder uv(int x, int y, int w, int h) {
             this.mode = 1;
             this.x = x;
@@ -234,6 +258,14 @@ public class UITexture implements IDrawable {
             return this;
         }
 
+        /**
+         * Specify a sub area of the image in relative uv values (0 - 1).
+         *
+         * @param u0 x start
+         * @param v0 y start
+         * @param u1 x end
+         * @param v1 y end
+         */
         public Builder uv(float u0, float v0, float u1, float v1) {
             this.mode = 2;
             this.u0 = u0;
@@ -243,40 +275,82 @@ public class UITexture implements IDrawable {
             return this;
         }
 
+        /**
+         * This will draw the border of the image separately, so it won't get stretched/tiled with the image body.
+         *
+         * @param borderX left and right border width. Can be 0.
+         * @param borderY top and bottom border width. Can be 0
+         */
         public Builder adaptable(int borderX, int borderY) {
             this.borderX = borderX;
             this.borderY = borderY;
             return this;
         }
 
+        /**
+         * This will draw the border of the image separately, so it won't get stretched/tiled with the image body.
+         *
+         * @param border border width
+         */
         public Builder adaptable(int border) {
             return adaptable(border, border);
         }
 
+        /**
+         * Specify if theme color should apply to this texture.
+         */
         public Builder canApplyTheme() {
             this.canApplyTheme = true;
             return this;
         }
 
+        /**
+         * Registers the texture with a name, so it can be used in json without creating the texture again.
+         *
+         * @param type texture type. Irrelevant
+         * @param name texture name
+         */
         public Builder registerAs(Type type, String name) {
             this.type = type;
             this.name = name;
             return this;
         }
 
+        /**
+         * Registers the texture with a name, so it can be used in json without creating the texture again.
+         *
+         * @param name texture name
+         */
         public Builder registerAsIcon(String name) {
             return registerAs(Type.ICON, name);
         }
 
+        /**
+         * Registers the texture with a name, so it can be used in json without creating the texture again.
+         * By default, theme color is applicable.
+         *
+         * @param name texture name
+         */
         public Builder registerAsBackground(String name) {
             return registerAsBackground(name, true);
         }
 
+        /**
+         * Registers the texture with a name, so it can be used in json without creating the texture again.
+         *
+         * @param name          texture name
+         * @param canApplyTheme if theme color can be applied
+         */
         public Builder registerAsBackground(String name, boolean canApplyTheme) {
             if (canApplyTheme) canApplyTheme();
             return registerAs(Type.BACKGROUND, name);
         }
 
+        /**
+         * Creates the texture
+         *
+         * @return the created texture
+         */
         public UITexture build() {
             UITexture texture = create();
             if (type != null && name != null) {
@@ -311,7 +385,10 @@ public class UITexture implements IDrawable {
             if (mode == 2) {
                 if (u0 < 0 || v0 < 0 || u1 > 1 || v1 > 1) throw new IllegalArgumentException("UV values must be 0 - 1");
                 if (borderX > 0 || borderY > 0) {
-                    return new AdaptableUITexture(location, u0, v0, u1, v1, canApplyTheme, iw, ih, borderX, borderY);
+                    return new AdaptableUITexture(location, u0, v0, u1, v1, canApplyTheme, iw, ih, borderX, borderY, tiled);
+                }
+                if (tiled) {
+                    return new TiledUITexture(location, u0, v0, u1, v1, iw, ih, canApplyTheme);
                 }
                 return new UITexture(location, u0, v0, u1, v1, canApplyTheme);
             }

@@ -204,11 +204,11 @@ public class ScrollData {
 
         if (this.direction == ScrollDirection.VERTICAL) {
             x = this.opposite ? 0 : area.width - scrollbar;
-            rx = x + scrollbar;
+            rx = scrollbar;
             ry = area.height;
         } else {
             y = this.opposite ? 0 : area.height - scrollbar;
-            ry = y + scrollbar;
+            ry = scrollbar;
             rx = area.width;
         }
         GuiDraw.drawRect(x, y, rx, ry, area.getScrollBarBackgroundColor());
@@ -219,28 +219,27 @@ public class ScrollData {
             if (area.getScrollX() != null && area.getScrollX().isScrollBarActive(area, true) && area.getScrollX().opposite) {
                 y += area.getScrollX().getScrollbarThickness();
             }
-            ry = y + h;
+            ry = h;
         } else {
             y = this.opposite ? 0 : area.height - scrollbar;
             x = ((this.direction.getFullSide(area) - h) * this.scroll) / (this.scrollSize - side);
             if (area.getScrollY() != null && area.getScrollY().isScrollBarActive(area, true) && area.getScrollY().opposite) {
                 x += area.getScrollY().getScrollbarThickness();
             }
-            rx = x + h;
-            ry = y + scrollbar;
+            rx = h;
         }
 
         // TODO
         if (/*ModularUI.scrollbarFlat.get()*/false) {
-            Gui.drawRect(x, y, rx, ry, -6250336);
+            GuiDraw.drawRect(x, y, rx, ry, -6250336);
         } else {
             int color = 0;//ModularUI.scrollbarShadow.get();
 
             GuiDraw.drawDropShadow(x, y, rx, ry, 5, color, Color.withAlpha(color, 0));
 
-            Gui.drawRect(x, y, rx, ry, 0xffeeeeee);
-            Gui.drawRect(x + 1, y + 1, rx, ry, 0xff666666);
-            Gui.drawRect(x + 1, y + 1, rx - 1, ry - 1, 0xffaaaaaa);
+            GuiDraw.drawRect(x, y, rx, ry, 0xffeeeeee);
+            GuiDraw.drawRect(x + 1, y + 1, rx, ry, 0xff666666);
+            GuiDraw.drawRect(x + 1, y + 1, rx - 1, ry - 1, 0xffaaaaaa);
         }
     }
 
