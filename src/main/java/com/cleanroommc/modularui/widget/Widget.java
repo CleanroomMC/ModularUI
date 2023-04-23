@@ -12,7 +12,6 @@ import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.sync.GuiSyncHandler;
-import com.cleanroommc.modularui.sync.MapKey;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Box;
@@ -43,7 +42,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     private String debugName;
 
     @Nullable
-    private MapKey syncKey;
+    private String syncKey;
     @Nullable
     private SyncHandler syncHandler;
 
@@ -75,6 +74,9 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
             }
         }
         this.valid = true;
+        if (!getScreen().isClientOnly()) {
+            initialiseSyncHandler(getScreen().getSyncHandler());
+        }
         applyTheme(this.context.getTheme());
         onInit();
         if (this.tooltip != null && this.tooltip.getExcludeArea() == null && ModularUIConfig.placeTooltipNextToPanel()) {
@@ -408,7 +410,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     @Override
-    public W setSynced(MapKey key) {
+    public W setSynced(String key) {
         this.syncKey = key;
         return getThis();
     }

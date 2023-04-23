@@ -123,14 +123,6 @@ public abstract class ModularScreen {
 
     public void onOpen() {
         windowManager.init();
-        if (!getContainer().isClientOnly()) {
-            windowManager.getOpenPanels().forEach(panel -> WidgetTree.foreachChildByLayer(panel, widget -> {
-                if (widget instanceof ISynced) {
-                    ((ISynced<?>) widget).initialiseSyncHandler(this.syncHandler);
-                }
-                return true;
-            }));
-        }
     }
 
     @MustBeInvokedByOverriders
@@ -414,6 +406,8 @@ public abstract class ModularScreen {
     public void removeGuiActionListener(IGuiAction action) {
         this.guiActionListeners.getOrDefault(getGuiActionClass(action), Collections.emptyList()).remove(action);
     }
+
+
 
     private static Class<?> getGuiActionClass(IGuiAction action) {
         Class<?>[] classes = action.getClass().getInterfaces();

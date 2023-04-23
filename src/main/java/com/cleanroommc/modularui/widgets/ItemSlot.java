@@ -8,6 +8,8 @@ import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.TextRenderer;
+import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
+import com.cleanroommc.modularui.integration.jei.JeiIngredientProvider;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import com.cleanroommc.modularui.screen.ModularScreen;
@@ -27,10 +29,11 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable {
+public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable, JeiGhostIngredientSlot<ItemStack>, JeiIngredientProvider {
 
     private static final TextRenderer textRenderer = new TextRenderer();
     private ItemSlotSH syncHandler;
@@ -49,6 +52,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     @Override
     public void onInit() {
         size(18, 18);
+        getContext().addJeiGhostIngredientSlot(this);
     }
 
     @Override
@@ -147,8 +151,6 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     private void drawSlot(Slot slotIn) {
         GuiScreenWrapper guiScreen = getScreen().getScreenWrapper();
         GuiContainerAccessor accessor = guiScreen.getAccessor();
-        int x = slotIn.xPos;
-        int y = slotIn.yPos;
         ItemStack itemstack = slotIn.getStack();
         boolean flag = false;
         boolean flag1 = slotIn == accessor.getClickedSlot() && !accessor.getDraggedStack().isEmpty() && !accessor.getIsRightMouseClick();
@@ -235,5 +237,20 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
         guiScreen.getItemRenderer().zLevel = 0.0F;
         guiScreen.setZ(0f);
+    }
+
+    @Override
+    public void setGhostIngredient(@NotNull ItemStack ingredient) {
+        this.syncHandler.updateFromClient(ingredient);
+    }
+
+    @Override
+    public @Nullable ItemStack castGhostIngredientIfValid(@NotNull Object ingredient) {
+        return this.syncHandler.isPhantom() && ingredient instanceof ItemStack ? (ItemStack) ingredient : null;
+    }
+
+    @Override
+    public @Nullable Object getIngredient() {
+        return this.syncHandler.getSlot().getStack();
     }
 }
