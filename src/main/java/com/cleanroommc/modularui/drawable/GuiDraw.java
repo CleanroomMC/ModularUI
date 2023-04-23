@@ -371,11 +371,18 @@ public class GuiDraw {
         Gui.drawRect(left + border, bottom - border, right - border, bottom, color);
     }
 
-    public static void drawDropShadow(int left, int top, int right, int bottom, int offset, int opaque, int shadow) {
-        left -= offset;
-        top -= offset;
-        right += offset;
-        bottom += offset;
+    /**
+     * Draws a rectangular shadow
+     * @param x left of solid shadow part
+     * @param y top of solid shadow part
+     * @param w width of solid shadow part
+     * @param h height of solid shadow part
+     * @param oX shadow gradient size in x
+     * @param oY shadow gradient size in y
+     * @param opaque solid shadow color
+     * @param shadow gradient end color
+     */
+    public static void drawDropShadow(int x, int y, int w, int h, int oX, int oY, int opaque, int shadow) {
 
         float a1 = Color.getAlphaF(opaque);
         float r1 = Color.getRedF(opaque);
@@ -397,35 +404,37 @@ public class GuiDraw {
 
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
+        float x1 = x + w, y1 = y + h;
+
         /* Draw opaque part */
-        buffer.pos(right - offset, top + offset, 0).color(r1, g1, b1, a1).endVertex();
-        buffer.pos(left + offset, top + offset, 0).color(r1, g1, b1, a1).endVertex();
-        buffer.pos(left + offset, bottom - offset, 0).color(r1, g1, b1, a1).endVertex();
-        buffer.pos(right - offset, bottom - offset, 0).color(r1, g1, b1, a1).endVertex();
+        buffer.pos(x1, y, 0).color(r1, g1, b1, a1).endVertex();
+        buffer.pos(x, y, 0).color(r1, g1, b1, a1).endVertex();
+        buffer.pos(x, y1, 0).color(r1, g1, b1, a1).endVertex();
+        buffer.pos(x1, y1, 0).color(r1, g1, b1, a1).endVertex();
 
         /* Draw top shadow */
-        buffer.pos(right, top, 0).color(r2, g2, b2, a2).endVertex();
-        buffer.pos(left, top, 0).color(r2, g2, b2, a2).endVertex();
-        buffer.pos(left + offset, top + offset, 0).color(r1, g1, b1, a1).endVertex();
-        buffer.pos(right - offset, top + offset, 0).color(r1, g1, b1, a1).endVertex();
+        buffer.pos(x1 + oX, y - oY, 0).color(r2, g2, b2, a2).endVertex();
+        buffer.pos(x - oX, y - oY, 0).color(r2, g2, b2, a2).endVertex();
+        buffer.pos(x, y, 0).color(r1, g1, b1, a1).endVertex();
+        buffer.pos(x1, y, 0).color(r1, g1, b1, a1).endVertex();
 
         /* Draw bottom shadow */
-        buffer.pos(right - offset, bottom - offset, 0).color(r1, g1, b1, a1).endVertex();
-        buffer.pos(left + offset, bottom - offset, 0).color(r1, g1, b1, a1).endVertex();
-        buffer.pos(left, bottom, 0).color(r2, g2, b2, a2).endVertex();
-        buffer.pos(right, bottom, 0).color(r2, g2, b2, a2).endVertex();
+        buffer.pos(x1, y1, 0).color(r1, g1, b1, a1).endVertex();
+        buffer.pos(x, y1, 0).color(r1, g1, b1, a1).endVertex();
+        buffer.pos(x - oX, y1 + oY, 0).color(r2, g2, b2, a2).endVertex();
+        buffer.pos(x1 + oX, y1 + oY, 0).color(r2, g2, b2, a2).endVertex();
 
         /* Draw left shadow */
-        buffer.pos(left + offset, top + offset, 0).color(r1, g1, b1, a1).endVertex();
-        buffer.pos(left, top, 0).color(r2, g2, b2, a2).endVertex();
-        buffer.pos(left, bottom, 0).color(r2, g2, b2, a2).endVertex();
-        buffer.pos(left + offset, bottom - offset, 0).color(r1, g1, b1, a1).endVertex();
+        buffer.pos(x, y, 0).color(r1, g1, b1, a1).endVertex();
+        buffer.pos(x - oX, y - oY, 0).color(r2, g2, b2, a2).endVertex();
+        buffer.pos(x - oX, y1 + oY, 0).color(r2, g2, b2, a2).endVertex();
+        buffer.pos(x, y1, 0).color(r1, g1, b1, a1).endVertex();
 
         /* Draw right shadow */
-        buffer.pos(right, top, 0).color(r2, g2, b2, a2).endVertex();
-        buffer.pos(right - offset, top + offset, 0).color(r1, g1, b1, a1).endVertex();
-        buffer.pos(right - offset, bottom - offset, 0).color(r1, g1, b1, a1).endVertex();
-        buffer.pos(right, bottom, 0).color(r2, g2, b2, a2).endVertex();
+        buffer.pos(x1 + oX, y - oY, 0).color(r2, g2, b2, a2).endVertex();
+        buffer.pos(x1, y, 0).color(r1, g1, b1, a1).endVertex();
+        buffer.pos(x1, y1, 0).color(r1, g1, b1, a1).endVertex();
+        buffer.pos(x1  + oX, y1 + oY, 0).color(r2, g2, b2, a2).endVertex();
 
         tessellator.draw();
 

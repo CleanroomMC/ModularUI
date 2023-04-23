@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.utils;
 
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.drawable.GuiDraw;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -229,18 +228,14 @@ public class ScrollData {
             rx = h;
         }
 
-        // TODO
-        if (/*ModularUI.scrollbarFlat.get()*/false) {
-            GuiDraw.drawRect(x, y, rx, ry, -6250336);
-        } else {
-            int color = 0;//ModularUI.scrollbarShadow.get();
+        // flat scrollbar
+        //GuiDraw.drawRect(x, y, rx, ry, -6250336);
 
-            GuiDraw.drawDropShadow(x, y, rx, ry, 5, color, Color.withAlpha(color, 0));
-
-            GuiDraw.drawRect(x, y, rx, ry, 0xffeeeeee);
-            GuiDraw.drawRect(x + 1, y + 1, rx, ry, 0xff666666);
-            GuiDraw.drawRect(x + 1, y + 1, rx - 1, ry - 1, 0xffaaaaaa);
-        }
+        // fancy scrollbar
+        //GuiDraw.drawDropShadow(x + 2, y + 2, rx - 2, ry - 2, 2, 2, Color.withAlpha(0, 0.5f), 0);
+        GuiDraw.drawRect(x, y, rx, ry, 0xffeeeeee);
+        GuiDraw.drawRect(x + 1, y + 1, rx - 1, ry - 1, 0xff666666);
+        GuiDraw.drawRect(x + 1, y + 1, rx - 2, ry - 2, 0xffaaaaaa);
     }
 
     public ScrollData copyWith(ScrollDirection direction) {
