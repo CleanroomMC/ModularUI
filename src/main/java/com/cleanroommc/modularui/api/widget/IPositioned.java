@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.widget.sizer.Unit;
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public interface IPositioned<W extends IPositioned<W>> {
 
     Flex flex();
@@ -62,22 +63,22 @@ public interface IPositioned<W extends IPositioned<W>> {
         return getThis();
     }
 
-    default W left(float val) {
+    default W leftRel(float val) {
         flex().left(val, 0, 0, Unit.Measure.RELATIVE, true);
         return getThis();
     }
 
-    default W left(float val, int offset) {
+    default W leftRelOffset(float val, int offset) {
         flex().left(val, offset, 0, Unit.Measure.RELATIVE, true);
         return getThis();
     }
 
-    default W left(float val, float anchor) {
+    default W leftRelAnchor(float val, float anchor) {
         flex().left(val, 0, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
 
-    default W left(float val, int offset, float anchor) {
+    default W leftRel(float val, int offset, float anchor) {
         flex().left(val, offset, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
@@ -92,17 +93,17 @@ public interface IPositioned<W extends IPositioned<W>> {
         return getThis();
     }
 
-    default W left(DoubleSupplier val, int offset) {
+    default W leftRelOffset(DoubleSupplier val, int offset) {
         flex().left(val, offset, 0, Unit.Measure.RELATIVE, true);
         return getThis();
     }
 
-    default W left(DoubleSupplier val, float anchor) {
+    default W leftRelAnchor(DoubleSupplier val, float anchor) {
         flex().left(val, 0, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
 
-    default W left(DoubleSupplier val, int offset, float anchor) {
+    default W leftRel(DoubleSupplier val, int offset, float anchor) {
         flex().left(val, offset, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
@@ -112,22 +113,22 @@ public interface IPositioned<W extends IPositioned<W>> {
         return getThis();
     }
 
-    default W right(float val) {
+    default W rightRel(float val) {
         flex().right(val, 0, 0, Unit.Measure.RELATIVE, true);
         return getThis();
     }
 
-    default W right(float val, int offset) {
+    default W rightRelOffset(float val, int offset) {
         flex().right(val, offset, 0, Unit.Measure.RELATIVE, true);
         return getThis();
     }
 
-    default W right(float val, float anchor) {
+    default W rightRelAnchor(float val, float anchor) {
         flex().right(val, 0, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
 
-    default W right(float val, int offset, float anchor) {
+    default W rightRel(float val, int offset, float anchor) {
         flex().right(val, offset, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
@@ -142,17 +143,17 @@ public interface IPositioned<W extends IPositioned<W>> {
         return getThis();
     }
 
-    default W right(DoubleSupplier val, int offset) {
+    default W rightRelOffset(DoubleSupplier val, int offset) {
         flex().right(val, offset, 0, Unit.Measure.RELATIVE, true);
         return getThis();
     }
 
-    default W right(DoubleSupplier val, float anchor) {
+    default W rightRelAnchor(DoubleSupplier val, float anchor) {
         flex().right(val, 0, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
 
-    default W right(DoubleSupplier val, int offset, float anchor) {
+    default W rightRel(DoubleSupplier val, int offset, float anchor) {
         flex().right(val, offset, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
@@ -162,22 +163,22 @@ public interface IPositioned<W extends IPositioned<W>> {
         return getThis();
     }
 
-    default W top(float val) {
+    default W topRel(float val) {
         flex().top(val, 0, 0, Unit.Measure.RELATIVE, true);
         return getThis();
     }
 
-    default W top(float val, int offset) {
+    default W topRelOffset(float val, int offset) {
         flex().top(val, offset, 0, Unit.Measure.RELATIVE, true);
         return getThis();
     }
 
-    default W top(float val, float anchor) {
+    default W topRelAnchor(float val, float anchor) {
         flex().top(val, 0, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
 
-    default W top(float val, int offset, float anchor) {
+    default W topRel(float val, int offset, float anchor) {
         flex().top(val, offset, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
@@ -192,17 +193,17 @@ public interface IPositioned<W extends IPositioned<W>> {
         return getThis();
     }
 
-    default W top(DoubleSupplier val, int offset) {
+    default W topRelOffset(DoubleSupplier val, int offset) {
         flex().top(val, offset, 0, Unit.Measure.RELATIVE, true);
         return getThis();
     }
 
-    default W top(DoubleSupplier val, float anchor) {
+    default W topRelAnchor(DoubleSupplier val, float anchor) {
         flex().top(val, 0, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
 
-    default W top(DoubleSupplier val, int offset, float anchor) {
+    default W topRel(DoubleSupplier val, int offset, float anchor) {
         flex().top(val, offset, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
@@ -212,22 +213,22 @@ public interface IPositioned<W extends IPositioned<W>> {
         return getThis();
     }
 
-    default W bottom(float val) {
+    default W bottomRel(float val) {
         flex().bottom(val, 0, 0, Unit.Measure.RELATIVE, true);
         return getThis();
     }
 
-    default W bottom(float val, int offset) {
+    default W bottomRelOffset(float val, int offset) {
         flex().bottom(val, offset, 0, Unit.Measure.RELATIVE, true);
         return getThis();
     }
 
-    default W bottom(float val, float anchor) {
+    default W bottomRelAnchor(float val, float anchor) {
         flex().bottom(val, 0, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
 
-    default W bottom(float val, int offset, float anchor) {
+    default W bottomRel(float val, int offset, float anchor) {
         flex().bottom(val, offset, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
@@ -242,17 +243,17 @@ public interface IPositioned<W extends IPositioned<W>> {
         return getThis();
     }
 
-    default W bottom(DoubleSupplier val, int offset) {
+    default W bottomRelOffset(DoubleSupplier val, int offset) {
         flex().bottom(val, offset, 0, Unit.Measure.RELATIVE, true);
         return getThis();
     }
 
-    default W bottom(DoubleSupplier val, float anchor) {
+    default W bottomRelAnchor(DoubleSupplier val, float anchor) {
         flex().bottom(val, 0, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
 
-    default W bottom(DoubleSupplier val, int offset, float anchor) {
+    default W bottomRel(DoubleSupplier val, int offset, float anchor) {
         flex().bottom(val, offset, anchor, Unit.Measure.RELATIVE, false);
         return getThis();
     }
@@ -263,7 +264,7 @@ public interface IPositioned<W extends IPositioned<W>> {
         return getThis();
     }
 
-    default W width(float val) {
+    default W widthRel(float val) {
         flex().width(val, Unit.Measure.RELATIVE);
         return getThis();
     }
@@ -283,7 +284,7 @@ public interface IPositioned<W extends IPositioned<W>> {
         return getThis();
     }
 
-    default W height(float val) {
+    default W heightRel(float val) {
         flex().height(val, Unit.Measure.RELATIVE);
         return getThis();
     }
@@ -303,8 +304,8 @@ public interface IPositioned<W extends IPositioned<W>> {
         return getThis();
     }
 
-    default W pos(float x, float y) {
-        left(x).top(y);
+    default W posRel(float x, float y) {
+        leftRel(x).topRel(y);
         return getThis();
     }
 
@@ -313,8 +314,8 @@ public interface IPositioned<W extends IPositioned<W>> {
         return getThis();
     }
 
-    default W size(float w, float h) {
-        width(w).height(h);
+    default W sizeRel(float w, float h) {
+        widthRel(w).heightRel(h);
         return getThis();
     }
 
@@ -322,12 +323,12 @@ public interface IPositioned<W extends IPositioned<W>> {
         return width(val).height(val);
     }
 
-    default W size(float val) {
-        return width(val).height(val);
+    default W sizeRel(float val) {
+        return widthRel(val).heightRel(val);
     }
 
     default W full() {
-        return width(1f).height(1f);
+        return widthRel(1f).heightRel(1f);
     }
 
     default W anchorLeft(float val) {
@@ -356,12 +357,12 @@ public interface IPositioned<W extends IPositioned<W>> {
     }
 
     default W alignX(float val) {
-        left(val).anchorLeft(val);
+        leftRel(val).anchorLeft(val);
         return getThis();
     }
 
     default W alignY(float val) {
-        top(val).anchorTop(val);
+        topRel(val).anchorTop(val);
         return getThis();
     }
 

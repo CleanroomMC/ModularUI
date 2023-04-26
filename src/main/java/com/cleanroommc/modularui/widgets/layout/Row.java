@@ -14,7 +14,7 @@ public class Row extends ParentWidget<Row> implements ILayoutWidget {
 
     public Row() {
         flex().startDefaultMode()
-                .size(1f, 1f)
+                .sizeRel(1f, 1f)
                 .endDefaultMode();
     }
 

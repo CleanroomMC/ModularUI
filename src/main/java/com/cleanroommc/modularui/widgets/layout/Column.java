@@ -14,7 +14,7 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
 
     public Column() {
         flex().startDefaultMode()
-                .size(1f, 1f)
+                .sizeRel(1f, 1f)
                 .endDefaultMode();
     }
 

@@ -46,17 +46,17 @@ public class ColorPickerDialog extends Dialog<Integer> {
                 .child(new Row()
                         .left(5).right(5).height(14)
                         .child(new PageButton(0, controller)
-                                .size(0.5f, 1f)
+                                .sizeRel(0.5f, 1f)
                                 .background(true, GuiTextures.BUTTON)
                                 .background(false, GuiTextures.SLOT_DARK)
                                 .overlay(IKey.str("RGB")))
                         .child(new PageButton(1, controller)
-                                .size(0.5f, 1f)
+                                .sizeRel(0.5f, 1f)
                                 .background(true, GuiTextures.BUTTON)
                                 .background(false, GuiTextures.SLOT_DARK)
                                 .overlay(IKey.str("HSV"))))
-                .child(new Row().width(1f).height(12).marginTop(4)
-                        .child(IKey.str("Hex: ").asWidget().height(1f))
+                .child(new Row().widthRel(1f).height(12).marginTop(4)
+                        .child(IKey.str("Hex: ").asWidget().heightRel(1f))
                         .child(new TextFieldWidget()
                                 .expanded()
                                 .setValidator(this::validateRawColor)
@@ -83,14 +83,14 @@ public class ColorPickerDialog extends Dialog<Integer> {
                         .left(10).right(10).height(14)
                         .mainAxisAlignment(MainAxisAlignment.SPACE_BETWEEN)
                         .child(new ButtonWidget<>()
-                                .height(1f).width(50)
+                                .heightRel(1f).width(50)
                                 .overlay(IKey.str("Cancel"))
                                 .onMousePressed(button -> {
                                     animateClose();
                                     return true;
                                 }))
                         .child(new ButtonWidget<>()
-                                .height(1f).width(50)
+                                .heightRel(1f).width(50)
                                 .overlay(IKey.str("Confirm"))
                                 .onMousePressed(button -> {
                                     closeWith(this.color);
@@ -101,13 +101,13 @@ public class ColorPickerDialog extends Dialog<Integer> {
     private IWidget createRGBPage(GuiContext context) {
         IDrawable handleBackground = new Rectangle().setColor(Color.WHITE.normal);
         Column parentWidget = new Column()
-                .size(1f, 1f)
+                .sizeRel(1f, 1f)
                 .child(new Row()
-                        .width(1f).height(12)
-                        .child(IKey.str("R: ").asWidget().height(1f))
+                        .widthRel(1f).height(12)
+                        .child(IKey.str("R: ").asWidget().heightRel(1f))
                         .child(new SliderWidget()
                                 .expanded()
-                                .height(1f)
+                                .heightRel(1f)
                                 .background(this.sliderBackgroundR.asIcon().size(0, 4))
                                 .sliderTexture(handleBackground)
                                 .sliderSize(2, 8)
@@ -115,11 +115,11 @@ public class ColorPickerDialog extends Dialog<Integer> {
                                 .setter(val -> updateColor(Color.withRed(this.color, (int) val)))
                                 .getter(() -> Color.getRed(this.color))))
                 .child(new Row()
-                        .width(1f).height(12)
-                        .child(IKey.str("G: ").asWidget().height(1f))
+                        .widthRel(1f).height(12)
+                        .child(IKey.str("G: ").asWidget().heightRel(1f))
                         .child(new SliderWidget()
                                 .expanded()
-                                .height(1f)
+                                .heightRel(1f)
                                 .background(this.sliderBackgroundG.asIcon().size(0, 4))
                                 .sliderTexture(handleBackground)
                                 .sliderSize(2, 8)
@@ -127,11 +127,11 @@ public class ColorPickerDialog extends Dialog<Integer> {
                                 .setter(val -> updateColor(Color.withGreen(this.color, (int) val)))
                                 .getter(() -> Color.getGreen(this.color))))
                 .child(new Row()
-                        .width(1f).height(12)
-                        .child(IKey.str("B: ").asWidget().height(1f))
+                        .widthRel(1f).height(12)
+                        .child(IKey.str("B: ").asWidget().heightRel(1f))
                         .child(new SliderWidget()
                                 .expanded()
-                                .height(1f)
+                                .heightRel(1f)
                                 .background(this.sliderBackgroundB.asIcon().size(0, 4))
                                 .sliderTexture(handleBackground)
                                 .sliderSize(2, 8)
@@ -141,11 +141,11 @@ public class ColorPickerDialog extends Dialog<Integer> {
 
         if (this.controlAlpha) {
             parentWidget.child(new Row()
-                    .width(1f).height(12)
-                    .child(IKey.str("A: ").asWidget().height(1f))
+                    .widthRel(1f).height(12)
+                    .child(IKey.str("A: ").asWidget().heightRel(1f))
                     .child(new SliderWidget()
                             .expanded()
-                            .height(1f)
+                            .heightRel(1f)
                             .background(this.sliderBackgroundA.asIcon().size(0, 4))
                             .sliderTexture(handleBackground)
                             .sliderSize(2, 8)
@@ -158,8 +158,8 @@ public class ColorPickerDialog extends Dialog<Integer> {
 
     private IWidget createHSVPage(GuiContext context) {
         return new ParentWidget<>()
-                .size(1f, 1f)
-                .child(IKey.str("WIP").asWidget().size(1f, 1f).alignment(Alignment.Center));
+                .sizeRel(1f, 1f)
+                .child(IKey.str("WIP").asWidget().sizeRel(1f, 1f).alignment(Alignment.Center));
     }
 
     private String validateRawColor(String raw) {

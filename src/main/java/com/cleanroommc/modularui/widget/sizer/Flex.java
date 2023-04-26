@@ -5,7 +5,6 @@ import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IPositioned;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.utils.Alignment;
 import net.minecraft.inventory.Slot;
 import org.jetbrains.annotations.ApiStatus;
@@ -77,14 +76,6 @@ public class Flex implements IResizeable, IPositioned<Flex> {
     public Flex expanded() {
         this.expanded = true;
         return this;
-    }
-
-    public Flex coverChildren() {
-        return coverChildrenWidth().coverChildrenHeight();
-    }
-
-    public Flex relative(IGuiElement guiElement) {
-        return relative(guiElement.getArea());
     }
 
     public Flex relative(Area guiElement) {
@@ -190,14 +181,6 @@ public class Flex implements IResizeable, IPositioned<Flex> {
         return this;
     }
 
-    public Flex size(int w, int h) {
-        return width(w).height(h);
-    }
-
-    public Flex size(float w, float h) {
-        return width(w).height(h);
-    }
-
     public Flex anchorLeft(float val) {
         getLeft().setAnchor(val);
         getLeft().setAutoAnchor(false);
@@ -235,20 +218,6 @@ public class Flex implements IResizeable, IPositioned<Flex> {
         if (this.y.hasEnd()) {
             anchorBottom(alignment.y);
         }
-        return this;
-    }
-
-    public Flex alignX(float val) {
-        return left(val).anchorLeft(val);
-    }
-
-    public Flex alignY(float val) {
-        return top(val).anchorTop(val);
-    }
-
-    public Flex align(Alignment alignment) {
-        alignX(alignment.x);
-        alignY(alignment.y);
         return this;
     }
 
