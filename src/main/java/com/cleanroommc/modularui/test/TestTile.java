@@ -7,6 +7,7 @@ import com.cleanroommc.modularui.api.future.IItemHandlerModifiable;
 import com.cleanroommc.modularui.api.future.ItemStackHandler;
 import com.cleanroommc.modularui.api.layout.CrossAxisAlignment;
 import com.cleanroommc.modularui.drawable.*;
+import com.cleanroommc.modularui.drawable.keys.StringKey;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.Tooltip;
@@ -103,7 +104,8 @@ public class TestTile extends TileEntity implements IGuiHolder {
                         .child(new PageButton(1, tabController)
                                 .tab(GuiTextures.TAB_TOP, 0))
                         .child(new PageButton(2, tabController)
-                                .tab(GuiTextures.TAB_TOP, 0)))
+                                .tab(GuiTextures.TAB_TOP, 0))
+                        .child(new PageButton(3, tabController).tab(GuiTextures.TAB_TOP, 0)))
                 .child(new PagedWidget<>()
                         .size(1f)
                         .controller(tabController)
@@ -270,7 +272,8 @@ public class TestTile extends TileEntity implements IGuiHolder {
                                                         .texture(GuiTextures.CHECK_BOX)
                                                         .size(14, 14))
                                                 .child(IKey.lang("bogosort.gui.enabled").asWidget()
-                                                        .height(14))))));
+                                                        .height(14)))))
+                        .addPage(new ParentWidget<>().size(1f, 1f).padding(7).child(SlotGroupWidget.playerInventory()).child(new DropDownMenu().addChoice(i -> true, new StringKey("Help")).size(60, 16))));
         /*panel.child(new ButtonWidget<>()
                         .flex(flex -> flex.size(60, 20)
                                 .top(7)

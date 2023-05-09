@@ -190,6 +190,9 @@ public class GuiTextures {
     public static final TabTexture TAB_LEFT = TabTexture.of(UITexture.fullImage(Tags.MODID, "gui/tab/tabs_left", true), GuiAxis.X, false, 32, 28, 4);
     public static final TabTexture TAB_RIGHT = TabTexture.of(UITexture.fullImage(Tags.MODID, "gui/tab/tabs_right", true), GuiAxis.X, true, 32, 28, 4);;
 
+    public static final UITexture ARROW_UP = UITexture.fullImage(Tags.MODID, "gui/icons/arrow_up", false);
+    public static final UITexture ARROW_DOWN = UITexture.fullImage(Tags.MODID, "gui/icons/arrow_down", false);
+
     private static UITexture icon(String name, int x, int y, int w, int h) {
         return UITexture.builder()
                 .location(ICONS_LOCATION)

@@ -169,12 +169,13 @@ public class SortableListWidget<T, I extends SortableListWidget.Item<T>> extends
             return dropPredicate == null || dropPredicate.test(widget);
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public void onDrag(int mouseButton, long timeSinceLastClick) {
             super.onDrag(mouseButton, timeSinceLastClick);
             IGuiElement hovered = getContext().getHovered();
-            Item<?> item = (Item<?>) WidgetTree.findParent(hovered, guiElement -> guiElement instanceof Item);
-            if (item != null && item != this && item.listWidget == this.listWidget) {
+            Item<T> item = (Item<T>) WidgetTree.findParent(hovered, guiElement -> guiElement instanceof Item);
+            if (item != null && item != this && item.listWidget == listWidget) {
                 this.listWidget.moveTo(this.index, item.index);
             }
         }

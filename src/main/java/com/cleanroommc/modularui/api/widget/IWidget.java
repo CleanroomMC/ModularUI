@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.drawable.Scissor;
@@ -103,7 +104,7 @@ public interface IWidget extends IGuiElement {
      * @return all children of this widget
      */
     @NotNull
-    default List<IWidget> getChildren() {
+    default List<? extends IWidget> getChildren() {
         return Collections.emptyList();
     }
 

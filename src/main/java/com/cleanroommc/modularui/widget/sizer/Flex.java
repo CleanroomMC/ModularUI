@@ -312,7 +312,7 @@ public class Flex implements IResizeable, IPositioned<Flex> {
 
             IWidget widget = (IWidget) this.parent;
 
-            List<IWidget> children = widget.getChildren();
+            List<? extends IWidget> children = widget.getChildren();
             if (!children.isEmpty()) {
                 for (IWidget child : children) {
                     if (dependsOnThis(child, null)) {
@@ -332,7 +332,7 @@ public class Flex implements IResizeable, IPositioned<Flex> {
     public void postApply(IGuiElement guiElement) {
         // not skipped children are now calculated and now this area can be calculated if it requires childrens area
         if (this.x.dependsOnChildren() || this.y.dependsOnChildren()) {
-            List<IWidget> children = ((IWidget) parent).getChildren();
+            List<? extends IWidget> children = ((IWidget) parent).getChildren();
             if (!children.isEmpty()) {
                 int moveChildrenX = 0, moveChildrenY = 0;
 
