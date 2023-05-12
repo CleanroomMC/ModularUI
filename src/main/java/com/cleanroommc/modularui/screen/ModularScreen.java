@@ -82,7 +82,7 @@ public abstract class ModularScreen {
 
         ModularPanel panel = buildUI(this.context);
         if (panel.getFlex() == null) {
-            panel.flex().size(1f, 1f);
+            panel.flex().sizeRel(1f, 1f);
         }
         this.windowManager.construct(panel);
     }
