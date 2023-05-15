@@ -74,5 +74,4 @@ public interface ITheme {
     WidgetTextFieldTheme getTextFieldTheme();
 
     WidgetTheme getWidgetTheme(String id);
-
 }

@@ -386,7 +386,7 @@ public abstract class ModularScreen {
     }
 
     public boolean isClientOnly() {
-        return getSyncHandler() == null;
+        return getContainer().isClientOnly();
     }
 
     public ModularContainer getContainer() {

@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.utils.AssetHelper;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.JsonBuilder;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -35,6 +36,7 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
     private static final String DEFAULT = "DEFAULT";
 
     private static final Map<String, ITheme> THEMES = new Object2ObjectOpenHashMap<>();
+    private static final Map<String, List<JsonBuilder>> defaultThemes = new Object2ObjectOpenHashMap<>();
     protected static final Map<String, WidgetTheme> defaultWidgetThemes = new Object2ObjectOpenHashMap<>();
     private static final Map<String, WidgetThemeParser> widgetThemeFunctions = new Object2ObjectOpenHashMap<>();
     protected static final WidgetTheme defaultdefaultWidgetTheme = new WidgetTheme(null, null, Color.WHITE.normal, 0xFF404040, false);
@@ -42,11 +44,11 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
     private static final Map<String, String> screenThemes = new Object2ObjectOpenHashMap<>();
 
     static {
-        registerWidgetTheme(Theme.PANEL, new WidgetTheme(GuiTextures.BACKGROUND, null, Color.WHITE.normal, 0xFF404040, false), WidgetTheme::new);
-        registerWidgetTheme(Theme.BUTTON, new WidgetTheme(GuiTextures.BUTTON, null, Color.WHITE.normal, Color.WHITE.normal, true), WidgetTheme::new);
-        registerWidgetTheme(Theme.ITEM_SLOT, new WidgetSlotTheme(GuiTextures.SLOT, Color.withAlpha(Color.WHITE.normal, 0x80)), WidgetSlotTheme::new);
-        registerWidgetTheme(Theme.FLUID_SLOT, new WidgetSlotTheme(GuiTextures.SLOT_DARK, Color.withAlpha(Color.WHITE.normal, 0x80)), WidgetSlotTheme::new);
-        registerWidgetTheme(Theme.TEXT_FIELD, new WidgetTextFieldTheme(0xFF2F72A8), WidgetTextFieldTheme::new);
+        registerWidgetTheme(Theme.PANEL, new WidgetTheme(GuiTextures.BACKGROUND, null, Color.WHITE.normal, 0xFF404040, false), (parent, json, fallback) -> new WidgetTheme(parent, fallback, json));
+        registerWidgetTheme(Theme.BUTTON, new WidgetTheme(GuiTextures.BUTTON, null, Color.WHITE.normal, Color.WHITE.normal, true), (parent, json, fallback) -> new WidgetTheme(parent, fallback, json));
+        registerWidgetTheme(Theme.ITEM_SLOT, new WidgetSlotTheme(GuiTextures.SLOT, Color.withAlpha(Color.WHITE.normal, 0x80)), (parent, json, fallback) -> new WidgetSlotTheme(parent, fallback, json));
+        registerWidgetTheme(Theme.FLUID_SLOT, new WidgetSlotTheme(GuiTextures.SLOT_DARK, Color.withAlpha(Color.WHITE.normal, 0x80)), (parent, json, fallback) -> new WidgetSlotTheme(parent, fallback, json));
+        registerWidgetTheme(Theme.TEXT_FIELD, new WidgetTextFieldTheme(0xFF2F72A8), (parent, json, fallback) -> new WidgetTextFieldTheme(parent, fallback, json));
     }
 
     public static void registerWidgetTheme(String id, WidgetTheme defaultTheme, WidgetThemeParser function) {
@@ -70,6 +72,13 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
         THEMES.put(theme.getId(), theme);
     }
 
+    public static void registerTheme(String id, JsonBuilder builder) {
+        getJavaThemes(id).add(builder);
+    }
+
+    public static List<JsonBuilder> getJavaThemes(String id) {
+        return defaultThemes.computeIfAbsent(id, key -> new ArrayList<>());
+    }
 
     public static ITheme get(String id) {
         return THEMES.getOrDefault(id, Theme.DEFAULT_DEFAULT);
@@ -102,12 +111,13 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
 
     public static void loadThemes() {
         // find registered paths of themes in themes.json files
-        Map<String, String> themesPaths = findRegisteredThemes();
+        Map<String, List<String>> themesPaths = findRegisteredThemes();
         Map<String, ThemeJson> themeMap = new Object2ObjectOpenHashMap<>();
         SortedJsonThemeList themeList = new SortedJsonThemeList(themeMap);
 
         // load json files from the path and parse their parent
-        for (Map.Entry<String, String> entry : themesPaths.entrySet()) {
+        for (Map.Entry<String, List<String>> entry : themesPaths.entrySet()) {
+            if (entry.getValue().isEmpty()) continue;
             ThemeJson theme = loadThemeJson(entry.getKey(), entry.getValue());
             if (theme != null) {
                 themeMap.put(entry.getKey(), theme);
@@ -164,33 +174,39 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
         }
     }
 
-    private static ThemeJson loadThemeJson(String id, String path) {
-        ResourceLocation rl;
-        if (path.contains(":")) {
-            String[] parts = path.split(":", 2);
-            rl = new ResourceLocation(parts[0], "themes/" + parts[1] + ".json");
-        } else {
-            rl = new ResourceLocation("themes/" + path + ".json");
+    private static ThemeJson loadThemeJson(String id, List<String> paths) {
+        List<JsonObject> jsons = new ArrayList<>();
+        for (String path : paths) {
+            ResourceLocation rl;
+            if (path.contains(":")) {
+                String[] parts = path.split(":", 2);
+                rl = new ResourceLocation(parts[0], "themes/" + parts[1] + ".json");
+            } else {
+                rl = new ResourceLocation("themes/" + path + ".json");
+            }
+            IResource resource = AssetHelper.findAsset(rl);
+            if (resource == null) {
+                return null;
+            }
+            JsonElement element = JsonHelper.parse(resource.getInputStream());
+            try {
+                resource.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            if (element.isJsonObject()) {
+                jsons.add(element.getAsJsonObject());
+            }
         }
-        IResource resource = AssetHelper.findAsset(rl);
-        if (resource == null) {
+        if (jsons.isEmpty()) {
+            ModularUI.LOGGER.throwing(new JsonParseException("Theme must be a JsonObject!"));
             return null;
         }
-        JsonElement element = JsonHelper.parse(resource.getInputStream());
-        try {
-            resource.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        if (element.isJsonObject()) {
-            return new ThemeJson(id, element.getAsJsonObject());
-        }
-        ModularUI.LOGGER.throwing(new JsonParseException("Theme must be a JsonObject!"));
-        return null;
+        return new ThemeJson(id, jsons);
     }
 
-    private static Map<String, String> findRegisteredThemes() {
-        Map<String, String> themes = new Object2ObjectOpenHashMap<>();
+    private static Map<String, List<String>> findRegisteredThemes() {
+        Map<String, List<String>> themes = new Object2ObjectOpenHashMap<>();
         for (IResource resource : AssetHelper.findAssets(ModularUI.ID, "themes.json")) {
             try {
                 JsonElement element = JsonHelper.parse(resource.getInputStream());
@@ -208,7 +224,7 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
                         ModularUI.LOGGER.throwing(new JsonParseException("Theme must be a string!"));
                         continue;
                     }
-                    themes.put(entry.getKey(), entry.getValue().getAsString());
+                    themes.computeIfAbsent(entry.getKey(), key -> new ArrayList<>()).add(entry.getValue().getAsString());
                 }
                 resource.close();
             } catch (Exception e) {
@@ -278,12 +294,20 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
 
         private final String id;
         private final String parent;
-        private final JsonObject json;
+        private final List<JsonObject> jsons;
 
-        private ThemeJson(String id, JsonObject json) {
+        private ThemeJson(String id, List<JsonObject> jsons) {
             this.id = id;
-            this.parent = JsonHelper.getString(json, "DEFAULT", "parent");
-            this.json = json;
+            String p = null;
+            for (ListIterator<JsonObject> iterator = jsons.listIterator(jsons.size()); iterator.hasPrevious(); ) {
+                JsonObject json = iterator.previous();
+                if (json.has("parent")) {
+                    p = json.get("parent").getAsString();
+                    break;
+                }
+            }
+            this.parent = p == null ? "DEFAULT" : p;
+            this.jsons = jsons;
         }
 
         private Theme deserialize() {
@@ -291,27 +315,37 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
             if (parent == null) {
                 throw new IllegalStateException(String.format("Ancestor tree was validated, but parent '%s' was still null during parsing!", this.parent));
             }
-            Map<String, WidgetTheme> widgetThemes = new Object2ObjectOpenHashMap<>();
+            // merge themes defined in java and via resource pack of the same id into 1 json
+            JsonBuilder jsonBuilder = new JsonBuilder();
+            for (JsonBuilder builder : getJavaThemes(this.id)) {
+                jsonBuilder.addAllOf(builder);
+            }
+            for (JsonObject json : this.jsons) {
+                jsonBuilder.addAllOf(json);
+            }
 
+            // parse fallback theme for widget themes
+            Map<String, WidgetTheme> widgetThemes = new Object2ObjectOpenHashMap<>();
             WidgetTheme parentWidgetTheme = parent.getFallback();
-            WidgetTheme fallback = new WidgetTheme(parentWidgetTheme, this.json, this.json);
+            WidgetTheme fallback = new WidgetTheme(parentWidgetTheme, jsonBuilder.getJson(), jsonBuilder.getJson());
             widgetThemes.put(Theme.FALLBACK, fallback);
 
+            // parse all other widget themes
             JsonObject emptyJson = new JsonObject();
             for (Map.Entry<String, WidgetThemeParser> entry : widgetThemeFunctions.entrySet()) {
-                JsonObject json;
-                if (this.json.has(entry.getKey())) {
-                    JsonElement element = this.json.get(entry.getKey());
+                JsonObject fallbackTheme;
+                if (jsonBuilder.getJson().has(entry.getKey())) {
+                    JsonElement element = jsonBuilder.getJson().get(entry.getKey());
                     if (element.isJsonObject()) {
-                        json = element.getAsJsonObject();
+                        fallbackTheme = element.getAsJsonObject();
                     } else {
-                        json = emptyJson;
+                        fallbackTheme = emptyJson;
                     }
                 } else {
-                    json = emptyJson;
+                    fallbackTheme = emptyJson;
                 }
                 parentWidgetTheme = parent.getWidgetTheme(entry.getKey());
-                widgetThemes.put(entry.getKey(), entry.getValue().parse(parentWidgetTheme, this.json, json));
+                widgetThemes.put(entry.getKey(), entry.getValue().parse(parentWidgetTheme, jsonBuilder.getJson(), fallbackTheme));
             }
             return new Theme(this.id, parent, widgetThemes);
         }
