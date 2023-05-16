@@ -26,12 +26,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod(modid = ModularUI.ID, name = ModularUI.NAME, version = ModularUI.VERSION, dependencies = "required-after:mixinbooter@[5.0,);")
+@Mod(modid = ModularUI.ID, name = ModularUI.NAME, /* version = ModularUI.VERSION, */ dependencies = "required-after:mixinbooter@[5.0,);")
 public class ModularUI {
 
-    public static final String ID = "@MODID@";
+    public static final String ID = "modularui";
     public static final String NAME = "Modular UI";
-    public static final String VERSION = "@VERSION@";
+    //public static final String VERSION = "@VERSION@";
     public static final Logger LOGGER = LogManager.getLogger(ID);
 
     public static final String BOGO_SORT = "bogosorter";
