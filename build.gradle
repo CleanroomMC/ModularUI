@@ -52,6 +52,7 @@ minecraft {
     useDependencyAccessTransformers = true
 
     injectedTags.put("VERSION", project.version)
+    injectedTags.put("ID", project.archives_base_name)
 }
 
 // Generate a my.project.Tags class with the version number as a field
