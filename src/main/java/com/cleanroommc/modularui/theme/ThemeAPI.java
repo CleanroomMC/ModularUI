@@ -107,9 +107,9 @@ public class ThemeAPI implements IThemeApi {
 
     @ApiStatus.Internal
     void onReload() {
-        registerTheme(DEFAULT_DEFAULT);
         THEMES.clear();
         jsonScreenThemes.clear();
+        registerTheme(DEFAULT_DEFAULT);
     }
 
     public static class DefaultTheme extends AbstractDefaultTheme {
