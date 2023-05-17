@@ -3,7 +3,7 @@ package com.cleanroommc.modularui.utils.math;
 /**
  * Variable class
  * <p>
- * This class is responsible for providing a mutable {@link IValue}
+ * This class is responsible for providing a mutable {@link com.cleanroommc.modularui.api.IValue}
  * which can be modifier during runtime and still getting referenced in
  * the expressions parsed by {@link MathBuilder}.
  * <p>
