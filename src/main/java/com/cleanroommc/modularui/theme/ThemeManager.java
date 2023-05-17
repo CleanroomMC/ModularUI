@@ -105,6 +105,7 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
 
     private static ThemeJson loadThemeJson(String id, List<String> paths) {
         List<JsonObject> jsons = new ArrayList<>();
+        boolean override = false;
         for (String path : paths) {
             ResourceLocation rl;
             if (path.contains(":")) {
@@ -124,6 +125,10 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
                 throw new RuntimeException(e);
             }
             if (element.isJsonObject()) {
+                if (JsonHelper.getBoolean(element.getAsJsonObject(), false, "override")) {
+                    jsons.clear();
+                    override = true;
+                }
                 jsons.add(element.getAsJsonObject());
             }
         }
@@ -131,7 +136,7 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
             ModularUI.LOGGER.throwing(new JsonParseException("Theme must be a JsonObject!"));
             return null;
         }
-        return new ThemeJson(id, jsons);
+        return new ThemeJson(id, jsons, override);
     }
 
     private static Map<String, List<String>> findRegisteredThemes() {
@@ -206,9 +211,11 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
         private final String id;
         private final String parent;
         private final List<JsonObject> jsons;
+        private final boolean override;
 
-        private ThemeJson(String id, List<JsonObject> jsons) {
+        private ThemeJson(String id, List<JsonObject> jsons, boolean override) {
             this.id = id;
+            this.override = override;
             String p = null;
             for (ListIterator<JsonObject> iterator = jsons.listIterator(jsons.size()); iterator.hasPrevious(); ) {
                 JsonObject json = iterator.previous();
@@ -228,8 +235,10 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
             ITheme parent = ThemeAPI.INSTANCE.getTheme(this.parent);
             // merge themes defined in java and via resource pack of the same id into 1 json
             JsonBuilder jsonBuilder = new JsonBuilder();
-            for (JsonBuilder builder : ThemeAPI.INSTANCE.getJavaDefaultThemes(this.id)) {
-                jsonBuilder.addAllOf(builder);
+            if (!override) {
+                for (JsonBuilder builder : ThemeAPI.INSTANCE.getJavaDefaultThemes(this.id)) {
+                    jsonBuilder.addAllOf(builder);
+                }
             }
             for (JsonObject json : this.jsons) {
                 jsonBuilder.addAllOf(json);
