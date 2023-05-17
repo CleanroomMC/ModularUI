@@ -79,28 +79,18 @@ repositories {
 }
 
 dependencies {
-    if (project.use_assetmover.toBoolean()) {
-        implementation 'com.cleanroommc:assetmover:2.0'
-    }
-    if (project.use_mixins.toBoolean()) {
-        implementation 'zone.rong:mixinbooter:7.0'
-    }
+    compileOnly 'org.jetbrains:annotations:23.0.0'
+    implementation 'zone.rong:mixinbooter:7.0'
 
+    api("org.spongepowered:mixin:0.8.3") { transitive = false }
+    annotationProcessor('org.ow2.asm:asm-debug-all:5.2')
+    annotationProcessor('com.google.guava:guava:24.1.1-jre')
+    annotationProcessor('com.google.code.gson:gson:2.8.6')
+    annotationProcessor("org.spongepowered:mixin:0.8.3") { transitive = false }
     // Example deobf dependency
     // compileOnly rfg.deobf("curse.maven:endercore-231868:2972849:")
 
-    if (project.use_mixins.toBoolean()) {
-        api("org.spongepowered:mixin:0.8.3") { transitive = false }
-        annotationProcessor('org.ow2.asm:asm-debug-all:5.2')
-        annotationProcessor('com.google.guava:guava:24.1.1-jre')
-        annotationProcessor('com.google.code.gson:gson:2.8.6')
-        annotationProcessor("org.spongepowered:mixin:0.8.3") { transitive = false }
-    }
-
     implementation 'mezz.jei:jei_1.12.2:4.15.0.293'
-    implementation 'org.jetbrains:annotations:23.0.0'
-
-
 }
 
 def mixinConfigRefMap = 'mixins.' + project.archives_base_name + '.refmap.json'
@@ -108,30 +98,19 @@ def mixinTmpDir = buildDir.path + File.separator + 'tmp' + File.separator + 'mix
 def refMap = "${mixinTmpDir}" + File.separator + mixinConfigRefMap
 def mixinSrg = "${mixinTmpDir}" + File.separator + "mixins.srg"
 
-if (project.use_mixins.toBoolean()) {
-    tasks.named("reobfJar", ReobfuscatedJar).configure {
-        extraSrgFiles.from(mixinSrg)
-    }
-
-    tasks.named("compileJava", JavaCompile).configure {
-        doFirst {
-            new File(mixinTmpDir).mkdirs()
-        }
-        options.compilerArgs += [
-                "-AreobfSrgFile=${tasks.reobfJar.srg.get().asFile}",
-                "-AoutSrgFile=${mixinSrg}",
-                "-AoutRefMapFile=${refMap}",
-        ]
-    }
+tasks.named("reobfJar", ReobfuscatedJar).configure {
+    extraSrgFiles.from(mixinSrg)
 }
 
-if (project.use_access_transformer.toBoolean()) {
-    for (File at : sourceSets.getByName("main").resources.files) {
-        if (at.name.toLowerCase().endsWith("_at.cfg")) {
-            tasks.deobfuscateMergedJarToSrg.accessTransformerFiles.from(at)
-            tasks.srgifyBinpatchedJar.accessTransformerFiles.from(at)
-        }
+tasks.named("compileJava", JavaCompile).configure {
+    doFirst {
+        new File(mixinTmpDir).mkdirs()
     }
+    options.compilerArgs += [
+            "-AreobfSrgFile=${tasks.reobfJar.srg.get().asFile}",
+            "-AoutSrgFile=${mixinSrg}",
+            "-AoutRefMapFile=${refMap}",
+    ]
 }
 
 processResources {
