@@ -151,23 +151,17 @@ processResources {
         rename '(.+_at.cfg)', 'META-INF/$1' // Access Transformers
     }
 
-    if (project.use_mixins.toBoolean()) {
-        // Embed mixin refmap
-        from refMap
-        dependsOn("compileJava")
-    }
+    // Embed mixin refmap
+    from refMap
+    dependsOn("compileJava")
 }
 
 jar {
     manifest {
         def attribute_map = [:]
-        if (project.use_coremod.toBoolean()) {
-            attribute_map['FMLCorePlugin'] = project.coremod_plugin_class_name
-            if (project.include_mod.toBoolean()) {
-                attribute_map['FMLCorePluginContainsFMLMod'] = true
-                attribute_map['ForceLoadAsMod'] = project.gradle.startParameter.taskNames[0] == "build"
-            }
-        }
+        attribute_map['FMLCorePlugin'] = project.coremod_plugin_class_name
+        attribute_map['FMLCorePluginContainsFMLMod'] = true
+        attribute_map['ForceLoadAsMod'] = project.gradle.startParameter.taskNames[0] == "build"
         if (project.use_access_transformer.toBoolean()) {
             attribute_map['FMLAT'] = project.archives_base_name + '_at.cfg'
         }
