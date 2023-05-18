@@ -58,7 +58,7 @@ public class TabletScreen extends ModularScreen {
         Scissor.scissorTransformed(desktopArea.x, desktopArea.y, desktopArea.width, desktopArea.height, this.context);
         for (ModularPanel panel : getWindowManager().getReverseOpenPanels()) {
             if (panel.disablePanelsBelow()) {
-                GuiDraw.drawSolidRect(0, 0, getViewport().w(), getViewport().h(), Color.argb(16, 16, 16, (int) (125 * panel.getAlpha())));
+                GuiDraw.drawRect(0, 0, getViewport().w(), getViewport().h(), Color.argb(16, 16, 16, (int) (125 * panel.getAlpha())));
             }
             WidgetTree.drawTree(panel, this.context);
         }

@@ -30,7 +30,7 @@ public class TabletDesktop extends ModularPanel {
         align(Alignment.Center).size(screenWidth, screenHeight) ;
 
         this.tabletTaskbar = new TabletTaskbar()
-                .height(taskbarHeight).width(1f)
+                .height(taskbarHeight).widthRel(1f)
                 .background(new Rectangle().setColor(Color.withAlpha(0, 0.5f)))
                 .child(new ButtonWidget<>()
                         .width(11).height(taskbarHeight)
@@ -66,7 +66,7 @@ public class TabletDesktop extends ModularPanel {
     public void openApp(IApp<?> app) {
         if (getScreen().isPanelOpen(app.getName())) return;
         TabletApp tabletApp = app.createApp(getContext());
-        tabletApp.name(app.getName()).width(1f).top(0).bottom(taskbarHeight).relative(this);
+        tabletApp.name(app.getName()).widthRel(1f).top(0).bottom(taskbarHeight).relative(this);
         getScreen().openPanel(tabletApp);
     }
 

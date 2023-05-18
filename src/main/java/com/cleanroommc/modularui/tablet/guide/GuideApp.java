@@ -34,7 +34,7 @@ public class GuideApp extends TabletApp {
         this.listRightSide = categoryListWidth + 4;
         this.categoryList = GuideManager.getCategory().buildGui(context, this)
                 .left(() -> listRightSide - categoryListWidth - 4, Unit.Measure.PIXEL)
-                .width(categoryListWidth).height(1f)
+                .width(categoryListWidth).heightRel(1f)
                 .paddingLeft(0)
                 .background(new Rectangle().setColor(Color.withAlpha(0, 0.5f)));
 
@@ -48,7 +48,7 @@ public class GuideApp extends TabletApp {
                 });
         this.guideWidget = new GuideWidget()
                 .left(() -> listRightSide, Unit.Measure.PIXEL).right(0)
-                .height(1f);
+                .heightRel(1f);
         // make sure the guide widget is in the back so other stuff can be drawn on top
         child(this.guideWidget);
         child(this.categoryList);

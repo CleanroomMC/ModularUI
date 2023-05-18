@@ -76,7 +76,7 @@ public class GuideCategory {
     public Widget<?> buildGui(GuiContext context, GuideApp app) {
         ParentWidget<?> categoryList = createParentWidget(context)
                 .left(0)
-                .width(1f).height(16)
+                .widthRel(1f).height(16)
                 .paddingLeft(4)
                 .background(GuiTextures.BUTTON, categoryBackground)
                 .overlay(IKey.str(this.name).color(Color.WHITE.normal).alignment(Alignment.CenterLeft));
@@ -85,7 +85,7 @@ public class GuideCategory {
         }
         for (GuidePage page : this.pages.values()) {
             categoryList.child(new ButtonWidget<>()
-                    .width(1f).height(16)
+                    .widthRel(1f).height(16)
                     .background(categoryElementBackground)
                     .onMousePressed(mouseButton -> {
                         app.setCurrentGuidePage(page);

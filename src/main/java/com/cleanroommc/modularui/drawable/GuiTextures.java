@@ -159,6 +159,7 @@ public class GuiTextures {
             .imageSize(18, 18)
             .adaptable(1)
             .registerAsBackground("slot_item")
+            .canApplyTheme()
             .build();
 
     public static final UITexture SLOT_DARK = UITexture.builder()
