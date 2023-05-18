@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.theme;
 
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.IThemeApi;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -9,8 +10,6 @@ import java.util.Map;
 
 @SideOnly(Side.CLIENT)
 public class Theme implements ITheme {
-
-    public static final ITheme DEFAULT_DEFAULT = new ThemeManager.DefaultTheme();
 
     public static final String FALLBACK = "default";
     public static final String PANEL = "panel";
@@ -40,11 +39,11 @@ public class Theme implements ITheme {
                     this.widgetThemes.put(entry.getKey(), entry.getValue());
                 }
             }
-        } else if (parent == DEFAULT_DEFAULT) {
+        } else if (parent == IThemeApi.get().getDefaultTheme()) {
             if (!this.widgetThemes.containsKey(FALLBACK)) {
                 this.widgetThemes.put(FALLBACK, ThemeManager.defaultdefaultWidgetTheme);
             }
-            for (Map.Entry<String, WidgetTheme> entry : ThemeManager.defaultWidgetThemes.entrySet()) {
+            for (Map.Entry<String, WidgetTheme> entry : ThemeAPI.INSTANCE.defaultWidgetThemes.entrySet()) {
                 if (!this.widgetThemes.containsKey(entry.getKey())) {
                     this.widgetThemes.put(entry.getKey(), entry.getValue());
                 }

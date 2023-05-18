@@ -9,8 +9,7 @@ import net.minecraft.util.math.MathHelper;
  * interpolation code was from website below, but BauerCam also uses this code.
  *
  * @author mchorse
- * @link http://paulbourke.net/miscellaneous/interpolation/
- * @link https://github.com/daipenger/BauerCam
+ * @see <a href="http://paulbourke.net/miscellaneous/interpolation/">Interpolations</a>
  */
 public class Interpolations {
 

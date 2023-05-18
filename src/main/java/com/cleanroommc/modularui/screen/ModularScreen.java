@@ -82,7 +82,7 @@ public abstract class ModularScreen {
 
         ModularPanel panel = buildUI(this.context);
         if (panel.getFlex() == null) {
-            panel.flex().size(1f, 1f);
+            panel.flex().sizeRel(1f, 1f);
         }
         this.windowManager.construct(panel);
     }
@@ -386,7 +386,7 @@ public abstract class ModularScreen {
     }
 
     public boolean isClientOnly() {
-        return getSyncHandler() == null;
+        return getContainer().isClientOnly();
     }
 
     public ModularContainer getContainer() {

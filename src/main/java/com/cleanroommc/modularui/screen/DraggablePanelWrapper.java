@@ -42,8 +42,8 @@ public class DraggablePanelWrapper implements IDraggable {
             float x = this.panel.getContext().getAbsMouseX() - this.relativeClickX;
             y = y / (this.panel.getScreen().getViewport().height - this.panel.getArea().height);
             x = x / (this.panel.getScreen().getViewport().width - this.panel.getArea().width);
-            this.panel.flex().top(y, y)
-                    .left(x, x);
+            this.panel.flex().topRelAnchor(y, y)
+                    .leftRelAnchor(x, x);
             this.movingArea.x = this.panel.getArea().x;
             this.movingArea.y = this.panel.getArea().y;
             WidgetTree.resize(this.panel);

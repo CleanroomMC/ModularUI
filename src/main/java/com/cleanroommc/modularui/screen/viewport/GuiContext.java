@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.screen.viewport;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
@@ -11,7 +12,6 @@ import com.cleanroommc.modularui.screen.DraggablePanelWrapper;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.WindowManager;
-import com.cleanroommc.modularui.theme.ThemeManager;
 import com.cleanroommc.modularui.widget.sizer.GuiAxis;
 import mezz.jei.api.gui.IGhostIngredientHandler;
 import net.minecraft.client.Minecraft;
@@ -79,7 +79,7 @@ public class GuiContext extends GuiViewportStack {
         this.mc = ModularUI.getMC();
         this.font = this.mc.fontRenderer;
         if (this.currentTheme == null) {
-            this.currentTheme = ThemeManager.getThemeFor(screen.getOwner(), screen.getName(), null);
+            this.currentTheme = IThemeApi.get().getThemeForScreen(screen, null);
         }
     }
 
@@ -531,7 +531,7 @@ public class GuiContext extends GuiViewportStack {
     }
 
     public void useTheme(String theme) {
-        this.currentTheme = ThemeManager.getThemeFor(this.screen.getOwner(), this.screen.getName(), theme);
+        this.currentTheme = IThemeApi.get().getThemeForScreen(this.screen, theme);
     }
 
     private static class HoveredIterable implements Iterable<IGuiElement> {

@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.function.Function;
 
 public class JsonHelper {
@@ -67,7 +68,7 @@ public class JsonHelper {
 
     public static int getIntWithFallback(JsonObject json, JsonObject fallback, int defaultValue, String @NotNull ... keys) {
         Integer i = getBoxedInt(json, null, keys);
-        return i != null ? i : getInt(json, defaultValue, keys);
+        return i != null ? i : getInt(fallback, defaultValue, keys);
     }
 
     public static boolean getBoolean(JsonObject json, boolean defaultValue, String @NotNull ... keys) {
@@ -85,7 +86,7 @@ public class JsonHelper {
 
     public static boolean getBoolWithFallback(JsonObject json, JsonObject fallback, boolean defaultValue, String @NotNull ... keys) {
         Boolean i = getBoxedBool(json, null, keys);
-        return i != null ? i : getBoolean(json, defaultValue, keys);
+        return i != null ? i : getBoolean(fallback, defaultValue, keys);
     }
 
     public static String getString(JsonObject json, String defaultValue, String @NotNull ... keys) {
@@ -141,10 +142,10 @@ public class JsonHelper {
                 if (jsonElement.isJsonPrimitive()) {
                     return jsonElement.getAsBoolean();
                 }
-                return null;
+                return defaultValue;
             }
         }
-        return null;
+        return defaultValue;
     }
 
     public static int getColor(JsonObject json, int defaultValue, String... keys) {
@@ -180,5 +181,12 @@ public class JsonHelper {
 
     public static JsonElement parse(InputStream inputStream) {
         return parser.parse(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+    }
+
+    public static JsonObject merge(JsonObject base, JsonObject other) {
+        for (Map.Entry<String, JsonElement> entry : other.entrySet()) {
+            base.add(entry.getKey(), entry.getValue());
+        }
+        return base;
     }
 }

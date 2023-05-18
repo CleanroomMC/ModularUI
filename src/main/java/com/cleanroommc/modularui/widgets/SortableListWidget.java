@@ -144,8 +144,8 @@ public class SortableListWidget<T, I extends SortableListWidget.Item<T>> extends
             this.value = value;
             this.content = content;
             this.children.add(content);
-            this.content.flex().height(1f);
-            flex().width(1f).height(18);
+            this.content.flex().heightRel(1f);
+            flex().widthRel(1f).height(18);
             background(GuiTextures.BUTTON);
         }
 
@@ -201,7 +201,7 @@ public class SortableListWidget<T, I extends SortableListWidget.Item<T>> extends
             this.removeButton = new ButtonWidget<>()
                     .onMousePressed(mouseButton -> this.listWidget.remove(this.index))
                     .background(GuiTextures.CLOSE.asIcon())
-                    .width(10).height(1f)
+                    .width(10).heightRel(1f)
                     .right(0);
             return this;
         }

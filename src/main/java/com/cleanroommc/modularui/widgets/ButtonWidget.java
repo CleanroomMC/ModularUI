@@ -1,9 +1,11 @@
 package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.sync.InteractionSyncHandler;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.widget.SingleChildWidget;
 import org.jetbrains.annotations.NotNull;
@@ -18,6 +20,17 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
     private IGuiAction.KeyReleased keyReleased;
     private IGuiAction.KeyPressed keyTapped;
 
+    private InteractionSyncHandler syncHandler;
+
+    @Override
+    public boolean isValidSyncHandler(SyncHandler syncHandler) {
+        if (syncHandler instanceof InteractionSyncHandler) {
+            this.syncHandler = (InteractionSyncHandler) syncHandler;
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public WidgetTheme getWidgetTheme(ITheme theme) {
         return theme.getButtonTheme();
@@ -28,18 +41,25 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
         if (this.mousePressed != null && this.mousePressed.press(mouseButton)) {
             return Result.SUCCESS;
         }
+        if (this.syncHandler != null && this.syncHandler.onMousePressed(mouseButton)) {
+            return Result.SUCCESS;
+        }
         return Result.ACCEPT;
     }
 
     @Override
     public boolean onMouseRelease(int mouseButton) {
-        return this.mouseReleased != null && this.mouseReleased.release(mouseButton);
+        return (this.mouseReleased != null && this.mouseReleased.release(mouseButton)) ||
+                (this.syncHandler != null && this.syncHandler.onMouseReleased(mouseButton));
     }
 
     @NotNull
     @Override
     public Result onMouseTapped(int mouseButton) {
         if (this.mouseTapped != null && this.mouseTapped.press(mouseButton)) {
+            return Result.SUCCESS;
+        }
+        if (this.syncHandler != null && this.syncHandler.onMouseTapped(mouseButton)) {
             return Result.SUCCESS;
         }
         return Result.IGNORE;
@@ -50,12 +70,16 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
         if (this.keyPressed != null && this.keyPressed.press(typedChar, keyCode)) {
             return Result.SUCCESS;
         }
+        if (this.syncHandler != null && this.syncHandler.onKeyPressed(typedChar, keyCode)) {
+            return Result.SUCCESS;
+        }
         return Result.ACCEPT;
     }
 
     @Override
     public boolean onKeyRelease(char typedChar, int keyCode) {
-        return this.keyReleased != null && this.keyReleased.release(typedChar, keyCode);
+        return (this.keyReleased != null && this.keyReleased.release(typedChar, keyCode)) ||
+                (this.syncHandler != null && this.syncHandler.onKeyReleased(typedChar, keyCode));
     }
 
     @NotNull
@@ -64,12 +88,16 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
         if (this.keyTapped != null && this.keyTapped.press(typedChar, keyCode)) {
             return Result.SUCCESS;
         }
+        if (this.syncHandler != null && this.syncHandler.onKeyTapped(typedChar, keyCode)) {
+            return Result.SUCCESS;
+        }
         return Result.IGNORE;
     }
 
     @Override
     public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
-        return this.mouseScroll != null && this.mouseScroll.scroll(scrollDirection, amount);
+        return (this.mouseScroll != null && this.mouseScroll.scroll(scrollDirection, amount)) ||
+                (this.syncHandler != null && this.syncHandler.onMouseScroll((int) Math.copySign(amount, scrollDirection.modifier)));
     }
 
     public W onMousePressed(IGuiAction.MousePressed mousePressed) {
