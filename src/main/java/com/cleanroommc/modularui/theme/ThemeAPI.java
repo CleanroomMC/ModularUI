@@ -23,7 +23,7 @@ public class ThemeAPI implements IThemeApi {
     public static final ITheme DEFAULT_DEFAULT = new DefaultTheme(INSTANCE);
 
     private final Map<String, ITheme> THEMES = new Object2ObjectOpenHashMap<>();
-    private final Map<String, List<JsonBuilder>> defaultThemes = new Object2ObjectOpenHashMap<>();
+    protected final Map<String, List<JsonBuilder>> defaultThemes = new Object2ObjectOpenHashMap<>();
     protected final Map<String, WidgetTheme> defaultWidgetThemes = new Object2ObjectOpenHashMap<>();
     protected final Map<String, WidgetThemeParser> widgetThemeFunctions = new Object2ObjectOpenHashMap<>();
     protected final Map<String, String> jsonScreenThemes = new Object2ObjectOpenHashMap<>();
