@@ -15,7 +15,7 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.sync.FluidSlotSyncHandler;
 import com.cleanroommc.modularui.theme.WidgetSlotTheme;
 import com.cleanroommc.modularui.utils.Alignment;
-import com.cleanroommc.modularui.utils.ClickData;
+import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.widget.Widget;
@@ -151,8 +151,8 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
         }
         ItemStack cursorStack = Minecraft.getMinecraft().player.inventory.getItemStack();
         if (this.syncHandler.isPhantom() || (!cursorStack.isEmpty() && cursorStack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null))) {
-            ClickData clickData = ClickData.create(mouseButton);
-            this.syncHandler.syncToServer(1, clickData::writeToPacket);
+            MouseData mouseData = MouseData.create(mouseButton);
+            this.syncHandler.syncToServer(1, mouseData::writeToPacket);
         }
         return Result.SUCCESS;
     }
@@ -163,8 +163,8 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
             if ((scrollDirection.isUp() && !this.syncHandler.canFillSlot()) || (scrollDirection.isDown() && !this.syncHandler.canDrainSlot())) {
                 return false;
             }
-            ClickData clickData = ClickData.create(scrollDirection.modifier);
-            this.syncHandler.syncToServer(2, clickData::writeToPacket);
+            MouseData mouseData = MouseData.create(scrollDirection.modifier);
+            this.syncHandler.syncToServer(2, mouseData::writeToPacket);
             return true;
         }
         return false;

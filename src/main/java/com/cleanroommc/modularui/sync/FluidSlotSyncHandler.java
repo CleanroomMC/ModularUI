@@ -2,7 +2,7 @@ package com.cleanroommc.modularui.sync;
 
 import com.cleanroommc.modularui.api.sync.ValueSyncHandler;
 import com.cleanroommc.modularui.network.NetworkUtils;
-import com.cleanroommc.modularui.utils.ClickData;
+import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.FluidTankHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -87,13 +87,13 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
             read(buf);
         } else if (id == 1) {
             if (this.phantom) {
-                tryClickPhantom(ClickData.readPacket(buf));
+                tryClickPhantom(MouseData.readPacket(buf));
             } else {
-                tryClickContainer(ClickData.readPacket(buf));
+                tryClickContainer(MouseData.readPacket(buf));
             }
         } else if (id == 2) {
             if (this.phantom) {
-                tryScrollPhantom(ClickData.readPacket(buf));
+                tryScrollPhantom(MouseData.readPacket(buf));
             }
         } else if (id == 3) {
             this.controlsAmount = buf.readBoolean();
@@ -109,14 +109,14 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
         }
     }
 
-    private void tryClickContainer(ClickData clickData) {
+    private void tryClickContainer(MouseData mouseData) {
         EntityPlayer player = getSyncHandler().getPlayer();
         ItemStack currentStack = player.inventory.getItemStack();
         if (!currentStack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)) {
             return;
         }
-        int maxAttempts = clickData.shift ? currentStack.getCount() : 1;
-        if (clickData.mouseButton == 0 && canFillSlot) {
+        int maxAttempts = mouseData.shift ? currentStack.getCount() : 1;
+        if (mouseData.mouseButton == 0 && canFillSlot) {
             boolean performedTransfer = false;
             for (int i = 0; i < maxAttempts; i++) {
                 FluidActionResult result = FluidUtil.tryEmptyContainer(currentStack, fluidHandler, Integer.MAX_VALUE, null, false);
@@ -145,7 +145,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
             return;
         }
         FluidStack currentFluid = fluidTank.getFluid();
-        if (clickData.mouseButton == 1 && canDrainSlot && currentFluid != null && currentFluid.amount > 0) {
+        if (mouseData.mouseButton == 1 && canDrainSlot && currentFluid != null && currentFluid.amount > 0) {
             boolean performedTransfer = false;
             for (int i = 0; i < maxAttempts; i++) {
                 FluidActionResult result = FluidUtil.tryFillContainer(currentStack, fluidHandler, Integer.MAX_VALUE, null, false);
@@ -172,16 +172,16 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
         }
     }
 
-    public void tryClickPhantom(ClickData clickData) {
+    public void tryClickPhantom(MouseData mouseData) {
         EntityPlayer player = getSyncHandler().getPlayer();
         ItemStack currentStack = player.inventory.getItemStack();
         FluidStack currentFluid = this.fluidTank.getFluid();
         IFluidHandlerItem fluidHandlerItem = currentStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null);
 
-        if (clickData.mouseButton == 0) {
+        if (mouseData.mouseButton == 0) {
             if (currentStack.isEmpty() || fluidHandlerItem == null) {
                 if (canDrainSlot) {
-                    this.fluidTank.drain(clickData.shift ? Integer.MAX_VALUE : 1000, true);
+                    this.fluidTank.drain(mouseData.shift ? Integer.MAX_VALUE : 1000, true);
                 }
             } else {
                 FluidStack cellFluid = fluidHandlerItem.drain(Integer.MAX_VALUE, false);
@@ -196,11 +196,11 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
                     }
                 } else {
                     if (canDrainSlot) {
-                        fluidTank.drain(clickData.shift ? Integer.MAX_VALUE : 1000, true);
+                        fluidTank.drain(mouseData.shift ? Integer.MAX_VALUE : 1000, true);
                     }
                 }
             }
-        } else if (clickData.mouseButton == 1) {
+        } else if (mouseData.mouseButton == 1) {
             if (canFillSlot) {
                 if (currentFluid != null) {
                     if (this.controlsAmount) {
@@ -214,21 +214,21 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
                     this.fluidTank.fill(toFill, true);
                 }
             }
-        } else if (clickData.mouseButton == 2 && currentFluid != null && canDrainSlot) {
-            this.fluidTank.drain(clickData.shift ? Integer.MAX_VALUE : 1000, true);
+        } else if (mouseData.mouseButton == 2 && currentFluid != null && canDrainSlot) {
+            this.fluidTank.drain(mouseData.shift ? Integer.MAX_VALUE : 1000, true);
         }
     }
 
-    public void tryScrollPhantom(ClickData clickData) {
+    public void tryScrollPhantom(MouseData mouseData) {
         FluidStack currentFluid = this.fluidTank.getFluid();
-        int amount = clickData.mouseButton;
-        if (clickData.shift) {
+        int amount = mouseData.mouseButton;
+        if (mouseData.shift) {
             amount *= 10;
         }
-        if (clickData.ctrl) {
+        if (mouseData.ctrl) {
             amount *= 100;
         }
-        if (clickData.alt) {
+        if (mouseData.alt) {
             amount *= 1000;
         }
         if (currentFluid == null) {

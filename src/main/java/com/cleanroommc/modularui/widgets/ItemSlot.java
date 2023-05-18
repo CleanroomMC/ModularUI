@@ -6,7 +6,6 @@ import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
-import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.TextRenderer;
 import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
 import com.cleanroommc.modularui.integration.jei.JeiIngredientProvider;
@@ -16,7 +15,7 @@ import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.sync.ItemSlotSH;
 import com.cleanroommc.modularui.theme.WidgetSlotTheme;
 import com.cleanroommc.modularui.utils.Alignment;
-import com.cleanroommc.modularui.utils.ClickData;
+import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.widget.Widget;
@@ -91,8 +90,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     @Override
     public @NotNull Result onMousePressed(int mouseButton) {
         if (this.syncHandler.isPhantom()) {
-            ClickData clickData = ClickData.create(mouseButton);
-            this.syncHandler.syncToServer(2, clickData::writeToPacket);
+            MouseData mouseData = MouseData.create(mouseButton);
+            this.syncHandler.syncToServer(2, mouseData::writeToPacket);
         } else {
             getScreen().getScreenWrapper().clickSlot();
         }
@@ -108,8 +107,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     @Override
     public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
         if (this.syncHandler.isPhantom()) {
-            ClickData clickData = ClickData.create(scrollDirection.modifier);
-            this.syncHandler.syncToServer(3, clickData::writeToPacket);
+            MouseData mouseData = MouseData.create(scrollDirection.modifier);
+            this.syncHandler.syncToServer(3, mouseData::writeToPacket);
             return true;
         }
         return false;
