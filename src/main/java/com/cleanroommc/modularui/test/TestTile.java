@@ -273,7 +273,16 @@ public class TestTile extends TileEntity implements IGuiHolder {
                                                         .size(14, 14))
                                                 .child(IKey.lang("bogosort.gui.enabled").asWidget()
                                                         .height(14)))))
-                        .addPage(new ParentWidget<>().size(1f, 1f).padding(7).child(SlotGroupWidget.playerInventory()).child(new DropDownMenu().addChoice(i -> true, new StringKey("Help")).size(60, 16))));
+                        .addPage(
+                            new ParentWidget<>()
+                                .size(1f, 1f)
+                                .padding(7)
+                                .child(SlotGroupWidget.playerInventory())
+                                .child(
+                                    new DropDownMenu()
+                                        .addChoice(i -> true, new StringKey("Help"))
+                                        .addChoice(i -> true, "Help2")
+                                        .size(60, 16))));
         /*panel.child(new ButtonWidget<>()
                         .flex(flex -> flex.size(60, 20)
                                 .top(7)
