@@ -16,10 +16,14 @@ import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.util.Timer;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Config;
+import net.minecraftforge.common.config.ConfigManager;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.Side;
@@ -48,6 +52,7 @@ public class ModularUI {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        MinecraftForge.EVENT_BUS.register(ModularUI.class);
         NetworkRegistry.INSTANCE.registerGuiHandler(ID, GuiManager.INSTANCE);
         GuiInfos.init();
 
@@ -108,5 +113,12 @@ public class ModularUI {
 
     public static boolean isSortModLoaded() {
         return sorterLoaded;
+    }
+
+    @SubscribeEvent
+    public static void onConfigChange(ConfigChangedEvent.OnConfigChangedEvent event) {
+        if (event.getModID().equals(ModularUI.ID)) {
+            ConfigManager.sync(ModularUI.ID, Config.Type.INSTANCE);
+        }
     }
 }
