@@ -1,9 +1,8 @@
 package com.cleanroommc.modularui.widgets;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -13,9 +12,8 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.keys.StringKey;
+import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.utils.Alignment;
-import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.ScrollWidget;
 import com.cleanroommc.modularui.widget.SingleChildWidget;
 import com.cleanroommc.modularui.widget.Widget;
@@ -43,8 +41,8 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
         return getThis();
     }
 
-    public DropDownMenu addChoice(ButtonWidget<?> button) {
-        menu.addChoice(button);
+    public DropDownMenu addChoice(Function<Integer, DropDownItem> itemGetter) {
+        menu.addChoice(itemGetter);
         return getThis();
     }
 
@@ -55,13 +53,14 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
     }
 
     public DropDownMenu addChoice(IGuiAction.MouseReleased onSelect, IDrawable... drawable) {
-        ButtonWidget<?> button = new ButtonWidget<>();
-        return addChoice(button.onMouseReleased(onSelect).onMouseTapped(m -> {
-                menu.setStatus(false);
-                menu.setSelectedWidget(button);
+        DropDownItem button = new DropDownItem();
+        return addChoice(index ->
+            button.onMouseReleased(m -> {
+                menu.setOpened(false);
+                menu.setCurrentIndex(index);
+                onSelect.release(m);
                 return true; 
-            })
-            .background(GuiTextures.BUTTON)
+                })
             .overlay(drawable));
     }
 
@@ -77,11 +76,11 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
     @Override
     public @NotNull Result onMousePressed(int mouseButton) {
         if (!menu.isOpen()) {
-            menu.setStatus(true);
+            menu.setOpened(true);
             menu.setEnabled(true);
             return Result.SUCCESS;
         }
-        menu.setStatus(false);
+        menu.setOpened(false);
         menu.setEnabled(false);
         return Result.SUCCESS;
     }
@@ -91,9 +90,11 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
         super.draw(context);
         Area area = getArea();
         int smallerSide = area.width > area.height ? area.height : area.width;
-        if (menu.getSelectedWidget() != null) {
-            menu.getSelectedWidget().setEnabled(true);
-            menu.getSelectedWidget().draw(context);
+        if (menu.getSelectedItem() != null) {
+            menu.getSelectedItem().setEnabled(true);
+            menu.getSelectedItem().drawBackground(context);
+            menu.getSelectedItem().draw(context);
+            menu.getSelectedItem().drawForeground(context);
         } else {
             NONE.draw(context, 0, 0, area.width - smallerSide, area.height);
         }
@@ -111,9 +112,9 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
         return super.background(background);
     }
 
-    public static class DropDownDirection {
-        public static final DropDownDirection UP = new DropDownDirection(0, -1);
-        public static final DropDownDirection DOWN = new DropDownDirection(0, 1);
+    public static enum DropDownDirection {
+        UP(0, -1),
+        DOWN(0, 1);
 
         private int xOffset = 0;
         private int yOffset = 0;
@@ -130,29 +131,15 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
         public int getYOffset() {
             return yOffset;
         }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (!(obj instanceof DropDownDirection)) {
-                return false;
-            }
-            DropDownDirection dir = (DropDownDirection)obj;
-            return dir.xOffset == this.xOffset && dir.yOffset == this.yOffset;
-        }
     }
 
     private static class DropDownWrapper extends ScrollWidget<DropDownWrapper> {
         private DropDownDirection direction = DropDownDirection.DOWN;
         private int maxItemsOnDisplay = 10;
         private List<IWidget> children = new ArrayList<>();
-        private IWidget selectedWidget = null;
         private boolean open;
         private int count = 0;
-        private int currentIndex = 0;
-
-        public DropDownWrapper() {
-            super();
-        }
+        private int currentIndex = -1;
 
         public void setDropDownDirection(DropDownDirection direction) {
             this.direction = direction;
@@ -165,27 +152,24 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
             }
         }
 
-        public void setStatus(boolean open) {
-            Area parentArea = getParent().getArea();
-            size(parentArea.width, parentArea.height * maxItemsOnDisplay);
-            if (direction == DropDownDirection.UP) {
-                bottom(parentArea.height * (maxItemsOnDisplay + 1));
-            } else {
-                top(parentArea.height);
-            }
-            for (IWidget child : getChildren()) {
-                child.getArea().setSize(parentArea.width, parentArea.height);
-                child.setEnabled(open);
-            }
+        @Override
+        public void afterInit() {
+            super.afterInit();
+            rebuild();
+        }
+
+        public void setOpened(boolean open) {
             this.open = open;
+            rebuild();
         }
 
         public boolean isOpen() {
             return open;
         }
 
-        public void addChoice(ButtonWidget<?> button) {
-            children.add(currentIndex, button);
+        public void addChoice(Function<Integer, DropDownItem> itemGetter) {
+            children.add(itemGetter.apply(count));
+            count++;
         }
 
         public int getCurrentIndex() {
@@ -201,12 +185,11 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
             return children;
         }
 
-        public IWidget getSelectedWidget() {
-            return selectedWidget;
-        }
-
-        public void setSelectedWidget(IWidget selectedWidget) {
-            this.selectedWidget = selectedWidget;
+        public IWidget getSelectedItem() {
+            if (currentIndex < 0 || currentIndex >= count) {
+                return null;
+            }
+            return getChildren().get(currentIndex);
         }
 
         @Override
@@ -217,6 +200,115 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
                 childAsWidget.background(background);
             }
             return super.background();
+        }
+
+        private void rebuild() {
+            if (!isValid()) return;
+            Area parentArea = getParent().getArea();
+            size(parentArea.width, parentArea.height * maxItemsOnDisplay);
+            pos(0, direction == DropDownDirection.UP ? parentArea.height * (maxItemsOnDisplay + 1) : parentArea.height);
+
+            List<IWidget> children = getChildren();
+            for (int i = 0; i < children.size(); i++) {
+                IWidget child = children.get(i);
+                child.getArea().setSize(parentArea.width, parentArea.height);
+                child.getFlex().left(0).top(parentArea.height * i);
+                child.setEnabled(open);
+            }
+        }
+    }
+
+    public static class DropDownItem extends Widget<DropDownItem> implements Interactable {
+        private IGuiAction.MousePressed mousePressed;
+        private IGuiAction.MouseReleased mouseReleased;
+        private IGuiAction.MousePressed mouseTapped;
+        private IGuiAction.MouseScroll mouseScroll;
+        private IGuiAction.KeyPressed keyPressed;
+        private IGuiAction.KeyReleased keyReleased;
+        private IGuiAction.KeyPressed keyTapped;
+
+        @Override
+        public @NotNull Result onMousePressed(int mouseButton) {
+            if (this.mousePressed != null && this.mousePressed.press(mouseButton)) {
+                return Result.SUCCESS;
+            }
+            return Result.ACCEPT;
+        }
+
+        @Override
+        public boolean onMouseRelease(int mouseButton) {
+            return this.mouseReleased != null && this.mouseReleased.release(mouseButton);
+        }
+
+        @NotNull
+        @Override
+        public Result onMouseTapped(int mouseButton) {
+            if (this.mouseTapped != null && this.mouseTapped.press(mouseButton)) {
+                return Result.SUCCESS;
+            }
+            return Result.IGNORE;
+        }
+
+        @Override
+        public @NotNull Result onKeyPressed(char typedChar, int keyCode) {
+            if (this.keyPressed != null && this.keyPressed.press(typedChar, keyCode)) {
+                return Result.SUCCESS;
+            }
+            return Result.ACCEPT;
+        }
+
+        @Override
+        public boolean onKeyRelease(char typedChar, int keyCode) {
+            return this.keyReleased != null && this.keyReleased.release(typedChar, keyCode);
+        }
+
+        @NotNull
+        @Override
+        public Result onKeyTapped(char typedChar, int keyCode) {
+            if (this.keyTapped != null && this.keyTapped.press(typedChar, keyCode)) {
+                return Result.SUCCESS;
+            }
+            return Result.IGNORE;
+        }
+
+        @Override
+        public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
+            return this.mouseScroll != null && this.mouseScroll.scroll(scrollDirection, amount);
+        }
+
+        public DropDownItem onMousePressed(IGuiAction.MousePressed mousePressed) {
+            this.mousePressed = mousePressed;
+            return getThis();
+        }
+
+        public DropDownItem onMouseReleased(IGuiAction.MouseReleased mouseReleased) {
+            this.mouseReleased = mouseReleased;
+            return getThis();
+        }
+
+        public DropDownItem onMouseTapped(IGuiAction.MousePressed mouseTapped) {
+            this.mouseTapped = mouseTapped;
+            return getThis();
+        }
+
+        public DropDownItem onMouseScrolled(IGuiAction.MouseScroll mouseScroll) {
+            this.mouseScroll = mouseScroll;
+            return getThis();
+        }
+
+        public DropDownItem onKeyPressed(IGuiAction.KeyPressed keyPressed) {
+            this.keyPressed = keyPressed;
+            return getThis();
+        }
+
+        public DropDownItem onKeyReleased(IGuiAction.KeyReleased keyReleased) {
+            this.keyReleased = keyReleased;
+            return getThis();
+        }
+
+        public DropDownItem onKeyTapped(IGuiAction.KeyPressed keyTapped) {
+            this.keyTapped = keyTapped;
+            return getThis();
         }
     }
 }

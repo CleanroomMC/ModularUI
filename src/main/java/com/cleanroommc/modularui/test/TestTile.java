@@ -24,6 +24,7 @@ import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fluids.FluidTank;
 
@@ -55,6 +56,7 @@ public class TestTile extends TileEntity implements IGuiHolder {
 
     private boolean bool = false, bool2 = true;
     private int num = 2;
+    private int currentDropdownIndex = -1;
 
     @Override
     public void buildSyncHandler(GuiSyncHandler guiSyncHandler, EntityPlayer player) {
@@ -79,6 +81,7 @@ public class TestTile extends TileEntity implements IGuiHolder {
         }
         guiSyncHandler.syncValue("mixer_fluids", 0, SyncHandlers.fluidSlot(mixerFluids1));
         guiSyncHandler.syncValue("mixer_fluids", 1, SyncHandlers.fluidSlot(mixerFluids2));
+        guiSyncHandler.syncValue("drop_down_index", SyncHandlers.intNumber(() -> currentDropdownIndex, val -> currentDropdownIndex = val));
 
     }
 
@@ -95,6 +98,7 @@ public class TestTile extends TileEntity implements IGuiHolder {
         panel.flex()                        // returns object which is responsible for sizing
                 .size(176, 220)       // set a static size for the main panel
                 .align(Alignment.Center);    // center the panel in the screen
+        DropDownMenu dropDown = new DropDownMenu();
         panel.bindPlayerInventory()
                 .child(new Row()
                         .coverChildren()
@@ -279,10 +283,20 @@ public class TestTile extends TileEntity implements IGuiHolder {
                                 .padding(7)
                                 .child(SlotGroupWidget.playerInventory())
                                 .child(
-                                    new DropDownMenu()
-                                        .addChoice(i -> true, new StringKey("Help"))
-                                        .addChoice(i -> true, "Help2")
-                                        .size(60, 16))));
+                                    dropDown
+                                        .addChoice(i -> {
+                                            currentDropdownIndex = dropDown.getSelectedIndex();
+                                            markDirty();
+                                            return true;
+                                            }, "Help")
+                                        .addChoice(i -> {
+                                            currentDropdownIndex = dropDown.getSelectedIndex();
+                                            markDirty();
+                                            return true;
+                                            }, "Help2")
+                                        .size(60, 16)
+                                        .setSynced("drop_down_index")
+                                        .setSelectedIndex(currentDropdownIndex))));
         /*panel.child(new ButtonWidget<>()
                         .flex(flex -> flex.size(60, 20)
                                 .top(7)
@@ -349,6 +363,18 @@ public class TestTile extends TileEntity implements IGuiHolder {
         if (++progress == duration) {
             progress = 0;
         }
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound nbt) {
+        nbt.setInteger("dropDownIndex", currentDropdownIndex);
+        super.writeToNBT(nbt);
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound nbt) {
+        currentDropdownIndex = nbt.hasKey("dropDownIndex") ? nbt.getInteger("dropDownIndex") : -1;
+        super.readFromNBT(nbt);
     }
 
     private static class SpecialButton extends ButtonWidget<SpecialButton> {
