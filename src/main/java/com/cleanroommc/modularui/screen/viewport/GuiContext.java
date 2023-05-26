@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
 import com.cleanroommc.modularui.integration.jei.GhostIngredientTarget;
 import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
+import com.cleanroommc.modularui.integration.jei.JeiState;
 import com.cleanroommc.modularui.screen.DraggablePanelWrapper;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
@@ -65,7 +66,7 @@ public class GuiContext extends GuiViewportStack {
     private float partialTicks;
     private long tick;
 
-    private byte jeiState = 0;
+    private JeiState jeiState = JeiState.DEFAULT;
 
     public List<Consumer<GuiContext>> postRenderCallbacks = new ArrayList<>();
 
@@ -445,26 +446,19 @@ public class GuiContext extends GuiViewportStack {
     }
 
     public void enableJei() {
-        this.jeiState = 1;
+        this.jeiState = JeiState.ENABLED;
     }
 
     public void disableJei() {
-        this.jeiState = 2;
+        this.jeiState = JeiState.DISABLED;
     }
 
     public void defaultJei() {
-        this.jeiState = 0;
+        this.jeiState = JeiState.DEFAULT;
     }
 
     public boolean isJeiEnabled() {
-        switch (this.jeiState) {
-            case 1:
-                return true;
-            case 2:
-                return false;
-            default:
-                return !screen.getContainer().isClientOnly();
-        }
+        return this.jeiState.test(this.screen);
     }
 
     public void addJeiExclusionArea(Rectangle area) {
