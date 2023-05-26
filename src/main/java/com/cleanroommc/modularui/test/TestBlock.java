@@ -24,14 +24,15 @@ import javax.annotation.Nullable;
 
 public class TestBlock extends Block implements ITileEntityProvider {
 
-    public static Block testBlock = new TestBlock();
-    public static ItemBlock testItemBlock = new ItemBlock(testBlock);
+    public final static Block testBlock = new TestBlock();
+    public final static ItemBlock testItemBlock = new ItemBlock(testBlock);
 
     public static void preInit() {
-        ResourceLocation rl = new ResourceLocation("modularui", "test_block");
+        ResourceLocation rl = new ResourceLocation(ModularUI.ID, "test_block");
         testBlock.setRegistryName(rl);
         testItemBlock.setRegistryName(rl);
         GameRegistry.registerTileEntity(TestTile.class, rl);
+        TestItem.testItem.setRegistryName(ModularUI.ID, "test_item");
     }
 
     @SubscribeEvent
@@ -44,6 +45,7 @@ public class TestBlock extends Block implements ITileEntityProvider {
     public static void registerItems(RegistryEvent.Register<Item> event) {
         IForgeRegistry<Item> registry = event.getRegistry();
         registry.register(testItemBlock);
+        registry.register(TestItem.testItem);
     }
 
     public TestBlock() {
