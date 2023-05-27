@@ -41,7 +41,6 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     private Flex flex = new Flex(this);
     private IResizeable resizer = this.flex;
     private String debugName;
-    private String internalName;;
 
     @Nullable
     private MapKey syncKey;
@@ -420,14 +419,5 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
             return getClass().getSimpleName() + "#" + debugName;
         }
         return getClass().getSimpleName();
-    }
-
-    public String getInternalName() {
-        return internalName;
-    }
-
-    public W setInternalName(String internalName) {
-        this.internalName = internalName;
-        return getThis();
     }
 }

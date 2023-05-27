@@ -98,7 +98,6 @@ public class TestTile extends TileEntity implements IGuiHolder {
         panel.flex()                        // returns object which is responsible for sizing
                 .size(176, 220)       // set a static size for the main panel
                 .align(Alignment.Center);    // center the panel in the screen
-        DropDownMenu dropDown = new DropDownMenu();
         panel.bindPlayerInventory()
                 .child(new Row()
                         .coverChildren()
@@ -283,17 +282,9 @@ public class TestTile extends TileEntity implements IGuiHolder {
                                 .padding(7)
                                 .child(SlotGroupWidget.playerInventory())
                                 .child(
-                                    dropDown
-                                        .addChoice(i -> {
-                                            currentDropdownIndex = dropDown.getSelectedIndex();
-                                            markDirty();
-                                            return true;
-                                            }, "Help")
-                                        .addChoice(i -> {
-                                            currentDropdownIndex = dropDown.getSelectedIndex();
-                                            markDirty();
-                                            return true;
-                                            }, "Help2")
+                                    new DropDownMenu()
+                                        .addChoice(menu -> currentDropdownIndex = menu.getSelectedIndex(), "Help")
+                                        .addChoice(menu -> currentDropdownIndex = menu.getSelectedIndex(), "Help2")
                                         .size(60, 16)
                                         .setSynced("drop_down_index")
                                         .setSelectedIndex(currentDropdownIndex))));
