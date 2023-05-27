@@ -59,9 +59,9 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
     }
 
     public DropDownMenu addChoice(ItemSelected onSelect, IDrawable... drawable) {
-        DropDownItem button = new DropDownItem();
+        DropDownItem item = new DropDownItem();
         return addChoice(index ->
-            button.onMouseReleased(m -> {
+            item.onMouseReleased(m -> {
                 menu.setOpened(false);
                 menu.setCurrentIndex(index);
                 onSelect.selected(this);
@@ -122,8 +122,8 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
         UP(0, -1),
         DOWN(0, 1);
 
-        private int xOffset = 0;
-        private int yOffset = 0;
+        private final int xOffset;
+        private final int yOffset;
 
         DropDownDirection(int xOffset, int yOffset) {
             this.xOffset = xOffset;
@@ -216,7 +216,7 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
             if (!isValid()) return;
             Area parentArea = getParent().getArea();
             size(parentArea.width, parentArea.height * maxItemsOnDisplay);
-            pos(0, direction == DropDownDirection.UP ? parentArea.height * (maxItemsOnDisplay + 1) : parentArea.height);
+            pos(0, direction == DropDownDirection.UP ? -parentArea.height * (maxItemsOnDisplay + 1) : parentArea.height);
 
             List<IWidget> children = getChildren();
             for (int i = 0; i < children.size(); i++) {
