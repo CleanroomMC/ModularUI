@@ -15,7 +15,7 @@ public interface IDraggable extends IViewport {
      *
      * @param partialTicks difference from last from
      */
-    void drawMovingState(float partialTicks);
+    void drawMovingState(GuiContext context, float partialTicks);
 
     /**
      * @param button the mouse button that's holding down
