@@ -37,6 +37,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.registries.IForgeRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.opengl.GL11;
 
 @Mod(modid = ModularUI.ID, name = ModularUI.NAME, version = ModularUI.VERSION, dependencies = "required-after:mixinbooter@[5.0,);")
 public class ModularUI {
@@ -97,6 +98,12 @@ public class ModularUI {
 
         DrawableSerialization.init();
         RenderingRegistry.registerEntityRenderingHandler(ModularScreenEntity.class, ScreenEntityRender::new);
+
+        // enable stencil buffer
+        GL11.glEnable(GL11.GL_STENCIL_TEST);
+        if (!Minecraft.getMinecraft().getFramebuffer().isStencilEnabled()) {
+            Minecraft.getMinecraft().getFramebuffer().enableStencil();
+        }
     }
 
     @SideOnly(Side.CLIENT)

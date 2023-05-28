@@ -2,83 +2,151 @@ package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Stack;
 
 public class Scissor {
 
-    private final static Stack<Area> scissors = new Stack<Area>();
+    private final static Stack<Area> rawScissors = new Stack<>();
+    private final static Stack<Area> scissors = new Stack<>();
+    private static int stencilValue = 0;
 
-    public static void scissor(Area area, GuiContext context) {
+    public static void reset() {
+        scissors.clear();
+        stencilValue = 0;
+        GL11.glStencilMask(0xFF);
+        GL11.glClearStencil(0);
+        GL11.glClear(GL11.GL_STENCIL_BUFFER_BIT);
+        GL11.glStencilFunc(GL11.GL_ALWAYS, 0, 0xFF);
+        GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP);
+        GL11.glStencilMask(0x00);
+    }
+
+    public static void scissor(Area area, @Nullable GuiContext context) {
         scissor(area.x, area.y, area.width, area.height, context);
     }
 
-    public static void scissor(int x, int y, int w, int h, GuiContext context) {
-        scissor(context.transformX(x, y), context.transformY(x, y), w, h, context.screen.getViewport().width, context.screen.getViewport().height);
+    public static void scissorAtZero(Area area, @Nullable GuiContext context) {
+        scissor(0, 0, area.width, area.height, context);
     }
 
-    public static void scissorTransformed(Area area, GuiContext context) {
-        scissorTransformed(area.x, area.y, area.width, area.height, context);
+    public static void scissorTransformed(Area area) {
+        scissorTransformed(area.x, area.y, area.width, area.height);
     }
 
-    public static void scissorTransformed(int x, int y, int w, int h, GuiContext context) {
-        scissor(x, y, w, h, context.screen.getViewport().width, context.screen.getViewport().height);
+    public static void scissorTransformed(int x, int y, int w, int h) {
+        scissor(x, y, w, h, null);
     }
 
     /**
-     * Scissor (clip) the screen
+     * Scissor a transformed part of the screen.
+     * OpenGL's transformations do effect these values.
+     * If the context is not null, it's viewport transformations are applied to the area that will be stored in the stack,
+     * but not to the actual stencil.
      */
-    public static void scissor(int x, int y, int w, int h, int sw, int sh) {
-        Area scissor = new Area(x, y, w, h);
+    public static void scissor(int x, int y, int w, int h, @Nullable GuiContext context) {
+        Area rawScissor = new Area(x, y, w, h);
+        Area scissor = rawScissor.createCopy();
+        if (context != null) {
+            scissor.transformAndRectanglerize(context);
+        }
         if (!scissors.isEmpty()) {
             scissors.peek().clamp(scissor);
         }
-        scissorArea(x, y, w, h, sw, sh);
+        scissorArea(x, y, w, h);
         scissors.add(scissor);
+        rawScissors.add(rawScissor);
     }
 
-    private static void scissorArea(int x, int y, int w, int h, int sw, int sh) {
-        /* Clipping area around scroll area */
-        Minecraft mc = Minecraft.getMinecraft();
+    private static void scissorArea(int x, int y, int w, int h) {
+        // increase stencil values in the area
+        setStencilValue(x, y, w, h, stencilValue, Mode.INCR);
+        stencilValue++;
+        GL11.glStencilFunc(GL11.GL_LEQUAL, stencilValue, 0xFF);
+        GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP);
+        GL11.glStencilMask(0x00);
 
-        float rx = (float) Math.ceil(mc.displayWidth / (double) sw);
-        float ry = (float) Math.ceil(mc.displayHeight / (double) sh);
+        //GuiDraw.drawRect(x - 100, y - 100, w + 200, h + 200, Color.withAlpha(Color.BLUE.normal, 0.3f));
+    }
 
-        int xx = (int) (x * rx);
-        int yy = (int) (mc.displayHeight - (y + h) * ry);
-        int ww = (int) (w * rx);
-        int hh = (int) (h * ry);
-
-        GL11.glEnable(GL11.GL_SCISSOR_TEST);
-
-        if (ww == 0 || hh == 0) {
-            GL11.glScissor(0, 0, 1, 1);
+    private static void setStencilValue(int x, int y, int w, int h, int stencilValue, Mode mode) {
+        // Set stencil func
+        mode.stencilFunc(stencilValue);
+        GL11.glStencilMask(0xFF);
+        // Draw masking shape
+        if (mode != Mode.SET) {
+            GuiDraw.drawRect(x, y, w, h, Color.withAlpha(Color.GREEN.normal, 0.15f));
         } else {
-            GL11.glScissor(xx, yy, ww, hh);
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder bufferbuilder = tessellator.getBuffer();
+            float x0 = x, x1 = x + w, y0 = y, y1 = y + h;
+            bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+            bufferbuilder.pos(x0, y0, 0.0f).endVertex();
+            bufferbuilder.pos(x0, y1, 0.0f).endVertex();
+            bufferbuilder.pos(x1, y1, 0.0f).endVertex();
+            bufferbuilder.pos(x1, y0, 0.0f).endVertex();
+            tessellator.draw();
         }
+
+        // Re-enable drawing to color buffer + depth buffer
+        GlStateManager.colorMask(true, true, true, true);
+        GlStateManager.depthMask(true);
     }
 
     public static void unscissor(GuiContext context) {
-        unscissor(context.screen.getViewport().width, context.screen.getViewport().height);
-    }
-
-    public static void unscissor(int sw, int sh) {
         scissors.pop();
-
+        Area area = rawScissors.pop();
         if (scissors.isEmpty()) {
-            GL11.glDisable(GL11.GL_SCISSOR_TEST);
-        } else {
-            Area area = scissors.peek();
-
-            scissorArea(area.x, area.y, area.width, area.height, sw, sh);
+            reset();
+            return;
         }
+        setStencilValue(0, 0, area.width, area.height, stencilValue, Mode.DECR);
+        stencilValue--;
+        GL11.glStencilFunc(GL11.GL_LEQUAL, stencilValue, 0xFF);
+        GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP);
+        GL11.glStencilMask(0x00);
     }
 
     public static boolean isInsideScissorArea(Area area, IViewportStack stack) {
-        Area.SHARED.setTransformed(area.w(), area.h(), stack);
-        return scissors.isEmpty() || scissors.peek().intersects(Area.SHARED);
+        if (scissors.isEmpty()) return true;
+        Area.SHARED.set(0, 0, area.width, area.height);
+        Area.SHARED.transformAndRectanglerize(stack);
+        return scissors.peek().intersects(Area.SHARED);
+    }
+
+    public enum Mode {
+
+        SET {
+            @Override
+            void stencilFunc(int stencilValue) {
+                GL11.glStencilFunc(GL11.GL_ALWAYS, stencilValue, 0xFF);
+                GL11.glStencilOp(GL11.GL_REPLACE, GL11.GL_REPLACE, GL11.GL_REPLACE);
+            }
+        },
+        INCR {
+            @Override
+            void stencilFunc(int stencilValue) {
+                GL11.glStencilFunc(GL11.GL_EQUAL, stencilValue, 0xFF);
+                GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_INCR, GL11.GL_INCR);
+            }
+        },
+        DECR {
+            @Override
+            void stencilFunc(int stencilValue) {
+                GL11.glStencilFunc(GL11.GL_EQUAL, stencilValue, 0xFF);
+                GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_DECR, GL11.GL_DECR);
+            }
+        };
+
+        void stencilFunc(int stencilValue) {
+        }
     }
 }

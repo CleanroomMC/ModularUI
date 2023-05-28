@@ -1,11 +1,14 @@
 package com.cleanroommc.modularui;
 
+import com.cleanroommc.modularui.drawable.Scissor;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class ClientEventHandler {
@@ -19,5 +22,13 @@ public class ClientEventHandler {
                 event.setCanceled(true);
             }
         }
+    }
+
+    @SubscribeEvent
+    public static void preDraw(TickEvent.RenderTickEvent event) {
+        if (event.phase == TickEvent.Phase.START) {
+            GL11.glEnable(GL11.GL_STENCIL_TEST);
+        }
+        Scissor.reset();
     }
 }
