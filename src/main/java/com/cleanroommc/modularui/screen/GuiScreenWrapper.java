@@ -89,7 +89,7 @@ public class GuiScreenWrapper extends GuiContainer {
             timer += 1000;
         }
 
-        Stencil.apply(this.screen.getViewport(), null);
+        Stencil.apply(this.screen.getScreenArea(), null);
         drawDefaultBackground();
         int i = this.guiLeft;
         int j = this.guiTop;
@@ -221,7 +221,7 @@ public class GuiScreenWrapper extends GuiContainer {
     public void drawDebugScreen() {
         GuiContext context = screen.context;
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
-        int screenW = this.screen.getViewport().width, screenH = this.screen.getViewport().height;
+        int screenW = this.screen.getScreenArea().width, screenH = this.screen.getScreenArea().height;
         int color = Color.rgb(180, 40, 115);
         int lineY = screenH - 13;
         drawString(fontRenderer, "Mouse Pos: " + mouseX + ", " + mouseY, 5, lineY, color);

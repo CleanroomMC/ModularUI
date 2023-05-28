@@ -223,7 +223,7 @@ public class Flex implements IResizeable, IPositioned<Flex> {
 
     private Area getRelativeTo() {
         Area relativeTo = relativeToParent ? parent.getParentArea() : this.relativeTo;
-        return relativeTo != null ? relativeTo : this.parent.getScreen().getViewport();
+        return relativeTo != null ? relativeTo : this.parent.getScreen().getScreenArea();
     }
 
     public boolean isExpanded() {

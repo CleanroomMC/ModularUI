@@ -78,7 +78,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @Override
     public Area getParentArea() {
-        return getScreen().getViewport();
+        return getScreen().getScreenArea();
     }
 
     public boolean isOpen() {
@@ -176,7 +176,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         };
         getContext().reset();
         GuiViewportStack stack = new GuiViewportStack();
-        stack.pushViewport(null, getScreen().getViewport());
+        stack.pushViewport(null, getScreen().getScreenArea());
         stack.pushViewport(this, getArea());
         transform(stack);
         getSelfAt(stack, widgetList, getContext().getAbsMouseX(), getContext().getAbsMouseY());

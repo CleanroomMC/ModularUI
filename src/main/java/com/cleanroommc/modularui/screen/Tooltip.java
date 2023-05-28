@@ -72,7 +72,7 @@ public class Tooltip {
         if (maxWidth <= 0) {
             maxWidth = Integer.MAX_VALUE;
         }
-        Area screen = context.screen.getViewport();
+        Area screen = context.screen.getScreenArea();
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
         IconRenderer renderer = IconRenderer.SHARED;
         //List<IIcon> icons = renderer.measureLines(this.lines);
