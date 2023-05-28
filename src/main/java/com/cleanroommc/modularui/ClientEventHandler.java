@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui;
 
-import com.cleanroommc.modularui.drawable.Scissor;
+import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -29,6 +29,6 @@ public class ClientEventHandler {
         if (event.phase == TickEvent.Phase.START) {
             GL11.glEnable(GL11.GL_STENCIL_TEST);
         }
-        Scissor.reset();
+        Stencil.reset();
     }
 }

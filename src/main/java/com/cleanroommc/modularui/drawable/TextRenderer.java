@@ -8,7 +8,6 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -129,11 +128,11 @@ public class TextRenderer {
         scroll = scroll % (int) (line.width + 1) ;
         String drawString = line.getText();//getFontRenderer().trimStringToWidth(line.getText(), (int) (this.maxWidth + scroll));
         Area.SHARED.set(this.x, Integer.MIN_VALUE, this.x + (int) this.maxWidth, Integer.MAX_VALUE);
-        Scissor.scissor(Area.SHARED, context);
+        Stencil.apply(Area.SHARED, context);
         GlStateManager.translate(-scroll, 0, 0);
         drawMeasuredLines(Collections.singletonList(line(drawString)));
         GlStateManager.translate(scroll, 0, 0);
-        Scissor.unscissor(context);
+        Stencil.remove();
     }
 
     public List<String> wrapLine(String line) {
