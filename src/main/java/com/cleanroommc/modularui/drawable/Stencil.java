@@ -98,6 +98,7 @@ public class Stencil {
         // Draw masking shape
         //GuiDraw.drawRect(x, y, w, h, 0);
         GlStateManager.disableTexture2D();
+        GlStateManager.disableAlpha();
         GlStateManager.enableBlend();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
@@ -109,6 +110,7 @@ public class Stencil {
         bufferbuilder.pos(x1, y0, 0.0f).endVertex();
         tessellator.draw();
         GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
         GlStateManager.enableTexture2D();
         // Re-enable drawing to color buffer + depth buffer
         GlStateManager.colorMask(true, true, true, true);
