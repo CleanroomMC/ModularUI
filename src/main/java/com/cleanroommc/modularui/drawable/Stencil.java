@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.drawable;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -10,14 +11,12 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
-import java.util.Stack;
-
 public class Stencil {
 
     // Stores a stack of areas that are used as stencils
-    private final static Stack<Area> rawStencils = new Stack<>();
+    private final static ObjectArrayList<Area> rawStencils = new ObjectArrayList<>();
     // Stores a stack of areas that are transformed, so it represents the actual area
-    private final static Stack<Area> stencils = new Stack<>();
+    private final static ObjectArrayList<Area> stencils = new ObjectArrayList<>();
     // the current highest stencil value
     private static int stencilValue = 0;
 
@@ -65,7 +64,7 @@ public class Stencil {
             scissor.transformAndRectanglerize(context);
         }
         if (!stencils.isEmpty()) {
-            stencils.peek().clamp(scissor);
+            stencils.top().clamp(scissor);
         }
         applyArea(x, y, w, h);
         stencils.add(scissor);
@@ -137,6 +136,6 @@ public class Stencil {
         if (stencils.isEmpty()) return true;
         Area.SHARED.set(0, 0, area.width, area.height);
         Area.SHARED.transformAndRectanglerize(stack);
-        return stencils.peek().intersects(Area.SHARED);
+        return stencils.top().intersects(Area.SHARED);
     }
 }
