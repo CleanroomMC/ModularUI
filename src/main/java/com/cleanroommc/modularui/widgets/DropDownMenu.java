@@ -107,10 +107,11 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
             NONE.draw(context, 0, 0, area.width, area.height);
         }
 
+        int arrowSize = smallerSide / 2;
         if (menu.isOpen()) {
-            arrowOpened.draw(context, area.width - smallerSide , 0, smallerSide, smallerSide);
+            arrowOpened.draw(context, area.width - arrowSize , arrowSize / 2, arrowSize, arrowSize);
         } else {
-            arrowClosed.draw(context, area.width - smallerSide , 0, smallerSide, smallerSide);
+            arrowClosed.draw(context, area.width - arrowSize , arrowSize / 2, arrowSize, arrowSize);
         }
     }
 
