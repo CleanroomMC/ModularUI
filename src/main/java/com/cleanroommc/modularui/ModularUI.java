@@ -2,14 +2,14 @@ package com.cleanroommc.modularui;
 
 import com.cleanroommc.Tags;
 import com.cleanroommc.modularui.drawable.DrawableSerialization;
+import com.cleanroommc.modularui.holoui.HoloScreenEntity;
+import com.cleanroommc.modularui.holoui.ScreenEntityRender;
 import com.cleanroommc.modularui.keybind.KeyBindHandler;
 import com.cleanroommc.modularui.manager.GuiInfos;
 import com.cleanroommc.modularui.manager.GuiManager;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.test.EventHandler;
-import com.cleanroommc.modularui.test.ModularScreenEntity;
-import com.cleanroommc.modularui.test.ScreenEntityRender;
 import com.cleanroommc.modularui.test.TestBlock;
 import com.cleanroommc.modularui.theme.ThemeManager;
 import com.cleanroommc.modularui.theme.ThemeReloadCommand;
@@ -97,7 +97,7 @@ public class ModularUI {
         }
 
         DrawableSerialization.init();
-        RenderingRegistry.registerEntityRenderingHandler(ModularScreenEntity.class, ScreenEntityRender::new);
+        RenderingRegistry.registerEntityRenderingHandler(HoloScreenEntity.class, ScreenEntityRender::new);
 
         // enable stencil buffer
         GL11.glEnable(GL11.GL_STENCIL_TEST);
@@ -118,8 +118,8 @@ public class ModularUI {
         registry.register(EntityEntryBuilder.create()
                 .id("modular_screen", 0)
                 .name("ModularScreen")
-                .entity(ModularScreenEntity.class)
-                .factory(ModularScreenEntity::new)
+                .entity(HoloScreenEntity.class)
+                .factory(HoloScreenEntity::new)
                 .build());
     }
 
