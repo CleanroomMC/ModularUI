@@ -18,6 +18,7 @@ import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.widget.ScrollWidget;
 import com.cleanroommc.modularui.widget.SingleChildWidget;
 import com.cleanroommc.modularui.widget.Widget;
+import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
 public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Interactable {
@@ -158,12 +159,6 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
             }
         }
 
-        @Override
-        public void afterInit() {
-            super.afterInit();
-            rebuild();
-        }
-
         public void setOpened(boolean open) {
             this.open = open;
             rebuild();
@@ -212,7 +207,9 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
             maxItemsOnDisplay = maxItems;
         }
 
-        private void rebuild() {
+        @Override
+        public void resize() {
+            super.resize();
             if (!isValid()) return;
             Area parentArea = getParent().getArea();
             size(parentArea.width, parentArea.height * maxItemsOnDisplay);
@@ -226,6 +223,10 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
                 child.getFlex().left(0).top(parentArea.height * i);
                 child.setEnabled(open);
             }
+        }
+
+        private void rebuild() {
+            WidgetTree.resize(this);
         }
     }
 
