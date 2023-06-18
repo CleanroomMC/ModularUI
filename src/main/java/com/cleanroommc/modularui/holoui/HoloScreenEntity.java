@@ -15,8 +15,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Highly experimental
+ */
+@ApiStatus.Experimental
 public class HoloScreenEntity extends Entity {
 
     private GuiScreenWrapper wrapper;

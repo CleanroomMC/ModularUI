@@ -2,16 +2,14 @@ package com.cleanroommc.modularui.screen.viewport;
 
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
+import com.cleanroommc.modularui.utils.GuiUtils;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -25,7 +23,6 @@ import java.util.ListIterator;
 public class GuiViewportStack implements IViewportStack {
 
     private static final Vector3f sharedVec = new Vector3f();
-    private static final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(16);
 
     private final ObjectArrayList<TransformationMatrix> viewportStack = new ObjectArrayList<>();
     private final List<Area> viewportAreas = new ArrayList<>();
@@ -225,9 +222,7 @@ public class GuiViewportStack implements IViewportStack {
     @Override
     public void applyToOpenGl() {
         if (this.top == null) return;
-        this.top.getMatrix().store(floatBuffer);
-        floatBuffer.position(0);
-        GL11.glMultMatrix(floatBuffer);
+        GuiUtils.applyTransformationMatrix(this.top.getMatrix());
     }
 
     @Nullable

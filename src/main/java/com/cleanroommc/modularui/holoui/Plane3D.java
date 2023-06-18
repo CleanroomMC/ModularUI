@@ -1,12 +1,18 @@
 package com.cleanroommc.modularui.holoui;
 
+import com.cleanroommc.modularui.utils.GuiUtils;
 import net.minecraft.client.renderer.GlStateManager;
+import org.jetbrains.annotations.ApiStatus;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Matrix4f;
 
 import java.nio.FloatBuffer;
 
+/**
+ * Highly experimental
+ */
+@ApiStatus.Experimental
 public class Plane3D {
 
     private float w = 480, h = 270;
@@ -35,10 +41,7 @@ public class Plane3D {
             rotation.m02 = -nX;
             rotation.m12 = -nY;
             rotation.m22 = -nZ;
-            FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(16);
-            rotation.store(floatBuffer);
-            floatBuffer.position(0);
-            GL11.glMultMatrix(floatBuffer);
+            GuiUtils.applyTransformationMatrix(rotation);
         }
         // un-translate for scale and rotation
         GlStateManager.translate(-(w / 2f), -(h / 2f), 0);

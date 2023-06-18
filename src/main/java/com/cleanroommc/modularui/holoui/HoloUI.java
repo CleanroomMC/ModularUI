@@ -7,10 +7,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Map;
 import java.util.function.Supplier;
 
+/**
+ * Highly experimental
+ */
+@ApiStatus.Experimental
 public class HoloUI {
 
     private static final Map<ResourceLocation, Supplier<ModularScreen>> syncedHolos = new Object2ObjectOpenHashMap<>();
