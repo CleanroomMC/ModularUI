@@ -2,19 +2,17 @@ package com.cleanroommc.modularui.screen.viewport;
 
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
+import com.cleanroommc.modularui.utils.GuiUtils;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Stack;
 
 /**
  * Viewport stack
@@ -25,9 +23,8 @@ import java.util.Stack;
 public class GuiViewportStack implements IViewportStack {
 
     private static final Vector3f sharedVec = new Vector3f();
-    private static final FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(16);
 
-    private final Stack<TransformationMatrix> viewportStack = new Stack<>();
+    private final ObjectArrayList<TransformationMatrix> viewportStack = new ObjectArrayList<>();
     private final List<Area> viewportAreas = new ArrayList<>();
     private TransformationMatrix top;
     private TransformationMatrix topViewport;
@@ -60,7 +57,7 @@ public class GuiViewportStack implements IViewportStack {
         }
         this.viewportStack.push(new TransformationMatrix(viewport, child, parent));
         updateViewport(false);
-        this.topViewport = this.viewportStack.peek();
+        this.topViewport = this.viewportStack.top();
     }
 
     @Override
@@ -127,7 +124,7 @@ public class GuiViewportStack implements IViewportStack {
     @Override
     public void popUntilViewport(IViewport viewport) {
         int i = this.viewportStack.size();
-        while (--i >= 0 && this.viewportStack.peek().getViewport() != viewport) {
+        while (--i >= 0 && this.viewportStack.top().getViewport() != viewport) {
             this.viewportStack.pop();
         }
         updateViewport(true);
@@ -177,7 +174,7 @@ public class GuiViewportStack implements IViewportStack {
     }
 
     private void updateViewport(boolean findTopViewport) {
-        this.top = this.viewportStack.isEmpty() ? null : this.viewportStack.peek();
+        this.top = this.viewportStack.isEmpty() ? null : this.viewportStack.top();
         if (!findTopViewport || this.topViewport == null || !this.topViewport.isViewportMatrix()) return;
         // find new top viewport
         this.topViewport = null;
@@ -225,9 +222,7 @@ public class GuiViewportStack implements IViewportStack {
     @Override
     public void applyToOpenGl() {
         if (this.top == null) return;
-        this.top.getMatrix().store(floatBuffer);
-        floatBuffer.position(0);
-        GL11.glMultMatrix(floatBuffer);
+        GuiUtils.applyTransformationMatrix(this.top.getMatrix());
     }
 
     @Nullable

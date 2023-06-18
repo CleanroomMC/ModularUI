@@ -334,7 +334,7 @@ public class GuiContext extends GuiViewportStack {
         if (hasDraggable()) {
             int flag = IViewport.DRAWING | IViewport.DRAGGABLE;
             this.draggable.applyMatrix(this);
-            this.draggable.getElement().drawMovingState(this.partialTicks);
+            this.draggable.getElement().drawMovingState(this, this.partialTicks);
             this.draggable.unapplyMatrix(this);
         }
     }

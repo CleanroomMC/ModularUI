@@ -2,6 +2,8 @@ package com.cleanroommc.modularui;
 
 import com.cleanroommc.Tags;
 import com.cleanroommc.modularui.drawable.DrawableSerialization;
+import com.cleanroommc.modularui.holoui.HoloScreenEntity;
+import com.cleanroommc.modularui.holoui.ScreenEntityRender;
 import com.cleanroommc.modularui.keybind.KeyBindHandler;
 import com.cleanroommc.modularui.manager.GuiInfos;
 import com.cleanroommc.modularui.manager.GuiManager;
@@ -18,18 +20,24 @@ import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.registry.EntityEntry;
+import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.registries.IForgeRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.opengl.GL11;
 
 @Mod(modid = ModularUI.ID, name = ModularUI.NAME, version = ModularUI.VERSION, dependencies = "required-after:mixinbooter@[5.0,);")
 public class ModularUI {
@@ -89,12 +97,30 @@ public class ModularUI {
         }
 
         DrawableSerialization.init();
+        RenderingRegistry.registerEntityRenderingHandler(HoloScreenEntity.class, ScreenEntityRender::new);
+
+        // enable stencil buffer
+        GL11.glEnable(GL11.GL_STENCIL_TEST);
+        if (!Minecraft.getMinecraft().getFramebuffer().isStencilEnabled()) {
+            Minecraft.getMinecraft().getFramebuffer().enableStencil();
+        }
     }
 
     @SideOnly(Side.CLIENT)
     private void postInitClient() {
         ClientCommandHandler.instance.registerCommand(new ThemeReloadCommand());
         ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new ThemeManager());
+    }
+
+    @SubscribeEvent
+    public static void registerBlocks(RegistryEvent.Register<EntityEntry> event) {
+        IForgeRegistry<EntityEntry> registry = event.getRegistry();
+        registry.register(EntityEntryBuilder.create()
+                .id("modular_screen", 0)
+                .name("ModularScreen")
+                .entity(HoloScreenEntity.class)
+                .factory(HoloScreenEntity::new)
+                .build());
     }
 
     @SideOnly(Side.CLIENT)

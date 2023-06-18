@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IDraggable;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import org.jetbrains.annotations.Nullable;
@@ -19,17 +20,21 @@ public class DraggablePanelWrapper implements IDraggable {
     }
 
     @Override
-    public void drawMovingState(float partialTicks) {
-        WidgetTree.drawTree(this.panel, this.panel.getContext(), true);
+    public void drawMovingState(GuiContext context, float partialTicks) {
+        context.pushMatrix();
+        transform(context);
+        WidgetTree.drawTree(this.panel, context, true);
+        context.popMatrix();
     }
 
     @Override
     public boolean onDragStart(int button) {
         if (button == 0) {
-            this.relativeClickX = panel.getContext().getMouseX() - panel.getArea().x;
-            this.relativeClickY = panel.getContext().getMouseY() - panel.getArea().y;
-            this.movingArea.x = this.panel.getContext().getAbsMouseX() - this.relativeClickX;
-            this.movingArea.y = this.panel.getContext().getAbsMouseY() - this.relativeClickY;
+            GuiContext context = this.panel.getContext();
+            this.movingArea.x = context.transformX(0, 0);
+            this.movingArea.y = context.transformY(0, 0);
+            this.relativeClickX = context.getAbsMouseX() - this.movingArea.x;
+            this.relativeClickY = context.getAbsMouseY() - this.movingArea.y;
             return true;
         }
         return false;
@@ -40,12 +45,10 @@ public class DraggablePanelWrapper implements IDraggable {
         if (successful) {
             float y = this.panel.getContext().getAbsMouseY() - this.relativeClickY;
             float x = this.panel.getContext().getAbsMouseX() - this.relativeClickX;
-            y = y / (this.panel.getScreen().getViewport().height - this.panel.getArea().height);
-            x = x / (this.panel.getScreen().getViewport().width - this.panel.getArea().width);
+            y = y / (this.panel.getScreen().getScreenArea().height - this.panel.getArea().height);
+            x = x / (this.panel.getScreen().getScreenArea().width - this.panel.getArea().width);
             this.panel.flex().topRelAnchor(y, y)
                     .leftRelAnchor(x, x);
-            this.movingArea.x = this.panel.getArea().x;
-            this.movingArea.y = this.panel.getArea().y;
             WidgetTree.resize(this.panel);
         }
     }
@@ -74,18 +77,10 @@ public class DraggablePanelWrapper implements IDraggable {
 
     @Override
     public void transform(IViewportStack stack) {
-        Area area = this.panel.getArea();
-        stack.translate(area.rx, area.ry);
         if (isMoving()) {
+            Area area = this.panel.getArea();
             stack.translate(-area.x, -area.y);
             stack.translate(this.movingArea.x, this.movingArea.y);
-        }
-    }
-
-    @Override
-    public void transformChildren(IViewportStack stack) {
-        if (isMoving()) {
-            stack.translate(-this.movingArea.x + this.panel.getContext().unTransformX(this.panel.getArea().x, this.panel.getArea().y), -this.movingArea.y + this.panel.getContext().unTransformY(this.panel.getArea().x, this.panel.getArea().y));
         }
     }
 }

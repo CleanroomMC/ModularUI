@@ -301,12 +301,15 @@ public class Area extends Rectangle implements IResizeable {
         setBounds(area.x, area.y, area.width, area.height);
     }
 
-    public void setTransformed(int width, int height, IViewportStack stack) {
-        setPos(stack.transformX(0, 0), stack.transformY(0, 0), stack.transformX(width, height), stack.transformY(width, height));
-    }
-
-    public void setTransformed(Rectangle r, IViewportStack stack) {
-        setPos(stack.transformX(r.x, r.y), stack.transformY(r.x, r.y), stack.transformX(r.x + r.width, r.y + r.height), stack.transformY(r.x + r.width, r.y + r.height));
+    // transforms each corner vertex and then puts a min fit rectangle around all vertices
+    public void transformAndRectanglerize(IViewportStack stack) {
+        int xTL = stack.transformX(x, y), xTR = stack.transformX(ex(), y), xBL = stack.transformX(x, ey()), xBR = stack.transformX(ex(), ey());
+        int yTL = stack.transformY(x, y), yTR = stack.transformY(ex(), y), yBL = stack.transformY(x, ey()), yBR = stack.transformY(ex(), ey());
+        int x0 = MathUtils.min(xTL, xTR, xBL, xBR);
+        int x1 = MathUtils.max(xTL, xTR, xBL, xBR);
+        int y0 = MathUtils.min(yTL, yTR, yBL, yBR);
+        int y1 = MathUtils.max(yTL, yTR, yBL, yBR);
+        setPos(x0, y0, x1, y1);
     }
 
     public Box getMargin() {
