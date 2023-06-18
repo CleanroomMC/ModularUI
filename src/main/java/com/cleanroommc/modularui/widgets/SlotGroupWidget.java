@@ -100,13 +100,14 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
             for (String row : this.matrix) {
                 for (int i = 0; i < row.length(); i++) {
                     char c = row.charAt(i);
-                    charCount.put(c, charCount.get(c) + 1);
+                    int count = charCount.get(c);
+                    charCount.put(c, count + 1);
                     Object o = this.keys.get(c);
                     IWidget widget;
                     if (o instanceof IWidget) {
                         widget = (IWidget) o;
                     } else if (o instanceof IntFunction) {
-                        widget = ((IntFunction<IWidget>) o).apply(charCount.get(c) - 1);
+                        widget = ((IntFunction<IWidget>) o).apply(count);
                     } else {
                         x += 18;
                         continue;
