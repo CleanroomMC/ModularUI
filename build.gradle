@@ -79,7 +79,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.jetbrains:annotations:23.0.0'
+    compileOnly 'org.jetbrains:annotations:24.0.1'
     implementation 'zone.rong:mixinbooter:7.0'
 
     api("org.spongepowered:mixin:0.8.3") { transitive = false }
