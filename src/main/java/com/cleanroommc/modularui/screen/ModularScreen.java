@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
-import com.cleanroommc.modularui.api.widget.ISynced;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -68,7 +67,7 @@ public abstract class ModularScreen {
     private final String name;
     private final WindowManager windowManager;
     public final GuiContext context;
-    private final Area viewport = new Area();
+    private final Area screenArea = new Area();
     private final Map<Class<?>, List<IGuiAction>> guiActionListeners = new Object2ObjectOpenHashMap<>();
 
     private GuiScreenWrapper screenWrapper;
@@ -103,11 +102,11 @@ public abstract class ModularScreen {
 
     public void onResize(int width, int height) {
 
-        this.viewport.set(0, 0, width, height);
-        this.viewport.z(0);
+        this.screenArea.set(0, 0, width, height);
+        this.screenArea.z(0);
         this.viewportSet();
 
-        this.context.pushViewport(null, this.viewport);
+        this.context.pushViewport(null, this.screenArea);
         for (ModularPanel panel : this.windowManager.getReverseOpenPanels()) {
             WidgetTree.resize(panel);
         }
@@ -185,10 +184,10 @@ public abstract class ModularScreen {
         GlStateManager.disableAlpha();
 
         this.context.reset();
-        this.context.pushViewport(null, this.viewport);
+        this.context.pushViewport(null, this.screenArea);
         for (ModularPanel panel : this.windowManager.getReverseOpenPanels()) {
             if (panel.disablePanelsBelow()) {
-                GuiDraw.drawRect(0, 0, this.viewport.w(), this.viewport.h(), Color.argb(16, 16, 16, (int) (125 * panel.getAlpha())));
+                GuiDraw.drawRect(0, 0, this.screenArea.w(), this.screenArea.h(), Color.argb(16, 16, 16, (int) (125 * panel.getAlpha())));
             }
             WidgetTree.drawTree(panel, this.context);
         }
@@ -209,7 +208,7 @@ public abstract class ModularScreen {
         GlStateManager.disableAlpha();
 
         this.context.reset();
-        this.context.pushViewport(null, this.viewport);
+        this.context.pushViewport(null, this.screenArea);
         for (ModularPanel panel : this.windowManager.getReverseOpenPanels()) {
             if (panel.isEnabled()) {
                 WidgetTree.drawTreeForeground(panel, this.context);
@@ -377,8 +376,8 @@ public abstract class ModularScreen {
         return screenWrapper;
     }
 
-    public Area getViewport() {
-        return viewport;
+    public Area getScreenArea() {
+        return screenArea;
     }
 
     public void registerItemSlot(ItemSlotSH syncHandler) {

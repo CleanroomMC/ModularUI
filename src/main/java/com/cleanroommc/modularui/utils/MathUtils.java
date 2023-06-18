@@ -42,4 +42,24 @@ public class MathUtils {
 
         return count <= 0 ? 1 : (int) Math.ceil(x);
     }
+
+    public static int min(int... values) {
+        int min = Integer.MAX_VALUE;
+        for (int i : values) {
+            if (i < min) {
+                min = i;
+            }
+        }
+        return min;
+    }
+
+    public static int max(int... values) {
+        int max = Integer.MIN_VALUE;
+        for (int i : values) {
+            if (i > max) {
+                max = i;
+            }
+        }
+        return max;
+    }
 }

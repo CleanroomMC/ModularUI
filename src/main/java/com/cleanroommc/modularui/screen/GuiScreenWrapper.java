@@ -7,7 +7,7 @@ import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
-import com.cleanroommc.modularui.drawable.Scissor;
+import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
 import com.cleanroommc.modularui.utils.Color;
@@ -34,8 +34,11 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Set;
 
 @SideOnly(Side.CLIENT)
@@ -86,7 +89,7 @@ public class GuiScreenWrapper extends GuiContainer {
             timer += 1000;
         }
 
-        Scissor.scissorTransformed(this.screen.getViewport(), this.screen.context);
+        Stencil.apply(this.screen.getScreenArea(), null);
         drawDefaultBackground();
         int i = this.guiLeft;
         int j = this.guiTop;
@@ -175,7 +178,7 @@ public class GuiScreenWrapper extends GuiContainer {
         GlStateManager.enableRescaleNormal();
         RenderHelper.enableStandardItemLighting();
 
-        Scissor.unscissor(this.screen.context);
+        Stencil.remove();
     }
 
     @Override
@@ -218,7 +221,7 @@ public class GuiScreenWrapper extends GuiContainer {
     public void drawDebugScreen() {
         GuiContext context = screen.context;
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
-        int screenW = this.screen.getViewport().width, screenH = this.screen.getViewport().height;
+        int screenW = this.screen.getScreenArea().width, screenH = this.screen.getScreenArea().height;
         int color = Color.rgb(180, 40, 115);
         int lineY = screenH - 13;
         drawString(fontRenderer, "Mouse Pos: " + mouseX + ", " + mouseY, 5, lineY, color);
@@ -262,17 +265,22 @@ public class GuiScreenWrapper extends GuiContainer {
                     SlotGroup slotGroup = ((ModularContainer) inventorySlots).getSlotGroup(slotWidget.getSyncHandler());
                     boolean allowShiftTransfer = slotGroup != null && slotGroup.allowShiftTransfer();
                     GuiDraw.drawText("Shift-Click Priority: " + (allowShiftTransfer ? slotGroup.getShiftClickPriority() : "DISABLED"), 5, lineY, 1, color, false);
+                    lineY -= 11;
                 }
             }
         }
-        color = Color.withAlpha(color, 25);
+        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1);
+        GL11.glReadPixels(Mouse.getX(), Mouse.getY(), 1, 1, GL11.GL_STENCIL_INDEX, GL11.GL_UNSIGNED_BYTE, byteBuffer);
+        GuiDraw.drawText("Stencil: " + (0xFF & byteBuffer.get()), 5, lineY, 1, color, false);
+
+        /*color = Color.withAlpha(color, 25);
         for (int i = 5; i < screenW; i += 5) {
             drawVerticalLine(i, 0, screenH, color);
         }
 
         for (int i = 5; i < screenH; i += 5) {
             drawHorizontalLine(0, screenW, i, color);
-        }
+        }*/
         drawRect(mouseX, mouseY, mouseX + 1, mouseY + 1, Color.withAlpha(Color.GREEN.normal, 0.8f));
     }
 
