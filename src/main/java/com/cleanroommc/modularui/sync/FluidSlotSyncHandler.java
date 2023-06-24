@@ -98,6 +98,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
         } else if (id == 3) {
             this.controlsAmount = buf.readBoolean();
         } else if (id == 4) {
+            if (!this.phantom) return;
             FluidStack fluidStack = NetworkUtils.readFluidStack(buf);;
             this.fluidTank.drain(Integer.MAX_VALUE, true);
             if (fluidStack != null && fluidStack.amount > 0) {
