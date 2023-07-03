@@ -155,7 +155,7 @@ public interface IWidget extends IGuiElement {
     GuiContext getContext();
 
     /**
-     * @return flex of this widget. Creates a new one if it doesn't already have onw.
+     * @return flex of this widget. Creates a new one if it doesn't already have one.
      */
     Flex flex();
 
