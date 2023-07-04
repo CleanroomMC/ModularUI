@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.widget;
 
 import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.screen.ModularPanel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -27,6 +28,9 @@ public class ParentWidget<W extends ParentWidget<W>> extends Widget<W> {
     public boolean addChild(IWidget child, int index) {
         if (child == null || child == this || getChildren().contains(child)) {
             return false;
+        }
+        if (child instanceof ModularPanel) {
+            throw new IllegalStateException("ModularPanel should not be added as child widget; Use ModularScreen#openPanel instead");
         }
         if (index < 0) {
             index = getChildren().size() + index + 1;
