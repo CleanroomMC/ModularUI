@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui;
 
-import com.cleanroommc.Tags;
 import com.cleanroommc.modularui.drawable.DrawableSerialization;
 import com.cleanroommc.modularui.holoui.HoloScreenEntity;
 import com.cleanroommc.modularui.holoui.ScreenEntityRender;
