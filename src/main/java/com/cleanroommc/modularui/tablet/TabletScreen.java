@@ -2,7 +2,7 @@ package com.cleanroommc.modularui.tablet;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.drawable.GuiDraw;
-import com.cleanroommc.modularui.drawable.Scissor;
+import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -52,18 +52,17 @@ public class TabletScreen extends ModularScreen {
         GlStateManager.disableAlpha();
 
         this.context.reset();
-        this.context.pushViewport(null, getViewport());
+        this.context.pushViewport(null, getScreenArea());
 
         Area desktopArea = this.desktop.getArea();
-        Scissor.scissorTransformed(desktopArea.x, desktopArea.y, desktopArea.width, desktopArea.height, this.context);
+        Stencil.applyTransformed(desktopArea.x, desktopArea.y, desktopArea.width, desktopArea.height);
         for (ModularPanel panel : getWindowManager().getReverseOpenPanels()) {
             if (panel.disablePanelsBelow()) {
-                GuiDraw.drawRect(0, 0, getViewport().w(), getViewport().h(), Color.argb(16, 16, 16, (int) (125 * panel.getAlpha())));
+                GuiDraw.drawRect(0, 0, getScreenArea().w(), getScreenArea().h(), Color.argb(16, 16, 16, (int) (125 * panel.getAlpha())));
             }
             WidgetTree.drawTree(panel, this.context);
         }
-
-        Scissor.unscissor(this.context);
+        Stencil.remove();
 
         this.context.popViewport(null);
         this.context.postRenderCallbacks.forEach(element -> element.accept(this.context));
