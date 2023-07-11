@@ -91,7 +91,7 @@ public class WindowManager {
 
     private void openPanel(ModularPanel panel, boolean resize) {
         panel.validateName();
-        if (this.panels.contains(panel) || isPanelOpen(panel.getName())) throw new IllegalStateException();
+        if (this.panels.contains(panel) || isPanelOpen(panel.getName())) throw new IllegalStateException("Panel " + panel.getName() + " is already open.");
         this.panels.addFirst(panel);
         panel.onOpen(this.screen);
         if (resize) {
@@ -176,6 +176,7 @@ public class WindowManager {
         for (ModularPanel panel : this.panels) {
             panel.onClose();
         }
+        this.panels.clear();
     }
 
     public void pushUp(@NotNull ModularPanel window) {
