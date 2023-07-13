@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.TextRenderer;
 import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
 import com.cleanroommc.modularui.integration.jei.JeiIngredientProvider;
+import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import com.cleanroommc.modularui.screen.ModularScreen;
@@ -144,6 +145,14 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     protected List<String> getItemTooltip(ItemStack stack) {
         // todo: JEI seems to be getting tooltip from IngredientRenderer#getTooltip
         return getScreen().getScreenWrapper().getItemToolTip(stack);
+    }
+
+    @Override
+    public void drawForeground(GuiContext context) {
+        Tooltip tooltip = getTooltip();
+        if (tooltip != null && isHoveringFor(tooltip.getShowUpTimer())) {
+            tooltip.draw(getContext(), getSlot().getStack());
+        }
     }
 
     @SideOnly(Side.CLIENT)
