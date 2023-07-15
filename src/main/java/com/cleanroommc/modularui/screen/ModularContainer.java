@@ -187,7 +187,9 @@ public class ModularContainer extends Container implements ISortableContainer {
                 } else {
                     slot.putStack(stack.splitStack(stack.getCount()));
                 }
-                break;
+                if (stack.getCount() < 1) {
+                    break;
+                }
             }
         }
         return stack;
