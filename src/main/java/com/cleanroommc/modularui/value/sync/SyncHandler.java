@@ -1,9 +1,8 @@
-package com.cleanroommc.modularui.api.sync;
+package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.network.packets.PacketSyncHandler;
-import com.cleanroommc.modularui.sync.GuiSyncHandler;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
@@ -70,7 +69,7 @@ public abstract class SyncHandler {
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         buffer.writeVarInt(id);
         bufferConsumer.accept(buffer);
-        if (NetworkUtils.isClient(getSyncHandler().getPlayer())) {
+        if (NetworkUtils.isClient()) {
             sendToServer(buffer, this);
         } else {
             sendToClient(buffer, this);

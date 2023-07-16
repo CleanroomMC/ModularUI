@@ -41,7 +41,7 @@ public class SortableListWidget<T, I extends SortableListWidget.Item<T>> extends
     private int timeSinceLastMove = 0;
 
     public SortableListWidget(Function<T, I> valueToWidgetMapper) {
-        super(valueToWidgetMapper, Item::getValue);
+        super(valueToWidgetMapper, Item::getWidgetValue);
         flex().startDefaultMode()
                 .width(80)
                 .endDefaultMode();
@@ -184,7 +184,7 @@ public class SortableListWidget<T, I extends SortableListWidget.Item<T>> extends
         }
 
         @Override
-        public T getValue() {
+        public T getWidgetValue() {
             return value;
         }
 

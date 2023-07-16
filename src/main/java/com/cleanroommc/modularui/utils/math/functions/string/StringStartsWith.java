@@ -1,11 +1,11 @@
 package com.cleanroommc.modularui.utils.math.functions.string;
 
-import com.cleanroommc.modularui.api.IValue;
+import com.cleanroommc.modularui.api.IMathValue;
 import com.cleanroommc.modularui.utils.math.functions.SNFunction;
 
 public class StringStartsWith extends SNFunction {
 
-    public StringStartsWith(IValue[] values, String name) throws Exception {
+    public StringStartsWith(IMathValue[] values, String name) throws Exception {
         super(values, name);
     }
 

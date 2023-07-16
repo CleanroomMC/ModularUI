@@ -1,14 +1,15 @@
 package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
-import com.cleanroommc.modularui.api.sync.SyncHandler;
+import com.cleanroommc.modularui.api.value.IDoubleValue;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.Rectangle;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.sync.DoubleSyncHandler;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.value.DoubleValue;
+import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.GuiAxis;
@@ -23,9 +24,7 @@ import java.util.function.DoubleSupplier;
 
 public class SliderWidget extends Widget<SliderWidget> implements Interactable {
 
-    private DoubleSupplier getter;
-    private DoubleConsumer setter;
-    private DoubleSyncHandler syncHandler;
+    private IDoubleValue<?> doubleValue;
     private IDrawable stopperDrawable = new Rectangle().setColor(Color.withAlpha(Color.WHITE.normal, 0.4f));
     private IDrawable handleDrawable = GuiTextures.BUTTON;
     private GuiAxis axis = GuiAxis.X;
@@ -49,9 +48,16 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     }
 
     @Override
+    public void onInit() {
+        if (this.doubleValue == null) {
+            this.doubleValue = new DoubleValue((max - min) * 0.5 + min);
+        }
+    }
+
+    @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof DoubleSyncHandler) {
-            this.syncHandler = (DoubleSyncHandler) syncHandler;
+        if (syncHandler instanceof IDoubleValue) {
+            this.doubleValue = (IDoubleValue<?>) syncHandler;
             return true;
         }
         return false;
@@ -97,13 +103,13 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
 
     @Override
     public void postResize() {
-        setValue(getValue(), false);
+        setValue(getSliderValue(), false);
     }
 
     @Override
     public void onFrameUpdate() {
         if (this.dragging) return;
-        double val = getValue();
+        double val = getSliderValue();
         if (this.cache != val) {
             setValue(val, false);
         }
@@ -135,14 +141,8 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
         return (int) (value * (getArea().getSize(this.axis) - this.sliderArea.getSize(this.axis)));
     }
 
-    public double getValue() {
-        if (this.syncHandler != null) {
-            return this.syncHandler.getDoubleValue();
-        }
-        if (this.getter != null) {
-            return this.getter.getAsDouble();
-        }
-        return (this.max - this.min) / 2 + this.min;
+    public double getSliderValue() {
+        return this.doubleValue.getDoubleValue();
     }
 
     public void setValue(double value, boolean setSource) {
@@ -167,11 +167,7 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
         this.cache = value;
         this.sliderArea.setPoint(this.axis, valueToPos(value));
         if (setSource) {
-            if (this.syncHandler != null) {
-                this.syncHandler.updateFromClient(value);
-            } else if (this.setter != null) {
-                this.setter.accept(value);
-            }
+            this.doubleValue.setDoubleValue(value);
         }
     }
 
@@ -189,16 +185,11 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
 
     @Override
     public String toString() {
-        return super.toString() + " # " + getValue();
+        return super.toString() + " # " + getSliderValue();
     }
 
-    public SliderWidget getter(DoubleSupplier getter) {
-        this.getter = getter;
-        return this;
-    }
-
-    public SliderWidget setter(DoubleConsumer setter) {
-        this.setter = setter;
+    public SliderWidget value(IDoubleValue<?> value) {
+        this.doubleValue = value;
         return this;
     }
 

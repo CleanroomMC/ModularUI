@@ -1,13 +1,13 @@
 package com.cleanroommc.modularui.utils.math.functions.utility;
 
-import com.cleanroommc.modularui.api.IValue;
+import com.cleanroommc.modularui.api.IMathValue;
 import com.cleanroommc.modularui.utils.math.functions.NNFunction;
 
 public class Random extends NNFunction {
 
     public java.util.Random random;
 
-    public Random(IValue[] values, String name) throws Exception {
+    public Random(IMathValue[] values, String name) throws Exception {
         super(values, name);
 
         this.random = new java.util.Random();

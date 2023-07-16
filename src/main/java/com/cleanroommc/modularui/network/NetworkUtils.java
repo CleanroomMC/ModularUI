@@ -21,8 +21,15 @@ public class NetworkUtils {
     public static final Consumer<PacketBuffer> EMPTY_PACKET = buffer -> {
     };
 
+    public static final boolean CLIENT = FMLCommonHandler.instance().getEffectiveSide().isClient();
+    public static final boolean DEDICATED_CLIENT = FMLCommonHandler.instance().getSide().isClient();
+
+    public static boolean isClient() {
+        return CLIENT;
+    }
+
     public static boolean isDedicatedClient() {
-        return FMLCommonHandler.instance().getSide().isClient();
+        return DEDICATED_CLIENT;
     }
 
     public static boolean isClient(EntityPlayer player) {

@@ -1,10 +1,11 @@
 package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.ModularUIConfig;
-import com.cleanroommc.modularui.api.sync.SyncHandler;
+import com.cleanroommc.modularui.api.value.IDoubleValue;
 import com.cleanroommc.modularui.drawable.UITexture;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.sync.DoubleSyncHandler;
+import com.cleanroommc.modularui.value.DoubleValue;
+import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 import net.minecraft.util.math.MathHelper;
 
@@ -13,15 +14,17 @@ import java.util.function.DoubleSupplier;
 public class ProgressWidget extends Widget<ProgressWidget> {
 
     private final UITexture[] fullTexture = new UITexture[4];
-    private DoubleSupplier progress;
     private UITexture emptyTexture;
     private Direction direction = Direction.RIGHT;
     private int imageSize = -1;
 
-    private DoubleSyncHandler syncHandler;
+    private IDoubleValue<?> doubleValue;
 
     @Override
     public void onInit() {
+        if (this.doubleValue == null) {
+            this.doubleValue = new DoubleValue(0.5);
+        }
         if (direction == Direction.CIRCULAR_CW && fullTexture[0] != null) {
             UITexture base = fullTexture[0];
             fullTexture[0] = base.getSubArea(0f, 0.5f, 0.5f, 1f);
@@ -33,8 +36,8 @@ public class ProgressWidget extends Widget<ProgressWidget> {
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof DoubleSyncHandler) {
-            this.syncHandler = (DoubleSyncHandler) syncHandler;
+        if (syncHandler instanceof IDoubleValue) {
+            this.doubleValue = (IDoubleValue<?>) syncHandler;
             return true;
         }
         return false;
@@ -49,13 +52,7 @@ public class ProgressWidget extends Widget<ProgressWidget> {
     }
 
     public float getCurrentProgress() {
-        if (this.syncHandler != null) {
-            return (float) this.syncHandler.getDoubleValue();
-        }
-        if (this.progress != null) {
-            return (float) this.progress.getAsDouble();
-        }
-        return 1f;
+        return (float) this.doubleValue.getDoubleValue();
     }
 
     @Override
@@ -150,14 +147,17 @@ public class ProgressWidget extends Widget<ProgressWidget> {
         ); // BR, draw LEFT
     }
 
-    public ProgressWidget progress(DoubleSupplier progress) {
-        this.progress = progress;
+    public ProgressWidget value(IDoubleValue<?> value) {
+        this.doubleValue = value;
         return this;
     }
 
+    public ProgressWidget progress(DoubleSupplier progress) {
+        return value(new DoubleValue.Dynamic(progress, null));
+    }
+
     public ProgressWidget progress(double progress) {
-        this.progress = () -> progress;
-        return this;
+        return value(new DoubleValue(progress));
     }
 
     /**

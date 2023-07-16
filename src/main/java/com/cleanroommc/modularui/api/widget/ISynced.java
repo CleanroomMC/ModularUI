@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.api.widget;
 
-import com.cleanroommc.modularui.api.sync.SyncHandler;
-import com.cleanroommc.modularui.sync.GuiSyncHandler;
+import com.cleanroommc.modularui.value.sync.SyncHandler;
+import com.cleanroommc.modularui.value.sync.GuiSyncHandler;
 
 public interface ISynced<W extends IWidget> {
 

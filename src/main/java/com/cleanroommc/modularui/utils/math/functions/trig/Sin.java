@@ -1,11 +1,11 @@
 package com.cleanroommc.modularui.utils.math.functions.trig;
 
-import com.cleanroommc.modularui.api.IValue;
+import com.cleanroommc.modularui.api.IMathValue;
 import com.cleanroommc.modularui.utils.math.functions.NNFunction;
 
 public class Sin extends NNFunction {
 
-    public Sin(IValue[] values, String name) throws Exception {
+    public Sin(IMathValue[] values, String name) throws Exception {
         super(values, name);
     }
 

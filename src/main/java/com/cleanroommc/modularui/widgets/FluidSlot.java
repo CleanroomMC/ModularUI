@@ -3,7 +3,6 @@ package com.cleanroommc.modularui.widgets;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
-import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.TextRenderer;
@@ -12,12 +11,13 @@ import com.cleanroommc.modularui.integration.jei.JeiIngredientProvider;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.sync.FluidSlotSyncHandler;
 import com.cleanroommc.modularui.theme.WidgetSlotTheme;
 import com.cleanroommc.modularui.utils.Alignment;
-import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.NumberFormat;
+import com.cleanroommc.modularui.value.sync.FluidSlotSyncHandler;
+import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -49,7 +49,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
         tooltipBuilder(tooltip -> {
             tooltip.setHasSpaceAfterFirstLine(true);
             IFluidTank fluidTank = getFluidTank();
-            FluidStack fluid = this.syncHandler.getCachedValue();
+            FluidStack fluid = this.syncHandler.getValue();
             if (this.syncHandler.isPhantom()) {
                 if (fluid != null) {
                     tooltip.addLine(IKey.str(fluid.getLocalizedName()));
@@ -111,7 +111,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
     @Override
     public void draw(GuiContext context) {
         IFluidTank fluidTank = getFluidTank();
-        FluidStack content = this.syncHandler.getCachedValue();
+        FluidStack content = this.syncHandler.getValue();
         if (content != null) {
             int y = contentOffsetY;
             float height = getArea().height - y * 2;
@@ -188,7 +188,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
 
     @Nullable
     public FluidStack getFluidStack() {
-        return this.syncHandler == null ? null : this.syncHandler.getCachedValue();
+        return this.syncHandler == null ? null : this.syncHandler.getValue();
     }
 
     public IFluidTank getFluidTank() {
@@ -228,7 +228,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
 
     @Override
     public void setGhostIngredient(@NotNull FluidStack ingredient) {
-        this.syncHandler.updateFromClient(ingredient);
+        this.syncHandler.setValue(ingredient);
     }
 
     @Override

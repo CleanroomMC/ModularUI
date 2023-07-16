@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.sync;
+package com.cleanroommc.modularui.value.sync;
 
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
@@ -12,24 +12,24 @@ public class SyncHandlers {
     private SyncHandlers() {
     }
 
-    public static IntSyncHandler intNumber(IntSupplier getter, IntConsumer setter) {
-        return new IntSyncHandler(getter, setter);
+    public static IntSyncValue intNumber(IntSupplier getter, IntConsumer setter) {
+        return new IntSyncValue(getter, setter);
     }
 
-    public static LongSyncHandler longNumber(LongSupplier getter, LongConsumer setter) {
-        return new LongSyncHandler(getter, setter);
+    public static LongSyncValue longNumber(LongSupplier getter, LongConsumer setter) {
+        return new LongSyncValue(getter, setter);
     }
 
-    public static BooleanSyncHandler bool(BooleanSupplier getter, Consumer<Boolean> setter) {
-        return new BooleanSyncHandler(getter, setter);
+    public static BooleanSyncValue bool(BooleanSupplier getter, Consumer<Boolean> setter) {
+        return new BooleanSyncValue(getter, setter);
     }
 
-    public static DoubleSyncHandler doubleNumber(DoubleSupplier getter, DoubleConsumer setter) {
-        return new DoubleSyncHandler(getter, setter);
+    public static DoubleSyncValue doubleNumber(DoubleSupplier getter, DoubleConsumer setter) {
+        return new DoubleSyncValue(getter, setter);
     }
 
-    public static StringSyncHandler string(Supplier<String> getter, Consumer<String> setter) {
-        return new StringSyncHandler(getter, setter);
+    public static StringSyncValue string(Supplier<String> getter, Consumer<String> setter) {
+        return new StringSyncValue(getter, setter);
     }
 
     public static ItemSlotSH itemSlot(Slot slot) {
@@ -52,7 +52,7 @@ public class SyncHandlers {
         return new FluidSlotSyncHandler(fluidTank);
     }
 
-    public static <T extends Enum<T>> EnumSyncHandler<T> enumValue(Class<T> clazz, Supplier<T> getter, Consumer<T> setter) {
-        return new EnumSyncHandler<>(clazz, getter, setter);
+    public static <T extends Enum<T>> EnumSyncValue<T> enumValue(Class<T> clazz, Supplier<T> getter, Consumer<T> setter) {
+        return new EnumSyncValue<>(clazz, getter, setter);
     }
 }

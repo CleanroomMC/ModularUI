@@ -1,11 +1,11 @@
 package com.cleanroommc.modularui.utils.math.functions.string;
 
-import com.cleanroommc.modularui.api.IValue;
+import com.cleanroommc.modularui.api.IMathValue;
 import com.cleanroommc.modularui.utils.math.functions.SNFunction;
 
 public class StringContains extends SNFunction {
 
-    public StringContains(IValue[] values, String name) throws Exception {
+    public StringContains(IMathValue[] values, String name) throws Exception {
         super(values, name);
     }
 

@@ -1,6 +1,5 @@
-package com.cleanroommc.modularui.sync;
+package com.cleanroommc.modularui.value.sync;
 
-import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.widgets.slot.ICustomSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotCustomSlot;

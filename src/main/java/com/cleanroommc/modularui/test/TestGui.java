@@ -92,7 +92,7 @@ public class TestGui extends ModularScreen {
         ref.set(sortableListWidget);
         panel.child(sortableListWidget
                 .onRemove(stringItem -> {
-                    this.availableElements.get(stringItem.getValue()).available = true;
+                    this.availableElements.get(stringItem.getWidgetValue()).available = true;
                 })
                 /*.onChange(list -> {
                     this.configuredOptions = list;

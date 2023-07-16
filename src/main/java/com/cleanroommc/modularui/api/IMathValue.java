@@ -8,12 +8,12 @@ package com.cleanroommc.modularui.api;
  * provide generalized abstract method for computing/fetching some value
  * from different mathematical classes.
  */
-public interface IValue {
+public interface IMathValue {
 
     /**
      * Get computed or stored value
      */
-    IValue get();
+    IMathValue get();
 
     boolean isNumber();
 

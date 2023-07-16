@@ -1,9 +1,8 @@
-package com.cleanroommc.modularui.sync;
+package com.cleanroommc.modularui.value.sync;
 
-import com.cleanroommc.modularui.api.sync.ValueSyncHandler;
 import com.cleanroommc.modularui.network.NetworkUtils;
-import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.FluidTankHandler;
+import com.cleanroommc.modularui.utils.MouseData;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -35,13 +34,26 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
 
     @Nullable
     @Override
-    public FluidStack getCachedValue() {
+    public FluidStack getValue() {
         return cache;
     }
 
     @Override
-    public void setValue(@Nullable FluidStack value) {
+    public void setValue(@Nullable FluidStack value, boolean setSource, boolean sync) {
         this.cache = value;
+        if (setSource && !NetworkUtils.isClient()) {
+            this.fluidTank.drain(Integer.MAX_VALUE, true);
+            if (value != null && value.amount > 0) {
+                this.fluidTank.fill(value.copy(), true);
+            }
+        }
+        if (sync) {
+            if (NetworkUtils.isClient()) {
+                syncToServer(0, this::write);
+            } else {
+                syncToClient(0, this::write);
+            }
+        }
         onValueChanged();
     }
 
@@ -55,21 +67,13 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
     }
 
     @Override
-    public void updateAndWrite(PacketBuffer buffer) {
-        this.cache = this.fluidTank.getFluid() != null ? this.fluidTank.getFluid().copy() : null;
+    public void write(PacketBuffer buffer) {
         NetworkUtils.writeFluidStack(buffer, cache);
     }
 
     @Override
     public void read(PacketBuffer buffer) {
-        setValue(NetworkUtils.readFluidStack(buffer));
-        onValueChanged();
-    }
-
-    @Override
-    public void updateFromClient(FluidStack value) {
-        setValue(value);
-        syncToServer(4, buf -> NetworkUtils.writeFluidStack(buf, value));
+        setValue(NetworkUtils.readFluidStack(buffer), true, false);
     }
 
     @Override
@@ -97,15 +101,6 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
             }
         } else if (id == 3) {
             this.controlsAmount = buf.readBoolean();
-        } else if (id == 4) {
-            FluidStack fluidStack = NetworkUtils.readFluidStack(buf);;
-            this.fluidTank.drain(Integer.MAX_VALUE, true);
-            if (fluidStack != null && fluidStack.amount > 0) {
-                setValue(fluidStack.copy());
-                this.fluidTank.fill(fluidStack, true);
-            } else {
-                setValue(null);
-            }
         }
     }
 

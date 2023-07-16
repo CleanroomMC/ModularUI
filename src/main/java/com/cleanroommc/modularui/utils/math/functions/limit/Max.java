@@ -1,11 +1,11 @@
 package com.cleanroommc.modularui.utils.math.functions.limit;
 
-import com.cleanroommc.modularui.api.IValue;
+import com.cleanroommc.modularui.api.IMathValue;
 import com.cleanroommc.modularui.utils.math.functions.NNFunction;
 
 public class Max extends NNFunction {
 
-    public Max(IValue[] values, String name) throws Exception {
+    public Max(IMathValue[] values, String name) throws Exception {
         super(values, name);
     }
 

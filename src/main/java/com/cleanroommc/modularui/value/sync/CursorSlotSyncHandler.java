@@ -1,6 +1,5 @@
-package com.cleanroommc.modularui.sync;
+package com.cleanroommc.modularui.value.sync;
 
-import com.cleanroommc.modularui.api.sync.SyncHandler;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import net.minecraft.network.PacketBuffer;
 
@@ -9,11 +8,7 @@ import java.io.IOException;
 public class CursorSlotSyncHandler extends SyncHandler {
 
     public void sync() {
-        if (NetworkUtils.isClient(getSyncHandler().getPlayer())) {
-            syncToServer(0, buffer -> buffer.writeItemStack(getSyncHandler().getPlayer().inventory.getItemStack()));
-        } else {
-            syncToClient(0, buffer -> buffer.writeItemStack(getSyncHandler().getPlayer().inventory.getItemStack()));
-        }
+        sync(0, buffer -> buffer.writeItemStack(getSyncHandler().getPlayer().inventory.getItemStack()));
     }
 
     @Override

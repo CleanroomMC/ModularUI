@@ -9,8 +9,11 @@ import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.sync.GuiSyncHandler;
-import com.cleanroommc.modularui.sync.SyncHandlers;
+import com.cleanroommc.modularui.value.BoolValue;
+import com.cleanroommc.modularui.value.IntValue;
+import com.cleanroommc.modularui.value.StringValue;
+import com.cleanroommc.modularui.value.sync.GuiSyncHandler;
+import com.cleanroommc.modularui.value.sync.SyncHandlers;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.ParentWidget;
@@ -53,7 +56,6 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
     private final FluidTank mixerFluids1 = new FluidTank(16000);
     private final FluidTank mixerFluids2 = new FluidTank(16000);
 
-    private boolean bool = false, bool2 = true;
     private int num = 2;
 
     @Override
@@ -204,8 +206,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                                         .size(14, 14)
                                                         .length(3)
                                                         .texture(GuiTextures.CYCLE_BUTTON_DEMO)
-                                                        .getter(() -> val2)
-                                                        .setter(val -> this.val2 = val)
+                                                        .value(new IntValue.Dynamic(() -> val2, val -> this.val2 = val))
                                                         .margin(8, 0))
                                                 .child(IKey.str("Hello World").asWidget().height(18)))
                                         .child(new SpecialButton(IKey.str("A very long string that looks cool when animated").withAnimation())
@@ -240,7 +241,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                         .child(new Row()
                                                 .widthRel(1f).height(14)
                                                 .child(new CycleButtonWidget()
-                                                        .toggle(() -> bool, val -> bool = val)
+                                                        .value(new BoolValue(false))
                                                         .texture(GuiTextures.CHECK_BOX)
                                                         .size(14, 14)
                                                         .margin(8, 4))
@@ -250,8 +251,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                         .child(new Row()
                                                 .widthRel(1f).height(14)
                                                 .child(new TextFieldWidget()
-                                                        .getterLong(() -> num)
-                                                        .setterLong(val -> num = (int) val)
+                                                        .value(new IntValue.Dynamic(() -> num, val -> num = val))
                                                         .setNumbers(1, Short.MAX_VALUE)
                                                         .setTextAlignment(Alignment.Center)
                                                         .background(new Rectangle().setColor(0xFFb1b1b1))
@@ -268,7 +268,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                         .child(new Row()
                                                 .widthRel(1f).height(14)
                                                 .child(new CycleButtonWidget()
-                                                        .toggle(() -> bool2, val -> bool2 = val)
+                                                        .value(new BoolValue(false))
                                                         .texture(GuiTextures.CHECK_BOX)
                                                         .size(14, 14))
                                                 .child(IKey.lang("bogosort.gui.enabled").asWidget()
@@ -318,8 +318,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
         dialog.setDraggable(true);
         dialog.child(new TextFieldWidget()
                         .flex(flex -> flex.size(100, 20).align(Alignment.Center))
-                        .getter(value::get)
-                        .setter(value::set))
+                        .value(new StringValue.Dynamic(value::get, value::set)))
                 .child(new ButtonWidget<>()
                         .flex(flex -> flex.size(8, 8).top(5).right(5))
                         .overlay(IKey.str("x"))

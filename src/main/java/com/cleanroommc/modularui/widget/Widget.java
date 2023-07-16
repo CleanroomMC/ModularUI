@@ -3,16 +3,17 @@ package com.cleanroommc.modularui.widget;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
-import com.cleanroommc.modularui.api.sync.SyncHandler;
-import com.cleanroommc.modularui.api.sync.ValueSyncHandler;
+import com.cleanroommc.modularui.api.value.IValue;
 import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.drawable.DrawableArray;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.sync.GuiSyncHandler;
 import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.value.sync.GuiSyncHandler;
+import com.cleanroommc.modularui.value.sync.SyncHandler;
+import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Box;
 import com.cleanroommc.modularui.widget.sizer.Flex;
@@ -41,6 +42,8 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     private IResizeable resizer = this.flex;
     private String debugName;
 
+    @Nullable
+    private IValue<?> value;
     @Nullable
     private String syncKey;
     @Nullable
@@ -72,6 +75,9 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
                     this.context.screen.registerGuiActionListener(action);
                 }
             }
+        }
+        if (this.value != null && this.syncKey != null) {
+            throw new IllegalStateException("Widget has a value and a sync key for a synced value. This is not allowed!");
         }
         this.valid = true;
         if (!getScreen().isClientOnly()) {
@@ -344,6 +350,11 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         this.enabled = enabled;
     }
 
+    @Nullable
+    public IValue<?> getValue() {
+        return value;
+    }
+
     public W disabled() {
         setEnabled(false);
         return getThis();
@@ -413,6 +424,10 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     public W setSynced(String key) {
         this.syncKey = key;
         return getThis();
+    }
+
+    protected void setValue(IValue<?> value) {
+        this.value = value;
     }
 
     @Override

@@ -1,5 +1,6 @@
-package com.cleanroommc.modularui.api.sync;
+package com.cleanroommc.modularui.value.sync;
 
+import com.cleanroommc.modularui.api.value.sync.IValueSyncHandler;
 import net.minecraft.network.PacketBuffer;
 
 public abstract class ValueSyncHandler<T> extends SyncHandler implements IValueSyncHandler<T> {
@@ -21,7 +22,7 @@ public abstract class ValueSyncHandler<T> extends SyncHandler implements IValueS
     @Override
     public void detectAndSendChanges(boolean init) {
         if (needsSync(init)) {
-            syncToClient(0, this::updateAndWrite);
+            syncToClient(0, this::write);
         }
     }
 

@@ -1,8 +1,7 @@
-package com.cleanroommc.modularui.sync;
+package com.cleanroommc.modularui.value.sync;
 
-import com.cleanroommc.modularui.api.sync.IServerKeyboardAction;
-import com.cleanroommc.modularui.api.sync.IServerMouseAction;
-import com.cleanroommc.modularui.api.sync.SyncHandler;
+import com.cleanroommc.modularui.api.value.sync.IServerKeyboardAction;
+import com.cleanroommc.modularui.api.value.sync.IServerMouseAction;
 import com.cleanroommc.modularui.utils.KeyboardData;
 import com.cleanroommc.modularui.utils.MouseData;
 import net.minecraft.network.PacketBuffer;
