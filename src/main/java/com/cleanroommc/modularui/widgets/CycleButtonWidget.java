@@ -132,6 +132,7 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
 
     public CycleButtonWidget value(IIntValue<?> value) {
         this.intValue = value;
+        setValue(value);
         if (value instanceof IEnumValue) {
             length(((IEnumValue<?>) value).getEnumClass().getEnumConstants().length);
         } else if (value instanceof IBoolValue) {

@@ -2,10 +2,11 @@ package com.cleanroommc.modularui.widget;
 
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
+import com.cleanroommc.modularui.api.widget.ISynced;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.widget.sizer.Area;
+import com.cleanroommc.modularui.value.sync.GuiSyncHandler;
 import com.cleanroommc.modularui.widget.sizer.IResizeable;
 import net.minecraft.client.renderer.GlStateManager;
 import org.jetbrains.annotations.ApiStatus;
@@ -13,12 +14,15 @@ import org.jetbrains.annotations.ApiStatus;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
 /**
  * Helper class to apply actions to each widget in a tree.
  */
 public class WidgetTree {
+
+    private static final String AUTO_SYNC_KEY = "auto$sync";
 
     private WidgetTree() {
     }
@@ -248,7 +252,6 @@ public class WidgetTree {
         return filter.test(parent) ? parent : null;
     }
 
-    @SuppressWarnings("unchecked")
     public static <T extends IWidget> T findParent(IWidget parent, Class<T> type) {
         if (parent == null) return null;
         while (!(parent instanceof ModularPanel)) {
@@ -258,5 +261,22 @@ public class WidgetTree {
             parent = parent.getParent();
         }
         return type.isAssignableFrom(parent.getClass()) ? (T) parent : null;
+    }
+
+    public static void collectSyncValues(GuiSyncHandler syncHandler, ModularPanel panel) {
+        collectSyncValues(syncHandler, panel, new AtomicInteger(0));
+    }
+
+    private static <T extends IWidget & ISynced<T>> void collectSyncValues(GuiSyncHandler syncHandler, T parent, AtomicInteger id) {
+        if (parent.isSynced()) {
+            syncHandler.syncValue(AUTO_SYNC_KEY, id.getAndIncrement(), parent.getSyncHandler());
+        }
+        if (parent.hasChildren()) {
+            for (IWidget widget : parent.getChildren()) {
+                if (widget instanceof ISynced) {
+                    collectSyncValues(syncHandler, (T) widget, id);
+                }
+            }
+        }
     }
 }

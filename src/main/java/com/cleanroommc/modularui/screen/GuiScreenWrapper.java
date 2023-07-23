@@ -140,7 +140,7 @@ public class GuiScreenWrapper extends GuiContainer {
                 itemstack.setCount(getAccessor().getDragSplittingRemnant());
 
                 if (itemstack.isEmpty()) {
-                    s = "" + TextFormatting.YELLOW + "0";
+                    s = TextFormatting.YELLOW + "0";
                 }
             }
 

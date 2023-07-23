@@ -8,6 +8,8 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class IngredientDrawable implements IDrawable {
 
@@ -21,6 +23,7 @@ public class IngredientDrawable implements IDrawable {
         setItems(items);
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height) {
         if (this.items.length == 0) return;

@@ -4,10 +4,12 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import com.cleanroommc.modularui.screen.ModularContainer;
+import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.value.sync.GuiSyncHandler;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.IGuiHandler;
@@ -25,7 +27,7 @@ public final class GuiManager implements IGuiHandler {
     }
 
     void register(GuiInfo info) {
-        guiInfos.put(info.getId(), info);
+        this.guiInfos.put(info.getId(), info);
     }
 
     @SideOnly(Side.CLIENT)
@@ -41,21 +43,21 @@ public final class GuiManager implements IGuiHandler {
     @Nullable
     @Override
     public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-        GuiInfo info = guiInfos.get(ID);
+        GuiInfo info = this.guiInfos.get(ID);
         if (info == null) return null;
         GuiSyncHandler guiSyncHandler = new GuiSyncHandler(player);
-        info.createServerGuiManager(new GuiCreationContext(player, world, x, y, z), guiSyncHandler);
+        info.createCommonGui(new GuiCreationContext(player, world, x, y, z, EnumHand.MAIN_HAND), guiSyncHandler);
         return new ModularContainer(guiSyncHandler);
     }
 
     @Nullable
     @Override
     public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-        GuiInfo info = guiInfos.get(ID);
+        GuiInfo info = this.guiInfos.get(ID);
         if (info == null) return null;
         GuiSyncHandler guiSyncHandler = new GuiSyncHandler(player);
-        GuiCreationContext context = new GuiCreationContext(player, world, x, y, z);
-        info.createServerGuiManager(context, guiSyncHandler);
-        return new GuiScreenWrapper(new ModularContainer(guiSyncHandler), info.createGuiScreen(context));
+        GuiCreationContext context = new GuiCreationContext(player, world, x, y, z, EnumHand.MAIN_HAND);
+        ModularPanel panel = info.createCommonGui(context, guiSyncHandler);
+        return new GuiScreenWrapper(new ModularContainer(guiSyncHandler), info.createClientGui(context, panel));
     }
 }

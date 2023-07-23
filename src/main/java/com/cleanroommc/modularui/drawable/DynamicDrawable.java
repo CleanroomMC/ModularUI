@@ -4,6 +4,8 @@ import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.function.Supplier;
 
@@ -20,6 +22,7 @@ public class DynamicDrawable implements IDrawable {
         this.supplier = supplier;
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height) {
         IDrawable drawable = supplier.get();

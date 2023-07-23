@@ -4,10 +4,7 @@ import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.google.gson.JsonObject;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-@SideOnly(Side.CLIENT)
 public class WidgetTextFieldTheme extends WidgetTheme {
 
     private final int markedColor;

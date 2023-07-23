@@ -26,13 +26,13 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
         String key = "player";
         for (int i = 0; i < 9; i++) {
             slotGroupWidget.child(new ItemSlot()
-                    .setSynced(key, i)
+                    .syncHandler(key, i)
                     .pos(i * 18, 3 * 18 + 5)
                     .debugName("slot_" + i));
         }
         for (int i = 0; i < 27; i++) {
             slotGroupWidget.child(new ItemSlot()
-                    .setSynced(key, i + 9)
+                    .syncHandler(key, i + 9)
                     .pos(i % 9 * 18, i / 9 * 18)
                     .debugName("slot_" + (i + 9)));
         }
@@ -46,7 +46,7 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
         int i = 0;
         for (IWidget widget : getChildren()) {
             if (widget instanceof ISynced) {
-                ((ISynced<?>) widget).setSynced(name, i);
+                ((ISynced<?>) widget).syncHandler(name, i);
             }
             i++;
         }
@@ -115,7 +115,7 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
                     widget.flex().left(x).top(y);
                     slotGroupWidget.child(widget);
                     if (this.syncKey != null && widget instanceof ISynced) {
-                        ((ISynced<?>) widget).setSynced(this.syncKey, syncId++);
+                        ((ISynced<?>) widget).syncHandler(this.syncKey, syncId++);
                     }
                     x += 18;
                     maxWidth = Math.max(maxWidth, x);

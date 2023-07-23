@@ -7,6 +7,8 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
 
 public class ItemDrawable implements IDrawable {
@@ -20,6 +22,7 @@ public class ItemDrawable implements IDrawable {
         this.item = item;
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height) {
         if (item.isEmpty()) return;

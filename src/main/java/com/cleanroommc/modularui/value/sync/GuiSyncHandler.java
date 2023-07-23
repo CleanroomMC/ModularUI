@@ -148,6 +148,6 @@ public class GuiSyncHandler {
     }
 
     public static String makeSyncKey(int id) {
-        return String.valueOf(id);
+        return "_:" + id;
     }
 }

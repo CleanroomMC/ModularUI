@@ -14,6 +14,7 @@ import com.cleanroommc.modularui.widgets.layout.Grid;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
@@ -29,10 +30,6 @@ public class TestGui extends ModularScreen {
 
     private Map<String, AvailableElement> availableElements;
 
-    public TestGui() {
-        super("test");
-    }
-
     @Override
     public void onClose() {
         super.onClose();
@@ -40,7 +37,7 @@ public class TestGui extends ModularScreen {
     }
 
     @Override
-    public ModularPanel buildUI(GuiContext context) {
+    public @NotNull ModularPanel buildUI(GuiContext context) {
         if (lines == null) {
             lines = IntStream.range(0, 20).mapToObj(i -> "Option " + (i + 1)).collect(Collectors.toList());
             configuredOptions = lines;
@@ -64,7 +61,7 @@ public class TestGui extends ModularScreen {
             this.availableElements.get(value).available = !this.configuredOptions.contains(value);
         }
 
-        ModularPanel panel = ModularPanel.defaultPanel(context);
+        ModularPanel panel = ModularPanel.defaultPanel("test");
 
         /*List<List<IWidget>> matrix = new ArrayList<>();
         for (int i = 0; i < 400; i++) {
@@ -108,7 +105,7 @@ public class TestGui extends ModularScreen {
                 .overlay(GuiTextures.ADD)
                 .onMouseTapped(mouseButton -> {
                     if (!isPanelOpen("Option Selection")) {
-                        ModularPanel panel1 = ModularPanel.defaultPanel(context, 150, 120).name("Option Selection");
+                        ModularPanel panel1 = ModularPanel.defaultPanel("Option Selection", 150, 120);
                         openPanel(panel1
                                 .child(new ButtonWidget<>()
                                         .size(8, 8)

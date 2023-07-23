@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.value.IValue;
 import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.drawable.DrawableArray;
+import com.cleanroommc.modularui.manager.GuiCreationContext;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.Tooltip;
@@ -331,16 +332,15 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         this.resizer = resizer;
     }
 
+    @Override
     public boolean isSynced() {
-        return syncKey != null && syncHandler != null;
+        return this.syncHandler != null;
     }
 
-    public SyncHandler getSyncHandler() {
-        if (this.syncKey == null) {
-            throw new IllegalStateException("Widget is not synced!");
-        }
+    @Override
+    public @NotNull SyncHandler getSyncHandler() {
         if (this.syncHandler == null) {
-            throw new IllegalStateException("Widget is not initialised!");
+            throw new IllegalStateException("Widget is not initialised or not synced!");
         }
         return syncHandler;
     }
@@ -421,13 +421,24 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     @Override
-    public W setSynced(String key) {
+    public W syncHandler(String key) {
         this.syncKey = key;
         return getThis();
     }
 
     protected void setValue(IValue<?> value) {
         this.value = value;
+        if (value instanceof SyncHandler) {
+            setSyncHandler((SyncHandler) value);
+        }
+    }
+
+    /**
+     * This intended to only be used when build the main panel in methods like {@link com.cleanroommc.modularui.api.IGuiHolder#buildUI(GuiCreationContext, GuiSyncHandler, boolean)}
+     * since it's called on server and client. Otherwise, this will not work.
+     */
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        this.syncHandler = syncHandler;
     }
 
     @Override

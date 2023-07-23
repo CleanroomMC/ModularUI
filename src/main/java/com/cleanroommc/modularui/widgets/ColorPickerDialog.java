@@ -6,7 +6,6 @@ import com.cleanroommc.modularui.api.layout.MainAxisAlignment;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.Rectangle;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.value.DoubleValue;
@@ -30,13 +29,12 @@ public class ColorPickerDialog extends Dialog<Integer> {
     private final Rectangle sliderBackgroundB = new Rectangle();
     private final Rectangle sliderBackgroundA = new Rectangle();
 
-    public ColorPickerDialog(GuiContext context, Consumer<Integer> resultConsumer, int startColor) {
-        this(context, resultConsumer, startColor, false);
+    public ColorPickerDialog(Consumer<Integer> resultConsumer, int startColor, boolean controlAlpha) {
+        this("color_picker", resultConsumer, startColor, false);
     }
 
-    public ColorPickerDialog(GuiContext context, Consumer<Integer> resultConsumer, int startColor, boolean controlAlpha) {
-        super(context, resultConsumer);
-        name("color_picker");
+    public ColorPickerDialog(String name, Consumer<Integer> resultConsumer, int startColor, boolean controlAlpha) {
+        super(name, resultConsumer);
         this.alpha = Color.getAlpha(startColor);
         updateColor(startColor);
         this.controlAlpha = controlAlpha;
@@ -78,8 +76,8 @@ public class ColorPickerDialog extends Dialog<Integer> {
                         .left(5).right(5)
                         .expanded()
                         .controller(controller)
-                        .addPage(createRGBPage(context))
-                        .addPage(createHSVPage(context)))
+                        .addPage(createRGBPage())
+                        .addPage(createHSVPage()))
                 .child(new Row()
                         .left(10).right(10).height(14)
                         .mainAxisAlignment(MainAxisAlignment.SPACE_BETWEEN)
@@ -99,7 +97,7 @@ public class ColorPickerDialog extends Dialog<Integer> {
                                 }))));
     }
 
-    private IWidget createRGBPage(GuiContext context) {
+    private IWidget createRGBPage() {
         IDrawable handleBackground = new Rectangle().setColor(Color.WHITE.normal);
         Column parentWidget = new Column()
                 .sizeRel(1f, 1f)
@@ -153,7 +151,7 @@ public class ColorPickerDialog extends Dialog<Integer> {
         return parentWidget;
     }
 
-    private IWidget createHSVPage(GuiContext context) {
+    private IWidget createHSVPage() {
         return new ParentWidget<>()
                 .sizeRel(1f, 1f)
                 .child(IKey.str("WIP").asWidget().sizeRel(1f, 1f).alignment(Alignment.Center));

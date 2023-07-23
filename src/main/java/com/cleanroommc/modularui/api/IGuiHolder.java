@@ -1,31 +1,38 @@
 package com.cleanroommc.modularui.api;
 
+import com.cleanroommc.modularui.manager.GuiCreationContext;
+import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.value.sync.GuiSyncHandler;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
- * An interface to implement on {@link net.minecraft.tileentity.TileEntity}
- * to use with {@link com.cleanroommc.modularui.manager.GuiInfos#TILE_ENTITY}
+ * An interface to implement on {@link net.minecraft.tileentity.TileEntity} or {@link net.minecraft.item.Item}.
+ * More {@link com.cleanroommc.modularui.manager.GuiInfo} can be added to work with this interface.
  */
 public interface IGuiHolder {
 
     /**
-     * Called on server and client. Register sync handlers here. Must be the same on both sides.
+     * Only called on client side.
      *
-     * @param guiSyncHandler register sync handlers here
-     * @param player         player who opens the UI
-     */
-    void buildSyncHandler(GuiSyncHandler guiSyncHandler, EntityPlayer player);
-
-    /**
-     * Only called on client. Creates the UI screen
-     *
-     * @param player player who opens the UI
-     * @return the UI screen
+     * @param guiCreationContext information about the creation context
+     * @param mainPanel          the panel created in {@link #buildUI(GuiCreationContext, GuiSyncHandler, boolean)}
+     * @return a modular screen instance with the given panel
      */
     @SideOnly(Side.CLIENT)
-    ModularScreen createClientGui(EntityPlayer player);
+    default ModularScreen createScreen(GuiCreationContext guiCreationContext, ModularPanel mainPanel) {
+        return new ModularScreen(mainPanel);
+    }
+
+    /**
+     * Called on server and client. Create only the main panel here. Only here you can add sync handlers to widgets directly.
+     * If the widget to be synced is not in this panel yet (f.e. in another panel) the sync handler must be registered here
+     * with {@link GuiSyncHandler}.
+     *
+     * @param guiCreationContext information about the creation context
+     * @param guiSyncHandler     sync handler where widget sync handlers should be registered
+     * @param isClient           true if the world is a client world
+     */
+    ModularPanel buildUI(GuiCreationContext guiCreationContext, GuiSyncHandler guiSyncHandler, boolean isClient);
 }

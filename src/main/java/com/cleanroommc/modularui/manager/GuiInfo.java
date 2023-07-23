@@ -1,8 +1,10 @@
 package com.cleanroommc.modularui.manager;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.value.sync.GuiSyncHandler;
+import com.cleanroommc.modularui.widget.WidgetTree;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -10,8 +12,7 @@ import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.function.BiConsumer;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 public class GuiInfo {
 
@@ -20,19 +21,19 @@ public class GuiInfo {
     }
 
     private static int nextId = 0;
-    private final BiConsumer<GuiCreationContext, GuiSyncHandler> serverGuiCreator;
-    private final Function<GuiCreationContext, Object> clientGuiCreator;
+    private final BiFunction<GuiCreationContext, GuiSyncHandler, ModularPanel> mainPanelCreator;
+    private final BiFunction<GuiCreationContext, ModularPanel, Object> clientGuiCreator;
     private final int id;
 
-    public GuiInfo(BiConsumer<GuiCreationContext, GuiSyncHandler> serverGuiCreator, Function<GuiCreationContext, Object> clientGuiCreator) {
-        this.serverGuiCreator = serverGuiCreator;
+    public GuiInfo(BiFunction<GuiCreationContext, GuiSyncHandler, ModularPanel> mainPanelCreator, BiFunction<GuiCreationContext, ModularPanel, Object> clientGuiCreator) {
+        this.mainPanelCreator = mainPanelCreator;
         this.clientGuiCreator = clientGuiCreator;
         this.id = nextId++;
         GuiManager.INSTANCE.register(this);
     }
 
     public int getId() {
-        return id;
+        return this.id;
     }
 
     public void open(EntityPlayer player) {
@@ -47,13 +48,15 @@ public class GuiInfo {
         FMLNetworkHandler.openGui(player, ModularUI.ID, this.id, world, x, y, z);
     }
 
-    public void createServerGuiManager(GuiCreationContext context, GuiSyncHandler guiSyncHandler) {
-        this.serverGuiCreator.accept(context, guiSyncHandler);
+    public ModularPanel createCommonGui(GuiCreationContext context, GuiSyncHandler guiSyncHandler) {
+        ModularPanel panel = this.mainPanelCreator.apply(context, guiSyncHandler);
+        WidgetTree.collectSyncValues(guiSyncHandler, panel);
+        return panel;
     }
 
     @SideOnly(Side.CLIENT)
-    public ModularScreen createGuiScreen(GuiCreationContext context) {
-        Object screen = this.clientGuiCreator.apply(context);
+    public ModularScreen createClientGui(GuiCreationContext context, ModularPanel panel) {
+        Object screen = this.clientGuiCreator.apply(context, panel);
         if (!(screen instanceof ModularScreen)) {
             throw new IllegalStateException("Client screen must be an instance of ModularScreen");
         }
@@ -62,21 +65,21 @@ public class GuiInfo {
 
     public static class Builder {
 
-        private BiConsumer<GuiCreationContext, GuiSyncHandler> serverGuiCreator;
-        private Function<GuiCreationContext, Object> clientGuiCreator;
+        private BiFunction<GuiCreationContext, GuiSyncHandler, ModularPanel> mainPanelCreator;
+        private BiFunction<GuiCreationContext, ModularPanel, Object> clientGuiCreator;
 
-        public Builder serverGui(BiConsumer<GuiCreationContext, GuiSyncHandler> serverGuiCreator) {
-            this.serverGuiCreator = serverGuiCreator;
+        public Builder commonGui(BiFunction<GuiCreationContext, GuiSyncHandler, ModularPanel> mainPanelCreator) {
+            this.mainPanelCreator = mainPanelCreator;
             return this;
         }
 
-        public Builder clientGui(Function<GuiCreationContext, Object> clientGuiCreator) {
+        public Builder clientGui(BiFunction<GuiCreationContext, ModularPanel, Object> clientGuiCreator) {
             this.clientGuiCreator = clientGuiCreator;
             return this;
         }
 
         public GuiInfo build() {
-            return new GuiInfo(serverGuiCreator, clientGuiCreator);
+            return new GuiInfo(this.mainPanelCreator, this.clientGuiCreator);
         }
     }
 }

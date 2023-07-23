@@ -8,6 +8,8 @@ import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.google.gson.JsonObject;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * An object which can be drawn. This is mainly used for backgrounds in {@link com.cleanroommc.modularui.api.widget.IWidget}.
@@ -23,8 +25,10 @@ public interface IDrawable {
      * @param width   width
      * @param height  height
      */
+    @SideOnly(Side.CLIENT)
     void draw(GuiContext context, int x, int y, int width, int height);
 
+    @SideOnly(Side.CLIENT)
     default void draw(GuiContext context, int width, int height) {
         draw(context, 0, 0, width, height);
     }
@@ -35,10 +39,12 @@ public interface IDrawable {
      * @param context current context to draw with
      * @param area    area
      */
+    @SideOnly(Side.CLIENT)
     default void draw(GuiContext context, Area area) {
         draw(context, area.x, area.y, area.width, area.height);
     }
 
+    @SideOnly(Side.CLIENT)
     default void drawAtZero(GuiContext context, Area area) {
         draw(context, 0, 0, area.width, area.height);
     }
@@ -79,6 +85,7 @@ public interface IDrawable {
             this.drawable = drawable;
         }
 
+        @SideOnly(Side.CLIENT)
         @Override
         public void draw(GuiContext context) {
             this.drawable.drawAtZero(context, getArea());

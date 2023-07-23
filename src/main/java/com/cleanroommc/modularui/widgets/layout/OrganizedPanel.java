@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.widgets.layout;
 
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.widget.ParentWidget;
 
@@ -18,8 +17,8 @@ public class OrganizedPanel extends ModularPanel {
     private int leftSideWidth = 60;
     private int rightSideWidth = 60;
 
-    public OrganizedPanel(GuiContext context) {
-        super(context);
+    public OrganizedPanel(String name) {
+        super(name);
         getChildren().add(this.body);
     }
 

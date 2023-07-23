@@ -11,6 +11,8 @@ import com.cleanroommc.modularui.widget.sizer.Area;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -95,6 +97,7 @@ public class UITexture implements IDrawable {
         return (v1 - v0) * vNew + v0;
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height) {
         draw((float) x, y, width, height);

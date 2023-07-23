@@ -4,6 +4,8 @@ import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.sizer.Box;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class TextIcon implements IIcon {
 
@@ -21,6 +23,7 @@ public class TextIcon implements IIcon {
         this.alignment = alignment;
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height) {
         TextRenderer.SHARED.setPos(x, y);

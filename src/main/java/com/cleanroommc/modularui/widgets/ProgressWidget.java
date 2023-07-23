@@ -149,6 +149,7 @@ public class ProgressWidget extends Widget<ProgressWidget> {
 
     public ProgressWidget value(IDoubleValue<?> value) {
         this.doubleValue = value;
+        setValue(value);
         return this;
     }
 

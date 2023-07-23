@@ -4,6 +4,8 @@ import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class AnimatedText extends StyledText {
 
@@ -61,6 +63,7 @@ public class AnimatedText extends StyledText {
         this.timeLastDraw += (long) amount * this.speed;
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height) {
         if (this.fullString == null || !this.fullString.equals(super.get())) {

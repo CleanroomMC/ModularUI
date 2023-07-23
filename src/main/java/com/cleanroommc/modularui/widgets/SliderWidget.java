@@ -190,6 +190,7 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
 
     public SliderWidget value(IDoubleValue<?> value) {
         this.doubleValue = value;
+        setValue(value);
         return this;
     }
 

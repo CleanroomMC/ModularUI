@@ -2,9 +2,7 @@ package com.cleanroommc.modularui.config;
 
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.packets.SyncConfig;
-import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
@@ -77,12 +75,7 @@ public class Config {
     }
 
     public ModularScreen createScreen() {
-        return new ModularScreen("config_" + name) {
-            @Override
-            public ModularPanel buildUI(GuiContext context) {
-                return null;
-            }
-        };
+        return new ModularScreen(new ConfigPanel(this));
     }
 
     public JsonObject serialize() {

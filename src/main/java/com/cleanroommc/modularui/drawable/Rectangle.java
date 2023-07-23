@@ -8,6 +8,8 @@ import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.function.IntConsumer;
 
@@ -74,6 +76,7 @@ public class Rectangle implements IDrawable {
         }
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiContext context, int x0, int y0, int width, int height) {
         if (this.cornerRadius <= 0) {

@@ -240,4 +240,10 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
     public @Nullable Object getIngredient() {
         return getFluidStack();
     }
+
+    public FluidSlot syncHandler(FluidSlotSyncHandler syncHandler) {
+        setSyncHandler(syncHandler);
+        this.syncHandler = syncHandler;
+        return this;
+    }
 }

@@ -3,7 +3,6 @@ package com.cleanroommc.modularui.widgets.textfield;
 import com.cleanroommc.modularui.api.IMathValue;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.value.IStringValue;
-import com.cleanroommc.modularui.api.value.sync.IStringSyncValue;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.math.Constant;
 import com.cleanroommc.modularui.utils.math.MathBuilder;
