@@ -35,9 +35,6 @@ public class TestItem extends Item implements IGuiHolder {
     public ModularPanel buildUI(GuiCreationContext guiCreationContext, GuiSyncHandler guiSyncHandler, boolean isClient) {
         IItemHandlerModifiable itemHandler = (IItemHandlerModifiable) guiCreationContext.getUsedItemStack().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
         guiSyncHandler.registerSlotGroup("mixer_items", 2);
-        for (int i = 0; i < 4; i++) {
-            guiSyncHandler.syncValue("mixer_items", i, SyncHandlers.itemSlot(itemHandler, i).slotGroup("mixer_items"));
-        }
 
         ModularPanel panel = ModularPanel.defaultPanel("knapping_gui");
         panel.child(new Column()
@@ -47,10 +44,9 @@ public class TestItem extends Item implements IGuiHolder {
                 .child(SlotGroupWidget.builder()
                         .row("II")
                         .row("II")
-                        .key('I', index -> {
-                            ModularUI.LOGGER.info("Create item slot {}", index);
-                            return new ItemSlot().syncHandler("mixer_items", index);
-                        })
+                        .key('I', index -> new ItemSlot().syncHandler(SyncHandlers.phantomItemSlot(itemHandler, index)
+                                .ignoreMaxStackSize(true)
+                                .slotGroup("mixer_items")))
                         .build()));
 
         return panel;

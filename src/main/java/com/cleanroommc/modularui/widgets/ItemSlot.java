@@ -95,7 +95,9 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @Override
     public boolean onMouseRelease(int mouseButton) {
-        getScreen().getScreenWrapper().releaseSlot();
+        if (!this.syncHandler.isPhantom()) {
+            getScreen().getScreenWrapper().releaseSlot();
+        }
         return true;
     }
 

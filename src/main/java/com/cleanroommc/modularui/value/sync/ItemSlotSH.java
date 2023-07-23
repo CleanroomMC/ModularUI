@@ -8,6 +8,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -104,7 +105,14 @@ public class ItemSlotSH extends SyncHandler {
         ItemStack cursorStack = getSyncHandler().getCursorItem();
         ItemStack slotStack = getSlot().getStack();
         ItemStack stackToPut;
-        if (slotStack.isEmpty()) {
+        if (!cursorStack.isEmpty() && !slotStack.isEmpty() && !ItemHandlerHelper.canItemStacksStack(cursorStack, slotStack)) {
+            stackToPut = cursorStack.copy();
+            if (mouseData.mouseButton == 1) {
+                stackToPut.setCount(1);
+            }
+            getSlot().putStack(stackToPut);
+            this.lastStoredPhantomItem = stackToPut.copy();
+        } else if (slotStack.isEmpty()) {
             if (cursorStack.isEmpty()) {
                 if (mouseData.mouseButton == 1 && !this.lastStoredPhantomItem.isEmpty()) {
                     stackToPut = this.lastStoredPhantomItem.copy();
@@ -117,7 +125,7 @@ public class ItemSlotSH extends SyncHandler {
             if (mouseData.mouseButton == 1) {
                 stackToPut.setCount(1);
             }
-            this.slot.putStack(stackToPut);
+            getSlot().putStack(stackToPut);
             this.lastStoredPhantomItem = stackToPut.copy();
         } else {
             if (mouseData.mouseButton == 0) {
@@ -173,8 +181,9 @@ public class ItemSlotSH extends SyncHandler {
             }
         }
         if (oldAmount != amount) {
+            stack = stack.copy();
             stack.setCount(amount);
-            getSlot().onSlotChanged();
+            getSlot().putStack(stack);
         }
     }
 
