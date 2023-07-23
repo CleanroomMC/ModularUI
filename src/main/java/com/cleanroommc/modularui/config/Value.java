@@ -32,14 +32,14 @@ public abstract class Value {
     public abstract void resetToDefault();
 
     public String getKey() {
-        return key;
+        return this.key;
     }
 
     public boolean isSynced() {
-        return synced;
+        return this.synced;
     }
 
     public boolean isHidden() {
-        return hidden;
+        return this.hidden;
     }
 }

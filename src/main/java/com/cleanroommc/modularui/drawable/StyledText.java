@@ -34,31 +34,31 @@ public class StyledText implements IKey {
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height) {
         renderer.setAlignment(this.alignment, width, height);
-        if (colorChanged) {
+        if (this.colorChanged) {
             renderer.setColor(this.color);
         }
         renderer.setScale(this.scale);
         renderer.setPos(x, y);
-        if (shadowChanged) {
+        if (this.shadowChanged) {
             renderer.setShadow(this.shadow);
         }
         renderer.draw(get());
     }
 
     public Alignment getAlignment() {
-        return alignment;
+        return this.alignment;
     }
 
     public int getColor() {
-        return color;
+        return this.color;
     }
 
     public float getScale() {
-        return scale;
+        return this.scale;
     }
 
     public boolean isShadow() {
-        return shadow;
+        return this.shadow;
     }
 
     @Override
@@ -94,8 +94,8 @@ public class StyledText implements IKey {
                 .color(this.color)
                 .scale(this.scale)
                 .shadow(this.shadow);
-        textWidget.colorChanged = colorChanged;
-        textWidget.shadowChanged = shadowChanged;
+        textWidget.colorChanged = this.colorChanged;
+        textWidget.shadowChanged = this.shadowChanged;
         return textWidget;
     }
 
@@ -106,8 +106,8 @@ public class StyledText implements IKey {
                 .color(this.color)
                 .scale(this.scale)
                 .shadow(this.shadow);
-        animatedText.colorChanged = colorChanged;
-        animatedText.shadowChanged = shadowChanged;
+        animatedText.colorChanged = this.colorChanged;
+        animatedText.shadowChanged = this.shadowChanged;
         return animatedText;
     }
 }

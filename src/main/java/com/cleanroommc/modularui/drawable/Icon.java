@@ -24,17 +24,17 @@ public class Icon implements IIcon {
 
     @Override
     public int getWidth() {
-        return width;
+        return this.width;
     }
 
     @Override
     public int getHeight() {
-        return height;
+        return this.height;
     }
 
     @Override
     public Box getMargin() {
-        return margin;
+        return this.margin;
     }
 
     @SideOnly(Side.CLIENT)
@@ -45,18 +45,18 @@ public class Icon implements IIcon {
         width -= this.margin.horizontal();
         height -= this.margin.vertical();
         if (this.width > 0) {
-            x += width * alignment.x - this.width * alignment.x;
+            x += width * this.alignment.x - this.width * this.alignment.x;
             width = this.width;
         }
         if (this.height > 0) {
-            y += height * alignment.y - this.height * alignment.y;
+            y += height * this.alignment.y - this.height * this.alignment.y;
             height = this.height;
         }
-        drawable.draw(context, x, y, width, height);
+        this.drawable.draw(context, x, y, width, height);
     }
 
     public Alignment getAlignment() {
-        return alignment;
+        return this.alignment;
     }
 
     public Icon width(int width) {

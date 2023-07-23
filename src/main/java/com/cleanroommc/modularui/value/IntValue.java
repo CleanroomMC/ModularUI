@@ -26,7 +26,7 @@ public class IntValue implements IIntValue<Integer>, IStringValue<Integer> {
 
     @Override
     public int getIntValue() {
-        return value;
+        return this.value;
     }
 
     @Override

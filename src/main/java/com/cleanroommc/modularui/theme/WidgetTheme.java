@@ -32,22 +32,22 @@ public class WidgetTheme {
     }
 
     public @Nullable IDrawable getBackground() {
-        return background;
+        return this.background;
     }
 
     public @Nullable IDrawable getHoverBackground() {
-        return hoverBackground;
+        return this.hoverBackground;
     }
 
     public int getColor() {
-        return color;
+        return this.color;
     }
 
     public int getTextColor() {
-        return textColor;
+        return this.textColor;
     }
 
     public boolean getTextShadow() {
-        return textShadow;
+        return this.textShadow;
     }
 }

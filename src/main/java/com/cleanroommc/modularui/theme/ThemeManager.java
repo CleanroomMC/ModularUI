@@ -244,7 +244,7 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
             ITheme parent = ThemeAPI.INSTANCE.getTheme(this.parent);
             // merge themes defined in java and via resource pack of the same id into 1 json
             JsonBuilder jsonBuilder = new JsonBuilder();
-            if (!override) {
+            if (!this.override) {
                 for (JsonBuilder builder : ThemeAPI.INSTANCE.getJavaDefaultThemes(this.id)) {
                     jsonBuilder.addAllOf(builder);
                 }

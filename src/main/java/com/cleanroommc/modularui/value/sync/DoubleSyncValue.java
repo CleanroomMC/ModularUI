@@ -22,12 +22,12 @@ public class DoubleSyncValue extends ValueSyncHandler<Double> implements IDouble
 
     @Override
     public Double getValue() {
-        return cache;
+        return this.cache;
     }
 
     @Override
     public double getDoubleValue() {
-        return cache;
+        return this.cache;
     }
 
     @Override

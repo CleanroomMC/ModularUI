@@ -56,7 +56,7 @@ public class Animator {
     }
 
     public void backward() {
-        this.progress = duration;
+        this.progress = this.duration;
         this.dir = -1;
         updateValue();
         if (!activeAnimators.contains(this)) {
@@ -65,49 +65,49 @@ public class Animator {
     }
 
     public boolean isRunning() {
-        return dir != 0 && (dir > 0 ? progress < duration : progress > 0);
+        return this.dir != 0 && (this.dir > 0 ? this.progress < this.duration : this.progress > 0);
     }
 
     public boolean isRunningForwards() {
-        return dir > 0 && progress < duration;
+        return this.dir > 0 && this.progress < this.duration;
     }
 
     public boolean isRunningBackwards() {
-        return dir < 0 && progress > 0;
+        return this.dir < 0 && this.progress > 0;
     }
 
     public double getValue() {
-        return value;
+        return this.value;
     }
 
     public int getDuration() {
-        return duration;
+        return this.duration;
     }
 
     public int getProgress() {
-        return progress;
+        return this.progress;
     }
 
     public double getMin() {
-        return min;
+        return this.min;
     }
 
     public double getMax() {
-        return max;
+        return this.max;
     }
 
     private boolean tick() {
-        this.progress += dir;
+        this.progress += this.dir;
         updateValue();
-        if (callback != null) callback.accept(value);
+        if (this.callback != null) this.callback.accept(this.value);
         if (!isRunning()) {
-            if (endCallback != null) endCallback.accept(value);
+            if (this.endCallback != null) this.endCallback.accept(this.value);
             return true;
         }
         return false;
     }
 
     private void updateValue() {
-        this.value = interpolation.interpolate(min, max, progress / (double) duration);
+        this.value = this.interpolation.interpolate(this.min, this.max, this.progress / (double) this.duration);
     }
 }

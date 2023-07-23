@@ -23,7 +23,7 @@ public class EnumSyncValue<T extends Enum<T>> extends ValueSyncHandler<T> implem
 
     @Override
     public Class<T> getEnumClass() {
-        return enumCLass;
+        return this.enumCLass;
     }
 
     @Override

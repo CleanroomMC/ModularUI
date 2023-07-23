@@ -18,7 +18,7 @@ public class EnumValue<T extends Enum<T>> implements IEnumValue<T>, IIntValue<T>
 
     @Override
     public T getValue() {
-        return value;
+        return this.value;
     }
 
     @Override
@@ -28,7 +28,7 @@ public class EnumValue<T extends Enum<T>> implements IEnumValue<T>, IIntValue<T>
 
     @Override
     public int getIntValue() {
-        return value.ordinal();
+        return this.value.ordinal();
     }
 
     @Override
@@ -38,7 +38,7 @@ public class EnumValue<T extends Enum<T>> implements IEnumValue<T>, IIntValue<T>
 
     @Override
     public Class<T> getEnumClass() {
-        return enumClass;
+        return this.enumClass;
     }
 
     public static class Dynamic<T extends Enum<T>> implements IEnumValue<T>, IIntValue<T> {
@@ -75,7 +75,7 @@ public class EnumValue<T extends Enum<T>> implements IEnumValue<T>, IIntValue<T>
 
         @Override
         public Class<T> getEnumClass() {
-            return enumClass;
+            return this.enumClass;
         }
     }
 }

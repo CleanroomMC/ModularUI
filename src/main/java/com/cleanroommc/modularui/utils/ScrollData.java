@@ -183,7 +183,7 @@ public class ScrollData {
     }
 
     public int getAnimatingTo() {
-        return animatingTo;
+        return this.animatingTo;
     }
 
     @SideOnly(Side.CLIENT)
@@ -240,15 +240,15 @@ public class ScrollData {
 
     public ScrollData copyWith(ScrollDirection direction) {
         ScrollData data = new ScrollData(direction);
-        data.scroll = scroll;
-        data.dragging = dragging;
-        data.cancelScrollEdge = cancelScrollEdge;
-        data.opposite = opposite;
-        data.scrollAnimator = scrollAnimator;
-        data.scrollbarWidth = scrollbarWidth;
-        data.scrollItemSize = scrollItemSize;
-        data.scrollSize = scrollSize;
-        data.scrollSpeed = scrollSpeed;
+        data.scroll = this.scroll;
+        data.dragging = this.dragging;
+        data.cancelScrollEdge = this.cancelScrollEdge;
+        data.opposite = this.opposite;
+        data.scrollAnimator = this.scrollAnimator;
+        data.scrollbarWidth = this.scrollbarWidth;
+        data.scrollItemSize = this.scrollItemSize;
+        data.scrollSize = this.scrollSize;
+        data.scrollSpeed = this.scrollSpeed;
         return data;
     }
 }

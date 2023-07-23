@@ -23,12 +23,12 @@ public class BooleanSyncValue extends ValueSyncHandler<Boolean> implements IBool
 
     @Override
     public Boolean getValue() {
-        return cache;
+        return this.cache;
     }
 
     @Override
     public boolean getBoolValue() {
-        return cache;
+        return this.cache;
     }
 
     @Override

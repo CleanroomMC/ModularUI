@@ -82,7 +82,7 @@ public class GuiContext extends GuiViewportStack {
     }
 
     public boolean isAbove(IGuiElement widget) {
-        return widget.getArea().isInside(mouseX, mouseY);
+        return widget.getArea().isInside(this.mouseX, this.mouseY);
     }
 
     /* Element focusing */
@@ -101,11 +101,11 @@ public class GuiContext extends GuiViewportStack {
 
     @Nullable
     public IGuiElement getHovered() {
-        return hovered;
+        return this.hovered;
     }
 
     public Iterable<IGuiElement> getAllBelowMouse() {
-        return hoveredWidgets;
+        return this.hoveredWidgets;
     }
 
     /**
@@ -423,23 +423,23 @@ public class GuiContext extends GuiViewportStack {
     }
 
     public int getMouseButton() {
-        return mouseButton;
+        return this.mouseButton;
     }
 
     public int getMouseWheel() {
-        return mouseWheel;
+        return this.mouseWheel;
     }
 
     public int getKeyCode() {
-        return keyCode;
+        return this.keyCode;
     }
 
     public char getTypedChar() {
-        return typedChar;
+        return this.typedChar;
     }
 
     public float getPartialTicks() {
-        return partialTicks;
+        return this.partialTicks;
     }
 
     public void enableJei() {
@@ -487,11 +487,11 @@ public class GuiContext extends GuiViewportStack {
     }
 
     public List<Rectangle> getJeiExclusionAreas() {
-        return jeiExclusionAreas;
+        return this.jeiExclusionAreas;
     }
 
     public List<IWidget> getJeiExclusionWidgets() {
-        return jeiExclusionWidgets;
+        return this.jeiExclusionWidgets;
     }
 
     public List<Rectangle> getAllJeiExclusionAreas() {
@@ -505,7 +505,7 @@ public class GuiContext extends GuiViewportStack {
     }
 
     public List<JeiGhostIngredientSlot<?>> getJeiGhostIngredientSlots() {
-        return jeiGhostIngredientSlots;
+        return this.jeiGhostIngredientSlots;
     }
 
     public <I> List<IGhostIngredientHandler.Target<I>> getAllGhostIngredientTargets(@NotNull I ingredient) {
@@ -518,7 +518,7 @@ public class GuiContext extends GuiViewportStack {
     }
 
     public ITheme getTheme() {
-        return currentTheme;
+        return this.currentTheme;
     }
 
     public void useTheme(String theme) {
@@ -538,26 +538,26 @@ public class GuiContext extends GuiViewportStack {
         public Iterator<IGuiElement> iterator() {
             return new Iterator<IGuiElement>() {
 
-                private final Iterator<ModularPanel> panelIt = windowManager.getOpenPanels().iterator();
+                private final Iterator<ModularPanel> panelIt = HoveredIterable.this.windowManager.getOpenPanels().iterator();
                 private Iterator<LocatedWidget> widgetIt;
 
                 @Override
                 public boolean hasNext() {
-                    if (widgetIt == null) {
-                        if (!panelIt.hasNext()) {
+                    if (this.widgetIt == null) {
+                        if (!this.panelIt.hasNext()) {
                             return false;
                         }
-                        widgetIt = panelIt.next().getHovering().iterator();
+                        this.widgetIt = this.panelIt.next().getHovering().iterator();
                     }
-                    return widgetIt.hasNext();
+                    return this.widgetIt.hasNext();
                 }
 
                 @Override
                 public IGuiElement next() {
-                    if (widgetIt == null || !widgetIt.hasNext()) {
-                        widgetIt = panelIt.next().getHovering().iterator();
+                    if (this.widgetIt == null || !this.widgetIt.hasNext()) {
+                        this.widgetIt = this.panelIt.next().getHovering().iterator();
                     }
-                    return widgetIt.next().getElement();
+                    return this.widgetIt.next().getElement();
                 }
             };
         }

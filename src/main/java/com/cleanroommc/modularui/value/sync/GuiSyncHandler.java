@@ -29,7 +29,7 @@ public class GuiSyncHandler {
 
     public GuiSyncHandler(EntityPlayer player) {
         this.player = player;
-        syncValue(CURSOR_KEY, cursorSlotSyncHandler);
+        syncValue(CURSOR_KEY, this.cursorSlotSyncHandler);
         String key = "player";
         for (int i = 0; i < 9; i++) {
             Slot slot = player.inventoryContainer.getSlot(i + 36);
@@ -64,7 +64,7 @@ public class GuiSyncHandler {
     }
 
     public boolean isFrozen() {
-        return frozen;
+        return this.frozen;
     }
 
     public void freeze() {
@@ -80,7 +80,7 @@ public class GuiSyncHandler {
     }
 
     public void receiveWidgetUpdate(String mapKey, int id, PacketBuffer buf) throws IOException {
-        SyncHandler syncHandler = syncedValues.get(mapKey);
+        SyncHandler syncHandler = this.syncedValues.get(mapKey);
         if (NetworkUtils.isClient(this.player)) {
             syncHandler.readOnClient(id, buf);
         } else {
@@ -136,11 +136,11 @@ public class GuiSyncHandler {
     }
 
     public EntityPlayer getPlayer() {
-        return player;
+        return this.player;
     }
 
     public ModularContainer getContainer() {
-        return container;
+        return this.container;
     }
 
     public static String makeSyncKey(String name, int id) {

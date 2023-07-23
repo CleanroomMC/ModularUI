@@ -65,7 +65,7 @@ public class GuiScreenWrapper extends GuiContainer {
             this.screen.onOpen();
             this.init = false;
         }
-        this.screen.onResize(width, height);
+        this.screen.onResize(this.width, this.height);
     }
 
     public void updateArea(Area mainViewport) {
@@ -81,12 +81,12 @@ public class GuiScreenWrapper extends GuiContainer {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        frameCount++;
+        this.frameCount++;
         long time = Minecraft.getSystemTime();
-        if (time - timer >= 1000) {
-            fps = frameCount;
-            frameCount = 0;
-            timer += 1000;
+        if (time - this.timer >= 1000) {
+            this.fps = this.frameCount;
+            this.frameCount = 0;
+            this.timer += 1000;
         }
 
         Stencil.apply(this.screen.getScreenArea(), null);
@@ -200,7 +200,7 @@ public class GuiScreenWrapper extends GuiContainer {
         this.zLevel = 200.0F;
         this.itemRender.zLevel = 200.0F;
         FontRenderer font = stack.getItem().getFontRenderer(stack);
-        if (font == null) font = fontRenderer;
+        if (font == null) font = this.fontRenderer;
         GlStateManager.enableDepth();
         this.itemRender.renderItemAndEffectIntoGUI(stack, x, y);
         this.itemRender.renderItemOverlayIntoGUI(font, stack, x, y - (getAccessor().getDraggedStack().isEmpty() ? 0 : 8), altText);
@@ -219,14 +219,14 @@ public class GuiScreenWrapper extends GuiContainer {
     }
 
     public void drawDebugScreen() {
-        GuiContext context = screen.context;
+        GuiContext context = this.screen.context;
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
         int screenW = this.screen.getScreenArea().width, screenH = this.screen.getScreenArea().height;
         int color = Color.rgb(180, 40, 115);
         int lineY = screenH - 13;
-        drawString(fontRenderer, "Mouse Pos: " + mouseX + ", " + mouseY, 5, lineY, color);
+        drawString(this.fontRenderer, "Mouse Pos: " + mouseX + ", " + mouseY, 5, lineY, color);
         lineY -= 11;
-        drawString(fontRenderer, "FPS: " + fps, 5, screenH - 24, color);
+        drawString(this.fontRenderer, "FPS: " + this.fps, 5, screenH - 24, color);
         lineY -= 11;
         LocatedWidget locatedHovered = this.screen.getWindowManager().getTopWidgetLocated();
         if (locatedHovered != null) {
@@ -262,7 +262,7 @@ public class GuiScreenWrapper extends GuiContainer {
                 GuiDraw.drawText("Slot Number: " + slot.slotNumber, 5, lineY, 1, color, false);
                 lineY -= 11;
                 if (slotWidget.isSynced()) {
-                    SlotGroup slotGroup = ((ModularContainer) inventorySlots).getSlotGroup(slotWidget.getSyncHandler());
+                    SlotGroup slotGroup = ((ModularContainer) this.inventorySlots).getSlotGroup(slotWidget.getSyncHandler());
                     boolean allowShiftTransfer = slotGroup != null && slotGroup.allowShiftTransfer();
                     GuiDraw.drawText("Shift-Click Priority: " + (allowShiftTransfer ? slotGroup.getShiftClickPriority() : "DISABLED"), 5, lineY, 1, color, false);
                     lineY -= 11;
@@ -302,7 +302,7 @@ public class GuiScreenWrapper extends GuiContainer {
     }
 
     public ModularScreen getScreen() {
-        return screen;
+        return this.screen;
     }
 
     @Override
@@ -313,7 +313,7 @@ public class GuiScreenWrapper extends GuiContainer {
 
     public void clickSlot() {
         try {
-            super.mouseClicked(screen.context.getAbsMouseX(), screen.context.getAbsMouseY(), screen.context.getMouseButton());
+            super.mouseClicked(this.screen.context.getAbsMouseX(), this.screen.context.getAbsMouseY(), this.screen.context.getMouseButton());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -326,7 +326,7 @@ public class GuiScreenWrapper extends GuiContainer {
     }
 
     public void releaseSlot() {
-        super.mouseReleased(screen.context.getAbsMouseX(), screen.context.getAbsMouseY(), screen.context.getMouseButton());
+        super.mouseReleased(this.screen.context.getAbsMouseX(), this.screen.context.getAbsMouseY(), this.screen.context.getMouseButton());
     }
 
     @Override
@@ -336,7 +336,7 @@ public class GuiScreenWrapper extends GuiContainer {
     }
 
     public void dragSlot(long timeSinceLastClick) {
-        super.mouseClickMove(screen.context.getAbsMouseX(), screen.context.getAbsMouseY(), screen.context.getMouseButton(), timeSinceLastClick);
+        super.mouseClickMove(this.screen.context.getAbsMouseX(), this.screen.context.getAbsMouseY(), this.screen.context.getMouseButton(), timeSinceLastClick);
     }
 
     /**
@@ -386,19 +386,19 @@ public class GuiScreenWrapper extends GuiContainer {
     }
 
     public boolean isDragSplitting() {
-        return dragSplitting;
+        return this.dragSplitting;
     }
 
     public Set<Slot> getDragSlots() {
-        return dragSplittingSlots;
+        return this.dragSplittingSlots;
     }
 
     public RenderItem getItemRenderer() {
-        return itemRender;
+        return this.itemRender;
     }
 
     public float getZ() {
-        return zLevel;
+        return this.zLevel;
     }
 
     public void setZ(float z) {
@@ -406,6 +406,6 @@ public class GuiScreenWrapper extends GuiContainer {
     }
 
     public FontRenderer getFontRenderer() {
-        return fontRenderer;
+        return this.fontRenderer;
     }
 }

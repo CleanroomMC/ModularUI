@@ -79,12 +79,12 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
     @Override
     public void drawText(GuiContext context) {
-        renderer.setSimulate(false);
-        renderer.setPos(getArea().getPadding().left, 0);
-        renderer.setScale(scale);
-        renderer.setAlignment(textAlignment, -1, getArea().height);
-        renderer.draw(handler.getText());
-        getScrollData().scrollSize = Math.max(0, (int) renderer.getLastWidth());
+        this.renderer.setSimulate(false);
+        this.renderer.setPos(getArea().getPadding().left, 0);
+        this.renderer.setScale(this.scale);
+        this.renderer.setAlignment(this.textAlignment, -1, getArea().height);
+        this.renderer.draw(this.handler.getText());
+        getScrollData().scrollSize = Math.max(0, (int) this.renderer.getLastWidth());
     }
 
     @Override
@@ -96,20 +96,20 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
     @NotNull
     public String getText() {
-        if (handler.getText().isEmpty()) {
+        if (this.handler.getText().isEmpty()) {
             return "";
         }
-        if (handler.getText().size() > 1) {
+        if (this.handler.getText().size() > 1) {
             throw new IllegalStateException("TextFieldWidget can only have one line!");
         }
-        return handler.getText().get(0);
+        return this.handler.getText().get(0);
     }
 
     public void setText(@NotNull String text) {
-        if (handler.getText().isEmpty()) {
-            handler.getText().add(text);
+        if (this.handler.getText().isEmpty()) {
+            this.handler.getText().add(text);
         } else {
-            handler.getText().set(0, text);
+            this.handler.getText().set(0, text);
         }
     }
 
@@ -125,10 +125,10 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     @Override
     public void onRemoveFocus(GuiContext context) {
         super.onRemoveFocus(context);
-        if (handler.getText().isEmpty()) {
-            handler.getText().add(validator.apply(""));
-        } else if (handler.getText().size() == 1) {
-            handler.getText().set(0, validator.apply(handler.getText().get(0)));
+        if (this.handler.getText().isEmpty()) {
+            this.handler.getText().add(this.validator.apply(""));
+        } else if (this.handler.getText().size() == 1) {
+            this.handler.getText().set(0, this.validator.apply(this.handler.getText().get(0)));
             markDirty();
         } else {
             throw new IllegalStateException("TextFieldWidget can only have one line!");
@@ -147,7 +147,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     public TextFieldWidget setPattern(Pattern pattern) {
-        handler.setPattern(pattern);
+        this.handler.setPattern(pattern);
         return this;
     }
 

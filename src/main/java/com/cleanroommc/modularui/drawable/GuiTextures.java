@@ -188,7 +188,7 @@ public class GuiTextures {
     public static final TabTexture TAB_TOP = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_top", true), GuiAxis.Y, false, 28, 32, 4);
     public static final TabTexture TAB_BOTTOM = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_bottom", true), GuiAxis.Y, true, 28, 32, 4);
     public static final TabTexture TAB_LEFT = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_left", true), GuiAxis.X, false, 32, 28, 4);
-    public static final TabTexture TAB_RIGHT = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_right", true), GuiAxis.X, true, 32, 28, 4);;
+    public static final TabTexture TAB_RIGHT = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_right", true), GuiAxis.X, true, 32, 28, 4);
 
     private static UITexture icon(String name, int x, int y, int w, int h) {
         return UITexture.builder()

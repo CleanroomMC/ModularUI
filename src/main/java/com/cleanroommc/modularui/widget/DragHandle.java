@@ -26,7 +26,7 @@ public class DragHandle extends Widget<DragHandle> implements IDraggable {
             parent = parent.getParent();
         }
         if (((ModularPanel) parent).isDraggable()) {
-            parentDraggable = new DraggablePanelWrapper((ModularPanel) parent);
+            this.parentDraggable = new DraggablePanelWrapper((ModularPanel) parent);
         }
     }
 

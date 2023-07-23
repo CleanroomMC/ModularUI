@@ -87,25 +87,25 @@ public class IconRenderer {
             maxWidth = (int) this.maxWidth;
         }
         for (IIcon icon : lines) {
-            totalHeight += icon.getHeight() + linePadding;
+            totalHeight += icon.getHeight() + this.linePadding;
             if (!this.useWholeWidth && icon.getWidth() > 0) {
                 maxWidth = Math.max(maxWidth, icon.getWidth());
             }
         }
         if (lines.size() > 0) {
             // don't add padding to last line
-            totalHeight -= linePadding;
+            totalHeight -= this.linePadding;
         }
         int y = getStartY(totalHeight);
         for (IIcon icon : lines) {
             int x = icon.getWidth() > 0 ? getStartX(icon.getWidth()) : this.x;
-            if (!simulate) {
+            if (!this.simulate) {
                 icon.draw(context, x, y, maxWidth, icon.getHeight());
             }
-            y += (icon.getHeight() + linePadding) * scale;
+            y += (icon.getHeight() + this.linePadding) * this.scale;
         }
         this.lastWidth = this.maxWidth > 0 ? Math.min(this.maxWidth, maxWidth) : maxWidth;
-        this.lastHeight = totalHeight * scale;
+        this.lastHeight = totalHeight * this.scale;
     }
 
     public List<IIcon> measureLines(List<IDrawable> lines) {
@@ -135,34 +135,34 @@ public class IconRenderer {
     }
 
     public List<String> wrapLine(String line, float scale) {
-        return maxWidth > 0 ? getFontRenderer().listFormattedStringToWidth(line, (int) (maxWidth / scale)) : Collections.singletonList(line);
+        return this.maxWidth > 0 ? getFontRenderer().listFormattedStringToWidth(line, (int) (this.maxWidth / scale)) : Collections.singletonList(line);
     }
 
     protected int getStartY(int totalHeight) {
-        if (alignment.y > 0 && maxHeight > 0) {
-            float height = totalHeight * scale;
-            return (int) (y + (maxHeight * alignment.y) - height * alignment.y);
+        if (this.alignment.y > 0 && this.maxHeight > 0) {
+            float height = totalHeight * this.scale;
+            return (int) (this.y + (this.maxHeight * this.alignment.y) - height * this.alignment.y);
         }
-        return y;
+        return this.y;
     }
 
     protected int getStartX(float lineWidth) {
-        if (alignment.x > 0 && maxWidth > 0) {
-            return (int) (x + (maxWidth * alignment.x) - lineWidth * alignment.x);
+        if (this.alignment.x > 0 && this.maxWidth > 0) {
+            return (int) (this.x + (this.maxWidth * this.alignment.x) - lineWidth * this.alignment.x);
         }
-        return x;
+        return this.x;
     }
 
     public float getFontHeight() {
-        return getFontRenderer().FONT_HEIGHT * scale;
+        return getFontRenderer().FONT_HEIGHT * this.scale;
     }
 
     public float getLastHeight() {
-        return lastHeight;
+        return this.lastHeight;
     }
 
     public float getLastWidth() {
-        return lastWidth;
+        return this.lastWidth;
     }
 
     @SideOnly(Side.CLIENT)

@@ -27,7 +27,7 @@ public class BoolValue implements IBoolValue<Boolean>, IIntValue<Boolean>, IStri
 
     @Override
     public boolean getBoolValue() {
-        return value;
+        return this.value;
     }
 
     @Override

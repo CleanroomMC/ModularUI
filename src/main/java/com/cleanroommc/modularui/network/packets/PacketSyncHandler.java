@@ -33,8 +33,8 @@ public class PacketSyncHandler implements IPacket {
 
     @Override
     public void read(PacketBuffer buf) {
-        key = buf.readString(64);
-        packet = NetworkUtils.readPacketBuffer(buf);
+        this.key = buf.readString(64);
+        this.packet = NetworkUtils.readPacketBuffer(buf);
     }
 
     @Override

@@ -184,7 +184,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
 
     @Override
     public Area getArea() {
-        return area;
+        return this.area;
     }
 
     @SuppressWarnings("unchecked")
@@ -203,17 +203,17 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         if (!isValid()) {
             throw new IllegalStateException(getClass().getSimpleName() + " is not in a valid state!");
         }
-        return panel;
+        return this.panel;
     }
 
     @Override
     public boolean isEnabled() {
-        return enabled;
+        return this.enabled;
     }
 
     @Override
     public boolean isValid() {
-        return valid;
+        return this.valid;
     }
 
     @Override
@@ -228,7 +228,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         if (!isValid()) {
             throw new IllegalStateException(getClass().getSimpleName() + " is not in a valid state!");
         }
-        return parent;
+        return this.parent;
     }
 
     @Override
@@ -236,7 +236,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         if (!isValid()) {
             throw new IllegalStateException(getClass().getSimpleName() + " is not in a valid state!");
         }
-        return context;
+        return this.context;
     }
 
     /**
@@ -263,19 +263,19 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     public @Nullable IDrawable getBackground() {
-        return background;
+        return this.background;
     }
 
     public @Nullable IDrawable getOverlay() {
-        return overlay;
+        return this.overlay;
     }
 
     public @Nullable IDrawable getHoverBackground() {
-        return hoverBackground;
+        return this.hoverBackground;
     }
 
     public @Nullable IDrawable getHoverOverlay() {
-        return hoverOverlay;
+        return this.hoverOverlay;
     }
 
     public IDrawable getCurrentBackground() {
@@ -291,7 +291,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @Nullable
     @Override
     public Tooltip getTooltip() {
-        return tooltip;
+        return this.tooltip;
     }
 
     @Override
@@ -307,7 +307,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
 
     @Override
     public Flex getFlex() {
-        return flex;
+        return this.flex;
     }
 
     @Override
@@ -316,7 +316,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
             this.flex = new Flex(this);
 
             if (this.resizer == null) {
-                this.resizer = flex;
+                this.resizer = this.flex;
             }
         }
         return this.flex;
@@ -324,7 +324,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
 
     @Override
     public IResizeable resizer() {
-        return resizer;
+        return this.resizer;
     }
 
     @Override
@@ -342,7 +342,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         if (this.syncHandler == null) {
             throw new IllegalStateException("Widget is not initialised or not synced!");
         }
-        return syncHandler;
+        return this.syncHandler;
     }
 
     @Override
@@ -352,7 +352,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
 
     @Nullable
     public IValue<?> getValue() {
-        return value;
+        return this.value;
     }
 
     public W disabled() {
@@ -443,8 +443,8 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
 
     @Override
     public String toString() {
-        if (debugName != null) {
-            return getClass().getSimpleName() + "#" + debugName;
+        if (this.debugName != null) {
+            return getClass().getSimpleName() + "#" + this.debugName;
         }
         return getClass().getSimpleName();
     }

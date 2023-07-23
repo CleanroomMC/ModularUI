@@ -21,12 +21,12 @@ public class StringSyncValue extends ValueSyncHandler<String> implements IString
 
     @Override
     public String getValue() {
-        return cache;
+        return this.cache;
     }
 
     @Override
     public String getStringValue() {
-        return cache;
+        return this.cache;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class StringSyncValue extends ValueSyncHandler<String> implements IString
 
     @Override
     public boolean needsSync(boolean isFirstSync) {
-        return isFirstSync || !this.getter.get().equals(cache);
+        return isFirstSync || !this.getter.get().equals(this.cache);
     }
 
     @Override

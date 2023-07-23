@@ -14,7 +14,7 @@ public class DynamicKey implements IKey {
 
     @Override
     public String get() {
-        return supplier.get();
+        return this.supplier.get();
     }
 
     @Override

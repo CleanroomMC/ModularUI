@@ -12,7 +12,7 @@ public class ConstValue<T> implements IValue<T> {
 
     @Override
     public T getValue() {
-        return value;
+        return this.value;
     }
 
     @Override

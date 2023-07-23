@@ -34,12 +34,12 @@ public class TextIcon implements IIcon {
 
     @Override
     public int getWidth() {
-        return width;
+        return this.width;
     }
 
     @Override
     public int getHeight() {
-        return height;
+        return this.height;
     }
 
     @Override
@@ -48,6 +48,6 @@ public class TextIcon implements IIcon {
     }
 
     public String getText() {
-        return text;
+        return this.text;
     }
 }

@@ -494,7 +494,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     public @NotNull String getName() {
-        return name;
+        return this.name;
     }
 
     @Override
@@ -507,12 +507,12 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         if (!isValid()) {
             throw new IllegalStateException();
         }
-        return screen;
+        return this.screen;
     }
 
     @NotNull
     public LinkedList<LocatedWidget> getHovering() {
-        return hovering;
+        return this.hovering;
     }
 
     @Nullable
@@ -523,7 +523,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @Nullable
     public LocatedWidget getTopHoveringLocated() {
-        for (LocatedWidget widget : hovering) {
+        for (LocatedWidget widget : this.hovering) {
             if (widget.getElement().canHover()) {
                 return widget;
             }
@@ -555,11 +555,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     public float getScale() {
-        return scale;
+        return this.scale;
     }
 
     public float getAlpha() {
-        return alpha;
+        return this.alpha;
     }
 
     public ModularPanel bindPlayerInventory() {

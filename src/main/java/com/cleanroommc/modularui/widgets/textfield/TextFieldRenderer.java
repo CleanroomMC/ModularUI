@@ -48,18 +48,18 @@ public class TextFieldRenderer extends TextRenderer {
     }
 
     protected void drawCursors(List<Line> measuredLines) {
-        if (!simulate) {
+        if (!this.simulate) {
             Point2D.Float start;
-            if (handler.hasTextMarked()) {
-                start = getPosOf(measuredLines, handler.getStartCursor());
+            if (this.handler.hasTextMarked()) {
+                start = getPosOf(measuredLines, this.handler.getStartCursor());
                 // render Marked
-                Point2D.Float end = getPosOf(measuredLines, handler.getEndCursor());
+                Point2D.Float end = getPosOf(measuredLines, this.handler.getEndCursor());
 
                 if (start.y == end.y) {
                     drawMarked(start.y, start.x, end.x);
                 } else {
-                    int min = handler.getStartCursor().y;
-                    int max = handler.getEndCursor().y;
+                    int min = this.handler.getStartCursor().y;
+                    int max = this.handler.getEndCursor().y;
                     Line line = measuredLines.get(min);
                     int startX = getStartX(line.getWidth());
                     drawMarked(start.y, start.x, startX + line.getWidth());
@@ -106,7 +106,7 @@ public class TextFieldRenderer extends TextRenderer {
         float currentX = 0;
         for (int i = 0; i < line.getText().length(); i++) {
             char c = line.getText().charAt(i);
-            currentX += getFontRenderer().getCharWidth(c) * scale;
+            currentX += getFontRenderer().getCharWidth(c) * this.scale;
             if (currentX >= x) {
                 return new Point(i, index);
             }
@@ -120,17 +120,17 @@ public class TextFieldRenderer extends TextRenderer {
         }
         Line line = measuredLines.get(cursorPos.y);
         String sub = line.getText().substring(0, Math.min(line.getText().length(), cursorPos.x));
-        return new Point2D.Float(getStartX(line.getWidth()) + getFontRenderer().getStringWidth(sub) * scale, getStartY(measuredLines.size()) + cursorPos.y * getFontHeight());
+        return new Point2D.Float(getStartX(line.getWidth()) + getFontRenderer().getStringWidth(sub) * this.scale, getStartY(measuredLines.size()) + cursorPos.y * getFontHeight());
     }
 
     @SideOnly(Side.CLIENT)
     public void drawMarked(float y0, float x0, float x1) {
         y0 -= 1;
         float y1 = y0 + getFontHeight();
-        float red = Color.getRedF(markedColor);
-        float green = Color.getGreenF(markedColor);
-        float blue = Color.getBlueF(markedColor);
-        float alpha = Color.getAlphaF(markedColor);
+        float red = Color.getRedF(this.markedColor);
+        float green = Color.getGreenF(this.markedColor);
+        float blue = Color.getBlueF(this.markedColor);
+        float alpha = Color.getAlphaF(this.markedColor);
         if (alpha == 0)
             alpha = 1f;
         Tessellator tessellator = Tessellator.getInstance();
@@ -150,21 +150,21 @@ public class TextFieldRenderer extends TextRenderer {
 
     @SideOnly(Side.CLIENT)
     private void drawCursor(float x0, float y0) {
-        x0 = (x0 - 0.8f) / scale;
-        y0 = (y0 - 1) / scale;
+        x0 = (x0 - 0.8f) / this.scale;
+        y0 = (y0 - 1) / this.scale;
         float x1 = x0 + 0.6f;
         float y1 = y0 + 9;
-        float red = Color.getRedF(color);
-        float green = Color.getGreenF(color);
-        float blue = Color.getBlueF(color);
-        float alpha = Color.getAlphaF(color);
+        float red = Color.getRedF(this.color);
+        float green = Color.getGreenF(this.color);
+        float blue = Color.getBlueF(this.color);
+        float alpha = Color.getAlphaF(this.color);
         if (alpha == 0)
             alpha = 1f;
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
         GlStateManager.disableBlend();
         GlStateManager.pushMatrix();
-        GlStateManager.scale(scale, scale, 0);
+        GlStateManager.scale(this.scale, this.scale, 0);
         GlStateManager.color(red, green, blue, alpha);
         GlStateManager.disableTexture2D();
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION);

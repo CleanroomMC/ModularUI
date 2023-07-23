@@ -45,11 +45,11 @@ public class HoloScreenEntity extends Entity {
     }
 
     public ModularScreen getScreen() {
-        return screen;
+        return this.screen;
     }
 
     public GuiScreenWrapper getWrapper() {
-        return wrapper;
+        return this.wrapper;
     }
 
     public void spawnInWorld() {
@@ -65,7 +65,7 @@ public class HoloScreenEntity extends Entity {
     }
 
     public Plane3D getPlane3D() {
-        return plane3D;
+        return this.plane3D;
     }
 
     @Override

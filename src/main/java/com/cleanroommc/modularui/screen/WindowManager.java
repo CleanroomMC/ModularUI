@@ -23,7 +23,7 @@ public class WindowManager {
      * List of all open panels from top to bottom.
      */
     private final LinkedList<ModularPanel> panels = new LinkedList<>();
-    private final List<ModularPanel> panelsView = Collections.unmodifiableList(panels);
+    private final List<ModularPanel> panelsView = Collections.unmodifiableList(this.panels);
     private final ReverseIterable<ModularPanel> reversePanels = new ReverseIterable<>(this.panelsView);
     private final List<ModularPanel> queueOpenPanels = new ArrayList<>();
     private final List<ModularPanel> queueClosePanels = new ArrayList<>();
@@ -103,7 +103,7 @@ public class WindowManager {
 
     @NotNull
     public ModularScreen getScreen() {
-        return screen;
+        return this.screen;
     }
 
     @NotNull
@@ -114,7 +114,7 @@ public class WindowManager {
         if (this.closed) {
             throw new IllegalStateException("Screen has been closed");
         }
-        return mainPanel;
+        return this.mainPanel;
     }
 
     public ModularPanel getTopMostPanel() {
@@ -207,7 +207,7 @@ public class WindowManager {
     @NotNull
     @UnmodifiableView
     public List<ModularPanel> getOpenPanels() {
-        return panelsView;
+        return this.panelsView;
     }
 
     @NotNull
@@ -217,7 +217,7 @@ public class WindowManager {
     }
 
     public boolean isClosed() {
-        return closed;
+        return this.closed;
     }
 
     public boolean isAboutToClose(ModularPanel panel) {

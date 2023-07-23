@@ -22,29 +22,29 @@ public class Plane3D {
 
     public void transformRectangle() {
         // translate to anchor
-        GlStateManager.translate(-w * aX, -h * aY, 0);
+        GlStateManager.translate(-this.w * this.aX, -this.h * this.aY, 0);
         // translate for scale and rotation
-        GlStateManager.translate(w / 2f, h / 2f, 0);
+        GlStateManager.translate(this.w / 2f, this.h / 2f, 0);
         // scale to size. 0.0625 is 1/16
         GlStateManager.scale(0.0625 * this.scale, 0.0625 * this.scale, 0.0625 * this.scale);
         // rotate 180 deg
         GlStateManager.rotate(180, 0, 0, 1);
         // apply facing direction
-        if (nX != 0 || nY != 0 || nZ != 1) {
+        if (this.nX != 0 || this.nY != 0 || this.nZ != 1) {
             Matrix4f rotation = new Matrix4f();
-            rotation.m00 = -nZ + (nY * nY * (1 + nZ)) / (nX * nX + nY * nY);
-            rotation.m10 = -(nX * nY * (1 + nZ)) / (nX * nX + nY * nY);
-            rotation.m20 = nX;
-            rotation.m01 = -(nX * nY * (1 + nZ)) / (nX * nX + nY * nY);
-            rotation.m11 = -nZ + (nX * nX * (1 + nZ)) / (nX * nX + nY * nY);
-            rotation.m21 = nY;
-            rotation.m02 = -nX;
-            rotation.m12 = -nY;
-            rotation.m22 = -nZ;
+            rotation.m00 = -this.nZ + (this.nY * this.nY * (1 + this.nZ)) / (this.nX * this.nX + this.nY * this.nY);
+            rotation.m10 = -(this.nX * this.nY * (1 + this.nZ)) / (this.nX * this.nX + this.nY * this.nY);
+            rotation.m20 = this.nX;
+            rotation.m01 = -(this.nX * this.nY * (1 + this.nZ)) / (this.nX * this.nX + this.nY * this.nY);
+            rotation.m11 = -this.nZ + (this.nX * this.nX * (1 + this.nZ)) / (this.nX * this.nX + this.nY * this.nY);
+            rotation.m21 = this.nY;
+            rotation.m02 = -this.nX;
+            rotation.m12 = -this.nY;
+            rotation.m22 = -this.nZ;
             GuiUtils.applyTransformationMatrix(rotation);
         }
         // un-translate for scale and rotation
-        GlStateManager.translate(-(w / 2f), -(h / 2f), 0);
+        GlStateManager.translate(-(this.w / 2f), -(this.h / 2f), 0);
     }
 
     public void setSize(float w, float h) {
@@ -83,11 +83,11 @@ public class Plane3D {
     }
 
     public float getWidth() {
-        return w;
+        return this.w;
     }
 
     public float getHeight() {
-        return h;
+        return this.h;
     }
 
     public void setScale(float scale) {
@@ -95,6 +95,6 @@ public class Plane3D {
     }
 
     public float getScale() {
-        return scale;
+        return this.scale;
     }
 }

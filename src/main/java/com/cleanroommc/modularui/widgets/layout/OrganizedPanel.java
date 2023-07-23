@@ -60,7 +60,7 @@ public class OrganizedPanel extends ModularPanel {
     }
 
     public ParentWidget<?> getBody() {
-        return body;
+        return this.body;
     }
 
     @Override

@@ -28,6 +28,6 @@ public class SPacketSetSlotMixin {
 
     @Inject(method = "writePacketData", at = @At("TAIL"))
     public void writePacketData(PacketBuffer buf, CallbackInfo ci) throws IOException {
-        buf.writeVarInt(item.getCount());
+        buf.writeVarInt(this.item.getCount());
     }
 }

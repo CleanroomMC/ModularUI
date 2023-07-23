@@ -11,11 +11,11 @@ public class LocatedElement<T> {
     }
 
     public T getElement() {
-        return element;
+        return this.element;
     }
 
     public TransformationMatrix getTransformationMatrix() {
-        return transformationMatrix;
+        return this.transformationMatrix;
     }
 
     public void applyMatrix(GuiContext context) {

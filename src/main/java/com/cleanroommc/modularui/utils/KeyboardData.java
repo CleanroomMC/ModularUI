@@ -24,12 +24,12 @@ public class KeyboardData {
     }
 
     public void writeToPacket(PacketBuffer buffer) {
-        buffer.writeChar(character);
-        buffer.writeVarInt(keycode);
+        buffer.writeChar(this.character);
+        buffer.writeVarInt(this.keycode);
         byte data = 0;
-        if (shift) data |= 1;
-        if (ctrl) data |= 2;
-        if (alt) data |= 4;
+        if (this.shift) data |= 1;
+        if (this.ctrl) data |= 2;
+        if (this.alt) data |= 4;
         buffer.writeByte(data);
     }
 

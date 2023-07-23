@@ -78,20 +78,20 @@ public class TextRenderer {
             maxW = Math.max(draw(measuredLine.text, x0, y0), maxW);
             y0 += getFontHeight();
         }
-        this.lastWidth = maxWidth > 0 ? Math.min(maxW, maxWidth) : maxW;
+        this.lastWidth = this.maxWidth > 0 ? Math.min(maxW, this.maxWidth) : maxW;
         this.lastHeight = measuredLines.size() * getFontHeight();
-        this.lastWidth = Math.max(0, this.lastWidth - scale);
-        this.lastHeight = Math.max(0, this.lastHeight - scale);
+        this.lastWidth = Math.max(0, this.lastWidth - this.scale);
+        this.lastHeight = Math.max(0, this.lastHeight - this.scale);
     }
 
     public void drawSimple(String text) {
-        float w = getFontRenderer().getStringWidth(text) * scale;
+        float w = getFontRenderer().getStringWidth(text) * this.scale;
         int y = getStartY(1), x = getStartX(w);
         draw(text, x, y);
         this.lastWidth = w;
         this.lastHeight = getFontHeight();
-        this.lastWidth = Math.max(0, this.lastWidth - scale);
-        this.lastHeight = Math.max(0, this.lastHeight - scale);
+        this.lastWidth = Math.max(0, this.lastWidth - this.scale);
+        this.lastHeight = Math.max(0, this.lastHeight - this.scale);
     }
 
     public List<Line> measureLines(List<String> lines) {
@@ -136,16 +136,16 @@ public class TextRenderer {
     }
 
     public List<String> wrapLine(String line) {
-        return maxWidth > 0 ? getFontRenderer().listFormattedStringToWidth(line, (int) (maxWidth / scale)) : Collections.singletonList(line);
+        return this.maxWidth > 0 ? getFontRenderer().listFormattedStringToWidth(line, (int) (this.maxWidth / this.scale)) : Collections.singletonList(line);
     }
 
     public boolean wouldFit(List<String> text) {
-        if (maxHeight > 0 && maxHeight < text.size() * getFontHeight() - scale) {
+        if (this.maxHeight > 0 && this.maxHeight < text.size() * getFontHeight() - this.scale) {
             return false;
         }
-        if (maxWidth > 0) {
+        if (this.maxWidth > 0) {
             for (String line : text) {
-                if (maxWidth < getFontRenderer().getStringWidth(line)) {
+                if (this.maxWidth < getFontRenderer().getStringWidth(line)) {
                     return false;
                 }
             }
@@ -166,43 +166,43 @@ public class TextRenderer {
     }
 
     protected int getStartY(int lines) {
-        if (alignment.y > 0 && maxHeight > 0) {
-            float height = lines * getFontHeight() - scale;
-            return (int) (y + (maxHeight * alignment.y) - height * alignment.y);
+        if (this.alignment.y > 0 && this.maxHeight > 0) {
+            float height = lines * getFontHeight() - this.scale;
+            return (int) (this.y + (this.maxHeight * this.alignment.y) - height * this.alignment.y);
         }
-        return y;
+        return this.y;
     }
 
     protected int getStartX(float lineWidth) {
-        if (alignment.x > 0 && maxWidth > 0) {
-            return (int) (x + (maxWidth * alignment.x) - lineWidth * alignment.x);
+        if (this.alignment.x > 0 && this.maxWidth > 0) {
+            return (int) (this.x + (this.maxWidth * this.alignment.x) - lineWidth * this.alignment.x);
         }
-        return x;
+        return this.x;
     }
 
     protected float draw(String text, float x, float y) {
-        if (simulate) {
+        if (this.simulate) {
             return getFontRenderer().getStringWidth(text);
         }
         GlStateManager.disableBlend();
         GlStateManager.pushMatrix();
-        GlStateManager.scale(scale, scale, 0f);
-        int width = getFontRenderer().drawString(text, x / scale, y / scale, color, shadow);
+        GlStateManager.scale(this.scale, this.scale, 0f);
+        int width = getFontRenderer().drawString(text, x / this.scale, y / this.scale, this.color, this.shadow);
         GlStateManager.popMatrix();
         GlStateManager.enableBlend();
-        return width * scale;
+        return width * this.scale;
     }
 
     public float getFontHeight() {
-        return getFontRenderer().FONT_HEIGHT * scale;
+        return getFontRenderer().FONT_HEIGHT * this.scale;
     }
 
     public float getLastHeight() {
-        return lastHeight;
+        return this.lastHeight;
     }
 
     public float getLastWidth() {
-        return lastWidth;
+        return this.lastWidth;
     }
 
     @SideOnly(Side.CLIENT)
@@ -225,19 +225,19 @@ public class TextRenderer {
         }
 
         public String getText() {
-            return text;
+            return this.text;
         }
 
         public float getWidth() {
-            return width;
+            return this.width;
         }
 
         public int upperWidth() {
-            return (int) (width + 1);
+            return (int) (this.width + 1);
         }
 
         public int lowerWidth() {
-            return (int) (width + 1);
+            return (int) (this.width + 1);
         }
     }
 }

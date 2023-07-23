@@ -41,6 +41,6 @@ public class ValueBoolean extends Value {
     }
 
     public boolean getValue() {
-        return value;
+        return this.value;
     }
 }

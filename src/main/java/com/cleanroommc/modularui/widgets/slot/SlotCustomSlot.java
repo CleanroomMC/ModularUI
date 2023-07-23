@@ -11,7 +11,7 @@ import java.util.function.Predicate;
 
 public class SlotCustomSlot extends SlotItemHandler implements ICustomSlot {
 
-    private int slotLimit = 64;
+    private final int slotLimit = 64;
     private Predicate<ItemStack> filter;
     private boolean ignoreMaxStackSize = false;
     private boolean enabled = true;
@@ -22,7 +22,7 @@ public class SlotCustomSlot extends SlotItemHandler implements ICustomSlot {
 
     @Override
     public boolean isEnabled() {
-        return enabled;
+        return this.enabled;
     }
 
     public void setEnabled(boolean enabled) {
@@ -61,11 +61,11 @@ public class SlotCustomSlot extends SlotItemHandler implements ICustomSlot {
     }
 
     public boolean isIgnoreMaxStackSize() {
-        return ignoreMaxStackSize;
+        return this.ignoreMaxStackSize;
     }
 
     public Predicate<ItemStack> getFilter() {
-        return filter;
+        return this.filter;
     }
 
     public void setIgnoreMaxStackSize(boolean ignoreMaxStackSize) {

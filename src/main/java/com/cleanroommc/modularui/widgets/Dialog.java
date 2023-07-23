@@ -25,17 +25,17 @@ public class Dialog<T> extends ModularPanel {
 
     @Override
     public boolean isDraggable() {
-        return draggable;
+        return this.draggable;
     }
 
     @Override
     public boolean disablePanelsBelow() {
-        return disablePanelsBelow;
+        return this.disablePanelsBelow;
     }
 
     @Override
     public boolean closeOnOutOfBoundsClick() {
-        return closeOnOutOfBoundsClick;
+        return this.closeOnOutOfBoundsClick;
     }
 
     public Dialog<T> setDraggable(boolean draggable) {

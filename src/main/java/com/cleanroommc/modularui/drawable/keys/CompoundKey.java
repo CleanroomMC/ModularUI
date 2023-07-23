@@ -16,7 +16,7 @@ public class CompoundKey implements IKey {
 
     @Override
     public String get() {
-        if (lastTime > time) {
+        if (lastTime > this.time) {
             this.time = lastTime;
             this.construct();
         }

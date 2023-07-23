@@ -25,14 +25,14 @@ public class ItemDrawable implements IDrawable {
     @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height) {
-        if (item.isEmpty()) return;
+        if (this.item.isEmpty()) return;
         GlStateManager.pushMatrix();
         RenderHelper.enableGUIStandardItemLighting();
         GlStateManager.enableDepth();
         GlStateManager.scale(width / 16f, height / 16f, 1);
         RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
         renderItem.zLevel = 200;
-        renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().player, item, x, y);
+        renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().player, this.item, x, y);
         renderItem.zLevel = 0;
         GlStateManager.disableDepth();
         RenderHelper.enableStandardItemLighting();

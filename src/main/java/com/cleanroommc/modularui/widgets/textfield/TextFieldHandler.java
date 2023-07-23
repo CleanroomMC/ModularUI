@@ -57,29 +57,29 @@ public class TextFieldHandler {
     }
 
     public Point getMainCursor() {
-        return mainCursorStart ? cursor : cursorEnd;
+        return this.mainCursorStart ? this.cursor : this.cursorEnd;
     }
 
     public Point getOffsetCursor() {
-        return mainCursorStart ? cursorEnd : cursor;
+        return this.mainCursorStart ? this.cursorEnd : this.cursor;
     }
 
     public Point getStartCursor() {
         if (!hasTextMarked()) {
-            return cursor;
+            return this.cursor;
         }
-        return cursor.y > cursorEnd.y || (cursor.y == cursorEnd.y && cursor.x > cursorEnd.x) ? cursorEnd : cursor;
+        return this.cursor.y > this.cursorEnd.y || (this.cursor.y == this.cursorEnd.y && this.cursor.x > this.cursorEnd.x) ? this.cursorEnd : this.cursor;
     }
 
     public Point getEndCursor() {
         if (!hasTextMarked()) {
-            return cursor;
+            return this.cursor;
         }
-        return cursor.y > cursorEnd.y || (cursor.y == cursorEnd.y && cursor.x > cursorEnd.x) ? cursor : cursorEnd;
+        return this.cursor.y > this.cursorEnd.y || (this.cursor.y == this.cursorEnd.y && this.cursor.x > this.cursorEnd.x) ? this.cursor : this.cursorEnd;
     }
 
     public boolean hasTextMarked() {
-        return cursor.y != cursorEnd.y || cursor.x != cursorEnd.x;
+        return this.cursor.y != this.cursorEnd.y || this.cursor.x != this.cursorEnd.x;
     }
 
     public void setOffsetCursor(int linePos, int charPos) {
@@ -256,7 +256,7 @@ public class TextFieldHandler {
     }
 
     public boolean test(String text) {
-        return maxLines > 1 || ((pattern == null || pattern.matcher(text).matches()) && (maxCharacters < 0 || maxCharacters >= text.length()));
+        return this.maxLines > 1 || ((this.pattern == null || this.pattern.matcher(text).matches()) && (this.maxCharacters < 0 || this.maxCharacters >= text.length()));
     }
 
     public void insert(String text) {
@@ -266,7 +266,7 @@ public class TextFieldHandler {
     public void insert(List<String> text) {
         List<String> copy = new ArrayList<>(this.text);
         Point point = insert(copy, text);
-        if (point == null || copy.size() > maxLines || !renderer.wouldFit(copy)) return;
+        if (point == null || copy.size() > this.maxLines || !this.renderer.wouldFit(copy)) return;
         this.text.clear();
         this.text.addAll(copy);
         setCursor(point, true);
@@ -277,7 +277,7 @@ public class TextFieldHandler {
         if (insertion.isEmpty() || (insertion.size() > 1 && text.size() + insertion.size() - 1 > this.maxLines)) {
             return null;
         }
-        int x = cursor.x, y = cursor.y;
+        int x = this.cursor.x, y = this.cursor.y;
         if (hasTextMarked()) {
             delete(false);
         }
@@ -288,26 +288,26 @@ public class TextFieldHandler {
             text.addAll(insertion);
             return new Point(text.get(text.size() - 1).length(), text.size() - 1);
         }
-        String lineStart = text.get(cursor.y).substring(0, cursor.x);
-        String lineEnd = text.get(cursor.y).substring(cursor.x);
+        String lineStart = text.get(this.cursor.y).substring(0, this.cursor.x);
+        String lineEnd = text.get(this.cursor.y).substring(this.cursor.x);
         if (insertion.size() == 1 && text.size() == 1 && !test(lineStart + insertion.get(0) + lineEnd)) {
             return null;
         }
-        text.set(cursor.y, lineStart + insertion.get(0));
+        text.set(this.cursor.y, lineStart + insertion.get(0));
         if (insertion.size() == 1) {
             if (!test(insertion.get(0))) {
                 return null;
             }
-            text.set(cursor.y, text.get(cursor.y) + lineEnd);
-            return new Point(cursor.x + insertion.get(0).length(), cursor.y);
+            text.set(this.cursor.y, text.get(this.cursor.y) + lineEnd);
+            return new Point(this.cursor.x + insertion.get(0).length(), this.cursor.y);
         } else {
             if (insertion.size() > 1) {
-                text.add(cursor.y + 1, insertion.get(insertion.size() - 1) + lineEnd);
+                text.add(this.cursor.y + 1, insertion.get(insertion.size() - 1) + lineEnd);
                 x = insertion.get(insertion.size() - 1).length();
                 y += 1;
             }
             if (insertion.size() > 2) {
-                text.addAll(cursor.y + 1, text.subList(1, insertion.size() - 1));
+                text.addAll(this.cursor.y + 1, text.subList(1, insertion.size() - 1));
                 x = insertion.get(insertion.size() - 1).length();
                 y += insertion.size() - 1;
             }
@@ -319,10 +319,10 @@ public class TextFieldHandler {
         if (hasTextMarked()) {
             delete(false);
         }
-        String line = this.text.get(cursor.y);
-        this.text.set(cursor.y, line.substring(0, cursor.x));
-        this.text.add(cursor.y + 1, line.substring(cursor.x));
-        setCursor(cursor.y + 1, 0, false);
+        String line = this.text.get(this.cursor.y);
+        this.text.set(this.cursor.y, line.substring(0, this.cursor.x));
+        this.text.add(this.cursor.y + 1, line.substring(this.cursor.x));
+        setCursor(this.cursor.y + 1, 0, false);
     }
 
     public void delete() {
@@ -345,29 +345,29 @@ public class TextFieldHandler {
             }
             setCursor(min.y, min.x, false);
         } else {
-            String line = this.text.get(cursor.y);
+            String line = this.text.get(this.cursor.y);
             if (inFront) {
-                if (cursor.x == line.length()) {
-                    if (this.text.size() > cursor.y + 1) {
-                        this.text.set(cursor.y, line + this.text.get(cursor.y + 1));
-                        this.text.remove(cursor.y + 1);
+                if (this.cursor.x == line.length()) {
+                    if (this.text.size() > this.cursor.y + 1) {
+                        this.text.set(this.cursor.y, line + this.text.get(this.cursor.y + 1));
+                        this.text.remove(this.cursor.y + 1);
                     }
                 } else {
-                    line = line.substring(0, cursor.x) + line.substring(cursor.x + 1);
-                    this.text.set(cursor.y, line);
+                    line = line.substring(0, this.cursor.x) + line.substring(this.cursor.x + 1);
+                    this.text.set(this.cursor.y, line);
                 }
             } else {
-                if (cursor.x == 0) {
-                    if (cursor.y > 0) {
-                        String lineAbove = this.text.get(cursor.y - 1);
-                        this.text.set(cursor.y - 1, lineAbove + line);
-                        this.text.remove(cursor.y);
-                        setCursor(cursor.y - 1, lineAbove.length(), false);
+                if (this.cursor.x == 0) {
+                    if (this.cursor.y > 0) {
+                        String lineAbove = this.text.get(this.cursor.y - 1);
+                        this.text.set(this.cursor.y - 1, lineAbove + line);
+                        this.text.remove(this.cursor.y);
+                        setCursor(this.cursor.y - 1, lineAbove.length(), false);
                     }
                 } else {
-                    line = line.substring(0, cursor.x - 1) + line.substring(cursor.x);
-                    this.text.set(cursor.y, line);
-                    setCursor(cursor.y, cursor.x - 1, false);
+                    line = line.substring(0, this.cursor.x - 1) + line.substring(this.cursor.x);
+                    this.text.set(this.cursor.y, line);
+                    setCursor(this.cursor.y, this.cursor.x - 1, false);
                 }
             }
         }
@@ -382,11 +382,11 @@ public class TextFieldHandler {
     }
 
     public int getMaxLines() {
-        return maxLines;
+        return this.maxLines;
     }
 
     public GuiContext getGuiContext() {
-        return guiContext;
+        return this.guiContext;
     }
 
     public void setGuiContext(GuiContext guiContext) {

@@ -29,27 +29,27 @@ public class SlotGroup {
     }
 
     public int getShiftClickPriority() {
-        return shiftClickPriority;
+        return this.shiftClickPriority;
     }
 
     public List<Slot> getSlots() {
-        return slots;
+        return this.slots;
     }
 
     public int getRowSize() {
-        return rowSize;
+        return this.rowSize;
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public boolean allowShiftTransfer() {
-        return allowShiftTransfer;
+        return this.allowShiftTransfer;
     }
 
     public boolean isAllowSorting() {
-        return allowSorting;
+        return this.allowSorting;
     }
 
     public SlotGroup setAllowSorting(boolean allowSorting) {

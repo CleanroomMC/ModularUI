@@ -29,7 +29,7 @@ public class Area extends Rectangle implements IResizeable {
     }
 
     public int x() {
-        return x;
+        return this.x;
     }
 
     public void x(int x) {
@@ -37,7 +37,7 @@ public class Area extends Rectangle implements IResizeable {
     }
 
     public int y() {
-        return y;
+        return this.y;
     }
 
     public void y(int y) {
@@ -45,7 +45,7 @@ public class Area extends Rectangle implements IResizeable {
     }
 
     public int w() {
-        return width;
+        return this.width;
     }
 
     public void w(int w) {
@@ -53,7 +53,7 @@ public class Area extends Rectangle implements IResizeable {
     }
 
     public int h() {
-        return height;
+        return this.height;
     }
 
     public void h(int h) {
@@ -61,31 +61,31 @@ public class Area extends Rectangle implements IResizeable {
     }
 
     public int ex() {
-        return x + width;
+        return this.x + this.width;
     }
 
     public void ex(int ex) {
-        this.x = ex - width;
+        this.x = ex - this.width;
     }
 
     public int ey() {
-        return y + height;
+        return this.y + this.height;
     }
 
     public void ey(int ey) {
-        this.y = ey - width;
+        this.y = ey - this.width;
     }
 
     public int mx() {
-        return (int) (x + width * 0.5);
+        return (int) (this.x + this.width * 0.5);
     }
 
     public int my() {
-        return (int) (y + height * 0.5);
+        return (int) (this.y + this.height * 0.5);
     }
 
     public int z() {
-        return z;
+        return this.z;
     }
 
     public void z(int z) {
@@ -149,11 +149,11 @@ public class Area extends Rectangle implements IResizeable {
     }
 
     public int requestedWidth() {
-        return width + this.margin.horizontal();
+        return this.width + this.margin.horizontal();
     }
 
     public int requestedHeight() {
-        return height + this.margin.vertical();
+        return this.height + this.margin.vertical();
     }
 
     public int relativeEndX() {
@@ -303,8 +303,8 @@ public class Area extends Rectangle implements IResizeable {
 
     // transforms each corner vertex and then puts a min fit rectangle around all vertices
     public void transformAndRectanglerize(IViewportStack stack) {
-        int xTL = stack.transformX(x, y), xTR = stack.transformX(ex(), y), xBL = stack.transformX(x, ey()), xBR = stack.transformX(ex(), ey());
-        int yTL = stack.transformY(x, y), yTR = stack.transformY(ex(), y), yBL = stack.transformY(x, ey()), yBR = stack.transformY(ex(), ey());
+        int xTL = stack.transformX(this.x, this.y), xTR = stack.transformX(ex(), this.y), xBL = stack.transformX(this.x, ey()), xBR = stack.transformX(ex(), ey());
+        int yTL = stack.transformY(this.x, this.y), yTR = stack.transformY(ex(), this.y), yBL = stack.transformY(this.x, ey()), yBR = stack.transformY(ex(), ey());
         int x0 = MathUtils.min(xTL, xTR, xBL, xBR);
         int x1 = MathUtils.max(xTL, xTR, xBL, xBR);
         int y0 = MathUtils.min(yTL, yTR, yBL, yBR);
@@ -313,11 +313,11 @@ public class Area extends Rectangle implements IResizeable {
     }
 
     public Box getMargin() {
-        return margin;
+        return this.margin;
     }
 
     public Box getPadding() {
-        return padding;
+        return this.padding;
     }
 
     @Override

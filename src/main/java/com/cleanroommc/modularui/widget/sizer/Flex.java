@@ -27,8 +27,8 @@ public class Flex implements IResizeable, IPositioned<Flex> {
     }
 
     public void reset() {
-        x.reset();
-        y.reset();
+        this.x.reset();
+        this.y.reset();
     }
 
     public Flex startDefaultMode() {
@@ -50,7 +50,7 @@ public class Flex implements IResizeable, IPositioned<Flex> {
 
     @Override
     public Area getArea() {
-        return parent.getArea();
+        return this.parent.getArea();
     }
 
     public Flex coverChildrenWidth() {
@@ -222,12 +222,12 @@ public class Flex implements IResizeable, IPositioned<Flex> {
     }
 
     private Area getRelativeTo() {
-        Area relativeTo = relativeToParent ? parent.getParentArea() : this.relativeTo;
+        Area relativeTo = this.relativeToParent ? this.parent.getParentArea() : this.relativeTo;
         return relativeTo != null ? relativeTo : this.parent.getScreen().getScreenArea();
     }
 
     public boolean isExpanded() {
-        return expanded;
+        return this.expanded;
     }
 
     public boolean hasYPos() {
@@ -261,7 +261,7 @@ public class Flex implements IResizeable, IPositioned<Flex> {
 
     @Override
     public boolean isSkip() {
-        return skip;
+        return this.skip;
     }
 
     @Override
@@ -269,7 +269,7 @@ public class Flex implements IResizeable, IPositioned<Flex> {
         if (isSkip()) return;
         Area relativeTo = getRelativeTo();
 
-        if (relativeTo.z() >= parent.getArea().z()) {
+        if (relativeTo.z() >= this.parent.getArea().z()) {
             GuiError.throwNew(this.parent, GuiError.Type.SIZING, "Widget can't be relative to a widget at the same level or above");
             return;
         }
@@ -302,7 +302,7 @@ public class Flex implements IResizeable, IPositioned<Flex> {
     public void postApply(IGuiElement guiElement) {
         // not skipped children are now calculated and now this area can be calculated if it requires childrens area
         if (this.x.dependsOnChildren() || this.y.dependsOnChildren()) {
-            List<IWidget> children = ((IWidget) parent).getChildren();
+            List<IWidget> children = ((IWidget) this.parent).getChildren();
             if (!children.isEmpty()) {
                 int moveChildrenX = 0, moveChildrenY = 0;
 

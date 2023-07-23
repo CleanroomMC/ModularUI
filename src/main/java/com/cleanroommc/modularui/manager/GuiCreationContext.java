@@ -26,19 +26,19 @@ public class GuiCreationContext {
     }
 
     public EntityPlayer getPlayer() {
-        return player;
+        return this.player;
     }
 
     public World getWorld() {
-        return world;
+        return this.world;
     }
 
     public int getX() {
-        return x;
+        return this.x;
     }
 
     public int getY() {
-        return y;
+        return this.y;
     }
 
     public int getZ() {
@@ -50,7 +50,7 @@ public class GuiCreationContext {
     }
 
     public ItemStack getMainHandItem() {
-        return player.getHeldItemMainhand();
+        return this.player.getHeldItemMainhand();
     }
 
     public ItemStack getOffHandItem() {
@@ -62,19 +62,19 @@ public class GuiCreationContext {
     }
 
     public BlockPos getBlockPos() {
-        return new BlockPos(x, y, z);
+        return new BlockPos(this.x, this.y, this.z);
     }
 
     public IBlockState getBlockState() {
-        BlockPos.PooledMutableBlockPos pos = BlockPos.PooledMutableBlockPos.retain(x, y, z);
-        IBlockState blockState = world.getBlockState(pos);
+        BlockPos.PooledMutableBlockPos pos = BlockPos.PooledMutableBlockPos.retain(this.x, this.y, this.z);
+        IBlockState blockState = this.world.getBlockState(pos);
         pos.release();
         return blockState;
     }
 
     public TileEntity getTileEntity() {
-        BlockPos.PooledMutableBlockPos pos = BlockPos.PooledMutableBlockPos.retain(x, y, z);
-        TileEntity tile = world.getTileEntity(pos);
+        BlockPos.PooledMutableBlockPos pos = BlockPos.PooledMutableBlockPos.retain(this.x, this.y, this.z);
+        TileEntity tile = this.world.getTileEntity(pos);
         pos.release();
         return tile;
     }

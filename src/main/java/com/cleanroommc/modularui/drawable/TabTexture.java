@@ -70,15 +70,15 @@ public class TabTexture {
     }
 
     public UITexture getStart(boolean active) {
-        return active ? startActive : startInactive;
+        return active ? this.startActive : this.startInactive;
     }
 
     public UITexture getMiddle(boolean active) {
-        return active ? this.active : inactive;
+        return active ? this.active : this.inactive;
     }
 
     public UITexture getEnd(boolean active) {
-        return active ? endActive : endInactive;
+        return active ? this.endActive : this.endInactive;
     }
 
     public UITexture get(int location, boolean active) {
@@ -92,22 +92,22 @@ public class TabTexture {
     }
 
     public int getWidth() {
-        return width;
+        return this.width;
     }
 
     public int getHeight() {
-        return height;
+        return this.height;
     }
 
     public int getTextureInset() {
-        return textureInset;
+        return this.textureInset;
     }
 
     public GuiAxis getAxis() {
-        return axis;
+        return this.axis;
     }
 
     public boolean isPositive() {
-        return positive;
+        return this.positive;
     }
 }

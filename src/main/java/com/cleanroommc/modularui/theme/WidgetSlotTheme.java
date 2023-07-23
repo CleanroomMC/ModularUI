@@ -20,6 +20,6 @@ public class WidgetSlotTheme extends WidgetTheme {
     }
 
     public int getSlotHoverColor() {
-        return slotHoverColor;
+        return this.slotHoverColor;
     }
 }

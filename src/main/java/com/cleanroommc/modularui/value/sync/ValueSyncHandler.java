@@ -37,6 +37,6 @@ public abstract class ValueSyncHandler<T> extends SyncHandler implements IValueS
     }
 
     public Runnable getChangeListener() {
-        return changeListener;
+        return this.changeListener;
     }
 }

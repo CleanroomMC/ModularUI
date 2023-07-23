@@ -80,7 +80,7 @@ public class HoloUI {
 
         public void open(ModularScreen screen) {
             HoloScreenEntity holoScreenEntity = new HoloScreenEntity(Minecraft.getMinecraft().world, this.plane3D);
-            holoScreenEntity.setPosition(x, y, z);
+            holoScreenEntity.setPosition(this.x, this.y, this.z);
             holoScreenEntity.setScreen(screen);
             holoScreenEntity.spawnInWorld();
             holoScreenEntity.setOrientation(this.orientation);

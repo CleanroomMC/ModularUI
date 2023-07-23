@@ -115,7 +115,7 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
     }
 
     public ScrollData getScrollData() {
-        return scrollData;
+        return this.scrollData;
     }
 
     public W scrollDirection(ScrollDirection direction) {

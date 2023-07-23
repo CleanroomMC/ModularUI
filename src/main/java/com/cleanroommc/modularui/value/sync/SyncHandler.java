@@ -110,14 +110,14 @@ public abstract class SyncHandler {
      * @return the key that belongs to this sync handler
      */
     public final String getKey() {
-        return key;
+        return this.key;
     }
 
     /**
      * @return is this sync handler has been initialised yet
      */
     public final boolean isValid() {
-        return key != null;
+        return this.key != null;
     }
 
     /**
@@ -127,7 +127,7 @@ public abstract class SyncHandler {
         if (!isValid()) {
             throw new IllegalStateException("Sync handler is not yet initialised!");
         }
-        return syncHandler;
+        return this.syncHandler;
     }
 
     public static void sendToClient(PacketBuffer buffer, SyncHandler syncHandler) {

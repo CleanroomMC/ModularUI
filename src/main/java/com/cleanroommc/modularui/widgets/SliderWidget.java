@@ -47,7 +47,7 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     @Override
     public void onInit() {
         if (this.doubleValue == null) {
-            this.doubleValue = new DoubleValue((max - min) * 0.5 + min);
+            this.doubleValue = new DoubleValue((this.max - this.min) * 0.5 + this.min);
         }
     }
 
@@ -133,8 +133,8 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     }
 
     public int valueToPos(double value) {
-        value -= min;
-        value /= (max - min);
+        value -= this.min;
+        value /= (this.max - this.min);
         return (int) (value * (getArea().getSize(this.axis) - this.sliderArea.getSize(this.axis)));
     }
 
@@ -169,15 +169,15 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     }
 
     public double getMin() {
-        return min;
+        return this.min;
     }
 
     public double getMax() {
-        return max;
+        return this.max;
     }
 
     public boolean isDragging() {
-        return dragging;
+        return this.dragging;
     }
 
     @Override

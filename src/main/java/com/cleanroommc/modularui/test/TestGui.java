@@ -33,18 +33,18 @@ public class TestGui extends ModularScreen {
     @Override
     public void onClose() {
         super.onClose();
-        ModularUI.LOGGER.info("New values: {}", configuredOptions);
+        ModularUI.LOGGER.info("New values: {}", this.configuredOptions);
     }
 
     @Override
     public @NotNull ModularPanel buildUI(GuiContext context) {
-        if (lines == null) {
-            lines = IntStream.range(0, 20).mapToObj(i -> "Option " + (i + 1)).collect(Collectors.toList());
-            configuredOptions = lines;
-            availableElements = new Object2ObjectOpenHashMap<>();
+        if (this.lines == null) {
+            this.lines = IntStream.range(0, 20).mapToObj(i -> "Option " + (i + 1)).collect(Collectors.toList());
+            this.configuredOptions = this.lines;
+            this.availableElements = new Object2ObjectOpenHashMap<>();
         }
         AtomicReference<SortableListWidget<String, SortableListWidget.Item<String>>> ref = new AtomicReference<>(null);
-        List<List<AvailableElement>> availableMatrix = Grid.mapToMatrix(2, lines, (index, value) -> {
+        List<List<AvailableElement>> availableMatrix = Grid.mapToMatrix(2, this.lines, (index, value) -> {
             AvailableElement availableElement = new AvailableElement().overlay(IKey.str(value))
                     .size(60, 14)
                     .onMousePressed(mouseButton1 -> {
@@ -80,7 +80,7 @@ public class TestGui extends ModularScreen {
                 .matrix(matrix)
                 .scrollable()
                 .pos(10, 10).right(10).bottom(10))*/
-        SortableListWidget<String, SortableListWidget.Item<String>> sortableListWidget = SortableListWidget.sortableBuilder(lines, this.configuredOptions,
+        SortableListWidget<String, SortableListWidget.Item<String>> sortableListWidget = SortableListWidget.sortableBuilder(this.lines, this.configuredOptions,
                 s -> new SortableListWidget.Item<>(s, new Widget<>()
                         .background(GuiTextures.BUTTON)
                         .overlay(IKey.str(s))
@@ -158,7 +158,7 @@ public class TestGui extends ModularScreen {
 
         @Override
         public IDrawable getBackground() {
-            return this.available ? activeBackground : background;
+            return this.available ? this.activeBackground : this.background;
         }
     }
 }

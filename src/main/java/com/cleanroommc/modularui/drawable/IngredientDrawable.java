@@ -44,7 +44,7 @@ public class IngredientDrawable implements IDrawable {
     }
 
     public ItemStack[] getItems() {
-        return items;
+        return this.items;
     }
 
     public void setItems(ItemStack... items) {

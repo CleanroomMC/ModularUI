@@ -228,7 +228,7 @@ public class GuiViewportStack implements IViewportStack {
     @Nullable
     @Override
     public TransformationMatrix peek() {
-        return top;
+        return this.top;
     }
 
     private static Vector3f vec(float x, float y, float z) {

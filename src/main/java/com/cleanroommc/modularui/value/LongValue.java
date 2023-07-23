@@ -27,7 +27,7 @@ public class LongValue implements ILongValue<Long>, IIntValue<Long>, IStringValu
 
     @Override
     public long getLongValue() {
-        return value;
+        return this.value;
     }
 
     @Override

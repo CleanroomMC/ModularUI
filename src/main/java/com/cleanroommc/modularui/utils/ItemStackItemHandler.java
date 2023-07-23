@@ -29,7 +29,7 @@ public class ItemStackItemHandler implements IItemHandlerModifiable, ICapability
 
     @Override
     public int getSlots() {
-        return slots;
+        return this.slots;
     }
 
     @NotNull

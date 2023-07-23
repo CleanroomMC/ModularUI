@@ -24,12 +24,12 @@ public class GuiError {
 
     @Override
     public String toString() {
-        return "[" + level.name() + "][" + reference.toString() + "][" + type.toString() + "]: " + msg;
+        return "[" + this.level.name() + "][" + this.reference.toString() + "][" + this.type.toString() + "]: " + this.msg;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(level, reference, type);
+        return Objects.hash(this.level, this.reference, this.type);
     }
 
     public enum Type {

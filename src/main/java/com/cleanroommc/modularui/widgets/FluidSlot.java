@@ -93,9 +93,9 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
 
     @Override
     public void onInit() {
-        textRenderer.setShadow(true);
-        textRenderer.setScale(0.5f);
-        textRenderer.setColor(Color.WHITE.normal);
+        this.textRenderer.setShadow(true);
+        this.textRenderer.setScale(0.5f);
+        this.textRenderer.setColor(Color.WHITE.normal);
         getContext().addJeiGhostIngredientSlot(this);
     }
 
@@ -113,23 +113,23 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
         IFluidTank fluidTank = getFluidTank();
         FluidStack content = this.syncHandler.getValue();
         if (content != null) {
-            int y = contentOffsetY;
+            int y = this.contentOffsetY;
             float height = getArea().height - y * 2;
-            if (!alwaysShowFull) {
+            if (!this.alwaysShowFull) {
                 float newHeight = height * content.amount * 1f / fluidTank.getCapacity();
                 y += height - newHeight;
                 height = newHeight;
             }
-            GuiDraw.drawFluidTexture(content, contentOffsetX, y, getArea().width - contentOffsetX * 2, height, 0);
+            GuiDraw.drawFluidTexture(content, this.contentOffsetX, y, getArea().width - this.contentOffsetX * 2, height, 0);
         }
-        if (overlayTexture != null) {
-            overlayTexture.draw(context, getArea());
+        if (this.overlayTexture != null) {
+            this.overlayTexture.draw(context, getArea());
         }
-        if (content != null && syncHandler.controlsAmount()) {
+        if (content != null && this.syncHandler.controlsAmount()) {
             String s = NumberFormat.format(content.amount);
-            textRenderer.setAlignment(Alignment.CenterRight, getArea().width - contentOffsetX - 1f);
-            textRenderer.setPos((int) (contentOffsetX + 0.5f), (int) (getArea().height - 5.5f));
-            textRenderer.draw(s);
+            this.textRenderer.setAlignment(Alignment.CenterRight, getArea().width - this.contentOffsetX - 1f);
+            this.textRenderer.setPos((int) (this.contentOffsetX + 0.5f), (int) (getArea().height - 5.5f));
+            this.textRenderer.draw(s);
         }
         if (isHovering()) {
             GlStateManager.colorMask(true, true, true, false);

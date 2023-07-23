@@ -18,7 +18,7 @@ public class JsonArrayBuilder {
     }
 
     public JsonArray getJson() {
-        return json;
+        return this.json;
     }
 
     public JsonArrayBuilder add(boolean element) {

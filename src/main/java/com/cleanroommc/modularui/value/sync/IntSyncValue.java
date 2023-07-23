@@ -20,12 +20,12 @@ public class IntSyncValue extends ValueSyncHandler<Integer> implements IIntSyncV
 
     @Override
     public Integer getValue() {
-        return cache;
+        return this.cache;
     }
 
     @Override
     public int getIntValue() {
-        return cache;
+        return this.cache;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class IntSyncValue extends ValueSyncHandler<Integer> implements IIntSyncV
 
     @Override
     public boolean needsSync(boolean isFirstSync) {
-        return getter != null && (isFirstSync || getter.getAsInt() != cache);
+        return this.getter != null && (isFirstSync || this.getter.getAsInt() != this.cache);
     }
 
     @Override

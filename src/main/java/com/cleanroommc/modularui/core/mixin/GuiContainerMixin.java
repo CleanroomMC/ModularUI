@@ -18,7 +18,7 @@ public class GuiContainerMixin {
     @Inject(method = "getSlotAtPosition", at = @At("HEAD"), cancellable = true)
     public void getSlot(int x, int y, CallbackInfoReturnable<Slot> cir) {
         if (((Object) this).getClass() == GuiScreenWrapper.class) {
-            cir.setReturnValue(hoveredSlot);
+            cir.setReturnValue(this.hoveredSlot);
         }
     }
 }

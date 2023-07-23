@@ -26,7 +26,7 @@ public class DoubleValue implements IDoubleValue<Double>, IStringValue<Double> {
 
     @Override
     public double getDoubleValue() {
-        return value;
+        return this.value;
     }
 
     @Override

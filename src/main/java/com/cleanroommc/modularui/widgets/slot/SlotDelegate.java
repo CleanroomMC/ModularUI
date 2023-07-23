@@ -46,88 +46,88 @@ public class SlotDelegate extends Slot implements ICustomSlot {
 
     @Override
     public void onSlotChange(@NotNull ItemStack p_75220_1_, @NotNull ItemStack p_75220_2_) {
-        slot.onSlotChange(p_75220_1_, p_75220_2_);
+        this.slot.onSlotChange(p_75220_1_, p_75220_2_);
     }
 
     @Override
     protected void onCrafting(@NotNull ItemStack stack, int amount) {
-        ((SlotAccessor) slot).invokeOnCrafting(stack, amount);
+        ((SlotAccessor) this.slot).invokeOnCrafting(stack, amount);
     }
 
     @Override
     protected void onSwapCraft(int p_190900_1_) {
-        ((SlotAccessor) slot).invokeOnSwapCraft(p_190900_1_);
+        ((SlotAccessor) this.slot).invokeOnSwapCraft(p_190900_1_);
     }
 
     @Override
     protected void onCrafting(@NotNull ItemStack stack) {
-        ((SlotAccessor) slot).invokeOnCrafting(stack);
+        ((SlotAccessor) this.slot).invokeOnCrafting(stack);
     }
 
     @Override
     public @NotNull ItemStack onTake(@NotNull EntityPlayer thePlayer, @NotNull ItemStack stack) {
-        return slot.onTake(thePlayer, stack);
+        return this.slot.onTake(thePlayer, stack);
     }
 
     @Override
     public boolean isItemValid(@NotNull ItemStack stack) {
-        return slot.isItemValid(stack);
+        return this.slot.isItemValid(stack);
     }
 
     @Override
     public @NotNull ItemStack getStack() {
-        return slot.getStack();
+        return this.slot.getStack();
     }
 
     @Override
     public boolean getHasStack() {
-        return slot.getHasStack();
+        return this.slot.getHasStack();
     }
 
     @Override
     public void putStack(@NotNull ItemStack stack) {
-        slot.putStack(stack);
+        this.slot.putStack(stack);
     }
 
     @Override
     public void onSlotChanged() {
-        slot.onSlotChanged();
+        this.slot.onSlotChanged();
     }
 
     @Override
     public int getSlotStackLimit() {
-        return slot.getSlotStackLimit();
+        return this.slot.getSlotStackLimit();
     }
 
     @Override
     public int getItemStackLimit(@NotNull ItemStack stack) {
-        return slot.getItemStackLimit(stack);
+        return this.slot.getItemStackLimit(stack);
     }
 
     @Nullable
     @Override
     public String getSlotTexture() {
-        return slot.getSlotTexture();
+        return this.slot.getSlotTexture();
     }
 
     @Override
     public @NotNull ItemStack decrStackSize(int amount) {
-        return slot.decrStackSize(amount);
+        return this.slot.decrStackSize(amount);
     }
 
     @Override
     public boolean isHere(@NotNull IInventory inv, int slotIn) {
-        return slot.isHere(inv, slotIn);
+        return this.slot.isHere(inv, slotIn);
     }
 
     @Override
     public boolean canTakeStack(@NotNull EntityPlayer playerIn) {
-        return slot.canTakeStack(playerIn);
+        return this.slot.canTakeStack(playerIn);
     }
 
     @Override
     public boolean isEnabled() {
-        return this.enabled && slot.isEnabled();
+        return this.enabled && this.slot.isEnabled();
     }
 
     public void setEnabled(boolean enabled) {
@@ -136,41 +136,41 @@ public class SlotDelegate extends Slot implements ICustomSlot {
 
     @Override
     public @NotNull ResourceLocation getBackgroundLocation() {
-        return slot.getBackgroundLocation();
+        return this.slot.getBackgroundLocation();
     }
 
     @Override
     public void setBackgroundLocation(@NotNull ResourceLocation texture) {
-        slot.setBackgroundLocation(texture);
+        this.slot.setBackgroundLocation(texture);
     }
 
     @Override
     public void setBackgroundName(@Nullable String name) {
-        slot.setBackgroundName(name);
+        this.slot.setBackgroundName(name);
     }
 
     @Nullable
     @Override
     public TextureAtlasSprite getBackgroundSprite() {
-        return slot.getBackgroundSprite();
+        return this.slot.getBackgroundSprite();
     }
 
     @Override
     protected @NotNull TextureMap getBackgroundMap() {
-        return ((SlotAccessorClient) slot).invokeGetBackgroundMap();
+        return ((SlotAccessorClient) this.slot).invokeGetBackgroundMap();
     }
 
     @Override
     public int getSlotIndex() {
-        return slot.getSlotIndex();
+        return this.slot.getSlotIndex();
     }
 
     @Override
     public boolean isSameInventory(@NotNull Slot other) {
-        return slot.isSameInventory(other);
+        return this.slot.isSameInventory(other);
     }
 
     public Slot getDelegate() {
-        return slot;
+        return this.slot;
     }
 }

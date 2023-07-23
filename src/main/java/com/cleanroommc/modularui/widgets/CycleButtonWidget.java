@@ -35,11 +35,11 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
         if (this.intValue == null) {
             this.intValue = new IntValue(0);
         }
-        if (textureGetter == null) {
+        if (this.textureGetter == null) {
             ModularUI.LOGGER.warn("Texture Getter of {} was not set!", this);
-            textureGetter = val -> IDrawable.EMPTY;
+            this.textureGetter = val -> IDrawable.EMPTY;
         }
-        this.texture = textureGetter.apply(getState());
+        this.texture = this.textureGetter.apply(getState());
         for (Tooltip tooltip : this.stateTooltip) {
             if (tooltip != null && tooltip.getExcludeArea() == null && ModularUIConfig.placeTooltipNextToPanel()) {
                 tooltip.excludeArea(getPanel().getArea());
@@ -62,7 +62,7 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
 
     public void next() {
         int state = getState();
-        if (++state == length) {
+        if (++state == this.length) {
             state = 0;
         }
         setState(state);
@@ -71,17 +71,17 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
     public void prev() {
         int state = getState();
         if (--state == -1) {
-            state = length - 1;
+            state = this.length - 1;
         }
         setState(state);
     }
 
     public void setState(int state) {
-        if (state < 0 || state >= length) {
+        if (state < 0 || state >= this.length) {
             throw new IndexOutOfBoundsException("CycleButton state out of bounds");
         }
         this.intValue.setIntValue(state);
-        this.texture = textureGetter.apply(state);
+        this.texture = this.textureGetter.apply(state);
     }
 
     @Override
@@ -101,8 +101,8 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
 
     @Override
     public void draw(GuiContext context) {
-        texture.applyThemeColor(context.getTheme(), getWidgetTheme(context.getTheme()));
-        texture.draw(context, 0, 0, getArea().w(), getArea().h());
+        this.texture.applyThemeColor(context.getTheme(), getWidgetTheme(context.getTheme()));
+        this.texture.draw(context, 0, 0, getArea().w(), getArea().h());
     }
 
     @Override
@@ -147,7 +147,7 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
 
     public CycleButtonWidget texture(UITexture texture) {
         return textureGetter(val -> {
-            float a = 1f / length;
+            float a = 1f / this.length;
             return texture.getSubArea(0, val * a, 1, val * a + a);
         });
     }

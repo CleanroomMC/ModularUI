@@ -29,7 +29,7 @@ public class Variable extends Constant {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     @Override

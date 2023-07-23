@@ -115,17 +115,17 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     public Slot getSlot() {
-        return syncHandler.getSlot();
+        return this.syncHandler.getSlot();
     }
 
     @Override
     public Slot getVanillaSlot() {
-        return syncHandler.getSlot();
+        return this.syncHandler.getSlot();
     }
 
     @Override
     public boolean isSynced() {
-        return syncHandler != null;
+        return this.syncHandler != null;
     }
 
     @Override
@@ -133,7 +133,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         if (this.syncHandler == null) {
             throw new IllegalStateException("Widget is not initialised!");
         }
-        return syncHandler;
+        return this.syncHandler;
     }
 
     protected List<String> getItemTooltip(ItemStack stack) {

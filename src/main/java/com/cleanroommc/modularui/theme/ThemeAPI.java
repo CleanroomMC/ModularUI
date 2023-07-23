@@ -44,12 +44,12 @@ public class ThemeAPI implements IThemeApi {
 
     @Override
     public @NotNull ITheme getTheme(String id) {
-        return THEMES.getOrDefault(id, getDefaultTheme());
+        return this.THEMES.getOrDefault(id, getDefaultTheme());
     }
 
     @Override
     public boolean hasTheme(String id) {
-        return THEMES.containsKey(id);
+        return this.THEMES.containsKey(id);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class ThemeAPI implements IThemeApi {
 
     @Override
     public List<JsonBuilder> getJavaDefaultThemes(String id) {
-        return defaultThemes.computeIfAbsent(id, key -> new ArrayList<>());
+        return this.defaultThemes.computeIfAbsent(id, key -> new ArrayList<>());
     }
 
     @Override
@@ -71,11 +71,11 @@ public class ThemeAPI implements IThemeApi {
     }
 
     private String getThemeIdForScreen(String mod, String name) {
-        String theme = jsonScreenThemes.get(mod + ":" + name);
+        String theme = this.jsonScreenThemes.get(mod + ":" + name);
         if (theme != null) return theme;
-        theme = jsonScreenThemes.get(mod);
+        theme = this.jsonScreenThemes.get(mod);
         if (theme != null) return theme;
-        theme = screenThemes.get(mod + ":" + name);
+        theme = this.screenThemes.get(mod + ":" + name);
         return theme;
     }
 
@@ -83,32 +83,32 @@ public class ThemeAPI implements IThemeApi {
     public void registerThemeForScreen(String screen, String theme) {
         Objects.requireNonNull(screen);
         Objects.requireNonNull(theme);
-        screenThemes.put(screen, theme);
+        this.screenThemes.put(screen, theme);
     }
 
     @Override
     public void registerWidgetTheme(String id, WidgetTheme defaultTheme, WidgetThemeParser parser) {
-        if (widgetThemeFunctions.containsKey(id)) {
+        if (this.widgetThemeFunctions.containsKey(id)) {
             throw new IllegalStateException();
         }
-        widgetThemeFunctions.put(id, parser);
-        defaultWidgetThemes.put(id, defaultTheme);
+        this.widgetThemeFunctions.put(id, parser);
+        this.defaultWidgetThemes.put(id, defaultTheme);
     }
 
     // Internals
 
     @ApiStatus.Internal
     void registerTheme(ITheme theme) {
-        if (THEMES.containsKey(theme.getId())) {
+        if (this.THEMES.containsKey(theme.getId())) {
             throw new IllegalArgumentException("Theme with id " + theme.getId() + " already exists!");
         }
-        THEMES.put(theme.getId(), theme);
+        this.THEMES.put(theme.getId(), theme);
     }
 
     @ApiStatus.Internal
     void onReload() {
-        THEMES.clear();
-        jsonScreenThemes.clear();
+        this.THEMES.clear();
+        this.jsonScreenThemes.clear();
         registerTheme(DEFAULT_DEFAULT);
     }
 

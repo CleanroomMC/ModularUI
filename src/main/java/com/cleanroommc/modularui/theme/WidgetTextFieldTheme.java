@@ -20,6 +20,6 @@ public class WidgetTextFieldTheme extends WidgetTheme {
     }
 
     public int getMarkedColor() {
-        return markedColor;
+        return this.markedColor;
     }
 }

@@ -446,25 +446,25 @@ public class Color implements Iterable<Integer> {
         this.all = new int[shadeBright.length + shadeDark.length + 1];
         int index = 0;
         for (int i = shadeBright.length - 1; i >= 0; i--) {
-            all[index++] = shadeBright[i];
+            this.all[index++] = shadeBright[i];
         }
-        all[index++] = normal;
+        this.all[index++] = normal;
         for (int shade : shadeDark) {
-            all[index++] = shade;
+            this.all[index++] = shade;
         }
     }
 
     public int bright(int index) {
-        return shadeBright[index];
+        return this.shadeBright[index];
     }
 
     public int dark(int index) {
-        return shadeDark[index];
+        return this.shadeDark[index];
     }
 
     @NotNull
     @Override
     public Iterator<Integer> iterator() {
-        return Arrays.stream(all).iterator();
+        return Arrays.stream(this.all).iterator();
     }
 }

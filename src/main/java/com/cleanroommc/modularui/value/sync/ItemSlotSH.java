@@ -117,7 +117,7 @@ public class ItemSlotSH extends SyncHandler {
             if (mouseData.mouseButton == 1) {
                 stackToPut.setCount(1);
             }
-            slot.putStack(stackToPut);
+            this.slot.putStack(stackToPut);
             this.lastStoredPhantomItem = stackToPut.copy();
         } else {
             if (mouseData.mouseButton == 0) {
@@ -144,7 +144,7 @@ public class ItemSlotSH extends SyncHandler {
         if (mouseData.alt) {
             amount *= 64;
         }
-        if (amount > 0 && currentItem.isEmpty() && !lastStoredPhantomItem.isEmpty()) {
+        if (amount > 0 && currentItem.isEmpty() && !this.lastStoredPhantomItem.isEmpty()) {
             ItemStack stackToPut = this.lastStoredPhantomItem.copy();
             stackToPut.setCount(amount);
             this.slot.putStack(stackToPut);
@@ -192,7 +192,7 @@ public class ItemSlotSH extends SyncHandler {
     }
 
     public Slot getSlot() {
-        return slot;
+        return this.slot;
     }
 
     public boolean isItemValid(ItemStack itemStack) {
@@ -200,11 +200,11 @@ public class ItemSlotSH extends SyncHandler {
     }
 
     public boolean isPhantom() {
-        return phantom;
+        return this.phantom;
     }
 
     public String getSlotGroup() {
-        return slotGroup;
+        return this.slotGroup;
     }
 
     public ItemSlotSH filter(Predicate<ItemStack> filter) {

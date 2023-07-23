@@ -46,6 +46,6 @@ public class DrawableArray implements IDrawable {
     }
 
     public IDrawable[] getDrawables() {
-        return drawables;
+        return this.drawables;
     }
 }
