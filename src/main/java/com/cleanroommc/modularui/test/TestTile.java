@@ -60,25 +60,9 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
 
     @Override
     public ModularPanel buildUI(GuiCreationContext guiCreationContext, GuiSyncHandler guiSyncHandler, boolean isClient) {
-        guiSyncHandler.syncValue(0, SyncHandlers.intNumber(() -> this.val, val -> this.val = val));
-        //guiSyncHandler.syncValue(1, SyncHandlers.string(() -> this.value, val -> this.value = val));
-        //guiSyncHandler.syncValue(2, SyncHandlers.doubleNumber(() -> this.doubleValue, val -> this.doubleValue = val));
-        //guiSyncHandler.syncValue(3, SyncHandlers.intNumber(() -> this.cycleState, val -> this.cycleState = val));
-        guiSyncHandler.syncValue("phantom_item_slot", SyncHandlers.phantomItemSlot(this.inventory, 0).ignoreMaxStackSize(true));
-        //guiSyncHandler.syncValue("fluid_slot", SyncHandlers.fluidSlot(this.fluidTank));
-        guiSyncHandler.syncValue("fluid_slot", 1, SyncHandlers.fluidSlot(this.fluidTankPhantom).phantom(true));
-
-        for (int i = 0; i < this.bigInventory.getSlots(); i++) {
-            guiSyncHandler.syncValue("item_inv", i, SyncHandlers.itemSlot(this.bigInventory, i).slotGroup("item_inv"));
-        }
-
         guiSyncHandler.registerSlotGroup("item_inv", 3);
-
-        // mixer
         guiSyncHandler.registerSlotGroup("mixer_items", 2);
-        for (int i = 0; i < 4; i++) {
-            guiSyncHandler.syncValue("mixer_items", i, SyncHandlers.itemSlot(this.mixerItems, i).slotGroup("mixer_items"));
-        }
+
         guiSyncHandler.syncValue("mixer_fluids", 0, SyncHandlers.fluidSlot(this.mixerFluids1));
         guiSyncHandler.syncValue("mixer_fluids", 1, SyncHandlers.fluidSlot(this.mixerFluids2));
 
@@ -169,11 +153,11 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                                         .background(GuiTextures.BUTTON)
                                                         .value(SyncHandlers.intNumber(() -> this.cycleState, val -> this.cycleState = val)))
                                                 .child(new ItemSlot()
-                                                        .syncHandler("phantom_item_slot"))
+                                                        .syncHandler(SyncHandlers.phantomItemSlot(this.inventory, 0).ignoreMaxStackSize(true)))
                                                 .child(new FluidSlot()
                                                         .margin(2)
                                                         .width(30)
-                                                        .syncHandler("fluid_slot", 1))
+                                                        .syncHandler(SyncHandlers.fluidSlot(this.fluidTankPhantom).phantom(true)))
                                         )))
                         .addPage(new Column()
                                         //.coverChildren()
@@ -181,15 +165,14 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                         .child(SlotGroupWidget.playerInventory())
                                         .child(SlotGroupWidget.builder()
                                                 .matrix("III", "III", "III")
-                                                .key('I', index -> new ItemSlot())
-                                                .synced("item_inv")
+                                                .key('I', index -> new ItemSlot().syncHandler(SyncHandlers.itemSlot(this.bigInventory, index).slotGroup("item_inv")))
                                                 .build()
                                                 .marginBottom(2))
                                         .child(SlotGroupWidget.builder()
                                                 .row("FII")
                                                 .row("FII")
                                                 .key('F', index -> new FluidSlot().syncHandler("mixer_fluids", index))
-                                                .key('I', index -> new ItemSlot().syncHandler("mixer_items", index))
+                                                .key('I', index -> new ItemSlot().syncHandler(SyncHandlers.itemSlot(this.mixerItems, index).slotGroup("mixer_items")))
                                                 .build())
                                         .child(new Row()
                                                 .coverChildrenHeight()
