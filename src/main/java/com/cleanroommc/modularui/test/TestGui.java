@@ -88,9 +88,7 @@ public class TestGui extends ModularScreen {
                         .removeable()).debugName("sortable list");
         ref.set(sortableListWidget);
         panel.child(sortableListWidget
-                .onRemove(stringItem -> {
-                    this.availableElements.get(stringItem.getWidgetValue()).available = true;
-                })
+                .onRemove(stringItem -> this.availableElements.get(stringItem.getWidgetValue()).available = true)
                 /*.onChange(list -> {
                     this.configuredOptions = list;
                     for (String value : this.lines) {
@@ -137,8 +135,7 @@ public class TestGui extends ModularScreen {
                 /*.child(SlotGroup.playerInventory()
                         .flex(flex -> flex
                                 .left(0.5f)
-                                .bottom(7)))*/
-        ;
+                                .bottom(7)));*/
 
         return panel;
     }

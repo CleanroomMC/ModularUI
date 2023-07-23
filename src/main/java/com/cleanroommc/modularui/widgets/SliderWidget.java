@@ -19,9 +19,6 @@ import it.unimi.dsi.fastutil.doubles.DoubleList;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.DoubleConsumer;
-import java.util.function.DoubleSupplier;
-
 public class SliderWidget extends Widget<SliderWidget> implements Interactable {
 
     private IDoubleValue<?> doubleValue;

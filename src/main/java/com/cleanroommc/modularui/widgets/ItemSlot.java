@@ -83,11 +83,6 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     @Override
-    public boolean canHover() {
-        return true;
-    }
-
-    @Override
     public @NotNull Result onMousePressed(int mouseButton) {
         if (this.syncHandler.isPhantom()) {
             MouseData mouseData = MouseData.create(mouseButton);

@@ -188,6 +188,6 @@ public class ProgressWidget extends Widget<ProgressWidget> {
     }
 
     public enum Direction {
-        LEFT, RIGHT, UP, DOWN, CIRCULAR_CW;
+        LEFT, RIGHT, UP, DOWN, CIRCULAR_CW
     }
 }

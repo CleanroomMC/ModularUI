@@ -46,9 +46,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         setText(this.stringValue.getStringValue());
         if (!hasTooltip()) {
             tooltip().excludeArea(getArea());
-            tooltipBuilder(tooltip -> {
-                tooltip.addLine(IKey.str(getText()));
-            });
+            tooltipBuilder(tooltip -> tooltip.addLine(IKey.str(getText())));
         }
         if (!this.changedMarkedColor) {
             this.renderer.setMarkedColor(getWidgetTheme(getContext().getTheme()).getMarkedColor());

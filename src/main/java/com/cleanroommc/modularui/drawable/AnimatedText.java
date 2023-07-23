@@ -45,6 +45,7 @@ public class AnimatedText extends StyledText {
                 if (c == ' ') {
                     max = Math.min(this.fullString.length() - 1, max + 1);
                 }
+                //noinspection StringConcatenationInLoop
                 this.currentString += c;
             }
             this.currentIndex = max;

@@ -364,7 +364,7 @@ public class GuiScreenWrapper extends GuiContainer {
     }
 
     @Override
-    protected void keyTyped(char typedChar, int keyCode) throws IOException {
+    protected void keyTyped(char typedChar, int keyCode) {
         // debug mode C + CTRL + SHIFT + ALT
         if (keyCode == 46 && isCtrlKeyDown() && isShiftKeyDown() && isAltKeyDown()) {
             ModularUIConfig.guiDebugMode = !ModularUIConfig.guiDebugMode;
