@@ -47,8 +47,12 @@ public class LongSyncValue extends ValueSyncHandler<Long> implements ILongSyncVa
     }
 
     @Override
-    public boolean needsSync(boolean isFirstSync) {
-        return isFirstSync || this.getter.getAsLong() != this.cache;
+    public boolean updateCacheFromSource(boolean isFirstSync) {
+        if (isFirstSync || this.getter.getAsLong() != this.cache) {
+            setLongValue(this.getter.getAsLong(), false, false);
+            return true;
+        }
+        return false;
     }
 
     @Override

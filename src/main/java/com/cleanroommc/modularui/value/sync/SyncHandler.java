@@ -69,7 +69,7 @@ public abstract class SyncHandler {
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         buffer.writeVarInt(id);
         bufferConsumer.accept(buffer);
-        if (NetworkUtils.isClient()) {
+        if (NetworkUtils.isClient(getSyncHandler().getPlayer())) {
             sendToServer(buffer, this);
         } else {
             sendToClient(buffer, this);

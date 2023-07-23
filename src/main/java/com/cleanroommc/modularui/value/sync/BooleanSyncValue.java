@@ -48,8 +48,12 @@ public class BooleanSyncValue extends ValueSyncHandler<Boolean> implements IBool
     }
 
     @Override
-    public boolean needsSync(boolean isFirstSync) {
-        return isFirstSync || this.cache != this.getter.getAsBoolean();
+    public boolean updateCacheFromSource(boolean isFirstSync) {
+        if (isFirstSync || this.getter.getAsBoolean() != this.cache) {
+            setBoolValue(this.getter.getAsBoolean(), false, false);
+            return true;
+        }
+        return false;
     }
 
     @Override

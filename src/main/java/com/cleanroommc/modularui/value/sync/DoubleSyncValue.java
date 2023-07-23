@@ -51,8 +51,12 @@ public class DoubleSyncValue extends ValueSyncHandler<Double> implements IDouble
     }
 
     @Override
-    public boolean needsSync(boolean isFirstSync) {
-        return isFirstSync || this.getter.getAsDouble() != getDoubleValue();
+    public boolean updateCacheFromSource(boolean isFirstSync) {
+        if (isFirstSync || this.getter.getAsDouble() != this.cache) {
+            setDoubleValue(this.getter.getAsDouble(), false, false);
+            return true;
+        }
+        return false;
     }
 
     @Override

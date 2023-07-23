@@ -45,8 +45,12 @@ public class IntSyncValue extends ValueSyncHandler<Integer> implements IIntSyncV
     }
 
     @Override
-    public boolean needsSync(boolean isFirstSync) {
-        return this.getter != null && (isFirstSync || this.getter.getAsInt() != this.cache);
+    public boolean updateCacheFromSource(boolean isFirstSync) {
+        if (this.getter != null && (isFirstSync || this.getter.getAsInt() != this.cache)) {
+            setIntValue(this.getter.getAsInt(), false, false);
+            return true;
+        }
+        return false;
     }
 
     @Override

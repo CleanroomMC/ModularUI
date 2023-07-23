@@ -43,8 +43,12 @@ public class EnumSyncValue<T extends Enum<T>> extends ValueSyncHandler<T> implem
     }
 
     @Override
-    public boolean needsSync(boolean isFirstSync) {
-        return isFirstSync || this.cache != this.getter.get();
+    public boolean updateCacheFromSource(boolean isFirstSync) {
+        if (isFirstSync || this.getter.get() != this.cache) {
+            setValue(this.getter.get(), false, false);
+            return true;
+        }
+        return false;
     }
 
     @Override

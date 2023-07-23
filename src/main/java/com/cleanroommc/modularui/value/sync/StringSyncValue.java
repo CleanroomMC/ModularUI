@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.api.value.sync.IStringSyncValue;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import net.minecraft.network.PacketBuffer;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -46,8 +47,12 @@ public class StringSyncValue extends ValueSyncHandler<String> implements IString
     }
 
     @Override
-    public boolean needsSync(boolean isFirstSync) {
-        return isFirstSync || !this.getter.get().equals(this.cache);
+    public boolean updateCacheFromSource(boolean isFirstSync) {
+        if (isFirstSync || !Objects.equals(this.getter.get(), this.cache)) {
+            setValue(this.getter.get(), false, false);
+            return true;
+        }
+        return false;
     }
 
     @Override

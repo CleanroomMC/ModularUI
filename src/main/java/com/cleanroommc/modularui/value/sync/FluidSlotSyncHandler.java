@@ -19,6 +19,15 @@ import org.jetbrains.annotations.Nullable;
 
 public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
 
+    public static boolean isFluidEmpty(@Nullable FluidStack fluidStack) {
+        return fluidStack == null || fluidStack.amount <= 0;
+    }
+
+    @Nullable
+    public static FluidStack copyFluid(@Nullable FluidStack fluidStack) {
+        return isFluidEmpty(fluidStack) ? null : fluidStack.copy();
+    }
+
     @Nullable
     private FluidStack cache;
     private final IFluidTank fluidTank;
@@ -40,10 +49,10 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
 
     @Override
     public void setValue(@Nullable FluidStack value, boolean setSource, boolean sync) {
-        this.cache = value;
+        this.cache = copyFluid(value);
         if (setSource && !NetworkUtils.isClient()) {
             this.fluidTank.drain(Integer.MAX_VALUE, true);
-            if (value != null && value.amount > 0) {
+            if (!isFluidEmpty(value)) {
                 this.fluidTank.fill(value.copy(), true);
             }
         }
@@ -57,15 +66,21 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
         onValueChanged();
     }
 
-    @Override
-    public boolean needsSync(boolean isFirstSync) {
-        if (isFirstSync) return true;
+    public boolean needsSync() {
         FluidStack current = this.fluidTank.getFluid();
         if (current == this.cache) return false;
         if (current == null || this.cache == null) return true;
         return current.amount != this.cache.amount || !current.isFluidEqual(this.cache);
     }
 
+    @Override
+    public boolean updateCacheFromSource(boolean isFirstSync) {
+        if (isFirstSync || needsSync()) {
+            setValue(this.fluidTank.getFluid(), false, false);
+            return true;
+        }
+        return false;
+    }
     @Override
     public void write(PacketBuffer buffer) {
         NetworkUtils.writeFluidStack(buffer, this.cache);
