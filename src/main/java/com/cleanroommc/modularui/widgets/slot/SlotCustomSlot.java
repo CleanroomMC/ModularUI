@@ -36,9 +36,6 @@ public class SlotCustomSlot extends SlotItemHandler implements ICustomSlot {
     protected void onCrafting(@NotNull ItemStack stack, int amount) {
     }
 
-    protected void onSwapCraft(int p_190900_1_) {
-    }
-
     protected void onCrafting(@NotNull ItemStack stack) {
     }
 

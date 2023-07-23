@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.holoui;
 
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.test.TestGui;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;

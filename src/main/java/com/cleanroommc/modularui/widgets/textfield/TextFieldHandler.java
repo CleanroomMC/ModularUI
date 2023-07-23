@@ -44,7 +44,7 @@ public class TextFieldHandler {
         this.maxCharacters = maxCharacters;
     }
 
-    public void setScrollArea(ScrollArea scrollArea) {
+    public void setScrollArea(@Nullable ScrollArea scrollArea) {
         this.scrollArea = scrollArea;
     }
 

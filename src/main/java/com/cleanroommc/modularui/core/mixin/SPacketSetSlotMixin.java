@@ -18,7 +18,7 @@ public class SPacketSetSlotMixin {
     private ItemStack item;
 
     @Inject(method = "readPacketData", at = @At("TAIL"))
-    public void readPacketData(PacketBuffer buf, CallbackInfo ci) throws IOException {
+    public void readPacketData(PacketBuffer buf, CallbackInfo ci) {
         try {
             this.item.setCount(buf.readVarInt());
         } catch (Exception e) {
@@ -27,7 +27,7 @@ public class SPacketSetSlotMixin {
     }
 
     @Inject(method = "writePacketData", at = @At("TAIL"))
-    public void writePacketData(PacketBuffer buf, CallbackInfo ci) throws IOException {
+    public void writePacketData(PacketBuffer buf, CallbackInfo ci) {
         buf.writeVarInt(this.item.getCount());
     }
 }
