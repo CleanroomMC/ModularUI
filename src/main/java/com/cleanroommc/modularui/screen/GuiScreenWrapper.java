@@ -35,11 +35,8 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Set;
 
 @SideOnly(Side.CLIENT)
@@ -270,18 +267,6 @@ public class GuiScreenWrapper extends GuiContainer {
                 }
             }
         }
-        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1);
-        GL11.glReadPixels(Mouse.getX(), Mouse.getY(), 1, 1, GL11.GL_STENCIL_INDEX, GL11.GL_UNSIGNED_BYTE, byteBuffer);
-        GuiDraw.drawText("Stencil: " + (0xFF & byteBuffer.get()), 5, lineY, 1, color, false);
-
-        /*color = Color.withAlpha(color, 25);
-        for (int i = 5; i < screenW; i += 5) {
-            drawVerticalLine(i, 0, screenH, color);
-        }
-
-        for (int i = 5; i < screenH; i += 5) {
-            drawHorizontalLine(0, screenW, i, color);
-        }*/
         drawRect(mouseX, mouseY, mouseX + 1, mouseY + 1, Color.withAlpha(Color.GREEN.normal, 0.8f));
     }
 
