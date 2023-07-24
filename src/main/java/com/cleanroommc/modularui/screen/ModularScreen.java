@@ -9,7 +9,7 @@ import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
-import com.cleanroommc.modularui.value.sync.GuiSyncHandler;
+import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -77,7 +77,6 @@ public class ModularScreen {
     private final Map<Class<?>, List<IGuiAction>> guiActionListeners = new Object2ObjectOpenHashMap<>();
 
     private GuiScreenWrapper screenWrapper;
-    private GuiSyncHandler syncHandler;
 
     /**
      * If this constructor is used the method {@link #buildUI(GuiContext)} should be overriden!
@@ -119,11 +118,10 @@ public class ModularScreen {
 
     @ApiStatus.Internal
     @MustBeInvokedByOverriders
-    public void construct(GuiScreenWrapper wrapper, GuiSyncHandler syncHandler) {
+    public void construct(GuiScreenWrapper wrapper) {
         if (this.screenWrapper != null) throw new IllegalStateException("ModularScreen is already constructed!");
         if (wrapper == null) throw new NullPointerException("GuiScreenWrapper must not be null!");
         this.screenWrapper = wrapper;
-        this.syncHandler = syncHandler;
         this.screenWrapper.updateArea(this.windowManager.getMainPanel().getArea());
     }
 
@@ -402,7 +400,7 @@ public class ModularScreen {
         return this.windowManager;
     }
 
-    public GuiSyncHandler getSyncHandler() {
+    public GuiSyncManager getSyncHandler() {
         return getContainer().getSyncHandler();
     }
 

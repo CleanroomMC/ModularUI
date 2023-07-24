@@ -3,7 +3,7 @@ package com.cleanroommc.modularui.manager;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.value.sync.GuiSyncHandler;
+import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
@@ -21,11 +21,11 @@ public class GuiInfo {
     }
 
     private static int nextId = 0;
-    private final BiFunction<GuiCreationContext, GuiSyncHandler, ModularPanel> mainPanelCreator;
+    private final BiFunction<GuiCreationContext, GuiSyncManager, ModularPanel> mainPanelCreator;
     private final BiFunction<GuiCreationContext, ModularPanel, Object> clientGuiCreator;
     private final int id;
 
-    public GuiInfo(BiFunction<GuiCreationContext, GuiSyncHandler, ModularPanel> mainPanelCreator, BiFunction<GuiCreationContext, ModularPanel, Object> clientGuiCreator) {
+    public GuiInfo(BiFunction<GuiCreationContext, GuiSyncManager, ModularPanel> mainPanelCreator, BiFunction<GuiCreationContext, ModularPanel, Object> clientGuiCreator) {
         this.mainPanelCreator = mainPanelCreator;
         this.clientGuiCreator = clientGuiCreator;
         this.id = nextId++;
@@ -48,9 +48,9 @@ public class GuiInfo {
         FMLNetworkHandler.openGui(player, ModularUI.ID, this.id, world, x, y, z);
     }
 
-    public ModularPanel createCommonGui(GuiCreationContext context, GuiSyncHandler guiSyncHandler) {
-        ModularPanel panel = this.mainPanelCreator.apply(context, guiSyncHandler);
-        WidgetTree.collectSyncValues(guiSyncHandler, panel);
+    public ModularPanel createCommonGui(GuiCreationContext context, GuiSyncManager guiSyncManager) {
+        ModularPanel panel = this.mainPanelCreator.apply(context, guiSyncManager);
+        WidgetTree.collectSyncValues(guiSyncManager, panel);
         return panel;
     }
 
@@ -65,10 +65,10 @@ public class GuiInfo {
 
     public static class Builder {
 
-        private BiFunction<GuiCreationContext, GuiSyncHandler, ModularPanel> mainPanelCreator;
+        private BiFunction<GuiCreationContext, GuiSyncManager, ModularPanel> mainPanelCreator;
         private BiFunction<GuiCreationContext, ModularPanel, Object> clientGuiCreator;
 
-        public Builder commonGui(BiFunction<GuiCreationContext, GuiSyncHandler, ModularPanel> mainPanelCreator) {
+        public Builder commonGui(BiFunction<GuiCreationContext, GuiSyncManager, ModularPanel> mainPanelCreator) {
             this.mainPanelCreator = mainPanelCreator;
             return this;
         }

@@ -6,7 +6,7 @@ import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.value.sync.GuiSyncHandler;
+import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumHand;
@@ -45,9 +45,9 @@ public final class GuiManager implements IGuiHandler {
     public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
         GuiInfo info = this.guiInfos.get(ID);
         if (info == null) return null;
-        GuiSyncHandler guiSyncHandler = new GuiSyncHandler(player);
-        info.createCommonGui(new GuiCreationContext(player, world, x, y, z, EnumHand.MAIN_HAND), guiSyncHandler);
-        return new ModularContainer(guiSyncHandler);
+        GuiSyncManager guiSyncManager = new GuiSyncManager(player);
+        info.createCommonGui(new GuiCreationContext(player, world, x, y, z, EnumHand.MAIN_HAND), guiSyncManager);
+        return new ModularContainer(guiSyncManager);
     }
 
     @Nullable
@@ -55,9 +55,9 @@ public final class GuiManager implements IGuiHandler {
     public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
         GuiInfo info = this.guiInfos.get(ID);
         if (info == null) return null;
-        GuiSyncHandler guiSyncHandler = new GuiSyncHandler(player);
+        GuiSyncManager guiSyncManager = new GuiSyncManager(player);
         GuiCreationContext context = new GuiCreationContext(player, world, x, y, z, EnumHand.MAIN_HAND);
-        ModularPanel panel = info.createCommonGui(context, guiSyncHandler);
-        return new GuiScreenWrapper(new ModularContainer(guiSyncHandler), info.createClientGui(context, panel));
+        ModularPanel panel = info.createCommonGui(context, guiSyncManager);
+        return new GuiScreenWrapper(new ModularContainer(guiSyncManager), info.createClientGui(context, panel));
     }
 }

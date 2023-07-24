@@ -6,7 +6,7 @@ import com.cleanroommc.modularui.manager.GuiCreationContext;
 import com.cleanroommc.modularui.manager.GuiInfos;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.utils.ItemStackItemHandler;
-import com.cleanroommc.modularui.value.sync.GuiSyncHandler;
+import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandlers;
 import com.cleanroommc.modularui.widgets.ItemSlot;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
@@ -32,9 +32,9 @@ public class TestItem extends Item implements IGuiHolder {
     public static final TestItem testItem = new TestItem();
 
     @Override
-    public ModularPanel buildUI(GuiCreationContext guiCreationContext, GuiSyncHandler guiSyncHandler, boolean isClient) {
+    public ModularPanel buildUI(GuiCreationContext guiCreationContext, GuiSyncManager guiSyncManager, boolean isClient) {
         IItemHandlerModifiable itemHandler = (IItemHandlerModifiable) guiCreationContext.getUsedItemStack().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-        guiSyncHandler.registerSlotGroup("mixer_items", 2);
+        guiSyncManager.registerSlotGroup("mixer_items", 2);
 
         ModularPanel panel = ModularPanel.defaultPanel("knapping_gui");
         panel.child(new Column()

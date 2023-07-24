@@ -4,7 +4,7 @@ import com.cleanroommc.bogosorter.api.ISortableContainer;
 import com.cleanroommc.bogosorter.api.ISortingContextBuilder;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.network.NetworkUtils;
-import com.cleanroommc.modularui.value.sync.GuiSyncHandler;
+import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import net.minecraft.entity.player.EntityPlayer;
@@ -38,32 +38,32 @@ public class ModularContainer extends Container implements ISortableContainer {
         return null;
     }
 
-    private final GuiSyncHandler guiSyncHandler;
+    private final GuiSyncManager guiSyncManager;
     private boolean init = true;
     private final List<ItemSlotSH> slots = new ArrayList<>();
     private final List<ItemSlotSH> shiftClickSlots = new ArrayList<>();
 
-    public ModularContainer(GuiSyncHandler guiSyncHandler) {
-        this.guiSyncHandler = Objects.requireNonNull(guiSyncHandler);
-        this.guiSyncHandler.construct(this);
+    public ModularContainer(GuiSyncManager guiSyncManager) {
+        this.guiSyncManager = Objects.requireNonNull(guiSyncManager);
+        this.guiSyncManager.construct(this);
         sortShiftClickSlots();
     }
 
     @SideOnly(Side.CLIENT)
     public ModularContainer() {
-        this.guiSyncHandler = null;
+        this.guiSyncManager = null;
     }
 
     @Override
     public void detectAndSendChanges() {
         super.detectAndSendChanges();
-        this.guiSyncHandler.detectAndSendChanges(this.init);
+        this.guiSyncManager.detectAndSendChanges(this.init);
         this.init = false;
     }
 
     public SlotGroup getSlotGroup(ItemSlotSH syncHandler) {
         if (syncHandler.getSlotGroup() == null) return null;
-        return this.guiSyncHandler.getSlotGroup(syncHandler.getSlotGroup());
+        return this.guiSyncManager.getSlotGroup(syncHandler.getSlotGroup());
     }
 
     private void sortShiftClickSlots() {
@@ -103,19 +103,19 @@ public class ModularContainer extends Container implements ISortableContainer {
         }
     }
 
-    public GuiSyncHandler getSyncHandler() {
-        if (this.guiSyncHandler == null) {
+    public GuiSyncManager getSyncHandler() {
+        if (this.guiSyncManager == null) {
             throw new IllegalStateException("GuiSyncHandler is not available for client only GUI's.");
         }
-        return this.guiSyncHandler;
+        return this.guiSyncManager;
     }
 
     public boolean isClient() {
-        return this.guiSyncHandler == null || NetworkUtils.isClient(this.guiSyncHandler.getPlayer());
+        return this.guiSyncManager == null || NetworkUtils.isClient(this.guiSyncManager.getPlayer());
     }
 
     public boolean isClientOnly() {
-        return this.guiSyncHandler == null;
+        return this.guiSyncManager == null;
     }
 
     @Override

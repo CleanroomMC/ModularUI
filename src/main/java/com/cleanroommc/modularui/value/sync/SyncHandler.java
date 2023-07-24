@@ -22,12 +22,12 @@ import java.util.function.Consumer;
  */
 public abstract class SyncHandler {
 
-    private GuiSyncHandler syncHandler;
+    private GuiSyncManager syncHandler;
     private String key;
 
     @ApiStatus.OverrideOnly
     @MustBeInvokedByOverriders
-    public void init(String key, GuiSyncHandler syncHandler) {
+    public void init(String key, GuiSyncManager syncHandler) {
         this.key = key;
         this.syncHandler = syncHandler;
     }
@@ -123,7 +123,7 @@ public abstract class SyncHandler {
     /**
      * @return the sync handler manager handling this sync handler
      */
-    public GuiSyncHandler getSyncHandler() {
+    public GuiSyncManager getSyncHandler() {
         if (!isValid()) {
             throw new IllegalStateException("Sync handler is not yet initialised!");
         }

@@ -12,7 +12,7 @@ import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.value.sync.GuiSyncHandler;
+import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -109,7 +109,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     @Override
-    public void initialiseSyncHandler(GuiSyncHandler syncHandler) {
+    public void initialiseSyncHandler(GuiSyncManager syncHandler) {
         if (this.syncKey != null) {
             this.syncHandler = syncHandler.getSyncHandler(this.syncKey);
             if (!isValidSyncHandler(this.syncHandler)) {
@@ -434,7 +434,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     /**
-     * This intended to only be used when build the main panel in methods like {@link com.cleanroommc.modularui.api.IGuiHolder#buildUI(GuiCreationContext, GuiSyncHandler, boolean)}
+     * This intended to only be used when build the main panel in methods like {@link com.cleanroommc.modularui.api.IGuiHolder#buildUI(GuiCreationContext, GuiSyncManager, boolean)}
      * since it's called on server and client. Otherwise, this will not work.
      */
     protected void setSyncHandler(@Nullable SyncHandler syncHandler) {

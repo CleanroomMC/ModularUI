@@ -6,7 +6,7 @@ import com.cleanroommc.modularui.api.widget.ISynced;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.value.sync.GuiSyncHandler;
+import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.cleanroommc.modularui.widget.sizer.IResizeable;
 import net.minecraft.client.renderer.GlStateManager;
 import org.jetbrains.annotations.ApiStatus;
@@ -263,11 +263,11 @@ public class WidgetTree {
         return type.isAssignableFrom(parent.getClass()) ? (T) parent : null;
     }
 
-    public static void collectSyncValues(GuiSyncHandler syncHandler, ModularPanel panel) {
+    public static void collectSyncValues(GuiSyncManager syncHandler, ModularPanel panel) {
         collectSyncValues(syncHandler, panel, new AtomicInteger(0));
     }
 
-    private static <T extends IWidget & ISynced<T>> void collectSyncValues(GuiSyncHandler syncHandler, T parent, AtomicInteger id) {
+    private static <T extends IWidget & ISynced<T>> void collectSyncValues(GuiSyncManager syncHandler, T parent, AtomicInteger id) {
         if (parent.isSynced()) {
             syncHandler.syncValue(AUTO_SYNC_KEY, id.getAndIncrement(), parent.getSyncHandler());
         }

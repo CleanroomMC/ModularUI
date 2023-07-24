@@ -54,7 +54,7 @@ public class GuiScreenWrapper extends GuiContainer {
     public GuiScreenWrapper(ModularContainer container, ModularScreen screen) {
         super(container);
         this.screen = screen;
-        this.screen.construct(this, container.isClientOnly() ? null : container.getSyncHandler());
+        this.screen.construct(this);
     }
 
     @Override

@@ -14,7 +14,7 @@ import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.value.IntValue;
 import com.cleanroommc.modularui.value.StringValue;
-import com.cleanroommc.modularui.value.sync.GuiSyncHandler;
+import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandlers;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widgets.*;
@@ -59,12 +59,12 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
     private int num = 2;
 
     @Override
-    public ModularPanel buildUI(GuiCreationContext guiCreationContext, GuiSyncHandler guiSyncHandler, boolean isClient) {
-        guiSyncHandler.registerSlotGroup("item_inv", 3);
-        guiSyncHandler.registerSlotGroup("mixer_items", 2);
+    public ModularPanel buildUI(GuiCreationContext guiCreationContext, GuiSyncManager guiSyncManager, boolean isClient) {
+        guiSyncManager.registerSlotGroup("item_inv", 3);
+        guiSyncManager.registerSlotGroup("mixer_items", 2);
 
-        guiSyncHandler.syncValue("mixer_fluids", 0, SyncHandlers.fluidSlot(this.mixerFluids1));
-        guiSyncHandler.syncValue("mixer_fluids", 1, SyncHandlers.fluidSlot(this.mixerFluids2));
+        guiSyncManager.syncValue("mixer_fluids", 0, SyncHandlers.fluidSlot(this.mixerFluids1));
+        guiSyncManager.syncValue("mixer_fluids", 1, SyncHandlers.fluidSlot(this.mixerFluids2));
 
         Rectangle colorPickerBackground = new Rectangle().setColor(Color.RED.normal);
         ModularPanel panel = new ModularPanel("test_tile");

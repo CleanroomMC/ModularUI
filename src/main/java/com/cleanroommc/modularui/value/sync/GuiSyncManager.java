@@ -2,20 +2,20 @@ package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.screen.ModularContainer;
-import com.cleanroommc.modularui.widgets.slot.SlotDelegate;
+import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
-public class GuiSyncHandler {
+public class GuiSyncManager {
 
     private static final String PLAYER_INVENTORY = "player_inventory";
 
@@ -27,7 +27,7 @@ public class GuiSyncHandler {
     private ModularContainer container;
     private boolean frozen;
 
-    public GuiSyncHandler(EntityPlayer player) {
+    public GuiSyncManager(EntityPlayer player) {
         this.player = player;
         syncValue(CURSOR_KEY, this.cursorSlotSyncHandler);
         String key = "player";
@@ -88,7 +88,7 @@ public class GuiSyncHandler {
         }
     }
 
-    public GuiSyncHandler syncValue(String key, SyncHandler syncHandler) {
+    public GuiSyncManager syncValue(String key, SyncHandler syncHandler) {
         if (key == null) throw new NullPointerException("Key must not be null");
         if (syncHandler == null) throw new NullPointerException("Sync Handler must not be null");
         if (this.syncedValues.containsKey(key)) {
@@ -98,11 +98,11 @@ public class GuiSyncHandler {
         return this;
     }
 
-    public GuiSyncHandler syncValue(String name, int id, SyncHandler syncHandler) {
+    public GuiSyncManager syncValue(String name, int id, SyncHandler syncHandler) {
         return syncValue(makeSyncKey(name, id), syncHandler);
     }
 
-    public GuiSyncHandler syncValue(int id, SyncHandler syncHandler) {
+    public GuiSyncManager syncValue(int id, SyncHandler syncHandler) {
         return syncValue(makeSyncKey(id), syncHandler);
     }
 
@@ -111,15 +111,15 @@ public class GuiSyncHandler {
         return this;
     }
 
-    public GuiSyncHandler registerSlotGroup(String name, int rowSize, int shiftClickPriority) {
+    public GuiSyncManager registerSlotGroup(String name, int rowSize, int shiftClickPriority) {
         return registerSlotGroup(new SlotGroup(name, rowSize, shiftClickPriority, true));
     }
 
-    public GuiSyncHandler registerSlotGroup(String name, int rowSize, boolean allowShiftTransfer) {
+    public GuiSyncManager registerSlotGroup(String name, int rowSize, boolean allowShiftTransfer) {
         return registerSlotGroup(new SlotGroup(name, rowSize, 100, allowShiftTransfer));
     }
 
-    public GuiSyncHandler registerSlotGroup(String name, int rowSize) {
+    public GuiSyncManager registerSlotGroup(String name, int rowSize) {
         return registerSlotGroup(new SlotGroup(name, rowSize, 100, true));
     }
 
