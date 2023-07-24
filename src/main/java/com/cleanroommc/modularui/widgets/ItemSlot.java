@@ -19,6 +19,7 @@ import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
+import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Container;
@@ -143,6 +144,12 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         return getScreen().getScreenWrapper().getItemToolTip(stack);
     }
 
+    public ItemSlot slot(ModularSlot slot) {
+        this.syncHandler = new ItemSlotSH(slot);
+        setSyncHandler(this.syncHandler);
+        return this;
+    }
+
     @SideOnly(Side.CLIENT)
     private void drawSlot(Slot slotIn) {
         GuiScreenWrapper guiScreen = getScreen().getScreenWrapper();
@@ -248,11 +255,5 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     @Override
     public @Nullable Object getIngredient() {
         return this.syncHandler.getSlot().getStack();
-    }
-
-    public ItemSlot syncHandler(ItemSlotSH syncHandler) {
-        this.syncHandler = syncHandler;
-        setSyncHandler(syncHandler);
-        return this;
     }
 }

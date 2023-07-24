@@ -1,81 +1,32 @@
 package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.utils.MouseData;
-import com.cleanroommc.modularui.widgets.slot.ICustomSlot;
-import com.cleanroommc.modularui.widgets.slot.SlotCustomSlot;
-import net.minecraft.inventory.IInventory;
+import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.items.ItemStackHandler;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.function.Predicate;
 
 /**
- * This does NOT sync items between server and client. It makes sure there is a
- * mc slot in the container class, which will handle syncing.
- * This will also handle interaction in case this is a phantom slot.
+ * Wraps a slot and handles interactions for phantom slots.
+ * Use {@link ModularSlot} directly.
  */
 public class ItemSlotSH extends SyncHandler {
 
-    private final SlotCustomSlot customSlot;
-    private final Slot slot;
-    private Predicate<ItemStack> filter;
-    private String slotGroup;
-
-    private boolean phantom = false;
+    private final ModularSlot slot;
     private ItemStack lastStoredPhantomItem = ItemStack.EMPTY;
 
-    public static ItemSlotSH phantom(Slot slot) {
-        return new ItemSlotSH(slot).phantom(true);
-    }
-
-    public static ItemSlotSH phantom(IItemHandlerModifiable itemHandler, int index) {
-        return new ItemSlotSH(itemHandler, index).phantom(true);
-    }
-
-    public static ItemSlotSH phantom(int slotLimit, Predicate<ItemStack> filter) {
-        ItemStackHandler itemStackHandler = new ItemStackHandler(1) {
-            @Override
-            public int getSlotLimit(int slot) {
-                return slotLimit;
-            }
-
-            @Override
-            public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-                return filter == null || filter.test(stack);
-            }
-        };
-        return phantom(itemStackHandler, 0);
-    }
-
-    public static ItemSlotSH phantom(int slotLimit) {
-        return phantom(slotLimit, null);
-    }
-
-    public static ItemSlotSH phantom() {
-        return phantom(64, null);
-    }
-
-    public ItemSlotSH(Slot slot) {
+    @ApiStatus.Internal
+    public ItemSlotSH(ModularSlot slot) {
         this.slot = slot;
-        this.customSlot = slot instanceof SlotCustomSlot ? (SlotCustomSlot) slot : null;
-    }
-
-    public ItemSlotSH(IItemHandlerModifiable itemHandler, int index) {
-        this(new SlotCustomSlot(itemHandler, index, 0, 0));
-    }
-
-    public ItemSlotSH(IInventory itemHandler, int index) {
-        this(new Slot(itemHandler, index, 0, 0));
     }
 
     @Override
-    public void init(String key, GuiSyncHandler syncHandler) {
+    public void init(String key, GuiSyncManager syncHandler) {
         super.init(key, syncHandler);
         syncHandler.getContainer().registerSlot(this);
     }
@@ -174,7 +125,7 @@ public class ItemSlotSH extends SyncHandler {
                 amount = Integer.MAX_VALUE;
             } else {
                 int maxSize = getSlot().getSlotStackLimit();
-                if ((this.customSlot == null || !this.customSlot.isIgnoreMaxStackSize()) && stack.getMaxStackSize() < maxSize) {
+                if (!this.slot.isIgnoreMaxStackSize() && stack.getMaxStackSize() < maxSize) {
                     maxSize = stack.getMaxStackSize();
                 }
                 amount = Math.min(oldAmount + amount, maxSize);
@@ -188,11 +139,9 @@ public class ItemSlotSH extends SyncHandler {
     }
 
     public void setEnabled(boolean enabled, boolean sync) {
-        if (this.slot instanceof ICustomSlot) {
-            ((ICustomSlot) this.slot).setEnabled(enabled);
-            if (sync) {
-                sync(4, buffer -> buffer.writeBoolean(enabled));
-            }
+        this.slot.setEnabled(enabled);
+        if (sync) {
+            sync(4, buffer -> buffer.writeBoolean(enabled));
         }
     }
 
@@ -205,37 +154,15 @@ public class ItemSlotSH extends SyncHandler {
     }
 
     public boolean isItemValid(ItemStack itemStack) {
-        return getSlot().isItemValid(itemStack) && (this.filter == null || this.filter.test(itemStack));
+        return getSlot().isItemValid(itemStack);
     }
 
     public boolean isPhantom() {
-        return this.phantom;
+        return this.slot.isPhantom();
     }
 
+    @Nullable
     public String getSlotGroup() {
-        return this.slotGroup;
-    }
-
-    public ItemSlotSH filter(Predicate<ItemStack> filter) {
-        this.filter = filter;
-        return this;
-    }
-
-    public ItemSlotSH phantom(boolean phantom) {
-        this.phantom = phantom;
-        return this;
-    }
-
-    public ItemSlotSH ignoreMaxStackSize(boolean ignore) {
-        if (this.customSlot == null) {
-            throw new IllegalStateException("Slot must be a SlotCustomSlot");
-        }
-        this.customSlot.setIgnoreMaxStackSize(ignore);
-        return this;
-    }
-
-    public ItemSlotSH slotGroup(String name) {
-        this.slotGroup = name;
-        return this;
+        return this.slot.getSlotGroup();
     }
 }

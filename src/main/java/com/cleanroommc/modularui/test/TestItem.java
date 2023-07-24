@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.test;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.manager.GuiCreationContext;
 import com.cleanroommc.modularui.manager.GuiInfos;
@@ -44,7 +43,7 @@ public class TestItem extends Item implements IGuiHolder {
                 .child(SlotGroupWidget.builder()
                         .row("II")
                         .row("II")
-                        .key('I', index -> new ItemSlot().syncHandler(SyncHandlers.phantomItemSlot(itemHandler, index)
+                        .key('I', index -> new ItemSlot().slot(SyncHandlers.phantomItemSlot(itemHandler, index)
                                 .ignoreMaxStackSize(true)
                                 .slotGroup("mixer_items")))
                         .build()));

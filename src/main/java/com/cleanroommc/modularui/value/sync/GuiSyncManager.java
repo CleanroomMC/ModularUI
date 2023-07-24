@@ -22,6 +22,7 @@ public class GuiSyncManager {
     private static final String CURSOR_KEY = makeSyncKey("cursor_slot", 255255);
     private final CursorSlotSyncHandler cursorSlotSyncHandler = new CursorSlotSyncHandler();
     private final EntityPlayer player;
+    private final PlayerMainInvWrapper playerInventory;
     private final Map<String, SyncHandler> syncedValues = new Object2ObjectLinkedOpenHashMap<>();
     private final Map<String, SlotGroup> slotGroups = new Object2ObjectOpenHashMap<>();
     private ModularContainer container;
@@ -29,15 +30,11 @@ public class GuiSyncManager {
 
     public GuiSyncManager(EntityPlayer player) {
         this.player = player;
+        this.playerInventory = new PlayerMainInvWrapper(player.inventory);
         syncValue(CURSOR_KEY, this.cursorSlotSyncHandler);
         String key = "player";
-        for (int i = 0; i < 9; i++) {
-            Slot slot = player.inventoryContainer.getSlot(i + 36);
-            syncValue(key, i, SyncHandlers.itemSlot(SlotDelegate.create(slot)).slotGroup(PLAYER_INVENTORY));
-        }
-        for (int i = 0; i < 27; i++) {
-            Slot slot = player.inventoryContainer.getSlot(i + 9);
-            syncValue(key, i + 9, SyncHandlers.itemSlot(SlotDelegate.create(slot)).slotGroup(PLAYER_INVENTORY));
+        for (int i = 0; i < 36; i++) {
+            itemSlot(key, i, SyncHandlers.itemSlot(this.playerInventory, i).slotGroup(PLAYER_INVENTORY));
         }
         // player inv sorting is handled by bogosorter
         registerSlotGroup(new SlotGroup(PLAYER_INVENTORY, 9, SlotGroup.PLAYER_INVENTORY_PRIO, true).setAllowSorting(false));
@@ -106,7 +103,19 @@ public class GuiSyncManager {
         return syncValue(makeSyncKey(id), syncHandler);
     }
 
-    public GuiSyncHandler registerSlotGroup(SlotGroup slotGroup) {
+    public GuiSyncManager itemSlot(String key, ModularSlot slot) {
+        return syncValue(key, new ItemSlotSH(slot));
+    }
+
+    public GuiSyncManager itemSlot(String key, int id, ModularSlot slot) {
+        return itemSlot(makeSyncKey(key, id), slot);
+    }
+
+    public GuiSyncManager itemSlot(int id, ModularSlot slot) {
+        return itemSlot(makeSyncKey(id), slot);
+    }
+
+    public GuiSyncManager registerSlotGroup(SlotGroup slotGroup) {
         this.slotGroups.put(slotGroup.getName(), slotGroup);
         return this;
     }
@@ -141,6 +150,10 @@ public class GuiSyncManager {
 
     public ModularContainer getContainer() {
         return this.container;
+    }
+
+    public PlayerMainInvWrapper getPlayerInventory() {
+        return this.playerInventory;
     }
 
     public static String makeSyncKey(String name, int id) {

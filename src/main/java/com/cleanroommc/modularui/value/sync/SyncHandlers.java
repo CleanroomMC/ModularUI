@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.value.sync;
 
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
@@ -32,20 +31,12 @@ public class SyncHandlers {
         return new StringSyncValue(getter, setter);
     }
 
-    public static ItemSlotSH itemSlot(Slot slot) {
-        return new ItemSlotSH(slot);
+    public static ModularSlot itemSlot(IItemHandlerModifiable inventory, int index) {
+        return new ModularSlot(inventory, index);
     }
 
-    public static ItemSlotSH itemSlot(IItemHandlerModifiable inventory, int index) {
-        return new ItemSlotSH(inventory, index);
-    }
-
-    public static ItemSlotSH itemSlot(IInventory inventory, int index) {
-        return new ItemSlotSH(inventory, index);
-    }
-
-    public static ItemSlotSH phantomItemSlot(IItemHandlerModifiable inventory, int index) {
-        return ItemSlotSH.phantom(inventory, index);
+    public static ModularSlot phantomItemSlot(IItemHandlerModifiable inventory, int index) {
+        return new ModularSlot(inventory, index, true);
     }
 
     public static FluidSlotSyncHandler fluidSlot(IFluidTank fluidTank) {
