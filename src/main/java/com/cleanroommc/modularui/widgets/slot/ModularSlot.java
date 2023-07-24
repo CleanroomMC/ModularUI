@@ -28,7 +28,8 @@ public class ModularSlot extends SlotItemHandler {
     private Consumer<ItemStack> changeListener = stack -> {
     };
     private boolean ignoreMaxStackSize = false;
-    private String slotGroup = null;
+    private String slotGroupName = null;
+    private SlotGroup slotGroup = null;
 
     public ModularSlot(IItemHandler itemHandler, int index) {
         this(itemHandler, index, false);
@@ -91,7 +92,12 @@ public class ModularSlot extends SlotItemHandler {
     }
 
     @Nullable
-    public String getSlotGroup() {
+    public String getSlotGroupName() {
+        return this.slotGroupName;
+    }
+
+    @Nullable
+    public SlotGroup getSlotGroup() {
         return this.slotGroup;
     }
 
@@ -142,13 +148,47 @@ public class ModularSlot extends SlotItemHandler {
     }
 
     /**
-     * A slot group determines whether items can be shift clicked here and if this slot is part of a group
-     * which can be sorted with Inventory BogoSorter mod.
+     * Sets a slot group for this slot by a name. The slot group must be registered.
+     * The real slot group is later automatically set.
      *
      * @param slotGroup slot group id
      */
     public ModularSlot slotGroup(String slotGroup) {
-        this.slotGroup = slotGroup;
+        this.slotGroupName = slotGroup;
         return this;
+    }
+
+    /**
+     * Sets a slot group for this slot. The slot group must be registered if it's not a singleton.
+     *
+     * @param slotGroup slot group
+     */
+    public ModularSlot slotGroup(SlotGroup slotGroup) {
+        if (this.slotGroup == slotGroup) return this;
+        if (this.slotGroup != null) {
+            this.slotGroup.removeSlot(this);
+        }
+        this.slotGroup = slotGroup;
+        if (this.slotGroup != null) {
+            this.slotGroup.addSlot(this);
+        }
+        return this;
+    }
+
+    /**
+     * Creates and sets a singleton slot group simply for the purpose of shift clicking into slots that don't belong to a group.
+     *
+     * @param shiftClickPriority determines in which group a shift clicked item should be inserted first
+     */
+    public ModularSlot singletonSlotGroup(int shiftClickPriority) {
+        this.slotGroupName = null;
+        return slotGroup(SlotGroup.singleton(toString(), shiftClickPriority));
+    }
+
+    /**
+     * Creates and sets a singleton slot group simply for the purpose of shift clicking into slots that don't belong to a group.
+     */
+    public ModularSlot singletonSlotGroup() {
+        return singletonSlotGroup(SlotGroup.STORAGE_SLOT_PRIO);
     }
 }

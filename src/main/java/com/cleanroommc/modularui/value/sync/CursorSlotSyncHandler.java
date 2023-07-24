@@ -7,16 +7,16 @@ import java.io.IOException;
 public class CursorSlotSyncHandler extends SyncHandler {
 
     public void sync() {
-        sync(0, buffer -> buffer.writeItemStack(getSyncHandler().getPlayer().inventory.getItemStack()));
+        sync(0, buffer -> buffer.writeItemStack(getSyncManager().getPlayer().inventory.getItemStack()));
     }
 
     @Override
     public void readOnClient(int id, PacketBuffer buf) throws IOException {
-        getSyncHandler().getPlayer().inventory.setItemStack(buf.readItemStack());
+        getSyncManager().getPlayer().inventory.setItemStack(buf.readItemStack());
     }
 
     @Override
     public void readOnServer(int id, PacketBuffer buf) throws IOException {
-        getSyncHandler().getPlayer().inventory.setItemStack(buf.readItemStack());
+        getSyncManager().getPlayer().inventory.setItemStack(buf.readItemStack());
     }
 }

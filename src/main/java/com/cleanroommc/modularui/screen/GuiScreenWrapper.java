@@ -13,6 +13,7 @@ import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.ItemSlot;
+import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -256,13 +257,13 @@ public class GuiScreenWrapper extends GuiContainer {
             lineY -= 11;
             if (hovered instanceof ItemSlot) {
                 ItemSlot slotWidget = (ItemSlot) hovered;
-                Slot slot = slotWidget.getSlot();
+                ModularSlot slot = slotWidget.getSlot();
                 GuiDraw.drawText("Slot Index: " + slot.getSlotIndex(), 5, lineY, 1, color, false);
                 lineY -= 11;
                 GuiDraw.drawText("Slot Number: " + slot.slotNumber, 5, lineY, 1, color, false);
                 lineY -= 11;
                 if (slotWidget.isSynced()) {
-                    SlotGroup slotGroup = ((ModularContainer) this.inventorySlots).getSlotGroup(slotWidget.getSyncHandler());
+                    SlotGroup slotGroup = slot.getSlotGroup();
                     boolean allowShiftTransfer = slotGroup != null && slotGroup.allowShiftTransfer();
                     GuiDraw.drawText("Shift-Click Priority: " + (allowShiftTransfer ? slotGroup.getShiftClickPriority() : "DISABLED"), 5, lineY, 1, color, false);
                     lineY -= 11;

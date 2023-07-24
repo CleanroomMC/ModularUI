@@ -120,7 +120,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
     }
 
     private void tryClickContainer(MouseData mouseData) {
-        EntityPlayer player = getSyncHandler().getPlayer();
+        EntityPlayer player = getSyncManager().getPlayer();
         ItemStack currentStack = player.inventory.getItemStack();
         if (!currentStack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)) {
             return;
@@ -150,7 +150,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
             FluidStack fluid = this.fluidTank.getFluid();
             if (performedTransfer && fluid != null) {
                 playSound(fluid, false);
-                getSyncHandler().setCursorItem(currentStack);
+                getSyncManager().setCursorItem(currentStack);
             }
             return;
         }
@@ -177,13 +177,13 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
             }
             if (performedTransfer) {
                 playSound(currentFluid, true);
-                getSyncHandler().setCursorItem(currentStack);
+                getSyncManager().setCursorItem(currentStack);
             }
         }
     }
 
     public void tryClickPhantom(MouseData mouseData) {
-        EntityPlayer player = getSyncHandler().getPlayer();
+        EntityPlayer player = getSyncManager().getPlayer();
         ItemStack currentStack = player.inventory.getItemStack();
         FluidStack currentFluid = this.fluidTank.getFluid();
         IFluidHandlerItem fluidHandlerItem = currentStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null);
@@ -259,7 +259,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
     }
 
     private void playSound(FluidStack fluid, boolean fill) {
-        EntityPlayer player = getSyncHandler().getPlayer();
+        EntityPlayer player = getSyncManager().getPlayer();
         SoundEvent soundevent = fill ? fluid.getFluid().getFillSound(fluid) : fluid.getFluid().getEmptySound(fluid);
         player.world.playSound(null, player.posX, player.posY + 0.5, player.posZ, soundevent, SoundCategory.BLOCKS, 1.0F, 1.0F);
     }

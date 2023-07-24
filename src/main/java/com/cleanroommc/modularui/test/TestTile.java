@@ -165,7 +165,13 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                         .child(SlotGroupWidget.playerInventory())
                                         .child(SlotGroupWidget.builder()
                                                 .matrix("III", "III", "III")
-                                                .key('I', index -> new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).slotGroup("item_inv")))
+                                                .key('I', index -> {
+                                                    // 4 is the middle slot with a negative priority -> shift click prioritises middle slot
+                                                    if (index == 4) {
+                                                        return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).singletonSlotGroup(-100));
+                                                    }
+                                                    return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).slotGroup("item_inv"));
+                                                })
                                                 .build()
                                                 .marginBottom(2))
                                         .child(SlotGroupWidget.builder()

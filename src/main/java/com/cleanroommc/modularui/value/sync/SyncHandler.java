@@ -22,14 +22,14 @@ import java.util.function.Consumer;
  */
 public abstract class SyncHandler {
 
-    private GuiSyncManager syncHandler;
+    private GuiSyncManager syncManager;
     private String key;
 
     @ApiStatus.OverrideOnly
     @MustBeInvokedByOverriders
-    public void init(String key, GuiSyncManager syncHandler) {
+    public void init(String key, GuiSyncManager syncManager) {
         this.key = key;
-        this.syncHandler = syncHandler;
+        this.syncManager = syncManager;
     }
 
     /**
@@ -69,7 +69,7 @@ public abstract class SyncHandler {
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         buffer.writeVarInt(id);
         bufferConsumer.accept(buffer);
-        if (NetworkUtils.isClient(getSyncHandler().getPlayer())) {
+        if (NetworkUtils.isClient(getSyncManager().getPlayer())) {
             sendToServer(buffer, this);
         } else {
             sendToClient(buffer, this);
@@ -123,11 +123,11 @@ public abstract class SyncHandler {
     /**
      * @return the sync handler manager handling this sync handler
      */
-    public GuiSyncManager getSyncHandler() {
+    public GuiSyncManager getSyncManager() {
         if (!isValid()) {
             throw new IllegalStateException("Sync handler is not yet initialised!");
         }
-        return this.syncHandler;
+        return this.syncManager;
     }
 
     public static void sendToClient(PacketBuffer buffer, SyncHandler syncHandler) {
@@ -136,7 +136,7 @@ public abstract class SyncHandler {
         if (!syncHandler.isValid()) {
             throw new IllegalStateException();
         }
-        NetworkHandler.sendToPlayer(new PacketSyncHandler(syncHandler.getKey(), buffer), (EntityPlayerMP) syncHandler.syncHandler.getPlayer());
+        NetworkHandler.sendToPlayer(new PacketSyncHandler(syncHandler.getKey(), buffer), (EntityPlayerMP) syncHandler.syncManager.getPlayer());
     }
 
     public static void sendToServer(PacketBuffer buffer, SyncHandler syncHandler) {

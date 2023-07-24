@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
-import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -28,7 +27,7 @@ public class ItemSlotSH extends SyncHandler {
     @Override
     public void init(String key, GuiSyncManager syncHandler) {
         super.init(key, syncHandler);
-        syncHandler.getContainer().registerSlot(this);
+        syncHandler.getContainer().registerSlot(this.slot);
     }
 
     @Override
@@ -53,7 +52,7 @@ public class ItemSlotSH extends SyncHandler {
     }
 
     protected void phantomClick(MouseData mouseData) {
-        ItemStack cursorStack = getSyncHandler().getCursorItem();
+        ItemStack cursorStack = getSyncManager().getCursorItem();
         ItemStack slotStack = getSlot().getStack();
         ItemStack stackToPut;
         if (!cursorStack.isEmpty() && !slotStack.isEmpty() && !ItemHandlerHelper.canItemStacksStack(cursorStack, slotStack)) {
@@ -149,7 +148,7 @@ public class ItemSlotSH extends SyncHandler {
         syncToServer(5, buf -> buf.writeItemStack(stack));
     }
 
-    public Slot getSlot() {
+    public ModularSlot getSlot() {
         return this.slot;
     }
 
@@ -163,6 +162,6 @@ public class ItemSlotSH extends SyncHandler {
 
     @Nullable
     public String getSlotGroup() {
-        return this.slot.getSlotGroup();
+        return this.slot.getSlotGroupName();
     }
 }

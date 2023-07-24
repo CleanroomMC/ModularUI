@@ -55,7 +55,7 @@ public class PacketSyncHandler implements IPacket {
         Container container = handler.player.openContainer;
         if (container instanceof ModularContainer) {
             try {
-                ((ModularContainer) container).getSyncHandler().receiveWidgetUpdate(this.key, this.packet.readVarInt(), this.packet);
+                ((ModularContainer) container).getSyncManager().receiveWidgetUpdate(this.key, this.packet.readVarInt(), this.packet);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

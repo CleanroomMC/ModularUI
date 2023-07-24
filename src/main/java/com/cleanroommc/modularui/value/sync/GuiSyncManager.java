@@ -14,6 +14,7 @@ import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 public class GuiSyncManager {
 
@@ -26,7 +27,6 @@ public class GuiSyncManager {
     private final Map<String, SyncHandler> syncedValues = new Object2ObjectLinkedOpenHashMap<>();
     private final Map<String, SlotGroup> slotGroups = new Object2ObjectOpenHashMap<>();
     private ModularContainer container;
-    private boolean frozen;
 
     public GuiSyncManager(EntityPlayer player) {
         this.player = player;
@@ -42,13 +42,14 @@ public class GuiSyncManager {
 
     public void construct(ModularContainer container) {
         if (this.container != null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Tried to initialise GuiSyncManager twice!");
         }
-        if (container == null) {
-            throw new NullPointerException();
-        }
-        this.container = container;
+        this.container = Objects.requireNonNull(container, "ModularContainer must not be null!");
         this.syncedValues.forEach((mapKey, syncHandler) -> syncHandler.init(mapKey, this));
+    }
+
+    public boolean isInitialised() {
+        return this.container != null;
     }
 
     public ItemStack getCursorItem() {
@@ -58,14 +59,6 @@ public class GuiSyncManager {
     public void setCursorItem(ItemStack item) {
         getPlayer().inventory.setItemStack(item);
         this.cursorSlotSyncHandler.sync();
-    }
-
-    public boolean isFrozen() {
-        return this.frozen;
-    }
-
-    public void freeze() {
-        this.frozen = true;
     }
 
     public void detectAndSendChanges(boolean init) {
@@ -92,6 +85,9 @@ public class GuiSyncManager {
             throw new IllegalStateException("Sync Handler with key " + key + " already exists!");
         }
         this.syncedValues.put(key, syncHandler);
+        if (isInitialised()) {
+            syncHandler.init(key, this);
+        }
         return this;
     }
 
@@ -116,7 +112,9 @@ public class GuiSyncManager {
     }
 
     public GuiSyncManager registerSlotGroup(SlotGroup slotGroup) {
-        this.slotGroups.put(slotGroup.getName(), slotGroup);
+        if (!slotGroup.isSingleton()) {
+            this.slotGroups.put(slotGroup.getName(), slotGroup);
+        }
         return this;
     }
 

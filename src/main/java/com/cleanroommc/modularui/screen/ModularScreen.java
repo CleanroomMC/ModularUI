@@ -10,7 +10,6 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.value.sync.GuiSyncManager;
-import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.Dialog;
@@ -31,6 +30,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
 
+/**
+ * This is the base class for all modular ui's. It only exists on client side.
+ * It handles drawing the screen, all panels and widget interactions.
+ */
 @SideOnly(Side.CLIENT)
 public class ModularScreen {
 
@@ -401,7 +404,7 @@ public class ModularScreen {
     }
 
     public GuiSyncManager getSyncHandler() {
-        return getContainer().getSyncHandler();
+        return getContainer().getSyncManager();
     }
 
     public ModularPanel getMainPanel() {
@@ -414,10 +417,6 @@ public class ModularScreen {
 
     public Area getScreenArea() {
         return this.screenArea;
-    }
-
-    public void registerItemSlot(ItemSlotSH syncHandler) {
-        getContainer().registerSlot(syncHandler);
     }
 
     public boolean isClientOnly() {

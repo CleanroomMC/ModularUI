@@ -117,7 +117,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         getScreen().getScreenWrapper().dragSlot(timeSinceClick);
     }
 
-    public Slot getSlot() {
+    public ModularSlot getSlot() {
         return this.syncHandler.getSlot();
     }
 

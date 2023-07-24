@@ -5,7 +5,7 @@ import com.cleanroommc.bogosorter.api.ISortingContextBuilder;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.value.sync.GuiSyncManager;
-import com.cleanroommc.modularui.value.sync.ItemSlotSH;
+import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -20,6 +20,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.PlayerInvWrapper;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -40,8 +41,8 @@ public class ModularContainer extends Container implements ISortableContainer {
 
     private final GuiSyncManager guiSyncManager;
     private boolean init = true;
-    private final List<ItemSlotSH> slots = new ArrayList<>();
-    private final List<ItemSlotSH> shiftClickSlots = new ArrayList<>();
+    private final List<ModularSlot> slots = new ArrayList<>();
+    private final List<ModularSlot> shiftClickSlots = new ArrayList<>();
 
     public ModularContainer(GuiSyncManager guiSyncManager) {
         this.guiSyncManager = Objects.requireNonNull(guiSyncManager);
@@ -61,13 +62,8 @@ public class ModularContainer extends Container implements ISortableContainer {
         this.init = false;
     }
 
-    public SlotGroup getSlotGroup(ItemSlotSH syncHandler) {
-        if (syncHandler.getSlotGroup() == null) return null;
-        return this.guiSyncManager.getSlotGroup(syncHandler.getSlotGroup());
-    }
-
     private void sortShiftClickSlots() {
-        this.shiftClickSlots.sort(Comparator.comparingInt(slot -> getSlotGroup(slot).getShiftClickPriority()));
+        this.shiftClickSlots.sort(Comparator.comparingInt(slot -> Objects.requireNonNull(slot.getSlotGroup()).getShiftClickPriority()));
     }
 
     @Override
@@ -80,22 +76,25 @@ public class ModularContainer extends Container implements ISortableContainer {
         }
     }
 
-    public void registerSlot(ItemSlotSH syncHandler) {
-        Slot slot = syncHandler.getSlot();
+    @ApiStatus.Internal
+    public void registerSlot(ModularSlot slot) {
         if (this.inventorySlots.contains(slot)) {
             throw new IllegalArgumentException();
         }
         addSlotToContainer(slot);
-        this.slots.add(syncHandler);
-        if (syncHandler.getSlotGroup() != null) {
-            SlotGroup slotGroup = this.getSyncHandler().getSlotGroup(syncHandler.getSlotGroup());
+        this.slots.add(slot);
+        if (slot.getSlotGroupName() != null) {
+            SlotGroup slotGroup = getSyncManager().getSlotGroup(slot.getSlotGroupName());
             if (slotGroup == null) {
-                ModularUI.LOGGER.throwing(new IllegalArgumentException("SlotGroup '" + syncHandler.getSlotGroup() + "' is not registered!"));
+                ModularUI.LOGGER.throwing(new IllegalArgumentException("SlotGroup '" + slot.getSlotGroupName() + "' is not registered!"));
                 return;
             }
-            slotGroup.addSlot(slot);
+            slot.slotGroup(slotGroup);
+        }
+        if (slot.getSlotGroup() != null) {
+            SlotGroup slotGroup = slot.getSlotGroup();
             if (slotGroup.allowShiftTransfer()) {
-                this.shiftClickSlots.add(syncHandler);
+                this.shiftClickSlots.add(slot);
                 if (!this.init) {
                     sortShiftClickSlots();
                 }
@@ -103,9 +102,9 @@ public class ModularContainer extends Container implements ISortableContainer {
         }
     }
 
-    public GuiSyncManager getSyncHandler() {
+    public GuiSyncManager getSyncManager() {
         if (this.guiSyncManager == null) {
-            throw new IllegalStateException("GuiSyncHandler is not available for client only GUI's.");
+            throw new IllegalStateException("GuiSyncManager is not available for client only GUI's.");
         }
         return this.guiSyncManager;
     }
@@ -125,9 +124,9 @@ public class ModularContainer extends Container implements ISortableContainer {
 
     @Override
     public @NotNull ItemStack transferStackInSlot(@NotNull EntityPlayer playerIn, int index) {
-        ItemSlotSH slot = this.slots.get(index);
+        ModularSlot slot = this.slots.get(index);
         if (!slot.isPhantom()) {
-            ItemStack stack = slot.getSlot().getStack();
+            ItemStack stack = slot.getStack();
             if (!stack.isEmpty()) {
                 ItemStack remainder = transferItem(slot, stack.copy());
                 stack.setCount(remainder.getCount());
@@ -138,30 +137,30 @@ public class ModularContainer extends Container implements ISortableContainer {
     }
 
     // TODO: Don't insert to slot when a parent is disabled
-    protected ItemStack transferItem(ItemSlotSH fromSlot, ItemStack stack) {
-        SlotGroup fromSlotGroup = getSlotGroup(fromSlot);
-        for (ItemSlotSH slot : this.shiftClickSlots) {
-            SlotGroup slotGroup = getSlotGroup(slot);
+    protected ItemStack transferItem(ModularSlot fromSlot, ItemStack stack) {
+        SlotGroup fromSlotGroup = Objects.requireNonNull(fromSlot.getSlotGroup());
+        for (ModularSlot slot : this.shiftClickSlots) {
+            SlotGroup slotGroup = Objects.requireNonNull(slot.getSlotGroup());
             boolean valid = slotGroup != null && slotGroup != fromSlotGroup;
-            if (valid && slot.getSlot().isEnabled() && slot.isItemValid(stack)) {
-                ItemStack itemstack = slot.getSlot().getStack();
+            if (valid && slot.isEnabled() && slot.isItemValid(stack)) {
+                ItemStack itemstack = slot.getStack();
                 if (slot.isPhantom()) {
-                    if (itemstack.isEmpty() || (ItemHandlerHelper.canItemStacksStack(stack, itemstack) && itemstack.getCount() < slot.getSlot().getItemStackLimit(itemstack))) {
-                        slot.getSlot().putStack(stack.copy());
+                    if (itemstack.isEmpty() || (ItemHandlerHelper.canItemStacksStack(stack, itemstack) && itemstack.getCount() < slot.getItemStackLimit(itemstack))) {
+                        slot.putStack(stack.copy());
                         return stack;
                     }
                 } else if (ItemHandlerHelper.canItemStacksStack(stack, itemstack)) {
                     int j = itemstack.getCount() + stack.getCount();
-                    int maxSize = Math.min(slot.getSlot().getSlotStackLimit(), stack.getMaxStackSize());
+                    int maxSize = Math.min(slot.getSlotStackLimit(), stack.getMaxStackSize());
 
                     if (j <= maxSize) {
                         stack.setCount(0);
                         itemstack.setCount(j);
-                        slot.getSlot().onSlotChanged();
+                        slot.onSlotChanged();
                     } else if (itemstack.getCount() < maxSize) {
                         stack.shrink(maxSize - itemstack.getCount());
                         itemstack.setCount(maxSize);
-                        slot.getSlot().onSlotChanged();
+                        slot.onSlotChanged();
                     }
 
                     if (stack.isEmpty()) {
@@ -170,10 +169,9 @@ public class ModularContainer extends Container implements ISortableContainer {
                 }
             }
         }
-        for (ItemSlotSH syncHandler : this.shiftClickSlots) {
-            Slot slot = syncHandler.getSlot();
+        for (ModularSlot slot : this.shiftClickSlots) {
             ItemStack itemstack = slot.getStack();
-            SlotGroup slotGroup = getSlotGroup(syncHandler);
+            SlotGroup slotGroup = slot.getSlotGroup();
             boolean valid = slotGroup != null && slotGroup != fromSlotGroup;
             if (valid && slot.isEnabled() && itemstack.isEmpty() && slot.isItemValid(stack)) {
                 if (stack.getCount() > slot.getSlotStackLimit()) {
@@ -203,7 +201,7 @@ public class ModularContainer extends Container implements ISortableContainer {
 
     @Override
     public void buildSortingContext(ISortingContextBuilder builder) {
-        for (SlotGroup slotGroup : this.getSyncHandler().getSlotGroups()) {
+        for (SlotGroup slotGroup : this.getSyncManager().getSlotGroups()) {
             if (slotGroup.isAllowSorting()) {
                 builder.addSlotGroup(slotGroup.getRowSize(), slotGroup.getSlots());
             }
