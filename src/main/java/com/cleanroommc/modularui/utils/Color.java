@@ -199,6 +199,34 @@ public class Color implements Iterable<Integer> {
         return getAlpha(argb) / 255f;
     }
 
+    public static int getHue(int argb) {
+        float r = getRedF(argb), g = getGreenF(argb), b = getBlueF(argb);
+        if (r == g && r == b) return 0;
+        float min = Math.min(r, Math.min(g, b));
+        if (r >= g && r >= b) {
+            return (int) (((g - b) / (r - min)) % 6) * 60;
+        }
+        if (g >= r && g >= b) {
+            return (int) (((b - r) / (g - min)) + 2) * 60;
+        }
+        if(b >= r && b >= g) {
+            return (int) (((r - g) / (b - min)) + 4) * 60;
+        }
+        return 0;
+    }
+
+    public static float getSaturation(int argb) {
+        float r = getRedF(argb), g = getGreenF(argb), b = getBlueF(argb);
+        float min = Math.min(r, Math.min(g, b));
+        float max = Math.max(r, Math.max(g, b));
+        return max == 0 ? 0 : (max - min) / max;
+    }
+
+    public static float getValue(int argb) {
+        float r = getRedF(argb), g = getGreenF(argb), b = getBlueF(argb);
+        return Math.max(r, Math.max(g, b));
+    }
+
     /**
      * @return rgba as an array [red, green, blue, alpha]
      */

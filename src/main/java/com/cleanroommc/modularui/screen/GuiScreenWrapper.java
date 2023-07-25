@@ -219,7 +219,7 @@ public class GuiScreenWrapper extends GuiContainer {
     public void drawDebugScreen() {
         GuiContext context = this.screen.context;
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
-        int screenW = this.screen.getScreenArea().width, screenH = this.screen.getScreenArea().height;
+        int screenH = this.screen.getScreenArea().height;
         int color = Color.rgb(180, 40, 115);
         int lineY = screenH - 13;
         drawString(this.fontRenderer, "Mouse Pos: " + mouseX + ", " + mouseY, 5, lineY, color);
@@ -263,7 +263,6 @@ public class GuiScreenWrapper extends GuiContainer {
                     SlotGroup slotGroup = slot.getSlotGroup();
                     boolean allowShiftTransfer = slotGroup != null && slotGroup.allowShiftTransfer();
                     GuiDraw.drawText("Shift-Click Priority: " + (allowShiftTransfer ? slotGroup.getShiftClickPriority() : "DISABLED"), 5, lineY, 1, color, false);
-                    lineY -= 11;
                 }
             }
         }
@@ -329,7 +328,7 @@ public class GuiScreenWrapper extends GuiContainer {
      * This replicates vanilla behavior while also injecting custom behavior for consistency
      */
     @Override
-    public void handleKeyboardInput() throws IOException {
+    public void handleKeyboardInput() {
         char c0 = Keyboard.getEventCharacter();
         int key = Keyboard.getEventKey();
         boolean state = Keyboard.getEventKeyState();

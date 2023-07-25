@@ -28,7 +28,7 @@ public class SlotGroup {
     private final boolean singleton;
 
     /**
-     * Creates a slot group that is only a single slot. Singleton groups don't need to b registered.
+     * Creates a slot group that is only a single slot. Singleton groups don't need to be registered.
      * This exists only exists so that single slots can accept items from shift clicks.
      *
      * @param name               the name of the group
