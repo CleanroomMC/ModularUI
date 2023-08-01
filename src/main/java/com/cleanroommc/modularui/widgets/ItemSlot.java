@@ -8,6 +8,8 @@ import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.TextRenderer;
 import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
 import com.cleanroommc.modularui.integration.jei.JeiIngredientProvider;
+import com.cleanroommc.modularui.screen.Tooltip;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -77,6 +79,14 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             GlStateManager.colorMask(true, true, true, true);
         }
     }
+  
+    @Override
+    public void drawForeground(GuiContext context) {
+        Tooltip tooltip = getTooltip();
+        if (tooltip != null && isHoveringFor(tooltip.getShowUpTimer())) {
+            tooltip.draw(getContext(), getSlot().getStack());
+        }
+    }
 
     @Override
     public WidgetSlotTheme getWidgetTheme(ITheme theme) {
@@ -143,6 +153,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         // todo: JEI seems to be getting tooltip from IngredientRenderer#getTooltip
         return getScreen().getScreenWrapper().getItemToolTip(stack);
     }
+
 
     public ItemSlot slot(ModularSlot slot) {
         this.syncHandler = new ItemSlotSH(slot);

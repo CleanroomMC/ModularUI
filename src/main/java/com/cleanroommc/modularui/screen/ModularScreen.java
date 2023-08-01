@@ -124,9 +124,8 @@ public class ModularScreen {
         this.windowManager.construct(mainPanel);
     }
 
-    @ApiStatus.Internal
     @MustBeInvokedByOverriders
-    public void construct(GuiScreenWrapper wrapper) {
+    void construct(GuiScreenWrapper wrapper) {
         if (this.screenWrapper != null) throw new IllegalStateException("ModularScreen is already constructed!");
         if (wrapper == null) throw new NullPointerException("GuiScreenWrapper must not be null!");
         this.screenWrapper = wrapper;

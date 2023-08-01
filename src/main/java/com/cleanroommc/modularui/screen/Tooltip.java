@@ -23,9 +23,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class Tooltip {
 
@@ -64,6 +64,10 @@ public class Tooltip {
     }
 
     public void draw(GuiContext context) {
+        draw(context, ItemStack.EMPTY);
+    }
+
+    public void draw(GuiContext context, @Nullable ItemStack stack) {
         if (this.updateTooltipEveryTick) {
             markDirty();
         }
@@ -72,12 +76,12 @@ public class Tooltip {
         if (this.maxWidth <= 0) {
             this.maxWidth = Integer.MAX_VALUE;
         }
+        if (stack == null) stack = ItemStack.EMPTY;
         Area screen = context.screen.getScreenArea();
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
         IconRenderer renderer = IconRenderer.SHARED;
-        //List<IIcon> icons = renderer.measureLines(this.lines);
-        List<String> textLines = Collections.emptyList();//icons.stream().filter(iIcon -> iIcon instanceof TextIcon).map(icon -> ((TextIcon) icon).getText()).collect(Collectors.toList());
-        RenderTooltipEvent.Pre event = new RenderTooltipEvent.Pre(ItemStack.EMPTY, Collections.emptyList(), mouseX, mouseY, screen.width, screen.height, this.maxWidth, TextRenderer.getFontRenderer());
+        List<String> textLines = lines.stream().filter(drawable -> drawable instanceof IKey).map(key -> ((IKey) key).get()).collect(Collectors.toList());
+        RenderTooltipEvent.Pre event = new RenderTooltipEvent.Pre(stack, textLines, mouseX, mouseY, screen.width, screen.height, thimaxWidth, TextRenderer.getFontRenderer());
         if (MinecraftForge.EVENT_BUS.post(event)) {
             return;
         }
@@ -106,9 +110,9 @@ public class Tooltip {
         GlStateManager.disableDepth();
         GlStateManager.disableBlend();
 
-        GuiDraw.drawTooltipBackground(textLines, area.x, area.y, area.width, area.height);
+        GuiDraw.drawTooltipBackground(stack, textLines, area.x, area.y, area.width, area.height);
 
-        MinecraftForge.EVENT_BUS.post(new RenderTooltipEvent.PostBackground(ItemStack.EMPTY, textLines, area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height));
+        MinecraftForge.EVENT_BUS.post(new RenderTooltipEvent.PostBackground(stack, textLines, area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height));
 
         GlStateManager.color(1f, 1f, 1f, 1f);
 
@@ -117,7 +121,7 @@ public class Tooltip {
         renderer.setPos(area.x, area.y);
         renderer.draw(context, this.lines);
 
-        MinecraftForge.EVENT_BUS.post(new RenderTooltipEvent.PostText(ItemStack.EMPTY, textLines, area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height));
+        MinecraftForge.EVENT_BUS.post(new RenderTooltipEvent.PostText(stack, textLines, area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height));
     }
 
     public Rectangle determineTooltipArea(GuiContext context, List<IDrawable> lines, IconRenderer renderer, int screenWidth, int screenHeight, int mouseX, int mouseY) {

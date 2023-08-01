@@ -559,12 +559,12 @@ public class GuiDraw {
         GlStateManager.enableBlend();
     }
 
-    public static void drawTooltipBackground(List<String> lines, int x, int y, int textWidth, int height) {
+    public static void drawTooltipBackground(ItemStack stack, List<String> lines, int x, int y, int textWidth, int height) {
         // TODO theme color
         int backgroundColor = 0xF0100010;
         int borderColorStart = 0x505000FF;
         int borderColorEnd = (borderColorStart & 0xFEFEFE) >> 1 | borderColorStart & 0xFF000000;
-        RenderTooltipEvent.Color colorEvent = new RenderTooltipEvent.Color(ItemStack.EMPTY, lines, x, y, TextRenderer.getFontRenderer(), backgroundColor, borderColorStart, borderColorEnd);
+        RenderTooltipEvent.Color colorEvent = new RenderTooltipEvent.Color(stack, lines, x, y, TextRenderer.getFontRenderer(), backgroundColor, borderColorStart, borderColorEnd);
         MinecraftForge.EVENT_BUS.post(colorEvent);
         backgroundColor = colorEvent.getBackground();
         borderColorStart = colorEvent.getBorderStart();

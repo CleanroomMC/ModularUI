@@ -142,8 +142,7 @@ public class Area extends Rectangle implements IResizeable {
         }
     }
 
-    @ApiStatus.Internal
-    public void applyPos(int parentX, int parentY) {
+    void applyPos(int parentX, int parentY) {
         this.x = parentX + this.rx;
         this.y = parentY + this.ry;
     }

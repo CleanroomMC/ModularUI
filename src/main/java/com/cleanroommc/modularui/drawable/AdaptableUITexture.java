@@ -13,8 +13,7 @@ public class AdaptableUITexture extends UITexture {
     /**
      * Use {@link UITexture#builder()} with {@link Builder#adaptable(int, int)}
      */
-    @ApiStatus.Internal
-    public AdaptableUITexture(ResourceLocation location, float u0, float v0, float u1, float v1, boolean background, int imageWidth, int imageHeight, int borderX, int borderY, boolean tiled) {
+    AdaptableUITexture(ResourceLocation location, float u0, float v0, float u1, float v1, boolean background, int imageWidth, int imageHeight, int borderX, int borderY, boolean tiled) {
         super(location, u0, v0, u1, v1, background);
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;

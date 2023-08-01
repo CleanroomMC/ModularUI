@@ -51,8 +51,7 @@ public class WindowManager {
         return this.mainPanel == panel;
     }
 
-    @ApiStatus.Internal
-    public void clearQueue() {
+    void clearQueue() {
         if (!this.queueOpenPanels.isEmpty()) {
             for (ModularPanel panel : this.queueOpenPanels) {
                 openPanel(panel, true);
