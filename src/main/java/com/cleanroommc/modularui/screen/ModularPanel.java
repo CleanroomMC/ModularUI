@@ -28,23 +28,25 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 public class ModularPanel extends ParentWidget<ModularPanel> implements IViewport {
 
-    public static ModularPanel defaultPanel(GuiContext context) {
-        return defaultPanel(context, 176, 166);
+    public static ModularPanel defaultPanel(@NotNull String name) {
+        return defaultPanel(name, 176, 166);
     }
 
-    public static ModularPanel defaultPanel(GuiContext context, int width, int height) {
-        ModularPanel panel = new ModularPanel(context);
+    public static ModularPanel defaultPanel(@NotNull String name, int width, int height) {
+        ModularPanel panel = new ModularPanel(name);
         panel.flex().size(width, height).align(Alignment.Center);
         return panel;
     }
 
     private static final int tapTime = 200;
 
-    private String name;
+    @NotNull
+    private final String name;
     private ModularScreen screen;
     private final LinkedList<LocatedWidget> hovering = new LinkedList<>();
     private final List<Interactable> acceptedInteractions = new ArrayList<>();
@@ -58,17 +60,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     private float scale = 1f;
     private float alpha = 1f;
 
-    public ModularPanel(GuiContext context) {
-        setContext(context);
-        context.addJeiExclusionArea(this);
-    }
-
-    public ModularPanel name(String name) {
-        if (this.screen != null) {
-            throw new IllegalStateException("Name must be set before initialization!");
-        }
-        this.name = name;
-        return this;
+    public ModularPanel(@NotNull String name) {
+        this.name = Objects.requireNonNull(name, "A panels name must not be null and should be unique!");
     }
 
     @Override
@@ -104,9 +97,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             return;
         }
         if (isOpen() && !isOpening() && !isClosing()) {
-            this.animator.setEndCallback(val -> {
-                this.screen.closePanel(this);
-            });
+            this.animator.setEndCallback(val -> this.screen.closePanel(this));
             this.animator.backward();
         }
     }
@@ -195,13 +186,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @MustBeInvokedByOverriders
     public void onOpen(ModularScreen screen) {
         this.screen = screen;
-        if (this.name == null) {
-            if (this == screen.getMainPanel()) {
-                this.name = "Main";
-            } else {
-                throw new IllegalArgumentException("Non main panels must be given a name via .name()");
-            }
-        }
         initialise(this);
         if (ModularUIConfig.panelOpenCloseAnimationTime <= 0) return;
         this.scale = 0.75f;
@@ -228,7 +212,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @Override
     public void dispose() {
-        getContext().removeJeiExclusionArea(this);
+        getContext().getJeiSettings().removeJeiExclusionArea(this);
         super.dispose();
         this.screen = null;
     }
@@ -509,8 +493,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return false;
     }
 
-    public String getName() {
-        return name;
+    public @NotNull String getName() {
+        return this.name;
     }
 
     @Override
@@ -523,12 +507,12 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         if (!isValid()) {
             throw new IllegalStateException();
         }
-        return screen;
+        return this.screen;
     }
 
     @NotNull
     public LinkedList<LocatedWidget> getHovering() {
-        return hovering;
+        return this.hovering;
     }
 
     @Nullable
@@ -539,12 +523,27 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @Nullable
     public LocatedWidget getTopHoveringLocated() {
-        for (LocatedWidget widget : hovering) {
+        for (LocatedWidget widget : this.hovering) {
             if (widget.getElement().canHover()) {
                 return widget;
             }
         }
         return null;
+    }
+
+    @Override
+    public int getDefaultHeight() {
+        return 166;
+    }
+
+    @Override
+    public int getDefaultWidth() {
+        return 177;
+    }
+
+    protected final void setPanelGuiContext(@NotNull GuiContext context) {
+        setContext(context);
+        context.getJeiSettings().addJeiExclusionArea(this);
     }
 
     public boolean isOpening() {
@@ -556,11 +555,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     public float getScale() {
-        return scale;
+        return this.scale;
     }
 
     public float getAlpha() {
-        return alpha;
+        return this.alpha;
     }
 
     public ModularPanel bindPlayerInventory() {

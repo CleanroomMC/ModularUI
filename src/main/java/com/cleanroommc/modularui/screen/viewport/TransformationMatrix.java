@@ -53,19 +53,19 @@ public class TransformationMatrix {
     }
 
     public TransformationMatrix getWrapped() {
-        return wrapped;
+        return this.wrapped;
     }
 
     public IViewport getViewport() {
-        return viewport;
+        return this.viewport;
     }
 
     public Area getArea() {
-        return area;
+        return this.area;
     }
 
     public Matrix4f getMatrix() {
-        return matrix;
+        return this.matrix;
     }
 
     public Matrix4f getInvertedMatrix() {
@@ -73,11 +73,11 @@ public class TransformationMatrix {
             Matrix4f.invert(this.matrix, this.invertedMatrix);
             this.dirty = false;
         }
-        return invertedMatrix;
+        return this.invertedMatrix;
     }
 
     public boolean isViewportMatrix() {
-        return viewportMatrix;
+        return this.viewportMatrix;
     }
 
     public void markDirty() {
@@ -85,7 +85,7 @@ public class TransformationMatrix {
     }
 
     public boolean isDirty() {
-        return dirty;
+        return this.dirty;
     }
 
     public int transformX(float x, float y) {

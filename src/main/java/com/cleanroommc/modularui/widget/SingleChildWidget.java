@@ -13,7 +13,7 @@ public class SingleChildWidget<W extends SingleChildWidget<W>> extends Widget<W>
 
     @Override
     public @NotNull List<IWidget> getChildren() {
-        return list;
+        return this.list;
     }
 
     private void updateList() {

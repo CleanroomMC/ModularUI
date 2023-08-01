@@ -1,11 +1,11 @@
 package com.cleanroommc.modularui.utils.math.functions.rounding;
 
-import com.cleanroommc.modularui.api.IValue;
+import com.cleanroommc.modularui.api.IMathValue;
 import com.cleanroommc.modularui.utils.math.functions.NNFunction;
 
 public class Floor extends NNFunction {
 
-    public Floor(IValue[] values, String name) throws Exception {
+    public Floor(IMathValue[] values, String name) throws Exception {
         super(values, name);
     }
 

@@ -14,6 +14,8 @@ import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widgets.TextWidget;
 import com.google.gson.JsonObject;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.function.Supplier;
 
@@ -87,6 +89,7 @@ public interface IKey extends IDrawable {
     @Deprecated
     void set(String string);
 
+    @SideOnly(Side.CLIENT)
     @Override
     default void draw(GuiContext context, int x, int y, int width, int height) {
         renderer.setAlignment(Alignment.Center, width, height);

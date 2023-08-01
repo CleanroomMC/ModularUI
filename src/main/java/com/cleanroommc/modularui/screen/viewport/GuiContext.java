@@ -2,37 +2,24 @@ package com.cleanroommc.modularui.screen.viewport;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
-import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
-import com.cleanroommc.modularui.integration.jei.GhostIngredientTarget;
-import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
-import com.cleanroommc.modularui.integration.jei.JeiState;
-import com.cleanroommc.modularui.screen.DraggablePanelWrapper;
-import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.screen.WindowManager;
+import com.cleanroommc.modularui.screen.*;
 import com.cleanroommc.modularui.widget.sizer.GuiAxis;
-import mezz.jei.api.gui.IGhostIngredientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
-@SideOnly(Side.CLIENT)
 public class GuiContext extends GuiViewportStack {
 
     public final Minecraft mc;
@@ -40,7 +27,6 @@ public class GuiContext extends GuiViewportStack {
 
     /* GUI elements */
     public final ModularScreen screen;
-    private ITheme currentTheme;
     private LocatedWidget focusedWidget = LocatedWidget.EMPTY;
     @Nullable
     private IGuiElement hovered;
@@ -66,26 +52,19 @@ public class GuiContext extends GuiViewportStack {
     private float partialTicks;
     private long tick;
 
-    private JeiState jeiState = JeiState.DEFAULT;
-
     public List<Consumer<GuiContext>> postRenderCallbacks = new ArrayList<>();
 
-    private final List<IWidget> jeiExclusionWidgets = new ArrayList<>();
-    private final List<Rectangle> jeiExclusionAreas = new ArrayList<>();
-    private final List<JeiGhostIngredientSlot<?>> jeiGhostIngredientSlots = new ArrayList<>();
+    private JeiSettings jeiSettings = new JeiSettings();
 
     public GuiContext(ModularScreen screen) {
         this.screen = screen;
         this.hoveredWidgets = new HoveredIterable(this.screen.getWindowManager());
         this.mc = ModularUI.getMC();
         this.font = this.mc.fontRenderer;
-        if (this.currentTheme == null) {
-            this.currentTheme = IThemeApi.get().getThemeForScreen(screen, null);
-        }
     }
 
     public boolean isAbove(IGuiElement widget) {
-        return widget.getArea().isInside(mouseX, mouseY);
+        return widget.getArea().isInside(this.mouseX, this.mouseY);
     }
 
     /* Element focusing */
@@ -104,11 +83,11 @@ public class GuiContext extends GuiViewportStack {
 
     @Nullable
     public IGuiElement getHovered() {
-        return hovered;
+        return this.hovered;
     }
 
     public Iterable<IGuiElement> getAllBelowMouse() {
-        return hoveredWidgets;
+        return this.hoveredWidgets;
     }
 
     /**
@@ -426,106 +405,35 @@ public class GuiContext extends GuiViewportStack {
     }
 
     public int getMouseButton() {
-        return mouseButton;
+        return this.mouseButton;
     }
 
     public int getMouseWheel() {
-        return mouseWheel;
+        return this.mouseWheel;
     }
 
     public int getKeyCode() {
-        return keyCode;
+        return this.keyCode;
     }
 
     public char getTypedChar() {
-        return typedChar;
+        return this.typedChar;
     }
 
     public float getPartialTicks() {
-        return partialTicks;
-    }
-
-    public void enableJei() {
-        this.jeiState = JeiState.ENABLED;
-    }
-
-    public void disableJei() {
-        this.jeiState = JeiState.DISABLED;
-    }
-
-    public void defaultJei() {
-        this.jeiState = JeiState.DEFAULT;
-    }
-
-    public boolean isJeiEnabled() {
-        return this.jeiState.test(this.screen);
-    }
-
-    public void addJeiExclusionArea(Rectangle area) {
-        if (!this.jeiExclusionAreas.contains(area)) {
-            this.jeiExclusionAreas.add(area);
-        }
-    }
-
-    public void removeJeiExclusionArea(Rectangle area) {
-        this.jeiExclusionAreas.remove(area);
-    }
-
-    public void addJeiExclusionArea(IWidget area) {
-        if (!this.jeiExclusionWidgets.contains(area)) {
-            this.jeiExclusionWidgets.add(area);
-        }
-    }
-
-    public void removeJeiExclusionArea(IWidget area) {
-        this.jeiExclusionWidgets.remove(area);
-    }
-
-    public <W extends IWidget & JeiGhostIngredientSlot> void addJeiGhostIngredientSlot(W slot) {
-        this.jeiGhostIngredientSlots.add(slot);
-    }
-
-    public <W extends IWidget & JeiGhostIngredientSlot> void removeJeiGhostIngredientSlot(W slot) {
-        this.jeiGhostIngredientSlots.remove(slot);
-    }
-
-    public List<Rectangle> getJeiExclusionAreas() {
-        return jeiExclusionAreas;
-    }
-
-    public List<IWidget> getJeiExclusionWidgets() {
-        return jeiExclusionWidgets;
-    }
-
-    public List<Rectangle> getAllJeiExclusionAreas() {
-        this.jeiExclusionWidgets.removeIf(widget -> !widget.isValid());
-        List<Rectangle> areas = new ArrayList<>(this.jeiExclusionAreas);
-        areas.addAll(this.jeiExclusionWidgets.stream()
-                .filter(IWidget::isEnabled)
-                .map(IWidget::getArea)
-                .collect(Collectors.toList()));
-        return areas;
-    }
-
-    public List<JeiGhostIngredientSlot<?>> getJeiGhostIngredientSlots() {
-        return jeiGhostIngredientSlots;
-    }
-
-    public <I> List<IGhostIngredientHandler.Target<I>> getAllGhostIngredientTargets(@NotNull I ingredient) {
-        this.jeiGhostIngredientSlots.removeIf(widget -> !((IWidget) widget).isValid());
-        return this.jeiGhostIngredientSlots.stream()
-                .filter(slot -> ((IWidget) slot).isEnabled())
-                .filter(slot -> slot.castGhostIngredientIfValid(ingredient) != null)
-                .map(slot -> (IGhostIngredientHandler.Target<I>) GhostIngredientTarget.of(slot))
-                .collect(Collectors.toList());
+        return this.partialTicks;
     }
 
     public ITheme getTheme() {
-        return currentTheme;
+        return this.screen.getCurrentTheme();
     }
 
-    public void useTheme(String theme) {
-        this.currentTheme = IThemeApi.get().getThemeForScreen(this.screen, theme);
+    public JeiSettings getJeiSettings() {
+        return this.jeiSettings;
+    }
+
+    public void setJeiSettings(JeiSettings jeiSettings) {
+        this.jeiSettings = jeiSettings;
     }
 
     private static class HoveredIterable implements Iterable<IGuiElement> {
@@ -541,26 +449,26 @@ public class GuiContext extends GuiViewportStack {
         public Iterator<IGuiElement> iterator() {
             return new Iterator<IGuiElement>() {
 
-                private final Iterator<ModularPanel> panelIt = windowManager.getOpenPanels().iterator();
+                private final Iterator<ModularPanel> panelIt = HoveredIterable.this.windowManager.getOpenPanels().iterator();
                 private Iterator<LocatedWidget> widgetIt;
 
                 @Override
                 public boolean hasNext() {
-                    if (widgetIt == null) {
-                        if (!panelIt.hasNext()) {
+                    if (this.widgetIt == null) {
+                        if (!this.panelIt.hasNext()) {
                             return false;
                         }
-                        widgetIt = panelIt.next().getHovering().iterator();
+                        this.widgetIt = this.panelIt.next().getHovering().iterator();
                     }
-                    return widgetIt.hasNext();
+                    return this.widgetIt.hasNext();
                 }
 
                 @Override
                 public IGuiElement next() {
-                    if (widgetIt == null || !widgetIt.hasNext()) {
-                        widgetIt = panelIt.next().getHovering().iterator();
+                    if (this.widgetIt == null || !this.widgetIt.hasNext()) {
+                        this.widgetIt = this.panelIt.next().getHovering().iterator();
                     }
-                    return widgetIt.next().getElement();
+                    return this.widgetIt.next().getElement();
                 }
             };
         }

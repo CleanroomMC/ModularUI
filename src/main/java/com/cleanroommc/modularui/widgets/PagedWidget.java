@@ -46,15 +46,15 @@ public class PagedWidget<W extends PagedWidget<W>> extends Widget<W> {
     }
 
     public List<IWidget> getPages() {
-        return pages;
+        return this.pages;
     }
 
     public IWidget getCurrentPage() {
-        return currentPage;
+        return this.currentPage;
     }
 
     public int getCurrentPageIndex() {
-        return currentPageIndex;
+        return this.currentPageIndex;
     }
 
     @Override

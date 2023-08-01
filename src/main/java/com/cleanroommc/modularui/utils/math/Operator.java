@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.utils.math;
 
-import com.cleanroommc.modularui.api.IValue;
+import com.cleanroommc.modularui.api.IMathValue;
 
 /**
  * Operator class
@@ -8,23 +8,23 @@ import com.cleanroommc.modularui.api.IValue;
  * This class is responsible for performing a calculation of two values
  * based on given operation.
  */
-public class Operator implements IValue {
+public class Operator implements IMathValue {
 
     public static boolean DEBUG = false;
 
     public Operation operation;
-    public IValue a;
-    public IValue b;
-    private final IValue result = new Constant(0);
+    public IMathValue a;
+    public IMathValue b;
+    private final IMathValue result = new Constant(0);
 
-    public Operator(Operation op, IValue a, IValue b) {
+    public Operator(Operation op, IMathValue a, IMathValue b) {
         this.operation = op;
         this.a = a;
         this.b = b;
     }
 
     @Override
-    public IValue get() {
+    public IMathValue get() {
         if (!this.isNumber() && this.operation == Operation.ADD) {
             this.result.set(this.stringValue());
         } else {

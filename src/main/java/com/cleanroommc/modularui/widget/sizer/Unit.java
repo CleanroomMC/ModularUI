@@ -53,15 +53,15 @@ public class Unit {
     }
 
     public boolean isAutoAnchor() {
-        return autoAnchor;
+        return this.autoAnchor;
     }
 
     public int getOffset() {
-        return offset;
+        return this.offset;
     }
 
     public Measure getMeasure() {
-        return measure;
+        return this.measure;
     }
 
     public void setAnchor(float anchor) {
@@ -81,7 +81,7 @@ public class Unit {
     }
 
     public boolean isRelative() {
-        return measure == Measure.RELATIVE;
+        return this.measure == Measure.RELATIVE;
     }
 
     public enum Measure {

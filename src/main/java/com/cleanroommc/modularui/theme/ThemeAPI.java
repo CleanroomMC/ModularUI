@@ -32,8 +32,8 @@ public class ThemeAPI implements IThemeApi {
     private ThemeAPI() {
         registerWidgetTheme(Theme.PANEL, new WidgetTheme(GuiTextures.BACKGROUND, null, Color.WHITE.normal, 0xFF404040, false), (parent, json, fallback) -> new WidgetTheme(parent, fallback, json));
         registerWidgetTheme(Theme.BUTTON, new WidgetTheme(GuiTextures.BUTTON, null, Color.WHITE.normal, Color.WHITE.normal, true), (parent, json, fallback) -> new WidgetTheme(parent, fallback, json));
-        registerWidgetTheme(Theme.ITEM_SLOT, new WidgetSlotTheme(GuiTextures.SLOT, Color.withAlpha(Color.WHITE.normal, 0x80)), (parent, json, fallback) -> new WidgetSlotTheme(parent, fallback, json));
-        registerWidgetTheme(Theme.FLUID_SLOT, new WidgetSlotTheme(GuiTextures.SLOT_DARK, Color.withAlpha(Color.WHITE.normal, 0x80)), (parent, json, fallback) -> new WidgetSlotTheme(parent, fallback, json));
+        registerWidgetTheme(Theme.ITEM_SLOT, new WidgetSlotTheme(GuiTextures.SLOT, Color.withAlpha(Color.WHITE.normal, 0x60)), (parent, json, fallback) -> new WidgetSlotTheme(parent, fallback, json));
+        registerWidgetTheme(Theme.FLUID_SLOT, new WidgetSlotTheme(GuiTextures.SLOT_DARK, Color.withAlpha(Color.WHITE.normal, 0x60)), (parent, json, fallback) -> new WidgetSlotTheme(parent, fallback, json));
         registerWidgetTheme(Theme.TEXT_FIELD, new WidgetTextFieldTheme(0xFF2F72A8), (parent, json, fallback) -> new WidgetTextFieldTheme(parent, fallback, json));
     }
 
@@ -44,12 +44,12 @@ public class ThemeAPI implements IThemeApi {
 
     @Override
     public @NotNull ITheme getTheme(String id) {
-        return THEMES.getOrDefault(id, getDefaultTheme());
+        return this.THEMES.getOrDefault(id, getDefaultTheme());
     }
 
     @Override
     public boolean hasTheme(String id) {
-        return THEMES.containsKey(id);
+        return this.THEMES.containsKey(id);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class ThemeAPI implements IThemeApi {
 
     @Override
     public List<JsonBuilder> getJavaDefaultThemes(String id) {
-        return defaultThemes.computeIfAbsent(id, key -> new ArrayList<>());
+        return this.defaultThemes.computeIfAbsent(id, key -> new ArrayList<>());
     }
 
     @Override
@@ -71,11 +71,11 @@ public class ThemeAPI implements IThemeApi {
     }
 
     private String getThemeIdForScreen(String mod, String name) {
-        String theme = jsonScreenThemes.get(mod + ":" + name);
+        String theme = this.jsonScreenThemes.get(mod + ":" + name);
         if (theme != null) return theme;
-        theme = jsonScreenThemes.get(mod);
+        theme = this.jsonScreenThemes.get(mod);
         if (theme != null) return theme;
-        theme = screenThemes.get(mod + ":" + name);
+        theme = this.screenThemes.get(mod + ":" + name);
         return theme;
     }
 
@@ -83,30 +83,30 @@ public class ThemeAPI implements IThemeApi {
     public void registerThemeForScreen(String screen, String theme) {
         Objects.requireNonNull(screen);
         Objects.requireNonNull(theme);
-        screenThemes.put(screen, theme);
+        this.screenThemes.put(screen, theme);
     }
 
     @Override
     public void registerWidgetTheme(String id, WidgetTheme defaultTheme, WidgetThemeParser parser) {
-        if (widgetThemeFunctions.containsKey(id)) {
+        if (this.widgetThemeFunctions.containsKey(id)) {
             throw new IllegalStateException();
         }
-        widgetThemeFunctions.put(id, parser);
-        defaultWidgetThemes.put(id, defaultTheme);
+        this.widgetThemeFunctions.put(id, parser);
+        this.defaultWidgetThemes.put(id, defaultTheme);
     }
 
     // Internals
 
     void registerTheme(ITheme theme) {
-        if (THEMES.containsKey(theme.getId())) {
+        if (this.THEMES.containsKey(theme.getId())) {
             throw new IllegalArgumentException("Theme with id " + theme.getId() + " already exists!");
         }
-        THEMES.put(theme.getId(), theme);
+        this.THEMES.put(theme.getId(), theme);
     }
 
     void onReload() {
-        THEMES.clear();
-        jsonScreenThemes.clear();
+        this.THEMES.clear();
+        this.jsonScreenThemes.clear();
         registerTheme(DEFAULT_DEFAULT);
     }
 

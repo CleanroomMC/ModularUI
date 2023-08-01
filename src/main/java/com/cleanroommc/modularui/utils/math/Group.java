@@ -1,23 +1,23 @@
 package com.cleanroommc.modularui.utils.math;
 
-import com.cleanroommc.modularui.api.IValue;
+import com.cleanroommc.modularui.api.IMathValue;
 
 /**
  * Group class
  * <p>
- * Simply wraps given {@link IValue} into parenthesis in the
+ * Simply wraps given {@link IMathValue} into parenthesis in the
  * {@link #toString()} method.
  */
-public class Group implements IValue {
+public class Group implements IMathValue {
 
-    private final IValue value;
+    private final IMathValue value;
 
-    public Group(IValue value) {
+    public Group(IMathValue value) {
         this.value = value;
     }
 
     @Override
-    public IValue get() {
+    public IMathValue get() {
         return this.value.get();
     }
 

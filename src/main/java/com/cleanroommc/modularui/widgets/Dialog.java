@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.widgets;
 
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.ModularPanel;
 
 import java.util.function.Consumer;
@@ -12,8 +11,8 @@ public class Dialog<T> extends ModularPanel {
     private boolean disablePanelsBelow = true;
     private boolean closeOnOutOfBoundsClick = false;
 
-    public Dialog(GuiContext context, Consumer<T> resultConsumer) {
-        super(context);
+    public Dialog(String name, Consumer<T> resultConsumer) {
+        super(name);
         this.resultConsumer = resultConsumer;
     }
 
@@ -26,17 +25,17 @@ public class Dialog<T> extends ModularPanel {
 
     @Override
     public boolean isDraggable() {
-        return draggable;
+        return this.draggable;
     }
 
     @Override
     public boolean disablePanelsBelow() {
-        return disablePanelsBelow;
+        return this.disablePanelsBelow;
     }
 
     @Override
     public boolean closeOnOutOfBoundsClick() {
-        return closeOnOutOfBoundsClick;
+        return this.closeOnOutOfBoundsClick;
     }
 
     public Dialog<T> setDraggable(boolean draggable) {

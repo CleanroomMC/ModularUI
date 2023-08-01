@@ -22,7 +22,7 @@ public class PopupMenu<W extends PopupMenu<W>> extends Widget<W> {
     @NotNull
     @Override
     public List<IWidget> getChildren() {
-        return children;
+        return this.children;
     }
 
     @Override
@@ -50,7 +50,7 @@ public class PopupMenu<W extends PopupMenu<W>> extends Widget<W> {
 
         @Override
         public @NotNull List<IWidget> getChildren() {
-            return children;
+            return this.children;
         }
 
         @Override

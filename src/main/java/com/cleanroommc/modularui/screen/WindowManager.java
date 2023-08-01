@@ -9,10 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class WindowManager {
 
@@ -26,7 +23,7 @@ public class WindowManager {
      * List of all open panels from top to bottom.
      */
     private final LinkedList<ModularPanel> panels = new LinkedList<>();
-    private final List<ModularPanel> panelsView = Collections.unmodifiableList(panels);
+    private final List<ModularPanel> panelsView = Collections.unmodifiableList(this.panels);
     private final ReverseIterable<ModularPanel> reversePanels = new ReverseIterable<>(this.panelsView);
     private final List<ModularPanel> queueOpenPanels = new ArrayList<>();
     private final List<ModularPanel> queueClosePanels = new ArrayList<>();
@@ -40,19 +37,12 @@ public class WindowManager {
         if (this.mainPanel != null) {
             throw new IllegalStateException();
         }
-        if (panel == null) {
-            throw new NullPointerException();
-        }
-        this.mainPanel = panel;
-
+        this.mainPanel = Objects.requireNonNull(panel, "Main panel must not be null!");
     }
 
     void init() {
         if (this.mainPanel == null) {
             throw new IllegalStateException("WindowManager is not yet constructed!");
-        }
-        if (this.mainPanel.getName() == null) {
-            this.mainPanel.name("Main");
         }
         openPanel(this.mainPanel, false);
     }
@@ -90,7 +80,10 @@ public class WindowManager {
 
     private void openPanel(ModularPanel panel, boolean resize) {
         panel.validateName();
-        if (this.panels.contains(panel) || isPanelOpen(panel.getName())) throw new IllegalStateException("Panel " + panel.getName() + " is already open.");
+        if (this.panels.contains(panel) || isPanelOpen(panel.getName())) {
+            throw new IllegalStateException("Panel " + panel.getName() + " is already open.");
+        }
+        panel.setPanelGuiContext(this.screen.context);
         this.panels.addFirst(panel);
         panel.onOpen(this.screen);
         if (resize) {
@@ -109,7 +102,7 @@ public class WindowManager {
 
     @NotNull
     public ModularScreen getScreen() {
-        return screen;
+        return this.screen;
     }
 
     @NotNull
@@ -120,7 +113,7 @@ public class WindowManager {
         if (this.closed) {
             throw new IllegalStateException("Screen has been closed");
         }
-        return mainPanel;
+        return this.mainPanel;
     }
 
     public ModularPanel getTopMostPanel() {
@@ -213,7 +206,7 @@ public class WindowManager {
     @NotNull
     @UnmodifiableView
     public List<ModularPanel> getOpenPanels() {
-        return panelsView;
+        return this.panelsView;
     }
 
     @NotNull
@@ -223,7 +216,7 @@ public class WindowManager {
     }
 
     public boolean isClosed() {
-        return closed;
+        return this.closed;
     }
 
     public boolean isAboutToClose(ModularPanel panel) {

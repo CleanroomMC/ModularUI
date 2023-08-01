@@ -23,11 +23,11 @@ public class MouseData {
     }
 
     public void writeToPacket(PacketBuffer buffer) {
-        buffer.writeVarInt(mouseButton);
+        buffer.writeVarInt(this.mouseButton);
         byte data = 0;
-        if (shift) data |= 1;
-        if (ctrl) data |= 2;
-        if (alt) data |= 4;
+        if (this.shift) data |= 1;
+        if (this.ctrl) data |= 2;
+        if (this.alt) data |= 4;
         buffer.writeByte(data);
     }
 

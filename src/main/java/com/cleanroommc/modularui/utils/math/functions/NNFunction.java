@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.utils.math.functions;
 
-import com.cleanroommc.modularui.api.IValue;
+import com.cleanroommc.modularui.api.IMathValue;
 import com.cleanroommc.modularui.utils.math.Operation;
 
 /**
@@ -8,19 +8,19 @@ import com.cleanroommc.modularui.utils.math.Operation;
  */
 public abstract class NNFunction extends Function {
 
-    public NNFunction(IValue[] values, String name) throws Exception {
+    public NNFunction(IMathValue[] values, String name) throws Exception {
         super(values, name);
     }
 
     @Override
-    protected void verifyArgument(int index, IValue value) {
+    protected void verifyArgument(int index, IMathValue value) {
         if (!value.isNumber()) {
             throw new IllegalStateException("Function " + this.name + " cannot receive string arguments!");
         }
     }
 
     @Override
-    public IValue get() {
+    public IMathValue get() {
         this.result.set(this.doubleValue());
 
         return this.result;

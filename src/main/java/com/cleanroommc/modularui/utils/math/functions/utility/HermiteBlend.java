@@ -1,11 +1,11 @@
 package com.cleanroommc.modularui.utils.math.functions.utility;
 
-import com.cleanroommc.modularui.api.IValue;
+import com.cleanroommc.modularui.api.IMathValue;
 import com.cleanroommc.modularui.utils.math.functions.NNFunction;
 
 public class HermiteBlend extends NNFunction {
 
-    public HermiteBlend(IValue[] values, String name) throws Exception {
+    public HermiteBlend(IMathValue[] values, String name) throws Exception {
         super(values, name);
     }
 

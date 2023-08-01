@@ -1,11 +1,11 @@
 package com.cleanroommc.modularui.utils.math.functions.classic;
 
-import com.cleanroommc.modularui.api.IValue;
+import com.cleanroommc.modularui.api.IMathValue;
 import com.cleanroommc.modularui.utils.math.functions.NNFunction;
 
 public class Sqrt extends NNFunction {
 
-    public Sqrt(IValue[] values, String name) throws Exception {
+    public Sqrt(IMathValue[] values, String name) throws Exception {
         super(values, name);
     }
 

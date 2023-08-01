@@ -3,11 +3,8 @@ package com.cleanroommc.modularui.theme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.google.gson.JsonObject;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.Nullable;
 
-@SideOnly(Side.CLIENT)
 public class WidgetTheme {
 
     @Nullable
@@ -35,22 +32,22 @@ public class WidgetTheme {
     }
 
     public @Nullable IDrawable getBackground() {
-        return background;
+        return this.background;
     }
 
     public @Nullable IDrawable getHoverBackground() {
-        return hoverBackground;
+        return this.hoverBackground;
     }
 
     public int getColor() {
-        return color;
+        return this.color;
     }
 
     public int getTextColor() {
-        return textColor;
+        return this.textColor;
     }
 
     public boolean getTextShadow() {
-        return textShadow;
+        return this.textShadow;
     }
 }

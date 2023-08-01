@@ -1,10 +1,7 @@
 package com.cleanroommc.modularui.theme;
 
 import com.cleanroommc.modularui.api.ITheme;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-@SideOnly(Side.CLIENT)
 public abstract class AbstractDefaultTheme implements ITheme {
 
     private WidgetTheme panel;
@@ -23,7 +20,7 @@ public abstract class AbstractDefaultTheme implements ITheme {
         if (this.panel == null) {
             this.panel = getWidgetTheme(Theme.PANEL);
         }
-        return panel;
+        return this.panel;
     }
 
     @Override
@@ -31,7 +28,7 @@ public abstract class AbstractDefaultTheme implements ITheme {
         if (this.button == null) {
             this.button = getWidgetTheme(Theme.BUTTON);
         }
-        return button;
+        return this.button;
     }
 
     @Override
@@ -39,7 +36,7 @@ public abstract class AbstractDefaultTheme implements ITheme {
         if (this.itemSlot == null) {
             this.itemSlot = (WidgetSlotTheme) getWidgetTheme(Theme.ITEM_SLOT);
         }
-        return itemSlot;
+        return this.itemSlot;
     }
 
     @Override
@@ -47,7 +44,7 @@ public abstract class AbstractDefaultTheme implements ITheme {
         if (this.fluidSlot == null) {
             this.fluidSlot = (WidgetSlotTheme) getWidgetTheme(Theme.FLUID_SLOT);
         }
-        return fluidSlot;
+        return this.fluidSlot;
     }
 
     @Override
@@ -55,6 +52,6 @@ public abstract class AbstractDefaultTheme implements ITheme {
         if (this.textField == null) {
             this.textField = (WidgetTextFieldTheme) getWidgetTheme(Theme.TEXT_FIELD);
         }
-        return textField;
+        return this.textField;
     }
 }

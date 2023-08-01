@@ -3,12 +3,9 @@ package com.cleanroommc.modularui.theme;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.IThemeApi;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Map;
 
-@SideOnly(Side.CLIENT)
 public class Theme implements ITheme {
 
     public static final String FALLBACK = "default";
@@ -58,37 +55,37 @@ public class Theme implements ITheme {
     }
 
     public String getId() {
-        return id;
+        return this.id;
     }
 
     public ITheme getParentTheme() {
-        return parentTheme;
+        return this.parentTheme;
     }
 
     public WidgetTheme getFallback() {
-        return fallback;
+        return this.fallback;
     }
 
     public WidgetTheme getPanelTheme() {
-        return panelTheme;
+        return this.panelTheme;
     }
 
     public WidgetTheme getButtonTheme() {
-        return buttonTheme;
+        return this.buttonTheme;
     }
 
     @Override
     public WidgetSlotTheme getItemSlotTheme() {
-        return itemSlotTheme;
+        return this.itemSlotTheme;
     }
 
     @Override
     public WidgetSlotTheme getFluidSlotTheme() {
-        return fluidSlotTheme;
+        return this.fluidSlotTheme;
     }
 
     public WidgetTextFieldTheme getTextFieldTheme() {
-        return textFieldTheme;
+        return this.textFieldTheme;
     }
 
     public WidgetTheme getWidgetTheme(String id) {

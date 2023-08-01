@@ -6,9 +6,10 @@ import com.cleanroommc.modularui.api.layout.MainAxisAlignment;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.Rectangle;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.value.DoubleValue;
+import com.cleanroommc.modularui.value.StringValue;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Row;
@@ -28,13 +29,12 @@ public class ColorPickerDialog extends Dialog<Integer> {
     private final Rectangle sliderBackgroundB = new Rectangle();
     private final Rectangle sliderBackgroundA = new Rectangle();
 
-    public ColorPickerDialog(GuiContext context, Consumer<Integer> resultConsumer, int startColor) {
-        this(context, resultConsumer, startColor, false);
+    public ColorPickerDialog(Consumer<Integer> resultConsumer, int startColor, boolean controlAlpha) {
+        this("color_picker", resultConsumer, startColor, false);
     }
 
-    public ColorPickerDialog(GuiContext context, Consumer<Integer> resultConsumer, int startColor, boolean controlAlpha) {
-        super(context, resultConsumer);
-        name("color_picker");
+    public ColorPickerDialog(String name, Consumer<Integer> resultConsumer, int startColor, boolean controlAlpha) {
+        super(name, resultConsumer);
         this.alpha = Color.getAlpha(startColor);
         updateColor(startColor);
         this.controlAlpha = controlAlpha;
@@ -60,25 +60,24 @@ public class ColorPickerDialog extends Dialog<Integer> {
                         .child(new TextFieldWidget()
                                 .expanded()
                                 .setValidator(this::validateRawColor)
-                                .getter(() -> {
+                                .value(new StringValue.Dynamic(() -> {
                                     if (controlAlpha) {
                                         return "#" + Integer.toHexString(this.color);
                                     }
                                     return "#" + Integer.toHexString(Color.withAlpha(this.color, 0));
-                                })
-                                .setter(val -> {
+                                }, val -> {
                                     try {
                                         updateColor(Integer.decode(val));
                                     } catch (NumberFormatException ignored) {
                                     }
-                                }))
+                                })))
                         .child(this.preview.asWidget().background(GuiTextures.CHECKBOARD).size(10, 10).margin(1)))
                 .child(new PagedWidget<>()
                         .left(5).right(5)
                         .expanded()
                         .controller(controller)
-                        .addPage(createRGBPage(context))
-                        .addPage(createHSVPage(context)))
+                        .addPage(createRGBPage())
+                        .addPage(createHSVPage()))
                 .child(new Row()
                         .left(10).right(10).height(14)
                         .mainAxisAlignment(MainAxisAlignment.SPACE_BETWEEN)
@@ -98,7 +97,7 @@ public class ColorPickerDialog extends Dialog<Integer> {
                                 }))));
     }
 
-    private IWidget createRGBPage(GuiContext context) {
+    private IWidget createRGBPage() {
         IDrawable handleBackground = new Rectangle().setColor(Color.WHITE.normal);
         Column parentWidget = new Column()
                 .sizeRel(1f, 1f)
@@ -112,8 +111,7 @@ public class ColorPickerDialog extends Dialog<Integer> {
                                 .sliderTexture(handleBackground)
                                 .sliderSize(2, 8)
                                 .bounds(0, 255)
-                                .setter(val -> updateColor(Color.withRed(this.color, (int) val)))
-                                .getter(() -> Color.getRed(this.color))))
+                                .value(new DoubleValue.Dynamic(() -> Color.getRed(this.color), val -> updateColor(Color.withRed(this.color, (int) val))))))
                 .child(new Row()
                         .widthRel(1f).height(12)
                         .child(IKey.str("G: ").asWidget().heightRel(1f))
@@ -124,8 +122,7 @@ public class ColorPickerDialog extends Dialog<Integer> {
                                 .sliderTexture(handleBackground)
                                 .sliderSize(2, 8)
                                 .bounds(0, 255)
-                                .setter(val -> updateColor(Color.withGreen(this.color, (int) val)))
-                                .getter(() -> Color.getGreen(this.color))))
+                                .value(new DoubleValue.Dynamic(() -> Color.getGreen(this.color), val -> updateColor(Color.withGreen(this.color, (int) val))))))
                 .child(new Row()
                         .widthRel(1f).height(12)
                         .child(IKey.str("B: ").asWidget().heightRel(1f))
@@ -136,8 +133,7 @@ public class ColorPickerDialog extends Dialog<Integer> {
                                 .sliderTexture(handleBackground)
                                 .sliderSize(2, 8)
                                 .bounds(0, 255)
-                                .setter(val -> updateColor(Color.withBlue(this.color, (int) val)))
-                                .getter(() -> Color.getBlue(this.color))));
+                                .value(new DoubleValue.Dynamic(() -> Color.getBlue(this.color), val -> updateColor(Color.withBlue(this.color, (int) val))))));
 
         if (this.controlAlpha) {
             parentWidget.child(new Row()
@@ -150,13 +146,12 @@ public class ColorPickerDialog extends Dialog<Integer> {
                             .sliderTexture(handleBackground)
                             .sliderSize(2, 8)
                             .bounds(0, 255)
-                            .setter(val -> updateColor(Color.withAlpha(this.color, (int) val)))
-                            .getter(() -> Color.getAlpha(this.color))));
+                            .value(new DoubleValue.Dynamic(() -> Color.getAlpha(this.color), val -> updateColor(Color.withAlpha(this.color, (int) val))))));
         }
         return parentWidget;
     }
 
-    private IWidget createHSVPage(GuiContext context) {
+    private IWidget createHSVPage() {
         return new ParentWidget<>()
                 .sizeRel(1f, 1f)
                 .child(IKey.str("WIP").asWidget().sizeRel(1f, 1f).alignment(Alignment.Center));

@@ -42,7 +42,7 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
     }
 
     public ScrollArea getScrollArea() {
-        return scroll;
+        return this.scroll;
     }
 
     @Override

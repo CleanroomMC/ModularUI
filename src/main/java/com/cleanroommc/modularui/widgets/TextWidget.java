@@ -40,10 +40,10 @@ public class TextWidget extends Widget<TextWidget> {
 
     @Override
     public void applyTheme(ITheme theme) {
-        if (!colorChanged) {
+        if (!this.colorChanged) {
             this.color = getWidgetTheme(theme).getTextColor();
         }
-        if (!shadowChanged) {
+        if (!this.shadowChanged) {
             this.shadow = getWidgetTheme(theme).getTextShadow();
         }
     }
@@ -82,23 +82,23 @@ public class TextWidget extends Widget<TextWidget> {
     }
 
     public IKey getKey() {
-        return key;
+        return this.key;
     }
 
     public Alignment getAlignment() {
-        return alignment;
+        return this.alignment;
     }
 
     public float getScale() {
-        return scale;
+        return this.scale;
     }
 
     public int getColor() {
-        return color;
+        return this.color;
     }
 
     public boolean isShadow() {
-        return shadow;
+        return this.shadow;
     }
 
     public TextWidget alignment(Alignment alignment) {

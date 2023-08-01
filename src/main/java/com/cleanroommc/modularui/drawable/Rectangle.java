@@ -8,6 +8,8 @@ import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.function.IntConsumer;
 
@@ -28,7 +30,7 @@ public class Rectangle implements IDrawable {
     }
 
     public int getColor() {
-        return colorTL;
+        return this.colorTL;
     }
 
     public Rectangle setCornerRadius(int cornerRadius) {
@@ -74,6 +76,7 @@ public class Rectangle implements IDrawable {
         }
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiContext context, int x0, int y0, int width, int height) {
         if (this.cornerRadius <= 0) {
@@ -85,7 +88,7 @@ public class Rectangle implements IDrawable {
 
     @Override
     public boolean canApplyTheme() {
-        return canApplyTheme;
+        return this.canApplyTheme;
     }
 
     @Override
@@ -124,10 +127,10 @@ public class Rectangle implements IDrawable {
                 this.colorBR = c;
             }
         }
-        setColor(json, val -> colorTL = val, "colorTopLeft", "colorTL");
-        setColor(json, val -> colorTR = val, "colorTopRight", "colorTR");
-        setColor(json, val -> colorBL = val, "colorBottomLeft", "colorBL");
-        setColor(json, val -> colorBR = val, "colorBottomRight", "colorBR");
+        setColor(json, val -> this.colorTL = val, "colorTopLeft", "colorTL");
+        setColor(json, val -> this.colorTR = val, "colorTopRight", "colorTR");
+        setColor(json, val -> this.colorBL = val, "colorBottomLeft", "colorBL");
+        setColor(json, val -> this.colorBR = val, "colorBottomRight", "colorBR");
         this.cornerRadius = JsonHelper.getInt(json, 0, "cornerRadius");
         this.cornerSegments = JsonHelper.getInt(json, 10, "cornerSegments");
     }

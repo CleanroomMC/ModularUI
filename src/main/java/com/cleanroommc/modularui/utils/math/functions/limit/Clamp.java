@@ -1,12 +1,12 @@
 package com.cleanroommc.modularui.utils.math.functions.limit;
 
-import com.cleanroommc.modularui.api.IValue;
+import com.cleanroommc.modularui.api.IMathValue;
 import com.cleanroommc.modularui.utils.math.functions.NNFunction;
 import net.minecraft.util.math.MathHelper;
 
 public class Clamp extends NNFunction {
 
-    public Clamp(IValue[] values, String name) throws Exception {
+    public Clamp(IMathValue[] values, String name) throws Exception {
         super(values, name);
     }
 

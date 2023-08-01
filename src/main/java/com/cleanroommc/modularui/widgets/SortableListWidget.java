@@ -41,7 +41,7 @@ public class SortableListWidget<T, I extends SortableListWidget.Item<T>> extends
     private int timeSinceLastMove = 0;
 
     public SortableListWidget(Function<T, I> valueToWidgetMapper) {
-        super(valueToWidgetMapper, Item::getValue);
+        super(valueToWidgetMapper, Item::getWidgetValue);
         flex().startDefaultMode()
                 .width(80)
                 .endDefaultMode();
@@ -152,21 +152,21 @@ public class SortableListWidget<T, I extends SortableListWidget.Item<T>> extends
         @Override
         public void onInit() {
             super.onInit();
-            if (removeButton != null) {
+            if (this.removeButton != null) {
 
-                children.add(removeButton);
+                this.children.add(this.removeButton);
             }
         }
 
         @NotNull
         @Override
         public List<IWidget> getChildren() {
-            return children;
+            return this.children;
         }
 
         @Override
         public boolean canDropHere(int x, int y, @Nullable IGuiElement widget) {
-            return dropPredicate == null || dropPredicate.test(widget);
+            return this.dropPredicate == null || this.dropPredicate.test(widget);
         }
 
         @Override
@@ -184,12 +184,12 @@ public class SortableListWidget<T, I extends SortableListWidget.Item<T>> extends
         }
 
         @Override
-        public T getValue() {
-            return value;
+        public T getWidgetValue() {
+            return this.value;
         }
 
         public int getIndex() {
-            return index;
+            return this.index;
         }
 
         public Item<T> dropPredicate(Predicate<IGuiElement> dropPredicate) {

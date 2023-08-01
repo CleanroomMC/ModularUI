@@ -54,9 +54,9 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
 
         // calculate start y
         int lastY = 0;
-        if (maa == MainAxisAlignment.CENTER) {
+        if (this.maa == MainAxisAlignment.CENTER) {
             lastY = (int) (height / 2f - totalHeight / 2f);
-        } else if (maa == MainAxisAlignment.END) {
+        } else if (this.maa == MainAxisAlignment.END) {
             lastY = height - totalHeight;
         }
         lastY = Math.max(lastY, padding.top) - getArea().getMargin().top;
@@ -68,9 +68,9 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
             // don't align auto positioned (X) children in X
             if (!widget.flex().hasXPos()) {
                 int x = 0;
-                if (caa == CrossAxisAlignment.CENTER) {
+                if (this.caa == CrossAxisAlignment.CENTER) {
                     x = (int) (width / 2f - widget.getArea().requestedWidth() / 2f);
-                } else if (caa == CrossAxisAlignment.END) {
+                } else if (this.caa == CrossAxisAlignment.END) {
                     x = width - widget.getArea().requestedWidth();
                 }
                 x = Math.max(x, padding.left + margin.left);
@@ -81,7 +81,7 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
             widget.getArea().ry = lastY + margin.top;
 
             lastY += widget.getArea().requestedHeight();
-            if (maa == MainAxisAlignment.SPACE_BETWEEN) {
+            if (this.maa == MainAxisAlignment.SPACE_BETWEEN) {
                 lastY += (height - totalHeight) / (getChildren().size() - 1);
             }
         }

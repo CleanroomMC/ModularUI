@@ -30,15 +30,15 @@ public class GhostIngredientTarget<I> implements IGhostIngredientHandler.Target<
 
     @Override
     public @NotNull Rectangle getArea() {
-        return guiElement.getArea();
+        return this.guiElement.getArea();
     }
 
     @Override
     public void accept(@NotNull I ingredient) {
-        ingredient = ghostSlot.castGhostIngredientIfValid(ingredient);
+        ingredient = this.ghostSlot.castGhostIngredientIfValid(ingredient);
         if (ingredient == null) {
             throw new IllegalStateException("Ghost slot did accept ingredient before, but now it doesn't.");
         }
-        ghostSlot.setGhostIngredient(ingredient);
+        this.ghostSlot.setGhostIngredient(ingredient);
     }
 }

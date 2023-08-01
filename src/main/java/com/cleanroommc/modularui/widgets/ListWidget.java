@@ -45,7 +45,7 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
     }
 
     public static <T, V extends IValueWidget<T> & IWidget, W extends ListWidget<T, V, W>> ListWidget<T, V, W> of(Function<T, V> valueToWidgetMapper) {
-        return new ListWidget<>(valueToWidgetMapper, IValueWidget::getValue);
+        return new ListWidget<>(valueToWidgetMapper, IValueWidget::getWidgetValue);
     }
 
     public static <T, I extends IWidget, W extends ListWidget<T, I, W>> ListWidget<T, I, W> builder(List<T> list, Function<T, I> creator) {
@@ -115,7 +115,7 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
     }
 
     public ScrollData getScrollData() {
-        return scrollData;
+        return this.scrollData;
     }
 
     public W scrollDirection(ScrollDirection direction) {

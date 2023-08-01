@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.utils.math;
 
-import com.cleanroommc.modularui.api.IValue;
+import com.cleanroommc.modularui.api.IMathValue;
 
 /**
  * Ternary operator class
@@ -8,22 +8,22 @@ import com.cleanroommc.modularui.api.IValue;
  * This value implementation allows to return different values depending on
  * given condition value
  */
-public class Ternary implements IValue {
+public class Ternary implements IMathValue {
 
-    public IValue condition;
-    public IValue ifTrue;
-    public IValue ifFalse;
+    public IMathValue condition;
+    public IMathValue ifTrue;
+    public IMathValue ifFalse;
 
-    private final IValue result = new Constant(0);
+    private final IMathValue result = new Constant(0);
 
-    public Ternary(IValue condition, IValue ifTrue, IValue ifFalse) {
+    public Ternary(IMathValue condition, IMathValue ifTrue, IMathValue ifFalse) {
         this.condition = condition;
         this.ifTrue = ifTrue;
         this.ifFalse = ifFalse;
     }
 
     @Override
-    public IValue get() {
+    public IMathValue get() {
         if (this.isNumber()) {
             this.result.set(this.doubleValue());
         } else {

@@ -8,17 +8,14 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.Widget;
 import net.minecraft.client.Minecraft;
+import org.jetbrains.annotations.NotNull;
 
 public class TransformationTestGui extends ModularScreen {
 
-    public TransformationTestGui() {
-        super("test");
-    }
-
     @Override
-    public ModularPanel buildUI(GuiContext context) {
-        return new TestPanel(context)
-                .child(new TestWidget()
+    public @NotNull ModularPanel buildUI(GuiContext context) {
+        return new TestPanel("test")
+                .child(new Widget<>()
                         .align(Alignment.Center)
                         .size(50, 50)
                         .background(GuiTextures.BUTTON));
@@ -26,8 +23,8 @@ public class TransformationTestGui extends ModularScreen {
 
     private static class TestPanel extends ModularPanel {
 
-        public TestPanel(GuiContext context) {
-            super(context);
+        public TestPanel(String name) {
+            super(name);
             //background(GuiTextures.BACKGROUND);
             align(Alignment.Center).size(100, 100);
         }
@@ -40,13 +37,5 @@ public class TransformationTestGui extends ModularScreen {
             stack.rotateZ(angle);
             stack.translate(-50, -50);
         }
-
-        @Override
-        public void transformChildren(IViewportStack stack) {
-        }
-    }
-
-    private static class TestWidget extends Widget<TestWidget> {
-
     }
 }

@@ -1,13 +1,13 @@
 package com.cleanroommc.modularui.utils.math;
 
-import com.cleanroommc.modularui.api.IValue;
+import com.cleanroommc.modularui.api.IMathValue;
 
 /**
  * Constant class
  * <p>
  * This class simply returns supplied in the constructor value
  */
-public class Constant implements IValue {
+public class Constant implements IMathValue {
 
     private double doubleValue;
     private String stringValue;
@@ -21,7 +21,7 @@ public class Constant implements IValue {
     }
 
     @Override
-    public IValue get() {
+    public IMathValue get() {
         return this;
     }
 

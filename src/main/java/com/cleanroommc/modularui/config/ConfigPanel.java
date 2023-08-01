@@ -1,14 +1,13 @@
 package com.cleanroommc.modularui.config;
 
 import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
 
 public class ConfigPanel extends ModularPanel {
 
     private final Config config;
 
-    public ConfigPanel(GuiContext context, Config config) {
-        super(context);
+    public ConfigPanel(Config config) {
+        super("config");
         this.config = config;
         initGui();
     }

@@ -53,9 +53,9 @@ public class Row extends ParentWidget<Row> implements ILayoutWidget {
 
         // calculate start y
         int lastX = 0;
-        if (maa == MainAxisAlignment.CENTER) {
+        if (this.maa == MainAxisAlignment.CENTER) {
             lastX = (int) (width / 2f - totalWidth / 2f);
-        } else if (maa == MainAxisAlignment.END) {
+        } else if (this.maa == MainAxisAlignment.END) {
             lastX = width - totalWidth;
         }
         lastX = Math.max(lastX, padding.left) - getArea().getMargin().left;
@@ -67,9 +67,9 @@ public class Row extends ParentWidget<Row> implements ILayoutWidget {
             // don't align auto positioned (Y) children in Y
             if (!widget.flex().hasYPos()) {
                 int y = 0;
-                if (caa == CrossAxisAlignment.CENTER) {
+                if (this.caa == CrossAxisAlignment.CENTER) {
                     y = (int) (height / 2f - widget.getArea().requestedHeight() / 2f);
-                } else if (caa == CrossAxisAlignment.END) {
+                } else if (this.caa == CrossAxisAlignment.END) {
                     y = height - widget.getArea().requestedHeight();
                 }
                 y = Math.max(y, padding.top);
@@ -80,7 +80,7 @@ public class Row extends ParentWidget<Row> implements ILayoutWidget {
             widget.getArea().rx = lastX + margin.left;
 
             lastX += widget.getArea().requestedWidth();
-            if (maa == MainAxisAlignment.SPACE_BETWEEN) {
+            if (this.maa == MainAxisAlignment.SPACE_BETWEEN) {
                 lastX += (width - totalWidth) / (getChildren().size() - 1);
             }
         }

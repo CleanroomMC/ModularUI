@@ -25,7 +25,7 @@ public class ValueInt extends Value {
 
     @Override
     public JsonElement writeJson() {
-        return new JsonPrimitive(value);
+        return new JsonPrimitive(this.value);
     }
 
     @Override
@@ -49,10 +49,10 @@ public class ValueInt extends Value {
     }
 
     public int getValue() {
-        return value;
+        return this.value;
     }
 
     public int getDefaultValue() {
-        return defaultValue;
+        return this.defaultValue;
     }
 }

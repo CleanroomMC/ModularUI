@@ -1,7 +1,8 @@
 package com.cleanroommc.modularui.api.widget;
 
-import com.cleanroommc.modularui.api.sync.SyncHandler;
-import com.cleanroommc.modularui.sync.GuiSyncHandler;
+import com.cleanroommc.modularui.value.sync.GuiSyncManager;
+import com.cleanroommc.modularui.value.sync.SyncHandler;
+import org.jetbrains.annotations.NotNull;
 
 public interface ISynced<W extends IWidget> {
 
@@ -10,19 +11,24 @@ public interface ISynced<W extends IWidget> {
         return (W) this;
     }
 
-    void initialiseSyncHandler(GuiSyncHandler syncHandler);
+    void initialiseSyncHandler(GuiSyncManager syncHandler);
 
     default boolean isValidSyncHandler(SyncHandler syncHandler) {
         return true;
     }
 
-    W setSynced(String key);
+    boolean isSynced();
 
-    default W setSynced(String name, int id) {
-        return setSynced(GuiSyncHandler.makeSyncKey(name, id));
+    @NotNull
+    SyncHandler getSyncHandler();
+
+    W syncHandler(String key);
+
+    default W syncHandler(String name, int id) {
+        return syncHandler(GuiSyncManager.makeSyncKey(name, id));
     }
 
-    default W setSynced(int id) {
-        return setSynced(GuiSyncHandler.makeSyncKey(id));
+    default W syncHandler(int id) {
+        return syncHandler(GuiSyncManager.makeSyncKey(id));
     }
 }

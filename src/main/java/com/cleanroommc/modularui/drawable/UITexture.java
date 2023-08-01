@@ -11,6 +11,8 @@ import com.cleanroommc.modularui.widget.sizer.Area;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -80,28 +82,29 @@ public class UITexture implements IDrawable {
      * @return relative sub area
      */
     public UITexture getSubArea(float uStart, float vStart, float uEnd, float vEnd) {
-        return new UITexture(location, calcU(uStart), calcV(vStart), calcU(uEnd), calcV(vEnd), canApplyTheme);
+        return new UITexture(this.location, calcU(uStart), calcV(vStart), calcU(uEnd), calcV(vEnd), this.canApplyTheme);
     }
 
     public ResourceLocation getLocation() {
-        return location;
+        return this.location;
     }
 
     protected final float calcU(float uNew) {
-        return (u1 - u0) * uNew + u0;
+        return (this.u1 - this.u0) * uNew + this.u0;
     }
 
     protected final float calcV(float vNew) {
-        return (v1 - v0) * vNew + v0;
+        return (this.v1 - this.v0) * vNew + this.v0;
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height) {
         draw((float) x, y, width, height);
     }
 
     public void draw(float x, float y, float width, float height) {
-        GuiDraw.drawTexture(this.location, x, y, x + width, y + height, u0, v0, u1, v1);
+        GuiDraw.drawTexture(this.location, x, y, x + width, y + height, this.u0, this.v0, this.u1, this.v1);
     }
 
     public void drawSubArea(float x, float y, float width, float height, float uStart, float vStart, float uEnd, float vEnd) {
@@ -119,7 +122,7 @@ public class UITexture implements IDrawable {
 
     @Override
     public boolean canApplyTheme() {
-        return canApplyTheme;
+        return this.canApplyTheme;
     }
 
     public static IDrawable parseFromJson(JsonObject json) {
@@ -353,11 +356,11 @@ public class UITexture implements IDrawable {
          */
         public UITexture build() {
             UITexture texture = create();
-            if (type != null && name != null) {
-                if (type == Type.ICON) {
-                    GuiTextures.registerIcon(name, texture);
-                } else if (type == Type.BACKGROUND) {
-                    GuiTextures.registerBackground(name, texture);
+            if (this.type != null && this.name != null) {
+                if (this.type == Type.ICON) {
+                    GuiTextures.registerIcon(this.name, texture);
+                } else if (this.type == Type.BACKGROUND) {
+                    GuiTextures.registerBackground(this.name, texture);
                 }
             }
             return texture;
@@ -367,30 +370,30 @@ public class UITexture implements IDrawable {
             if (this.location == null) {
                 throw new NullPointerException("Location must not be null");
             }
-            if (iw <= 0 || ih <= 0) throw new IllegalArgumentException("Image size must be > 0");
-            if (mode == 0) {
-                u0 = 0;
-                v0 = 0;
-                u1 = 1;
-                v1 = 1;
-                mode = 2;
-            } else if (mode == 1) {
-                float tw = 1f / iw, th = 1f / ih;
-                u0 = x * tw;
-                v0 = y * th;
-                u1 = (x + w) * tw;
-                v1 = (y + h) * th;
-                mode = 2;
+            if (this.iw <= 0 || this.ih <= 0) throw new IllegalArgumentException("Image size must be > 0");
+            if (this.mode == 0) {
+                this.u0 = 0;
+                this.v0 = 0;
+                this.u1 = 1;
+                this.v1 = 1;
+                this.mode = 2;
+            } else if (this.mode == 1) {
+                float tw = 1f / this.iw, th = 1f / this.ih;
+                this.u0 = this.x * tw;
+                this.v0 = this.y * th;
+                this.u1 = (this.x + this.w) * tw;
+                this.v1 = (this.y + this.h) * th;
+                this.mode = 2;
             }
-            if (mode == 2) {
-                if (u0 < 0 || v0 < 0 || u1 > 1 || v1 > 1) throw new IllegalArgumentException("UV values must be 0 - 1");
-                if (borderX > 0 || borderY > 0) {
-                    return new AdaptableUITexture(location, u0, v0, u1, v1, canApplyTheme, iw, ih, borderX, borderY, tiled);
+            if (this.mode == 2) {
+                if (this.u0 < 0 || this.v0 < 0 || this.u1 > 1 || this.v1 > 1) throw new IllegalArgumentException("UV values must be 0 - 1");
+                if (this.borderX > 0 || this.borderY > 0) {
+                    return new AdaptableUITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.canApplyTheme, this.iw, this.ih, this.borderX, this.borderY, this.tiled);
                 }
-                if (tiled) {
-                    return new TiledUITexture(location, u0, v0, u1, v1, iw, ih, canApplyTheme);
+                if (this.tiled) {
+                    return new TiledUITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.iw, this.ih, this.canApplyTheme);
                 }
-                return new UITexture(location, u0, v0, u1, v1, canApplyTheme);
+                return new UITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.canApplyTheme);
             }
             throw new IllegalStateException();
         }

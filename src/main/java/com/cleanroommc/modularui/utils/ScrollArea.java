@@ -44,11 +44,11 @@ public class ScrollArea extends Area {
     }
 
     public ScrollData getScrollX() {
-        return scrollX;
+        return this.scrollX;
     }
 
     public ScrollData getScrollY() {
-        return scrollY;
+        return this.scrollY;
     }
 
     public ScrollData getScrollData(GuiAxis axis) {
@@ -158,9 +158,9 @@ public class ScrollArea extends Area {
     public void drag(int x, int y) {
         ScrollData data;
         if (this.scrollX != null && this.scrollX.dragging) {
-            data = scrollX;
+            data = this.scrollX;
         } else if (this.scrollY != null && this.scrollY.dragging) {
-            data = scrollY;
+            data = this.scrollY;
         } else {
             return;
         }
@@ -187,7 +187,7 @@ public class ScrollArea extends Area {
     }
 
     public int getScrollBarBackgroundColor() {
-        return scrollBarBackgroundColor;
+        return this.scrollBarBackgroundColor;
     }
 
     public void setScrollBarBackgroundColor(int scrollBarBackgroundColor) {

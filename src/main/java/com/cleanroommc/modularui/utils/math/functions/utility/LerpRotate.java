@@ -1,12 +1,12 @@
 package com.cleanroommc.modularui.utils.math.functions.utility;
 
-import com.cleanroommc.modularui.api.IValue;
+import com.cleanroommc.modularui.api.IMathValue;
 import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.math.functions.NNFunction;
 
 public class LerpRotate extends NNFunction {
 
-    public LerpRotate(IValue[] values, String name) throws Exception {
+    public LerpRotate(IMathValue[] values, String name) throws Exception {
         super(values, name);
     }
 

@@ -55,7 +55,7 @@ public class EmptyWidget implements IWidget {
 
     @Override
     public Area getArea() {
-        return area;
+        return this.area;
     }
 
     @Override
@@ -83,7 +83,7 @@ public class EmptyWidget implements IWidget {
 
     @Override
     public @NotNull IWidget getParent() {
-        return parent;
+        return this.parent;
     }
 
     @Override
@@ -96,12 +96,12 @@ public class EmptyWidget implements IWidget {
         if (this.flex == null) {
             this.flex = new Flex(this);
         }
-        return flex;
+        return this.flex;
     }
 
     @Override
     public @Nullable IResizeable resizer() {
-        return flex;
+        return this.flex;
     }
 
     @Override
@@ -110,6 +110,6 @@ public class EmptyWidget implements IWidget {
 
     @Override
     public Flex getFlex() {
-        return flex;
+        return this.flex;
     }
 }

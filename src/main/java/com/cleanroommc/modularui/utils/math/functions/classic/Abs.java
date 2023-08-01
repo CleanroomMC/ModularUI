@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.utils.math.functions.classic;
 
-import com.cleanroommc.modularui.api.IValue;
+import com.cleanroommc.modularui.api.IMathValue;
 import com.cleanroommc.modularui.utils.math.functions.NNFunction;
 
 /**
@@ -8,7 +8,7 @@ import com.cleanroommc.modularui.utils.math.functions.NNFunction;
  */
 public class Abs extends NNFunction {
 
-    public Abs(IValue[] values, String name) throws Exception {
+    public Abs(IMathValue[] values, String name) throws Exception {
         super(values, name);
     }
 

@@ -29,7 +29,7 @@ public class LangKey implements IKey {
 
     @Override
     public String get() {
-        if (string == null || (this.args.length > 0 && lastTime > time)) {
+        if (this.string == null || (this.args.length > 0 && lastTime > this.time)) {
             this.time = lastTime;
             this.string = I18n.format(this.key, this.args);
         }

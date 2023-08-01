@@ -22,19 +22,19 @@ public class GuiErrorHandler {
     }
 
     public void clear() {
-        errors.clear();
+        this.errors.clear();
     }
 
     void pushError(IGuiElement reference, GuiError.Type type, String msg) {
         GuiError error = new GuiError(msg, reference, type);
-        if (errorSet.add(error)) {
+        if (this.errorSet.add(error)) {
             ModularUI.LOGGER.error(msg);
             this.errors.add(error);
         }
     }
 
     public List<GuiError> getErrors() {
-        return errors;
+        return this.errors;
     }
 
     public void drawErrors(int x, int y) {

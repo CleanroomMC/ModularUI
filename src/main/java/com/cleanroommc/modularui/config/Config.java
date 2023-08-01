@@ -2,9 +2,7 @@ package com.cleanroommc.modularui.config;
 
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.packets.SyncConfig;
-import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
@@ -77,21 +75,16 @@ public class Config {
     }
 
     public ModularScreen createScreen() {
-        return new ModularScreen("config_" + name) {
-            @Override
-            public ModularPanel buildUI(GuiContext context) {
-                return null;
-            }
-        };
+        return new ModularScreen(new ConfigPanel(this));
     }
 
     public JsonObject serialize() {
         JsonObject json = new JsonObject();
-        for (Map.Entry<String, Value> entry : values.entrySet()) {
+        for (Map.Entry<String, Value> entry : this.values.entrySet()) {
             JsonElement jsonElement = entry.getValue().writeJson();
             json.add(entry.getKey(), jsonElement);
         }
-        for (Map.Entry<String, Config> entry : categories.entrySet()) {
+        for (Map.Entry<String, Config> entry : this.categories.entrySet()) {
             JsonObject jsonObject = entry.getValue().serialize();
             json.add(entry.getKey(), jsonObject);
         }
@@ -101,13 +94,13 @@ public class Config {
     public void deserialize(JsonObject json) {
         for (Map.Entry<String, JsonElement> entry : json.entrySet()) {
             if (entry.getValue().isJsonObject()) {
-                Config category = categories.get(entry.getKey());
+                Config category = this.categories.get(entry.getKey());
                 if (category != null) {
                     category.deserialize(entry.getValue().getAsJsonObject());
                     continue;
                 }
             }
-            Value value = values.get(entry.getKey());
+            Value value = this.values.get(entry.getKey());
             if (value != null) {
                 value.readJson(entry.getValue());
             }
@@ -146,15 +139,15 @@ public class Config {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public File getFilePath() {
-        return filePath;
+        return this.filePath;
     }
 
     public boolean isSynced() {
-        return synced;
+        return this.synced;
     }
 
     public static class Builder {
@@ -191,23 +184,23 @@ public class Config {
         }
 
         public Builder buildCategory() {
-            if (parent == null) {
+            if (this.parent == null) {
                 throw new IllegalStateException("Call 'build' on root config");
             }
             Config config = buildInternal();
-            parent.categories.put(name, config);
-            return parent;
+            this.parent.categories.put(this.name, config);
+            return this.parent;
         }
 
         public Config build() {
-            if (parent != null) {
+            if (this.parent != null) {
                 throw new IllegalStateException("Call 'buildCategory' on categories!");
             }
             return buildInternal();
         }
 
         private Config buildInternal() {
-            return new Config(name, categories, values, basePath, synced);
+            return new Config(this.name, this.categories, this.values, this.basePath, this.synced);
         }
     }
 }

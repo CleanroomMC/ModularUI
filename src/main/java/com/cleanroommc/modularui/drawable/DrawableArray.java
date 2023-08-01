@@ -4,6 +4,8 @@ import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class DrawableArray implements IDrawable {
 
@@ -16,6 +18,7 @@ public class DrawableArray implements IDrawable {
         this.drawables = drawables == null || drawables.length == 0 ? EMPTY_BACKGROUND : drawables;
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height) {
         for (IDrawable drawable : this.drawables) {
@@ -43,6 +46,6 @@ public class DrawableArray implements IDrawable {
     }
 
     public IDrawable[] getDrawables() {
-        return drawables;
+        return this.drawables;
     }
 }

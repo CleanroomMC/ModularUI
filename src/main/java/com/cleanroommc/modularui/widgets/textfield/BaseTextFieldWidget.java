@@ -6,7 +6,6 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
-import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.ScrollData;
 import com.cleanroommc.modularui.utils.ScrollDirection;
@@ -37,7 +36,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     private static final Pattern BASE_PATTERN = Pattern.compile("[^§]");
 
     protected TextFieldHandler handler = new TextFieldHandler(this);
-    protected TextFieldRenderer renderer = new TextFieldRenderer(handler);
+    protected TextFieldRenderer renderer = new TextFieldRenderer(this.handler);
     protected Alignment textAlignment = Alignment.CenterLeft;
     protected int scrollOffset = 0;
     protected float scale = 1f;
@@ -47,7 +46,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
 
     public BaseTextFieldWidget() {
         super(new ScrollData(ScrollDirection.HORIZONTAL));
-        this.handler.setRenderer(renderer);
+        this.handler.setRenderer(this.renderer);
         this.handler.setScrollArea(getScrollArea());
         getScrollArea().getScrollX().scrollItemSize = 4;
         padding(4, 0);
@@ -75,9 +74,9 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     @Override
     public void onFrameUpdate() {
         super.onFrameUpdate();
-        if (isFocused() && ++cursorTimer == 30) {
-            renderer.toggleCursor();
-            cursorTimer = 0;
+        if (isFocused() && ++this.cursorTimer == 30) {
+            this.renderer.toggleCursor();
+            this.cursorTimer = 0;
         }
     }
 
@@ -90,11 +89,11 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     }
 
     public void drawText(GuiContext context) {
-        renderer.setSimulate(false);
-        renderer.setScale(scale);
-        renderer.setAlignment(textAlignment, -2, getArea().height);
-        renderer.draw(handler.getText());
-        getScrollArea().getScrollX().scrollSize = Math.max(0, (int) (renderer.getLastWidth() + 0.5f));
+        this.renderer.setSimulate(false);
+        this.renderer.setScale(this.scale);
+        this.renderer.setAlignment(this.textAlignment, -2, getArea().height);
+        this.renderer.draw(this.handler.getText());
+        getScrollArea().getScrollX().scrollSize = Math.max(0, (int) (this.renderer.getLastWidth() + 0.5f));
     }
 
     @Override
@@ -139,14 +138,14 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
         if (!isHovering()) {
             return Result.IGNORE;
         }
-        handler.setCursor(renderer.getCursorPos(handler.getText(), getContext().getMouseX() - getArea().x, getContext().getMouseY() - getArea().y), true);
+        this.handler.setCursor(this.renderer.getCursorPos(this.handler.getText(), getContext().getMouseX() - getArea().x, getContext().getMouseY() - getArea().y), true);
         return Result.SUCCESS;
     }
 
     @Override
     public void onMouseDrag(int mouseButton, long timeSinceClick) {
         if (isFocused()) {
-            handler.setMainCursor(renderer.getCursorPos(handler.getText(), getContext().getMouseX() - getArea().x, getContext().getMouseY() - getArea().y), true);
+            this.handler.setMainCursor(this.renderer.getCursorPos(this.handler.getText(), getContext().getMouseX() - getArea().x, getContext().getMouseY() - getArea().y), true);
         }
     }
 
@@ -158,7 +157,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
         switch (keyCode) {
             case Keyboard.KEY_RETURN:
                 if (getMaxLines() > 1) {
-                    handler.newLine();
+                    this.handler.newLine();
                 } else {
                     getContext().removeFocus();
                 }
@@ -167,26 +166,26 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
                 getContext().removeFocus();
                 return Result.SUCCESS;
             case Keyboard.KEY_LEFT: {
-                handler.moveCursorLeft(Interactable.hasControlDown(), Interactable.hasShiftDown());
+                this.handler.moveCursorLeft(Interactable.hasControlDown(), Interactable.hasShiftDown());
                 return Result.SUCCESS;
             }
             case Keyboard.KEY_RIGHT: {
-                handler.moveCursorRight(Interactable.hasControlDown(), Interactable.hasShiftDown());
+                this.handler.moveCursorRight(Interactable.hasControlDown(), Interactable.hasShiftDown());
                 return Result.SUCCESS;
             }
             case Keyboard.KEY_UP: {
-                handler.moveCursorUp(Interactable.hasControlDown(), Interactable.hasShiftDown());
+                this.handler.moveCursorUp(Interactable.hasControlDown(), Interactable.hasShiftDown());
                 return Result.SUCCESS;
             }
             case Keyboard.KEY_DOWN: {
-                handler.moveCursorDown(Interactable.hasControlDown(), Interactable.hasShiftDown());
+                this.handler.moveCursorDown(Interactable.hasControlDown(), Interactable.hasShiftDown());
                 return Result.SUCCESS;
             }
             case Keyboard.KEY_DELETE:
-                handler.delete(true);
+                this.handler.delete(true);
                 return Result.SUCCESS;
             case Keyboard.KEY_BACK:
-                handler.delete();
+                this.handler.delete();
                 return Result.SUCCESS;
         }
 
@@ -196,31 +195,31 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
 
         if (GuiScreen.isKeyComboCtrlC(keyCode)) {
             // copy marked text
-            GuiScreen.setClipboardString(handler.getSelectedText());
+            GuiScreen.setClipboardString(this.handler.getSelectedText());
             return Result.SUCCESS;
         } else if (GuiScreen.isKeyComboCtrlV(keyCode)) {
             // paste copied text in marked text
-            handler.insert(GuiScreen.getClipboardString());
+            this.handler.insert(GuiScreen.getClipboardString());
             return Result.SUCCESS;
-        } else if (GuiScreen.isKeyComboCtrlX(keyCode) && handler.hasTextMarked()) {
+        } else if (GuiScreen.isKeyComboCtrlX(keyCode) && this.handler.hasTextMarked()) {
             // copy and delete copied text
-            GuiScreen.setClipboardString(handler.getSelectedText());
-            handler.delete();
+            GuiScreen.setClipboardString(this.handler.getSelectedText());
+            this.handler.delete();
             return Result.SUCCESS;
         } else if (GuiScreen.isKeyComboCtrlA(keyCode)) {
             // mark whole text
-            handler.markAll();
+            this.handler.markAll();
             return Result.SUCCESS;
         } else if (BASE_PATTERN.matcher(String.valueOf(character)).matches()) {
             // insert typed char
-            handler.insert(String.valueOf(character));
+            this.handler.insert(String.valueOf(character));
             return Result.SUCCESS;
         }
         return Result.STOP;
     }
 
     public int getMaxLines() {
-        return handler.getMaxLines();
+        return this.handler.getMaxLines();
     }
 
     public ScrollData getScrollData() {

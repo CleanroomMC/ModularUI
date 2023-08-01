@@ -1,9 +1,11 @@
 package com.cleanroommc.modularui.utils.math;
 
+import com.cleanroommc.modularui.api.IMathValue;
+
 /**
  * Variable class
  * <p>
- * This class is responsible for providing a mutable {@link com.cleanroommc.modularui.api.IValue}
+ * This class is responsible for providing a mutable {@link IMathValue}
  * which can be modifier during runtime and still getting referenced in
  * the expressions parsed by {@link MathBuilder}.
  * <p>
@@ -27,7 +29,7 @@ public class Variable extends Constant {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     @Override

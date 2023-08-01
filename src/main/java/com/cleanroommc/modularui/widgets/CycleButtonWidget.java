@@ -4,38 +4,44 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
-import com.cleanroommc.modularui.api.sync.INumberSyncHandler;
-import com.cleanroommc.modularui.api.sync.SyncHandler;
+import com.cleanroommc.modularui.api.value.IBoolValue;
+import com.cleanroommc.modularui.api.value.IEnumValue;
+import com.cleanroommc.modularui.api.value.IIntValue;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.UITexture;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.Tooltip;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.value.IntValue;
+import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
+import com.cleanroommc.modularui.widget.sizer.Box;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.*;
+import java.util.function.Consumer;
+import java.util.function.IntFunction;
 
 public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Interactable {
 
     private int length = 1;
-    private IntConsumer setter;
-    private IntSupplier getter;
+    private IIntValue<?> intValue;
     private IntFunction<IDrawable> textureGetter;
     private IDrawable texture = IDrawable.EMPTY;
     private final List<Tooltip> stateTooltip = new ArrayList<>();
 
-    private INumberSyncHandler<?> syncHandler;
-
     @Override
     public void onInit() {
-        if (textureGetter == null) {
-            ModularUI.LOGGER.warn("Texture Getter of {} was not set!", this);
-            textureGetter = val -> IDrawable.EMPTY;
+        if (this.intValue == null) {
+            this.intValue = new IntValue(0);
         }
-        this.texture = textureGetter.apply(getState());
+        if (this.textureGetter == null) {
+            ModularUI.LOGGER.warn("Texture Getter of {} was not set!", this);
+            this.textureGetter = val -> IDrawable.EMPTY;
+        }
+        this.texture = this.textureGetter.apply(getState());
         for (Tooltip tooltip : this.stateTooltip) {
             if (tooltip != null && tooltip.getExcludeArea() == null && ModularUIConfig.placeTooltipNextToPanel()) {
                 tooltip.excludeArea(getPanel().getArea());
@@ -45,26 +51,20 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof INumberSyncHandler) {
-            this.syncHandler = (INumberSyncHandler<?>) syncHandler;
+        if (syncHandler instanceof IIntValue) {
+            this.intValue = (IIntValue<?>) syncHandler;
             return true;
         }
         return false;
     }
 
     private int getState() {
-        if (this.syncHandler != null) {
-            return this.syncHandler.getCacheAsInt();
-        }
-        if (this.getter != null) {
-            return this.getter.getAsInt();
-        }
-        return 0;
+        return this.intValue.getIntValue();
     }
 
     public void next() {
         int state = getState();
-        if (++state == length) {
+        if (++state == this.length) {
             state = 0;
         }
         setState(state);
@@ -73,24 +73,17 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
     public void prev() {
         int state = getState();
         if (--state == -1) {
-            state = length - 1;
+            state = this.length - 1;
         }
         setState(state);
     }
 
     public void setState(int state) {
-        if (state < 0 || state >= length) {
+        if (state < 0 || state >= this.length) {
             throw new IndexOutOfBoundsException("CycleButton state out of bounds");
         }
-
-        if (this.setter != null) {
-            this.setter.accept(state);
-        }
-        if (this.syncHandler != null) {
-            this.syncHandler.updateFromClient(state);
-        }
-
-        this.texture = textureGetter.apply(state);
+        this.intValue.setIntValue(state);
+        this.texture = this.textureGetter.apply(state);
     }
 
     @Override
@@ -109,9 +102,23 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
     }
 
     @Override
-    public void draw(GuiContext context) {
-        texture.applyThemeColor(context.getTheme(), getWidgetTheme(context.getTheme()));
-        texture.draw(context, 0, 0, getArea().w(), getArea().h());
+    public void drawBackground(GuiContext context) {
+        WidgetTheme widgetTheme = getWidgetTheme(context.getTheme());
+        IDrawable bg = getCurrentBackground();
+        if (bg != null) {
+            bg.applyThemeColor(context.getTheme(), widgetTheme);
+            bg.drawAtZero(context, getArea());
+        }
+        // draw state texture after background, but before overlay
+        this.texture.applyThemeColor(context.getTheme(), getWidgetTheme(context.getTheme()));
+        this.texture.draw(context, 0, 0, getArea().w(), getArea().h());
+
+        bg = getCurrentOverlay();
+        if (bg != null) {
+            bg.applyThemeColor(context.getTheme(), widgetTheme);
+            Box padding = getArea().getPadding();
+            bg.draw(context, padding.left, padding.top, getArea().width - padding.horizontal(), getArea().height - padding.vertical());
+        }
     }
 
     @Override
@@ -138,26 +145,15 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
         return tooltip;
     }
 
-    public CycleButtonWidget setter(IntConsumer setter) {
-        this.setter = setter;
+    public CycleButtonWidget value(IIntValue<?> value) {
+        this.intValue = value;
+        setValue(value);
+        if (value instanceof IEnumValue) {
+            length(((IEnumValue<?>) value).getEnumClass().getEnumConstants().length);
+        } else if (value instanceof IBoolValue) {
+            length(2);
+        }
         return this;
-    }
-
-    public CycleButtonWidget getter(IntSupplier getter) {
-        this.getter = getter;
-        return this;
-    }
-
-    public <T extends Enum<T>> CycleButtonWidget forEnum(Class<T> clazz, Supplier<T> getter, Consumer<T> setter) {
-        return setter(val -> setter.accept(clazz.getEnumConstants()[val]))
-                .getter(() -> getter.get().ordinal())
-                .length(clazz.getEnumConstants().length);
-    }
-
-    public CycleButtonWidget toggle(BooleanSupplier getter, Consumer<Boolean> setter) {
-        return setter(val -> setter.accept(val == 1))
-                .getter(() -> getter.getAsBoolean() ? 1 : 0)
-                .length(2);
     }
 
     public CycleButtonWidget textureGetter(IntFunction<IDrawable> textureGetter) {
@@ -167,7 +163,7 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
 
     public CycleButtonWidget texture(UITexture texture) {
         return textureGetter(val -> {
-            float a = 1f / length;
+            float a = 1f / this.length;
             return texture.getSubArea(0, val * a, 1, val * a + a);
         });
     }

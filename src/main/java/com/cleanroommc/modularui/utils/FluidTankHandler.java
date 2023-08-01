@@ -26,28 +26,28 @@ public class FluidTankHandler implements IFluidHandler {
     @Override
     public IFluidTankProperties[] getTankProperties() {
         return new IFluidTankProperties[]{
-                new FluidTankProperties(fluidTank.getFluid(), fluidTank.getCapacity())
+                new FluidTankProperties(this.fluidTank.getFluid(), this.fluidTank.getCapacity())
         };
     }
 
     @Override
     public int fill(FluidStack resource, boolean doFill) {
-        return fluidTank.fill(resource, doFill);
+        return this.fluidTank.fill(resource, doFill);
     }
 
     @Nullable
     @Override
     public FluidStack drain(FluidStack resource, boolean doDrain) {
-        FluidStack currentFluid = fluidTank.getFluid();
+        FluidStack currentFluid = this.fluidTank.getFluid();
         if (currentFluid == null || currentFluid.amount <= 0 || !currentFluid.isFluidEqual(resource)) {
             return null;
         }
-        return fluidTank.drain(resource.amount, doDrain);
+        return this.fluidTank.drain(resource.amount, doDrain);
     }
 
     @Nullable
     @Override
     public FluidStack drain(int maxDrain, boolean doDrain) {
-        return fluidTank.drain(maxDrain, doDrain);
+        return this.fluidTank.drain(maxDrain, doDrain);
     }
 }

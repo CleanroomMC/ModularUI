@@ -107,7 +107,7 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
 
     private void makeFlatList() {
         super.getChildren().clear();
-        super.getChildren().addAll(matrix.stream().flatMap(List::stream).filter(Objects::nonNull).collect(Collectors.toList()));
+        super.getChildren().addAll(this.matrix.stream().flatMap(List::stream).filter(Objects::nonNull).collect(Collectors.toList()));
     }
 
     @Override
@@ -183,7 +183,7 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
             child.initialise(this);
         }
         onChildAdd(child);
-        dirty = true;
+        this.dirty = true;
         return true;
     }
 

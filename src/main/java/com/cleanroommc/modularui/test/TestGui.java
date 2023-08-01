@@ -14,6 +14,7 @@ import com.cleanroommc.modularui.widgets.layout.Grid;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
@@ -29,25 +30,21 @@ public class TestGui extends ModularScreen {
 
     private Map<String, AvailableElement> availableElements;
 
-    public TestGui() {
-        super("test");
-    }
-
     @Override
     public void onClose() {
         super.onClose();
-        ModularUI.LOGGER.info("New values: {}", configuredOptions);
+        ModularUI.LOGGER.info("New values: {}", this.configuredOptions);
     }
 
     @Override
-    public ModularPanel buildUI(GuiContext context) {
-        if (lines == null) {
-            lines = IntStream.range(0, 20).mapToObj(i -> "Option " + (i + 1)).collect(Collectors.toList());
-            configuredOptions = lines;
-            availableElements = new Object2ObjectOpenHashMap<>();
+    public @NotNull ModularPanel buildUI(GuiContext context) {
+        if (this.lines == null) {
+            this.lines = IntStream.range(0, 20).mapToObj(i -> "Option " + (i + 1)).collect(Collectors.toList());
+            this.configuredOptions = this.lines;
+            this.availableElements = new Object2ObjectOpenHashMap<>();
         }
         AtomicReference<SortableListWidget<String, SortableListWidget.Item<String>>> ref = new AtomicReference<>(null);
-        List<List<AvailableElement>> availableMatrix = Grid.mapToMatrix(2, lines, (index, value) -> {
+        List<List<AvailableElement>> availableMatrix = Grid.mapToMatrix(2, this.lines, (index, value) -> {
             AvailableElement availableElement = new AvailableElement().overlay(IKey.str(value))
                     .size(60, 14)
                     .onMousePressed(mouseButton1 -> {
@@ -64,7 +61,7 @@ public class TestGui extends ModularScreen {
             this.availableElements.get(value).available = !this.configuredOptions.contains(value);
         }
 
-        ModularPanel panel = ModularPanel.defaultPanel(context);
+        ModularPanel panel = ModularPanel.defaultPanel("test");
 
         /*List<List<IWidget>> matrix = new ArrayList<>();
         for (int i = 0; i < 400; i++) {
@@ -83,7 +80,7 @@ public class TestGui extends ModularScreen {
                 .matrix(matrix)
                 .scrollable()
                 .pos(10, 10).right(10).bottom(10))*/
-        SortableListWidget<String, SortableListWidget.Item<String>> sortableListWidget = SortableListWidget.sortableBuilder(lines, this.configuredOptions,
+        SortableListWidget<String, SortableListWidget.Item<String>> sortableListWidget = SortableListWidget.sortableBuilder(this.lines, this.configuredOptions,
                 s -> new SortableListWidget.Item<>(s, new Widget<>()
                         .background(GuiTextures.BUTTON)
                         .overlay(IKey.str(s))
@@ -91,9 +88,7 @@ public class TestGui extends ModularScreen {
                         .removeable()).debugName("sortable list");
         ref.set(sortableListWidget);
         panel.child(sortableListWidget
-                .onRemove(stringItem -> {
-                    this.availableElements.get(stringItem.getValue()).available = true;
-                })
+                .onRemove(stringItem -> this.availableElements.get(stringItem.getWidgetValue()).available = true)
                 /*.onChange(list -> {
                     this.configuredOptions = list;
                     for (String value : this.lines) {
@@ -108,7 +103,7 @@ public class TestGui extends ModularScreen {
                 .overlay(GuiTextures.ADD)
                 .onMouseTapped(mouseButton -> {
                     if (!isPanelOpen("Option Selection")) {
-                        ModularPanel panel1 = ModularPanel.defaultPanel(context, 150, 120).name("Option Selection");
+                        ModularPanel panel1 = ModularPanel.defaultPanel("Option Selection", 150, 120);
                         openPanel(panel1
                                 .child(new ButtonWidget<>()
                                         .size(8, 8)
@@ -140,8 +135,7 @@ public class TestGui extends ModularScreen {
                 /*.child(SlotGroup.playerInventory()
                         .flex(flex -> flex
                                 .left(0.5f)
-                                .bottom(7)))*/
-        ;
+                                .bottom(7)));*/
 
         return panel;
     }
@@ -164,7 +158,7 @@ public class TestGui extends ModularScreen {
 
         @Override
         public IDrawable getBackground() {
-            return this.available ? activeBackground : background;
+            return this.available ? this.activeBackground : this.background;
         }
     }
 }

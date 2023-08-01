@@ -1,14 +1,12 @@
 package com.cleanroommc.modularui.test;
 
-import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.IItemGuiHolder;
+import com.cleanroommc.modularui.api.IGuiHolder;
+import com.cleanroommc.modularui.manager.GuiCreationContext;
 import com.cleanroommc.modularui.manager.GuiInfos;
 import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.sync.GuiSyncHandler;
-import com.cleanroommc.modularui.sync.SyncHandlers;
 import com.cleanroommc.modularui.utils.ItemStackItemHandler;
+import com.cleanroommc.modularui.value.sync.GuiSyncManager;
+import com.cleanroommc.modularui.value.sync.SyncHandlers;
 import com.cleanroommc.modularui.widgets.ItemSlot;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import com.cleanroommc.modularui.widgets.layout.Column;
@@ -28,27 +26,16 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 
-public class TestItem extends Item implements IItemGuiHolder {
+public class TestItem extends Item implements IGuiHolder {
 
     public static final TestItem testItem = new TestItem();
 
     @Override
-    public void buildSyncHandler(GuiSyncHandler guiSyncHandler, EntityPlayer entityPlayer, ItemStack itemStack) {
-        IItemHandlerModifiable itemHandler = (IItemHandlerModifiable) itemStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-        guiSyncHandler.registerSlotGroup("mixer_items", 2);
-        for (int i = 0; i < 4; i++) {
-            guiSyncHandler.syncValue("mixer_items", i, SyncHandlers.itemSlot(itemHandler, i).slotGroup("mixer_items"));
-        }
-    }
+    public ModularPanel buildUI(GuiCreationContext guiCreationContext, GuiSyncManager guiSyncManager, boolean isClient) {
+        IItemHandlerModifiable itemHandler = (IItemHandlerModifiable) guiCreationContext.getUsedItemStack().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        guiSyncManager.registerSlotGroup("mixer_items", 2);
 
-    @Override
-    public ModularScreen createGuiScreen(EntityPlayer entityPlayer, ItemStack itemStack) {
-        return ModularScreen.simple("knapping_gui", this::createPanel);
-    }
-
-    public ModularPanel createPanel(GuiContext context) {
-        ModularPanel panel = ModularPanel.defaultPanel(context);
-
+        ModularPanel panel = ModularPanel.defaultPanel("knapping_gui");
         panel.child(new Column()
                 //.coverChildren()
                 .padding(7)
@@ -56,10 +43,9 @@ public class TestItem extends Item implements IItemGuiHolder {
                 .child(SlotGroupWidget.builder()
                         .row("II")
                         .row("II")
-                        .key('I', index -> {
-                            ModularUI.LOGGER.info("Create item slot {}", index);
-                            return new ItemSlot().setSynced("mixer_items", index);
-                        })
+                        .key('I', index -> new ItemSlot().slot(SyncHandlers.phantomItemSlot(itemHandler, index)
+                                .ignoreMaxStackSize(true)
+                                .slotGroup("mixer_items")))
                         .build()));
 
         return panel;

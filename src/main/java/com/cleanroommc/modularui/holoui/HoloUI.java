@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.holoui;
 
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.test.TestGui;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -80,7 +79,7 @@ public class HoloUI {
 
         public void open(ModularScreen screen) {
             HoloScreenEntity holoScreenEntity = new HoloScreenEntity(Minecraft.getMinecraft().world, this.plane3D);
-            holoScreenEntity.setPosition(x, y, z);
+            holoScreenEntity.setPosition(this.x, this.y, this.z);
             holoScreenEntity.setScreen(screen);
             holoScreenEntity.spawnInWorld();
             holoScreenEntity.setOrientation(this.orientation);

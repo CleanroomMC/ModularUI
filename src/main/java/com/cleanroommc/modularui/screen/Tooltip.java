@@ -52,14 +52,14 @@ public class Tooltip {
         this.dirty = false;
         this.lines.clear();
         List<IDrawable> additionalLines = this.additionalLines;
-        this.additionalLines = lines;
+        this.additionalLines = this.lines;
         if (this.tooltipBuilder != null) {
             this.tooltipBuilder.accept(this);
         }
         this.lines.addAll(additionalLines);
         this.additionalLines = additionalLines;
-        if (hasSpaceAfterFirstLine && lines.size() > 1) {
-            lines.add(1, Icon.EMPTY_2PX);
+        if (this.hasSpaceAfterFirstLine && this.lines.size() > 1) {
+            this.lines.add(1, Icon.EMPTY_2PX);
         }
     }
 
@@ -68,22 +68,20 @@ public class Tooltip {
     }
 
     public void draw(GuiContext context, @Nullable ItemStack stack) {
-        if (updateTooltipEveryTick) {
+        if (this.updateTooltipEveryTick) {
             markDirty();
         }
         if (isEmpty()) return;
 
-        if (maxWidth <= 0) {
-            maxWidth = Integer.MAX_VALUE;
+        if (this.maxWidth <= 0) {
+            this.maxWidth = Integer.MAX_VALUE;
         }
         if (stack == null) stack = ItemStack.EMPTY;
         Area screen = context.screen.getScreenArea();
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
         IconRenderer renderer = IconRenderer.SHARED;
-        //List<IIcon> icons = renderer.measureLines(this.lines);
         List<String> textLines = lines.stream().filter(drawable -> drawable instanceof IKey).map(key -> ((IKey) key).get()).collect(Collectors.toList());
-        //icons.stream().filter(iIcon -> iIcon instanceof TextIcon).map(icon -> ((TextIcon) icon).getText()).collect(Collectors.toList());
-        RenderTooltipEvent.Pre event = new RenderTooltipEvent.Pre(stack, textLines, mouseX, mouseY, screen.width, screen.height, maxWidth, TextRenderer.getFontRenderer());
+        RenderTooltipEvent.Pre event = new RenderTooltipEvent.Pre(stack, textLines, mouseX, mouseY, screen.width, screen.height, thimaxWidth, TextRenderer.getFontRenderer());
         if (MinecraftForge.EVENT_BUS.post(event)) {
             return;
         }
@@ -91,13 +89,13 @@ public class Tooltip {
         mouseX = event.getX();
         mouseY = event.getY();
         int screenWidth = event.getScreenWidth(), screenHeight = event.getScreenHeight();
-        maxWidth = event.getMaxWidth();
+        this.maxWidth = event.getMaxWidth();
 
         renderer.setShadow(this.textShadow);
         renderer.setColor(this.textColor);
         renderer.setScale(this.scale);
         renderer.setAlignment(this.alignment, this.maxWidth);
-        renderer.setLinePadding(linePadding);
+        renderer.setLinePadding(this.linePadding);
         renderer.setSimulate(true);
         renderer.setPos(0, 0);
 
@@ -259,16 +257,16 @@ public class Tooltip {
     }
 
     public Area getExcludeArea() {
-        return excludeArea;
+        return this.excludeArea;
     }
 
     public int getShowUpTimer() {
-        return showUpTimer;
+        return this.showUpTimer;
     }
 
     @Nullable
     public Consumer<Tooltip> getTooltipBuilder() {
-        return tooltipBuilder;
+        return this.tooltipBuilder;
     }
 
     public Tooltip excludeArea(Area area) {

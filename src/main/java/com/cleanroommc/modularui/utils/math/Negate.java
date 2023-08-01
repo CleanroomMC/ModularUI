@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.utils.math;
 
-import com.cleanroommc.modularui.api.IValue;
+import com.cleanroommc.modularui.api.IMathValue;
 
 /**
  * Negate operator class
@@ -9,7 +9,7 @@ import com.cleanroommc.modularui.api.IValue;
  */
 public class Negate extends Wrapper {
 
-    public Negate(IValue value) {
+    public Negate(IMathValue value) {
         super(value);
     }
 

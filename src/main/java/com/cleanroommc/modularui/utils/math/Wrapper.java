@@ -1,19 +1,19 @@
 package com.cleanroommc.modularui.utils.math;
 
-import com.cleanroommc.modularui.api.IValue;
+import com.cleanroommc.modularui.api.IMathValue;
 
-public abstract class Wrapper implements IValue {
+public abstract class Wrapper implements IMathValue {
 
-    public IValue value;
+    public IMathValue value;
 
-    protected IValue result = new Constant(0);
+    protected IMathValue result = new Constant(0);
 
-    public Wrapper(IValue value) {
+    public Wrapper(IMathValue value) {
         this.value = value;
     }
 
     @Override
-    public IValue get() {
+    public IMathValue get() {
         this.process();
 
         return this.result;

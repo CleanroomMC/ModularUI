@@ -1,11 +1,11 @@
 package com.cleanroommc.modularui.utils.math.functions.trig;
 
-import com.cleanroommc.modularui.api.IValue;
+import com.cleanroommc.modularui.api.IMathValue;
 import com.cleanroommc.modularui.utils.math.functions.NNFunction;
 
 public class Acos extends NNFunction {
 
-    public Acos(IValue[] values, String name) throws Exception {
+    public Acos(IMathValue[] values, String name) throws Exception {
         super(values, name);
     }
 
