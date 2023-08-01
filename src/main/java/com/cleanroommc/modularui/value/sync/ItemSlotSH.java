@@ -28,6 +28,10 @@ public class ItemSlotSH extends SyncHandler {
     public void init(String key, GuiSyncManager syncHandler) {
         super.init(key, syncHandler);
         syncHandler.getContainer().registerSlot(this.slot);
+        if (isPhantom() && !getSlot().getStack().isEmpty()) {
+            this.lastStoredPhantomItem = getSlot().getStack().copy();
+            this.lastStoredPhantomItem.setCount(1);
+        }
     }
 
     @Override
