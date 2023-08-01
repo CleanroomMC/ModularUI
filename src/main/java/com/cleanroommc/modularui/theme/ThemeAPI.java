@@ -97,7 +97,6 @@ public class ThemeAPI implements IThemeApi {
 
     // Internals
 
-    @ApiStatus.Internal
     void registerTheme(ITheme theme) {
         if (THEMES.containsKey(theme.getId())) {
             throw new IllegalArgumentException("Theme with id " + theme.getId() + " already exists!");
@@ -105,7 +104,6 @@ public class ThemeAPI implements IThemeApi {
         THEMES.put(theme.getId(), theme);
     }
 
-    @ApiStatus.Internal
     void onReload() {
         THEMES.clear();
         jsonScreenThemes.clear();
