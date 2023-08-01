@@ -212,7 +212,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @Override
     public void dispose() {
-        getContext().removeJeiExclusionArea(this);
+        getContext().getJeiSettings().removeJeiExclusionArea(this);
         super.dispose();
         this.screen = null;
     }
@@ -543,7 +543,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     protected final void setPanelGuiContext(@NotNull GuiContext context) {
         setContext(context);
-        context.addJeiExclusionArea(this);
+        context.getJeiSettings().addJeiExclusionArea(this);
     }
 
     public boolean isOpening() {

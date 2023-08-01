@@ -25,7 +25,7 @@ public class ModularUIHandler implements IAdvancedGuiHandler<GuiScreenWrapper>, 
     @Nullable
     @Override
     public List<Rectangle> getGuiExtraAreas(@NotNull GuiScreenWrapper guiContainer) {
-        return guiContainer.getScreen().context.getAllJeiExclusionAreas();
+        return guiContainer.getScreen().context.getJeiSettings().getAllJeiExclusionAreas();
     }
 
     @Nullable
@@ -37,7 +37,7 @@ public class ModularUIHandler implements IAdvancedGuiHandler<GuiScreenWrapper>, 
 
     @Override
     public <I> @NotNull List<Target<I>> getTargets(GuiScreenWrapper gui, @NotNull I ingredient, boolean doStart) {
-        return gui.getScreen().context.getAllGhostIngredientTargets(ingredient);
+        return gui.getScreen().context.getJeiSettings().getAllGhostIngredientTargets(ingredient);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class ModularUIHandler implements IAdvancedGuiHandler<GuiScreenWrapper>, 
     @Nullable
     @Override
     public IGuiProperties apply(@NotNull GuiScreenWrapper guiScreen) {
-        return guiScreen.getScreen().context.isJeiEnabled() ? GuiProperties.create(guiScreen) : null;
+        return guiScreen.getScreen().context.getJeiSettings().isJeiEnabled(guiScreen.getScreen()) ? GuiProperties.create(guiScreen) : null;
     }
 
     @Override

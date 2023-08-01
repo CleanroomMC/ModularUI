@@ -96,7 +96,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
         this.textRenderer.setShadow(true);
         this.textRenderer.setScale(0.5f);
         this.textRenderer.setColor(Color.WHITE.normal);
-        getContext().addJeiGhostIngredientSlot(this);
+        getContext().getJeiSettings().addJeiGhostIngredientSlot(this);
     }
 
     @Override

@@ -52,7 +52,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     @Override
     public void onInit() {
         size(18, 18);
-        getContext().addJeiGhostIngredientSlot(this);
+        getContext().getJeiSettings().addJeiGhostIngredientSlot(this);
     }
 
     @Override

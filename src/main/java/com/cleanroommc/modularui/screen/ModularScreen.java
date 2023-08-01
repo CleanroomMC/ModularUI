@@ -1,6 +1,8 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.IWidget;
@@ -79,6 +81,7 @@ public class ModularScreen {
     private final Area screenArea = new Area();
     private final Map<Class<?>, List<IGuiAction>> guiActionListeners = new Object2ObjectOpenHashMap<>();
 
+    private ITheme currentTheme;
     private GuiScreenWrapper screenWrapper;
 
     /**
@@ -98,6 +101,7 @@ public class ModularScreen {
         this.owner = owner;
         this.windowManager = new WindowManager(this);
         this.context = new GuiContext(this);
+        this.currentTheme = IThemeApi.get().getThemeForScreen(this, null);
 
         ModularPanel mainPanel = buildUI(this.context);
         Objects.requireNonNull(mainPanel, "The main panel must not be null!");
@@ -116,6 +120,7 @@ public class ModularScreen {
         this.name = mainPanel.getName();
         this.windowManager = new WindowManager(this);
         this.context = new GuiContext(this);
+        this.currentTheme = IThemeApi.get().getThemeForScreen(this, null);
         this.windowManager.construct(mainPanel);
     }
 
@@ -450,6 +455,20 @@ public class ModularScreen {
             }
         }
         throw new IllegalArgumentException();
+    }
+
+    public ITheme getCurrentTheme() {
+        return this.currentTheme;
+    }
+
+    public ModularScreen useTheme(String theme) {
+        this.currentTheme = IThemeApi.get().getThemeForScreen(this, theme);
+        return this;
+    }
+
+    public ModularScreen useJeiSettings(JeiSettings jeiSettings) {
+        this.context.setJeiSettings(jeiSettings);
+        return this;
     }
 
     public enum UpOrDown {

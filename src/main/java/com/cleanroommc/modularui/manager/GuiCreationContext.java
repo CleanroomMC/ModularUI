@@ -16,6 +16,7 @@ public class GuiCreationContext {
     private final int x, y, z;
     private final EnumHand hand;
 
+    @ApiStatus.Internal
     public GuiCreationContext(EntityPlayer player, World world, int x, int y, int z, EnumHand hand) {
         this.player = player;
         this.world = world;
@@ -59,6 +60,18 @@ public class GuiCreationContext {
 
     public ItemStack getUsedItemStack() {
         return this.player.getHeldItem(this.hand);
+    }
+
+    public void setItemInMainHand(ItemStack item) {
+        this.player.setHeldItem(EnumHand.MAIN_HAND, item);
+    }
+
+    public void setItemInOffHand(ItemStack item) {
+        this.player.setHeldItem(EnumHand.OFF_HAND, item);
+    }
+
+    public void setItemInUsedHand(ItemStack item) {
+        this.player.setHeldItem(this.hand, item);
     }
 
     public BlockPos getBlockPos() {
