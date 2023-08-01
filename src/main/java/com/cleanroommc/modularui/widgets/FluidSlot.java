@@ -133,7 +133,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
         }
         if (isHovering()) {
             GlStateManager.colorMask(true, true, true, false);
-            GuiDraw.drawRect(1, 1, getArea().w() - 2, getArea().h()  - 2, getWidgetTheme(context.getTheme()).getSlotHoverColor());
+            GuiDraw.drawRect(1, 1, getArea().w() - 2, getArea().h() - 2, getWidgetTheme(context.getTheme()).getSlotHoverColor());
             GlStateManager.colorMask(true, true, true, true);
         }
     }
@@ -228,7 +228,9 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
 
     @Override
     public void setGhostIngredient(@NotNull FluidStack ingredient) {
-        this.syncHandler.setValue(ingredient);
+        if (this.syncHandler.isPhantom()) {
+            this.syncHandler.setValue(ingredient);
+        }
     }
 
     @Override

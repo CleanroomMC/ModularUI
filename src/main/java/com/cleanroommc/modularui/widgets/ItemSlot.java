@@ -244,7 +244,9 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @Override
     public void setGhostIngredient(@NotNull ItemStack ingredient) {
-        this.syncHandler.updateFromClient(ingredient);
+        if (this.syncHandler.isPhantom()) {
+            this.syncHandler.updateFromClient(ingredient);
+        }
     }
 
     @Override
