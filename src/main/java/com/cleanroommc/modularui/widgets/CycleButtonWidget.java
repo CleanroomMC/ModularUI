@@ -11,9 +11,11 @@ import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.UITexture;
 import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.value.IntValue;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
+import com.cleanroommc.modularui.widget.sizer.Box;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -100,9 +102,23 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
     }
 
     @Override
-    public void draw(GuiContext context) {
+    public void drawBackground(GuiContext context) {
+        WidgetTheme widgetTheme = getWidgetTheme(context.getTheme());
+        IDrawable bg = getCurrentBackground();
+        if (bg != null) {
+            bg.applyThemeColor(context.getTheme(), widgetTheme);
+            bg.drawAtZero(context, getArea());
+        }
+        // draw state texture after background, but before overlay
         this.texture.applyThemeColor(context.getTheme(), getWidgetTheme(context.getTheme()));
         this.texture.draw(context, 0, 0, getArea().w(), getArea().h());
+
+        bg = getCurrentOverlay();
+        if (bg != null) {
+            bg.applyThemeColor(context.getTheme(), widgetTheme);
+            Box padding = getArea().getPadding();
+            bg.draw(context, padding.left, padding.top, getArea().width - padding.horizontal(), getArea().height - padding.vertical());
+        }
     }
 
     @Override
