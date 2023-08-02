@@ -234,7 +234,7 @@ public class TextFieldHandler {
     }
 
     public void onChanged() {
-        this.textFieldWidget.markDirty();
+        this.textFieldWidget.markTooltipDirty();
     }
 
     public String getSelectedText() {

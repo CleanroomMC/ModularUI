@@ -78,7 +78,7 @@ public class EmptyWidget implements IWidget {
     }
 
     @Override
-    public void markDirty() {
+    public void markTooltipDirty() {
     }
 
     @Override

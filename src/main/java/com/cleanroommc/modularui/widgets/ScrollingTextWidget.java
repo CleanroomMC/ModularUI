@@ -75,7 +75,7 @@ public class ScrollingTextWidget extends TextWidget {
             TextRenderer.SHARED.setScale(getScale());
             this.line = TextRenderer.SHARED.line(s);
             this.scroll = 0;
-            markDirty();
+            markTooltipDirty();
         }
     }
 

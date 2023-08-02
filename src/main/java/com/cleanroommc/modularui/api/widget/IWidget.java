@@ -139,10 +139,9 @@ public interface IWidget extends IGuiElement {
     }
 
     /**
-     * Marks this widget as dirty.
-     * Mainly used for the tooltip.
+     * Marks tooltip for this widget as dirty.
      */
-    void markDirty();
+    void markTooltipDirty();
 
     /**
      * @return the parent of this widget

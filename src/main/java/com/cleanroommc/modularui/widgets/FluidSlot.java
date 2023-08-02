@@ -173,7 +173,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
     @Override
     public @NotNull Result onKeyPressed(char typedChar, int keyCode) {
         if (keyCode == Keyboard.KEY_LSHIFT || keyCode == Keyboard.KEY_RSHIFT) {
-            markDirty();
+            markTooltipDirty();
         }
         return Interactable.super.onKeyPressed(typedChar, keyCode);
     }
@@ -181,7 +181,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
     @Override
     public boolean onKeyRelease(char typedChar, int keyCode) {
         if (keyCode == Keyboard.KEY_LSHIFT || keyCode == Keyboard.KEY_RSHIFT) {
-            markDirty();
+            markTooltipDirty();
         }
         return Interactable.super.onKeyRelease(typedChar, keyCode);
     }

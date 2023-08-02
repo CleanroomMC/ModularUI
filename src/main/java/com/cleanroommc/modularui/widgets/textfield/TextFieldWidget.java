@@ -58,7 +58,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         if (syncHandler instanceof IStringValue && syncHandler instanceof ValueSyncHandler) {
             this.stringValue = (IStringValue<?>) syncHandler;
             ((ValueSyncHandler<?>) this.stringValue).setChangeListener(() -> {
-                markDirty();
+                markTooltipDirty();
                 setText(this.stringValue.getValue().toString());
             });
             return true;
@@ -129,7 +129,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             this.handler.getText().add(this.validator.apply(""));
         } else if (this.handler.getText().size() == 1) {
             this.handler.getText().set(0, this.validator.apply(this.handler.getText().get(0)));
-            markDirty();
+            markTooltipDirty();
         } else {
             throw new IllegalStateException("TextFieldWidget can only have one line!");
         }
