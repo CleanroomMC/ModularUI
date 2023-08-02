@@ -103,7 +103,9 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
     @Override
     public void readOnServer(int id, PacketBuffer buf) {
         if (id == 0) {
-            read(buf);
+            if (this.phantom) {
+                read(buf);
+            }
         } else if (id == 1) {
             if (this.phantom) {
                 tryClickPhantom(MouseData.readPacket(buf));
