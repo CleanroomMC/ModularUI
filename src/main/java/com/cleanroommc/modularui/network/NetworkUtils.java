@@ -21,11 +21,10 @@ public class NetworkUtils {
     public static final Consumer<PacketBuffer> EMPTY_PACKET = buffer -> {
     };
 
-    public static final boolean CLIENT = FMLCommonHandler.instance().getEffectiveSide().isClient();
     public static final boolean DEDICATED_CLIENT = FMLCommonHandler.instance().getSide().isClient();
 
     public static boolean isClient() {
-        return CLIENT;
+        return FMLCommonHandler.instance().getEffectiveSide().isClient();
     }
 
     public static boolean isDedicatedClient() {
