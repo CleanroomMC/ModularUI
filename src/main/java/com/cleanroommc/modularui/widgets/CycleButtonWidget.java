@@ -128,8 +128,8 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
     }
 
     @Override
-    public void markDirty() {
-        super.markDirty();
+    public void markTooltipDirty() {
+        super.markTooltipDirty();
         for (Tooltip tooltip : this.stateTooltip) {
             tooltip.markDirty();
         }
