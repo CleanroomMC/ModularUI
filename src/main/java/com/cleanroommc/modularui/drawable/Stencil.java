@@ -13,10 +13,10 @@ import org.lwjgl.opengl.GL11;
 
 public class Stencil {
 
-    // Stores a stack of areas that are used as stencils
-    private final static ObjectArrayList<Area> rawStencils = new ObjectArrayList<>();
     // Stores a stack of areas that are transformed, so it represents the actual area
     private final static ObjectArrayList<Area> stencils = new ObjectArrayList<>();
+    // Stores a stack of stencilShapes which is used to mark and remove the stencil shape area
+    private final static ObjectArrayList<Runnable> stencilShapes = new ObjectArrayList<>();
     // the current highest stencil value
     private static int stencilValue = 0;
 
@@ -25,7 +25,7 @@ public class Stencil {
      */
     public static void reset() {
         stencils.clear();
-        rawStencils.clear();
+        stencilShapes.clear();
         stencilValue = 0;
         GL11.glStencilMask(0xFF);
         GL11.glClearStencil(0);
@@ -58,45 +58,62 @@ public class Stencil {
      * but not to the actual stencil.
      */
     public static void apply(int x, int y, int w, int h, @Nullable GuiContext context) {
-        Area rawScissor = new Area(x, y, w, h);
-        Area scissor = rawScissor.createCopy();
+        apply(() -> drawRectangleStencilShape(x, y, w, h), x, y, w, h, context);
+    }
+
+    // should not be used inside GUI'S
+    public static void apply(Runnable stencilShape, boolean hideStencilShape) {
+        apply(stencilShape, 0, 0, 0, 0, null, hideStencilShape);
+    }
+
+    public static void apply(Runnable stencilShape, int x, int y, int w, int h, @Nullable GuiContext context) {
+        apply(stencilShape, x, y, w, h, context, true);
+    }
+
+    public static void apply(Runnable stencilShape, int x, int y, int w, int h, @Nullable GuiContext context, boolean hideStencilShape) {
+        Area scissor = new Area(x, y, w, h);
         if (context != null) {
             scissor.transformAndRectanglerize(context);
         }
         if (!stencils.isEmpty()) {
             stencils.top().clamp(scissor);
         }
-        applyArea(x, y, w, h);
+        applyShape(stencilShape, hideStencilShape);
         stencils.add(scissor);
-        rawStencils.add(rawScissor);
+        stencilShapes.add(stencilShape);
     }
 
-    /**
-     * Applies a stencil area and prepares for drawing other stuff.
-     */
-    private static void applyArea(int x, int y, int w, int h) {
+    private static void applyShape(Runnable stencilShape, boolean hideStencilShape) {
         // increase stencil values in the area
-        setStencilValue(x, y, w, h, stencilValue, false);
+        GL11.glEnable(GL11.GL_STENCIL_TEST);
+        setStencilValue(stencilShape, stencilValue, false, hideStencilShape);
         stencilValue++;
         GL11.glStencilFunc(GL11.GL_LEQUAL, stencilValue, 0xFF);
         GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP);
         GL11.glStencilMask(0x00);
     }
 
-    /**
-     * Increases or decreases stencil values in a rectangle
-     */
-    private static void setStencilValue(int x, int y, int w, int h, int stencilValue, boolean remove) {
+    private static void setStencilValue(Runnable stencilShape, int stencilValue, boolean remove, boolean hideStencilShape) {
         // Set stencil func
         int mode = remove ? GL11.GL_DECR : GL11.GL_INCR;
         GL11.glStencilFunc(GL11.GL_EQUAL, stencilValue, 0xFF);
         GL11.glStencilOp(GL11.GL_KEEP, mode, mode);
         GL11.glStencilMask(0xFF);
-        // disable colors and depth
-        GlStateManager.colorMask(false, false, false, false);
-        GlStateManager.depthMask(false);
-        // Draw masking shape
-        //GuiDraw.drawRect(x, y, w, h, 0);
+
+        if (hideStencilShape) {
+            // disable colors and depth
+            GlStateManager.colorMask(false, false, false, false);
+            GlStateManager.depthMask(false);
+        }
+        stencilShape.run();
+        if (hideStencilShape) {
+            // Re-enable drawing to color buffer + depth buffer
+            GlStateManager.colorMask(true, true, true, true);
+            GlStateManager.depthMask(true);
+        }
+    }
+
+    private static void drawRectangleStencilShape(int x, int y, int w, int h) {
         GlStateManager.disableTexture2D();
         GlStateManager.disableAlpha();
         GlStateManager.enableBlend();
@@ -112,9 +129,6 @@ public class Stencil {
         GlStateManager.disableBlend();
         GlStateManager.enableAlpha();
         GlStateManager.enableTexture2D();
-        // Re-enable drawing to color buffer + depth buffer
-        GlStateManager.colorMask(true, true, true, true);
-        GlStateManager.depthMask(true);
     }
 
     /**
@@ -122,12 +136,13 @@ public class Stencil {
      */
     public static void remove() {
         stencils.pop();
-        Area area = rawStencils.pop();
+        Runnable stencilShape = stencilShapes.pop();
         if (stencils.isEmpty()) {
             reset();
+            GL11.glDisable(GL11.GL_STENCIL_TEST);
             return;
         }
-        setStencilValue(area.x, area.y, area.width, area.height, stencilValue, true);
+        setStencilValue(stencilShape, stencilValue, true, true);
         stencilValue--;
         GL11.glStencilFunc(GL11.GL_LEQUAL, stencilValue, 0xFF);
         GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP);
