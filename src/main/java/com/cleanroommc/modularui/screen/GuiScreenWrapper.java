@@ -87,6 +87,7 @@ public class GuiScreenWrapper extends GuiContainer {
             this.timer += 1000;
         }
 
+        Stencil.reset();
         Stencil.apply(this.screen.getScreenArea(), null);
         drawDefaultBackground();
         int i = this.guiLeft;

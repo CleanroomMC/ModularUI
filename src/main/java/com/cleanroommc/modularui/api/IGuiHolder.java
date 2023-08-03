@@ -16,12 +16,12 @@ public interface IGuiHolder {
     /**
      * Only called on client side.
      *
-     * @param guiCreationContext information about the creation context
-     * @param mainPanel          the panel created in {@link #buildUI(GuiCreationContext, GuiSyncManager, boolean)}
+     * @param creationContext information about the creation context
+     * @param mainPanel       the panel created in {@link #buildUI(GuiCreationContext, GuiSyncManager, boolean)}
      * @return a modular screen instance with the given panel
      */
     @SideOnly(Side.CLIENT)
-    default ModularScreen createScreen(GuiCreationContext guiCreationContext, ModularPanel mainPanel) {
+    default ModularScreen createScreen(GuiCreationContext creationContext, ModularPanel mainPanel) {
         return new ModularScreen(mainPanel);
     }
 
@@ -30,9 +30,9 @@ public interface IGuiHolder {
      * If the widget to be synced is not in this panel yet (f.e. in another panel) the sync handler must be registered here
      * with {@link GuiSyncManager}.
      *
-     * @param guiCreationContext information about the creation context
-     * @param guiSyncManager     sync handler where widget sync handlers should be registered
-     * @param isClient           true if the world is a client world
+     * @param creationContext information about the creation context
+     * @param syncManager     sync handler where widget sync handlers should be registered
+     * @param isClient        true if the world is a client world
      */
-    ModularPanel buildUI(GuiCreationContext guiCreationContext, GuiSyncManager guiSyncManager, boolean isClient);
+    ModularPanel buildUI(GuiCreationContext creationContext, GuiSyncManager syncManager, boolean isClient);
 }

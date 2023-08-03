@@ -92,7 +92,6 @@ public class GuiCreationContext {
         return tile;
     }
 
-    @ApiStatus.Internal
     public GuiCreationContext with(EnumHand hand) {
         if (this.hand != hand) {
             return new GuiCreationContext(this.player, this.world, this.x, this.y, this.z, hand);
