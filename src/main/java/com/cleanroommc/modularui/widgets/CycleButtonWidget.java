@@ -28,6 +28,7 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
 
     private int length = 1;
     private IIntValue<?> intValue;
+    private int lastValue = -1;
     private IntFunction<IDrawable> textureGetter;
     private IDrawable texture = IDrawable.EMPTY;
     private final List<Tooltip> stateTooltip = new ArrayList<>();
@@ -59,7 +60,11 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
     }
 
     private int getState() {
-        return this.intValue.getIntValue();
+        int val = this.intValue.getIntValue();
+        if (val != this.lastValue) {
+            setState(val, false);
+        }
+        return val;
     }
 
     public void next() {
@@ -67,7 +72,7 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
         if (++state == this.length) {
             state = 0;
         }
-        setState(state);
+        setState(state, true);
     }
 
     public void prev() {
@@ -75,15 +80,18 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
         if (--state == -1) {
             state = this.length - 1;
         }
-        setState(state);
+        setState(state, true);
     }
 
-    public void setState(int state) {
+    public void setState(int state, boolean setSource) {
         if (state < 0 || state >= this.length) {
             throw new IndexOutOfBoundsException("CycleButton state out of bounds");
         }
-        this.intValue.setIntValue(state);
+        if (setSource) {
+            this.intValue.setIntValue(state);
+        }
         this.texture = this.textureGetter.apply(state);
+        this.lastValue = state;
     }
 
     @Override
@@ -109,6 +117,8 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
             bg.applyThemeColor(context.getTheme(), widgetTheme);
             bg.drawAtZero(context, getArea());
         }
+        // make sure texture is up-to-date
+        getState();
         // draw state texture after background, but before overlay
         this.texture.applyThemeColor(context.getTheme(), getWidgetTheme(context.getTheme()));
         this.texture.draw(context, 0, 0, getArea().w(), getArea().h());
