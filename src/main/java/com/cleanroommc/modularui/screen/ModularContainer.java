@@ -56,6 +56,14 @@ public class ModularContainer extends Container implements ISortableContainer {
     }
 
     @Override
+    public void onContainerClosed(@NotNull EntityPlayer playerIn) {
+        super.onContainerClosed(playerIn);
+        if (this.guiSyncManager != null) {
+            this.guiSyncManager.onClose();
+        }
+    }
+
+    @Override
     public void detectAndSendChanges() {
         super.detectAndSendChanges();
         this.guiSyncManager.detectAndSendChanges(this.init);

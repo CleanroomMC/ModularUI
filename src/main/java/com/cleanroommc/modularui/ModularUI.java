@@ -8,10 +8,12 @@ import com.cleanroommc.modularui.manager.GuiInfos;
 import com.cleanroommc.modularui.manager.GuiManager;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.NetworkUtils;
+import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.test.EventHandler;
 import com.cleanroommc.modularui.test.TestBlock;
 import com.cleanroommc.modularui.theme.ThemeManager;
 import com.cleanroommc.modularui.theme.ThemeReloadCommand;
+import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.util.Timer;
@@ -20,6 +22,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Loader;
@@ -36,7 +39,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.registries.IForgeRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.opengl.GL11;
 
 @Mod(modid = ModularUI.ID, name = ModularUI.NAME, version = ModularUI.VERSION, dependencies = "required-after:mixinbooter@[5.0,);")
 public class ModularUI {
@@ -99,7 +101,6 @@ public class ModularUI {
         RenderingRegistry.registerEntityRenderingHandler(HoloScreenEntity.class, ScreenEntityRender::new);
 
         // enable stencil buffer
-        GL11.glEnable(GL11.GL_STENCIL_TEST);
         if (!Minecraft.getMinecraft().getFramebuffer().isStencilEnabled()) {
             Minecraft.getMinecraft().getFramebuffer().enableStencil();
         }
@@ -120,6 +121,16 @@ public class ModularUI {
                 .entity(HoloScreenEntity.class)
                 .factory(HoloScreenEntity::new)
                 .build());
+    }
+
+    @SubscribeEvent
+    public static void onCloseContainer(PlayerContainerEvent.Open event) {
+        if (event.getContainer() instanceof ModularContainer) {
+            GuiSyncManager syncManager = ((ModularContainer) event.getContainer()).getSyncManager();
+            if (syncManager != null) {
+                syncManager.onOpen();
+            }
+        }
     }
 
     @SideOnly(Side.CLIENT)
