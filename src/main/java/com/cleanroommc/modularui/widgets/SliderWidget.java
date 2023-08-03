@@ -29,7 +29,7 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     private int stopperWidth = 2, stopperHeight = 4;
     private final Unit sliderWidth = new Unit(), sliderHeight = new Unit();
     private final Area sliderArea = new Area();
-    private double min, max;
+    private double min, max, each = 0;
     private boolean dragging = false;
 
     private double cache = Double.MIN_VALUE;
@@ -48,6 +48,13 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     public void onInit() {
         if (this.doubleValue == null) {
             this.doubleValue = new DoubleValue((this.max - this.min) * 0.5 + this.min);
+        }
+        if (this.each > 0 && this.stopper == null) {
+            this.stopper = new DoubleArrayList();
+            for (double d = this.min; d < this.max; d += this.each) {
+                this.stopper.add(d);
+            }
+            this.stopper.add(this.max);
         }
     }
 
@@ -210,6 +217,11 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
             this.stopper.add(stop);
         }
         this.stopper.sort(Double::compare);
+        return this;
+    }
+
+    public SliderWidget stopper(double each) {
+        this.each = each;
         return this;
     }
 
