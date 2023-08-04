@@ -39,7 +39,9 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     public static ModularPanel defaultPanel(@NotNull String name, int width, int height) {
         ModularPanel panel = new ModularPanel(name);
+        panel.flex().startDefaultMode();
         panel.flex().size(width, height).align(Alignment.Center);
+        panel.flex().endDefaultMode();
         return panel;
     }
 

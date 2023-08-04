@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widgets;
 
+import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.value.IDoubleValue;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
@@ -7,6 +8,7 @@ import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.Rectangle;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.value.DoubleValue;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
@@ -89,6 +91,9 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     @Override
     public void draw(GuiContext context) {
         if (this.handleDrawable != null) {
+            ITheme theme = getContext().getTheme();
+            WidgetTheme buttonTheme = theme.getButtonTheme();
+            this.handleDrawable.applyThemeColor(theme, buttonTheme);
             this.handleDrawable.draw(context, this.sliderArea);
         }
     }

@@ -151,7 +151,7 @@ public class GuiTextures {
             .location(ModularUI.ID, "gui/widgets/base_button")
             .imageSize(18, 18)
             .adaptable(1)
-            .registerAsBackground("vanilla_button", false)
+            .registerAsBackground("vanilla_button", true)
             .build();
 
     public static final UITexture SLOT = UITexture.builder()
