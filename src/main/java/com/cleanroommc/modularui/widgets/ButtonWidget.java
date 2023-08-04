@@ -134,4 +134,10 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
         this.keyTapped = keyTapped;
         return getThis();
     }
+
+    public W syncHandler(InteractionSyncHandler interactionSyncHandler) {
+        this.syncHandler = interactionSyncHandler;
+        setSyncHandler(interactionSyncHandler);
+        return getThis();
+    }
 }
