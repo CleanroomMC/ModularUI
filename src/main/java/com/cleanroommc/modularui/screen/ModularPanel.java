@@ -177,15 +177,10 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         stack.popViewport(null);
     }
 
-    protected void validateName() {
-        if (this.name == null) {
-            throw new IllegalArgumentException("Non main panels must be given a name via .name()");
-        }
-    }
-
     @MustBeInvokedByOverriders
     public void onOpen(ModularScreen screen) {
         this.screen = screen;
+        getArea().z(1);
         initialise(this);
         if (ModularUIConfig.panelOpenCloseAnimationTime <= 0) return;
         this.scale = 0.75f;

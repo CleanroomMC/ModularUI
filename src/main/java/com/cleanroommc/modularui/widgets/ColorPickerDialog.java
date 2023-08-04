@@ -38,8 +38,10 @@ public class ColorPickerDialog extends Dialog<Integer> {
         this.alpha = Color.getAlpha(startColor);
         updateColor(startColor);
         this.controlAlpha = controlAlpha;
+        flex().startDefaultMode();
         size(140, controlAlpha ? 106 : 94).background(GuiTextures.BACKGROUND);
         align(Alignment.Center);
+        flex().endDefaultMode();
         PagedWidget.Controller controller = new PagedWidget.Controller();
         child(new Column()
                 .left(5).right(5).top(5).bottom(5)

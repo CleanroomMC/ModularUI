@@ -6,8 +6,8 @@ public class DimensionSizer {
 
     private final GuiAxis axis;
 
+    private final Unit p1 = new Unit(), p2 = new Unit();
     private Unit start, end, size;
-    private Unit p1, p2;
 
     private boolean coverChildren = false;
     private boolean cancelAutoMovement = false;
@@ -15,15 +15,32 @@ public class DimensionSizer {
 
     public DimensionSizer(GuiAxis axis) {
         this.axis = axis;
-        reset();
     }
 
     public void reset() {
-        this.p1 = new Unit();
-        this.p2 = new Unit();
+        this.p1.reset();
+        this.p2.reset();
         this.start = null;
         this.end = null;
         this.size = null;
+    }
+
+    public void resetPosition() {
+        if (this.start != null) {
+            this.start.reset();
+            this.start = null;
+        }
+        if (this.end != null) {
+            this.end.reset();
+            this.end = null;
+        }
+    }
+
+    public void resetSize() {
+        if (this.size != null) {
+            this.size.reset();
+            this.size = null;
+        }
     }
 
     public void setDefaultMode(boolean defaultMode) {
@@ -49,6 +66,10 @@ public class DimensionSizer {
 
     public boolean hasPos() {
         return this.start != null || this.end != null;
+    }
+
+    public boolean hasFixedSize() {
+        return this.start == null || this.end == null;
     }
 
     public boolean hasSize() {

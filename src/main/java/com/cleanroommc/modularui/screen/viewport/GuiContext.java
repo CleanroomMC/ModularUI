@@ -289,6 +289,9 @@ public class GuiContext extends GuiViewportStack {
             } else if (widget instanceof ModularPanel) {
                 ModularPanel panel = (ModularPanel) widget;
                 if (panel.isDraggable() && !this.screen.getWindowManager().isAboutToClose(panel)) {
+                    if (!panel.flex().hasFixedSize()) {
+                        throw new IllegalStateException("Panel must have a fixed size. It can't specify left AND right or top AND bottom!");
+                    }
                     draggable = new LocatedElement<>(new DraggablePanelWrapper(panel), TransformationMatrix.EMPTY);
                 } else {
                     return false;

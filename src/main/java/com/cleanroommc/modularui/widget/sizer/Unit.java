@@ -26,6 +26,7 @@ public class Unit {
     }
 
     public void reset() {
+        this.type = UNUSED;
         this.autoAnchor = true;
         this.value = 0f;
         this.valueSupplier = null;

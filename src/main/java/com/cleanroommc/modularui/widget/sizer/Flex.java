@@ -31,6 +31,11 @@ public class Flex implements IResizeable, IPositioned<Flex> {
         this.y.reset();
     }
 
+    public void resetPosition() {
+        this.x.resetPosition();
+        this.y.resetPosition();
+    }
+
     public Flex startDefaultMode() {
         this.x.setDefaultMode(true);
         this.y.setDefaultMode(true);
@@ -252,6 +257,10 @@ public class Flex implements IResizeable, IPositioned<Flex> {
 
     public boolean yAxisDependsOnChildren() {
         return this.y.dependsOnChildren();
+    }
+
+    public boolean hasFixedSize() {
+        return this.x.hasFixedSize() && this.y.hasFixedSize();
     }
 
     @ApiStatus.Internal
