@@ -4,7 +4,6 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
 import com.cleanroommc.modularui.utils.ReverseIterable;
 import com.cleanroommc.modularui.widget.WidgetTree;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
@@ -79,12 +78,15 @@ public class WindowManager {
     }
 
     private void openPanel(ModularPanel panel, boolean resize) {
-        panel.validateName();
+        if (this.panels.size() == 127) {
+            throw new IllegalStateException("Too many panels are open!");
+        }
         if (this.panels.contains(panel) || isPanelOpen(panel.getName())) {
             throw new IllegalStateException("Panel " + panel.getName() + " is already open.");
         }
         panel.setPanelGuiContext(this.screen.context);
         this.panels.addFirst(panel);
+        panel.getArea().setPanelLayer((byte) this.panels.size());
         panel.onOpen(this.screen);
         if (resize) {
             WidgetTree.resize(panel);
