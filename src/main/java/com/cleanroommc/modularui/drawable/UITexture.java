@@ -56,6 +56,18 @@ public class UITexture implements IDrawable {
         return new Builder();
     }
 
+    public static UITexture fullImage(ResourceLocation location) {
+        return new UITexture(location, 0, 0, 1, 1, false);
+    }
+
+    public static UITexture fullImage(String location) {
+        return fullImage(new ResourceLocation(location), false);
+    }
+
+    public static UITexture fullImage(String mod, String location) {
+        return fullImage(new ResourceLocation(mod, location), false);
+    }
+
     public static UITexture fullImage(ResourceLocation location, boolean canApplyTheme) {
         return new UITexture(location, 0, 0, 1, 1, canApplyTheme);
     }
