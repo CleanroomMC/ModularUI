@@ -183,7 +183,9 @@ public class ModularScreen {
                 return;
             }
             if (!getMainPanel().isOpening() && !getMainPanel().isClosing()) {
-                getMainPanel().animateClose();
+                for (ModularPanel panel : this.windowManager.getOpenPanels()) {
+                    panel.animateClose();
+                }
             }
         }
     }
