@@ -83,6 +83,7 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
                 if (child != null) {
                     child.getArea().rx = (int) (x + width * 0.5 - child.getArea().width * 0.5);
                     child.getArea().ry = (int) (y + height * 0.5 - child.getArea().height * 0.5);
+                    child.resizer().setPosResized(true, true);
                 }
                 x += width;
             }

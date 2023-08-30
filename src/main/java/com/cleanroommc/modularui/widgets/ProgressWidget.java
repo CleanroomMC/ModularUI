@@ -44,11 +44,12 @@ public class ProgressWidget extends Widget<ProgressWidget> {
     }
 
     @Override
-    public void resize() {
-        super.resize();
+    public boolean resize(boolean init) {
+        boolean b = super.resize(init);
         if (this.imageSize < 0) {
             this.imageSize = getArea().width;
         }
+        return b;
     }
 
     public float getCurrentProgress() {

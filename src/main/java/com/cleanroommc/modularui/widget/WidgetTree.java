@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widget;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.ISynced;
@@ -211,11 +212,14 @@ public class WidgetTree {
 
     public static void resize(IWidget parent) {
         // resize each widget and calculate their relative pos
-        parent.resize();
+        if (!parent.resize(true) && !parent.resize(false)) {
+            throw new IllegalStateException("Failed to resize widgets");
+        }
         // now apply the calculated pos
         applyPos(parent);
         WidgetTree.foreachChildByLayer(parent, child -> {
             child.postResize();
+            //ModularUI.LOGGER.info("{} at {}", child, child.getArea());
             return true;
         }, true);
     }

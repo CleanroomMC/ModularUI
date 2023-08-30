@@ -65,14 +65,15 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
     }
 
     @Override
-    public void resize() {
-        super.resize();
+    public boolean resize(boolean init) {
+        boolean b = super.resize(init);
         if (this.scroll.getScrollX() != null) {
             this.scroll.getScrollX().clamp(this.scroll);
         }
         if (this.scroll.getScrollY() != null) {
             this.scroll.getScrollY().clamp(this.scroll);
         }
+        return b;
     }
 
     @Override

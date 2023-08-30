@@ -63,12 +63,12 @@ public class PagedWidget<W extends PagedWidget<W>> extends Widget<W> {
     }
 
     @Override
-    public void resize() {
+    public boolean resize(boolean init) {
         int page = this.currentPageIndex;
         this.currentPageIndex = -1;
-        super.resize();
+        boolean b = super.resize(init);
         this.currentPageIndex = page;
-
+        return b;
     }
 
     public W addPage(IWidget widget) {

@@ -62,14 +62,15 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
     }
 
     @Override
-    public void resize() {
-        super.resize();
-        if (this.keepScrollBarInArea) return;
+    public boolean resize(boolean init) {
+        boolean b = super.resize(init);
+        if (this.keepScrollBarInArea) return b;
         if (this.scrollData.direction == ScrollDirection.VERTICAL) {
             getArea().width += this.scrollData.getScrollbarThickness();
         } else {
             getArea().height += this.scrollData.getScrollbarThickness();
         }
+        return b;
     }
 
     public boolean add(T value, int index) {
@@ -110,6 +111,11 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
             widget.getArea().setRelativePoint(axis, p);
             p += widget.getArea().getSize(axis);
             lastMargin = widget.getArea().getMargin().getEnd(axis);
+            if (axis.isHorizontal()) {
+                widget.resizer().setXResized(true);
+            } else {
+                widget.resizer().setYResized(true);
+            }
         }
         getScrollData().scrollSize = p + Math.max(lastMargin, getArea().getPadding().getEnd(axis));
     }

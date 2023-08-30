@@ -328,15 +328,60 @@ public class Area extends Rectangle implements IResizeable {
     }
 
     @Override
-    public void apply(IGuiElement guiElement) {
-        guiElement.getArea().set(this);
+    public void initResizing() {
     }
 
     @Override
-    public void postApply(IGuiElement guiElement) {
+    public boolean resize(IGuiElement guiElement) {
+        guiElement.getArea().set(this);
+        return true;
+    }
+
+    @Override
+    public boolean postResize(IGuiElement guiElement) {
+        return true;
+    }
+
+    @Override
+    public Area getArea() {
+        return this;
+    }
+
+    @Override
+    public boolean isXCalculated() {
+        return true;
+    }
+
+    @Override
+    public boolean isYCalculated() {
+        return true;
+    }
+
+    @Override
+    public boolean isWidthCalculated() {
+        return true;
+    }
+
+    @Override
+    public boolean isHeightCalculated() {
+        return true;
+    }
+
+    @Override
+    public void setResized(boolean x, boolean y, boolean w, boolean h) {
     }
 
     public Area createCopy() {
         return new Area(this);
+    }
+
+    @Override
+    public String toString() {
+        return "Area{" +
+                "x=" + this.x +
+                ", y=" + this.y +
+                ", width=" + this.width +
+                ", height=" + this.height +
+                '}';
     }
 }

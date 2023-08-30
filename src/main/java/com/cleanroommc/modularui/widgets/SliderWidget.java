@@ -99,8 +99,8 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     }
 
     @Override
-    public void resize() {
-        super.resize();
+    public boolean resize(boolean init) {
+        boolean b = super.resize(init);
         float sw = this.sliderWidth.getValue();
         if (this.sliderWidth.isRelative()) sw *= getArea().width;
         float sh = this.sliderHeight.getValue();
@@ -108,6 +108,7 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
         this.sliderArea.setSize((int) sw, (int) sh);
         GuiAxis other = this.axis.getOther();
         this.sliderArea.setPoint(other, getArea().getSize(other) / 2 - this.sliderArea.getSize(other) / 2);
+        return b;
     }
 
     @Override

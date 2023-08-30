@@ -10,10 +10,6 @@ public interface ILayoutWidget {
      */
     void layoutWidgets();
 
-    /**
-     * Can be used for some extra calculations
-     * TODO: Really needed?
-     */
     default void postLayoutWidgets() {
     }
 }

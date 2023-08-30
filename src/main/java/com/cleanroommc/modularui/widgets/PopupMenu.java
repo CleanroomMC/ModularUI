@@ -14,7 +14,7 @@ public class PopupMenu<W extends PopupMenu<W>> extends Widget<W> {
 
     public PopupMenu(IWidget child) {
         this.menu = new MenuWrapper(child);
-        child.flex().relative(this);
+        child.flex().relative(this.getArea());
         this.menu.setEnabled(false);
         this.children = Collections.singletonList(this.menu);
     }

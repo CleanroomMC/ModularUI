@@ -11,8 +11,8 @@ import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Flex;
 import com.cleanroommc.modularui.widget.sizer.IResizeable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -162,7 +162,6 @@ public interface IWidget extends IGuiElement {
     /**
      * @return resizer of this widget
      */
-    @Nullable
     IResizeable resizer();
 
     /**
@@ -174,30 +173,52 @@ public interface IWidget extends IGuiElement {
 
     /**
      * Called when the screen resizes. Handles the positioning and sizing of this element.
+     *
+     * @return if position and size are fully calculated
      */
     @Override
-    default void resize() {
+    default boolean resize(boolean init) {
+        boolean result = false;
+        // first try to resize this widget
         IResizeable resizer = resizer();
         if (resizer != null) {
-            if (resizer.isSkip()) return;
-            resizer.apply(this);
+            if (init) resizer.initResizing();
+            result = resizer.resize(this);
         }
 
+        // now resize all children and collect children which could not be fully calculated
+        List<IWidget> anotherResize = new ArrayList<>();
         if (hasChildren()) {
-            getChildren().forEach(IWidget::resize);
+            getChildren().forEach(iWidget -> {
+                if (!iWidget.resize(init)) {
+                    anotherResize.add(iWidget);
+                }
+            });
         }
 
         if (this instanceof ILayoutWidget) {
             ((ILayoutWidget) this).layoutWidgets();
         }
 
-        if (resizer != null) {
-            resizer.postApply(this);
+        // post resize this widget if possible
+        if (resizer != null && !result) {
+            result = resizer.postResize(this);
         }
 
         if (this instanceof ILayoutWidget) {
             ((ILayoutWidget) this).postLayoutWidgets();
         }
+
+        // now fully resize all children which needs it
+        if (!anotherResize.isEmpty()) {
+            anotherResize.forEach(iWidget -> {
+                if (!iWidget.resizer().isFullyCalculated()) {
+                    iWidget.resize(false);
+                }
+            });
+        }
+
+        return result;
     }
 
     default void postResize() {
