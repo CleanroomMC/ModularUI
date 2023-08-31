@@ -471,11 +471,6 @@ public class ModularScreen {
         return this;
     }
 
-    public ModularScreen useJeiSettings(JeiSettings jeiSettings) {
-        this.context.setJeiSettings(jeiSettings);
-        return this;
-    }
-
     public enum UpOrDown {
         UP(1), DOWN(-1);
 

@@ -57,6 +57,6 @@ public final class GuiManager implements IGuiHandler {
         ModularPanel panel = info.createCommonGui(context, guiSyncManager);
         ModularScreen modularScreen = info.createClientGui(context, panel);
         modularScreen.getContext().setJeiSettings(context.getJeiSettings());
-        return new GuiScreenWrapper(new ModularContainer(guiSyncManager), info.createClientGui(context, panel));
+        return new GuiScreenWrapper(new ModularContainer(guiSyncManager), modularScreen);
     }
 }
