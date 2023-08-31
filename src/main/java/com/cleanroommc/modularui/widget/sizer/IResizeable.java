@@ -13,11 +13,6 @@ public interface IResizeable {
     default void applyPos(IGuiElement guiElement) {
     }
 
-    @Deprecated
-    default boolean isSkip() {
-        return false;
-    }
-
     Area getArea();
 
     boolean isXCalculated();
