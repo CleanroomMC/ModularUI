@@ -2,10 +2,7 @@ package com.cleanroommc.modularui.manager;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.network.NetworkUtils;
-import com.cleanroommc.modularui.screen.GuiScreenWrapper;
-import com.cleanroommc.modularui.screen.ModularContainer;
-import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.*;
 import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.entity.player.EntityPlayer;
@@ -46,7 +43,7 @@ public final class GuiManager implements IGuiHandler {
         GuiInfo info = this.guiInfos.get(ID);
         if (info == null) return null;
         GuiSyncManager guiSyncManager = new GuiSyncManager(player);
-        info.createCommonGui(new GuiCreationContext(player, world, x, y, z, EnumHand.MAIN_HAND), guiSyncManager);
+        info.createCommonGui(new GuiCreationContext(player, world, x, y, z, EnumHand.MAIN_HAND, new JeiSettings()), guiSyncManager);
         return new ModularContainer(guiSyncManager);
     }
 
@@ -56,8 +53,10 @@ public final class GuiManager implements IGuiHandler {
         GuiInfo info = this.guiInfos.get(ID);
         if (info == null) return null;
         GuiSyncManager guiSyncManager = new GuiSyncManager(player);
-        GuiCreationContext context = new GuiCreationContext(player, world, x, y, z, EnumHand.MAIN_HAND);
+        GuiCreationContext context = new GuiCreationContext(player, world, x, y, z, EnumHand.MAIN_HAND, new JeiSettings());
         ModularPanel panel = info.createCommonGui(context, guiSyncManager);
+        ModularScreen modularScreen = info.createClientGui(context, panel);
+        modularScreen.getContext().setJeiSettings(context.getJeiSettings());
         return new GuiScreenWrapper(new ModularContainer(guiSyncManager), info.createClientGui(context, panel));
     }
 }

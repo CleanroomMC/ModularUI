@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.api.ITheme;
-import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.ModularPanel;
@@ -12,7 +11,6 @@ import com.cleanroommc.modularui.widget.sizer.Flex;
 import com.cleanroommc.modularui.widget.sizer.IResizeable;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -130,6 +128,15 @@ public interface IWidget extends IGuiElement {
 
     void setEnabled(boolean enabled);
 
+    default boolean areAncestorsEnabled() {
+        IWidget parent = this;
+        while (parent != null) {
+            if (!parent.isEnabled()) return false;
+            parent = parent.getParent();
+        }
+        return true;
+    }
+
     default boolean canBeSeen(IViewportStack stack) {
         return Stencil.isInsideScissorArea(getArea(), stack);
     }
@@ -171,23 +178,21 @@ public interface IWidget extends IGuiElement {
      */
     void resizer(IResizeable resizer);
 
+    /**
+     * Called before a widget is resized.
+     */
     default void beforeResize() {
     }
 
+    /**
+     * Called after a widget is fully resized.
+     */
     default void onResized() {
     }
 
     /**
-     * Called when the screen resizes. Handles the positioning and sizing of this element.
-     *
-     * @return if position and size are fully calculated
+     * Called after the full widget tree is resized and the absolute positions are calculated.
      */
-    @Deprecated
-    @Override
-    default boolean resize(boolean init) {
-        return false;
-    }
-
     default void postResize() {
     }
 

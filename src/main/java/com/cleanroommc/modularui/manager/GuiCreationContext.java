@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.manager;
 
+import com.cleanroommc.modularui.screen.JeiSettings;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -15,15 +16,17 @@ public class GuiCreationContext {
     private final World world;
     private final int x, y, z;
     private final EnumHand hand;
+    private final JeiSettings jeiSettings;
 
     @ApiStatus.Internal
-    public GuiCreationContext(EntityPlayer player, World world, int x, int y, int z, EnumHand hand) {
+    public GuiCreationContext(EntityPlayer player, World world, int x, int y, int z, EnumHand hand, JeiSettings jeiSettings) {
         this.player = player;
         this.world = world;
         this.x = x;
         this.y = y;
         this.z = z;
         this.hand = hand;
+        this.jeiSettings = jeiSettings;
     }
 
     public EntityPlayer getPlayer() {
@@ -78,6 +81,10 @@ public class GuiCreationContext {
         return new BlockPos(this.x, this.y, this.z);
     }
 
+    public JeiSettings getJeiSettings() {
+        return this.jeiSettings;
+    }
+
     public IBlockState getBlockState() {
         BlockPos.PooledMutableBlockPos pos = BlockPos.PooledMutableBlockPos.retain(this.x, this.y, this.z);
         IBlockState blockState = this.world.getBlockState(pos);
@@ -94,7 +101,7 @@ public class GuiCreationContext {
 
     public GuiCreationContext with(EnumHand hand) {
         if (this.hand != hand) {
-            return new GuiCreationContext(this.player, this.world, this.x, this.y, this.z, hand);
+            return new GuiCreationContext(this.player, this.world, this.x, this.y, this.z, hand, this.jeiSettings);
         }
         return this;
     }

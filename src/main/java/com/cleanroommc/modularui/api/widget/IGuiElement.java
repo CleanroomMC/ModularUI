@@ -102,14 +102,6 @@ public interface IGuiElement {
     boolean isEnabled();
 
     /**
-     * Called when the screen resizes. Handles the positioning and sizing of this element.
-     *
-     * @return if position and size are fully calculated
-     */
-    @ApiStatus.Internal
-    boolean resize(boolean init);
-
-    /**
      * @return default width if it can't be calculated
      */
     default int getDefaultWidth() {

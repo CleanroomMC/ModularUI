@@ -405,6 +405,10 @@ public class ModularScreen {
         return new ResourceLocation(this.owner, this.name);
     }
 
+    public GuiContext getContext() {
+        return this.context;
+    }
+
     public WindowManager getWindowManager() {
         return this.windowManager;
     }

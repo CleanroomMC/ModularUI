@@ -23,8 +23,6 @@ import java.util.function.Predicate;
  */
 public class WidgetTree {
 
-    private static final String AUTO_SYNC_KEY = "auto$sync";
-
     private WidgetTree() {
     }
 
