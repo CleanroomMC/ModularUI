@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.widget;
 
-import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.ISynced;
@@ -212,7 +212,7 @@ public class WidgetTree {
 
     public static void resize(IWidget parent) {
         // resize each widget and calculate their relative pos
-        if (!parent.resize(true) && !parent.resize(false)) {
+        if (!resizeWidget(parent, true) && !resizeWidget(parent, false)) {
             throw new IllegalStateException("Failed to resize widgets");
         }
         // now apply the calculated pos
@@ -222,6 +222,55 @@ public class WidgetTree {
             //ModularUI.LOGGER.info("{} at {}", child, child.getArea());
             return true;
         }, true);
+    }
+
+    private static boolean resizeWidget(IWidget widget, boolean init) {
+        boolean result = false;
+        // first try to resize this widget
+        IResizeable resizer = widget.resizer();
+        if (resizer != null) {
+            if (init) {
+                widget.beforeResize();
+                resizer.initResizing();
+            }
+            result = resizer.resize(widget);
+        }
+
+        // now resize all children and collect children which could not be fully calculated
+        List<IWidget> anotherResize = new ArrayList<>();
+        if (widget.hasChildren()) {
+            widget.getChildren().forEach(iWidget -> {
+                if (!resizeWidget(iWidget, init)) {
+                    anotherResize.add(iWidget);
+                }
+            });
+        }
+
+        if (widget instanceof ILayoutWidget) {
+            ((ILayoutWidget) widget).layoutWidgets();
+        }
+
+        // post resize this widget if possible
+        if (resizer != null && !result) {
+            result = resizer.postResize(widget);
+        }
+
+        if (widget instanceof ILayoutWidget) {
+            ((ILayoutWidget) widget).postLayoutWidgets();
+        }
+
+        // now fully resize all children which needs it
+        if (!anotherResize.isEmpty()) {
+            anotherResize.forEach(iWidget -> {
+                if (!iWidget.resizer().isFullyCalculated()) {
+                    resizeWidget(iWidget, false);
+                }
+            });
+        }
+
+        if (result) widget.onResized();
+
+        return result;
     }
 
     public static void applyPos(IWidget parent) {

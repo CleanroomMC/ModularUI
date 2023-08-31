@@ -62,15 +62,13 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
     }
 
     @Override
-    public boolean resize(boolean init) {
-        boolean b = super.resize(init);
-        if (this.keepScrollBarInArea) return b;
+    public void onResized() {
+        if (this.keepScrollBarInArea) return;
         if (this.scrollData.direction == ScrollDirection.VERTICAL) {
             getArea().width += this.scrollData.getScrollbarThickness();
         } else {
             getArea().height += this.scrollData.getScrollbarThickness();
         }
-        return b;
     }
 
     public boolean add(T value, int index) {
