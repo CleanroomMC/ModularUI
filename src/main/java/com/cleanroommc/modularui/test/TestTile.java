@@ -235,7 +235,8 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                                 .size(1, 40))*/
                                         .child(new Row()
                                                 .debugName("bogo test config 1")
-                                                .widthRel(1f).height(14)
+                                                .widthRel(1f).coverChildrenHeight()
+                                                .crossAxisAlignment(CrossAxisAlignment.CENTER)
                                                 .child(new CycleButtonWidget()
                                                         .value(new BoolValue(false))
                                                         .texture(GuiTextures.CHECK_BOX)

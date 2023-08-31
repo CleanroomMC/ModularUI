@@ -105,6 +105,9 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
             if (widget.getFlex() != null && (axis.isVertical() ? widget.getFlex().hasYPos() : widget.getFlex().hasXPos())) {
                 continue;
             }
+            if (axis.isHorizontal() ? !widget.resizer().isWidthCalculated() : !widget.resizer().isHeightCalculated()) {
+                continue;
+            }
             p += Math.max(lastMargin, widget.getArea().getMargin().getStart(axis));
             widget.getArea().setRelativePoint(axis, p);
             p += widget.getArea().getSize(axis);

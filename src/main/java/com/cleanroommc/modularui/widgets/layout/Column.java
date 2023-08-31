@@ -94,7 +94,7 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
                 int x = padding.left + margin.left;
                 if (hasWidth) {
                     if (this.caa == CrossAxisAlignment.CENTER) {
-                        x = (int) (width / 2f - widget.getArea().requestedWidth() / 2f);
+                        x = (int) (width / 2f - widget.getArea().width / 2f);
                     } else if (this.caa == CrossAxisAlignment.END) {
                         x = width - widget.getArea().width - padding.right - margin.left;
                     }

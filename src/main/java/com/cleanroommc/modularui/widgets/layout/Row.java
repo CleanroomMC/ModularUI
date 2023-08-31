@@ -93,7 +93,7 @@ public class Row extends ParentWidget<Row> implements ILayoutWidget {
                 int y = margin.top + padding.top;
                 if (hasHeight) {
                     if (this.caa == CrossAxisAlignment.CENTER) {
-                        y = (int) (height / 2f - widget.getArea().requestedHeight() / 2f);
+                        y = (int) (height / 2f - widget.getArea().height / 2f);
                     } else if (this.caa == CrossAxisAlignment.END) {
                         y = height - widget.getArea().height - margin.bottom - padding.bottom;
                     }

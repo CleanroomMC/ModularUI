@@ -53,6 +53,7 @@
 ## Internal changes
 - [ ] Clean up IInterpolation
 - [ ] Fix shift clicking to slots which can not be seen
+- [ ] Put axis alignments as inner class into Alignment
 
 ## HoloUI
 - [ ] Fix/Remove current rotations
