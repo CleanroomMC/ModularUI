@@ -41,7 +41,7 @@ public abstract class PanelSyncHandler extends SyncHandler {
 
     public void closePanel() {
         if (getSyncManager().isClient()) {
-            if (this.openedPanel != null) this.openedPanel.closeIfOpen();
+            if (this.openedPanel != null) this.openedPanel.animateClose();
         } else {
             syncToClient(2);
         }
@@ -49,7 +49,7 @@ public abstract class PanelSyncHandler extends SyncHandler {
     }
 
     public boolean isPanelOpen() {
-        return this.openedPanel != null && (getSyncManager().isClient() || this.openedPanel.isOpen());
+        return this.openedPanel != null && (!getSyncManager().isClient() || this.openedPanel.isOpen());
     }
 
     @Override
