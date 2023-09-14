@@ -15,6 +15,7 @@ public class EventHandler {
             //GuiManager.openClientUI(Minecraft.getMinecraft().player, new TestGui());
             HoloUI.builder()
                     .inFrontOf(Minecraft.getMinecraft().player, 5, false)
+                    .screenScale(0.5f)
                     .open(new TestGui());
         }
     }

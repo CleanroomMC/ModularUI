@@ -109,6 +109,7 @@ dependencies {
     annotationProcessor('com.google.guava:guava:24.1.1-jre')
     annotationProcessor('com.google.code.gson:gson:2.8.6')
     annotationProcessor(mixin) { transitive = false }
+
     // Example deobf dependency
     // compileOnly rfg.deobf("curse.maven:endercore-231868:2972849:")
 

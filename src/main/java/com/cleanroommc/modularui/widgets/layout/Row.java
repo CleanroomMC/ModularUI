@@ -20,8 +20,8 @@ public class Row extends ParentWidget<Row> implements ILayoutWidget {
 
     @Override
     public void layoutWidgets() {
+        boolean hasWidth = resizer().isWidthCalculated();
         int width = getArea().width;
-        int height = getArea().height;
         Box padding = getArea().getPadding();
 
         int maxHeight = 0;
@@ -40,23 +40,26 @@ public class Row extends ParentWidget<Row> implements ILayoutWidget {
             totalWidth += widget.getArea().requestedWidth();
         }
 
-        if (expandedAmount > 0) {
+        if (expandedAmount > 0 && hasWidth) {
             int newWidth = (width - totalWidth - padding.horizontal()) / expandedAmount;
             for (IWidget widget : getChildren()) {
                 // exclude self positioned (X) children
                 if (widget.flex().hasXPos()) continue;
                 if (widget.flex().isExpanded()) {
-                    widget.getArea().w(newWidth);
+                    widget.getArea().width = newWidth;
+                    widget.resizer().setWidthResized(true);
                 }
             }
         }
 
         // calculate start y
         int lastX = 0;
-        if (this.maa == MainAxisAlignment.CENTER) {
-            lastX = (int) (width / 2f - totalWidth / 2f);
-        } else if (this.maa == MainAxisAlignment.END) {
-            lastX = width - totalWidth;
+        if (hasWidth) {
+            if (this.maa == MainAxisAlignment.CENTER) {
+                lastX = (int) (width / 2f - totalWidth / 2f);
+            } else if (this.maa == MainAxisAlignment.END) {
+                lastX = width - totalWidth;
+            }
         }
         lastX = Math.max(lastX, padding.left) - getArea().getMargin().left;
 
@@ -64,24 +67,39 @@ public class Row extends ParentWidget<Row> implements ILayoutWidget {
             // exclude self positioned (X) children
             if (widget.flex().hasXPos()) continue;
             Box margin = widget.getArea().getMargin();
-            // don't align auto positioned (Y) children in Y
-            if (!widget.flex().hasYPos()) {
-                int y = 0;
-                if (this.caa == CrossAxisAlignment.CENTER) {
-                    y = (int) (height / 2f - widget.getArea().requestedHeight() / 2f);
-                } else if (this.caa == CrossAxisAlignment.END) {
-                    y = height - widget.getArea().requestedHeight();
-                }
-                y = Math.max(y, padding.top);
-                widget.getArea().ry = y;
-            }
 
             // set calculated relative Y pos and set bottom margin for next widget
             widget.getArea().rx = lastX + margin.left;
+            widget.resizer().setXResized(true);
 
             lastX += widget.getArea().requestedWidth();
-            if (this.maa == MainAxisAlignment.SPACE_BETWEEN) {
+            if (hasWidth && this.maa == MainAxisAlignment.SPACE_BETWEEN) {
                 lastX += (width - totalWidth) / (getChildren().size() - 1);
+            }
+        }
+    }
+
+    @Override
+    public void postLayoutWidgets() {
+        int height = getArea().height;
+        Box padding = getArea().getPadding();
+        boolean hasHeight = resizer().isWidthCalculated();
+        for (IWidget widget : getChildren()) {
+            // exclude self positioned (X) children
+            if (widget.flex().hasXPos()) continue;
+            Box margin = widget.getArea().getMargin();
+            // don't align auto positioned (Y) children in Y
+            if (!widget.flex().hasYPos()) {
+                int y = margin.top + padding.top;
+                if (hasHeight) {
+                    if (this.caa == CrossAxisAlignment.CENTER) {
+                        y = (int) (height / 2f - widget.getArea().height / 2f);
+                    } else if (this.caa == CrossAxisAlignment.END) {
+                        y = height - widget.getArea().height - margin.bottom - padding.bottom;
+                    }
+                }
+                widget.getArea().ry = y;
+                widget.resizer().setYResized(true);
             }
         }
     }

@@ -48,4 +48,13 @@
 - [ ]  properly add modularui elements to any gui screen
 - [ ]  a gui to create guis
 - [ ]  sounds ?
-- [ ]  change color of themes to IDrawable
+- [x]  change color of themes to IDrawable
+
+## Internal changes
+- [ ] Clean up IInterpolation
+- [ ] Fix shift clicking to slots which can not be seen
+- [ ] Put axis alignments as inner class into Alignment
+
+## HoloUI
+- [ ] Fix/Remove current rotations
+- [ ] Implement interactions

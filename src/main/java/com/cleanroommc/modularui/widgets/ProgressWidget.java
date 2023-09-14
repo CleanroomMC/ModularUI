@@ -44,8 +44,7 @@ public class ProgressWidget extends Widget<ProgressWidget> {
     }
 
     @Override
-    public void resize() {
-        super.resize();
+    public void onResized() {
         if (this.imageSize < 0) {
             this.imageSize = getArea().width;
         }

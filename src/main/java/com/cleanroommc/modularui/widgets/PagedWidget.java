@@ -62,14 +62,15 @@ public class PagedWidget<W extends PagedWidget<W>> extends Widget<W> {
         return this.pages;
     }
 
-    @Override
-    public void resize() {
+    // TODO why is this needed?
+    /*@Override
+    public boolean resize(boolean init) {
         int page = this.currentPageIndex;
         this.currentPageIndex = -1;
-        super.resize();
+        boolean b = super.resize(init);
         this.currentPageIndex = page;
-
-    }
+        return b;
+    }*/
 
     public W addPage(IWidget widget) {
         this.pages.add(widget);

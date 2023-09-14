@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.network.NetworkHandler;
-import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.network.packets.PacketSyncHandler;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -10,6 +9,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -38,7 +38,7 @@ public abstract class SyncHandler {
      * @param id             an internal denominator to identify this package
      * @param bufferConsumer the package builder
      */
-    public final void syncToClient(int id, Consumer<PacketBuffer> bufferConsumer) {
+    public final void syncToClient(int id, @NotNull Consumer<PacketBuffer> bufferConsumer) {
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         buffer.writeVarInt(id);
         bufferConsumer.accept(buffer);
@@ -52,7 +52,7 @@ public abstract class SyncHandler {
      * @param bufferConsumer the package builder
      */
     @SideOnly(Side.CLIENT)
-    public final void syncToServer(int id, Consumer<PacketBuffer> bufferConsumer) {
+    public final void syncToServer(int id, @NotNull Consumer<PacketBuffer> bufferConsumer) {
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         buffer.writeVarInt(id);
         bufferConsumer.accept(buffer);
@@ -65,15 +65,42 @@ public abstract class SyncHandler {
      * @param id             an internal denominator to identify this package
      * @param bufferConsumer the package builder
      */
-    public final void sync(int id, Consumer<PacketBuffer> bufferConsumer) {
+    public final void sync(int id, @NotNull Consumer<PacketBuffer> bufferConsumer) {
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         buffer.writeVarInt(id);
         bufferConsumer.accept(buffer);
-        if (NetworkUtils.isClient(getSyncManager().getPlayer())) {
+        if (getSyncManager().isClient()) {
             sendToServer(buffer, this);
         } else {
             sendToClient(buffer, this);
         }
+    }
+
+    /**
+     * Sends an empty packte to the client with an id.
+     *
+     * @param id identifier
+     */
+    public final void syncToClient(int id) {
+        syncToClient(id, buf -> {});
+    }
+
+    /**
+     * Sends an empty packte to the server with an id.
+     *
+     * @param id identifier
+     */
+    public final void syncToServer(int id) {
+        syncToServer(id, buf -> {});
+    }
+
+    /**
+     * Sends an empty packte to the other side with an id.
+     *
+     * @param id identifier
+     */
+    public final void sync(int id) {
+        sync(id, buf -> {});
     }
 
     /**

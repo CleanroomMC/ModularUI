@@ -64,7 +64,7 @@ public class OrganizedPanel extends ModularPanel {
     }
 
     @Override
-    public void resize() {
+    public void beforeResize() {
         int top = 0;
         int bot = 0;
         this.body.flex().reset();
@@ -91,7 +91,6 @@ public class OrganizedPanel extends ModularPanel {
             this.rightSide.right(0).width(this.rightSideWidth).top(top).bottom(bot);
             this.body.right(this.rightSideWidth);
         }
-        super.resize();
     }
 
     public OrganizedPanel header(IWidget widget) {

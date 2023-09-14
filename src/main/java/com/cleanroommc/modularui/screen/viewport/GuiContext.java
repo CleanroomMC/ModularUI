@@ -54,7 +54,7 @@ public class GuiContext extends GuiViewportStack {
 
     public List<Consumer<GuiContext>> postRenderCallbacks = new ArrayList<>();
 
-    private JeiSettings jeiSettings = new JeiSettings();
+    private JeiSettings jeiSettings;
 
     public GuiContext(ModularScreen screen) {
         this.screen = screen;
@@ -432,10 +432,17 @@ public class GuiContext extends GuiViewportStack {
     }
 
     public JeiSettings getJeiSettings() {
+        if (this.jeiSettings == null) {
+            throw new IllegalStateException("The screen is not yet initialised!");
+        }
         return this.jeiSettings;
     }
 
+    @ApiStatus.Internal
     public void setJeiSettings(JeiSettings jeiSettings) {
+        if (this.jeiSettings != null) {
+            throw new IllegalStateException("Tried to set jei settings twice");
+        }
         this.jeiSettings = jeiSettings;
     }
 

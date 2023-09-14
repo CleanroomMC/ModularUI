@@ -86,6 +86,7 @@ public class CategoryList extends ParentWidget<CategoryList> implements Interact
             int y = getArea().height;
             for (IWidget widget : getChildren()) {
                 widget.getArea().ry = y;
+                widget.resizer().setYResized(true);
                 y += widget instanceof CategoryList && ((CategoryList) widget).expanded ?
                         ((CategoryList) widget).totalHeight : widget.getArea().height;
             }
@@ -141,6 +142,7 @@ public class CategoryList extends ParentWidget<CategoryList> implements Interact
             int y = 0;
             for (IWidget widget : getChildren()) {
                 widget.getArea().ry = y;
+                widget.resizer().setYResized(true);
                 y += widget instanceof CategoryList && ((CategoryList) widget).expanded ?
                         ((CategoryList) widget).totalHeight : widget.getArea().height;
             }

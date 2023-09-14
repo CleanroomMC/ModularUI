@@ -20,8 +20,8 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
 
     @Override
     public void layoutWidgets() {
+        boolean hasHeight = resizer().isHeightCalculated();
         int height = getArea().height;
-        int width = getArea().width;
         Box padding = getArea().getPadding();
 
         int maxWidth = 0;
@@ -41,23 +41,26 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
             totalHeight += widget.getArea().requestedHeight();
         }
 
-        if (expandedAmount > 0) {
+        if (expandedAmount > 0 && hasHeight) {
             int newHeight = (height - totalHeight - padding.vertical()) / expandedAmount;
             for (IWidget widget : getChildren()) {
                 // exclude self positioned (Y) children
                 if (widget.flex().hasYPos()) continue;
                 if (widget.flex().isExpanded()) {
-                    widget.getArea().h(newHeight);
+                    widget.getArea().height = newHeight;
+                    widget.resizer().setHeightResized(true);
                 }
             }
         }
 
         // calculate start y
         int lastY = 0;
-        if (this.maa == MainAxisAlignment.CENTER) {
-            lastY = (int) (height / 2f - totalHeight / 2f);
-        } else if (this.maa == MainAxisAlignment.END) {
-            lastY = height - totalHeight;
+        if (hasHeight) {
+            if (this.maa == MainAxisAlignment.CENTER) {
+                lastY = (int) (height / 2f - totalHeight / 2f);
+            } else if (this.maa == MainAxisAlignment.END) {
+                lastY = height - totalHeight;
+            }
         }
         lastY = Math.max(lastY, padding.top) - getArea().getMargin().top;
 
@@ -65,24 +68,39 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
             // exclude self positioned (Y) children
             if (widget.flex().hasYPos()) continue;
             Box margin = widget.getArea().getMargin();
-            // don't align auto positioned (X) children in X
-            if (!widget.flex().hasXPos()) {
-                int x = 0;
-                if (this.caa == CrossAxisAlignment.CENTER) {
-                    x = (int) (width / 2f - widget.getArea().requestedWidth() / 2f);
-                } else if (this.caa == CrossAxisAlignment.END) {
-                    x = width - widget.getArea().requestedWidth();
-                }
-                x = Math.max(x, padding.left + margin.left);
-                widget.getArea().rx = x;
-            }
 
             // set calculated relative Y pos and set bottom margin for next widget
             widget.getArea().ry = lastY + margin.top;
 
             lastY += widget.getArea().requestedHeight();
-            if (this.maa == MainAxisAlignment.SPACE_BETWEEN) {
+            if (hasHeight && this.maa == MainAxisAlignment.SPACE_BETWEEN) {
                 lastY += (height - totalHeight) / (getChildren().size() - 1);
+            }
+            widget.resizer().setYResized(true);
+        }
+    }
+
+    @Override
+    public void postLayoutWidgets() {
+        int width = getArea().width;
+        Box padding = getArea().getPadding();
+        boolean hasWidth = resizer().isWidthCalculated();
+        for (IWidget widget : getChildren()) {
+            // exclude self positioned (Y) children
+            if (widget.flex().hasYPos()) continue;
+            Box margin = widget.getArea().getMargin();
+            // don't align auto positioned (X) children in X
+            if (!widget.flex().hasXPos() && widget.resizer().isWidthCalculated()) {
+                int x = padding.left + margin.left;
+                if (hasWidth) {
+                    if (this.caa == CrossAxisAlignment.CENTER) {
+                        x = (int) (width / 2f - widget.getArea().width / 2f);
+                    } else if (this.caa == CrossAxisAlignment.END) {
+                        x = width - widget.getArea().width - padding.right - margin.left;
+                    }
+                }
+                widget.getArea().rx = x;
+                widget.resizer().setXResized(true);
             }
         }
     }

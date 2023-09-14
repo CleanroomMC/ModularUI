@@ -5,6 +5,8 @@ import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import com.cleanroommc.modularui.widget.sizer.IResizeable;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Base interface for gui elements. For example widgets.
@@ -20,6 +22,8 @@ public interface IGuiElement {
      * @return the parent of this element
      */
     IGuiElement getParent();
+
+    IResizeable resizer();
 
     /**
      * @return the area this element occupies
@@ -96,11 +100,6 @@ public interface IGuiElement {
      * @return if this element is enabled
      */
     boolean isEnabled();
-
-    /**
-     * Called when the screen resizes. Handles the positioning and sizing of this element.
-     */
-    void resize();
 
     /**
      * @return default width if it can't be calculated

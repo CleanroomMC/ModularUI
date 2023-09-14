@@ -67,6 +67,12 @@ public class ModularSlot extends SlotItemHandler {
         this.changeListener.accept(getStack());
     }
 
+    @Override
+    public void putStack(@NotNull ItemStack stack) {
+        if (ItemStack.areItemStacksEqual(stack, getStack())) return;
+        super.putStack(stack);
+    }
+
     @Nullable
     @SideOnly(Side.CLIENT)
     @Override

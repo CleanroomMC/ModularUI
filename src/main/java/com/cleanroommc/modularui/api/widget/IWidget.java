@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.api.ITheme;
-import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.ModularPanel;
@@ -11,7 +10,6 @@ import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Flex;
 import com.cleanroommc.modularui.widget.sizer.IResizeable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -130,6 +128,15 @@ public interface IWidget extends IGuiElement {
 
     void setEnabled(boolean enabled);
 
+    default boolean areAncestorsEnabled() {
+        IWidget parent = this;
+        while (parent != null) {
+            if (!parent.isEnabled()) return false;
+            parent = parent.getParent();
+        }
+        return true;
+    }
+
     default boolean canBeSeen(IViewportStack stack) {
         return Stencil.isInsideScissorArea(getArea(), stack);
     }
@@ -162,7 +169,6 @@ public interface IWidget extends IGuiElement {
     /**
      * @return resizer of this widget
      */
-    @Nullable
     IResizeable resizer();
 
     /**
@@ -173,33 +179,20 @@ public interface IWidget extends IGuiElement {
     void resizer(IResizeable resizer);
 
     /**
-     * Called when the screen resizes. Handles the positioning and sizing of this element.
+     * Called before a widget is resized.
      */
-    @Override
-    default void resize() {
-        IResizeable resizer = resizer();
-        if (resizer != null) {
-            if (resizer.isSkip()) return;
-            resizer.apply(this);
-        }
-
-        if (hasChildren()) {
-            getChildren().forEach(IWidget::resize);
-        }
-
-        if (this instanceof ILayoutWidget) {
-            ((ILayoutWidget) this).layoutWidgets();
-        }
-
-        if (resizer != null) {
-            resizer.postApply(this);
-        }
-
-        if (this instanceof ILayoutWidget) {
-            ((ILayoutWidget) this).postLayoutWidgets();
-        }
+    default void beforeResize() {
     }
 
+    /**
+     * Called after a widget is fully resized.
+     */
+    default void onResized() {
+    }
+
+    /**
+     * Called after the full widget tree is resized and the absolute positions are calculated.
+     */
     default void postResize() {
     }
 

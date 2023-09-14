@@ -179,6 +179,10 @@ public class GuiSyncManager {
         return this.playerInventory;
     }
 
+    public boolean isClient() {
+        return NetworkUtils.isClient(this.player);
+    }
+
     public static String makeSyncKey(String name, int id) {
         return name + ":" + id;
     }

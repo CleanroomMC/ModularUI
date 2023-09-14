@@ -9,7 +9,6 @@ import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Box;
-import com.cleanroommc.modularui.widget.sizer.Flex;
 
 public class TextWidget extends Widget<TextWidget> {
 
@@ -53,10 +52,8 @@ public class TextWidget extends Widget<TextWidget> {
         return theme.getWidgetTheme(this.widgetTheme);
     }
 
-    @Override
-    public int getDefaultHeight() {
-        Flex parentFlex = getParent().getFlex();
-        float maxWidth = parentFlex != null && !parentFlex.xAxisDependsOnChildren() ? getParent().getArea().width : Float.MAX_VALUE;
+    private TextRenderer simulate() {
+        float maxWidth = getParent().resizer() != null ? getParent().getArea().width : Float.MAX_VALUE;
         Box padding = getArea().getPadding();
         TextRenderer renderer = TextRenderer.SHARED;
         renderer.setAlignment(Alignment.TopLeft, maxWidth);
@@ -64,20 +61,26 @@ public class TextWidget extends Widget<TextWidget> {
         renderer.setScale(this.scale);
         renderer.setSimulate(true);
         renderer.draw(this.key.get());
+        return renderer;
+    }
+
+    @Override
+    public int getDefaultHeight() {
+        if (getParent().resizer() != null && !getParent().resizer().isWidthCalculated()) {
+            return -1;
+        }
+        TextRenderer renderer = simulate();
+        Box padding = getArea().getPadding();
         return (int) (renderer.getLastHeight() + padding.vertical() + 0.5f);
     }
 
     @Override
     public int getDefaultWidth() {
-        Flex parentFlex = getParent().getFlex();
-        float maxWidth = parentFlex != null && !parentFlex.xAxisDependsOnChildren() ? getParent().getArea().width : Float.MAX_VALUE;
+        if (getParent().resizer() != null && !getParent().resizer().isWidthCalculated()) {
+            return -1;
+        }
+        TextRenderer renderer = simulate();
         Box padding = getArea().getPadding();
-        TextRenderer renderer = TextRenderer.SHARED;
-        renderer.setAlignment(Alignment.TopLeft, maxWidth);
-        renderer.setPos(padding.left, padding.top);
-        renderer.setScale(this.scale);
-        renderer.setSimulate(true);
-        renderer.draw(this.key.get());
         return (int) (renderer.getLastWidth() + padding.horizontal() + 0.5f);
     }
 
