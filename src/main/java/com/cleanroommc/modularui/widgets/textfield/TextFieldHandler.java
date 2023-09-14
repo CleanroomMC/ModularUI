@@ -187,8 +187,7 @@ public class TextFieldHandler {
                 for (int i = main.x; i < line.length(); i++) {
                     char c = line.charAt(i);
                     if (!Character.isLetter(c) && !Character.isDigit(c)) {
-                        if (newPos == i) newPos++;
-                        else newPos = i;
+                        if (newPos < i) newPos = i;
                         found = true;
                         break;
                     }
