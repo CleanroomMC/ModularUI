@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.network;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.network.packets.PacketSyncHandler;
+import com.cleanroommc.modularui.network.packets.SClipboard;
 import com.cleanroommc.modularui.network.packets.SyncConfig;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -20,6 +21,7 @@ public class NetworkHandler {
     private static int packetId = 0;
 
     public static void init() {
+        registerS2C(SClipboard.class);
         registerS2C(PacketSyncHandler.class);
         registerC2S(PacketSyncHandler.class);
         registerC2S(SyncConfig.class);

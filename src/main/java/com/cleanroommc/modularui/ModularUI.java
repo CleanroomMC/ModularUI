@@ -10,6 +10,7 @@ import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.test.EventHandler;
+import com.cleanroommc.modularui.test.ItemEditorGui;
 import com.cleanroommc.modularui.test.TestBlock;
 import com.cleanroommc.modularui.theme.ThemeManager;
 import com.cleanroommc.modularui.theme.ThemeReloadCommand;
@@ -29,6 +30,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.EntityEntry;
@@ -110,6 +112,11 @@ public class ModularUI {
     private void postInitClient() {
         ClientCommandHandler.instance.registerCommand(new ThemeReloadCommand());
         ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new ThemeManager());
+    }
+
+    @Mod.EventHandler
+    public void onServerLoad(FMLServerStartingEvent event) {
+        event.registerServerCommand(new ItemEditorGui.Command());
     }
 
     @SubscribeEvent
