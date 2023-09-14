@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.widget.IFocusedWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
+import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
 import com.cleanroommc.modularui.utils.Alignment;
@@ -82,9 +83,10 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
 
     @Override
     public void preDraw(GuiContext context, boolean transformed) {
-        super.preDraw(context, transformed);
         if (transformed) {
             drawText(context);
+        } else {
+            Stencil.apply(1, 1, getArea().w() - 2, getArea().h() - 2, context);
         }
     }
 
