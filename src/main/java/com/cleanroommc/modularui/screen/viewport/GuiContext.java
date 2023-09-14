@@ -407,6 +407,14 @@ public class GuiContext extends GuiViewportStack {
         return axis.isHorizontal() ? getAbsMouseX() : getAbsMouseY();
     }
 
+    public int unTransformMouseX() {
+        return unTransformX(getAbsMouseX(), getAbsMouseY());
+    }
+
+    public int unTransformMouseY() {
+        return unTransformY(getAbsMouseX(), getAbsMouseY());
+    }
+
     public int getMouseButton() {
         return this.mouseButton;
     }

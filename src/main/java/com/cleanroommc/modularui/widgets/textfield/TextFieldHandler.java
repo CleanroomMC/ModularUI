@@ -154,13 +154,13 @@ public class TextFieldHandler {
             setCursor(main.y - 1, this.text.get(main.y - 1).length(), !shift, true);
         } else {
             int newPos = main.x - 1;
-            if (ctrl) {
+            if (ctrl && newPos > 0) {
                 String line = this.text.get(main.y);
                 boolean found = false;
-                for (int i = main.x - 1; i >= 0; i--) {
+                for (int i = newPos; i >= 0; i--) {
                     char c = line.charAt(i);
                     if (!Character.isLetter(c) && !Character.isDigit(c)) {
-                        newPos = i + 1;
+                        if (i < newPos) newPos = i + 1;
                         found = true;
                         break;
                     }
@@ -182,12 +182,13 @@ public class TextFieldHandler {
             setCursor(main.y + 1, 0, !shift, true);
         } else {
             int newPos = main.x + 1;
-            if (ctrl) {
+            if (ctrl && newPos < line.length()) {
                 boolean found = false;
-                for (int i = main.x + 1; i < line.length(); i++) {
+                for (int i = main.x; i < line.length(); i++) {
                     char c = line.charAt(i);
                     if (!Character.isLetter(c) && !Character.isDigit(c)) {
-                        newPos = i;
+                        if (newPos == i) newPos++;
+                        else newPos = i;
                         found = true;
                         break;
                     }

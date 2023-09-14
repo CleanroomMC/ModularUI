@@ -70,7 +70,9 @@ public class TransformationMatrix {
 
     public Matrix4f getInvertedMatrix() {
         if (this.dirty) {
-            Matrix4f.invert(this.matrix, this.invertedMatrix);
+            if (Matrix4f.invert(this.matrix, this.invertedMatrix) == null) {
+                this.invertedMatrix.load(this.matrix);
+            }
             this.dirty = false;
         }
         return this.invertedMatrix;
