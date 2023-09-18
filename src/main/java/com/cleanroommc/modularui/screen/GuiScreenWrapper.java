@@ -243,7 +243,7 @@ public class GuiScreenWrapper extends GuiContainer {
             }
             GlStateManager.popMatrix();
             locatedHovered.unapplyMatrix(context);
-            GuiDraw.drawText("Pos: " + area.x + ", " + area.y, 5, lineY, 1, color, false);
+            GuiDraw.drawText("Pos: " + area.x + ", " + area.y + "  Rel: " + area.rx + ", " + area.ry, 5, lineY, 1, color, false);
             lineY -= 11;
             GuiDraw.drawText("Size: " + area.width + ", " + area.height, 5, lineY, 1, color, false);
             lineY -= 11;
