@@ -23,6 +23,10 @@ public class KeyboardData {
         this.alt = alt;
     }
 
+    public boolean isClient() {
+        return this.side.isClient();
+    }
+
     public void writeToPacket(PacketBuffer buffer) {
         buffer.writeChar(this.character);
         buffer.writeVarInt(this.keycode);

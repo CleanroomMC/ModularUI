@@ -22,6 +22,10 @@ public class MouseData {
         this.alt = alt;
     }
 
+    public boolean isClient() {
+        return this.side.isClient();
+    }
+
     public void writeToPacket(PacketBuffer buffer) {
         buffer.writeVarInt(this.mouseButton);
         byte data = 0;

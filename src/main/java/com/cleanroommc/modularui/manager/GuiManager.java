@@ -29,10 +29,16 @@ public final class GuiManager implements IGuiHandler {
 
     @SideOnly(Side.CLIENT)
     public static void openClientUI(EntityPlayer player, ModularScreen screen) {
+        openClientUI(player, screen, new JeiSettings());
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static void openClientUI(EntityPlayer player, ModularScreen screen, JeiSettings jeiSettings) {
         if (!NetworkUtils.isClient(player)) {
             ModularUI.LOGGER.info("Tried opening client ui on server!");
             return;
         }
+        screen.getContext().setJeiSettings(jeiSettings);
         GuiScreenWrapper screenWrapper = new GuiScreenWrapper(new ModularContainer(), screen);
         FMLCommonHandler.instance().showGuiScreen(screenWrapper);
     }
