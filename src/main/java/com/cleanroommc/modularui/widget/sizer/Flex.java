@@ -330,19 +330,32 @@ public class Flex implements IResizeable, IPositioned<Flex> {
                 Box padding = this.parent.getArea().getPadding();
                 // first calculate the area the children span
                 int x0 = Integer.MAX_VALUE, x1 = Integer.MIN_VALUE, y0 = Integer.MAX_VALUE, y1 = Integer.MIN_VALUE;
+                int w = 0, h = 0;
                 for (IWidget child : children) {
                     Box margin = child.getArea().getMargin();
                     IResizeable resizeable = child.resizer();
                     Area area = child.getArea();
                     if (this.x.dependsOnChildren() && resizeable.isWidthCalculated()) {
-                        x0 = Math.min(x0, area.rx - padding.left - margin.left);
-                        x1 = Math.max(x1, area.rx + area.width + padding.right + margin.right);
+                        w = Math.max(w, area.requestedWidth() + padding.horizontal());
+                        if (resizeable.isXCalculated()) {
+                            x0 = Math.min(x0, area.rx - padding.left - margin.left);
+                            x1 = Math.max(x1, area.rx + area.width + padding.right + margin.right);
+                        }
                     }
                     if (this.y.dependsOnChildren() && resizeable.isHeightCalculated()) {
-                        y0 = Math.min(y0, area.ry - padding.top - margin.top);
-                        y1 = Math.max(y1, area.ry + area.height + padding.bottom + margin.bottom);
+                        h = Math.max(h, area.requestedHeight() + padding.vertical());
+                        if (resizeable.isYCalculated()) {
+                            y0 = Math.min(y0, area.ry - padding.top - margin.top);
+                            y1 = Math.max(y1, area.ry + area.height + padding.bottom + margin.bottom);
+                        }
                     }
                 }
+                if (x1 == Integer.MIN_VALUE) x1 = 0;
+                if (y1 == Integer.MIN_VALUE) y1 = 0;
+                if (x0 == Integer.MAX_VALUE) y0 = 0;
+                if (y0 == Integer.MAX_VALUE) y0 = 0;
+                if (w > x1 - x0) x1 = x0 + w;
+                if (h > y1 - y0) y1 = y0 + h;
 
                 // now calculate new x, y, width and height based on the childrens area
                 Area relativeTo = getRelativeTo().getArea();

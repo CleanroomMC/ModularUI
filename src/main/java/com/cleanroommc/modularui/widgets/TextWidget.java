@@ -52,8 +52,7 @@ public class TextWidget extends Widget<TextWidget> {
         return theme.getWidgetTheme(this.widgetTheme);
     }
 
-    private TextRenderer simulate() {
-        float maxWidth = getParent().resizer() != null ? getParent().getArea().width : Float.MAX_VALUE;
+    private TextRenderer simulate(float maxWidth) {
         Box padding = getArea().getPadding();
         TextRenderer renderer = TextRenderer.SHARED;
         renderer.setAlignment(Alignment.TopLeft, maxWidth);
@@ -66,20 +65,24 @@ public class TextWidget extends Widget<TextWidget> {
 
     @Override
     public int getDefaultHeight() {
-        if (getParent().resizer() != null && !getParent().resizer().isWidthCalculated()) {
-            return -1;
+        float maxWidth = getScreen().getScreenArea().width;
+        if (resizer() != null && resizer().isWidthCalculated()) {
+            maxWidth = getArea().width;
+        } else if (getParent().resizer() != null && getParent().resizer().isWidthCalculated()) {
+            maxWidth = getParent().getArea().width;
         }
-        TextRenderer renderer = simulate();
+        TextRenderer renderer = simulate(maxWidth);
         Box padding = getArea().getPadding();
         return (int) (renderer.getLastHeight() + padding.vertical() + 0.5f);
     }
 
     @Override
     public int getDefaultWidth() {
-        if (getParent().resizer() != null && !getParent().resizer().isWidthCalculated()) {
-            return -1;
+        float maxWidth = getScreen().getScreenArea().width;
+        if (getParent().resizer() != null && getParent().resizer().isWidthCalculated()) {
+            maxWidth = getParent().getArea().width;
         }
-        TextRenderer renderer = simulate();
+        TextRenderer renderer = simulate(maxWidth);
         Box padding = getArea().getPadding();
         return (int) (renderer.getLastWidth() + padding.horizontal() + 0.5f);
     }

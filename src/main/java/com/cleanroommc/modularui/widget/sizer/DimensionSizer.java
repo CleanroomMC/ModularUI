@@ -121,6 +121,7 @@ public class DimensionSizer {
                 p = calcPoint(this.start, s, parentSize, calcParent);
             } else if (this.end != null) {
                 p = calcPoint(this.end, s, parentSize, calcParent);
+                p = parentSize - p - s;
             } else {
                 throw new IllegalStateException();
             }
@@ -184,7 +185,7 @@ public class DimensionSizer {
             Box padding = relativeTo.getArea().getPadding();
             Box margin = area.getMargin();
 
-            if (parentSize < 1 || (this.size != null && !this.size.isRelative())) {
+            if (!calcParent || (this.size != null && !this.size.isRelative())) {
                 area.setRelativePoint(this.axis, p);
             } else {
                 area.setRelativePoint(this.axis, Math.max(p, padding.getStart(this.axis) + margin.getStart(this.axis)));
