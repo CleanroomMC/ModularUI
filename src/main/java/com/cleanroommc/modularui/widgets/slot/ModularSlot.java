@@ -25,8 +25,7 @@ public class ModularSlot extends SlotItemHandler {
     private boolean enabled = true;
     private boolean canTake = true, canPut = true;
     private Predicate<ItemStack> filter = stack -> true;
-    private Consumer<ItemStack> changeListener = stack -> {
-    };
+    private IOnSlotChanged changeListener = IOnSlotChanged.DEFAULT;
     private boolean ignoreMaxStackSize = false;
     private String slotGroupName = null;
     private SlotGroup slotGroup = null;
@@ -64,7 +63,10 @@ public class ModularSlot extends SlotItemHandler {
 
     @Override
     public void onSlotChanged() {
-        this.changeListener.accept(getStack());
+    }
+
+    public void onSlotChangedReal(ItemStack itemStack, boolean onlyChangedAmount, boolean client) {
+        this.changeListener.onChange(itemStack, onlyChangedAmount, client);
     }
 
     @Override
@@ -123,9 +125,8 @@ public class ModularSlot extends SlotItemHandler {
      *
      * @param changeListener change listener that should be called on a change
      */
-    public ModularSlot changeListener(Consumer<ItemStack> changeListener) {
-        this.changeListener = changeListener != null ? changeListener : stack -> {
-        };
+    public ModularSlot changeListener(IOnSlotChanged changeListener) {
+        this.changeListener = changeListener != null ? changeListener : IOnSlotChanged.DEFAULT;
         return this;
     }
 
