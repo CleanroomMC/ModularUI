@@ -2,13 +2,17 @@ package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
+import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.utils.ReverseIterable;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 public class WindowManager {
 
@@ -21,7 +25,7 @@ public class WindowManager {
     /**
      * List of all open panels from top to bottom.
      */
-    private final LinkedList<ModularPanel> panels = new LinkedList<>();
+    private final ObjectList<ModularPanel> panels = ObjectList.create();
     private final List<ModularPanel> panelsView = Collections.unmodifiableList(this.panels);
     private final ReverseIterable<ModularPanel> reversePanels = new ReverseIterable<>(this.panelsView);
     private final List<ModularPanel> queueOpenPanels = new ArrayList<>();
