@@ -91,12 +91,12 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
             Box margin = widget.getArea().getMargin();
             // don't align auto positioned (X) children in X
             if (!widget.flex().hasXPos() && widget.resizer().isWidthCalculated()) {
-                int x = padding.left + margin.left;
+                int x = 0;
                 if (hasWidth) {
                     if (this.caa == CrossAxisAlignment.CENTER) {
                         x = (int) (width / 2f - widget.getArea().width / 2f);
                     } else if (this.caa == CrossAxisAlignment.END) {
-                        x = width - widget.getArea().width - padding.right - margin.left;
+                        x = width - widget.getArea().width;
                     }
                 }
                 widget.getArea().rx = x;

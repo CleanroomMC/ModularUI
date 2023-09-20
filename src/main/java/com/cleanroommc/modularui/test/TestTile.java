@@ -72,7 +72,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
         panel.flex()                        // returns object which is responsible for sizing
                 .size(176, 220)       // set a static size for the main panel
                 .align(Alignment.Center);    // center the panel in the screen
-        panel.bindPlayerInventory()
+        panel//.bindPlayerInventory()
                 .child(new Row()
                         .debugName("Tab row")
                         .coverChildren()
@@ -95,7 +95,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                         .debugName("buttons, slots and more tests")
                                         .height(137)
                                         .coverChildrenWidth()
-                                        .padding(7)
+                                        //.padding(7)
                                         .child(new Column()
                                                 .debugName("buttons and slots test")
                                                 .coverChildren()
@@ -171,7 +171,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                         .debugName("Slots test page")
                                         //.coverChildren()
                                         .padding(7)
-                                        .child(SlotGroupWidget.playerInventory())
+                                        .child(SlotGroupWidget.playerInventory().left(0))
                                         .child(SlotGroupWidget.builder()
                                                 .matrix("III", "III", "III")
                                                 .key('I', index -> {

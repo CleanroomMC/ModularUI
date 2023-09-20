@@ -179,24 +179,23 @@ public class DimensionSizer {
             }
         }
 
-        // apply padding and margin
-        if (this.posCalculated && this.sizeCalculated) {
-            Box.SHARED.all(0);
+        // apply padding and margin to size
+        if (this.sizeCalculated && calcParent && ((this.size != null && this.size.isRelative()) ||
+                (this.start != null && this.end != null && (this.start.isRelative() || this.end.isRelative())))) {
             Box padding = relativeTo.getArea().getPadding();
             Box margin = area.getMargin();
+            s = Math.min(s, parentSize - padding.getTotal(this.axis) - margin.getTotal(this.axis));
 
-            if (!calcParent || (this.size != null && !this.size.isRelative())) {
+            /*if (!calcParent || (this.size != null && !this.size.isRelative())) {
                 area.setRelativePoint(this.axis, p);
             } else {
                 area.setRelativePoint(this.axis, Math.max(p, padding.getStart(this.axis) + margin.getStart(this.axis)));
                 s = Math.min(s, parentSize - padding.getTotal(this.axis) - margin.getTotal(this.axis));
-            }
+            }*/
 
-        } else {
-            area.setRelativePoint(this.axis, p);
         }
-        p += relativeTo.getArea().x;
-        area.setPoint(this.axis, p); // temporary
+        area.setRelativePoint(this.axis, p);
+        area.setPoint(this.axis, p + relativeTo.getArea().x); // temporary
         area.setSize(this.axis, s);
     }
 
@@ -222,6 +221,14 @@ public class DimensionSizer {
             this.posCalculated = true;
         }
         return moveAmount;
+    }
+
+    public void applyMarginAndPaddingToPos(Area area, Area relativeTo) {
+        int o = area.getMargin().getStart(this.axis) + relativeTo.getPadding().getStart(this.axis);
+        if (o == 0) return;
+        if (this.start != null && !this.start.isRelative()) return;
+        if (this.end != null && !this.end.isRelative() && (this.size == null || !this.size.isRelative())) return;
+        area.setRelativePoint(this.axis, area.getRelativePoint(this.axis) + o);
     }
 
     private int calcSize(Unit s, int parentSize, boolean parentSizeCalculated) {

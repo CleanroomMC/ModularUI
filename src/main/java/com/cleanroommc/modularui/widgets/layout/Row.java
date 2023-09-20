@@ -90,12 +90,12 @@ public class Row extends ParentWidget<Row> implements ILayoutWidget {
             Box margin = widget.getArea().getMargin();
             // don't align auto positioned (Y) children in Y
             if (!widget.flex().hasYPos()) {
-                int y = margin.top + padding.top;
+                int y = 0;
                 if (hasHeight) {
                     if (this.caa == CrossAxisAlignment.CENTER) {
                         y = (int) (height / 2f - widget.getArea().height / 2f);
                     } else if (this.caa == CrossAxisAlignment.END) {
-                        y = height - widget.getArea().height - margin.bottom - padding.bottom;
+                        y = height - widget.getArea().height;
                     }
                 }
                 widget.getArea().ry = y;

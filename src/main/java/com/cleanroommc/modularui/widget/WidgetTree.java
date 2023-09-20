@@ -217,7 +217,6 @@ public class WidgetTree {
         applyPos(parent);
         WidgetTree.foreachChildByLayer(parent, child -> {
             child.postResize();
-            //ModularUI.LOGGER.info("{} at {}", child, child.getArea());
             return true;
         }, true);
     }

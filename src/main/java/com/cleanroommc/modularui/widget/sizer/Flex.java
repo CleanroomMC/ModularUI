@@ -352,7 +352,7 @@ public class Flex implements IResizeable, IPositioned<Flex> {
                 }
                 if (x1 == Integer.MIN_VALUE) x1 = 0;
                 if (y1 == Integer.MIN_VALUE) y1 = 0;
-                if (x0 == Integer.MAX_VALUE) y0 = 0;
+                if (x0 == Integer.MAX_VALUE) x0 = 0;
                 if (y0 == Integer.MAX_VALUE) y0 = 0;
                 if (w > x1 - x0) x1 = x0 + w;
                 if (h > y1 - y0) y1 = y0 + h;
@@ -410,6 +410,8 @@ public class Flex implements IResizeable, IPositioned<Flex> {
         // after all widgets x, y, width and height have been calculated we can now calculate the absolute position
         Area relativeTo = getRelativeTo().getArea();
         Area area = parent.getArea();
+        this.x.applyMarginAndPaddingToPos(area, relativeTo);
+        this.y.applyMarginAndPaddingToPos(area, relativeTo);
         area.applyPos(relativeTo.x, relativeTo.y);
         Area parentArea = parent.getParentArea();
         area.rx = area.x - parentArea.x;
