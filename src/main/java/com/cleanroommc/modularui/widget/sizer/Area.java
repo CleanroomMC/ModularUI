@@ -371,6 +371,24 @@ public class Area extends Rectangle implements IResizeable {
     public void setResized(boolean x, boolean y, boolean w, boolean h) {
     }
 
+    @Override
+    public void setXMarginPaddingApplied(boolean b) {
+    }
+
+    @Override
+    public void setYMarginPaddingApplied(boolean b) {
+    }
+
+    @Override
+    public boolean isXMarginPaddingApplied() {
+        return true;
+    }
+
+    @Override
+    public boolean isYMarginPaddingApplied() {
+        return true;
+    }
+
     public Area createCopy() {
         return new Area(this);
     }

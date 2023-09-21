@@ -71,6 +71,7 @@ public class Row extends ParentWidget<Row> implements ILayoutWidget {
             // set calculated relative Y pos and set bottom margin for next widget
             widget.getArea().rx = lastX + margin.left;
             widget.resizer().setXResized(true);
+            widget.resizer().setXMarginPaddingApplied(true);
 
             lastX += widget.getArea().requestedWidth();
             if (hasWidth && this.maa == MainAxisAlignment.SPACE_BETWEEN) {
@@ -90,16 +91,17 @@ public class Row extends ParentWidget<Row> implements ILayoutWidget {
             Box margin = widget.getArea().getMargin();
             // don't align auto positioned (Y) children in Y
             if (!widget.flex().hasYPos()) {
-                int y = 0;
+                int y = margin.top + padding.top;
                 if (hasHeight) {
                     if (this.caa == CrossAxisAlignment.CENTER) {
                         y = (int) (height / 2f - widget.getArea().height / 2f);
                     } else if (this.caa == CrossAxisAlignment.END) {
-                        y = height - widget.getArea().height;
+                        y = height - widget.getArea().height - margin.bottom - padding.bottom;
                     }
                 }
                 widget.getArea().ry = y;
                 widget.resizer().setYResized(true);
+                widget.resizer().setYMarginPaddingApplied(true);
             }
         }
     }

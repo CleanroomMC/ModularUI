@@ -286,14 +286,34 @@ public class Flex implements IResizeable, IPositioned<Flex> {
 
     @Override
     public void initResizing() {
-        this.x.setResized(false);
-        this.y.setResized(false);
+        setMarginPaddingApplied(false);
+        setResized(false);
     }
 
     @Override
     public void setResized(boolean x, boolean y, boolean w, boolean h) {
         this.x.setResized(x, w);
         this.y.setResized(y, h);
+    }
+
+    @Override
+    public void setXMarginPaddingApplied(boolean b) {
+        this.x.setMarginPaddingApplied(b);
+    }
+
+    @Override
+    public void setYMarginPaddingApplied(boolean b) {
+        this.y.setMarginPaddingApplied(b);
+    }
+
+    @Override
+    public boolean isXMarginPaddingApplied() {
+        return this.x.isMarginPaddingApplied();
+    }
+
+    @Override
+    public boolean isYMarginPaddingApplied() {
+        return this.y.isMarginPaddingApplied();
     }
 
     @Override
@@ -382,18 +402,30 @@ public class Flex implements IResizeable, IPositioned<Flex> {
             if (!children.isEmpty()) {
                 Box padding = this.parent.getArea().getPadding();
                 // first calculate the area the children span
-                int x0 = Integer.MAX_VALUE, x1 = Integer.MIN_VALUE, y0 = Integer.MAX_VALUE, y1 = Integer.MIN_VALUE;
+                int x1 = Integer.MIN_VALUE, y1 = Integer.MIN_VALUE;
+                int w = 0, h = 0;
                 for (IWidget child : children) {
                     Box margin = child.getArea().getMargin();
                     IResizeable resizeable = child.resizer();
                     Area area = child.getArea();
                     if (this.x.dependsOnChildren() && resizeable.isWidthCalculated()) {
-                        x1 = Math.max(x1, area.rx + area.width + padding.right + margin.right);
+                        w = Math.max(w, area.requestedWidth() + padding.horizontal());
+                        if (resizeable.isXCalculated()) {
+                            x1 = Math.max(x1, area.rx + area.width + padding.right + margin.right);
+                        }
                     }
                     if (this.y.dependsOnChildren() && resizeable.isHeightCalculated()) {
-                        y1 = Math.max(y1, area.ry + area.height + padding.bottom + margin.bottom);
+                        h = Math.max(h, area.requestedHeight() + padding.vertical());
+                        if (resizeable.isXCalculated()) {
+                            y1 = Math.max(y1, area.ry + area.height + padding.bottom + margin.bottom);
+                        }
                     }
                 }
+                if (x1 == Integer.MIN_VALUE) x1 = 0;
+                if (y1 == Integer.MIN_VALUE) y1 = 0;
+                if (w > x1) x1 = w;
+                if (h > y1) y1 = h;
+
                 Area relativeTo = getRelativeTo().getArea();
                 if (this.x.dependsOnChildren()) {
                     this.x.postApply(getArea(), relativeTo, 0, x1);

@@ -14,6 +14,7 @@ public class DimensionSizer {
     private boolean defaultMode = false;
 
     private boolean posCalculated = false, sizeCalculated = false;
+    private boolean marginPaddingApplied = false;
 
     public DimensionSizer(GuiAxis axis) {
         this.axis = axis;
@@ -103,6 +104,14 @@ public class DimensionSizer {
     public void setResized(boolean pos, boolean size) {
         this.posCalculated = pos;
         this.sizeCalculated = size;
+    }
+
+    public boolean isMarginPaddingApplied() {
+        return marginPaddingApplied;
+    }
+
+    public void setMarginPaddingApplied(boolean marginPaddingApplied) {
+        this.marginPaddingApplied = marginPaddingApplied;
     }
 
     private boolean needsSize(Unit unit) {
@@ -212,7 +221,7 @@ public class DimensionSizer {
                 p = calcPoint(this.end, s, relativeTo.getSize(this.axis), true);
                 p = relativeTo.getSize(this.axis) - p - s;
             } else {
-                p = area.getRelativePoint(this.axis) + p0 + area.getMargin().getStart(this.axis);
+                p = area.getRelativePoint(this.axis) + p0/* + area.getMargin().getStart(this.axis)*/;
                 if (!this.cancelAutoMovement) {
                     moveAmount = -p0;
                 }
@@ -224,6 +233,8 @@ public class DimensionSizer {
     }
 
     public void applyMarginAndPaddingToPos(Area area, Area relativeTo) {
+        if (isMarginPaddingApplied()) return;
+        setMarginPaddingApplied(true);
         int o = area.getMargin().getStart(this.axis) + relativeTo.getPadding().getStart(this.axis);
         if (o == 0) return;
         if (this.start != null && !this.start.isRelative()) return;

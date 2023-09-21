@@ -60,4 +60,21 @@ public interface IResizeable {
     default void setHeightResized(boolean v) {
         setResized(isXCalculated(), isYCalculated(), isWidthCalculated(), v);
     }
+
+    default void setResized(boolean b) {
+        setResized(b, b, b, b);
+    }
+
+    void setXMarginPaddingApplied(boolean b);
+
+    void setYMarginPaddingApplied(boolean b);
+
+    default void setMarginPaddingApplied(boolean b) {
+        setXMarginPaddingApplied(b);
+        setYMarginPaddingApplied(b);
+    }
+
+    boolean isXMarginPaddingApplied();
+
+    boolean isYMarginPaddingApplied();
 }

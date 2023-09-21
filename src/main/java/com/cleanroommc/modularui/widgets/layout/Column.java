@@ -77,6 +77,7 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
                 lastY += (height - totalHeight) / (getChildren().size() - 1);
             }
             widget.resizer().setYResized(true);
+            widget.resizer().setYMarginPaddingApplied(true);
         }
     }
 
@@ -91,16 +92,17 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
             Box margin = widget.getArea().getMargin();
             // don't align auto positioned (X) children in X
             if (!widget.flex().hasXPos() && widget.resizer().isWidthCalculated()) {
-                int x = 0;
+                int x = margin.left + padding.left;
                 if (hasWidth) {
                     if (this.caa == CrossAxisAlignment.CENTER) {
                         x = (int) (width / 2f - widget.getArea().width / 2f);
                     } else if (this.caa == CrossAxisAlignment.END) {
-                        x = width - widget.getArea().width;
+                        x = width - widget.getArea().width - margin.right - padding.left;
                     }
                 }
                 widget.getArea().rx = x;
                 widget.resizer().setXResized(true);
+                widget.resizer().setXMarginPaddingApplied(true);
             }
         }
     }
