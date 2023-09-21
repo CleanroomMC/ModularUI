@@ -23,16 +23,23 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
         boolean hasHeight = resizer().isHeightCalculated();
         int height = getArea().height;
         Box padding = getArea().getPadding();
+        MainAxisAlignment maa = this.maa;
+        if (!hasHeight && maa != MainAxisAlignment.START) {
+            if (flex().yAxisDependsOnChildren()) {
+                maa = MainAxisAlignment.START;
+            } else {
+                throw new IllegalStateException("MainAxisAlignment other than start need the height to be calculated!");
+            }
+        }
 
-        int maxWidth = 0;
         int totalHeight = 0;
         int expandedAmount = 0;
 
+        // TODO children needs width calculated
         // calculate total height and maximum width
         for (IWidget widget : getChildren()) {
             // exclude self positioned (Y) children
             if (widget.flex().hasYPos()) continue;
-            maxWidth = Math.max(maxWidth, widget.getArea().requestedWidth());
             if (widget.flex().isExpanded()) {
                 expandedAmount++;
                 totalHeight += widget.getArea().getMargin().vertical();
@@ -51,18 +58,20 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
                     widget.resizer().setHeightResized(true);
                 }
             }
+            if (maa == MainAxisAlignment.SPACE_BETWEEN || maa == MainAxisAlignment.SPACE_AROUND) {
+                maa = MainAxisAlignment.START;
+            }
         }
 
         // calculate start y
-        int lastY = 0;
+        int lastY = padding.top;
         if (hasHeight) {
-            if (this.maa == MainAxisAlignment.CENTER) {
+            if (maa == MainAxisAlignment.CENTER) {
                 lastY = (int) (height / 2f - totalHeight / 2f);
-            } else if (this.maa == MainAxisAlignment.END) {
+            } else if (maa == MainAxisAlignment.END) {
                 lastY = height - totalHeight;
             }
         }
-        lastY = Math.max(lastY, padding.top) - getArea().getMargin().top;
 
         for (IWidget widget : getChildren()) {
             // exclude self positioned (Y) children
@@ -71,13 +80,13 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
 
             // set calculated relative Y pos and set bottom margin for next widget
             widget.getArea().ry = lastY + margin.top;
-
-            lastY += widget.getArea().requestedHeight();
-            if (hasHeight && this.maa == MainAxisAlignment.SPACE_BETWEEN) {
-                lastY += (height - totalHeight) / (getChildren().size() - 1);
-            }
             widget.resizer().setYResized(true);
             widget.resizer().setYMarginPaddingApplied(true);
+
+            lastY += widget.getArea().requestedHeight();
+            if (hasHeight && maa == MainAxisAlignment.SPACE_BETWEEN) {
+                lastY += (height - totalHeight) / (getChildren().size() - 1);
+            }
         }
     }
 
