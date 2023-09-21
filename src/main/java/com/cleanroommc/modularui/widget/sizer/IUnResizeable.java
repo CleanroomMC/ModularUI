@@ -1,0 +1,57 @@
+package com.cleanroommc.modularui.widget.sizer;
+
+import com.cleanroommc.modularui.api.layout.IResizeable;
+import com.cleanroommc.modularui.api.widget.IGuiElement;
+
+/**
+ * A variation of {@link IResizeable} with default implementations which don't do anything
+ */
+public interface IUnResizeable extends IResizeable {
+
+    @Override
+    default void initResizing() {}
+
+    @Override
+    default boolean postResize(IGuiElement guiElement) {
+        return true;
+    }
+
+    @Override
+    default boolean isXCalculated() {
+        return true;
+    }
+
+    @Override
+    default boolean isYCalculated() {
+        return true;
+    }
+
+    @Override
+    default boolean isWidthCalculated() {
+        return true;
+    }
+
+    @Override
+    default boolean isHeightCalculated() {
+        return true;
+    }
+
+    @Override
+    default void setResized(boolean x, boolean y, boolean w, boolean h) {}
+
+    @Override
+    default void setXMarginPaddingApplied(boolean b) {}
+
+    @Override
+    default void setYMarginPaddingApplied(boolean b) {}
+
+    @Override
+    default boolean isXMarginPaddingApplied() {
+        return true;
+    }
+
+    @Override
+    default boolean isYMarginPaddingApplied() {
+        return true;
+    }
+}

@@ -1,5 +1,11 @@
 package com.cleanroommc.modularui.widget.sizer;
 
+import com.cleanroommc.modularui.api.GuiAxis;
+
+/**
+ * A box with four edges.
+ * Used for margins and paddings.
+ */
 public class Box {
 
     public static final Box SHARED = new Box();

@@ -3,7 +3,12 @@ package com.cleanroommc.modularui.widgets.layout;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.widget.ParentWidget;
+import org.jetbrains.annotations.ApiStatus;
 
+/**
+ * A panel with a header, left sidebar, right sidebar and a footer
+ */
+@ApiStatus.Experimental
 public class OrganizedPanel extends ModularPanel {
 
     private ParentWidget<?> header;

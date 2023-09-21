@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.drawable;
 
-import com.cleanroommc.modularui.widget.sizer.GuiAxis;
+import com.cleanroommc.modularui.api.GuiAxis;
 
 import java.util.Objects;
 

@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.widget.sizer;
+package com.cleanroommc.modularui.api;
 
 public enum GuiAxis {
 

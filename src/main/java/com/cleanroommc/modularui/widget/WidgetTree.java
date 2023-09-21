@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.widget;
 
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
+import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.ISynced;
@@ -9,7 +10,6 @@ import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.value.sync.GuiSyncManager;
-import com.cleanroommc.modularui.widget.sizer.IResizeable;
 import net.minecraft.client.renderer.GlStateManager;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -209,6 +209,7 @@ public class WidgetTree {
     }
 
     public static void resize(IWidget parent) {
+        // TODO check if widget has a parent which depends on its children
         // resize each widget and calculate their relative pos
         if (!resizeWidget(parent, true) && !resizeWidget(parent, false)) {
             throw new IllegalStateException("Failed to resize widgets");

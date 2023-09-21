@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widgets;
 
+import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.widget.IValueWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
@@ -7,7 +8,6 @@ import com.cleanroommc.modularui.utils.ScrollData;
 import com.cleanroommc.modularui.utils.ScrollDirection;
 import com.cleanroommc.modularui.widget.ScrollWidget;
 import com.cleanroommc.modularui.widget.WidgetTree;
-import com.cleanroommc.modularui.widget.sizer.GuiAxis;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.Nullable;
 

@@ -1,7 +1,16 @@
 package com.cleanroommc.modularui.widget.sizer;
 
+import com.cleanroommc.modularui.api.GuiAxis;
+import com.cleanroommc.modularui.api.layout.IResizeable;
+import org.jetbrains.annotations.ApiStatus;
+
 import java.util.function.IntSupplier;
 
+/**
+ * Handles calculating size and position in one dimension (x or y).
+ * Two of these can fully calculate a widget size and pos.
+ */
+@ApiStatus.Internal
 public class DimensionSizer {
 
     private final GuiAxis axis;
@@ -119,12 +128,14 @@ public class DimensionSizer {
     }
 
     public void apply(Area area, IResizeable relativeTo, IntSupplier defaultSize) {
+        // is already calculated
         if (this.sizeCalculated && this.posCalculated) return;
         int p, s;
         int parentSize = relativeTo.getArea().getSize(this.axis);
         boolean calcParent = relativeTo.isSizeCalculated(this.axis);
 
         if (this.sizeCalculated && !this.posCalculated) {
+            // size was calculated before
             s = area.getSize(this.axis);
             if (this.start != null) {
                 p = calcPoint(this.start, s, parentSize, calcParent);
@@ -135,6 +146,7 @@ public class DimensionSizer {
                 throw new IllegalStateException();
             }
         } else if (!this.sizeCalculated && this.posCalculated) {
+            // pos was calculated before
             p = area.getRelativePoint(this.axis);
             if (this.size != null) {
                 s = this.coverChildren ? 18 : calcSize(this.size, parentSize, calcParent);
@@ -194,14 +206,6 @@ public class DimensionSizer {
             Box padding = relativeTo.getArea().getPadding();
             Box margin = area.getMargin();
             s = Math.min(s, parentSize - padding.getTotal(this.axis) - margin.getTotal(this.axis));
-
-            /*if (!calcParent || (this.size != null && !this.size.isRelative())) {
-                area.setRelativePoint(this.axis, p);
-            } else {
-                area.setRelativePoint(this.axis, Math.max(p, padding.getStart(this.axis) + margin.getStart(this.axis)));
-                s = Math.min(s, parentSize - padding.getTotal(this.axis) - margin.getTotal(this.axis));
-            }*/
-
         }
         area.setRelativePoint(this.axis, p);
         area.setPoint(this.axis, p + relativeTo.getArea().x); // temporary
@@ -209,6 +213,7 @@ public class DimensionSizer {
     }
 
     public int postApply(Area area, Area relativeTo, int p0, int p1) {
+        // only called when the widget cover its children
         int moveAmount = 0;
         // calculate width and recalculate x based on the new width
         int s = p1 - p0, p;
@@ -233,6 +238,7 @@ public class DimensionSizer {
     }
 
     public void applyMarginAndPaddingToPos(Area area, Area relativeTo) {
+        // apply self margin and parent padding if not done yet
         if (isMarginPaddingApplied()) return;
         setMarginPaddingApplied(true);
         int o = area.getMargin().getStart(this.axis) + relativeTo.getPadding().getStart(this.axis);
@@ -269,6 +275,10 @@ public class DimensionSizer {
         this.posCalculated = true;
         return (int) val;
     }
+
+    // the following methods try to find a unit from p1 and p2 and apply it to start, end or size
+    // if one of the units was applied in default mode, they can be overwritten
+    // if p1 and p2 are already in use and none is in default mode, an exception is thrown
 
     protected Unit getStart() {
         if (this.start == null) {

@@ -1,12 +1,11 @@
 package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import com.cleanroommc.modularui.widget.sizer.IResizeable;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Base interface for gui elements. For example widgets.

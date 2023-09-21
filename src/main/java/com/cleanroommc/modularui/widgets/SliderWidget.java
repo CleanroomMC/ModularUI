@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widgets;
 
+import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.value.IDoubleValue;
@@ -14,7 +15,6 @@ import com.cleanroommc.modularui.value.DoubleValue;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import com.cleanroommc.modularui.widget.sizer.GuiAxis;
 import com.cleanroommc.modularui.widget.sizer.Unit;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;

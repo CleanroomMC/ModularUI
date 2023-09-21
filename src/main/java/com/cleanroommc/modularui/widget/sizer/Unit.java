@@ -1,9 +1,11 @@
 package com.cleanroommc.modularui.widget.sizer;
 
 import org.intellij.lang.annotations.MagicConstant;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.DoubleSupplier;
 
+@ApiStatus.Internal
 public class Unit {
 
     public static final byte UNUSED = -2;

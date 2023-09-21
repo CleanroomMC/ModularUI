@@ -1,7 +1,12 @@
-package com.cleanroommc.modularui.widget.sizer;
+package com.cleanroommc.modularui.api.layout;
 
+import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
+import com.cleanroommc.modularui.widget.sizer.Area;
 
+/**
+ * An interface that handles resizing of widgets.
+ */
 public interface IResizeable {
 
     void initResizing();
