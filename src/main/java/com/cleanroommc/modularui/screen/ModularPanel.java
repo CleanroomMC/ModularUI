@@ -16,6 +16,7 @@ import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Animator;
 import com.cleanroommc.modularui.utils.Interpolation;
+import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
@@ -25,9 +26,6 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -53,8 +51,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @NotNull
     private final String name;
     private ModularScreen screen;
-    private final LinkedList<LocatedWidget> hovering = new LinkedList<>();
-    private final List<Interactable> acceptedInteractions = new ArrayList<>();
+    private final ObjectList<LocatedWidget> hovering = ObjectList.create();
+    private final ObjectList<Interactable> acceptedInteractions = ObjectList.create();
     private boolean isMouseButtonHeld = false, isKeyHeld = false;
     @Nullable
     private LocatedWidget lastPressed;
@@ -157,7 +155,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
             @Override
             public IWidget peek() {
-                return isEmpty() ? null : ModularPanel.this.hovering.peekFirst().getElement();
+                return isEmpty() ? null : ModularPanel.this.hovering.getFirst().getElement();
             }
 
             @Override
@@ -511,7 +509,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     @NotNull
-    public LinkedList<LocatedWidget> getHovering() {
+    public ObjectList<LocatedWidget> getHovering() {
         return this.hovering;
     }
 

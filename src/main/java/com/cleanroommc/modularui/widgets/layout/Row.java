@@ -23,15 +23,21 @@ public class Row extends ParentWidget<Row> implements ILayoutWidget {
         boolean hasWidth = resizer().isWidthCalculated();
         int width = getArea().width;
         Box padding = getArea().getPadding();
+        MainAxisAlignment maa = this.maa;
+        if (!hasWidth && maa != MainAxisAlignment.START) {
+            if (flex().yAxisDependsOnChildren()) {
+                maa = MainAxisAlignment.START;
+            } else {
+                throw new IllegalStateException("MainAxisAlignment other than start need the width to be calculated!");
+            }
+        }
 
-        int maxHeight = 0;
         int totalWidth = 0;
         int expandedAmount = 0;
 
         for (IWidget widget : getChildren()) {
             // exclude self positioned (X) children
             if (widget.flex().hasXPos()) continue;
-            maxHeight = Math.max(maxHeight, widget.getArea().requestedHeight());
             if (widget.flex().isExpanded()) {
                 expandedAmount++;
                 totalWidth += widget.getArea().getMargin().horizontal();
@@ -50,18 +56,20 @@ public class Row extends ParentWidget<Row> implements ILayoutWidget {
                     widget.resizer().setWidthResized(true);
                 }
             }
+            if (maa == MainAxisAlignment.SPACE_BETWEEN || maa == MainAxisAlignment.SPACE_AROUND) {
+                maa = MainAxisAlignment.START;
+            }
         }
 
         // calculate start y
-        int lastX = 0;
+        int lastX = padding.left;
         if (hasWidth) {
-            if (this.maa == MainAxisAlignment.CENTER) {
+            if (maa == MainAxisAlignment.CENTER) {
                 lastX = (int) (width / 2f - totalWidth / 2f);
-            } else if (this.maa == MainAxisAlignment.END) {
+            } else if (maa == MainAxisAlignment.END) {
                 lastX = width - totalWidth;
             }
         }
-        lastX = Math.max(lastX, padding.left) - getArea().getMargin().left;
 
         for (IWidget widget : getChildren()) {
             // exclude self positioned (X) children
@@ -71,9 +79,10 @@ public class Row extends ParentWidget<Row> implements ILayoutWidget {
             // set calculated relative Y pos and set bottom margin for next widget
             widget.getArea().rx = lastX + margin.left;
             widget.resizer().setXResized(true);
+            widget.resizer().setXMarginPaddingApplied(true);
 
             lastX += widget.getArea().requestedWidth();
-            if (hasWidth && this.maa == MainAxisAlignment.SPACE_BETWEEN) {
+            if (hasWidth && maa == MainAxisAlignment.SPACE_BETWEEN) {
                 lastX += (width - totalWidth) / (getChildren().size() - 1);
             }
         }
@@ -100,6 +109,7 @@ public class Row extends ParentWidget<Row> implements ILayoutWidget {
                 }
                 widget.getArea().ry = y;
                 widget.resizer().setYResized(true);
+                widget.resizer().setYMarginPaddingApplied(true);
             }
         }
     }

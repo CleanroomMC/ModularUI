@@ -44,6 +44,9 @@ public class MathUtils {
     }
 
     public static int min(int... values) {
+        if (values == null || values.length == 0) throw new IllegalArgumentException();
+        if (values.length == 1) return values[0];
+        if (values.length == 2) return Math.min(values[0], values[1]);
         int min = Integer.MAX_VALUE;
         for (int i : values) {
             if (i < min) {
@@ -54,6 +57,9 @@ public class MathUtils {
     }
 
     public static int max(int... values) {
+        if (values == null || values.length == 0) throw new IllegalArgumentException();
+        if (values.length == 1) return values[0];
+        if (values.length == 2) return Math.max(values[0], values[1]);
         int max = Integer.MIN_VALUE;
         for (int i : values) {
             if (i > max) {

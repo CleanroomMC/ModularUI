@@ -1,5 +1,11 @@
 package com.cleanroommc.modularui.widget.sizer;
 
+import com.cleanroommc.modularui.api.GuiAxis;
+
+/**
+ * A box with four edges.
+ * Used for margins and paddings.
+ */
 public class Box {
 
     public static final Box SHARED = new Box();
@@ -22,31 +28,26 @@ public class Box {
         this.top = top;
         this.right = right;
         this.bottom = bottom;
-
         return this;
     }
 
     public Box left(int left) {
         this.left = left;
-
         return this;
     }
 
     public Box top(int top) {
         this.top = top;
-
         return this;
     }
 
     public Box right(int right) {
         this.right = right;
-
         return this;
     }
 
     public Box bottom(int bottom) {
         this.bottom = bottom;
-
         return this;
     }
 

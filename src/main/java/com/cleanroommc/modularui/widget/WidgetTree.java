@@ -1,19 +1,19 @@
 package com.cleanroommc.modularui.widget;
 
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
+import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.ISynced;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.value.sync.GuiSyncManager;
-import com.cleanroommc.modularui.widget.sizer.IResizeable;
 import net.minecraft.client.renderer.GlStateManager;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
@@ -33,10 +33,10 @@ public class WidgetTree {
     public static List<IWidget> getAllChildrenByLayer(IWidget parent, boolean includeSelf) {
         List<IWidget> children = new ArrayList<>();
         if (includeSelf) children.add(parent);
-        LinkedList<IWidget> parents = new LinkedList<>();
+        ObjectList<IWidget> parents = ObjectList.create();
         parents.add(parent);
         while (!parents.isEmpty()) {
-            for (IWidget child : parents.pollFirst().getChildren()) {
+            for (IWidget child : parents.removeFirst().getChildren()) {
                 if (!child.getChildren().isEmpty()) {
                     parents.add(child);
                 }
@@ -52,10 +52,10 @@ public class WidgetTree {
 
     public static boolean foreachChildByLayer(IWidget parent, Predicate<IWidget> consumer, boolean includeSelf) {
         if (includeSelf && !consumer.test(parent)) return false;
-        LinkedList<IWidget> parents = new LinkedList<>();
+        ObjectList<IWidget> parents = ObjectList.create();
         parents.add(parent);
         while (!parents.isEmpty()) {
-            for (IWidget child : parents.pollFirst().getChildren()) {
+            for (IWidget child : parents.removeFirst().getChildren()) {
                 if (child.hasChildren()) {
                     parents.addLast(child);
                 }
@@ -67,10 +67,10 @@ public class WidgetTree {
 
     public static boolean foreachChildByLayer2(IWidget parent, Predicate<IWidget> consumer, boolean includeSelf) {
         if (includeSelf && !consumer.test(parent)) return false;
-        LinkedList<IWidget> parents = new LinkedList<>();
+        ObjectList<IWidget> parents = ObjectList.create();
         parents.add(parent);
         while (!parents.isEmpty()) {
-            for (IWidget child : parents.pollFirst().getChildren()) {
+            for (IWidget child : parents.removeFirst().getChildren()) {
                 if (!consumer.test(child)) return false;
 
                 if (child.hasChildren()) {
@@ -209,6 +209,7 @@ public class WidgetTree {
     }
 
     public static void resize(IWidget parent) {
+        // TODO check if widget has a parent which depends on its children
         // resize each widget and calculate their relative pos
         if (!resizeWidget(parent, true) && !resizeWidget(parent, false)) {
             throw new IllegalStateException("Failed to resize widgets");
@@ -217,7 +218,6 @@ public class WidgetTree {
         applyPos(parent);
         WidgetTree.foreachChildByLayer(parent, child -> {
             child.postResize();
-            //ModularUI.LOGGER.info("{} at {}", child, child.getArea());
             return true;
         }, true);
     }

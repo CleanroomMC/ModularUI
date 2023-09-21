@@ -1,7 +1,9 @@
 package com.cleanroommc.modularui.widget.sizer;
 
 import com.cleanroommc.modularui.GuiError;
+import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
+import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IPositioned;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
@@ -13,6 +15,9 @@ import org.jetbrains.annotations.ApiStatus;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 
+/**
+ * This class handles resizing and positioning of widgets.
+ */
 public class Flex implements IResizeable, IPositioned<Flex> {
 
     private final DimensionSizer x = new DimensionSizer(GuiAxis.X);
@@ -286,14 +291,34 @@ public class Flex implements IResizeable, IPositioned<Flex> {
 
     @Override
     public void initResizing() {
-        this.x.setResized(false);
-        this.y.setResized(false);
+        setMarginPaddingApplied(false);
+        setResized(false);
     }
 
     @Override
     public void setResized(boolean x, boolean y, boolean w, boolean h) {
         this.x.setResized(x, w);
         this.y.setResized(y, h);
+    }
+
+    @Override
+    public void setXMarginPaddingApplied(boolean b) {
+        this.x.setMarginPaddingApplied(b);
+    }
+
+    @Override
+    public void setYMarginPaddingApplied(boolean b) {
+        this.y.setMarginPaddingApplied(b);
+    }
+
+    @Override
+    public boolean isXMarginPaddingApplied() {
+        return this.x.isMarginPaddingApplied();
+    }
+
+    @Override
+    public boolean isYMarginPaddingApplied() {
+        return this.y.isMarginPaddingApplied();
     }
 
     @Override
@@ -317,9 +342,13 @@ public class Flex implements IResizeable, IPositioned<Flex> {
     @Override
     public boolean postResize(IGuiElement guiElement) {
         if (this.parent instanceof ILayoutWidget) {
+            // layout widgets handle widget layout's themselves, so we only need to fit the right and bottom border
             coverChildrenForLayout();
             return true;
         }
+        // non layout widgets can have their children in any position
+        // we try to wrap all edges as close as possible to all widgets
+        // this means for each edge there is at least one widget that touches it (plus padding and margin)
 
         // not skipped children are now calculated and now this area can be calculated if it requires childrens area
         if (this.x.dependsOnChildren() || this.y.dependsOnChildren()) {
@@ -336,8 +365,10 @@ public class Flex implements IResizeable, IPositioned<Flex> {
                     IResizeable resizeable = child.resizer();
                     Area area = child.getArea();
                     if (this.x.dependsOnChildren() && resizeable.isWidthCalculated()) {
+                        // minimum width this widget requests
                         w = Math.max(w, area.requestedWidth() + padding.horizontal());
                         if (resizeable.isXCalculated()) {
+                            // if pos is calculated use that
                             x0 = Math.min(x0, area.rx - padding.left - margin.left);
                             x1 = Math.max(x1, area.rx + area.width + padding.right + margin.right);
                         }
@@ -352,24 +383,30 @@ public class Flex implements IResizeable, IPositioned<Flex> {
                 }
                 if (x1 == Integer.MIN_VALUE) x1 = 0;
                 if (y1 == Integer.MIN_VALUE) y1 = 0;
-                if (x0 == Integer.MAX_VALUE) y0 = 0;
+                if (x0 == Integer.MAX_VALUE) x0 = 0;
                 if (y0 == Integer.MAX_VALUE) y0 = 0;
-                if (w > x1 - x0) x1 = x0 + w;
+                if (w > x1 - x0)
+                    x1 = x0 + w; // we found at least one widget which was wider than what was calculated by start and end pos
                 if (h > y1 - y0) y1 = y0 + h;
 
                 // now calculate new x, y, width and height based on the childrens area
                 Area relativeTo = getRelativeTo().getArea();
                 if (this.x.dependsOnChildren()) {
+                    // apply the size to this widget
+                    // the return value is the amount of pixels we need to move the children
                     moveChildrenX = this.x.postApply(this.parent.getArea(), relativeTo, x0, x1);
                 }
                 if (this.y.dependsOnChildren()) {
                     moveChildrenY = this.y.postApply(this.parent.getArea(), relativeTo, y0, y1);
                 }
-                for (IWidget widget : children) {
-                    Area area = widget.getArea();
-                    IResizeable resizeable = widget.resizer();
-                    if (resizeable.isXCalculated()) area.rx += moveChildrenX;
-                    if (resizeable.isYCalculated()) area.ry += moveChildrenY;
+                // since the edges might have been moved closer to the widgets, the widgets should move back into it's original (absolute) position
+                if (moveChildrenX != 0 || moveChildrenY != 0) {
+                    for (IWidget widget : children) {
+                        Area area = widget.getArea();
+                        IResizeable resizeable = widget.resizer();
+                        if (resizeable.isXCalculated()) area.rx += moveChildrenX;
+                        if (resizeable.isYCalculated()) area.ry += moveChildrenY;
+                    }
                 }
             }
         }
@@ -382,18 +419,30 @@ public class Flex implements IResizeable, IPositioned<Flex> {
             if (!children.isEmpty()) {
                 Box padding = this.parent.getArea().getPadding();
                 // first calculate the area the children span
-                int x0 = Integer.MAX_VALUE, x1 = Integer.MIN_VALUE, y0 = Integer.MAX_VALUE, y1 = Integer.MIN_VALUE;
+                int x1 = Integer.MIN_VALUE, y1 = Integer.MIN_VALUE;
+                int w = 0, h = 0;
                 for (IWidget child : children) {
                     Box margin = child.getArea().getMargin();
                     IResizeable resizeable = child.resizer();
                     Area area = child.getArea();
                     if (this.x.dependsOnChildren() && resizeable.isWidthCalculated()) {
-                        x1 = Math.max(x1, area.rx + area.width + padding.right + margin.right);
+                        w = Math.max(w, area.requestedWidth() + padding.horizontal());
+                        if (resizeable.isXCalculated()) {
+                            x1 = Math.max(x1, area.rx + area.width + padding.right + margin.right);
+                        }
                     }
                     if (this.y.dependsOnChildren() && resizeable.isHeightCalculated()) {
-                        y1 = Math.max(y1, area.ry + area.height + padding.bottom + margin.bottom);
+                        h = Math.max(h, area.requestedHeight() + padding.vertical());
+                        if (resizeable.isXCalculated()) {
+                            y1 = Math.max(y1, area.ry + area.height + padding.bottom + margin.bottom);
+                        }
                     }
                 }
+                if (x1 == Integer.MIN_VALUE) x1 = 0;
+                if (y1 == Integer.MIN_VALUE) y1 = 0;
+                if (w > x1) x1 = w;
+                if (h > y1) y1 = h;
+
                 Area relativeTo = getRelativeTo().getArea();
                 if (this.x.dependsOnChildren()) {
                     this.x.postApply(getArea(), relativeTo, 0, x1);
@@ -407,14 +456,18 @@ public class Flex implements IResizeable, IPositioned<Flex> {
 
     @Override
     public void applyPos(IGuiElement parent) {
-        // after all widgets x, y, width and height have been calculated we can now calculate the absolute position
         Area relativeTo = getRelativeTo().getArea();
         Area area = parent.getArea();
+        // apply margin and padding if not done yet
+        this.x.applyMarginAndPaddingToPos(area, relativeTo);
+        this.y.applyMarginAndPaddingToPos(area, relativeTo);
+        // after all widgets x, y, width and height have been calculated we can now calculate the absolute position
         area.applyPos(relativeTo.x, relativeTo.y);
         Area parentArea = parent.getParentArea();
         area.rx = area.x - parentArea.x;
         area.ry = area.y - parentArea.y;
         if (parent instanceof IVanillaSlot) {
+            // special treatment for minecraft slots
             Slot slot = ((IVanillaSlot) parent).getVanillaSlot();
             slot.xPos = parent.getArea().x;
             slot.yPos = parent.getArea().y;

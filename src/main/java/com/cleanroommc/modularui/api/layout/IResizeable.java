@@ -1,7 +1,12 @@
-package com.cleanroommc.modularui.widget.sizer;
+package com.cleanroommc.modularui.api.layout;
 
+import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
+import com.cleanroommc.modularui.widget.sizer.Area;
 
+/**
+ * An interface that handles resizing of widgets.
+ */
 public interface IResizeable {
 
     void initResizing();
@@ -60,4 +65,21 @@ public interface IResizeable {
     default void setHeightResized(boolean v) {
         setResized(isXCalculated(), isYCalculated(), isWidthCalculated(), v);
     }
+
+    default void setResized(boolean b) {
+        setResized(b, b, b, b);
+    }
+
+    void setXMarginPaddingApplied(boolean b);
+
+    void setYMarginPaddingApplied(boolean b);
+
+    default void setMarginPaddingApplied(boolean b) {
+        setXMarginPaddingApplied(b);
+        setYMarginPaddingApplied(b);
+    }
+
+    boolean isXMarginPaddingApplied();
+
+    boolean isYMarginPaddingApplied();
 }

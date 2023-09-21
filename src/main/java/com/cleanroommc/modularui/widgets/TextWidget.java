@@ -67,9 +67,9 @@ public class TextWidget extends Widget<TextWidget> {
     public int getDefaultHeight() {
         float maxWidth = getScreen().getScreenArea().width;
         if (resizer() != null && resizer().isWidthCalculated()) {
-            maxWidth = getArea().width;
+            maxWidth = getArea().width + 1;
         } else if (getParent().resizer() != null && getParent().resizer().isWidthCalculated()) {
-            maxWidth = getParent().getArea().width;
+            maxWidth = getParent().getArea().width + 1;
         }
         TextRenderer renderer = simulate(maxWidth);
         Box padding = getArea().getPadding();

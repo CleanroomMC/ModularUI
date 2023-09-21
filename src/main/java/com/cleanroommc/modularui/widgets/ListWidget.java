@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widgets;
 
+import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.widget.IValueWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
@@ -7,7 +8,6 @@ import com.cleanroommc.modularui.utils.ScrollData;
 import com.cleanroommc.modularui.utils.ScrollDirection;
 import com.cleanroommc.modularui.widget.ScrollWidget;
 import com.cleanroommc.modularui.widget.WidgetTree;
-import com.cleanroommc.modularui.widget.sizer.GuiAxis;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.Nullable;
 
@@ -99,26 +99,23 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
     @Override
     public void layoutWidgets() {
         GuiAxis axis = this.scrollData.direction.axis;
-        int p = 0;
-        int lastMargin = getArea().getPadding().getStart(axis);
+        int p = getArea().getPadding().getStart(axis);
         for (IWidget widget : getChildren()) {
-            if (widget.getFlex() != null && (axis.isVertical() ? widget.getFlex().hasYPos() : widget.getFlex().hasXPos())) {
+            if (axis.isVertical() ?
+                    widget.getFlex().hasYPos() || !widget.resizer().isHeightCalculated() :
+                    widget.getFlex().hasXPos() || !widget.resizer().isWidthCalculated()) {
                 continue;
             }
-            if (axis.isHorizontal() ? !widget.resizer().isWidthCalculated() : !widget.resizer().isHeightCalculated()) {
-                continue;
-            }
-            p += Math.max(lastMargin, widget.getArea().getMargin().getStart(axis));
+            p += widget.getArea().getMargin().getStart(axis);
             widget.getArea().setRelativePoint(axis, p);
-            p += widget.getArea().getSize(axis);
-            lastMargin = widget.getArea().getMargin().getEnd(axis);
+            p += widget.getArea().getSize(axis) + widget.getArea().getMargin().getEnd(axis);
             if (axis.isHorizontal()) {
                 widget.resizer().setXResized(true);
             } else {
                 widget.resizer().setYResized(true);
             }
         }
-        getScrollData().scrollSize = p + Math.max(lastMargin, getArea().getPadding().getEnd(axis));
+        getScrollData().scrollSize = p + getArea().getPadding().getEnd(axis);
     }
 
     public ScrollData getScrollData() {

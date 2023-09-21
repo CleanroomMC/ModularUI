@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widget.sizer;
 
+import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.utils.MathUtils;
@@ -7,12 +8,25 @@ import com.cleanroommc.modularui.utils.MathUtils;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
-public class Area extends Rectangle implements IResizeable {
+/**
+ * A rectangular widget area, composed of a position and a size.
+ * Also has fields for a relative position, a layer and margin & padding.
+ */
+public class Area extends Rectangle implements IUnResizeable {
 
     public static final Area SHARED = new Area();
 
+    /**
+     * relative position (in most cases the direct parent)
+     */
     public int rx, ry;
+    /**
+     * each panel has its own layer
+     */
     private byte panelLayer = 0;
+    /**
+     * the widget layer within this panel
+     */
     private int z;
     private final Box margin = new Box();
     private final Box padding = new Box();
@@ -328,47 +342,14 @@ public class Area extends Rectangle implements IResizeable {
     }
 
     @Override
-    public void initResizing() {
-    }
-
-    @Override
     public boolean resize(IGuiElement guiElement) {
         guiElement.getArea().set(this);
         return true;
     }
 
     @Override
-    public boolean postResize(IGuiElement guiElement) {
-        return true;
-    }
-
-    @Override
     public Area getArea() {
         return this;
-    }
-
-    @Override
-    public boolean isXCalculated() {
-        return true;
-    }
-
-    @Override
-    public boolean isYCalculated() {
-        return true;
-    }
-
-    @Override
-    public boolean isWidthCalculated() {
-        return true;
-    }
-
-    @Override
-    public boolean isHeightCalculated() {
-        return true;
-    }
-
-    @Override
-    public void setResized(boolean x, boolean y, boolean w, boolean h) {
     }
 
     public Area createCopy() {

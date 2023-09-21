@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.widget.sizer.GuiAxis;
+import com.cleanroommc.modularui.api.GuiAxis;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.Nullable;

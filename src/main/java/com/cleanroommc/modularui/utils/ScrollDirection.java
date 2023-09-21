@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.utils;
 
+import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import com.cleanroommc.modularui.widget.sizer.GuiAxis;
 
 /**
  * Scroll direction
