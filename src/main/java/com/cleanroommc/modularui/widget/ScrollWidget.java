@@ -101,6 +101,7 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
 
     @Override
     public void onUpdate() {
+        super.onUpdate();
         this.scroll.drag(getContext().getAbsMouseX(), getContext().getAbsMouseY());
     }
 

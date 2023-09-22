@@ -67,6 +67,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @Override
     public void onUpdate() {
+        super.onUpdate();
         boolean shouldBeEnabled = areAncestorsEnabled();
         if (shouldBeEnabled != getSlot().isEnabled()) {
             this.syncHandler.setEnabled(shouldBeEnabled, true);

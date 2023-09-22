@@ -55,6 +55,7 @@ public class PopupMenu<W extends PopupMenu<W>> extends Widget<W> {
 
         @Override
         public void onUpdate() {
+            super.onUpdate();
             if (this.mightClose && !isBelowMouse()) {
                 setEnabled(false);
             }

@@ -40,6 +40,7 @@ public class ScrollingTextWidget extends TextWidget {
 
     @Override
     public void onUpdate() {
+        super.onUpdate();
         if (this.pauseTimer > 0) {
             if (++this.pauseTimer == pauseTime) {
                 this.pauseTimer = this.scroll == 0 ? 0 : 1;
