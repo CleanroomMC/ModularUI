@@ -22,6 +22,7 @@ import net.minecraftforge.items.wrapper.PlayerInvWrapper;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -145,7 +146,7 @@ public class ModularContainer extends Container implements ISortableContainer {
     }
 
     protected ItemStack transferItem(ModularSlot fromSlot, ItemStack stack) {
-        SlotGroup fromSlotGroup = Objects.requireNonNull(fromSlot.getSlotGroup());
+        @Nullable SlotGroup fromSlotGroup = fromSlot.getSlotGroup();
         for (ModularSlot slot : this.shiftClickSlots) {
             SlotGroup slotGroup = Objects.requireNonNull(slot.getSlotGroup());
             if (slotGroup != fromSlotGroup && slot.isEnabled() && slot.isItemValid(stack)) {
