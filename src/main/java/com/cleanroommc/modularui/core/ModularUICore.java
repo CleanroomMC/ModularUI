@@ -1,7 +1,11 @@
 package com.cleanroommc.modularui.core;
 
+import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.common.ForgeVersion;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import zone.rong.mixinbooter.IEarlyMixinLoader;
 
 import javax.annotation.Nullable;
@@ -11,11 +15,16 @@ import java.util.Map;
 
 @IFMLLoadingPlugin.Name("ModularUI-Core")
 @IFMLLoadingPlugin.MCVersion(ForgeVersion.mcVersion)
+@IFMLLoadingPlugin.SortingIndex(2000) // after ae2uel and stackup
+@IFMLLoadingPlugin.TransformerExclusions({"com.cleanroommc.modularui.core"})
 public class ModularUICore implements IFMLLoadingPlugin, IEarlyMixinLoader {
+
+    public static final Logger LOGGER = LogManager.getLogger("modularui");
+    protected static boolean ae2Loaded = false, stackUpLoaded = false;
 
     @Override
     public String[] getASMTransformerClass() {
-        return new String[0];
+        return new String[]{"com.cleanroommc.modularui.core.ClassTransformer"};
     }
 
     @Override
@@ -31,6 +40,14 @@ public class ModularUICore implements IFMLLoadingPlugin, IEarlyMixinLoader {
 
     @Override
     public void injectData(Map<String, Object> data) {
+        for (IClassTransformer transformer : Launch.classLoader.getTransformers()) {
+            String name = transformer.getClass().getName();
+            if (name.endsWith("appeng.core.transformer.AE2ELTransformer")) {
+                ae2Loaded = true;
+            } else if (name.endsWith("pl.asie.stackup.core.StackUpTransformer")) {
+                stackUpLoaded = true;
+            }
+        }
     }
 
     @Override
