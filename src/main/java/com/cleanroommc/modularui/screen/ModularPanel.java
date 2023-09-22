@@ -106,6 +106,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     @Override
+    public boolean hasParent() {
+        return false;
+    }
+
+    @Override
     public WidgetTheme getWidgetTheme(ITheme theme) {
         return theme.getPanelTheme();
     }
@@ -490,14 +495,14 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @Nullable
     public IWidget getTopHovering() {
-        LocatedWidget lw = getTopHoveringLocated();
+        LocatedWidget lw = getTopHoveringLocated(false);
         return lw == null ? null : lw.getElement();
     }
 
     @Nullable
-    public LocatedWidget getTopHoveringLocated() {
+    public LocatedWidget getTopHoveringLocated(boolean debug) {
         for (LocatedWidget widget : this.hovering) {
-            if (widget.getElement().canHover()) {
+            if (debug || widget.getElement().canHover()) {
                 return widget;
             }
         }

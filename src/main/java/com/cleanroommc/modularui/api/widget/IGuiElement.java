@@ -22,6 +22,13 @@ public interface IGuiElement {
      */
     IGuiElement getParent();
 
+    /**
+     * Returns if this element has a parent. This is the case when the widget is valid, but never if it's root widget.
+     *
+     * @return if this element has a parent
+     */
+    boolean hasParent();
+
     IResizeable resizer();
 
     /**

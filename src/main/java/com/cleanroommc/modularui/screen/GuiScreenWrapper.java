@@ -226,9 +226,11 @@ public class GuiScreenWrapper extends GuiContainer {
         drawString(this.fontRenderer, "Mouse Pos: " + mouseX + ", " + mouseY, 5, lineY, color);
         lineY -= 11;
         drawString(this.fontRenderer, "FPS: " + this.fps, 5, screenH - 24, color);
-        lineY -= 11;
-        LocatedWidget locatedHovered = this.screen.getWindowManager().getTopWidgetLocated();
+        LocatedWidget locatedHovered = this.screen.getWindowManager().getTopWidgetLocated(true);
         if (locatedHovered != null) {
+            drawSegmentLine(lineY -= 4, color);
+            lineY -= 10;
+
             IGuiElement hovered = locatedHovered.getElement();
             locatedHovered.applyMatrix(context);
             GlStateManager.pushMatrix();
@@ -238,7 +240,7 @@ public class GuiScreenWrapper extends GuiContainer {
             IGuiElement parent = hovered.getParent();
 
             GuiDraw.drawBorder(0, 0, area.width, area.height, color, 1f);
-            if (parent != null) {
+            if (hovered.hasParent()) {
                 GuiDraw.drawBorder(-area.rx, -area.ry, parent.getArea().width, parent.getArea().height, Color.withAlpha(color, 0.3f), 1f);
             }
             GlStateManager.popMatrix();
@@ -247,13 +249,18 @@ public class GuiScreenWrapper extends GuiContainer {
             lineY -= 11;
             GuiDraw.drawText("Size: " + area.width + ", " + area.height, 5, lineY, 1, color, false);
             lineY -= 11;
-            if (parent != null) {
-                GuiDraw.drawText("Parent: " + parent, 5, lineY, 1, color, false);
-                lineY -= 11;
-            }
             GuiDraw.drawText("Class: " + hovered, 5, lineY, 1, color, false);
-            lineY -= 11;
+            if (hovered.hasParent()) {
+                drawSegmentLine(lineY -= 4, color);
+                lineY -= 10;
+                area = parent.getArea();
+                GuiDraw.drawText("Parent size: " + area.width + ", " + area.height, 5, lineY, 1, color, false);
+                lineY -= 11;
+                GuiDraw.drawText("Parent: " + parent, 5, lineY, 1, color, false);
+            }
             if (hovered instanceof ItemSlot) {
+                drawSegmentLine(lineY -= 4, color);
+                lineY -= 10;
                 ItemSlot slotWidget = (ItemSlot) hovered;
                 ModularSlot slot = slotWidget.getSlot();
                 GuiDraw.drawText("Slot Index: " + slot.getSlotIndex(), 5, lineY, 1, color, false);
@@ -267,7 +274,12 @@ public class GuiScreenWrapper extends GuiContainer {
                 }
             }
         }
+        // dot at mouse pos
         drawRect(mouseX, mouseY, mouseX + 1, mouseY + 1, Color.withAlpha(Color.GREEN.normal, 0.8f));
+    }
+
+    private void drawSegmentLine(int y, int color) {
+        GuiDraw.drawRect(5, y, 140, 1, color);
     }
 
     @Override

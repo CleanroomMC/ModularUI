@@ -138,9 +138,9 @@ public class WindowManager {
     }
 
     @Nullable
-    public LocatedWidget getTopWidgetLocated() {
+    public LocatedWidget getTopWidgetLocated(boolean debug) {
         for (ModularPanel panel : this.panels) {
-            LocatedWidget widget = panel.getTopHoveringLocated();
+            LocatedWidget widget = panel.getTopHoveringLocated(debug);
             if (widget != null) {
                 return widget;
             }

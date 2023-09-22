@@ -130,10 +130,10 @@ public interface IWidget extends IGuiElement {
 
     default boolean areAncestorsEnabled() {
         IWidget parent = this;
-        while (parent != null) {
+        do {
             if (!parent.isEnabled()) return false;
             parent = parent.getParent();
-        }
+        } while (parent.hasParent());
         return true;
     }
 
@@ -155,6 +155,11 @@ public interface IWidget extends IGuiElement {
      */
     @NotNull
     IWidget getParent();
+
+    @Override
+    default boolean hasParent() {
+        return isValid();
+    }
 
     /**
      * @return the context the current screen
