@@ -28,36 +28,29 @@ import java.util.List;
 
 public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITooltip<W>, ISynced<W> {
 
-    private final Area area = new Area();
+    private String debugName;
     private boolean enabled = true;
+    // gui context
     private boolean valid = false;
-    private List<IGuiAction> guiActionListeners;
-
     private IWidget parent = null;
     private ModularPanel panel = null;
     private GuiContext context = null;
-
+    // sizing
+    private final Area area = new Area();
     private Flex flex = new Flex(this);
     private IResizeable resizer = this.flex;
-    private String debugName;
-
-    @Nullable
-    private IValue<?> value;
-    @Nullable
-    private String syncKey;
-    @Nullable
-    private SyncHandler syncHandler;
-
-    @Nullable
-    private IDrawable background = null;
-    @Nullable
-    private IDrawable overlay = null;
-    @Nullable
-    private IDrawable hoverBackground = null;
-    @Nullable
-    private IDrawable hoverOverlay = null;
-    @Nullable
-    private Tooltip tooltip;
+    // syncing
+    @Nullable private IValue<?> value;
+    @Nullable private String syncKey;
+    @Nullable private SyncHandler syncHandler;
+    // rendering
+    @Nullable private IDrawable background = null;
+    @Nullable private IDrawable overlay = null;
+    @Nullable private IDrawable hoverBackground = null;
+    @Nullable private IDrawable hoverOverlay = null;
+    @Nullable private Tooltip tooltip;
+    // listener
+    private List<IGuiAction> guiActionListeners;
 
     @ApiStatus.Internal
     @Override
