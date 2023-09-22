@@ -105,11 +105,11 @@ public class ModularScreen {
         this.owner = owner;
         this.windowManager = new WindowManager(this);
         this.context = new GuiContext(this);
-        this.currentTheme = IThemeApi.get().getThemeForScreen(this, null);
 
         ModularPanel mainPanel = buildUI(this.context);
         Objects.requireNonNull(mainPanel, "The main panel must not be null!");
         this.name = mainPanel.getName();
+        this.currentTheme = IThemeApi.get().getThemeForScreen(this, null);
         this.windowManager.construct(mainPanel);
     }
 

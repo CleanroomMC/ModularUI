@@ -56,7 +56,9 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @Nullable private List<IGuiAction> guiActionListeners;
     @Nullable private Consumer<W> onUpdateListener;
 
+    // -----------------
     // === Lifecycle ===
+    // -----------------
 
     @ApiStatus.Internal
     @Override
