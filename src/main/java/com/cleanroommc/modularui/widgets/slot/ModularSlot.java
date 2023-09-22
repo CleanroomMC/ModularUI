@@ -82,6 +82,7 @@ public class ModularSlot extends SlotItemHandler {
         return null;
     }
 
+    @ApiStatus.Internal
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }

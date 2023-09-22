@@ -144,13 +144,11 @@ public class ModularContainer extends Container implements ISortableContainer {
         return ItemStack.EMPTY;
     }
 
-    // TODO: Don't insert to slot when a parent is disabled
     protected ItemStack transferItem(ModularSlot fromSlot, ItemStack stack) {
         SlotGroup fromSlotGroup = Objects.requireNonNull(fromSlot.getSlotGroup());
         for (ModularSlot slot : this.shiftClickSlots) {
             SlotGroup slotGroup = Objects.requireNonNull(slot.getSlotGroup());
-            boolean valid = slotGroup != null && slotGroup != fromSlotGroup;
-            if (valid && slot.isEnabled() && slot.isItemValid(stack)) {
+            if (slotGroup != fromSlotGroup && slot.isEnabled() && slot.isItemValid(stack)) {
                 ItemStack itemstack = slot.getStack();
                 if (slot.isPhantom()) {
                     if (itemstack.isEmpty() || (ItemHandlerHelper.canItemStacksStack(stack, itemstack) && itemstack.getCount() < slot.getItemStackLimit(itemstack))) {
@@ -179,9 +177,8 @@ public class ModularContainer extends Container implements ISortableContainer {
         }
         for (ModularSlot slot : this.shiftClickSlots) {
             ItemStack itemstack = slot.getStack();
-            SlotGroup slotGroup = slot.getSlotGroup();
-            boolean valid = slotGroup != null && slotGroup != fromSlotGroup;
-            if (valid && slot.isEnabled() && itemstack.isEmpty() && slot.isItemValid(stack)) {
+            SlotGroup slotGroup = Objects.requireNonNull(slot.getSlotGroup());
+            if (slotGroup != fromSlotGroup && slot.isEnabled() && itemstack.isEmpty() && slot.isItemValid(stack)) {
                 if (stack.getCount() > slot.getSlotStackLimit()) {
                     slot.putStack(stack.splitStack(slot.getSlotStackLimit()));
                 } else {
