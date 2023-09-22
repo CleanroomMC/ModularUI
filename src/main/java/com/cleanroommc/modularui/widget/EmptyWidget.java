@@ -50,7 +50,7 @@ public class EmptyWidget implements IWidget {
     }
 
     @Override
-    public void onFrameUpdate() {
+    public void onUpdate() {
     }
 
     @Override

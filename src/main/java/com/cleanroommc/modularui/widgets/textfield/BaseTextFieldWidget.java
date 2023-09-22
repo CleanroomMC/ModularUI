@@ -73,8 +73,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     }
 
     @Override
-    public void onFrameUpdate() {
-        super.onFrameUpdate();
+    public void onUpdate() {
         super.onUpdate();
         if (isFocused() && ++this.cursorTimer == 30) {
             this.renderer.toggleCursor();

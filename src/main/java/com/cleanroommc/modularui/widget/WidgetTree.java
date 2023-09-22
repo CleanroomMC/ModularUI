@@ -201,9 +201,9 @@ public class WidgetTree {
     }
 
     @ApiStatus.Internal
-    public static void onFrameUpdate(IWidget parent) {
+    public static void onUpdate(IWidget parent) {
         foreachChildByLayer(parent, widget -> {
-            widget.onFrameUpdate();
+            widget.onUpdate();
             return true;
         }, true);
     }

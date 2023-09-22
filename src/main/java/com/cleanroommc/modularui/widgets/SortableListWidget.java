@@ -53,8 +53,8 @@ public class SortableListWidget<T, I extends SortableListWidget.Item<T>> extends
     }
 
     @Override
-    public void onFrameUpdate() {
-        super.onFrameUpdate();
+    public void onUpdate() {
+        super.onUpdate();
         this.timeSinceLastMove++;
     }
 

@@ -11,10 +11,7 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.GuiViewportStack;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.utils.Alignment;
-import com.cleanroommc.modularui.utils.Animator;
-import com.cleanroommc.modularui.utils.Interpolation;
-import com.cleanroommc.modularui.utils.ObjectList;
+import com.cleanroommc.modularui.utils.*;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
@@ -75,6 +72,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return getScreen().getScreenArea();
     }
 
+    @Override
+    public void onInit() {
+        getScreen().registerFrameUpdateListener(this, this::findHoveredWidgets, false);
+    }
+
     public boolean isOpen() {
         return this.screen != null;
     }
@@ -109,12 +111,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     @Override
-    public void onFrameUpdate() {
-        // only updating hovered widgets when the mouse was moved is a bad idea
-        gatherWidgets();
-    }
-
-    @Override
     public void transform(IViewportStack stack) {
         super.transform(stack);
         if (getScale() != 1f) {
@@ -140,7 +136,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         }
     }
 
-    public void gatherWidgets() {
+    private void findHoveredWidgets() {
         this.hovering.clear();
         this.hovering.trim();
         if (!isEnabled()) {

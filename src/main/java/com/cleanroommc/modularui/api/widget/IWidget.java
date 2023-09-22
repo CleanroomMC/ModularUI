@@ -72,9 +72,9 @@ public interface IWidget extends IGuiElement {
     }
 
     /**
-     * Called approximately 60 times per second.
+     * Called 20 times per second.
      */
-    void onFrameUpdate();
+    void onUpdate();
 
     /**
      * @return the area this widget occupies

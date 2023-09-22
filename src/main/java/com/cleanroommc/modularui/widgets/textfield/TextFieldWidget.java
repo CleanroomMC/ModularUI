@@ -67,8 +67,8 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     @Override
-    public void onFrameUpdate() {
-        super.onFrameUpdate();
+    public void onUpdate() {
+        super.onUpdate();
         if (!isFocused()) {
             String s = this.stringValue.getStringValue();
             if (!getText().equals(s)) {

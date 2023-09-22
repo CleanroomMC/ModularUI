@@ -15,7 +15,10 @@ import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.Dialog;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
@@ -80,6 +83,7 @@ public class ModularScreen {
     public final GuiContext context;
     private final Area screenArea = new Area();
     private final Map<Class<?>, List<IGuiAction>> guiActionListeners = new Object2ObjectOpenHashMap<>();
+    private final Object2ObjectArrayMap<IWidget, Runnable> frameUpdates = new Object2ObjectArrayMap<>();
 
     private ITheme currentTheme;
     private GuiScreenWrapper screenWrapper;
@@ -205,13 +209,21 @@ public class ModularScreen {
     @MustBeInvokedByOverriders
     public void onUpdate() {
         this.context.tick();
+        for (ModularPanel panel : this.windowManager.getOpenPanels()) {
+            WidgetTree.onUpdate(panel);
+        }
     }
 
     @MustBeInvokedByOverriders
     public void onFrameUpdate() {
         this.windowManager.clearQueue();
-        for (ModularPanel panel : this.windowManager.getOpenPanels()) {
-            WidgetTree.onFrameUpdate(panel);
+        for (ObjectIterator<Object2ObjectMap.Entry<IWidget, Runnable>> iterator = this.frameUpdates.object2ObjectEntrySet().fastIterator(); iterator.hasNext(); ) {
+            Object2ObjectMap.Entry<IWidget, Runnable> entry = iterator.next();
+            if (!entry.getKey().isValid()) {
+                iterator.remove();
+                continue;
+            }
+            entry.getValue().run();
         }
         this.context.onFrameUpdate();
     }
@@ -451,6 +463,25 @@ public class ModularScreen {
         this.guiActionListeners.getOrDefault(getGuiActionClass(action), Collections.emptyList()).remove(action);
     }
 
+    public void registerFrameUpdateListener(IWidget widget, Runnable runnable) {
+        registerFrameUpdateListener(widget, runnable, true);
+    }
+
+    public void registerFrameUpdateListener(IWidget widget, Runnable runnable, boolean merge) {
+        Objects.requireNonNull(runnable);
+        if (merge) {
+            this.frameUpdates.merge(widget, runnable, (old, now) -> () -> {
+                old.run();
+                now.run();
+            });
+        } else {
+            this.frameUpdates.put(widget, runnable);
+        }
+    }
+
+    public void removeFrameUpdateListener(IWidget widget) {
+        this.frameUpdates.remove(widget);
+    }
 
     private static Class<?> getGuiActionClass(IGuiAction action) {
         Class<?>[] classes = action.getClass().getInterfaces();

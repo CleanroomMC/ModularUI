@@ -173,7 +173,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     @Override
-    public void onFrameUpdate() {
+    public void onUpdate() {
     }
 
     @Override
