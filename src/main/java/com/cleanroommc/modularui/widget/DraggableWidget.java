@@ -3,8 +3,8 @@ package com.cleanroommc.modularui.widget;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IDraggable;
-import com.cleanroommc.modularui.api.widget.IWidgetList;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.utils.HoveredWidgetList;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import org.jetbrains.annotations.Nullable;
 
@@ -72,14 +72,14 @@ public class DraggableWidget<W extends DraggableWidget<W>> extends Widget<W> imp
     }
 
     @Override
-    public void getSelfAt(IViewportStack stack, IWidgetList widgets, int x, int y) {
+    public void getSelfAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
         if (!isMoving() && isInside(stack, x, y)) {
             widgets.add(this, stack.peek());
         }
     }
 
     @Override
-    public void getWidgetsAt(IViewportStack stack, IWidgetList widgets, int x, int y) {
+    public void getWidgetsAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
         if (!isMoving() && hasChildren()) {
             IViewport.getChildrenAt(this, stack, widgets, x, y);
         }

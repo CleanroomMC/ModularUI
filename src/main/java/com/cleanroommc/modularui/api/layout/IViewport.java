@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.api.layout;
 
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.api.widget.IWidgetList;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.utils.HoveredWidgetList;
 
 import java.util.function.Predicate;
 
@@ -43,18 +43,18 @@ public interface IViewport {
      * @param x       x position
      * @param y       y position
      */
-    void getWidgetsAt(IViewportStack stack, IWidgetList widgets, int x, int y);
+    void getWidgetsAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y);
 
     /**
      * Gathers all children at a position. Transformations from this viewport are not applied.
-     * Called before {@link #getWidgetsAt(IViewportStack, IWidgetList, int, int)}
+     * Called before {@link #getWidgetsAt(IViewportStack, HoveredWidgetList, int, int)}
      *
      * @param stack   current viewport stack. Should not be modified.
      * @param widgets widget list of already gathered widgets. Add children here.
      * @param x       x position
      * @param y       y position
      */
-    default void getSelfAt(IViewportStack stack, IWidgetList widgets, int x, int y) {
+    default void getSelfAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
     }
 
     /**
@@ -75,7 +75,7 @@ public interface IViewport {
     default void postDraw(GuiContext context, boolean transformed) {
     }
 
-    static void getChildrenAt(IWidget parent, IViewportStack stack, IWidgetList widgetList, int x, int y) {
+    static void getChildrenAt(IWidget parent, IViewportStack stack, HoveredWidgetList widgetList, int x, int y) {
         for (IWidget child : parent.getChildren()) {
             if (!child.isEnabled()) {
                 continue;
@@ -146,7 +146,7 @@ public interface IViewport {
         }
 
         @Override
-        public void getWidgetsAt(IViewportStack viewports, IWidgetList widgets, int x, int y) {
+        public void getWidgetsAt(IViewportStack viewports, HoveredWidgetList widgets, int x, int y) {
         }
     };
 }

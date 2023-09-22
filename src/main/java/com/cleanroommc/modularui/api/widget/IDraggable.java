@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.api.widget;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.utils.HoveredWidgetList;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,6 +60,6 @@ public interface IDraggable extends IViewport {
     }
 
     @Override
-    default void getWidgetsAt(IViewportStack stack, IWidgetList widgets, int x, int y) {
+    default void getWidgetsAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
     }
 }

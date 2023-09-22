@@ -3,11 +3,11 @@ package com.cleanroommc.modularui.widget;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
-import com.cleanroommc.modularui.api.widget.IWidgetList;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.utils.HoveredWidgetList;
 import com.cleanroommc.modularui.utils.ScrollArea;
 import com.cleanroommc.modularui.utils.ScrollData;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -51,14 +51,14 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
     }
 
     @Override
-    public void getSelfAt(IViewportStack stack, IWidgetList widgets, int x, int y) {
+    public void getSelfAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
         if (isInside(stack, x, y)) {
             widgets.add(this, stack.peek());
         }
     }
 
     @Override
-    public void getWidgetsAt(IViewportStack stack, IWidgetList widgets, int x, int y) {
+    public void getWidgetsAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
         if (getArea().isInside(x, y) && !getScrollArea().isInsideScrollbarArea(x, y) && hasChildren()) {
             IViewport.getChildrenAt(this, stack, widgets, x, y);
         }

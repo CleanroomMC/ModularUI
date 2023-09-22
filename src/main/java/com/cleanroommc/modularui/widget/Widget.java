@@ -28,8 +28,6 @@ import java.util.List;
 
 public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITooltip<W>, ISynced<W> {
 
-    public static final IDrawable[] EMPTY_BACKGROUND = {};
-
     private final Area area = new Area();
     private boolean enabled = true;
     private boolean valid = false;

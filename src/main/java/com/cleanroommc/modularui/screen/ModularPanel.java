@@ -6,12 +6,10 @@ import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IFocusedWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.api.widget.IWidgetList;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.GuiViewportStack;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
-import com.cleanroommc.modularui.screen.viewport.TransformationMatrix;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Animator;
@@ -129,14 +127,14 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     @Override
-    public void getWidgetsAt(IViewportStack stack, IWidgetList widgets, int x, int y) {
+    public void getWidgetsAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
         if (hasChildren()) {
             IViewport.getChildrenAt(this, stack, widgets, x, y);
         }
     }
 
     @Override
-    public void getSelfAt(IViewportStack stack, IWidgetList widgets, int x, int y) {
+    public void getSelfAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
         if (isInside(stack, x, y)) {
             widgets.add(this, stack.peek());
         }
@@ -144,30 +142,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     public void gatherWidgets() {
         this.hovering.clear();
+        this.hovering.trim();
         if (!isEnabled()) {
             return;
         }
-        IWidgetList widgetList = new IWidgetList() {
-            @Override
-            public void add(IWidget widget, TransformationMatrix transformationMatrix) {
-                ModularPanel.this.hovering.addFirst(new LocatedWidget(widget, transformationMatrix));
-            }
-
-            @Override
-            public IWidget peek() {
-                return isEmpty() ? null : ModularPanel.this.hovering.getFirst().getElement();
-            }
-
-            @Override
-            public boolean isEmpty() {
-                return ModularPanel.this.hovering.isEmpty();
-            }
-
-            @Override
-            public int size() {
-                return ModularPanel.this.hovering.size();
-            }
-        };
+        HoveredWidgetList widgetList = new HoveredWidgetList(this.hovering);
         getContext().reset();
         GuiViewportStack stack = new GuiViewportStack();
         stack.pushViewport(null, getScreen().getScreenArea());

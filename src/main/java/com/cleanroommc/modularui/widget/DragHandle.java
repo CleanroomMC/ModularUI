@@ -4,10 +4,10 @@ import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IDraggable;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.api.widget.IWidgetList;
 import com.cleanroommc.modularui.screen.DraggablePanelWrapper;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.utils.HoveredWidgetList;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import org.jetbrains.annotations.Nullable;
 
@@ -92,14 +92,14 @@ public class DragHandle extends Widget<DragHandle> implements IDraggable {
     }
 
     @Override
-    public void getWidgetsAt(IViewportStack stack, IWidgetList widgets, int x, int y) {
+    public void getWidgetsAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
         if (this.parentDraggable != null) {
             this.parentDraggable.getWidgetsAt(stack, widgets, x, y);
         }
     }
 
     @Override
-    public void getSelfAt(IViewportStack stack, IWidgetList widgets, int x, int y) {
+    public void getSelfAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
         if (this.parentDraggable != null) {
             this.parentDraggable.getSelfAt(stack, widgets, x, y);
         }
