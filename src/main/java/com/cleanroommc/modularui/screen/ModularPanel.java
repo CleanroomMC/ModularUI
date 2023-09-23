@@ -170,7 +170,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         this.alpha = 0f;
         if (this.animator == null) {
             this.animator = new Animator(ModularUIConfig.panelOpenCloseAnimationTime, Interpolation.QUINT_OUT)
-                    .setValueBounds(0.0, 1.0)
+                    .setValueBounds(0.0f, 1.0f)
                     .setCallback(val -> {
                         this.alpha = (float) val;
                         this.scale = (float) val * 0.25f + 0.75f;

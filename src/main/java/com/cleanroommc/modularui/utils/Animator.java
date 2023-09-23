@@ -19,8 +19,8 @@ public class Animator {
     private final int duration;
     private int progress;
     private int dir = 0;
-    private double min = 0, max = 1;
-    private double value;
+    private float min = 0, max = 1;
+    private float value;
     private final IInterpolation interpolation;
     private DoubleConsumer callback;
     private DoubleConsumer endCallback;
@@ -40,7 +40,7 @@ public class Animator {
         return this;
     }
 
-    public Animator setValueBounds(double min, double max) {
+    public Animator setValueBounds(float min, float max) {
         this.min = min;
         this.max = max;
         return this;
@@ -108,6 +108,6 @@ public class Animator {
     }
 
     private void updateValue() {
-        this.value = this.interpolation.interpolate(this.min, this.max, this.progress / (double) this.duration);
+        this.value = this.interpolation.interpolate(this.min, this.max, this.progress / (float) this.duration);
     }
 }
