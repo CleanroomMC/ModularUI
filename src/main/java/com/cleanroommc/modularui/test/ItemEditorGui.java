@@ -2,11 +2,11 @@ package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.IKey;
-import com.cleanroommc.modularui.api.layout.CrossAxisAlignment;
 import com.cleanroommc.modularui.manager.GuiCreationContext;
 import com.cleanroommc.modularui.manager.GuiInfo;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.cleanroommc.modularui.value.sync.IntSyncValue;
 import com.cleanroommc.modularui.value.sync.StringSyncValue;
@@ -62,13 +62,13 @@ public class ItemEditorGui {
         ModularPanel panel = ModularPanel.defaultPanel("item_editor");
         return panel.bindPlayerInventory()
                 .child(new Column()
-                        .crossAxisAlignment(CrossAxisAlignment.START)
+                        .crossAxisAlignment(Alignment.CrossAxis.START)
                         .sizeRel(1f)
                         .margin(7)
                         .child(IKey.str("Item Editor").asWidget().marginTop(7).marginBottom(3))
                         .child(new ItemSlot().slot(new ModularSlot(this.stackHandler, 0)))
                         .child(new Row()
-                                .crossAxisAlignment(CrossAxisAlignment.CENTER)
+                                .crossAxisAlignment(Alignment.CrossAxis.CENTER)
                                 .height(16)
                                 .margin(0, 4)
                                 .child(IKey.str("Meta: ").asWidget())

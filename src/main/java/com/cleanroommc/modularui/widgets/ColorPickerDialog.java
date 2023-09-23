@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
-import com.cleanroommc.modularui.api.layout.MainAxisAlignment;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.Rectangle;
@@ -82,7 +81,7 @@ public class ColorPickerDialog extends Dialog<Integer> {
                         .addPage(createHSVPage()))
                 .child(new Row()
                         .left(10).right(10).height(14)
-                        .mainAxisAlignment(MainAxisAlignment.SPACE_BETWEEN)
+                        .mainAxisAlignment(Alignment.MainAxis.SPACE_BETWEEN)
                         .child(new ButtonWidget<>()
                                 .heightRel(1f).width(50)
                                 .overlay(IKey.str("Cancel"))

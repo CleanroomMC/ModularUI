@@ -53,6 +53,24 @@ public class Alignment {
         }
     }
 
+    /**
+     * Defines how elements should be aligned on the cross axis.
+     * In a row this would mean the x coordinates.
+     */
+    public enum MainAxis {
+
+        START, CENTER, END, SPACE_BETWEEN, SPACE_AROUND
+    }
+
+    /**
+     * Defines how elements should be aligned on the cross axis.
+     * In a row this would mean the y coordinates.
+     */
+    public enum CrossAxis {
+
+        START, CENTER, END
+    }
+
     public static class Json implements JsonDeserializer<Alignment> {
 
         @Override

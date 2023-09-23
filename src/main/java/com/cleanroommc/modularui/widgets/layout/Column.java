@@ -1,16 +1,15 @@
 package com.cleanroommc.modularui.widgets.layout;
 
-import com.cleanroommc.modularui.api.layout.CrossAxisAlignment;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
-import com.cleanroommc.modularui.api.layout.MainAxisAlignment;
 import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.sizer.Box;
 
 public class Column extends ParentWidget<Column> implements ILayoutWidget {
 
-    private MainAxisAlignment maa = MainAxisAlignment.START;
-    private CrossAxisAlignment caa = CrossAxisAlignment.CENTER;
+    private Alignment.MainAxis maa = Alignment.MainAxis.START;
+    private Alignment.CrossAxis caa = Alignment.CrossAxis.CENTER;
 
     public Column() {
         flex().startDefaultMode()
@@ -23,12 +22,12 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
         boolean hasHeight = resizer().isHeightCalculated();
         int height = getArea().height;
         Box padding = getArea().getPadding();
-        MainAxisAlignment maa = this.maa;
-        if (!hasHeight && maa != MainAxisAlignment.START) {
+        Alignment.MainAxis maa = this.maa;
+        if (!hasHeight && maa != Alignment.MainAxis.START) {
             if (flex().yAxisDependsOnChildren()) {
-                maa = MainAxisAlignment.START;
+                maa = Alignment.MainAxis.START;
             } else {
-                throw new IllegalStateException("MainAxisAlignment other than start need the height to be calculated!");
+                throw new IllegalStateException("Alignment.MainAxis other than start need the height to be calculated!");
             }
         }
 
@@ -58,17 +57,17 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
                     widget.resizer().setHeightResized(true);
                 }
             }
-            if (maa == MainAxisAlignment.SPACE_BETWEEN || maa == MainAxisAlignment.SPACE_AROUND) {
-                maa = MainAxisAlignment.START;
+            if (maa == Alignment.MainAxis.SPACE_BETWEEN || maa == Alignment.MainAxis.SPACE_AROUND) {
+                maa = Alignment.MainAxis.START;
             }
         }
 
         // calculate start y
         int lastY = padding.top;
         if (hasHeight) {
-            if (maa == MainAxisAlignment.CENTER) {
+            if (maa == Alignment.MainAxis.CENTER) {
                 lastY = (int) (height / 2f - totalHeight / 2f);
-            } else if (maa == MainAxisAlignment.END) {
+            } else if (maa == Alignment.MainAxis.END) {
                 lastY = height - totalHeight;
             }
         }
@@ -84,7 +83,7 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
             widget.resizer().setYMarginPaddingApplied(true);
 
             lastY += widget.getArea().requestedHeight();
-            if (hasHeight && maa == MainAxisAlignment.SPACE_BETWEEN) {
+            if (hasHeight && maa == Alignment.MainAxis.SPACE_BETWEEN) {
                 lastY += (height - totalHeight) / (getChildren().size() - 1);
             }
         }
@@ -103,9 +102,9 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
             if (!widget.flex().hasXPos() && widget.resizer().isWidthCalculated()) {
                 int x = margin.left + padding.left;
                 if (hasWidth) {
-                    if (this.caa == CrossAxisAlignment.CENTER) {
+                    if (this.caa == Alignment.CrossAxis.CENTER) {
                         x = (int) (width / 2f - widget.getArea().width / 2f);
-                    } else if (this.caa == CrossAxisAlignment.END) {
+                    } else if (this.caa == Alignment.CrossAxis.END) {
                         x = width - widget.getArea().width - margin.right - padding.left;
                     }
                 }
@@ -116,12 +115,12 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
         }
     }
 
-    public Column crossAxisAlignment(CrossAxisAlignment caa) {
+    public Column crossAxisAlignment(Alignment.CrossAxis caa) {
         this.caa = caa;
         return this;
     }
 
-    public Column mainAxisAlignment(MainAxisAlignment maa) {
+    public Column mainAxisAlignment(Alignment.MainAxis maa) {
         this.maa = maa;
         return this;
     }
