@@ -26,6 +26,7 @@ public class ThemeReloadCommand extends CommandBase {
     @Override
     public void execute(@NotNull MinecraftServer server, @NotNull ICommandSender sender, String @NotNull [] args) throws CommandException {
         try {
+            sender.sendMessage(new TextComponentString("Reloading ModularUI themes..."));
             ThemeManager.reload();
             sender.sendMessage(new TextComponentString(TextFormatting.GREEN + "Successfully reloaded themes"));
         } catch (Exception e) {

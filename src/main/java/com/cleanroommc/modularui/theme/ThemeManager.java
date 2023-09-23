@@ -2,14 +2,13 @@ package com.cleanroommc.modularui.theme;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
-import com.cleanroommc.modularui.utils.AssetHelper;
-import com.cleanroommc.modularui.utils.Color;
-import com.cleanroommc.modularui.utils.JsonBuilder;
-import com.cleanroommc.modularui.utils.JsonHelper;
+import com.cleanroommc.modularui.utils.*;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
@@ -35,16 +34,54 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
     protected static final WidgetTheme defaultdefaultWidgetTheme = new WidgetTheme(null, null, Color.WHITE.normal, 0xFF404040, false);
 
     public static void reload() {
+        ModularUI.LOGGER.info("Reloading Themes...");
         MinecraftForge.EVENT_BUS.post(new ReloadThemeEvent.Pre());
         ThemeAPI.INSTANCE.onReload();
-        loadThemes();
-        loadScreenThemes();
+        loadThemesJsons();
+        validateJsonScreenThemes();
         MinecraftForge.EVENT_BUS.post(new ReloadThemeEvent.Post());
     }
 
-    public static void loadThemes() {
-        // find registered paths of themes in themes.json files
-        Map<String, List<String>> themesPaths = findRegisteredThemes();
+    private static void loadThemesJsons() {
+        Map<String, List<String>> themes = new Object2ObjectOpenHashMap<>();
+        // find any theme.json files under any domain
+        // works with mods like resource loader
+        ObjectList<String> themesJsons = ObjectList.create();
+        for (IResource resource : AssetHelper.findAssets("themes.json")) {
+            themesJsons.add(resource.getResourceLocation().toString());
+            try {
+                JsonElement element = JsonHelper.parse(resource.getInputStream());
+                JsonObject definitions;
+                if (!element.isJsonObject()) {
+                    resource.close();
+                    continue;
+                }
+                definitions = element.getAsJsonObject();
+                for (Map.Entry<String, JsonElement> entry : definitions.entrySet()) {
+                    if (entry.getKey().equals("screens")) {
+                        if (!entry.getValue().isJsonObject()) {
+                            ModularUI.LOGGER.error("Theme screen definitions must be an object!");
+                            continue;
+                        }
+                        loadScreenThemes(entry.getValue().getAsJsonObject());
+                        continue;
+                    }
+                    if (entry.getValue().isJsonObject() || entry.getValue().isJsonArray() || entry.getValue().isJsonNull()) {
+                        ModularUI.LOGGER.throwing(new JsonParseException("Theme must be a string!"));
+                        continue;
+                    }
+                    themes.computeIfAbsent(entry.getKey(), key -> new ArrayList<>()).add(entry.getValue().getAsString());
+                }
+                resource.close();
+            } catch (Exception e) {
+                ModularUI.LOGGER.catching(e);
+            }
+        }
+        ModularUI.LOGGER.info("Found themes.json's at {}", themesJsons);
+        loadThemes(themes);
+    }
+
+    public static void loadThemes(Map<String, List<String>> themesPaths) {
         Map<String, ThemeJson> themeMap = new Object2ObjectOpenHashMap<>();
         SortedJsonThemeList themeList = new SortedJsonThemeList(themeMap);
 
@@ -148,61 +185,23 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
         return new ThemeJson(id, jsons, override);
     }
 
-    private static Map<String, List<String>> findRegisteredThemes() {
-        Map<String, List<String>> themes = new Object2ObjectOpenHashMap<>();
-        for (IResource resource : AssetHelper.findAssets(ModularUI.ID, "themes.json")) {
-            try {
-                JsonElement element = JsonHelper.parse(resource.getInputStream());
-                JsonObject definitions;
-                if (!element.isJsonObject()) {
-                    resource.close();
-                    continue;
-                }
-                definitions = element.getAsJsonObject();
-                for (Map.Entry<String, JsonElement> entry : definitions.entrySet()) {
-                    if (entry.getKey().equals("screens")) {
-                        continue;
-                    }
-                    if (entry.getValue().isJsonObject() || entry.getValue().isJsonArray() || entry.getValue().isJsonNull()) {
-                        ModularUI.LOGGER.throwing(new JsonParseException("Theme must be a string!"));
-                        continue;
-                    }
-                    themes.computeIfAbsent(entry.getKey(), key -> new ArrayList<>()).add(entry.getValue().getAsString());
-                }
-                resource.close();
-            } catch (Exception e) {
-                e.printStackTrace();
+    private static void loadScreenThemes(JsonObject json) {
+        for (Map.Entry<String, JsonElement> entry : json.entrySet()) {
+            if (entry.getValue().isJsonPrimitive()) {
+                String theme = entry.getValue().getAsString();
+                ThemeAPI.INSTANCE.jsonScreenThemes.put(entry.getKey(), theme);
+            } else {
+                ModularUI.LOGGER.error("Theme screen definitions must be strings!");
             }
         }
-        return themes;
     }
 
-    private static void loadScreenThemes() {
-        for (IResource resource : AssetHelper.findAssets(ModularUI.ID, "themes.json")) {
-            try {
-                JsonElement element = JsonHelper.parse(resource.getInputStream());
-                JsonObject definitions;
-                if (!element.isJsonObject()) {
-                    resource.close();
-                    continue;
-                }
-                definitions = element.getAsJsonObject();
-                if (definitions.has("screens")) {
-                    element = definitions.get("screens");
-                    if (element.isJsonObject()) {
-                        for (Map.Entry<String, JsonElement> entry : element.getAsJsonObject().entrySet()) {
-                            if (entry.getValue().isJsonPrimitive()) {
-                                String theme = entry.getValue().getAsString();
-                                if (ThemeAPI.INSTANCE.hasTheme(theme)) {
-                                    ThemeAPI.INSTANCE.jsonScreenThemes.put(entry.getKey(), theme);
-                                }
-                            }
-                        }
-                    }
-                }
-                resource.close();
-            } catch (Exception e) {
-                e.printStackTrace();
+    private static void validateJsonScreenThemes() {
+        for (ObjectIterator<Object2ObjectMap.Entry<String, String>> iterator = ThemeAPI.INSTANCE.jsonScreenThemes.object2ObjectEntrySet().fastIterator(); iterator.hasNext(); ) {
+            Map.Entry<String, String> entry = iterator.next();
+            if (!ThemeAPI.INSTANCE.hasTheme(entry.getValue())) {
+                ModularUI.LOGGER.error("Tried to register theme '{}' for screen '{}', but theme does not exist", entry.getValue(), entry.getKey());
+                iterator.remove();
             }
         }
     }
@@ -210,7 +209,6 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
     @Override
     public void onResourceManagerReload(@NotNull IResourceManager resourceManager, @NotNull Predicate<IResourceType> resourcePredicate) {
         if (resourcePredicate.test(VanillaResourceType.TEXTURES)) {
-            ModularUI.LOGGER.info("Reloading Themes...");
             reload();
         }
     }

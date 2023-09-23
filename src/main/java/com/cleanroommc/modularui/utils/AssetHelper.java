@@ -26,4 +26,12 @@ public class AssetHelper {
             return Collections.emptyList();
         }
     }
+
+    public static List<IResource> findAssets(String file) {
+        ObjectList<IResource> assets = ObjectList.create();
+        for (String domain : Minecraft.getMinecraft().getResourceManager().getResourceDomains()) {
+            assets.addAll(findAssets(domain, file));
+        }
+        return assets;
+    }
 }
