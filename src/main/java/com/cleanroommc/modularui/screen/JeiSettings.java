@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -88,11 +89,18 @@ public class JeiSettings {
 
     @Optional.Method(modid = "jei")
     public <I> List<IGhostIngredientHandler.Target<I>> getAllGhostIngredientTargets(@NotNull I ingredient) {
-        this.jeiGhostIngredientSlots.removeIf(widget -> !((IWidget) widget).isValid());
-        return this.jeiGhostIngredientSlots.stream()
-                .filter(slot -> ((IWidget) slot).isEnabled())
-                .filter(slot -> slot.castGhostIngredientIfValid(ingredient) != null)
-                .map(slot -> (IGhostIngredientHandler.Target<I>) GhostIngredientTarget.of(slot))
-                .collect(Collectors.toList());
+        List<IGhostIngredientHandler.Target<I>> ghostHandlerTargets = new ArrayList<>();
+        for (Iterator<JeiGhostIngredientSlot<?>> iterator = this.jeiGhostIngredientSlots.iterator(); iterator.hasNext(); ) {
+            JeiGhostIngredientSlot<?> slot = iterator.next();
+            IWidget widget = (IWidget) slot;
+            if (!widget.isValid()) {
+                iterator.remove();
+                continue;
+            }
+            if (widget.isEnabled() && slot.castGhostIngredientIfValid(ingredient) != null) {
+                ghostHandlerTargets.add((IGhostIngredientHandler.Target<I>) new GhostIngredientTarget<>(widget, slot));
+            }
+        }
+        return ghostHandlerTargets;
     }
 }
