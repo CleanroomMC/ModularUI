@@ -349,6 +349,20 @@ public class GuiDraw {
         GlStateManager.color(1f, 1f, 1f, 1f);
     }
 
+    public static void drawSprite(TextureAtlasSprite sprite, float x0, float y0, float w, float h) {
+        drawSprite(Minecraft.getMinecraft().getTextureMapBlocks(), sprite, x0, y0, w, h);
+    }
+
+    public static void drawSprite(TextureMap textureMap, TextureAtlasSprite sprite, float x0, float y0, float w, float h) {
+        GlStateManager.disableAlpha();
+        GlStateManager.enableBlend();
+        GlStateManager.enableTexture2D();
+        GlStateManager.bindTexture(textureMap.getGlTextureId());
+        drawTexture(x0, y0, x0 + w, y0 + h, sprite.getMinU(), sprite.getMinV(), sprite.getMaxU(), sprite.getMaxV());
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+    }
+
     public static void drawOutlineCenter(int x, int y, int offset, int color) {
         drawOutlineCenter(x, y, offset, color, 1);
     }
@@ -373,12 +387,13 @@ public class GuiDraw {
 
     /**
      * Draws a rectangular shadow
-     * @param x left of solid shadow part
-     * @param y top of solid shadow part
-     * @param w width of solid shadow part
-     * @param h height of solid shadow part
-     * @param oX shadow gradient size in x
-     * @param oY shadow gradient size in y
+     *
+     * @param x      left of solid shadow part
+     * @param y      top of solid shadow part
+     * @param w      width of solid shadow part
+     * @param h      height of solid shadow part
+     * @param oX     shadow gradient size in x
+     * @param oY     shadow gradient size in y
      * @param opaque solid shadow color
      * @param shadow gradient end color
      */
@@ -434,7 +449,7 @@ public class GuiDraw {
         buffer.pos(x1 + oX, y - oY, 0).color(r2, g2, b2, a2).endVertex();
         buffer.pos(x1, y, 0).color(r1, g1, b1, a1).endVertex();
         buffer.pos(x1, y1, 0).color(r1, g1, b1, a1).endVertex();
-        buffer.pos(x1  + oX, y1 + oY, 0).color(r2, g2, b2, a2).endVertex();
+        buffer.pos(x1 + oX, y1 + oY, 0).color(r2, g2, b2, a2).endVertex();
 
         tessellator.draw();
 
