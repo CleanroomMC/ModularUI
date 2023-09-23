@@ -9,11 +9,11 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Flex;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * A widget in a Gui
@@ -41,11 +41,12 @@ public interface IWidget extends IGuiElement {
     boolean isValid();
 
     /**
-     * Draws the background of this widget
+     * Draws the background of this widget.
      *
-     * @param context gui context
+     * @param context     gui context
+     * @param widgetTheme widget theme of this widget
      */
-    void drawBackground(GuiContext context);
+    void drawBackground(GuiContext context, WidgetTheme widgetTheme);
 
     /**
      * Draws additional stuff in this widget.
@@ -53,8 +54,29 @@ public interface IWidget extends IGuiElement {
      *
      * @param context gui context
      */
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.3.0")
+    @Deprecated
     @Override
-    void draw(GuiContext context);
+    default void draw(GuiContext context) {
+        draw(context, getWidgetTheme(context.getTheme()));
+    }
+
+    /**
+     * Draws extra elements of this widget. Called after {@link #drawBackground(GuiContext, WidgetTheme)} and before
+     * {@link #drawOverlay(GuiContext, WidgetTheme)}
+     *
+     * @param context     gui context
+     * @param widgetTheme widget theme
+     */
+    void draw(GuiContext context, WidgetTheme widgetTheme);
+
+    /**
+     * Draws the overlay of this theme.
+     *
+     * @param context     gui context
+     * @param widgetTheme widget theme
+     */
+    void drawOverlay(GuiContext context, WidgetTheme widgetTheme);
 
     /**
      * Draws foreground elements of this widget. For example tooltips.

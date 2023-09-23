@@ -143,23 +143,26 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     // -----------------
 
     @Override
-    public void drawBackground(GuiContext context) {
-        WidgetTheme widgetTheme = getWidgetTheme(context.getTheme());
+    public void drawBackground(GuiContext context, WidgetTheme widgetTheme) {
         IDrawable bg = getCurrentBackground();
         if (bg != null) {
             bg.applyThemeColor(context.getTheme(), widgetTheme);
             bg.drawAtZero(context, getArea());
         }
-        bg = getCurrentOverlay();
+    }
+
+    @Override
+    public void draw(GuiContext context, WidgetTheme widgetTheme) {
+    }
+
+    @Override
+    public void drawOverlay(GuiContext context, WidgetTheme widgetTheme) {
+        IDrawable bg = getCurrentOverlay();
         if (bg != null) {
             bg.applyThemeColor(context.getTheme(), widgetTheme);
             Box padding = getArea().getPadding();
             bg.draw(context, padding.left, padding.top, getArea().width - padding.horizontal(), getArea().height - padding.vertical());
         }
-    }
-
-    @Override
-    public void draw(GuiContext context) {
     }
 
     @Override

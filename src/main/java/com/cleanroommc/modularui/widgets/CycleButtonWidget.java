@@ -116,25 +116,13 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
     }
 
     @Override
-    public void drawBackground(GuiContext context) {
-        WidgetTheme widgetTheme = getWidgetTheme(context.getTheme());
-        IDrawable bg = getCurrentBackground();
-        if (bg != null) {
-            bg.applyThemeColor(context.getTheme(), widgetTheme);
-            bg.drawAtZero(context, getArea());
-        }
+    public void draw(GuiContext context, WidgetTheme widgetTheme) {
+        super.draw(context, widgetTheme);
         // make sure texture is up-to-date
         getState();
         // draw state texture after background, but before overlay
         this.texture.applyThemeColor(context.getTheme(), getWidgetTheme(context.getTheme()));
         this.texture.draw(context, 0, 0, getArea().w(), getArea().h());
-
-        bg = getCurrentOverlay();
-        if (bg != null) {
-            bg.applyThemeColor(context.getTheme(), widgetTheme);
-            Box padding = getArea().getPadding();
-            bg.draw(context, padding.left, padding.top, getArea().width - padding.horizontal(), getArea().height - padding.vertical());
-        }
     }
 
     @Override

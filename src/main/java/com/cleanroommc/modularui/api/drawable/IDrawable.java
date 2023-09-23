@@ -87,7 +87,7 @@ public interface IDrawable {
 
         @SideOnly(Side.CLIENT)
         @Override
-        public void draw(GuiContext context) {
+        public void draw(GuiContext context, WidgetTheme widgetTheme) {
             this.drawable.drawAtZero(context, getArea());
         }
     }
