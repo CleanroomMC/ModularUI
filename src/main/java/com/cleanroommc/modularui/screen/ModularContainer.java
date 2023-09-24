@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.screen;
 
+import com.cleanroommc.bogosorter.api.IPosSetter;
 import com.cleanroommc.bogosorter.api.ISortableContainer;
 import com.cleanroommc.bogosorter.api.ISortingContextBuilder;
 import com.cleanroommc.modularui.ModularUI;
@@ -210,9 +211,16 @@ public class ModularContainer extends Container implements ISortableContainer {
     @Override
     public void buildSortingContext(ISortingContextBuilder builder) {
         for (SlotGroup slotGroup : this.getSyncManager().getSlotGroups()) {
-            if (slotGroup.isAllowSorting()) {
-                builder.addSlotGroup(slotGroup.getRowSize(), slotGroup.getSlots());
+            if (slotGroup.isAllowSorting() && !isPlayerSlot(slotGroup.getSlots().get(0))) {
+                builder.addSlotGroupOf(slotGroup.getSlots(), slotGroup.getRowSize())
+                        .buttonPosSetter(null)
+                        .priority(slotGroup.getShiftClickPriority());
             }
         }
+    }
+
+    @Override
+    public IPosSetter getPlayerButtonPosSetter() {
+        return null;
     }
 }

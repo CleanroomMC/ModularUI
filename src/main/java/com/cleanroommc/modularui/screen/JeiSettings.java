@@ -98,7 +98,8 @@ public class JeiSettings {
                 continue;
             }
             if (widget.isEnabled() && slot.castGhostIngredientIfValid(ingredient) != null) {
-                ghostHandlerTargets.add((IGhostIngredientHandler.Target<I>) new GhostIngredientTarget<>(widget, slot));
+                JeiGhostIngredientSlot<I> slotWithType = (JeiGhostIngredientSlot<I>) slot;
+                ghostHandlerTargets.add(new GhostIngredientTarget<>(widget, slotWithType));
             }
         }
         return ghostHandlerTargets;
