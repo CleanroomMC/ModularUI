@@ -318,19 +318,16 @@ public class WidgetTree {
     }
 
     public static void collectSyncValues(GuiSyncManager syncHandler, ModularPanel panel) {
-        collectSyncValues(syncHandler, panel.getName(), panel, new AtomicInteger(0));
-    }
-
-    private static <T extends IWidget & ISynced<T>> void collectSyncValues(GuiSyncManager syncHandler, String syncSuffix, T parent, AtomicInteger id) {
-        if (parent.isSynced()) {
-            syncHandler.syncValue(GuiSyncManager.AUTO_SYNC_PREFIX + syncSuffix, id.getAndIncrement(), parent.getSyncHandler());
-        }
-        if (parent.hasChildren()) {
-            for (IWidget widget : parent.getChildren()) {
-                if (widget instanceof ISynced) {
-                    collectSyncValues(syncHandler, syncSuffix, (T) widget, id);
+        AtomicInteger id = new AtomicInteger(0);
+        String syncKey = GuiSyncManager.AUTO_SYNC_PREFIX + panel.getName();
+        foreachChildByLayer(panel, widget -> {
+            if (widget instanceof ISynced) {
+                ISynced<?> synced = (ISynced<?>) widget;
+                if (synced.isSynced()) {
+                    syncHandler.syncValue(syncKey, id.getAndIncrement(), synced.getSyncHandler());
                 }
             }
-        }
+            return true;
+        }, true);
     }
 }
