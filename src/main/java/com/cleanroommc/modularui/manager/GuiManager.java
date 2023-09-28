@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 public final class GuiManager implements IGuiHandler {
@@ -19,6 +20,8 @@ public final class GuiManager implements IGuiHandler {
     public static final GuiManager INSTANCE = new GuiManager();
 
     private final Int2ObjectOpenHashMap<GuiInfo> guiInfos = new Int2ObjectOpenHashMap<>();
+    private static ModularScreen queuedClientScreen;
+    private static JeiSettings queuedJeiSettings;
 
     private GuiManager() {
     }
@@ -38,9 +41,21 @@ public final class GuiManager implements IGuiHandler {
             ModularUI.LOGGER.info("Tried opening client ui on server!");
             return;
         }
-        screen.getContext().setJeiSettings(jeiSettings);
-        GuiScreenWrapper screenWrapper = new GuiScreenWrapper(new ModularContainer(), screen);
-        FMLCommonHandler.instance().showGuiScreen(screenWrapper);
+        // we need to queue the screen, because we might break the current gui
+        queuedClientScreen = screen;
+        queuedJeiSettings = jeiSettings;
+    }
+
+    @SideOnly(Side.CLIENT)
+    @ApiStatus.Internal
+    public static void checkQueuedScreen() {
+        if (queuedClientScreen != null) {
+            queuedClientScreen.getContext().setJeiSettings(queuedJeiSettings);
+            GuiScreenWrapper screenWrapper = new GuiScreenWrapper(new ModularContainer(), queuedClientScreen);
+            FMLCommonHandler.instance().showGuiScreen(screenWrapper);
+            queuedClientScreen = null;
+            queuedJeiSettings = null;
+        }
     }
 
     @Nullable

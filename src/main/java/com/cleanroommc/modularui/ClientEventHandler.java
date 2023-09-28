@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui;
 
 import com.cleanroommc.modularui.drawable.Stencil;
+import com.cleanroommc.modularui.manager.GuiManager;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -30,5 +31,12 @@ public class ClientEventHandler {
             GL11.glEnable(GL11.GL_STENCIL_TEST);
         }
         Stencil.reset();
+    }
+
+    @SubscribeEvent
+    public static void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.START) {
+            GuiManager.checkQueuedScreen();
+        }
     }
 }
