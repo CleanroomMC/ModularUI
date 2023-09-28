@@ -26,7 +26,7 @@ public class TextWidget extends Widget<TextWidget> {
     }
 
     @Override
-    public void draw(GuiContext context) {
+    public void draw(GuiContext context, WidgetTheme widgetTheme) {
         TextRenderer renderer = TextRenderer.SHARED;
         renderer.setColor(this.color);
         renderer.setAlignment(this.alignment, getArea().w() + 1, getArea().h());

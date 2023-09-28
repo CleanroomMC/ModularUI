@@ -50,11 +50,12 @@ public interface IWidget extends IGuiElement {
 
     /**
      * Draws additional stuff in this widget.
-     * x = 0 and y = 0 is now in the top left corner of this widget
+     * x = 0 and y = 0 is now in the top left corner of this widget.
+     * Do NOT override this method, it is never called. Use {@link #draw(GuiContext, WidgetTheme)} instead.
      *
      * @param context gui context
      */
-    @ApiStatus.ScheduledForRemoval(inVersion = "2.3.0")
+    @ApiStatus.NonExtendable
     @Deprecated
     @Override
     default void draw(GuiContext context) {
