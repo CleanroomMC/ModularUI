@@ -22,6 +22,7 @@ import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.PlayerInvWrapper;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -111,6 +112,27 @@ public class ModularContainer extends Container implements ISortableContainer {
             }
         }
     }
+
+    @Contract("null, null -> fail")
+    @NotNull
+    @ApiStatus.Internal
+    public SlotGroup validateSlotGroup(@Nullable String slotGroupName, @Nullable SlotGroup slotGroup) {
+        if (slotGroup != null) {
+            if (getSyncManager().getSlotGroup(slotGroup.getName()) == null) {
+                throw new IllegalArgumentException("Slot group is not registered in the GUI.");
+            }
+            return slotGroup;
+        }
+        if (slotGroupName != null) {
+            slotGroup = getSyncManager().getSlotGroup(slotGroupName);
+            if (slotGroup == null) {
+                throw new IllegalArgumentException("Can't find slot group for name " + slotGroupName);
+            }
+            return slotGroup;
+        }
+        throw new IllegalArgumentException("Either the slot group or the name must not be null!");
+    }
+
 
     public GuiSyncManager getSyncManager() {
         if (this.guiSyncManager == null) {
