@@ -46,7 +46,7 @@ import org.apache.logging.log4j.Logger;
         name = ModularUI.NAME,
         version = ModularUI.VERSION,
         dependencies = "required-after:mixinbooter@[5.0,);" +
-                "after:bogorter@[1.3.4,);")
+                "after:bogorter@[1.4.0,);")
 public class ModularUI {
 
     public static final String ID = Tags.ID;
