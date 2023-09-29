@@ -20,7 +20,7 @@ public class ModularUIConfig {
     public static int panelOpenCloseAnimationTime = 8;
 
     // Tooltip
-    @Config.Comment("If panels should be placed next to a widgets panel or the widget by default.")
+    @Config.Comment("If tooltips should be placed next to a widgets panel or the widget by default.")
     public static boolean placeNextToPanelByDefault = true;
     // Default direction
     @Config.Comment("Default tooltip position around the widget or its panel.")
@@ -31,6 +31,10 @@ public class ModularUIConfig {
 
     @Config.Comment("If true and not specified otherwise, screens will try to use the 'vanilla_dark' theme.")
     public static boolean useDarkThemeByDefault = false;
+
+    @Config.RequiresMcRestart
+    @Config.Comment("Enables a test block, test item with a test gui and opening a gui by right clicking a diamond.")
+    public static boolean enabledTestGuis = FMLLaunchHandler.isDeobfuscatedEnvironment();
 
     public static boolean placeTooltipNextToPanel() {
         return NetworkUtils.isDedicatedClient() && placeNextToPanelByDefault && Minecraft.getMinecraft().gameSettings.guiScale > 0;

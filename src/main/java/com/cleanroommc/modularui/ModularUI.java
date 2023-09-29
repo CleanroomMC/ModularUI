@@ -78,7 +78,7 @@ public class ModularUI {
             preInitClient();
         }
 
-        if (FMLLaunchHandler.isDeobfuscatedEnvironment()) {
+        if (ModularUIConfig.enabledTestGuis) {
             MinecraftForge.EVENT_BUS.register(TestBlock.class);
             TestBlock.preInit();
         }
@@ -99,7 +99,7 @@ public class ModularUI {
         MinecraftForge.EVENT_BUS.register(ClientEventHandler.class);
         MinecraftForge.EVENT_BUS.register(KeyBindHandler.class);
 
-        if (FMLLaunchHandler.isDeobfuscatedEnvironment()) {
+        if (ModularUIConfig.enabledTestGuis) {
             MinecraftForge.EVENT_BUS.register(EventHandler.class);
         }
 
