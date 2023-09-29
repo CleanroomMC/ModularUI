@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.manager.GuiCreationContext;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.value.BoolValue;
@@ -182,7 +183,10 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                                     return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).slotGroup("item_inv"));
                                                 })
                                                 .build()
-                                                .marginBottom(2))
+                                                .marginBottom(2)
+                                                .child(new SortButtons()
+                                                        .slotGroup("item_inv")
+                                                        .right(0).top(-11)))
                                         .child(SlotGroupWidget.builder()
                                                 .row("FII")
                                                 .row("FII")
@@ -349,7 +353,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
         }
 
         @Override
-        public void draw(GuiContext context) {
+        public void draw(GuiContext context, WidgetTheme widgetTheme) {
             this.animatedKey.draw(context, 0, 0, getArea().w(), getArea().h());
         }
 

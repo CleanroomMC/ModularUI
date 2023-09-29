@@ -42,7 +42,11 @@ import net.minecraftforge.registries.IForgeRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod(modid = ModularUI.ID, name = ModularUI.NAME, version = ModularUI.VERSION, dependencies = "required-after:mixinbooter@[5.0,);")
+@Mod(modid = ModularUI.ID,
+        name = ModularUI.NAME,
+        version = ModularUI.VERSION,
+        dependencies = "required-after:mixinbooter@[5.0,);" +
+                "after:bogorter@[1.3.4,);")
 public class ModularUI {
 
     public static final String ID = Tags.ID;
@@ -74,7 +78,7 @@ public class ModularUI {
             preInitClient();
         }
 
-        if (FMLLaunchHandler.isDeobfuscatedEnvironment()) {
+        if (ModularUIConfig.enabledTestGuis) {
             MinecraftForge.EVENT_BUS.register(TestBlock.class);
             TestBlock.preInit();
         }
@@ -95,7 +99,7 @@ public class ModularUI {
         MinecraftForge.EVENT_BUS.register(ClientEventHandler.class);
         MinecraftForge.EVENT_BUS.register(KeyBindHandler.class);
 
-        if (FMLLaunchHandler.isDeobfuscatedEnvironment()) {
+        if (ModularUIConfig.enabledTestGuis) {
             MinecraftForge.EVENT_BUS.register(EventHandler.class);
         }
 
