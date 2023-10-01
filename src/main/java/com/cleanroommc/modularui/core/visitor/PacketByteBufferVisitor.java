@@ -43,6 +43,7 @@ public class PacketByteBufferVisitor extends ClassVisitor implements Opcodes {
         public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
             if ("writeByte".equals(name)) {
                 name = WRITE_VAR_INT_METHOD;
+                desc = "(I)Lnet/minecraft/network/PacketBuffer;";
             } else if ("readByte".equals(name)) {
                 name = READ_VAR_INT_METHOD;
                 desc = "()I";
