@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.value;
 import com.cleanroommc.modularui.api.value.IBoolValue;
 import com.cleanroommc.modularui.api.value.IIntValue;
 import com.cleanroommc.modularui.api.value.IStringValue;
+import com.cleanroommc.modularui.utils.BooleanConsumer;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -58,9 +59,9 @@ public class BoolValue implements IBoolValue<Boolean>, IIntValue<Boolean>, IStri
     public static class Dynamic implements IBoolValue<Boolean>, IIntValue<Boolean>, IStringValue<Boolean> {
 
         private final BooleanSupplier getter;
-        private final Consumer<Boolean> setter;
+        private final BooleanConsumer setter;
 
-        public Dynamic(BooleanSupplier getter, Consumer<Boolean> setter) {
+        public Dynamic(BooleanSupplier getter, BooleanConsumer setter) {
             this.getter = getter;
             this.setter = setter;
         }

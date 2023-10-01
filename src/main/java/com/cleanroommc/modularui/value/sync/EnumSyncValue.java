@@ -2,9 +2,14 @@ package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.api.value.IEnumValue;
 import com.cleanroommc.modularui.api.value.sync.IIntSyncValue;
+import com.cleanroommc.modularui.network.NetworkUtils;
 import net.minecraft.network.PacketBuffer;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
+import java.util.function.DoubleConsumer;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 public class EnumSyncValue<T extends Enum<T>> extends ValueSyncHandler<T> implements IEnumValue<T>, IIntSyncValue<T> {
@@ -19,6 +24,23 @@ public class EnumSyncValue<T extends Enum<T>> extends ValueSyncHandler<T> implem
         this.getter = getter;
         this.setter = setter;
         this.cache = getter.get();
+    }
+
+    @Contract("_, null, _, null, _ -> fail")
+    public EnumSyncValue(Class<T> enumCLass, @Nullable Supplier<T> clientGetter, @Nullable Consumer<T> clientSetter,
+                           @Nullable Supplier<T> serverGetter, @Nullable Consumer<T> serverSetter) {
+        this.enumCLass = enumCLass;
+        if (clientGetter == null && serverGetter == null) {
+            throw new NullPointerException("Client or server getter must not be null!");
+        }
+        if (NetworkUtils.isClient()) {
+            this.getter = clientGetter != null ? clientGetter : serverGetter;
+            this.setter = clientSetter != null ? clientSetter : serverSetter;
+        } else {
+            this.getter = serverGetter != null ? serverGetter : clientGetter;
+            this.setter = serverSetter != null ? serverSetter : clientSetter;
+        }
+        this.cache = this.getter.get();
     }
 
     @Override

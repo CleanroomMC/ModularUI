@@ -3,9 +3,13 @@ package com.cleanroommc.modularui.value.sync;
 import com.cleanroommc.modularui.api.value.sync.IStringSyncValue;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import net.minecraft.network.PacketBuffer;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.DoubleConsumer;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 public class StringSyncValue extends ValueSyncHandler<String> implements IStringSyncValue<String> {
@@ -18,6 +22,22 @@ public class StringSyncValue extends ValueSyncHandler<String> implements IString
         this.getter = getter;
         this.setter = setter;
         this.cache = getter.get();
+    }
+
+    @Contract("null, _, null, _ -> fail")
+    public StringSyncValue(@Nullable Supplier<String> clientGetter, @Nullable Consumer<String> clientSetter,
+                           @Nullable Supplier<String> serverGetter, @Nullable Consumer<String> serverSetter) {
+        if (clientGetter == null && serverGetter == null) {
+            throw new NullPointerException("Client or server getter must not be null!");
+        }
+        if (NetworkUtils.isClient()) {
+            this.getter = clientGetter != null ? clientGetter : serverGetter;
+            this.setter = clientSetter != null ? clientSetter : serverSetter;
+        } else {
+            this.getter = serverGetter != null ? serverGetter : clientGetter;
+            this.setter = serverSetter != null ? serverSetter : clientSetter;
+        }
+        this.cache = this.getter.get();
     }
 
     @Override

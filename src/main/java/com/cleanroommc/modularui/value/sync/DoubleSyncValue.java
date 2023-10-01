@@ -2,9 +2,14 @@ package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.api.value.sync.IDoubleSyncValue;
 import com.cleanroommc.modularui.api.value.sync.IStringSyncValue;
+import com.cleanroommc.modularui.network.NetworkUtils;
+import com.cleanroommc.modularui.utils.BooleanConsumer;
 import net.minecraft.network.PacketBuffer;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
@@ -18,6 +23,22 @@ public class DoubleSyncValue extends ValueSyncHandler<Double> implements IDouble
         this.getter = getter;
         this.setter = setter;
         this.cache = getter.getAsDouble();
+    }
+
+    @Contract("null, _, null, _ -> fail")
+    public DoubleSyncValue(@Nullable DoubleSupplier clientGetter, @Nullable DoubleConsumer clientSetter,
+                            @Nullable DoubleSupplier serverGetter, @Nullable DoubleConsumer serverSetter) {
+        if (clientGetter == null && serverGetter == null) {
+            throw new NullPointerException("Client or server getter must not be null!");
+        }
+        if (NetworkUtils.isClient()) {
+            this.getter = clientGetter != null ? clientGetter : serverGetter;
+            this.setter = clientSetter != null ? clientSetter : serverSetter;
+        } else {
+            this.getter = serverGetter != null ? serverGetter : clientGetter;
+            this.setter = serverSetter != null ? serverSetter : clientSetter;
+        }
+        this.cache = this.getter.getAsDouble();
     }
 
     @Override
