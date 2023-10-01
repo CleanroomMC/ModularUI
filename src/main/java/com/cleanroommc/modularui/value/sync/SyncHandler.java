@@ -32,6 +32,13 @@ public abstract class SyncHandler {
         this.syncManager = syncManager;
     }
 
+    @ApiStatus.OverrideOnly
+    @MustBeInvokedByOverriders
+    public void dispose() {
+        this.key = null;
+        this.syncManager = null;
+    }
+
     /**
      * Syncs a custom packet to the client
      *
@@ -144,7 +151,7 @@ public abstract class SyncHandler {
      * @return is this sync handler has been initialised yet
      */
     public final boolean isValid() {
-        return this.key != null;
+        return this.key != null && this.syncManager != null;
     }
 
     /**

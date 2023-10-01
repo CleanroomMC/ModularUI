@@ -425,7 +425,7 @@ public class ModularScreen {
         return this.windowManager;
     }
 
-    public GuiSyncManager getSyncHandler() {
+    public GuiSyncManager getSyncManager() {
         return getContainer().getSyncManager();
     }
 

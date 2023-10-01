@@ -317,14 +317,14 @@ public class WidgetTree {
         return type.isAssignableFrom(parent.getClass()) ? (T) parent : null;
     }
 
-    public static void collectSyncValues(GuiSyncManager syncHandler, ModularPanel panel) {
+    public static void collectSyncValues(GuiSyncManager syncManager, ModularPanel panel) {
         AtomicInteger id = new AtomicInteger(0);
         String syncKey = GuiSyncManager.AUTO_SYNC_PREFIX + panel.getName();
         foreachChildByLayer(panel, widget -> {
             if (widget instanceof ISynced) {
                 ISynced<?> synced = (ISynced<?>) widget;
-                if (synced.isSynced()) {
-                    syncHandler.syncValue(syncKey, id.getAndIncrement(), synced.getSyncHandler());
+                if (synced.isSynced() && !syncManager.hasSyncHandler(synced.getSyncHandler())) {
+                    syncManager.syncValue(syncKey, id.getAndIncrement(), synced.getSyncHandler());
                 }
             }
             return true;

@@ -146,11 +146,6 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     @Override
-    public boolean isSynced() {
-        return this.syncHandler != null;
-    }
-
-    @Override
     public @NotNull ItemSlotSH getSyncHandler() {
         if (this.syncHandler == null) {
             throw new IllegalStateException("Widget is not initialised!");

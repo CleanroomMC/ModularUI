@@ -30,6 +30,7 @@ public class WindowManager {
     private final ReverseIterable<ModularPanel> reversePanels = new ReverseIterable<>(this.panelsView);
     private final List<ModularPanel> queueOpenPanels = new ArrayList<>();
     private final List<ModularPanel> queueClosePanels = new ArrayList<>();
+    private boolean isScreenClosing = false;
     private boolean closed;
 
     public WindowManager(ModularScreen screen) {
@@ -64,10 +65,7 @@ public class WindowManager {
 
         if (!this.queueClosePanels.isEmpty()) {
             if (this.queueClosePanels.contains(this.mainPanel)) {
-                this.panels.removeIf(panel -> {
-                    panel.onClose();
-                    return true;
-                });
+                closeAll();
                 this.screen.close(true);
             } else {
                 for (ModularPanel panel : this.queueClosePanels) {
@@ -171,10 +169,12 @@ public class WindowManager {
     }
 
     public void closeAll() {
+        this.isScreenClosing = true;
         for (ModularPanel panel : this.panels) {
             panel.onClose();
         }
         this.panels.clear();
+        this.closed = true;
     }
 
     public void pushUp(@NotNull ModularPanel window) {
@@ -232,5 +232,9 @@ public class WindowManager {
             }
         }
         return false;
+    }
+
+    public boolean isScreenClosing() {
+        return this.isScreenClosing;
     }
 }

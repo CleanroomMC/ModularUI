@@ -90,7 +90,7 @@ public class ModularContainer extends Container implements ISortableContainer {
     @ApiStatus.Internal
     public void registerSlot(ModularSlot slot) {
         if (this.inventorySlots.contains(slot)) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Tried to register slot which already exists!");
         }
         addSlotToContainer(slot);
         this.slots.add(slot);

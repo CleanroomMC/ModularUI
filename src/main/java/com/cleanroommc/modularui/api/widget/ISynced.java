@@ -29,6 +29,6 @@ public interface ISynced<W extends IWidget> {
     }
 
     default W syncHandler(int id) {
-        return syncHandler(GuiSyncManager.makeSyncKey(id));
+        return syncHandler("_", id);
     }
 }

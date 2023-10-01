@@ -42,7 +42,7 @@ public class PacketSyncHandler implements IPacket {
         ModularScreen screen = ModularScreen.getCurrent();
         if (screen != null) {
             try {
-                screen.getSyncHandler().receiveWidgetUpdate(this.key, this.packet.readVarInt(), this.packet);
+                screen.getSyncManager().receiveWidgetUpdate(this.key, this.packet.readVarInt(), this.packet);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

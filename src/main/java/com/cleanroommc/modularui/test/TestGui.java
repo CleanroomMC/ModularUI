@@ -140,11 +140,6 @@ public class TestGui extends ModularScreen {
         return panel;
     }
 
-    @Override
-    public void close() {
-        super.close();
-    }
-
     private static class AvailableElement extends ButtonWidget<AvailableElement> {
 
         private boolean available = true;

@@ -25,8 +25,9 @@ public class GuiSyncManager {
     private final CursorSlotSyncHandler cursorSlotSyncHandler = new CursorSlotSyncHandler();
     private final EntityPlayer player;
     private final PlayerMainInvWrapper playerInventory;
-    private final Map<String, SyncHandler> syncedValues = new Object2ObjectLinkedOpenHashMap<>();
+    private final Map<String, SyncHandler> syncHandlers = new Object2ObjectLinkedOpenHashMap<>();
     private final Map<String, SlotGroup> slotGroups = new Object2ObjectOpenHashMap<>();
+    private final Map<SyncHandler, String> reverseSyncHandlers = new Object2ObjectOpenHashMap<>();
     private ModularContainer container;
 
     private final List<Consumer<EntityPlayer>> openListener = new ArrayList<>();
@@ -50,7 +51,7 @@ public class GuiSyncManager {
             throw new IllegalStateException("Tried to initialise GuiSyncManager twice!");
         }
         this.container = Objects.requireNonNull(container, "ModularContainer must not be null!");
-        this.syncedValues.forEach((mapKey, syncHandler) -> syncHandler.init(mapKey, this));
+        this.syncHandlers.forEach((mapKey, syncHandler) -> syncHandler.init(mapKey, this));
     }
 
     @ApiStatus.Internal
@@ -78,14 +79,14 @@ public class GuiSyncManager {
 
     public void detectAndSendChanges(boolean init) {
         if (!NetworkUtils.isClient(this.player)) {
-            for (SyncHandler syncHandler : this.syncedValues.values()) {
+            for (SyncHandler syncHandler : this.syncHandlers.values()) {
                 syncHandler.detectAndSendChanges(init);
             }
         }
     }
 
     public void receiveWidgetUpdate(String mapKey, int id, PacketBuffer buf) throws IOException {
-        SyncHandler syncHandler = this.syncedValues.get(mapKey);
+        SyncHandler syncHandler = this.syncHandlers.get(mapKey);
         if (NetworkUtils.isClient(this.player)) {
             syncHandler.readOnClient(id, buf);
         } else {
@@ -93,37 +94,66 @@ public class GuiSyncManager {
         }
     }
 
-    public GuiSyncManager syncValue(String key, SyncHandler syncHandler) {
-        if (key == null) throw new NullPointerException("Key must not be null");
-        if (syncHandler == null) throw new NullPointerException("Sync Handler must not be null");
-        if (!key.startsWith(AUTO_SYNC_PREFIX) && this.syncedValues.containsKey(key)) {
-            throw new IllegalStateException("Sync Handler with key " + key + " already exists!");
+    @ApiStatus.Internal
+    public void disposeSyncHandler(SyncHandler syncHandler) {
+        String key = this.reverseSyncHandlers.remove(syncHandler);
+        if (key != null) {
+            this.syncHandlers.remove(key);
+            syncHandler.dispose();
         }
-        this.syncedValues.put(key, syncHandler);
+    }
+
+    public boolean hasSyncHandler(SyncHandler syncHandler) {
+        return syncHandler.isValid() && syncHandler.getSyncManager() == this && this.reverseSyncHandlers.containsKey(syncHandler);
+    }
+
+    private void putSyncValue(String name, int id, SyncHandler syncHandler) {
+        String key = makeSyncKey(name, id);
+        String currentKey = this.reverseSyncHandlers.get(syncHandler);
+        if (currentKey != null) {
+            if (!currentKey.equals(key)) {
+                boolean auto = name.startsWith(AUTO_SYNC_PREFIX);
+                if (auto != currentKey.startsWith(AUTO_SYNC_PREFIX)) {
+                    throw new IllegalStateException("Old and new sync handler must both be either not auto or auto!");
+                }
+                if (auto && !currentKey.startsWith(name)) {
+                    throw new IllegalStateException("Sync Handler was previously added with a different panel!");
+                }
+            }
+            this.syncHandlers.remove(currentKey);
+        }
+        this.syncHandlers.put(key, syncHandler);
+        this.reverseSyncHandlers.put(syncHandler, key);
         if (isInitialised()) {
             syncHandler.init(key, this);
         }
-        return this;
+    }
+
+    public GuiSyncManager syncValue(String name, SyncHandler syncHandler) {
+        return syncValue(name, 0, syncHandler);
     }
 
     public GuiSyncManager syncValue(String name, int id, SyncHandler syncHandler) {
-        return syncValue(makeSyncKey(name, id), syncHandler);
+        Objects.requireNonNull(name, "Name must not be null");
+        Objects.requireNonNull(syncHandler, "Sync Handler must not be null");
+        putSyncValue(name, id, syncHandler);
+        return this;
     }
 
     public GuiSyncManager syncValue(int id, SyncHandler syncHandler) {
-        return syncValue(makeSyncKey(id), syncHandler);
+        return syncValue("_", id, syncHandler);
     }
 
     public GuiSyncManager itemSlot(String key, ModularSlot slot) {
-        return syncValue(key, new ItemSlotSH(slot));
+        return itemSlot(key, 0, slot);
     }
 
     public GuiSyncManager itemSlot(String key, int id, ModularSlot slot) {
-        return itemSlot(makeSyncKey(key, id), slot);
+        return syncValue(key, id, new ItemSlotSH(slot));
     }
 
     public GuiSyncManager itemSlot(int id, ModularSlot slot) {
-        return itemSlot(makeSyncKey(id), slot);
+        return itemSlot("_", id, slot);
     }
 
     public GuiSyncManager registerSlotGroup(SlotGroup slotGroup) {
@@ -164,7 +194,7 @@ public class GuiSyncManager {
     }
 
     public SyncHandler getSyncHandler(String mapKey) {
-        return this.syncedValues.get(mapKey);
+        return this.syncHandlers.get(mapKey);
     }
 
     public EntityPlayer getPlayer() {
@@ -185,9 +215,5 @@ public class GuiSyncManager {
 
     public static String makeSyncKey(String name, int id) {
         return name + ":" + id;
-    }
-
-    public static String makeSyncKey(int id) {
-        return "_:" + id;
     }
 }
