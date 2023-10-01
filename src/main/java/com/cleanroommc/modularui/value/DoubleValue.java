@@ -20,8 +20,8 @@ public class DoubleValue implements IDoubleValue<Double>, IStringValue<Double> {
     }
 
     @Override
-    public void setValue(Double value, boolean setSource) {
-        setDoubleValue(value, setSource);
+    public void setValue(Double value) {
+        setDoubleValue(value);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class DoubleValue implements IDoubleValue<Double>, IStringValue<Double> {
     }
 
     @Override
-    public void setDoubleValue(double val, boolean setSource) {
+    public void setDoubleValue(double val) {
         this.value = val;
     }
 
@@ -40,8 +40,8 @@ public class DoubleValue implements IDoubleValue<Double>, IStringValue<Double> {
     }
 
     @Override
-    public void setStringValue(String val, boolean setSource) {
-        setDoubleValue(Double.parseDouble(val), setSource);
+    public void setStringValue(String val) {
+        setDoubleValue(Double.parseDouble(val));
     }
 
     public static class Dynamic implements IDoubleValue<Double>, IStringValue<Double> {
@@ -60,7 +60,7 @@ public class DoubleValue implements IDoubleValue<Double>, IStringValue<Double> {
         }
 
         @Override
-        public void setDoubleValue(double val, boolean setSource) {
+        public void setDoubleValue(double val) {
             this.setter.accept(val);
         }
 
@@ -70,8 +70,8 @@ public class DoubleValue implements IDoubleValue<Double>, IStringValue<Double> {
         }
 
         @Override
-        public void setStringValue(String val, boolean setSource) {
-            setDoubleValue(Double.parseDouble(val), setSource);
+        public void setStringValue(String val) {
+            setDoubleValue(Double.parseDouble(val));
         }
 
         @Override
@@ -80,8 +80,8 @@ public class DoubleValue implements IDoubleValue<Double>, IStringValue<Double> {
         }
 
         @Override
-        public void setValue(Double value, boolean setSource) {
-            setDoubleValue(value, setSource);
+        public void setValue(Double value) {
+            setDoubleValue(value);
         }
     }
 }

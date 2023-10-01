@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.api.value.IIntValue;
  */
 public interface IIntSyncValue<T> extends IValueSyncHandler<T>, IIntValue<T> {
 
+    @Override
     default void setIntValue(int val) {
         setIntValue(val, true, true);
     }

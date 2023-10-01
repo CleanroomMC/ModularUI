@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.api.value.ILongValue;
  */
 public interface ILongSyncValue<T> extends IValueSyncHandler<T>, ILongValue<T> {
 
+    @Override
     default void setLongValue(long val) {
         setLongValue(val, true, true);
     }

@@ -18,8 +18,8 @@ public class StringValue extends ConstValue<String> implements IStringValue<Stri
     }
 
     @Override
-    public void setStringValue(String val, boolean setSource) {
-        setValue(val, setSource);
+    public void setStringValue(String val) {
+        setValue(val);
     }
 
     public static class Dynamic extends DynamicValue<String> implements IStringValue<String> {
@@ -34,8 +34,8 @@ public class StringValue extends ConstValue<String> implements IStringValue<Stri
         }
 
         @Override
-        public void setStringValue(String val, boolean setSource) {
-            setValue(val, setSource);
+        public void setStringValue(String val) {
+            setValue(val);
         }
     }
 }

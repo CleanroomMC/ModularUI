@@ -16,7 +16,7 @@ public class ConstValue<T> implements IValue<T> {
     }
 
     @Override
-    public void setValue(T value, boolean setSource) {
+    public void setValue(T value) {
         this.value = value;
     }
 }

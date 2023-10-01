@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.api.value.IStringValue;
  */
 public interface IStringSyncValue<T> extends IValueSyncHandler<T>, IStringValue<T> {
 
+    @Override
     default void setStringValue(String val) {
         setStringValue(val, true, true);
     }

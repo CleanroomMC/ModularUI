@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.api.value.IDoubleValue;
  */
 public interface IDoubleSyncValue<T> extends IValueSyncHandler<T>, IDoubleValue<T> {
 
+    @Override
     default void setDoubleValue(double val) {
         setDoubleValue(val, true, true);
     }

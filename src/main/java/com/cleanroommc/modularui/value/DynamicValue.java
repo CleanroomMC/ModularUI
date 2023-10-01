@@ -23,7 +23,7 @@ public class DynamicValue<T> implements IValue<T> {
     }
 
     @Override
-    public void setValue(T value, boolean setSource) {
+    public void setValue(T value) {
         if (this.setter != null) {
             this.setter.accept(value);
         }

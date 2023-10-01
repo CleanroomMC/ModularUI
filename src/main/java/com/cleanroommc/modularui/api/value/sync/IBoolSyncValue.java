@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.api.value.IBoolValue;
  */
 public interface IBoolSyncValue<T> extends IValueSyncHandler<T>, IBoolValue<T> {
 
+    @Override
     default void setBoolValue(boolean val) {
         setBoolValue(val, true, true);
     }

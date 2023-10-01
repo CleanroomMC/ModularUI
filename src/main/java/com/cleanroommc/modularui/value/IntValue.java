@@ -20,8 +20,8 @@ public class IntValue implements IIntValue<Integer>, IStringValue<Integer> {
     }
 
     @Override
-    public void setValue(Integer value, boolean setSource) {
-        setIntValue(value, setSource);
+    public void setValue(Integer value) {
+        setIntValue(value);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class IntValue implements IIntValue<Integer>, IStringValue<Integer> {
     }
 
     @Override
-    public void setIntValue(int val, boolean setSource) {
+    public void setIntValue(int val) {
         this.value = val;
     }
 
@@ -40,8 +40,8 @@ public class IntValue implements IIntValue<Integer>, IStringValue<Integer> {
     }
 
     @Override
-    public void setStringValue(String val, boolean setSource) {
-        setIntValue(Integer.parseInt(val), setSource);
+    public void setStringValue(String val) {
+        setIntValue(Integer.parseInt(val));
     }
 
     public static class Dynamic implements IIntValue<Integer>, IStringValue<Integer> {
@@ -60,7 +60,7 @@ public class IntValue implements IIntValue<Integer>, IStringValue<Integer> {
         }
 
         @Override
-        public void setIntValue(int val, boolean setSource) {
+        public void setIntValue(int val) {
             this.setter.accept(val);
         }
 
@@ -70,8 +70,8 @@ public class IntValue implements IIntValue<Integer>, IStringValue<Integer> {
         }
 
         @Override
-        public void setStringValue(String val, boolean setSource) {
-            setIntValue(Integer.parseInt(val), setSource);
+        public void setStringValue(String val) {
+            setIntValue(Integer.parseInt(val));
         }
 
         @Override
@@ -80,8 +80,8 @@ public class IntValue implements IIntValue<Integer>, IStringValue<Integer> {
         }
 
         @Override
-        public void setValue(Integer value, boolean setSource) {
-            setIntValue(value, setSource);
+        public void setValue(Integer value) {
+            setIntValue(value);
         }
     }
 }

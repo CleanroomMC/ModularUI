@@ -21,8 +21,8 @@ public class LongValue implements ILongValue<Long>, IIntValue<Long>, IStringValu
     }
 
     @Override
-    public void setValue(Long value, boolean setSource) {
-        setLongValue(value, setSource);
+    public void setValue(Long value) {
+        setLongValue(value);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class LongValue implements ILongValue<Long>, IIntValue<Long>, IStringValu
     }
 
     @Override
-    public void setLongValue(long val, boolean setSource) {
+    public void setLongValue(long val) {
         this.value = val;
     }
 
@@ -41,8 +41,8 @@ public class LongValue implements ILongValue<Long>, IIntValue<Long>, IStringValu
     }
 
     @Override
-    public void setStringValue(String val, boolean setSource) {
-        setLongValue(Long.parseLong(val), setSource);
+    public void setStringValue(String val) {
+        setLongValue(Long.parseLong(val));
     }
 
     @Override
@@ -51,8 +51,8 @@ public class LongValue implements ILongValue<Long>, IIntValue<Long>, IStringValu
     }
 
     @Override
-    public void setIntValue(int val, boolean setSource) {
-        setLongValue(val, setSource);
+    public void setIntValue(int val) {
+        setLongValue(val);
     }
 
     public static class Dynamic implements ILongValue<Long>, IIntValue<Long>, IStringValue<Long> {
@@ -71,7 +71,7 @@ public class LongValue implements ILongValue<Long>, IIntValue<Long>, IStringValu
         }
 
         @Override
-        public void setLongValue(long val, boolean setSource) {
+        public void setLongValue(long val) {
             this.setter.accept(val);
         }
 
@@ -81,8 +81,8 @@ public class LongValue implements ILongValue<Long>, IIntValue<Long>, IStringValu
         }
 
         @Override
-        public void setStringValue(String val, boolean setSource) {
-            setLongValue(Long.parseLong(val), setSource);
+        public void setStringValue(String val) {
+            setLongValue(Long.parseLong(val));
         }
 
         @Override
@@ -91,8 +91,8 @@ public class LongValue implements ILongValue<Long>, IIntValue<Long>, IStringValu
         }
 
         @Override
-        public void setValue(Long value, boolean setSource) {
-            setLongValue(value, setSource);
+        public void setValue(Long value) {
+            setLongValue(value);
         }
 
         @Override
@@ -101,8 +101,8 @@ public class LongValue implements ILongValue<Long>, IIntValue<Long>, IStringValu
         }
 
         @Override
-        public void setIntValue(int val, boolean setSource) {
-            setLongValue(val, setSource);
+        public void setIntValue(int val) {
+            setLongValue(val);
         }
     }
 }

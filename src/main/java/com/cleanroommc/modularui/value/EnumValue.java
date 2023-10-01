@@ -22,7 +22,7 @@ public class EnumValue<T extends Enum<T>> implements IEnumValue<T>, IIntValue<T>
     }
 
     @Override
-    public void setValue(T value, boolean setSource) {
+    public void setValue(T value) {
         this.value = value;
     }
 
@@ -32,8 +32,8 @@ public class EnumValue<T extends Enum<T>> implements IEnumValue<T>, IIntValue<T>
     }
 
     @Override
-    public void setIntValue(int val, boolean setSource) {
-        setValue(this.enumClass.getEnumConstants()[0], setSource);
+    public void setIntValue(int val) {
+        setValue(this.enumClass.getEnumConstants()[0]);
     }
 
     @Override
@@ -59,8 +59,8 @@ public class EnumValue<T extends Enum<T>> implements IEnumValue<T>, IIntValue<T>
         }
 
         @Override
-        public void setIntValue(int val, boolean setSource) {
-            setValue(this.enumClass.getEnumConstants()[val], setSource);
+        public void setIntValue(int val) {
+            setValue(this.enumClass.getEnumConstants()[val]);
         }
 
         @Override
@@ -69,7 +69,7 @@ public class EnumValue<T extends Enum<T>> implements IEnumValue<T>, IIntValue<T>
         }
 
         @Override
-        public void setValue(T value, boolean setSource) {
+        public void setValue(T value) {
             this.setter.accept(value);
         }
 

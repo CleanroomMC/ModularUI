@@ -14,9 +14,5 @@ public interface IValue<T> {
      *
      * @param value new value
      */
-    default void setValue(T value) {
-        setValue(value, true);
-    }
-
-    void setValue(T value, boolean setSource);
+    void setValue(T value);
 }

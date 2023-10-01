@@ -26,7 +26,6 @@ public interface IValueSyncHandler<T> extends IValue<T> {
      * @param value     new value
      * @param setSource whether the source should be updated with the new value
      */
-    @Override
     default void setValue(T value, boolean setSource) {
         setValue(value, setSource, true);
     }
