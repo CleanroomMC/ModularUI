@@ -128,17 +128,17 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         if (this.syncHandler != null) {
             getScreen().getSyncManager().disposeSyncHandler(this.syncHandler);
         }
+        if (hasChildren()) {
+            for (IWidget child : getChildren()) {
+                child.dispose();
+            }
+        }
         if (!(this instanceof ModularPanel)) {
             this.panel = null;
             this.parent = null;
             this.context = null;
         }
         this.valid = false;
-        if (hasChildren()) {
-            for (IWidget child : getChildren()) {
-                child.dispose();
-            }
-        }
     }
 
     // -----------------
