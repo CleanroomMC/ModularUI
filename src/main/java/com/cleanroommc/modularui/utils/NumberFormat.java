@@ -1,75 +1,60 @@
 package com.cleanroommc.modularui.utils;
 
-import org.jetbrains.annotations.NotNull;
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.DecimalFormat;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
 
 public class NumberFormat {
 
-    private static final NavigableMap<Double, String> suffixesByPower = new TreeMap<>();
-    private static final java.text.NumberFormat[] NUMBER_FORMAT = {
-            new DecimalFormat("0."),
-            new DecimalFormat("0.#"),
-            new DecimalFormat("0.##"),
-            new DecimalFormat("0.###"),
-            new DecimalFormat("0.####"),
-            new DecimalFormat("0.#####"),
-            new DecimalFormat("0.######"),
-            new DecimalFormat("0.#######"),
-            new DecimalFormat("0.########"),
-            new DecimalFormat("0.#########"),
-    };
+    public static final DecimalFormat FORMAT = new DecimalFormat("0.###");
 
-    static {
-        suffixesByPower.put(0.000_000_000_000_000_001D, "a");
-        suffixesByPower.put(0.000_000_000_000_001D, "f");
-        suffixesByPower.put(0.000_000_000_001D, "p");
-        suffixesByPower.put(0.000_000_001D, "n");
-        suffixesByPower.put(0.000_001D, "u");
-        suffixesByPower.put(0.001D, "m");
-        suffixesByPower.put(1_000D, "k");
-        suffixesByPower.put(1_000_000D, "M");
-        suffixesByPower.put(1_000_000_000D, "G");
-        suffixesByPower.put(1_000_000000_000D, "T");
-        suffixesByPower.put(1_000_000000_000_000D, "P");
-        suffixesByPower.put(1_000_000000_000_000_000D, "E");
+    private static final double[] FACTORS_HIGH = {1e3, 1e6, 1e9, 1e12, 1e15, 1e18};
+    private static final double[] FACTORS_LOW = {1e-3, 1e-6, 1e-9, 1e-12, 1e-15, 1e-18};
+    private static final String[] SUFFIX_HIGH = {"k", "M", "G", "T", "P", "E"};
+    private static final String[] SUFFIX_LOW = {"m", "u", "n", "p", "f", "a"};
+
+    public static String formatWithMaxDigits(double value) {
+        return format(value, 4, true);
     }
 
-    @NotNull
-    public static String format(double value, int precision) {
-        //Double.MIN_VALUE == -Double.MIN_VALUE so we need an adjustment here
-        if (value == Double.MIN_VALUE) return format(Double.MIN_VALUE + 1, precision);
-        if (value == 0) return "0";
-        if (value < 0) return '-' + format(-value, precision);
-        double divideBy;
-        String suffix;
-        if (value < pow(10, precision)) {
-            divideBy = 1;
-            suffix = "";
-        } else {
-            Map.Entry<Double, String> e = suffixesByPower.floorEntry(value);
-            divideBy = e.getKey();
-            suffix = e.getValue();
+    public static String formatWithMaxDigits(double value, int maxDigits) {
+        return format(value, maxDigits, true);
+    }
+
+    public static String formatWithMaxDecimals(double value, int decimals) {
+        return format(value, decimals, false);
+    }
+
+    private static String format(double value, int precision, boolean maxDigits) {
+        if (value >= 1000) {
+            int index;
+            for (index = 0; index < 5; index++) {
+                if (value < FACTORS_HIGH[index + 1]) {
+                    break;
+                }
+            }
+            return formatToString(value / FACTORS_HIGH[index], precision, maxDigits, SUFFIX_HIGH[index]);
         }
-
-        double truncated = value / (divideBy / 10); //the number part of the output times 10
-        boolean hasDecimal = truncated < 100 && (truncated / 10D) != (truncated / 10);
-        return hasDecimal ? NUMBER_FORMAT[precision].format(truncated / 10D) + suffix : NUMBER_FORMAT[precision].format(truncated / 10) + suffix;
-    }
-
-    @NotNull
-    public static String format(double value) {
-        return format(value, 3);
-    }
-
-    private static int pow(int num, int e) {
-        int result = num;
-        for (int i = 0; i < e; i++) {
-            result *= num;
+        if (value < 1) {
+            int index;
+            for (index = 0; index < 5; index++) {
+                if (value >= FACTORS_LOW[index]) {
+                    break;
+                }
+            }
+            return formatToString(value / FACTORS_LOW[index], precision, maxDigits, SUFFIX_LOW[index]);
         }
-        return result;
+        return formatToString(value, precision, maxDigits, StringUtils.EMPTY);
+    }
+
+    private static String formatToString(double value, int precision, boolean maxDigits, String suffix) {
+        if (maxDigits) {
+            String[] parts = String.valueOf(value).split("\\.");
+            if (parts.length > 1) {
+                precision -= parts[0].length();
+            }
+        }
+        FORMAT.setMaximumFractionDigits(precision);
+        return FORMAT.format(value) + suffix;
     }
 }

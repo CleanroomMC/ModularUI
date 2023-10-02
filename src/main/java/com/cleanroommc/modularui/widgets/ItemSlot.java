@@ -41,8 +41,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     private ItemSlotSH syncHandler;
 
     public ItemSlot() {
+        tooltip().setAutoUpdate(true).setHasTitleMargin(true);
         tooltipBuilder(tooltip -> {
-            tooltip.setAutoUpdate(true).setHasTitleMargin(true);
             tooltip.excludeArea(getArea());
             if (!isSynced()) return;
             ItemStack stack = getSlot().getStack();
@@ -218,7 +218,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 }
                 // render the amount overlay
                 if (amount > 1 || format != null) {
-                    String amountText = NumberFormat.format(amount, 2);
+                    String amountText = NumberFormat.formatWithMaxDigits(amount);
                     if (format != null) {
                         amountText = format + amountText;
                     }

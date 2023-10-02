@@ -35,7 +35,7 @@ import java.util.function.Function;
 public class TestTile extends TileEntity implements IGuiHolder, ITickable {
 
     private final FluidTank fluidTank = new FluidTank(10000);
-    private final FluidTank fluidTankPhantom = new FluidTank(10000);
+    private final FluidTank fluidTankPhantom = new FluidTank(Integer.MAX_VALUE);
     private long time = 0;
     private int val, val2 = 0;
     private String value = "";
