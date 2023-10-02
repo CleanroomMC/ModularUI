@@ -9,6 +9,7 @@ public abstract class AbstractDefaultTheme implements ITheme {
     private WidgetSlotTheme itemSlot;
     private WidgetSlotTheme fluidSlot;
     private WidgetTextFieldTheme textField;
+    private WidgetToggleButtonTheme toggleButtonTheme;
 
     @Override
     public ITheme getParentTheme() {
@@ -53,5 +54,13 @@ public abstract class AbstractDefaultTheme implements ITheme {
             this.textField = (WidgetTextFieldTheme) getWidgetTheme(Theme.TEXT_FIELD);
         }
         return this.textField;
+    }
+
+    @Override
+    public WidgetToggleButtonTheme getToggleButtonTheme() {
+        if (this.toggleButtonTheme == null) {
+            this.toggleButtonTheme = (WidgetToggleButtonTheme) getWidgetTheme(Theme.TOGGLE_BUTTON);
+        }
+        return this.toggleButtonTheme;
     }
 }

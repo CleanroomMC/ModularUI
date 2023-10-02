@@ -179,8 +179,12 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @Override
     public void applyTheme(ITheme theme) {
         WidgetTheme widgetTheme = getWidgetTheme(theme);
-        applyThemeBackground(false, widgetTheme.getBackground());
-        applyThemeBackground(true, widgetTheme.getHoverBackground());
+        if (this.background == null) {
+            this.background = widgetTheme.getBackground();
+        }
+        if (this.hoverBackground == null) {
+            this.hoverBackground = widgetTheme.getHoverBackground();
+        }
     }
 
     /**
@@ -188,18 +192,6 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
      */
     public final WidgetTheme getWidgetTheme() {
         return getWidgetTheme(getContext().getTheme());
-    }
-
-    protected void applyThemeBackground(boolean hover, IDrawable drawable) {
-        if (hover) {
-            if (this.hoverBackground == null) {
-                this.hoverBackground = drawable;
-            }
-        } else {
-            if (this.background == null) {
-                this.background = drawable;
-            }
-        }
     }
 
     public @Nullable IDrawable getBackground() {

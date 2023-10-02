@@ -34,6 +34,7 @@ public class ThemeAPI implements IThemeApi {
         registerWidgetTheme(Theme.ITEM_SLOT, new WidgetSlotTheme(GuiTextures.SLOT, Color.withAlpha(Color.WHITE.normal, 0x60)), (parent, json, fallback) -> new WidgetSlotTheme(parent, fallback, json));
         registerWidgetTheme(Theme.FLUID_SLOT, new WidgetSlotTheme(GuiTextures.SLOT_DARK, Color.withAlpha(Color.WHITE.normal, 0x60)), (parent, json, fallback) -> new WidgetSlotTheme(parent, fallback, json));
         registerWidgetTheme(Theme.TEXT_FIELD, new WidgetTextFieldTheme(0xFF2F72A8), (parent, json, fallback) -> new WidgetTextFieldTheme(parent, fallback, json));
+        registerWidgetTheme(Theme.TOGGLE_BUTTON, new WidgetToggleButtonTheme(GuiTextures.BUTTON, null, Color.WHITE.normal, Color.WHITE.normal, true, GuiTextures.BUTTON, null, 0xFF666666), (parent, json, fallback) -> new WidgetToggleButtonTheme(parent, fallback, json));
     }
 
     @Override

@@ -15,7 +15,8 @@ public class WidgetTheme {
     private final int textColor;
     private final boolean textShadow;
 
-    public WidgetTheme(@Nullable IDrawable background, @Nullable IDrawable hoverBackground, int color, int textColor, boolean textShadow) {
+    public WidgetTheme(@Nullable IDrawable background, @Nullable IDrawable hoverBackground,
+                       int color, int textColor, boolean textShadow) {
         this.background = background;
         this.hoverBackground = hoverBackground;
         this.color = color;

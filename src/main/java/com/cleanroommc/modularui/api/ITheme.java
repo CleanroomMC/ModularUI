@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.api;
 import com.cleanroommc.modularui.theme.WidgetSlotTheme;
 import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetToggleButtonTheme;
 
 /**
  * A theme is parsed from json and contains style information like color or background texture.
@@ -39,6 +40,8 @@ public interface ITheme {
     WidgetSlotTheme getFluidSlotTheme();
 
     WidgetTextFieldTheme getTextFieldTheme();
+
+    WidgetToggleButtonTheme getToggleButtonTheme();
 
     WidgetTheme getWidgetTheme(String id);
 }

@@ -14,6 +14,7 @@ public class Theme implements ITheme {
     public static final String ITEM_SLOT = "itemSlot";
     public static final String FLUID_SLOT = "fluidSlot";
     public static final String TEXT_FIELD = "textField";
+    public static final String TOGGLE_BUTTON = "toggleButton";
 
     private final Map<String, WidgetTheme> widgetThemes = new Object2ObjectOpenHashMap<>();
 
@@ -25,6 +26,7 @@ public class Theme implements ITheme {
     private final WidgetSlotTheme itemSlotTheme;
     private final WidgetSlotTheme fluidSlotTheme;
     private final WidgetTextFieldTheme textFieldTheme;
+    private final WidgetToggleButtonTheme toggleButtonTheme;
 
     Theme(String id, ITheme parent, Map<String, WidgetTheme> widgetThemes) {
         this.id = id;
@@ -52,6 +54,7 @@ public class Theme implements ITheme {
         this.itemSlotTheme = (WidgetSlotTheme) this.widgetThemes.get(ITEM_SLOT);
         this.fluidSlotTheme = (WidgetSlotTheme) this.widgetThemes.get(FLUID_SLOT);
         this.textFieldTheme = (WidgetTextFieldTheme) this.widgetThemes.get(TEXT_FIELD);
+        this.toggleButtonTheme = (WidgetToggleButtonTheme) this.widgetThemes.get(TOGGLE_BUTTON);
     }
 
     public String getId() {
@@ -86,6 +89,11 @@ public class Theme implements ITheme {
 
     public WidgetTextFieldTheme getTextFieldTheme() {
         return this.textFieldTheme;
+    }
+
+    @Override
+    public WidgetToggleButtonTheme getToggleButtonTheme() {
+        return this.toggleButtonTheme;
     }
 
     public WidgetTheme getWidgetTheme(String id) {
