@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 public class ParentWidget<W extends ParentWidget<W>> extends Widget<W> {
 
@@ -72,6 +73,16 @@ public class ParentWidget<W extends ParentWidget<W>> extends Widget<W> {
         if (!addChild(child, -1)) {
             throw new IllegalStateException("Failed to add child");
         }
+        return getThis();
+    }
+
+    public W childIf(boolean condition, IWidget child) {
+        if (condition) return child(child);
+        return getThis();
+    }
+
+    public W childIf(BooleanSupplier condition, IWidget child) {
+        if (condition.getAsBoolean()) return child(child);
         return getThis();
     }
 }
