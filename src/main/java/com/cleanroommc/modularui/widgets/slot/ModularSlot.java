@@ -11,7 +11,6 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -65,8 +64,8 @@ public class ModularSlot extends SlotItemHandler {
     public void onSlotChanged() {
     }
 
-    public void onSlotChangedReal(ItemStack itemStack, boolean onlyChangedAmount, boolean client) {
-        this.changeListener.onChange(itemStack, onlyChangedAmount, client);
+    public void onSlotChangedReal(ItemStack itemStack, boolean onlyChangedAmount, boolean client, boolean init) {
+        this.changeListener.onChange(itemStack, onlyChangedAmount, client, init);
     }
 
     @Override

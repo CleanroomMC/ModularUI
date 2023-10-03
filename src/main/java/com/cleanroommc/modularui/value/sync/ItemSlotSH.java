@@ -42,8 +42,10 @@ public class ItemSlotSH extends SyncHandler {
         ItemStack itemStack = getSlot().getStack();
         if (itemStack.isEmpty() && this.lastStoredItem.isEmpty()) return;
         boolean onlyAmountChanged = false;
-        if (!ItemHandlerHelper.canItemStacksStack(this.lastStoredItem, itemStack) || (onlyAmountChanged = itemStack.getCount() != this.lastStoredItem.getCount())) {
-            getSlot().onSlotChangedReal(itemStack, onlyAmountChanged, false);
+        if (init ||
+                !ItemHandlerHelper.canItemStacksStack(this.lastStoredItem, itemStack) ||
+                (onlyAmountChanged = itemStack.getCount() != this.lastStoredItem.getCount())) {
+            getSlot().onSlotChangedReal(itemStack, onlyAmountChanged, false, init);
             if (onlyAmountChanged) {
                 this.lastStoredItem.setCount(itemStack.getCount());
             } else {
@@ -53,6 +55,7 @@ public class ItemSlotSH extends SyncHandler {
             syncToClient(1, buffer -> {
                 buffer.writeBoolean(finalOnlyAmountChanged);
                 buffer.writeItemStack(itemStack);
+                buffer.writeBoolean(init);
             });
         }
     }
@@ -62,7 +65,7 @@ public class ItemSlotSH extends SyncHandler {
         if (id == 1) {
             boolean onlyAmountChanged = buf.readBoolean();
             this.lastStoredItem = NetworkUtils.readItemStack(buf);
-            getSlot().onSlotChangedReal(this.lastStoredItem, onlyAmountChanged, true);
+            getSlot().onSlotChangedReal(this.lastStoredItem, onlyAmountChanged, true, buf.readBoolean());
         } else if (id == 4) {
             setEnabled(buf.readBoolean(), false);
         }
