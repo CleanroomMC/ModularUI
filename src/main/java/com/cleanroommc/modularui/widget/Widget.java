@@ -19,6 +19,7 @@ import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Box;
 import com.cleanroommc.modularui.widget.sizer.Flex;
+import com.cleanroommc.modularui.widget.sizer.IUnResizeable;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,7 +41,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     private GuiContext context = null;
     // sizing
     private final Area area = new Area();
-    private Flex flex = new Flex(this);
+    private final Flex flex = new Flex(this);
     private IResizeable resizer = this.flex;
     // syncing
     @Nullable private IValue<?> value;
@@ -355,13 +356,6 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
 
     @Override
     public Flex flex() {
-        if (this.flex == null) {
-            this.flex = new Flex(this);
-
-            if (this.resizer == null) {
-                this.resizer = this.flex;
-            }
-        }
         return this.flex;
     }
 
@@ -372,7 +366,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
 
     @Override
     public void resizer(IResizeable resizer) {
-        this.resizer = resizer;
+        this.resizer = resizer != null ? resizer : IUnResizeable.INSTANCE;
     }
 
     // -------------------

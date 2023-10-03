@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * A widget in a Gui
@@ -194,6 +195,17 @@ public interface IWidget extends IGuiElement {
      * @return flex of this widget. Creates a new one if it doesn't already have one.
      */
     Flex flex();
+
+    /**
+     * Does the same as {@link IPositioned#flex(Consumer)}
+     *
+     * @param builder function to build flex
+     * @return this
+     */
+    default IWidget flexBuilder(Consumer<Flex> builder) {
+        builder.accept(flex());
+        return this;
+    }
 
     /**
      * @return resizer of this widget

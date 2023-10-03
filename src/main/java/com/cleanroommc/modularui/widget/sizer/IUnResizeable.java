@@ -8,6 +8,19 @@ import com.cleanroommc.modularui.api.widget.IGuiElement;
  */
 public interface IUnResizeable extends IResizeable {
 
+    IUnResizeable INSTANCE = new IUnResizeable() {
+        @Override
+        public boolean resize(IGuiElement guiElement) {
+            return true;
+        }
+
+        @Override
+        public Area getArea() {
+            Area.SHARED.set(0, 0, 0, 0);
+            return Area.SHARED;
+        }
+    };
+
     @Override
     default void initResizing() {}
 
