@@ -183,7 +183,9 @@ public class GuiTextures {
             .imageSize(18, 54)
             .build();
 
-    public static final UITexture CHECK_BOX = UITexture.fullImage(ModularUI.ID, "gui/widgets/toggle_config", false);
+    public static final UITexture CHECK_BOX = UITexture.fullImage(ModularUI.ID, "gui/widgets/toggle_config");
+    public static final UITexture CROSS = UITexture.fullImage(ModularUI.ID, "gui/icons/cross");
+    public static final UITexture CROSS_TINY = UITexture.fullImage(ModularUI.ID, "gui/icons/cross_tiny");
 
     public static final TabTexture TAB_TOP = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_top", true), GuiAxis.Y, false, 28, 32, 4);
     public static final TabTexture TAB_BOTTOM = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_bottom", true), GuiAxis.Y, true, 28, 32, 4);
