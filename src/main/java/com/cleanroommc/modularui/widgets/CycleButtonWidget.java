@@ -44,11 +44,6 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
             this.textureGetter = val -> IDrawable.EMPTY;
         }
         this.texture = this.textureGetter.apply(getState());
-        for (Tooltip tooltip : this.stateTooltip) {
-            if (tooltip != null && tooltip.getExcludeArea() == null && ModularUIConfig.placeTooltipNextToPanel()) {
-                tooltip.excludeArea(getPanel().getArea());
-            }
-        }
     }
 
     @Override
@@ -193,10 +188,7 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
     public CycleButtonWidget length(int length) {
         this.length = length;
         while (this.stateTooltip.size() < this.length) {
-            Tooltip tooltip = new Tooltip();
-            if (!ModularUIConfig.placeTooltipNextToPanel()) {
-                tooltip.excludeArea(getArea());
-            }
+            Tooltip tooltip = new Tooltip().excludeArea(getArea());
             this.stateTooltip.add(tooltip);
         }
         while (this.stateTooltip.size() > this.length) {

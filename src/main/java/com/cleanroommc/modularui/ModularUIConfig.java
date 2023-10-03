@@ -1,8 +1,6 @@
 package com.cleanroommc.modularui;
 
-import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.screen.Tooltip;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 
@@ -19,9 +17,6 @@ public class ModularUIConfig {
     @Config.Comment("Time in 1/60 sec to open and close panels.")
     public static int panelOpenCloseAnimationTime = 8;
 
-    // Tooltip
-    @Config.Comment("If tooltips should be placed next to a widgets panel or the widget by default.")
-    public static boolean placeNextToPanelByDefault = true;
     // Default direction
     @Config.Comment("Default tooltip position around the widget or its panel.")
     public static Tooltip.Pos tooltipPos = Tooltip.Pos.VERTICAL;
@@ -35,8 +30,4 @@ public class ModularUIConfig {
     @Config.RequiresMcRestart
     @Config.Comment("Enables a test block, test item with a test gui and opening a gui by right clicking a diamond.")
     public static boolean enabledTestGuis = FMLLaunchHandler.isDeobfuscatedEnvironment();
-
-    public static boolean placeTooltipNextToPanel() {
-        return NetworkUtils.isDedicatedClient() && placeNextToPanelByDefault && Minecraft.getMinecraft().gameSettings.guiScale > 0;
-    }
 }
