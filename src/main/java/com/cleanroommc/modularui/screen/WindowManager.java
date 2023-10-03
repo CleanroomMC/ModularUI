@@ -225,6 +225,10 @@ public class WindowManager {
         return this.closed;
     }
 
+    void resetClosed() {
+        this.closed = false;
+    }
+
     public boolean isAboutToClose(ModularPanel panel) {
         for (ModularPanel panel1 : this.queueClosePanels) {
             if (panel == panel1) {

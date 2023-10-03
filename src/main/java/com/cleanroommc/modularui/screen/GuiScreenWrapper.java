@@ -60,6 +60,7 @@ public class GuiScreenWrapper extends GuiContainer {
         GuiErrorHandler.INSTANCE.clear();
         super.initGui();
         if (this.init) {
+            this.screen.getWindowManager().resetClosed();
             this.screen.onOpen();
             this.init = false;
         }
