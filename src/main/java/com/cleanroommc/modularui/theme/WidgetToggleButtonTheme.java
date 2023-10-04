@@ -8,37 +8,38 @@ import org.jetbrains.annotations.Nullable;
 public class WidgetToggleButtonTheme extends WidgetTheme {
 
     @Nullable
-    private final IDrawable disabledBackground;
+    private final IDrawable selectedBackground;
     @Nullable
-    private final IDrawable disabledHoverBackground;
-    private final int disabledColor;
+    private final IDrawable selectedHoverBackground;
+    private final int selectedColor;
 
     public WidgetToggleButtonTheme(@Nullable IDrawable background, @Nullable IDrawable hoverBackground,
                                    int color, int textColor, boolean textShadow,
-                                   @Nullable IDrawable disabledBackground, @Nullable IDrawable disabledHoverBackground,
-                                   int disabledColor) {
+                                   @Nullable IDrawable selectedBackground, @Nullable IDrawable selectedHoverBackground,
+                                   int selectedColor) {
         super(background, hoverBackground, color, textColor, textShadow);
-        this.disabledBackground = disabledBackground;
-        this.disabledHoverBackground = disabledHoverBackground;
-        this.disabledColor = disabledColor;
+        this.selectedBackground = selectedBackground;
+        this.selectedHoverBackground = selectedHoverBackground;
+        this.selectedColor = selectedColor;
     }
 
     public WidgetToggleButtonTheme(WidgetTheme parent, JsonObject fallback, JsonObject json) {
         super(parent, fallback, json);
-        this.disabledBackground = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, parent.getBackground(), "disabledBackground");
-        this.disabledHoverBackground = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, parent.getHoverBackground(), "disabledHoverBackground");
-        this.disabledColor = JsonHelper.getColorWithFallback(json, fallback, parent.getColor(), "disabledColor");
+        WidgetToggleButtonTheme parentToggleButtonTheme = (WidgetToggleButtonTheme) parent;
+        this.selectedBackground = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, parentToggleButtonTheme.getSelectedBackground(), "selectedBackground");
+        this.selectedHoverBackground = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, parentToggleButtonTheme.getSelectedHoverBackground(), "selectedHoverBackground");
+        this.selectedColor = JsonHelper.getColorWithFallback(json, fallback, parentToggleButtonTheme.getSelectedColor(), "selectedColor");
     }
 
-    public @Nullable IDrawable getDisabledBackground() {
-        return this.disabledBackground;
+    public @Nullable IDrawable getSelectedBackground() {
+        return this.selectedBackground;
     }
 
-    public @Nullable IDrawable getDisabledHoverBackground() {
-        return this.disabledHoverBackground;
+    public @Nullable IDrawable getSelectedHoverBackground() {
+        return this.selectedHoverBackground;
     }
 
-    public int getDisabledColor() {
-        return this.disabledColor;
+    public int getSelectedColor() {
+        return this.selectedColor;
     }
 }

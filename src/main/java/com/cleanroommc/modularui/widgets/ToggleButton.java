@@ -14,8 +14,8 @@ import org.jetbrains.annotations.NotNull;
 public class ToggleButton extends Widget<ToggleButton> implements Interactable {
 
     private IBoolValue<?> boolValue;
-    private IDrawable disabledBackground;
-    private IDrawable disabledHoverBackground;
+    private IDrawable selectedBackground;
+    private IDrawable selectedHoverBackground;
 
     @Override
     public @NotNull Result onMousePressed(int mouseButton) {
@@ -34,30 +34,30 @@ public class ToggleButton extends Widget<ToggleButton> implements Interactable {
     @Override
     public void applyTheme(ITheme theme) {
         super.applyTheme(theme);
-        if (this.disabledBackground == null) {
-            this.disabledBackground = theme.getToggleButtonTheme().getDisabledBackground();
+        if (this.selectedBackground == null) {
+            this.selectedBackground = theme.getToggleButtonTheme().getSelectedBackground();
         }
-        if (this.disabledHoverBackground == null) {
-            this.disabledHoverBackground = theme.getToggleButtonTheme().getDisabledHoverBackground();
+        if (this.selectedHoverBackground == null) {
+            this.selectedHoverBackground = theme.getToggleButtonTheme().getSelectedHoverBackground();
         }
     }
 
     @Override
     public IDrawable getCurrentBackground() {
-        if (isValueEnabled()) {
-            return super.getCurrentBackground();
+        if (isValueSelected()) {
+            return this.selectedHoverBackground != null && isHovering() ? this.selectedHoverBackground : this.selectedBackground;
         }
-        return this.disabledHoverBackground != null && isHovering() ? this.disabledHoverBackground : this.disabledBackground;
+        return super.getCurrentBackground();
     }
 
     @Override
     public void drawBackground(GuiContext context, WidgetTheme widgetTheme) {
         IDrawable bg = getCurrentBackground();
         if (bg != null) {
-            if (isValueEnabled()) {
-                bg.applyThemeColor(context.getTheme(), widgetTheme);
+            if (isValueSelected()) {
+                Color.setGlColor(((WidgetToggleButtonTheme) widgetTheme).getSelectedColor());
             } else if (bg.canApplyTheme()) {
-                Color.setGlColor(((WidgetToggleButtonTheme) widgetTheme).getDisabledColor());
+                bg.applyThemeColor(context.getTheme(), widgetTheme);
             } else {
                 Color.setGlColor(Color.WHITE.normal);
             }
@@ -65,7 +65,7 @@ public class ToggleButton extends Widget<ToggleButton> implements Interactable {
         }
     }
 
-    public boolean isValueEnabled() {
+    public boolean isValueSelected() {
         return this.boolValue.getBoolValue();
     }
 
@@ -75,13 +75,13 @@ public class ToggleButton extends Widget<ToggleButton> implements Interactable {
         return this;
     }
 
-    public ToggleButton disabledBackground(IDrawable disabledBackground) {
-        this.disabledBackground = disabledBackground;
+    public ToggleButton selectedBackground(IDrawable selectedBackground) {
+        this.selectedBackground = selectedBackground;
         return this;
     }
 
-    public ToggleButton disabledHoverBackground(IDrawable disabledHoverBackground) {
-        this.disabledHoverBackground = disabledHoverBackground;
+    public ToggleButton selectedHoverBackground(IDrawable selectedHoverBackground) {
+        this.selectedHoverBackground = selectedHoverBackground;
         return this;
     }
 }

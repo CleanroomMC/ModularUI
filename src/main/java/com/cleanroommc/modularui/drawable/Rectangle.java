@@ -21,11 +21,8 @@ public class Rectangle implements IDrawable {
     private boolean canApplyTheme = false;
 
     public Rectangle() {
+        setColor(0xFFFFFFFF);
         this.cornerRadius = 0;
-        this.colorTL = 0;
-        this.colorTR = 0;
-        this.colorBL = 0;
-        this.colorBR = 0;
         this.cornerSegments = 6;
     }
 
@@ -63,8 +60,9 @@ public class Rectangle implements IDrawable {
         return this;
     }
 
-    public void setCanApplyTheme(boolean canApplyTheme) {
+    public Rectangle setCanApplyTheme(boolean canApplyTheme) {
         this.canApplyTheme = canApplyTheme;
+        return this;
     }
 
     @Override
