@@ -15,7 +15,7 @@ public class WidgetTextFieldTheme extends WidgetTheme {
     }
 
     public WidgetTextFieldTheme(WidgetTheme parent, JsonObject fallback, JsonObject json) {
-        super(parent, fallback, json);
+        super(parent, json, fallback);
         this.markedColor = JsonHelper.getColorWithFallback(json, fallback, ((WidgetTextFieldTheme) parent).getMarkedColor(), "markedColor");
     }
 

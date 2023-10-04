@@ -24,7 +24,7 @@ public class WidgetTheme {
         this.textShadow = textShadow;
     }
 
-    public WidgetTheme(WidgetTheme parent, JsonObject fallback, JsonObject json) {
+    public WidgetTheme(WidgetTheme parent, JsonObject json, JsonObject fallback) {
         this.background = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, parent.getBackground(), "background", "bg");
         this.hoverBackground = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, parent.getHoverBackground(), "hoverBackground", "hbg");
         this.color = JsonHelper.getColorWithFallback(json, fallback, parent.getColor(), "color");

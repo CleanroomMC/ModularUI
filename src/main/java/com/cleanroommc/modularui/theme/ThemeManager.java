@@ -260,19 +260,19 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
             // parse all other widget themes
             JsonObject emptyJson = new JsonObject();
             for (Map.Entry<String, WidgetThemeParser> entry : ThemeAPI.INSTANCE.widgetThemeFunctions.entrySet()) {
-                JsonObject fallbackTheme;
+                JsonObject widgetThemeJson;
                 if (jsonBuilder.getJson().has(entry.getKey())) {
                     JsonElement element = jsonBuilder.getJson().get(entry.getKey());
                     if (element.isJsonObject()) {
-                        fallbackTheme = element.getAsJsonObject();
+                        widgetThemeJson = element.getAsJsonObject();
                     } else {
-                        fallbackTheme = emptyJson;
+                        widgetThemeJson = emptyJson;
                     }
                 } else {
-                    fallbackTheme = emptyJson;
+                    widgetThemeJson = emptyJson;
                 }
                 parentWidgetTheme = parent.getWidgetTheme(entry.getKey());
-                widgetThemes.put(entry.getKey(), entry.getValue().parse(parentWidgetTheme, jsonBuilder.getJson(), fallbackTheme));
+                widgetThemes.put(entry.getKey(), entry.getValue().parse(parentWidgetTheme, widgetThemeJson, jsonBuilder.getJson()));
             }
             return new Theme(this.id, parent, widgetThemes);
         }
