@@ -4,6 +4,9 @@ import com.cleanroommc.modularui.api.drawable.IInterpolation;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Check out <a href=https://easings.net/en>this website</a> to find your desired interpolation method.
+ */
 public enum Interpolation implements IInterpolation {
 
     LINEAR("linear") {

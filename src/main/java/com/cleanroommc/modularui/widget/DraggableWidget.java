@@ -8,6 +8,10 @@ import com.cleanroommc.modularui.utils.HoveredWidgetList;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * A widget that can be picked up by the cursor.
+ * Might not work as expected when a parent is scaling or rotating itself.
+ */
 public class DraggableWidget<W extends DraggableWidget<W>> extends Widget<W> implements IDraggable {
 
     private boolean moving = false;
@@ -27,8 +31,8 @@ public class DraggableWidget<W extends DraggableWidget<W>> extends Widget<W> imp
     @Override
     public boolean onDragStart(int mouseButton) {
         if (mouseButton == 0) {
-            this.realX = getContext().transformX(0, 0);
-            this.realY = getContext().transformY(0, 0);
+            this.realX = getContext().transformX(0, 0) - getParentArea().x;
+            this.realY = getContext().transformY(0, 0) - getParentArea().y;
             this.movingArea.x = this.realX;
             this.movingArea.y = this.realY;
             this.relativeClickX = getContext().getAbsMouseX() - this.realX;
