@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 public class ParentWidget<W extends ParentWidget<W>> extends Widget<W> {
 
@@ -83,6 +84,16 @@ public class ParentWidget<W extends ParentWidget<W>> extends Widget<W> {
 
     public W childIf(BooleanSupplier condition, IWidget child) {
         if (condition.getAsBoolean()) return child(child);
+        return getThis();
+    }
+
+    public W childIf(boolean condition, Supplier<IWidget> child) {
+        if (condition) return child(child.get());
+        return getThis();
+    }
+
+    public W childIf(BooleanSupplier condition, Supplier<IWidget> child) {
+        if (condition.getAsBoolean()) return child(child.get());
         return getThis();
     }
 }
