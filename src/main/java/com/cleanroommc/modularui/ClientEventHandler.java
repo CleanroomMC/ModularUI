@@ -7,12 +7,15 @@ import com.cleanroommc.modularui.screen.ModularScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
+
+import java.io.IOException;
 
 @SideOnly(Side.CLIENT)
 public class ClientEventHandler {
@@ -49,5 +52,35 @@ public class ClientEventHandler {
             // another screen is already open, don't fade in the dark background as it's already there
             ((GuiScreenWrapper) event.getGui()).setAlphaFade(false);
         }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onGuiInput(GuiScreenEvent.MouseInputEvent.Pre event) {
+        if (hasDraggable(event)) {
+            // cancel interactions with other mods
+            try {
+                event.getGui().handleMouseInput();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onGuiInput(GuiScreenEvent.KeyboardInputEvent.Pre event) {
+        if (hasDraggable(event)) {
+            // cancel interactions with other mods
+            try {
+                event.getGui().handleKeyboardInput();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            event.setCanceled(true);
+        }
+    }
+
+    private static boolean hasDraggable(GuiScreenEvent event) {
+        return event.getGui() instanceof GuiScreenWrapper && ((GuiScreenWrapper) event.getGui()).getScreen().getContext().hasDraggable();
     }
 }
