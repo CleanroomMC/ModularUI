@@ -142,15 +142,28 @@ public class ColorPickerDialog extends Dialog<Integer> {
                         .widthRel(1f).height(12)
                         .child(IKey.str("H: ").asWidget().heightRel(1f))
                         .child(createSlider(new HueBar(GuiAxis.X))
-                                .debugName("HUE")
                                 .bounds(0, 360)
-                                .value(new DoubleValue.Dynamic(() -> Color.getHue(this.color), val -> updateColor(Color.withHSVHue(this.color, (int) val))))))
+                                .value(new DoubleValue.Dynamic(() -> {
+                                    float h = Color.getHue(this.color);
+                                    return h;
+                                }, val -> {
+                                    float h = (float) val;
+                                    int c = Color.withHSVHue(this.color, h);
+                                    updateColor(c);
+                                }))))
                 .child(new Row()
                         .widthRel(1f).height(12)
                         .child(IKey.str("S: ").asWidget().heightRel(1f))
                         .child(createSlider(this.sliderBackgroundS)
                                 .bounds(0, 1)
-                                .value(new DoubleValue.Dynamic(() -> Color.getHSVSaturation(this.color), val -> updateColor(Color.withHSVSaturation(this.color, (float) val))))))
+                                .value(new DoubleValue.Dynamic(() -> {
+                                    float s = Color.getHSVSaturation(this.color);
+                                    return s;
+                                }, val -> {
+                                    float s = (float) val;
+                                    int c = Color.withHSVSaturation(this.color, s);
+                                    updateColor(c);
+                                }))))
                 .child(new Row()
                         .widthRel(1f).height(12)
                         .child(IKey.str("V: ").asWidget().heightRel(1f))
