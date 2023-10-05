@@ -1,15 +1,17 @@
 package com.cleanroommc.modularui.widgets;
 
+import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.GuiTextures;
+import com.cleanroommc.modularui.drawable.HueBar;
 import com.cleanroommc.modularui.drawable.Rectangle;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.value.DoubleValue;
 import com.cleanroommc.modularui.value.StringValue;
-import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Row;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
@@ -17,6 +19,8 @@ import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 import java.util.function.Consumer;
 
 public class ColorPickerDialog extends Dialog<Integer> {
+
+    private static final IDrawable handleBackground = new Rectangle().setColor(Color.WHITE.normal);
 
     private int color;
     private final int alpha;
@@ -27,6 +31,8 @@ public class ColorPickerDialog extends Dialog<Integer> {
     private final Rectangle sliderBackgroundG = new Rectangle();
     private final Rectangle sliderBackgroundB = new Rectangle();
     private final Rectangle sliderBackgroundA = new Rectangle();
+    private final Rectangle sliderBackgroundS = new Rectangle();
+    private final Rectangle sliderBackgroundV = new Rectangle();
 
     public ColorPickerDialog(Consumer<Integer> resultConsumer, int startColor, boolean controlAlpha) {
         this("color_picker", resultConsumer, startColor, false);
@@ -41,6 +47,13 @@ public class ColorPickerDialog extends Dialog<Integer> {
         size(140, controlAlpha ? 106 : 94).background(GuiTextures.BACKGROUND);
         align(Alignment.Center);
         flex().endDefaultMode();
+        IWidget alphaSlider = controlAlpha ? new Row()
+                    .widthRel(1f).height(12)
+                    .child(IKey.str("A: ").asWidget().heightRel(1f))
+                    .child(createSlider(this.sliderBackgroundA)
+                            .bounds(0, 255)
+                            .value(new DoubleValue.Dynamic(() -> Color.getAlpha(this.color), val -> updateColor(Color.withAlpha(this.color, (int) val))))) : null;
+
         PagedWidget.Controller controller = new PagedWidget.Controller();
         child(new Column()
                 .left(5).right(5).top(5).bottom(5)
@@ -59,6 +72,7 @@ public class ColorPickerDialog extends Dialog<Integer> {
                 .child(new Row().widthRel(1f).height(12).marginTop(4)
                         .child(IKey.str("Hex: ").asWidget().heightRel(1f))
                         .child(new TextFieldWidget()
+                                .height(12)
                                 .expanded()
                                 .setValidator(this::validateRawColor)
                                 .value(new StringValue.Dynamic(() -> {
@@ -77,8 +91,8 @@ public class ColorPickerDialog extends Dialog<Integer> {
                         .left(5).right(5)
                         .expanded()
                         .controller(controller)
-                        .addPage(createRGBPage())
-                        .addPage(createHSVPage()))
+                        .addPage(createRGBPage(alphaSlider))
+                        .addPage(createHSVPage(alphaSlider)))
                 .child(new Row()
                         .left(10).right(10).height(14)
                         .mainAxisAlignment(Alignment.MainAxis.SPACE_BETWEEN)
@@ -98,64 +112,62 @@ public class ColorPickerDialog extends Dialog<Integer> {
                                 }))));
     }
 
-    private IWidget createRGBPage() {
-        IDrawable handleBackground = new Rectangle().setColor(Color.WHITE.normal);
-        Column parentWidget = new Column()
+    private IWidget createRGBPage(IWidget alphaSlider) {
+        return new Column()
                 .sizeRel(1f, 1f)
                 .child(new Row()
                         .widthRel(1f).height(12)
                         .child(IKey.str("R: ").asWidget().heightRel(1f))
-                        .child(new SliderWidget()
-                                .expanded()
-                                .heightRel(1f)
-                                .background(this.sliderBackgroundR.asIcon().size(0, 4))
-                                .sliderTexture(handleBackground)
-                                .sliderSize(2, 8)
+                        .child(createSlider(this.sliderBackgroundR)
                                 .bounds(0, 255)
                                 .value(new DoubleValue.Dynamic(() -> Color.getRed(this.color), val -> updateColor(Color.withRed(this.color, (int) val))))))
                 .child(new Row()
                         .widthRel(1f).height(12)
                         .child(IKey.str("G: ").asWidget().heightRel(1f))
-                        .child(new SliderWidget()
-                                .expanded()
-                                .heightRel(1f)
-                                .background(this.sliderBackgroundG.asIcon().size(0, 4))
-                                .sliderTexture(handleBackground)
-                                .sliderSize(2, 8)
+                        .child(createSlider(this.sliderBackgroundG)
                                 .bounds(0, 255)
                                 .value(new DoubleValue.Dynamic(() -> Color.getGreen(this.color), val -> updateColor(Color.withGreen(this.color, (int) val))))))
                 .child(new Row()
                         .widthRel(1f).height(12)
                         .child(IKey.str("B: ").asWidget().heightRel(1f))
-                        .child(new SliderWidget()
-                                .expanded()
-                                .heightRel(1f)
-                                .background(this.sliderBackgroundB.asIcon().size(0, 4))
-                                .sliderTexture(handleBackground)
-                                .sliderSize(2, 8)
+                        .child(createSlider(this.sliderBackgroundB)
                                 .bounds(0, 255)
-                                .value(new DoubleValue.Dynamic(() -> Color.getBlue(this.color), val -> updateColor(Color.withBlue(this.color, (int) val))))));
-
-        if (this.controlAlpha) {
-            parentWidget.child(new Row()
-                    .widthRel(1f).height(12)
-                    .child(IKey.str("A: ").asWidget().heightRel(1f))
-                    .child(new SliderWidget()
-                            .expanded()
-                            .heightRel(1f)
-                            .background(this.sliderBackgroundA.asIcon().size(0, 4))
-                            .sliderTexture(handleBackground)
-                            .sliderSize(2, 8)
-                            .bounds(0, 255)
-                            .value(new DoubleValue.Dynamic(() -> Color.getAlpha(this.color), val -> updateColor(Color.withAlpha(this.color, (int) val))))));
-        }
-        return parentWidget;
+                                .value(new DoubleValue.Dynamic(() -> Color.getBlue(this.color), val -> updateColor(Color.withBlue(this.color, (int) val))))))
+                .childIf(alphaSlider != null, alphaSlider);
     }
 
-    private IWidget createHSVPage() {
-        return new ParentWidget<>()
+    private IWidget createHSVPage(IWidget alphaSlider) {
+        return new Column()
                 .sizeRel(1f, 1f)
-                .child(IKey.str("WIP").asWidget().sizeRel(1f, 1f).alignment(Alignment.Center));
+                .child(new Row()
+                        .widthRel(1f).height(12)
+                        .child(IKey.str("H: ").asWidget().heightRel(1f))
+                        .child(createSlider(new HueBar(GuiAxis.X))
+                                .debugName("HUE")
+                                .bounds(0, 360)
+                                .value(new DoubleValue.Dynamic(() -> Color.getHue(this.color), val -> updateColor(Color.withHue(this.color, (int) val))))))
+                .child(new Row()
+                        .widthRel(1f).height(12)
+                        .child(IKey.str("S: ").asWidget().heightRel(1f))
+                        .child(createSlider(this.sliderBackgroundS)
+                                .bounds(0, 1)
+                                .value(new DoubleValue.Dynamic(() -> Color.getSaturation(this.color), val -> updateColor(Color.withSaturation(this.color, (float) val))))))
+                .child(new Row()
+                        .widthRel(1f).height(12)
+                        .child(IKey.str("V: ").asWidget().heightRel(1f))
+                        .child(createSlider(this.sliderBackgroundV)
+                                .bounds(0, 1)
+                                .value(new DoubleValue.Dynamic(() -> Color.getValue(this.color), val -> updateColor(Color.withValue(this.color, (float) val))))))
+                .childIf(alphaSlider != null, alphaSlider);
+    }
+
+    private static SliderWidget createSlider(IDrawable background) {
+        return new SliderWidget()
+                .expanded()
+                .heightRel(1f)
+                .background(background.asIcon().size(0, 4))
+                .sliderTexture(handleBackground)
+                .sliderSize(2, 8);
     }
 
     private String validateRawColor(String raw) {
@@ -182,6 +194,8 @@ public class ColorPickerDialog extends Dialog<Integer> {
         this.sliderBackgroundG.setHorizontalGradient(gs, ge);
         this.sliderBackgroundB.setHorizontalGradient(bs, be);
         this.sliderBackgroundA.setHorizontalGradient(as, ae);
+        this.sliderBackgroundS.setHorizontalGradient(Color.withSaturation(color, 0f), Color.withSaturation(color, 1f));
+        this.sliderBackgroundV.setHorizontalGradient(Color.withValue(color, 0f), Color.withValue(color, 1f));
         this.preview.setColor(this.color);
     }
 }

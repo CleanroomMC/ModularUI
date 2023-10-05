@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.utils;
 
+import com.cleanroommc.modularui.api.drawable.IInterpolation;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.client.renderer.GlStateManager;
@@ -72,10 +73,13 @@ public class Color implements Iterable<Integer> {
      * @return the color
      */
     public static int ofHSV(int hue, float saturation, float value, float alpha) {
-        hue = Math.max(0, Math.min(hue, 360));
+        hue %= 360;
+        saturation = MathHelper.clamp(saturation, 0f, 1f);
+        value = MathHelper.clamp(value, 0f, 1f);
+        alpha = MathHelper.clamp(alpha, 0f, 1f);
 
         float c = value * saturation;
-        float x = c * (1 - (((hue / 60f) % 2) - 1));
+        float x = c * (1 - Math.abs(hue / 60f % 2 - 1));
         x = Math.max(x, -x);
         float m = value - c;
         float r, g, b;
@@ -203,16 +207,15 @@ public class Color implements Iterable<Integer> {
         float r = getRedF(argb), g = getGreenF(argb), b = getBlueF(argb);
         if (r == g && r == b) return 0;
         float min = Math.min(r, Math.min(g, b));
+        float result = 0;
         if (r >= g && r >= b) {
-            return (int) (((g - b) / (r - min)) % 6) * 60;
+            result = ((g - b) / (r - min)) % 6;
+        } else if (g >= r && g >= b) {
+            result = ((b - r) / (g - min)) + 2;
+        } else if (b >= r && b >= g) {
+            result = ((r - g) / (b - min)) + 4;
         }
-        if (g >= r && g >= b) {
-            return (int) (((b - r) / (g - min)) + 2) * 60;
-        }
-        if(b >= r && b >= g) {
-            return (int) (((r - g) / (b - min)) + 4) * 60;
-        }
-        return 0;
+        return (int) (result * 60 + 0.5f);
     }
 
     public static float getSaturation(int argb) {
@@ -225,6 +228,18 @@ public class Color implements Iterable<Integer> {
     public static float getValue(int argb) {
         float r = getRedF(argb), g = getGreenF(argb), b = getBlueF(argb);
         return Math.max(r, Math.max(g, b));
+    }
+
+    public static int withHue(int argb, int hue) {
+        return ofHSV(hue, getSaturation(argb), getValue(argb), getAlphaF(argb));
+    }
+
+    public static int withSaturation(int argb, float saturation) {
+        return ofHSV(getHue(argb), saturation, getValue(argb), getAlphaF(argb));
+    }
+
+    public static int withValue(int argb, float value) {
+        return ofHSV(getHue(argb), getSaturation(argb), value, getAlphaF(argb));
     }
 
     /**
@@ -261,12 +276,16 @@ public class Color implements Iterable<Integer> {
         return argb(r / colors.length, g / colors.length, b / colors.length, a / colors.length);
     }
 
-    public static int interpolate(int color1, int color2, double value) {
+    public static int interpolate(int color1, int color2, float value) {
+        return interpolate(Interpolation.LINEAR, color1, color2, value);
+    }
+
+    public static int interpolate(IInterpolation curve, int color1, int color2, float value) {
         value = MathHelper.clamp(value, 0, 1);
-        int r = (int) ((Color.getRed(color2) - Color.getRed(color1)) * value + Color.getRed(color1));
-        int g = (int) ((Color.getGreen(color2) - Color.getGreen(color1)) * value + Color.getGreen(color1));
-        int b = (int) ((Color.getBlue(color2) - Color.getBlue(color1)) * value + Color.getBlue(color1));
-        int a = (int) ((Color.getAlpha(color2) - Color.getAlpha(color1)) * value + Color.getAlpha(color1));
+        int r = (int) curve.interpolate(Color.getRed(color1), Color.getRed(color2), value);
+        int g = (int) curve.interpolate(Color.getGreen(color1), Color.getGreen(color2), value);
+        int b = (int) curve.interpolate(Color.getBlue(color1), Color.getBlue(color2), value);
+        int a = (int) curve.interpolate(Color.getAlpha(color1), Color.getAlpha(color2), value);
         return Color.argb(r, g, b, a);
     }
 

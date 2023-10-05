@@ -1,13 +1,14 @@
 package com.cleanroommc.modularui.utils;
 
 import com.cleanroommc.modularui.api.drawable.IInterpolation;
+import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Check out <a href=https://easings.net/en>this website</a> to find your desired interpolation method.
  */
-public enum Interpolation implements IInterpolation {
+public enum Interpolation implements IInterpolation, IStringSerializable {
 
     LINEAR("linear") {
         @Override
@@ -150,10 +151,11 @@ public enum Interpolation implements IInterpolation {
         public float interpolate(float a, float b, float x) {
             final float c5 = (2 * (float) Math.PI) / 4.5F;
 
+            float v = (float) Math.sin((20 * x - 11.125) * c5);
             float factor = x == 0 ? 0 : (x == 1 ? 1 :
                     (x < 0.5
-                            ? -((float) Math.pow(2, 20 * x - 10) * (float) Math.sin((20 * x - 11.125) * c5)) / 2
-                            : ((float) Math.pow(2, -20 * x + 10) * (float) Math.sin((20 * x - 11.125) * c5)) / 2 + 1)
+                            ? -((float) Math.pow(2, 20 * x - 10) * v) / 2
+                            : ((float) Math.pow(2, -20 * x + 10) * v) / 2 + 1)
             );
 
             return Interpolations.lerp(a, b, factor);
@@ -308,6 +310,6 @@ public enum Interpolation implements IInterpolation {
 
     @Override
     public @NotNull String getName() {
-        return name;
+        return this.name;
     }
 }
