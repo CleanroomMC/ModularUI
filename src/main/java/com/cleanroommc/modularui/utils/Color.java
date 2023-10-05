@@ -13,13 +13,14 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.function.ToIntFunction;
 
 /**
  * Utility class for dealing with colors.
  * <b>All methods assume the color int to be AARRGGBB if not stated otherwise!</b>
+ * Most of the conversion methods are written by me with the help of <a href=https://www.rapidtables.com/convert/color/>this website</a>.
+ *
+ * @author brachy
  */
 public class Color implements IntIterable {
 
@@ -106,6 +107,9 @@ public class Color implements IntIterable {
         return ofHxcm(hue, c, x, m, alpha);
     }
 
+    /**
+     * Helper method to calculate hue based argb's
+     */
     private static int ofHxcm(int hue, float c, float x, float m, float alpha) {
         if (hue < 60) return argb(c + m, x + m, m, alpha);
         if (hue < 120) return argb(x + m, c + m, m, alpha);
@@ -113,6 +117,93 @@ public class Color implements IntIterable {
         if (hue < 240) return argb(m, x + m, c + m, alpha);
         if (hue < 300) return argb(x + m, m, c + m, alpha);
         return argb(c + m, m, x + m, alpha);
+    }
+
+    /**
+     * Converts the CMYK format into ARGB.
+     *
+     * @param cyan    cyan value
+     * @param magenta magenta value
+     * @param yellow  yellow value
+     * @param black   black value
+     * @param alpha   alpha value
+     * @return ARGB color
+     */
+    public static int ofCMYK(float cyan, float magenta, float yellow, float black, float alpha) {
+        float oneMinusBlack = 1f - black;
+        return argb((1 - cyan) * oneMinusBlack, (1 - magenta) * oneMinusBlack, (1 - yellow) * oneMinusBlack, alpha);
+    }
+
+    /**
+     * Extracts the red bits from the ARGB color.
+     *
+     * @return the red value (from 0 to 255)
+     */
+    public static int getRed(int argb) {
+        return argb >> 16 & 255;
+    }
+
+    /**
+     * Extracts the green bits from the ARGB color.
+     *
+     * @return the green value (from 0 to 255)
+     */
+    public static int getGreen(int argb) {
+        return argb >> 8 & 255;
+    }
+
+    /**
+     * Extracts the blue bits from the ARGB color.
+     *
+     * @return the blue value (from 0 to 255)
+     */
+    public static int getBlue(int argb) {
+        return argb & 255;
+    }
+
+    /**
+     * Extracts the alpha bits from the ARGB color.
+     *
+     * @return the alpha value (from 0 to 255)
+     */
+    public static int getAlpha(int argb) {
+        return argb >> 24 & 255;
+    }
+
+    /**
+     * Extracts the red bits from the ARGB color.
+     *
+     * @return the red value (from 0 to 1)
+     */
+    public static float getRedF(int argb) {
+        return getRed(argb) / 255f;
+    }
+
+    /**
+     * Extracts the green bits from the ARGB color.
+     *
+     * @return the green value (from 0 to 1)
+     */
+    public static float getGreenF(int argb) {
+        return getGreen(argb) / 255f;
+    }
+
+    /**
+     * Extracts the blue bits from the ARGB color.
+     *
+     * @return the blue value (from 0 to 1)
+     */
+    public static float getBlueF(int argb) {
+        return getBlue(argb) / 255f;
+    }
+
+    /**
+     * Extracts the alpha bits from the ARGB color.
+     *
+     * @return the alpha value (from 0 to 1)
+     */
+    public static float getAlphaF(int argb) {
+        return getAlpha(argb) / 255f;
     }
 
     /**
@@ -205,78 +296,6 @@ public class Color implements IntIterable {
      */
     public static int withAlpha(int argb, float alpha) {
         return withAlpha(argb, (int) (alpha * 255));
-    }
-
-    /**
-     * Extracts the red bits from the ARGB color.
-     *
-     * @return the red value (from 0 to 255)
-     */
-    public static int getRed(int argb) {
-        return argb >> 16 & 255;
-    }
-
-    /**
-     * Extracts the green bits from the ARGB color.
-     *
-     * @return the green value (from 0 to 255)
-     */
-    public static int getGreen(int argb) {
-        return argb >> 8 & 255;
-    }
-
-    /**
-     * Extracts the blue bits from the ARGB color.
-     *
-     * @return the blue value (from 0 to 255)
-     */
-    public static int getBlue(int argb) {
-        return argb & 255;
-    }
-
-    /**
-     * Extracts the alpha bits from the ARGB color.
-     *
-     * @return the alpha value (from 0 to 255)
-     */
-    public static int getAlpha(int argb) {
-        return argb >> 24 & 255;
-    }
-
-    /**
-     * Extracts the red bits from the ARGB color.
-     *
-     * @return the red value (from 0 to 1)
-     */
-    public static float getRedF(int argb) {
-        return getRed(argb) / 255f;
-    }
-
-    /**
-     * Extracts the green bits from the ARGB color.
-     *
-     * @return the green value (from 0 to 1)
-     */
-    public static float getGreenF(int argb) {
-        return getGreen(argb) / 255f;
-    }
-
-    /**
-     * Extracts the blue bits from the ARGB color.
-     *
-     * @return the blue value (from 0 to 1)
-     */
-    public static float getBlueF(int argb) {
-        return getBlue(argb) / 255f;
-    }
-
-    /**
-     * Extracts the alpha bits from the ARGB color.
-     *
-     * @return the alpha value (from 0 to 1)
-     */
-    public static float getAlphaF(int argb) {
-        return getAlpha(argb) / 255f;
     }
 
     /**
@@ -417,6 +436,97 @@ public class Color implements IntIterable {
     }
 
     /**
+     * Calculates the CMYK cyan value from the ARGB color.
+     *
+     * @param argb color
+     * @return cyan value
+     */
+    public static float getCyan(int argb) {
+        float r = getRedF(argb), g = getGreenF(argb), b = getBlueF(argb);
+        float oneMinusBlack = Math.max(r, Math.max(g, b));
+        return oneMinusBlack == 0 ? 0 : 1f - r / oneMinusBlack;
+    }
+
+    /**
+     * Calculates the CMYK magenta value from the ARGB color.
+     *
+     * @param argb color
+     * @return magenta value
+     */
+    public static float getMagenta(int argb) {
+        float r = getRedF(argb), g = getGreenF(argb), b = getBlueF(argb);
+        float oneMinusBlack = Math.max(r, Math.max(g, b));
+        return oneMinusBlack == 0 ? 0 : 1f - g / oneMinusBlack;
+    }
+
+    /**
+     * Calculates the CMYK yellow value from the ARGB color.
+     *
+     * @param argb color
+     * @return yellow value
+     */
+    public static float getYellow(int argb) {
+        float r = getRedF(argb), g = getGreenF(argb), b = getBlueF(argb);
+        float oneMinusBlack = Math.max(r, Math.max(g, b));
+        return oneMinusBlack == 0 ? 0 : 1f - b / oneMinusBlack;
+    }
+
+    /**
+     * Calculates the CMYK black value from the ARGB color.
+     *
+     * @param argb color
+     * @return black value
+     */
+    public static float getBlack(int argb) {
+        float r = getRedF(argb), g = getGreenF(argb), b = getBlueF(argb);
+        return 1f - Math.max(r, Math.max(g, b));
+    }
+
+    /**
+     * Replaces the cyan value in the ARGB color in the CMYK format.
+     *
+     * @param argb color
+     * @param cyan new cyan
+     * @return new ARGB color
+     */
+    public static int withCyan(int argb, float cyan) {
+        return ofCMYK(cyan, getMagenta(argb), getYellow(argb), getBlack(argb), getAlphaF(argb));
+    }
+
+    /**
+     * Replaces the magenta value in the ARGB color in the CMYK format.
+     *
+     * @param argb    color
+     * @param magenta new magenta
+     * @return new ARGB color
+     */
+    public static int withMagenta(int argb, float magenta) {
+        return ofCMYK(getCyan(argb), magenta, getYellow(argb), getBlack(argb), getAlphaF(argb));
+    }
+
+    /**
+     * Replaces the yellow value in the ARGB color in the CMYK format.
+     *
+     * @param argb   color
+     * @param yellow new yellow
+     * @return new ARGB color
+     */
+    public static int withYellow(int argb, float yellow) {
+        return ofCMYK(getCyan(argb), getMagenta(argb), yellow, getBlack(argb), getAlphaF(argb));
+    }
+
+    /**
+     * Replaces the black value in the ARGB color in the CMYK format.
+     *
+     * @param argb  color
+     * @param black new black
+     * @return new ARGB color
+     */
+    public static int withBlack(int argb, float black) {
+        return ofCMYK(getCyan(argb), getMagenta(argb), getYellow(argb), black, getAlphaF(argb));
+    }
+
+    /**
      * Extracts the RGB bits into an array.
      *
      * @return rgba as an array [red, green, blue]
@@ -432,6 +542,16 @@ public class Color implements IntIterable {
      */
     public static int[] getARGBValues(int argb) {
         return new int[]{getRed(argb), getGreen(argb), getBlue(argb), getAlpha(argb)};
+    }
+
+    /**
+     * Calculates the CMYK values and puts them into an array.
+     *
+     * @param argb ARGB color
+     * @return CMYK values array
+     */
+    public static float[] getCMYKValues(int argb) {
+        return new float[]{getCyan(argb), getMagenta(argb), getYellow(argb), getBlack(argb)};
     }
 
     /**
