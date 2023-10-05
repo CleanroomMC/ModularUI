@@ -151,10 +151,7 @@ public class JsonHelper {
     public static int getColor(JsonObject json, int defaultValue, String... keys) {
         JsonElement element = getJsonElement(json, keys);
         if (element != null) {
-            Integer color = Color.ofJson(element);
-            if (color != null) {
-                return color;
-            }
+            return Color.ofJson(element);
         }
         return defaultValue;
     }
@@ -162,10 +159,7 @@ public class JsonHelper {
     public static int getColorWithFallback(JsonObject json, JsonObject fallback, int defaultValue, String @NotNull ... keys) {
         JsonElement element = getJsonElement(json, keys);
         if (element != null) {
-            Integer color = Color.ofJson(element);
-            if (color != null) {
-                return color;
-            }
+            return Color.ofJson(element);
         }
         return getColor(fallback, defaultValue, keys);
     }

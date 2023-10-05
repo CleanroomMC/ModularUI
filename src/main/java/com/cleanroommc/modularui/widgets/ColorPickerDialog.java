@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.widgets;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
@@ -145,13 +144,13 @@ public class ColorPickerDialog extends Dialog<Integer> {
                         .child(createSlider(new HueBar(GuiAxis.X))
                                 .debugName("HUE")
                                 .bounds(0, 360)
-                                .value(new DoubleValue.Dynamic(() -> Color.getHue(this.color), val -> updateColor(Color.withHue(this.color, (int) val))))))
+                                .value(new DoubleValue.Dynamic(() -> Color.getHue(this.color), val -> updateColor(Color.withHSVHue(this.color, (int) val))))))
                 .child(new Row()
                         .widthRel(1f).height(12)
                         .child(IKey.str("S: ").asWidget().heightRel(1f))
                         .child(createSlider(this.sliderBackgroundS)
                                 .bounds(0, 1)
-                                .value(new DoubleValue.Dynamic(() -> Color.getSaturation(this.color), val -> updateColor(Color.withSaturation(this.color, (float) val))))))
+                                .value(new DoubleValue.Dynamic(() -> Color.getHSVSaturation(this.color), val -> updateColor(Color.withHSVSaturation(this.color, (float) val))))))
                 .child(new Row()
                         .widthRel(1f).height(12)
                         .child(IKey.str("V: ").asWidget().heightRel(1f))
@@ -194,7 +193,7 @@ public class ColorPickerDialog extends Dialog<Integer> {
         this.sliderBackgroundG.setHorizontalGradient(gs, ge);
         this.sliderBackgroundB.setHorizontalGradient(bs, be);
         this.sliderBackgroundA.setHorizontalGradient(as, ae);
-        this.sliderBackgroundS.setHorizontalGradient(Color.withSaturation(color, 0f), Color.withSaturation(color, 1f));
+        this.sliderBackgroundS.setHorizontalGradient(Color.withHSVSaturation(color, 0f), Color.withHSVSaturation(color, 1f));
         this.sliderBackgroundV.setHorizontalGradient(Color.withValue(color, 0f), Color.withValue(color, 1f));
         this.preview.setColor(this.color);
     }

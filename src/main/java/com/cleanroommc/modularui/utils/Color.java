@@ -3,23 +3,25 @@ package com.cleanroommc.modularui.utils;
 import com.cleanroommc.modularui.api.drawable.IInterpolation;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import it.unimi.dsi.fastutil.ints.IntIterable;
+import it.unimi.dsi.fastutil.ints.IntIterator;
+import it.unimi.dsi.fastutil.ints.IntIterators;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.function.ToIntFunction;
 
 /**
  * Utility class for dealing with colors.
  * <b>All methods assume the color int to be AARRGGBB if not stated otherwise!</b>
  */
-public class Color implements Iterable<Integer> {
-
-    public static final int HALF_BLACK = 0x88000000;
+public class Color implements IntIterable {
 
     /**
      * Creates a color int. All values should be 0 - 255
@@ -64,9 +66,9 @@ public class Color implements Iterable<Integer> {
     }
 
     /**
-     * Converts a HSV color to rgba
+     * Converts the HSV format into ARGB. With H being hue, S being saturation and V being value.
      *
-     * @param hue        value from 0 to 360
+     * @param hue        value from 0 to 360 (wraps around)
      * @param saturation value from 0 to 1
      * @param value      value from 0 to 1
      * @param alpha      value from 0 to 1
@@ -74,135 +76,215 @@ public class Color implements Iterable<Integer> {
      */
     public static int ofHSV(int hue, float saturation, float value, float alpha) {
         hue %= 360;
+        if (hue < 0) hue += 360;
         saturation = MathHelper.clamp(saturation, 0f, 1f);
         value = MathHelper.clamp(value, 0f, 1f);
         alpha = MathHelper.clamp(alpha, 0f, 1f);
-
         float c = value * saturation;
         float x = c * (1 - Math.abs(hue / 60f % 2 - 1));
-        x = Math.max(x, -x);
         float m = value - c;
-        float r, g, b;
-        if (hue < 60) {
-            r = c;
-            g = x;
-            b = 0;
-        } else if (hue < 120) {
-            r = x;
-            g = c;
-            b = 0;
-        } else if (hue < 180) {
-            r = 0;
-            g = c;
-            b = x;
-        } else if (hue < 240) {
-            r = 0;
-            g = x;
-            b = c;
-        } else if (hue < 300) {
-            r = x;
-            g = 0;
-            b = c;
-        } else {
-            r = c;
-            g = 0;
-            b = x;
-        }
-        return argb(r + m, g + m, b + m, alpha);
+        return ofHxcm(hue, c, x, m, alpha);
     }
 
+    /**
+     * Converts the HSL format into ARGB. With H being hue, S being saturation and L being lightness.
+     *
+     * @param hue        value from 0 to 360 (wraps around)
+     * @param saturation value from 0 to 1
+     * @param lightness  value from 0 to 1
+     * @param alpha      value from 0 to 1
+     * @return the color
+     */
+    public static int ofHSL(int hue, float saturation, float lightness, float alpha) {
+        hue %= 360;
+        saturation = MathHelper.clamp(saturation, 0f, 1f);
+        lightness = MathHelper.clamp(lightness, 0f, 1f);
+        alpha = MathHelper.clamp(alpha, 0f, 1f);
+        float c = (1 - Math.abs(2 * lightness - 1)) * saturation;
+        float x = c * (1 - Math.abs(hue / 60f % 2 - 1));
+        float m = lightness - c / 2;
+        return ofHxcm(hue, c, x, m, alpha);
+    }
+
+    private static int ofHxcm(int hue, float c, float x, float m, float alpha) {
+        if (hue < 60) return argb(c + m, x + m, m, alpha);
+        if (hue < 120) return argb(x + m, c + m, m, alpha);
+        if (hue < 180) return argb(m, c + m, x + m, alpha);
+        if (hue < 240) return argb(m, x + m, c + m, alpha);
+        if (hue < 300) return argb(x + m, m, c + m, alpha);
+        return argb(c + m, m, x + m, alpha);
+    }
+
+    /**
+     * Replaces the red bits in the ARGB color.
+     *
+     * @param argb color in argb format
+     * @param red  red value from 0 to 255
+     * @return new ARGB color
+     */
     public static int withRed(int argb, int red) {
         argb &= ~(0xFF << 16);
         return argb | red << 16;
     }
 
+    /**
+     * Replaces the green bits in the ARGB color.
+     *
+     * @param argb  color in argb format
+     * @param green green value from 0 to 255
+     * @return new ARGB color
+     */
     public static int withGreen(int argb, int green) {
         argb &= ~(0xFF << 8);
         return argb | green << 8;
     }
 
+    /**
+     * Replaces the blue bits in the ARGB color.
+     *
+     * @param argb color in argb format
+     * @param blue blue value from 0 to 255
+     * @return new ARGB color
+     */
     public static int withBlue(int argb, int blue) {
         argb &= ~0xFF;
         return argb | blue;
     }
 
+    /**
+     * Replaces the alpha bits in the ARGB color.
+     *
+     * @param argb  color in argb format
+     * @param alpha alpha value from 0 to 255
+     * @return new ARGB color
+     */
     public static int withAlpha(int argb, int alpha) {
         argb &= ~(0xFF << 24);
         return argb | alpha << 24;
     }
 
+    /**
+     * Replaces the red bits in the ARGB color.
+     *
+     * @param argb color in argb format
+     * @param red  red value from 0 to 1
+     * @return new ARGB color
+     */
     public static int withRed(int argb, float red) {
         return withRed(argb, (int) (red * 255));
     }
 
+    /**
+     * Replaces the green bits in the ARGB color.
+     *
+     * @param argb  color in argb format
+     * @param green green value from 0 to 1
+     * @return new ARGB color
+     */
     public static int withGreen(int argb, float green) {
         return withGreen(argb, (int) (green * 255));
     }
 
+    /**
+     * Replaces the blue bits in the ARGB color.
+     *
+     * @param argb color in argb format
+     * @param blue blue value from 0 to 1
+     * @return new ARGB color
+     */
     public static int withBlue(int argb, float blue) {
         return withBlue(argb, (int) (blue * 255));
     }
 
+    /**
+     * Replaces the alpha bits in the ARGB color.
+     *
+     * @param argb  color in argb format
+     * @param alpha alpha value from 0 to 1
+     * @return new ARGB color
+     */
     public static int withAlpha(int argb, float alpha) {
         return withAlpha(argb, (int) (alpha * 255));
     }
 
     /**
-     * @return the red value
+     * Extracts the red bits from the ARGB color.
+     *
+     * @return the red value (from 0 to 255)
      */
     public static int getRed(int argb) {
         return argb >> 16 & 255;
     }
 
     /**
-     * @return the green value
+     * Extracts the green bits from the ARGB color.
+     *
+     * @return the green value (from 0 to 255)
      */
     public static int getGreen(int argb) {
         return argb >> 8 & 255;
     }
 
     /**
-     * @return the blue value
+     * Extracts the blue bits from the ARGB color.
+     *
+     * @return the blue value (from 0 to 255)
      */
     public static int getBlue(int argb) {
         return argb & 255;
     }
 
     /**
-     * @return the alpha value
+     * Extracts the alpha bits from the ARGB color.
+     *
+     * @return the alpha value (from 0 to 255)
      */
     public static int getAlpha(int argb) {
         return argb >> 24 & 255;
     }
 
     /**
-     * @return the red value
+     * Extracts the red bits from the ARGB color.
+     *
+     * @return the red value (from 0 to 1)
      */
     public static float getRedF(int argb) {
         return getRed(argb) / 255f;
     }
 
     /**
-     * @return the green value
+     * Extracts the green bits from the ARGB color.
+     *
+     * @return the green value (from 0 to 1)
      */
     public static float getGreenF(int argb) {
         return getGreen(argb) / 255f;
     }
 
     /**
-     * @return the blue value
+     * Extracts the blue bits from the ARGB color.
+     *
+     * @return the blue value (from 0 to 1)
      */
     public static float getBlueF(int argb) {
         return getBlue(argb) / 255f;
     }
 
     /**
-     * @return the alpha value
+     * Extracts the alpha bits from the ARGB color.
+     *
+     * @return the alpha value (from 0 to 1)
      */
     public static float getAlphaF(int argb) {
         return getAlpha(argb) / 255f;
     }
 
+    /**
+     * Calculates the hue value (HSV or HSL format) from the ARGB color.
+     *
+     * @param argb color
+     * @return hue value
+     */
     public static int getHue(int argb) {
         float r = getRedF(argb), g = getGreenF(argb), b = getBlueF(argb);
         if (r == g && r == b) return 0;
@@ -218,53 +300,188 @@ public class Color implements Iterable<Integer> {
         return (int) (result * 60 + 0.5f);
     }
 
-    public static float getSaturation(int argb) {
+    /**
+     * Calculates the HSV saturation value from the ARGB color.
+     *
+     * @param argb color
+     * @return HSV saturation value.
+     */
+    public static float getHSVSaturation(int argb) {
         float r = getRedF(argb), g = getGreenF(argb), b = getBlueF(argb);
         float min = Math.min(r, Math.min(g, b));
         float max = Math.max(r, Math.max(g, b));
         return max == 0 ? 0 : (max - min) / max;
     }
 
+    /**
+     * Calculates the HSL saturation value from the ARGB color.
+     *
+     * @param argb color
+     * @return HSL saturation value.
+     */
+    public static float getHSLSaturation(int argb) {
+        float r = getRedF(argb), g = getGreenF(argb), b = getBlueF(argb);
+        float min = Math.min(r, Math.min(g, b));
+        float max = Math.max(r, Math.max(g, b));
+        return (max - min) / (1 - Math.abs(max + min - 1));
+    }
+
+    /**
+     * Calculates the HSV value from the ARGB color.
+     *
+     * @param argb color
+     * @return HSV value.
+     */
     public static float getValue(int argb) {
         float r = getRedF(argb), g = getGreenF(argb), b = getBlueF(argb);
         return Math.max(r, Math.max(g, b));
     }
 
-    public static int withHue(int argb, int hue) {
-        return ofHSV(hue, getSaturation(argb), getValue(argb), getAlphaF(argb));
-    }
-
-    public static int withSaturation(int argb, float saturation) {
-        return ofHSV(getHue(argb), saturation, getValue(argb), getAlphaF(argb));
-    }
-
-    public static int withValue(int argb, float value) {
-        return ofHSV(getHue(argb), getSaturation(argb), value, getAlphaF(argb));
+    /**
+     * Calculates the HSL lightness value from the ARGB color.
+     *
+     * @param argb color
+     * @return HSL lightness value.
+     */
+    public static float getLightness(int argb) {
+        float r = getRedF(argb), g = getGreenF(argb), b = getBlueF(argb);
+        float min = Math.min(r, Math.min(g, b));
+        float max = Math.max(r, Math.max(g, b));
+        return (max + min) / 2;
     }
 
     /**
+     * Replaces the hue value in the ARGB color in the HSV format.
+     *
+     * @param argb color
+     * @param hue  new hue
+     * @return new ARGB color
+     */
+    public static int withHSVHue(int argb, int hue) {
+        return ofHSV(hue, getHSVSaturation(argb), getValue(argb), getAlphaF(argb));
+    }
+
+    /**
+     * Replaces the saturation value in the ARGB color in the HSV format.
+     *
+     * @param argb       color
+     * @param saturation new saturation
+     * @return new ARGB color
+     */
+    public static int withHSVSaturation(int argb, float saturation) {
+        return ofHSV(getHue(argb), saturation, getValue(argb), getAlphaF(argb));
+    }
+
+    /**
+     * Replaces the value in the ARGB color in the HSV format.
+     *
+     * @param argb  color
+     * @param value new value
+     * @return new ARGB color
+     */
+    public static int withValue(int argb, float value) {
+        return ofHSV(getHue(argb), getHSVSaturation(argb), value, getAlphaF(argb));
+    }
+
+    /**
+     * Replaces the hue value in the ARGB color in the HSL format.
+     *
+     * @param argb color
+     * @param hue  new hue
+     * @return new ARGB color
+     */
+    public static int withHSLHue(int argb, int hue) {
+        return ofHSL(hue, getHSLSaturation(argb), getLightness(argb), getAlphaF(argb));
+    }
+
+    /**
+     * Replaces the saturation value in the ARGB color in the HSL format.
+     *
+     * @param argb       color
+     * @param saturation new saturation
+     * @return new ARGB color
+     */
+    public static int withHSLSaturation(int argb, float saturation) {
+        return ofHSL(getHue(argb), saturation, getLightness(argb), getAlphaF(argb));
+    }
+
+    /**
+     * Replaces the lightness value in the ARGB color in the HSL format.
+     *
+     * @param argb      color
+     * @param lightness new lightness
+     * @return new ARGB color
+     */
+    public static int withLightness(int argb, float lightness) {
+        return ofHSL(getHue(argb), getHSLSaturation(argb), lightness, getAlphaF(argb));
+    }
+
+    /**
+     * Extracts the RGB bits into an array.
+     *
+     * @return rgba as an array [red, green, blue]
+     */
+    public static int[] getRGBValues(int argb) {
+        return new int[]{getRed(argb), getGreen(argb), getBlue(argb)};
+    }
+
+    /**
+     * Extracts the ARGB bits into an array.
+     *
      * @return rgba as an array [red, green, blue, alpha]
      */
-    public static int[] getValues(int argb) {
+    public static int[] getARGBValues(int argb) {
         return new int[]{getRed(argb), getGreen(argb), getBlue(argb), getAlpha(argb)};
     }
 
+    /**
+     * Converts an RGBA int to an ARGB int.
+     *
+     * @param rgba RGBA color
+     * @return ARGB color
+     */
     public static int rgbaToArgb(int rgba) {
         return Color.argb(getAlpha(rgba), getRed(rgba), getGreen(rgba), getBlue(rgba));
     }
 
+    /**
+     * Converts an ARGB int to an RGBA int.
+     *
+     * @param argb ARGB color
+     * @return RGBA color
+     */
     public static int argbToRgba(int argb) {
         return Color.rgba(getRed(argb), getGreen(argb), getBlue(argb), getAlpha(argb));
     }
 
+    /**
+     * Inverts all color bytes except alpha.
+     *
+     * @param argb ARGB color
+     * @return inverted color
+     */
     public static int invert(int argb) {
         return Color.argb(255 - getRed(argb), 255 - getGreen(argb), 255 - getBlue(argb), getAlpha(argb));
     }
 
+    /**
+     * Multiplies each color byte with a factor to make it darker or brighter.
+     *
+     * @param argb          ARGB color
+     * @param factor        multiplication factor
+     * @param multiplyAlpha if alpha byte should be multiplied too
+     * @return multiplied ARGB color
+     */
     public static int multiply(int argb, float factor, boolean multiplyAlpha) {
         return argb(getRedF(argb) * factor, getGreenF(argb) * factor, getBlueF(argb) * factor, multiplyAlpha ? getAlphaF(argb) * factor : getAlphaF(argb));
     }
 
+    /**
+     * Calculates the average of each color byte in the array and puts it into a new ARGB color.
+     *
+     * @param colors ARGB colors
+     * @return average ARGB color
+     */
     public static int average(int... colors) {
         int r = 0, g = 0, b = 0, a = 0;
         for (int color : colors) {
@@ -276,10 +493,47 @@ public class Color implements Iterable<Integer> {
         return argb(r / colors.length, g / colors.length, b / colors.length, a / colors.length);
     }
 
+    /**
+     * Calculates the average of each color byte in the array and puts it into a new ARGB color.
+     *
+     * @param colorFunction function to extract a ARGB color from the objects
+     * @param colorHolders  objects that can be converted to ARGB colors
+     * @return average ARGB color
+     */
+    @SafeVarargs
+    public static <T> int average(ToIntFunction<T> colorFunction, T... colorHolders) {
+        int r = 0, g = 0, b = 0, a = 0;
+        for (T colorHolder : colorHolders) {
+            int color = colorFunction.applyAsInt(colorHolder);
+            r += getRed(color);
+            g += getGreen(color);
+            b += getBlue(color);
+            a += getAlpha(color);
+        }
+        return argb(r / colorHolders.length, g / colorHolders.length, b / colorHolders.length, a / colorHolders.length);
+    }
+
+    /**
+     * Interpolates each color byte between two ARGB colors using linear interpolation and a progress value.
+     *
+     * @param color1 lower color
+     * @param color2 higher color
+     * @param value  progress value
+     * @return interpolated ARGB color
+     */
     public static int interpolate(int color1, int color2, float value) {
         return interpolate(Interpolation.LINEAR, color1, color2, value);
     }
 
+    /**
+     * Interpolates each color byte between two ARGB colors with an interpolation curve and a progress value.
+     *
+     * @param curve  interpolation curve
+     * @param color1 lower color
+     * @param color2 higher color
+     * @param value  progress value
+     * @return interpolated ARGB color
+     */
     public static int interpolate(IInterpolation curve, int color1, int color2, float value) {
         value = MathHelper.clamp(value, 0, 1);
         int r = (int) curve.interpolate(Color.getRed(color1), Color.getRed(color2), value);
@@ -306,6 +560,11 @@ public class Color implements Iterable<Integer> {
         GlStateManager.color(getRedF(color), getGreenF(color), getBlueF(color), a);
     }
 
+    /**
+     * Applies a ARGB color to OpenGL with a fixed alpha value of 255.
+     *
+     * @param color ARGB color.
+     */
     @SideOnly(Side.CLIENT)
     public static void setGlColorOpaque(int color) {
         if (color == 0) {
@@ -315,14 +574,23 @@ public class Color implements Iterable<Integer> {
         GlStateManager.color(getRedF(color), getGreenF(color), getBlueF(color), 1f);
     }
 
+    /**
+     * Enables the OpenGL color mask and sets its colors to white.
+     */
     @SideOnly(Side.CLIENT)
     public static void resetGlColor() {
         GlStateManager.colorMask(true, true, true, true);
         setGlColorOpaque(WHITE.normal);
     }
 
-    @Nullable
-    public static Integer ofJson(JsonElement jsonElement) {
+    /**
+     * Parses a ARGB color of a json element.
+     *
+     * @param jsonElement json element
+     * @return ARGB color
+     * @throws JsonParseException if color could not be parsed
+     */
+    public static int ofJson(JsonElement jsonElement) {
         if (jsonElement.isJsonPrimitive()) {
             int color = (int) (long) Long.decode(jsonElement.getAsString()); // bruh
             if (color != 0 && getAlpha(color) == 0) {
@@ -332,16 +600,68 @@ public class Color implements Iterable<Integer> {
         }
         if (jsonElement.isJsonObject()) {
             JsonObject json = jsonElement.getAsJsonObject();
-            int red = JsonHelper.getInt(json, 255, "r", "red");
-            int green = JsonHelper.getInt(json, 255, "g", "green");
-            int blue = JsonHelper.getInt(json, 255, "b", "blue");
-            int alpha = JsonHelper.getInt(json, 255, "a", "alpha");
-            if ((red | green | blue) != 0 && alpha == 0) {
-                alpha = 255;
+            String alphaS = JsonHelper.getString(json, "1f", "a", "alpha");
+            float alphaF;
+            int alpha;
+            if (alphaS.contains(".") || alphaS.endsWith("f") || alphaS.endsWith("F") || alphaS.endsWith("d") || alphaS.endsWith("D")) {
+                try {
+                    alphaF = MathHelper.clamp(Float.parseFloat(alphaS), 0f, 1f);
+                    alpha = (int) (alphaF * 255);
+                } catch (NumberFormatException e) {
+                    throw new JsonParseException("Failed to parse alpha value", e);
+                }
+            } else {
+                try {
+                    alpha = MathHelper.clamp(Integer.parseInt(alphaS), 0, 255);
+                    alphaF = alpha / 255f;
+                } catch (NumberFormatException e) {
+                    throw new JsonParseException("Failed to parse alpha value", e);
+                }
             }
-            return Color.argb(red, green, blue, alpha);
+            if (hasRGB(json)) {
+                if (hasHS(json) || hasV(json) || hasL(json))
+                    throw new JsonParseException("Found RGB values but also HSV or HSL values!");
+                int red = JsonHelper.getInt(json, 255, "r", "red");
+                int green = JsonHelper.getInt(json, 255, "g", "green");
+                int blue = JsonHelper.getInt(json, 255, "b", "blue");
+                if ((red | green | blue) != 0 && alpha == 0) {
+                    alpha = 255;
+                }
+                return Color.argb(red, green, blue, alpha);
+            }
+            if (hasHS(json)) {
+                int hue = JsonHelper.getInt(json, 0, "h", "hue");
+                float saturation = JsonHelper.getFloat(json, 0, "s", "saturation");
+                if (hasV(json)) {
+                    if (hasL(json)) throw new JsonParseException("Found HSV values, but also HSL values!");
+                    float value = JsonHelper.getFloat(json, 1f, "v", "value");
+                    return ofHSV(hue, saturation, value, alphaF);
+                }
+                float lightness = JsonHelper.getFloat(json, 0.5f, "l", "lightness");
+                return ofHSL(hue, saturation, lightness, alphaF);
+            }
+            throw new JsonParseException("Empty color declaration");
         }
-        return null;
+        throw new JsonParseException("Color must be a primitive or an object!");
+    }
+
+    private static boolean hasRGB(JsonObject json) {
+        return json.has("r") || json.has("red") ||
+                json.has("g") || json.has("green") ||
+                json.has("b") || json.has("blue");
+    }
+
+    private static boolean hasHS(JsonObject json) {
+        return json.has("h") || json.has("hue") ||
+                json.has("s") || json.has("saturation");
+    }
+
+    private static boolean hasV(JsonObject json) {
+        return json.has("v") || json.has("value");
+    }
+
+    private static boolean hasL(JsonObject json) {
+        return json.has("l") || json.has("lightness");
     }
 
     public static final Color WHITE = new Color(0xFFFFFF, new int[]{},
@@ -511,7 +831,7 @@ public class Color implements Iterable<Integer> {
 
     @NotNull
     @Override
-    public Iterator<Integer> iterator() {
-        return Arrays.stream(this.all).iterator();
+    public IntIterator iterator() {
+        return IntIterators.wrap(this.all);
     }
 }

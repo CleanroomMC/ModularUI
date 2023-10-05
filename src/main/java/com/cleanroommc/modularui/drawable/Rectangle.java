@@ -92,38 +92,27 @@ public class Rectangle implements IDrawable {
     @Override
     public void loadFromJson(JsonObject json) {
         if (json.has("color")) {
-            Integer c = Color.ofJson(json.get("color"));
-            if (c != null) {
-                setColor(c);
-            }
+            setColor(Color.ofJson(json.get("color")));
         }
         if (json.has("colorTop")) {
-            Integer c = Color.ofJson(json.get("colorTop"));
-            if (c != null) {
-                this.colorTL = c;
-                this.colorTR = c;
-            }
+            int c = Color.ofJson(json.get("colorTop"));
+            this.colorTL = c;
+            this.colorTR = c;
         }
         if (json.has("colorBottom")) {
-            Integer c = Color.ofJson(json.get("colorBottom"));
-            if (c != null) {
-                this.colorBL = c;
-                this.colorBR = c;
-            }
+            int c = Color.ofJson(json.get("colorBottom"));
+            this.colorBL = c;
+            this.colorBR = c;
         }
         if (json.has("colorLeft")) {
-            Integer c = Color.ofJson(json.get("colorLeft"));
-            if (c != null) {
-                this.colorTL = c;
-                this.colorBL = c;
-            }
+            int c = Color.ofJson(json.get("colorLeft"));
+            this.colorTL = c;
+            this.colorBL = c;
         }
         if (json.has("colorRight")) {
-            Integer c = Color.ofJson(json.get("colorRight"));
-            if (c != null) {
-                this.colorTR = c;
-                this.colorBR = c;
-            }
+            int c = Color.ofJson(json.get("colorRight"));
+            this.colorTR = c;
+            this.colorBR = c;
         }
         setColor(json, val -> this.colorTL = val, "colorTopLeft", "colorTL");
         setColor(json, val -> this.colorTR = val, "colorTopRight", "colorTR");
@@ -136,10 +125,7 @@ public class Rectangle implements IDrawable {
     private void setColor(JsonObject json, IntConsumer color, String... keys) {
         JsonElement element = JsonHelper.getJsonElement(json, keys);
         if (element != null) {
-            Integer c = Color.ofJson(element);
-            if (c != null) {
-                color.accept(c);
-            }
+            color.accept(Color.ofJson(element));
         }
     }
 }
