@@ -1,57 +1,49 @@
 package com.cleanroommc.modularui.drawable.keys;
 
+import com.cleanroommc.modularui.ClientEventHandler;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import net.minecraft.client.resources.I18n;
+import org.jetbrains.annotations.Nullable;
 
 public class LangKey implements IKey {
 
-    public static long lastTime;
-
-    public String key;
-    public String string;
-    public long time = -1;
-    public Object[] args = new Object[0];
+    private final String key;
+    private String string;
+    private long time = 0;
+    private final Object[] args;
 
     public LangKey(String key) {
+        this(key, null);
+    }
+
+    public LangKey(String key, @Nullable Object[] args) {
         this.key = key;
-    }
-
-    public LangKey args(Object... args) {
         this.args = args;
-
-        return this;
     }
 
-    public String update() {
-        this.time = -1;
-        return this.get();
+    public String getKey() {
+        return this.key;
+    }
+
+    public Object[] getArgs() {
+        return this.args;
     }
 
     @Override
     public String get() {
-        if (this.string == null || (this.args.length > 0 && lastTime > this.time)) {
-            this.time = lastTime;
+        if (this.string == null || (this.args.length > 0 && this.time != ClientEventHandler.getTicks())) {
+            this.time = ClientEventHandler.getTicks();
             this.string = I18n.format(this.key, this.args);
         }
         return this.string;
     }
 
     @Override
-    public void set(String string) {
-        this.key = string;
-        this.string = I18n.format(this.key);
-    }
-
-    @Override
     public boolean equals(Object obj) {
-        if (super.equals(obj)) {
-            return true;
-        }
-
+        if (this == obj) return true;
         if (obj instanceof LangKey) {
             return this.get().equals(((LangKey) obj).get());
         }
-
         return false;
     }
 

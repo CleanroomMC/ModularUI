@@ -26,10 +26,6 @@ public class StyledText implements IKey {
         return this.key.get();
     }
 
-    @Override
-    public void set(String string) {
-    }
-
     @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height) {

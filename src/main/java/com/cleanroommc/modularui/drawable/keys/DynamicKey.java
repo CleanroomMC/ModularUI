@@ -18,7 +18,7 @@ public class DynamicKey implements IKey {
     }
 
     @Override
-    public void set(String string) {
-
+    public boolean equals(Object obj) {
+        return this == obj || (obj instanceof DynamicKey && ((DynamicKey) obj).supplier == this.supplier);
     }
 }

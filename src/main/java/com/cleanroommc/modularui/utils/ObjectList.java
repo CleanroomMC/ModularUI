@@ -71,6 +71,8 @@ public interface ObjectList<V> extends it.unimi.dsi.fastutil.objects.ObjectList<
 
     void trim();
 
+    V[] elements();
+
     class ObjectArrayList<V> extends it.unimi.dsi.fastutil.objects.ObjectArrayList<V> implements ObjectList<V> {
 
         public ObjectArrayList(int capacity) {

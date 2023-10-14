@@ -20,6 +20,12 @@ import java.io.IOException;
 @SideOnly(Side.CLIENT)
 public class ClientEventHandler {
 
+    private static long ticks = 0L;
+
+    public static long getTicks() {
+        return ticks;
+    }
+
     @SubscribeEvent
     public static void onScroll(GuiScreenEvent.MouseInputEvent.Pre event) {
         ModularScreen screen = ModularScreen.getCurrent();
@@ -42,6 +48,7 @@ public class ClientEventHandler {
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.START) {
+            ticks++;
             GuiManager.checkQueuedScreen();
         }
     }

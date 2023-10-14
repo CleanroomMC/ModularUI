@@ -48,7 +48,7 @@ public interface IKey extends IDrawable {
      * @return text key
      */
     static IKey format(String key, Object... args) {
-        return new LangKey(key).args(args);
+        return new LangKey(key, args);
     }
 
     /**
@@ -85,9 +85,6 @@ public interface IKey extends IDrawable {
      * @return the current formatted string
      */
     String get();
-
-    @Deprecated
-    void set(String string);
 
     @SideOnly(Side.CLIENT)
     @Override
