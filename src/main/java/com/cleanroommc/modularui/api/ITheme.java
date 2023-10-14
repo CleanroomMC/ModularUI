@@ -25,8 +25,14 @@ public interface ITheme {
         return IThemeApi.get().getTheme(id);
     }
 
+    /**
+     * @return theme id
+     */
     String getId();
 
+    /**
+     * @return parent theme
+     */
     ITheme getParentTheme();
 
     WidgetTheme getFallback();

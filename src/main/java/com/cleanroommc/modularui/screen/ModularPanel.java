@@ -207,7 +207,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 result = true;
             }
         } else {
-            int flag = IViewport.INTERACTION | IViewport.MOUSE | IViewport.PRESSED;
             loop:
             for (LocatedWidget widget : this.hovering) {
                 widget.applyMatrix(getContext());
@@ -252,9 +251,9 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         }
 
         if (result && pressed.getElement() instanceof IFocusedWidget) {
-            getContext().focus(pressed, true);
+            getContext().focus(pressed);
         } else {
-            getContext().focus(null);
+            getContext().removeFocus();
         }
         if (!this.isKeyHeld && !this.isMouseButtonHeld) {
             this.lastPressed = pressed;
@@ -270,8 +269,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @ApiStatus.OverrideOnly
     public boolean onMouseRelease(int mouseButton) {
         if (!isValid() || !isEnabled()) return false;
-        int flag = IViewport.INTERACTION | IViewport.MOUSE | IViewport.RELEASED;
-        if (interactFocused(widget -> widget.onMouseRelease(mouseButton), false, flag)) {
+        if (interactFocused(widget -> widget.onMouseRelease(mouseButton), false)) {
             return true;
         }
         boolean result = false;
@@ -306,8 +304,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @ApiStatus.OverrideOnly
     public boolean onKeyPressed(char typedChar, int keyCode) {
         if (!isValid()) return false;
-        int flag = IViewport.INTERACTION | IViewport.KEY | IViewport.PRESSED;
-        switch (interactFocused(widget -> widget.onKeyPressed(typedChar, keyCode), Interactable.Result.IGNORE, flag)) {
+        switch (interactFocused(widget -> widget.onKeyPressed(typedChar, keyCode), Interactable.Result.IGNORE)) {
             case STOP:
             case SUCCESS:
                 if (!this.isKeyHeld && !this.isMouseButtonHeld) {
@@ -370,8 +367,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @ApiStatus.OverrideOnly
     public boolean onKeyRelease(char typedChar, int keyCode) {
         if (!isValid()) return false;
-        int flag = IViewport.INTERACTION | IViewport.KEY | IViewport.RELEASED;
-        if (interactFocused(widget -> widget.onKeyRelease(typedChar, keyCode), false, flag)) {
+        if (interactFocused(widget -> widget.onKeyRelease(typedChar, keyCode), false)) {
             return true;
         }
         boolean result = false;
@@ -406,8 +402,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @ApiStatus.OverrideOnly
     public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
         if (!isValid()) return false;
-        int flag = IViewport.INTERACTION | IViewport.MOUSE | IViewport.SCROLL;
-        if (interactFocused(widget -> widget.onMouseScroll(scrollDirection, amount), false, flag)) {
+        if (interactFocused(widget -> widget.onMouseScroll(scrollDirection, amount), false)) {
             return true;
         }
         if (this.hovering.isEmpty()) return false;
@@ -438,7 +433,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return false;
     }
 
-    private <T, W extends IWidget & IFocusedWidget & Interactable> T interactFocused(Function<W, T> function, T defaultValue, int context) {
+    private <T, W extends IWidget & IFocusedWidget & Interactable> T interactFocused(Function<W, T> function, T defaultValue) {
         LocatedWidget focused = this.getContext().getFocusedWidget();
         T result = defaultValue;
         if (focused.getElement() instanceof Interactable) {

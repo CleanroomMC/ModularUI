@@ -114,20 +114,15 @@ public class GuiContext extends GuiViewportStack {
      * @param widget widget to focus
      */
     public void focus(IFocusedWidget widget) {
-        this.focus(widget, false);
-    }
-
-    public void focus(IFocusedWidget widget, boolean select) {
-        focus(LocatedWidget.of((IWidget) widget), select);
+        focus(LocatedWidget.of((IWidget) widget));
     }
 
     /**
      * Tries to focus the given widget
      *
      * @param widget widget to focus
-     * @param select true if the widget should also be selected (f.e. the text in a text field)
      */
-    public void focus(@NotNull LocatedWidget widget, boolean select) {
+    public void focus(@NotNull LocatedWidget widget) {
         if (this.focusedWidget.getElement() == widget.getElement()) {
             return;
         }
@@ -140,10 +135,6 @@ public class GuiContext extends GuiViewportStack {
             IFocusedWidget focusedWidget = (IFocusedWidget) this.focusedWidget.getElement();
             focusedWidget.onRemoveFocus(this);
             this.screen.setFocused(false);
-
-            if (select) {
-                focusedWidget.unselect(this);
-            }
         }
 
         this.focusedWidget = widget;
@@ -152,10 +143,6 @@ public class GuiContext extends GuiViewportStack {
             IFocusedWidget focusedWidget = (IFocusedWidget) this.focusedWidget.getElement();
             focusedWidget.onFocus(this);
             this.screen.setFocused(true);
-
-            if (select) {
-                focusedWidget.selectAll(this);
-            }
         }
     }
 
@@ -163,7 +150,7 @@ public class GuiContext extends GuiViewportStack {
      * Removes focus from any widget
      */
     public void removeFocus() {
-        this.focus(null);
+        focus(LocatedWidget.EMPTY);
     }
 
     /**
@@ -187,14 +174,14 @@ public class GuiContext extends GuiViewportStack {
     }
 
     public boolean focus(IWidget parent, int index, int factor) {
-        return this.focus(parent, index, factor, false);
+        return focus(parent, index, factor, false);
     }
 
     /**
      * Focus next focusable GUI element
      */
-    public boolean focus(IWidget parent, int index, int factor, boolean stop) {
-        List<IWidget> children = parent.getChildren();
+    public boolean focus(IWidget widget, int index, int factor, boolean stop) {
+        List<IWidget> children = widget.getChildren();
 
         factor = factor >= 0 ? 1 : -1;
         index += factor;
@@ -207,32 +194,28 @@ public class GuiContext extends GuiViewportStack {
             }
 
             if (child instanceof IFocusedWidget) {
-                this.focus((IFocusedWidget) child, true);
+                focus((IFocusedWidget) child);
 
                 return true;
             } else {
                 int start = factor > 0 ? -1 : child.getChildren().size();
 
-                if (this.focus(child, start, factor, true)) {
+                if (focus(child, start, factor, true)) {
                     return true;
                 }
             }
         }
 
-        IWidget grandparent = parent.getParent();
+        IWidget grandparent = widget.getParent();
         boolean isRoot = grandparent instanceof ModularPanel;//grandparent == this.screen.getRoot();
 
         if (grandparent != null && !stop && (isRoot || grandparent.canBeSeen(this))) {
-            /* Forgive me for this heresy, but I have no idea what other name I could give
-             * to this variable */
-            List<IWidget> childs = grandparent.getChildren();
-
-            if (this.focus(grandparent, childs.indexOf(parent), factor)) {
+            List<IWidget> siblings = grandparent.getChildren();
+            if (focus(grandparent, siblings.indexOf(widget), factor)) {
                 return true;
             }
-
             if (isRoot) {
-                return this.focus(grandparent, factor > 0 ? -1 : childs.size() - 1, factor);
+                return focus(grandparent, factor > 0 ? -1 : siblings.size() - 1, factor);
             }
         }
 
@@ -314,7 +297,6 @@ public class GuiContext extends GuiViewportStack {
     @ApiStatus.Internal
     public void drawDraggable() {
         if (hasDraggable()) {
-            int flag = IViewport.DRAWING | IViewport.DRAGGABLE;
             this.draggable.applyMatrix(this);
             this.draggable.getElement().drawMovingState(this, this.partialTicks);
             this.draggable.unapplyMatrix(this);

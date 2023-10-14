@@ -15,6 +15,11 @@ public class GuiContainerMixin {
     @Shadow
     private Slot hoveredSlot;
 
+    /**
+     * Mixin into ModularUI screen wrapper to return the true hovered slot.
+     * The method is private and only the mouse pos is ever passed to this method.
+     * That's why we can just return the current hovered slot.
+     */
     @Inject(method = "getSlotAtPosition", at = @At("HEAD"), cancellable = true)
     public void getSlot(int x, int y, CallbackInfoReturnable<Slot> cir) {
         if (((Object) this).getClass() == GuiScreenWrapper.class) {

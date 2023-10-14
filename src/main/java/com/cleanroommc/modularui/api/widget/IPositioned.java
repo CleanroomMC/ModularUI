@@ -8,6 +8,11 @@ import com.cleanroommc.modularui.widget.sizer.Unit;
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 
+/**
+ * Helper interface for position and size builder methods for widgets.
+ *
+ * @param <W> widget type
+ */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public interface IPositioned<W extends IPositioned<W>> {
 

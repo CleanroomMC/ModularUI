@@ -123,15 +123,6 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     }
 
     @Override
-    public void selectAll(GuiContext context) {
-
-    }
-
-    @Override
-    public void unselect(GuiContext context) {
-    }
-
-    @Override
     public @NotNull Result onMousePressed(int mouseButton) {
         Result result = super.onMousePressed(mouseButton);
         if (result != Result.IGNORE) {

@@ -101,9 +101,9 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     @Override
-    public void initialiseSyncHandler(GuiSyncManager syncHandler) {
+    public void initialiseSyncHandler(GuiSyncManager syncManager) {
         if (this.syncKey != null) {
-            this.syncHandler = syncHandler.getSyncHandler(this.syncKey);
+            this.syncHandler = syncManager.getSyncHandler(this.syncKey);
             if (!isValidSyncHandler(this.syncHandler)) {
                 String type = this.syncHandler == null ? null : this.syncHandler.getClass().getName();
                 this.syncHandler = null;
@@ -182,13 +182,6 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         if (this.hoverBackground == null) {
             this.hoverBackground = widgetTheme.getHoverBackground();
         }
-    }
-
-    /**
-     * Do not override this. Override {@link IWidget#getWidgetTheme(ITheme)} instead.
-     */
-    public final WidgetTheme getWidgetTheme() {
-        return getWidgetTheme(getContext().getTheme());
     }
 
     public @Nullable IDrawable getBackground() {
@@ -400,6 +393,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         return this.context;
     }
 
+    @ApiStatus.Internal
     protected final void setContext(GuiContext context) {
         this.context = context;
     }
@@ -427,8 +421,8 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     @Override
-    public W syncHandler(String key) {
-        this.syncKey = key;
+    public W syncHandler(String name, int id) {
+        this.syncKey = GuiSyncManager.makeSyncKey(name, id);
         return getThis();
     }
 

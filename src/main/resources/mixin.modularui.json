@@ -8,10 +8,8 @@
     "GuiContainerAccessor",
     "GuiContainerMixin",
     "KeyBindAccess",
-    "MinecraftMixin",
-    "SlotAccessorClient"
+    "MinecraftMixin"
   ],
   "mixins": [
-    "SlotMixin"
   ]
 }

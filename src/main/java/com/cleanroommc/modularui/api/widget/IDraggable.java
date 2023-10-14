@@ -7,6 +7,11 @@ import com.cleanroommc.modularui.utils.HoveredWidgetList;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Marks a widget as draggable.
+ * The dragging is handled by ModularUI.
+ * @see com.cleanroommc.modularui.widget.DraggableWidget
+ */
 public interface IDraggable extends IViewport {
 
     /**

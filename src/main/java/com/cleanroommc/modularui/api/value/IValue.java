@@ -1,5 +1,10 @@
 package com.cleanroommc.modularui.api.value;
 
+/**
+ * A value wrapper for widgets.
+ *
+ * @param <T> value type
+ */
 public interface IValue<T> {
 
     /**
