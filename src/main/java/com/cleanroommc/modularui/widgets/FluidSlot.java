@@ -240,6 +240,16 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
         return this;
     }
 
+    public FluidSlot syncHandler(IFluidTank fluidTank) {
+        return syncHandler(new FluidSlotSyncHandler(fluidTank));
+    }
+
+    public FluidSlot syncHandler(FluidSlotSyncHandler syncHandler) {
+        setSyncHandler(syncHandler);
+        this.syncHandler = syncHandler;
+        return this;
+    }
+
     /* === Jei ghost slot === */
 
     @Override
@@ -257,11 +267,5 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
     @Override
     public @Nullable Object getIngredient() {
         return getFluidStack();
-    }
-
-    public FluidSlot syncHandler(FluidSlotSyncHandler syncHandler) {
-        setSyncHandler(syncHandler);
-        this.syncHandler = syncHandler;
-        return this;
     }
 }
