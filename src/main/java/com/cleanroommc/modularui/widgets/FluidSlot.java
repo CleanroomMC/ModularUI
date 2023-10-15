@@ -57,34 +57,34 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
                 if (fluid != null) {
                     tooltip.addLine(IKey.str(fluid.getLocalizedName()));
                     if (this.syncHandler.controlsAmount()) {
-                        tooltip.addLine(IKey.format("modularui.fluid.phantom.amount", formatFluidAmount(fluid.amount), getBaseUnit()));
+                        tooltip.addLine(IKey.lang("modularui.fluid.phantom.amount", formatFluidAmount(fluid.amount), getBaseUnit()));
                     }
                 } else {
-                    tooltip.addLine(IKey.format("modularui.fluid.empty"));
+                    tooltip.addLine(IKey.lang("modularui.fluid.empty"));
                 }
                 if (this.syncHandler.controlsAmount()) {
-                    tooltip.addLine(IKey.format("modularui.fluid.phantom.control"));
+                    tooltip.addLine(IKey.lang("modularui.fluid.phantom.control"));
                 }
             } else {
                 if (fluid != null) {
                     tooltip.addLine(IKey.str(fluid.getLocalizedName()));
-                    tooltip.addLine(IKey.format("modularui.fluid.amount", formatFluidAmount(fluid.amount), formatFluidAmount(fluidTank.getCapacity()), getBaseUnit()));
+                    tooltip.addLine(IKey.lang("modularui.fluid.amount", formatFluidAmount(fluid.amount), formatFluidAmount(fluidTank.getCapacity()), getBaseUnit()));
                     addAdditionalFluidInfo(tooltip, fluid);
                 } else {
-                    tooltip.addLine(IKey.format("modularui.fluid.empty"));
+                    tooltip.addLine(IKey.lang("modularui.fluid.empty"));
                 }
                 if (this.syncHandler.canFillSlot() || this.syncHandler.canDrainSlot()) {
                     tooltip.addLine(IKey.EMPTY); // Add an empty line to separate from the bottom material tooltips
                     if (Interactable.hasShiftDown()) {
                         if (this.syncHandler.canFillSlot() && this.syncHandler.canDrainSlot()) {
-                            tooltip.addLine(IKey.format("modularui.fluid.click_combined"));
+                            tooltip.addLine(IKey.lang("modularui.fluid.click_combined"));
                         } else if (this.syncHandler.canDrainSlot()) {
-                            tooltip.addLine(IKey.format("modularui.fluid.click_to_fill"));
+                            tooltip.addLine(IKey.lang("modularui.fluid.click_to_fill"));
                         } else if (this.syncHandler.canFillSlot()) {
-                            tooltip.addLine(IKey.format("modularui.fluid.click_to_empty"));
+                            tooltip.addLine(IKey.lang("modularui.fluid.click_to_empty"));
                         }
                     } else {
-                        tooltip.addLine(IKey.format("modularui.tooltip.shift"));
+                        tooltip.addLine(IKey.lang("modularui.tooltip.shift"));
                     }
                 }
             }

@@ -16,6 +16,8 @@ import com.cleanroommc.modularui.widgets.TextWidget;
 import com.google.gson.JsonObject;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
@@ -36,7 +38,7 @@ public interface IKey extends IDrawable {
      * @param key translation key
      * @return text key
      */
-    static IKey lang(String key) {
+    static IKey lang(@NotNull String key) {
         return new LangKey(key);
     }
 
@@ -47,7 +49,7 @@ public interface IKey extends IDrawable {
      * @param args translation arguments
      * @return text key
      */
-    static IKey format(String key, Object... args) {
+    static IKey lang(@NotNull String key, @Nullable Object... args) {
         return new LangKey(key, args);
     }
 
@@ -57,8 +59,20 @@ public interface IKey extends IDrawable {
      * @param key string
      * @return text key
      */
-    static IKey str(String key) {
+    static IKey str(@NotNull String key) {
         return new StringKey(key);
+    }
+
+    /**
+     * Creates a formatted string literal text with arguments. The arguments can be dynamic.
+     * The string is formatted using {@link String#format(String, Object...)}.
+     *
+     * @param key string
+     * @param args arguments
+     * @return text key
+     */
+    static IKey format(@NotNull String key, @Nullable Object... args) {
+        return new StringKey(key, args);
     }
 
     /**
@@ -67,7 +81,7 @@ public interface IKey extends IDrawable {
      * @param keys text keys
      * @return composed text key.
      */
-    static IKey comp(IKey... keys) {
+    static IKey comp(@NotNull IKey... keys) {
         return new CompoundKey(keys);
     }
 
@@ -77,7 +91,7 @@ public interface IKey extends IDrawable {
      * @param getter string supplier
      * @return dynamic text key
      */
-    static IKey dynamic(Supplier<String> getter) {
+    static IKey dynamic(@NotNull Supplier<String> getter) {
         return new DynamicKey(getter);
     }
 

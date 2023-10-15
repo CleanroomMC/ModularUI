@@ -3,22 +3,25 @@ package com.cleanroommc.modularui.drawable.keys;
 import com.cleanroommc.modularui.ClientEventHandler;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import net.minecraft.client.resources.I18n;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 public class LangKey implements IKey {
 
     private final String key;
+    private final Object[] args;
     private String string;
     private long time = 0;
-    private final Object[] args;
 
-    public LangKey(String key) {
+    public LangKey(@NotNull String key) {
         this(key, null);
     }
 
-    public LangKey(String key, @Nullable Object[] args) {
-        this.key = key;
-        this.args = args;
+    public LangKey(@NotNull String key, @Nullable Object[] args) {
+        this.key = Objects.requireNonNull(key);
+        this.args = args == null || args.length == 0 ? null : args;
     }
 
     public String getKey() {
@@ -31,7 +34,7 @@ public class LangKey implements IKey {
 
     @Override
     public String get() {
-        if (this.string == null || (this.args.length > 0 && this.time != ClientEventHandler.getTicks())) {
+        if (this.string == null || (this.args != null && this.time != ClientEventHandler.getTicks())) {
             this.time = ClientEventHandler.getTicks();
             this.string = I18n.format(this.key, this.args);
         }
