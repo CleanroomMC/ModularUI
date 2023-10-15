@@ -86,7 +86,7 @@ public class WindowManager {
         if (this.panels.contains(panel) || isPanelOpen(panel.getName())) {
             throw new IllegalStateException("Panel " + panel.getName() + " is already open.");
         }
-        panel.setPanelGuiContext(this.screen.context);
+        panel.setPanelGuiContext(this.screen.getContext());
         this.panels.addFirst(panel);
         panel.getArea().setPanelLayer((byte) this.panels.size());
         panel.onOpen(this.screen);

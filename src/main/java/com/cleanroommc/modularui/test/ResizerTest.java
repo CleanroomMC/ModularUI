@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.drawable.GuiTextures;
+import com.cleanroommc.modularui.screen.CustomModularScreen;
 import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
@@ -10,7 +10,7 @@ import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Row;
 import org.jetbrains.annotations.NotNull;
 
-public class ResizerTest extends ModularScreen {
+public class ResizerTest extends CustomModularScreen {
 
     @Override
     public @NotNull ModularPanel buildUI(GuiContext context) {

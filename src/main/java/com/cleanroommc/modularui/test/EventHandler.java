@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.holoui.HoloScreenEntity;
 import com.cleanroommc.modularui.holoui.HoloUI;
+import com.cleanroommc.modularui.manager.ClientGUI;
 import com.cleanroommc.modularui.manager.GuiManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.init.Items;
@@ -18,7 +19,7 @@ public class EventHandler {
                     .inFrontOf(Minecraft.getMinecraft().player, 5, false)
                     .screenScale(0.5f)
                     .open(new TestGui());*/
-            GuiManager.openClientUI(Minecraft.getMinecraft().player, new ResizerTest());
+            ClientGUI.open(new ResizerTest());
         }
     }
 }

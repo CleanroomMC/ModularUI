@@ -20,6 +20,7 @@ import com.cleanroommc.modularui.widget.sizer.Box;
 import com.cleanroommc.modularui.widget.sizer.Flex;
 import com.cleanroommc.modularui.widget.sizer.IUnResizeable;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -279,6 +280,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     // === Events ===
     // --------------
 
+    @MustBeInvokedByOverriders
     @Override
     public void onUpdate() {
         if (this.onUpdateListener != null) {

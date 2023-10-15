@@ -115,7 +115,7 @@ public class GuiScreenWrapper extends GuiContainer {
         RenderHelper.enableGUIStandardItemLighting();
 
         getAccessor().setHoveredSlot(null);
-        IGuiElement hovered = this.screen.context.getHovered();
+        IGuiElement hovered = this.screen.getContext().getHovered();
         if (hovered instanceof IVanillaSlot) {
             getAccessor().setHoveredSlot(((IVanillaSlot) hovered).getVanillaSlot());
         }
@@ -220,7 +220,7 @@ public class GuiScreenWrapper extends GuiContainer {
     }
 
     public void drawDebugScreen() {
-        GuiContext context = this.screen.context;
+        GuiContext context = this.screen.getContext();
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
         int screenH = this.screen.getScreenArea().height;
         int color = Color.rgb(180, 40, 115);
@@ -314,7 +314,7 @@ public class GuiScreenWrapper extends GuiContainer {
 
     public void clickSlot() {
         try {
-            super.mouseClicked(this.screen.context.getAbsMouseX(), this.screen.context.getAbsMouseY(), this.screen.context.getMouseButton());
+            super.mouseClicked(this.screen.getContext().getAbsMouseX(), this.screen.getContext().getAbsMouseY(), this.screen.getContext().getMouseButton());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -327,7 +327,7 @@ public class GuiScreenWrapper extends GuiContainer {
     }
 
     public void releaseSlot() {
-        super.mouseReleased(this.screen.context.getAbsMouseX(), this.screen.context.getAbsMouseY(), this.screen.context.getMouseButton());
+        super.mouseReleased(this.screen.getContext().getAbsMouseX(), this.screen.getContext().getAbsMouseY(), this.screen.getContext().getMouseButton());
     }
 
     @Override
@@ -337,7 +337,7 @@ public class GuiScreenWrapper extends GuiContainer {
     }
 
     public void dragSlot(long timeSinceLastClick) {
-        super.mouseClickMove(this.screen.context.getAbsMouseX(), this.screen.context.getAbsMouseY(), this.screen.context.getMouseButton(), timeSinceLastClick);
+        super.mouseClickMove(this.screen.getContext().getAbsMouseX(), this.screen.getContext().getAbsMouseY(), this.screen.getContext().getMouseButton(), timeSinceLastClick);
     }
 
     /**
