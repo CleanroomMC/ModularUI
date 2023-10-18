@@ -54,7 +54,10 @@ public class ThemeAPI implements IThemeApi {
 
     @Override
     public void registerTheme(String id, JsonBuilder json) {
-        getJavaDefaultThemes(id).add(json);
+        List<JsonBuilder> themes = getJavaDefaultThemes(id);
+        if (!themes.contains(json)) {
+            themes.add(json);
+        }
     }
 
     @Override
@@ -71,12 +74,13 @@ public class ThemeAPI implements IThemeApi {
     }
 
     private String getThemeIdForScreen(String mod, String name) {
-        String theme = this.jsonScreenThemes.get(mod + ":" + name);
+        String fullName = mod + ":" + name;
+        String theme = this.jsonScreenThemes.get(fullName);
         if (theme != null) return theme;
         theme = this.jsonScreenThemes.get(mod);
         if (theme != null) return theme;
-        theme = this.screenThemes.get(mod + ":" + name);
-        return theme;
+        theme = this.screenThemes.get(fullName);
+        return theme != null ? theme : this.screenThemes.get(mod);
     }
 
     @Override

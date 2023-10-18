@@ -437,19 +437,49 @@ public class ModularScreen {
         return (List<T>) this.guiActionListeners.getOrDefault(clazz, Collections.emptyList());
     }
 
+    /**
+     * Registers an interaction listener. This is useful when you want to listen to any GUI interactions and not just
+     * for a specific widget. <br>
+     * <b>Do NOT register listeners which are bound to a widget here!</b>
+     * Use {@link com.cleanroommc.modularui.widget.Widget#listenGuiAction(IGuiAction) Widget#listenGuiAction(IGuiAction)} for that!
+     *
+     * @param action action listener
+     */
     public void registerGuiActionListener(IGuiAction action) {
         this.guiActionListeners.computeIfAbsent(getGuiActionClass(action), key -> new ArrayList<>()).add(action);
     }
 
-    @ApiStatus.Internal
+    /**
+     * Removes an interaction listener
+     *
+     * @param action action listener to remove
+     */
     public void removeGuiActionListener(IGuiAction action) {
         this.guiActionListeners.getOrDefault(getGuiActionClass(action), Collections.emptyList()).remove(action);
     }
 
+    /**
+     * Registers a frame update listener which runs approximately 60 times per second.
+     * Listeners are automatically removed if the widget becomes invalid.
+     * If a listener is already registered from the given widget, the listeners get merged.
+     *
+     * @param widget   widget the listener is bound to
+     * @param runnable listener function
+     */
     public void registerFrameUpdateListener(IWidget widget, Runnable runnable) {
         registerFrameUpdateListener(widget, runnable, true);
     }
 
+    /**
+     * Registers a frame update listener which runs approximately 60 times per second.
+     * Listeners are automatically removed if the widget becomes invalid.
+     * If a listener is already registered from the given widget and <code>merge</code> is true, the listeners get merged.
+     * Otherwise, the current listener is overwritten (if any)
+     *
+     * @param widget   widget the listener is bound to
+     * @param runnable listener function
+     * @param merge    if listener should be merged with existing listener
+     */
     public void registerFrameUpdateListener(IWidget widget, Runnable runnable, boolean merge) {
         Objects.requireNonNull(runnable);
         if (merge) {
@@ -462,6 +492,11 @@ public class ModularScreen {
         }
     }
 
+    /**
+     * Removes all frame update listeners for a widget.
+     *
+     * @param widget widget to remove listeners from
+     */
     public void removeFrameUpdateListener(IWidget widget) {
         this.frameUpdates.remove(widget);
     }

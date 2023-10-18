@@ -14,6 +14,7 @@ With ModularUI you simply call `.child(new FluidSlot().syncHandler(new FluidTank
 - panel system similar to windows
 - widgets are placed in a tree like structure
 - widget rendering and interactions are automatically handled
+- easy and dynamic widget sizing and positioning
 - syncing widget values
 - good for client only GUIs and client-server synced GUIs
 - GUI themes are loaded via JSON and can be added and modified by resourcepacks

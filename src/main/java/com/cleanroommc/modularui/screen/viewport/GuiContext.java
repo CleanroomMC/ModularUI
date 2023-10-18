@@ -3,7 +3,6 @@ package com.cleanroommc.modularui.screen.viewport;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.ITheme;
-import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
 import com.cleanroommc.modularui.screen.*;
@@ -20,6 +19,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * This class keeps track of the gui state like hovered widget, focused widget, pressed buttons, draggables, mouse pos
+ * jei settings and themes.
+ */
 public class GuiContext extends GuiViewportStack {
 
     public final Minecraft mc;
@@ -63,29 +66,49 @@ public class GuiContext extends GuiViewportStack {
         this.font = this.mc.fontRenderer;
     }
 
+    /**
+     * @return true the mouse is anywhere above the widget
+     */
     public boolean isAbove(IGuiElement widget) {
         return widget.getArea().isInside(this.mouseX, this.mouseY);
     }
 
-    /* Element focusing */
-
+    /**
+     * @return true if any widget is being hovered
+     */
     public boolean isHovered() {
         return this.hovered != null;
     }
 
+    /**
+     * @return true if the widget is directly below the mouse
+     */
     public boolean isHovered(IGuiElement guiElement) {
         return isHovered() && this.hovered == guiElement;
     }
 
+    /**
+     * Checks if a widget is hovered for a certain amount of ticks
+     *
+     * @param guiElement widget
+     * @param ticks      time hovered
+     * @return true if the widget is hovered for at least a certain number of ticks
+     */
     public boolean isHoveredFor(IGuiElement guiElement, int ticks) {
         return isHovered(guiElement) && this.timeHovered / 3 >= ticks;
     }
 
+    /**
+     * @return the hovered widget (widget directly below the mouse)
+     */
     @Nullable
     public IGuiElement getHovered() {
         return this.hovered;
     }
 
+    /**
+     * @return all widgets which are below the mouse ({@link #isAbove(IGuiElement)} is true)
+     */
     public Iterable<IGuiElement> getAllBelowMouse() {
         return this.hoveredWidgets;
     }
@@ -96,6 +119,8 @@ public class GuiContext extends GuiViewportStack {
     public boolean isFocused() {
         return this.focusedWidget.getElement() != null;
     }
+
+    /* Element focusing */
 
     /**
      * @return true if there is any focused widget
@@ -320,6 +345,7 @@ public class GuiContext extends GuiViewportStack {
 
     @ApiStatus.Internal
     public void onFrameUpdate() {
+        updateEventState();
         IGuiElement hovered = this.screen.getWindowManager().getTopWidget();
         if (hasDraggable() && (this.lastDragX != this.mouseX || this.lastDragY != this.mouseY)) {
             this.lastDragX = this.mouseX;

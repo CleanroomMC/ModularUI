@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.utils.JsonHelper;
+import com.cleanroommc.modularui.utils.ObjectList;
 import com.google.gson.*;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.ApiStatus;
@@ -33,8 +34,7 @@ public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDes
         registerDrawableType("color", json -> new Rectangle());
         registerDrawableType("rectangle", json -> new Rectangle());
         registerDrawableType("ellipse", json -> new Circle());
-        registerDrawableType("text", json -> parseKeyFromJson(json, IKey::str));
-        registerDrawableType("text:lang", json -> parseKeyFromJson(json, IKey::lang));
+        registerDrawableType("text", DrawableSerialization::parseText);
     }
 
     @Override
@@ -79,6 +79,41 @@ public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDes
     @Override
     public JsonElement serialize(IDrawable src, Type typeOfSrc, JsonSerializationContext context) {
         throw new UnsupportedOperationException();
+    }
+
+    private static IKey parseText(JsonObject json) throws JsonParseException {
+        JsonElement element = JsonHelper.getJsonElement(json, "text", "string", "key");
+        if (element == null || element.isJsonNull()) return IKey.str("No text found!");
+        if (element.isJsonPrimitive()) {
+            String s = element.getAsString();
+            if (s.startsWith("I18n:")) {
+                return IKey.lang(s.substring(5));
+            }
+            return JsonHelper.getBoolean(json, false, "lang", "translate") ? IKey.lang(s) : IKey.str(s);
+        }
+        if (element.isJsonArray()) {
+            ObjectList<IKey> strings = ObjectList.create();
+            for (JsonElement element1 : element.getAsJsonArray()) {
+                strings.add(parseText(element1));
+            }
+            strings.trim();
+            return IKey.comp(strings.elements());
+        }
+        throw new JsonParseException("");
+    }
+
+    private static IKey parseText(JsonElement element) throws JsonParseException {
+        if (element.isJsonPrimitive()) {
+            String s = element.getAsString();
+            if (s.startsWith("I18n:")) {
+                return IKey.lang(s.substring(5));
+            }
+            return IKey.str(s);
+        }
+        if (element.isJsonObject()) {
+            return parseText(element.getAsJsonObject());
+        }
+        throw new JsonParseException("");
     }
 
     private static IKey parseKeyFromJson(JsonObject json, Function<String, IKey> keyFunction) {

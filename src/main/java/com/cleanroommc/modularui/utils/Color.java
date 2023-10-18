@@ -800,7 +800,9 @@ public class Color implements IntIterable {
             }
             if (hasRGB(json)) {
                 if (hasHS(json) || hasV(json) || hasL(json))
-                    throw new JsonParseException("Found RGB values but also HSV or HSL values!");
+                    throw new JsonParseException("Found RGB values, but also HSV or HSL values!");
+                if (hasCMYK(json))
+                    throw new JsonParseException("Found RGB values, but also CMYK values!");
                 int red = JsonHelper.getInt(json, 255, "r", "red");
                 int green = JsonHelper.getInt(json, 255, "g", "green");
                 int blue = JsonHelper.getInt(json, 255, "b", "blue");
@@ -810,6 +812,8 @@ public class Color implements IntIterable {
                 return Color.argb(red, green, blue, alpha);
             }
             if (hasHS(json)) {
+                if (hasCMYK(json))
+                    throw new JsonParseException("Found HSV or HSL values, but also CMYK values!");
                 int hue = JsonHelper.getInt(json, 0, "h", "hue");
                 float saturation = JsonHelper.getFloat(json, 0, "s", "saturation");
                 if (hasV(json)) {
@@ -819,6 +823,13 @@ public class Color implements IntIterable {
                 }
                 float lightness = JsonHelper.getFloat(json, 0.5f, "l", "lightness");
                 return ofHSL(hue, saturation, lightness, alphaF);
+            }
+            if (hasCMYK(json)) {
+                float c = JsonHelper.getFloat(json, 1f, "c", "cyan");
+                float m = JsonHelper.getFloat(json, 1f, "m", "magenta");
+                float y = JsonHelper.getFloat(json, 1f, "y", "yellow");
+                float k = JsonHelper.getFloat(json, 1f, "k", "black");
+                return ofCMYK(c, m, y, k, alphaF);
             }
             throw new JsonParseException("Empty color declaration");
         }
@@ -842,6 +853,13 @@ public class Color implements IntIterable {
 
     private static boolean hasL(JsonObject json) {
         return json.has("l") || json.has("lightness");
+    }
+
+    private static boolean hasCMYK(JsonObject json) {
+        return json.has("c") || json.has("cyan") ||
+                json.has("m") || json.has("magenta") ||
+                json.has("y") || json.has("yellow") ||
+                json.has("k") || json.has("black");
     }
 
     public static final Color WHITE = new Color(0xFFFFFF, new int[]{},

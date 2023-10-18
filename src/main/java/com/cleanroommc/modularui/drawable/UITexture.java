@@ -14,9 +14,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class UITexture implements IDrawable {
 
     public static final UITexture DEFAULT = fullImage("gui/options_background", true);
@@ -168,6 +165,9 @@ public class UITexture implements IDrawable {
         int borderY = JsonHelper.getInt(json, 0, "borderY", "border");
         if (borderX > 0 || borderY > 0) {
             builder.adaptable(borderX, borderY);
+        }
+        if (JsonHelper.getBoolean(json, false, "tiled")) {
+            builder.tiled();
         }
         return builder.build();
     }
