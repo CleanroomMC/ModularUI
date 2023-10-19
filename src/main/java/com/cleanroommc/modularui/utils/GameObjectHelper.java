@@ -80,7 +80,7 @@ public class GameObjectHelper {
 
     public static ItemStack getItemStack(String mod, String path, int meta) {
         Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(mod, path));
-        if (item == null) throw new NoSuchElementException();
+        if (item == null) throw new NoSuchElementException("Item '" + mod + ":" + path + "' was not found!");
         return new ItemStack(item, 1, meta);
     }
 }

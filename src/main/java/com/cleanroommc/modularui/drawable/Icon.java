@@ -4,7 +4,9 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widget.sizer.Box;
+import com.google.gson.JsonObject;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -14,7 +16,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class Icon implements IIcon {
 
     private final IDrawable drawable;
-    private int width = 18, height = 18;
+    private int width = 0, height = 0;
     private Alignment alignment = Alignment.Center;
     private final Box margin = new Box();
 
@@ -60,12 +62,12 @@ public class Icon implements IIcon {
     }
 
     public Icon width(int width) {
-        this.width = width;
+        this.width = Math.max(0, width);
         return this;
     }
 
     public Icon height(int height) {
-        this.height = height;
+        this.height = Math.max(0, height);
         return this;
     }
 
@@ -115,5 +117,33 @@ public class Icon implements IIcon {
     public Icon marginBottom(int val) {
         this.margin.bottom(val);
         return this;
+    }
+
+    @Override
+    public void loadFromJson(JsonObject json) {
+        this.width = (json.has("autoWidth") || json.has("autoSize")) &&
+                JsonHelper.getBoolean(json, true, "autoWidth", "autoSize") ? 0 :
+                JsonHelper.getInt(json, 0, "width", "w", "size");
+        this.height = (json.has("autoHeight") || json.has("autoSize")) &&
+                JsonHelper.getBoolean(json, true, "autoHeight", "autoSize") ? 0 :
+                JsonHelper.getInt(json, 0, "height", "h", "size");
+        this.alignment = JsonHelper.deserialize(json, Alignment.class, Alignment.Center, "alignment", "align");
+        this.margin.all(JsonHelper.getInt(json, 0, "margin"));
+        if (json.has("marginHorizontal")) {
+            this.margin.left = json.get("marginHorizontal").getAsInt();
+            this.margin.right = this.margin.left;
+        }
+        if (json.has("marginVertical")) {
+            this.margin.top = json.get("marginVertical").getAsInt();
+            this.margin.bottom = this.margin.top;
+        }
+        this.margin.top = JsonHelper.getInt(json, this.margin.top, "marginTop");
+        this.margin.bottom = JsonHelper.getInt(json, this.margin.bottom, "marginBottom");
+        this.margin.left = JsonHelper.getInt(json, this.margin.left, "marginLeft");
+        this.margin.right = JsonHelper.getInt(json, this.margin.right, "marginRight");
+    }
+
+    public static Icon ofJson(JsonObject json) {
+        return JsonHelper.deserialize(json, IDrawable.class, IDrawable.EMPTY, "drawable", "icon").asIcon();
     }
 }

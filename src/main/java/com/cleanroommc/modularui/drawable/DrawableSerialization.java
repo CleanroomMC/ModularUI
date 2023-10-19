@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.utils.ObjectList;
 import com.google.gson.*;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDes
 
     private static final Map<String, Function<JsonObject, IDrawable>> DRAWABLE_TYPES = new Object2ObjectOpenHashMap<>();
 
-    public static void registerDrawableType(String id, Function<JsonObject, IDrawable> creator) {
+    public static void registerDrawableType(String id, Function<@NotNull JsonObject, @NotNull IDrawable> creator) {
         if (DRAWABLE_TYPES.containsKey(id)) {
             throw new IllegalArgumentException("Drawable type '" + id + "' already exists!");
         }
@@ -35,6 +36,8 @@ public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDes
         registerDrawableType("rectangle", json -> new Rectangle());
         registerDrawableType("ellipse", json -> new Circle());
         registerDrawableType("text", DrawableSerialization::parseText);
+        registerDrawableType("item", ItemDrawable::ofJson);
+        registerDrawableType("icon", Icon::ofJson);
     }
 
     @Override
