@@ -31,12 +31,12 @@ public class SClipboard implements IPacket {
 
     @Override
     public void write(PacketBuffer buf) {
-        NetworkUtils.writeStringSafe(buf, s);
+        NetworkUtils.writeStringSafe(buf, this.s);
     }
 
     @Override
     public void read(PacketBuffer buf) {
-        this.s = buf.readString(Short.MAX_VALUE);
+        this.s = NetworkUtils.readStringSafe(buf);
     }
 
     @Override

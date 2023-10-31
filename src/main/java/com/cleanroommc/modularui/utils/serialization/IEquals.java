@@ -29,8 +29,7 @@ public interface IEquals<T> {
      */
     static <T> IEquals<T> wrapNullSafe(IEquals<T> equals) {
         return (t1, t2) -> {
-            if (t1 == t2) return true;
-            if (t1 == null || t2 == null) return false;
+            if (t1 == null || t2 == null) return t1 == t2;
             return equals.areEqual(t1, t2);
         };
     }
