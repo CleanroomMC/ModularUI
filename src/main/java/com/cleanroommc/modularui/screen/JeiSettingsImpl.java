@@ -1,11 +1,14 @@
 package com.cleanroommc.modularui.screen;
 
+import com.cleanroommc.modularui.api.JeiSettings;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.integration.jei.GhostIngredientTarget;
 import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
 import com.cleanroommc.modularui.integration.jei.JeiState;
 import mezz.jei.api.gui.IGhostIngredientHandler;
 import net.minecraftforge.fml.common.Optional;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
@@ -22,7 +25,8 @@ import java.util.stream.Collectors;
  * By default, JEI is disabled in client only GUIs.
  * This class can be safely interacted with even when JEI/HEI is not installed.
  */
-public class JeiSettings {
+@SideOnly(Side.CLIENT)
+public class JeiSettingsImpl implements JeiSettings {
 
     private JeiState jeiState = JeiState.DEFAULT;
     private final List<IWidget> jeiExclusionWidgets = new ArrayList<>();
@@ -32,6 +36,7 @@ public class JeiSettings {
     /**
      * Force JEI to be enabled
      */
+    @Override
     public void enableJei() {
         this.jeiState = JeiState.ENABLED;
     }
@@ -39,6 +44,7 @@ public class JeiSettings {
     /**
      * Force JEI to be disabled
      */
+    @Override
     public void disableJei() {
         this.jeiState = JeiState.DISABLED;
     }
@@ -46,6 +52,7 @@ public class JeiSettings {
     /**
      * Only enabled JEI in synced GUIs
      */
+    @Override
     public void defaultJei() {
         this.jeiState = JeiState.DEFAULT;
     }
@@ -56,6 +63,7 @@ public class JeiSettings {
      * @param screen modular screen
      * @return true if jei is enabled
      */
+    @Override
     public boolean isJeiEnabled(ModularScreen screen) {
         return this.jeiState.test(screen);
     }
@@ -66,6 +74,7 @@ public class JeiSettings {
      *
      * @param area exclusion area
      */
+    @Override
     public void addJeiExclusionArea(Rectangle area) {
         if (!this.jeiExclusionAreas.contains(area)) {
             this.jeiExclusionAreas.add(area);
@@ -77,6 +86,7 @@ public class JeiSettings {
      *
      * @param area exclusion area to remove (must be the same instance)
      */
+    @Override
     public void removeJeiExclusionArea(Rectangle area) {
         this.jeiExclusionAreas.remove(area);
     }
@@ -87,6 +97,7 @@ public class JeiSettings {
      *
      * @param area widget
      */
+    @Override
     public void addJeiExclusionArea(IWidget area) {
         if (!this.jeiExclusionWidgets.contains(area)) {
             this.jeiExclusionWidgets.add(area);
@@ -98,6 +109,7 @@ public class JeiSettings {
      *
      * @param area widget
      */
+    @Override
     public void removeJeiExclusionArea(IWidget area) {
         this.jeiExclusionWidgets.remove(area);
     }
@@ -109,6 +121,7 @@ public class JeiSettings {
      * @param slot slot widget
      * @param <W>  slot widget type
      */
+    @Override
     public <W extends IWidget & JeiGhostIngredientSlot<?>> void addJeiGhostIngredientSlot(W slot) {
         this.jeiGhostIngredientSlots.add(slot);
     }
@@ -119,6 +132,7 @@ public class JeiSettings {
      * @param slot slot widget
      * @param <W>  slot widget type
      */
+    @Override
     public <W extends IWidget & JeiGhostIngredientSlot<?>> void removeJeiGhostIngredientSlot(W slot) {
         this.jeiGhostIngredientSlots.remove(slot);
     }

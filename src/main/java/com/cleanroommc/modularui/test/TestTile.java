@@ -4,7 +4,7 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.*;
-import com.cleanroommc.modularui.manager.GuiCreationContext;
+import com.cleanroommc.modularui.factory.PosGuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -33,7 +33,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
-public class TestTile extends TileEntity implements IGuiHolder, ITickable {
+public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITickable {
 
     private final FluidTank fluidTank = new FluidTank(10000);
     private final FluidTank fluidTankPhantom = new FluidTank(Integer.MAX_VALUE);
@@ -60,7 +60,7 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
     private int num = 2;
 
     @Override
-    public ModularPanel buildUI(GuiCreationContext guiCreationContext, GuiSyncManager guiSyncManager, boolean isClient) {
+    public ModularPanel buildUI(PosGuiData guiData, GuiSyncManager guiSyncManager, boolean isClient) {
         guiSyncManager.registerSlotGroup("item_inv", 3);
         guiSyncManager.registerSlotGroup("mixer_items", 2);
 
@@ -158,13 +158,13 @@ public class TestTile extends TileEntity implements IGuiHolder, ITickable {
                                                 .child(new Row().widthRel(1f).height(18)
                                                         .child(new ToggleButton()
                                                                 .value(new BoolValue.Dynamic(() -> cycleStateValue.getIntValue() == 0, val -> cycleStateValue.setIntValue(0)))
-                                                                .overlay(GuiTextures.CYCLE_BUTTON_DEMO.getSubArea(0, 0, 1, 1/3f)))
+                                                                .overlay(GuiTextures.CYCLE_BUTTON_DEMO.getSubArea(0, 0, 1, 1 / 3f)))
                                                         .child(new ToggleButton()
                                                                 .value(new BoolValue.Dynamic(() -> cycleStateValue.getIntValue() == 1, val -> cycleStateValue.setIntValue(1)))
-                                                                .overlay(GuiTextures.CYCLE_BUTTON_DEMO.getSubArea(0, 1/3f, 1, 2/3f)))
+                                                                .overlay(GuiTextures.CYCLE_BUTTON_DEMO.getSubArea(0, 1 / 3f, 1, 2 / 3f)))
                                                         .child(new ToggleButton()
                                                                 .value(new BoolValue.Dynamic(() -> cycleStateValue.getIntValue() == 2, val -> cycleStateValue.setIntValue(2)))
-                                                                .overlay(GuiTextures.CYCLE_BUTTON_DEMO.getSubArea(0, 2/3f, 1, 1))))
+                                                                .overlay(GuiTextures.CYCLE_BUTTON_DEMO.getSubArea(0, 2 / 3f, 1, 1))))
                                                 /*.child(new CycleButtonWidget()
                                                         .length(3)
                                                         .texture(GuiTextures.CYCLE_BUTTON_DEMO)

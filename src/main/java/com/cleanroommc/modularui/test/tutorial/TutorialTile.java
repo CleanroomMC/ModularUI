@@ -2,7 +2,7 @@ package com.cleanroommc.modularui.test.tutorial;
 
 import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.drawable.GuiTextures;
-import com.cleanroommc.modularui.manager.GuiCreationContext;
+import com.cleanroommc.modularui.factory.PosGuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.value.sync.DoubleSyncValue;
 import com.cleanroommc.modularui.value.sync.GuiSyncManager;
@@ -10,14 +10,14 @@ import com.cleanroommc.modularui.widgets.ProgressWidget;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 
-public class TutorialTile extends TileEntity implements IGuiHolder, ITickable {
+public class TutorialTile extends TileEntity implements IGuiHolder<PosGuiData>, ITickable {
 
     private int progress = 0;
 
     @Override
-    public ModularPanel buildUI(GuiCreationContext guiCreationContext, GuiSyncManager guiSyncManager, boolean isClient) {
+    public ModularPanel buildUI(PosGuiData guiData, GuiSyncManager guiSyncManager, boolean isClient) {
         // disables jei
-        guiCreationContext.getJeiSettings().disableJei();
+        guiData.getJeiSettings().disableJei();
 
         ModularPanel panel = ModularPanel.defaultPanel("tutorial_gui");
         panel.bindPlayerInventory()

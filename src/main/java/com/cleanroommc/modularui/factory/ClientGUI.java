@@ -1,7 +1,8 @@
-package com.cleanroommc.modularui.manager;
+package com.cleanroommc.modularui.factory;
 
-import com.cleanroommc.modularui.screen.JeiSettings;
+import com.cleanroommc.modularui.screen.JeiSettingsImpl;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +22,7 @@ public class ClientGUI {
      * @param screen new modular screen
      */
     public static void open(@NotNull ModularScreen screen) {
-        open(screen, new JeiSettings());
+        open(screen, new JeiSettingsImpl());
     }
 
     /**
@@ -31,8 +32,11 @@ public class ClientGUI {
      * @param screen      new modular screen
      * @param jeiSettings custom jei settings
      */
-    public static void open(@NotNull ModularScreen screen, @NotNull JeiSettings jeiSettings) {
-        GuiManager.queuedClientScreen = screen;
-        GuiManager.queuedJeiSettings = jeiSettings;
+    public static void open(@NotNull ModularScreen screen, @NotNull JeiSettingsImpl jeiSettings) {
+        GuiManager.openScreen(screen, jeiSettings);
+    }
+
+    public static void open(@NotNull GuiScreen screen) {
+        GuiManager.openScreen(screen);
     }
 }

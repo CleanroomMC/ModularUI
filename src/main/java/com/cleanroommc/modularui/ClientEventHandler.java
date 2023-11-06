@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui;
 
 import com.cleanroommc.modularui.drawable.Stencil;
-import com.cleanroommc.modularui.manager.GuiManager;
+import com.cleanroommc.modularui.factory.GuiManager;
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import net.minecraft.client.Minecraft;
