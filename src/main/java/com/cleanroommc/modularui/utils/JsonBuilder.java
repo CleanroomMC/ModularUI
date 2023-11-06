@@ -47,6 +47,14 @@ public class JsonBuilder {
         return this;
     }
 
+    public JsonBuilder add(String key, JsonBuilder element) {
+        return add(key, element.getJson());
+    }
+
+    public JsonBuilder add(String key, JsonArrayBuilder element) {
+        return add(key, element.getJson());
+    }
+
     public JsonBuilder addObject(String key, Consumer<JsonBuilder> builderConsumer) {
         JsonBuilder builder = new JsonBuilder();
         builderConsumer.accept(builder);

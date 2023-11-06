@@ -13,8 +13,6 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-
 public class ItemStackItemHandler implements IItemHandlerModifiable, ICapabilityProvider {
 
     private static final String KEY_ITEMS = "Items";
@@ -109,7 +107,7 @@ public class ItemStackItemHandler implements IItemHandlerModifiable, ICapability
         return 64;
     }
 
-    protected int getStackLimit(int slot, @Nonnull ItemStack stack) {
+    protected int getStackLimit(int slot, @NotNull ItemStack stack) {
         return Math.min(getSlotLimit(slot), stack.getMaxStackSize());
     }
 

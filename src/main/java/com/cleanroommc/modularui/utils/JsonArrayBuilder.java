@@ -46,6 +46,14 @@ public class JsonArrayBuilder {
         return this;
     }
 
+    public JsonArrayBuilder add(JsonBuilder element) {
+        return add(element.getJson());
+    }
+
+    public JsonArrayBuilder add(JsonArrayBuilder element) {
+        return add(element.getJson());
+    }
+
     public JsonArrayBuilder addObject(Consumer<JsonBuilder> builderConsumer) {
         JsonBuilder builder = new JsonBuilder();
         builderConsumer.accept(builder);

@@ -32,6 +32,8 @@ public class GameObjectHelper {
         if (block == null) throw new NoSuchElementException();
         return block.getDefaultState();
     }
+
+    @SuppressWarnings("deprecation")
     public static IBlockState getBlockState(String mod, String path, int meta) {
         Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(mod, path));
         if (block == null) throw new NoSuchElementException();
@@ -56,6 +58,7 @@ public class GameObjectHelper {
         return block;
     }
 
+    @SuppressWarnings({"rawtypes", "Guava"})
     private static IBlockState parseBlockStates(IBlockState defaultState, String[] properties) {
         for (String propertyName : properties) {
             String[] prop = propertyName.split(EQUALS, 2);
@@ -67,7 +70,7 @@ public class GameObjectHelper {
             if (value.isPresent()) {
                 defaultState = defaultState.withProperty(property, value.get());
             } else {
-                throw new IllegalArgumentException(String.format("Invalid property value '%s' for block '%s:%s'", prop[1], defaultState.getBlock().getRegistryName()));
+                throw new IllegalArgumentException(String.format("Invalid property value '%s' for block '%s'", prop[1], defaultState.getBlock().getRegistryName()));
             }
         }
 
