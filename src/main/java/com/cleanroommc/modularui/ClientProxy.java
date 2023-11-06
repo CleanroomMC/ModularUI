@@ -15,17 +15,19 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 @SuppressWarnings("unused")
 public class ClientProxy extends CommonProxy {
 
-    private Timer timer60Fps;
+    private final Timer timer60Fps = new Timer(60f);
 
     @Override
     void preInit(FMLPreInitializationEvent event) {
         super.preInit(event);
 
-        timer60Fps = new Timer(60f);
         MinecraftForge.EVENT_BUS.register(ClientEventHandler.class);
         MinecraftForge.EVENT_BUS.register(KeyBindHandler.class);
 
@@ -52,6 +54,6 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public Timer getTimer60Fps() {
-        return timer60Fps;
+        return this.timer60Fps;
     }
 }
