@@ -8,8 +8,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.function.DoubleConsumer;
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 public class StringSyncValue extends ValueSyncHandler<String> implements IStringSyncValue<String> {
@@ -77,11 +75,11 @@ public class StringSyncValue extends ValueSyncHandler<String> implements IString
 
     @Override
     public void write(PacketBuffer buffer) {
-        NetworkUtils.writeStringSafe(buffer, getValue());
+        NetworkUtils.writeStringSafe(buffer, getValue(), Short.MAX_VALUE - 74);
     }
 
     @Override
     public void read(PacketBuffer buffer) {
-        setValue(buffer.readString(Short.MAX_VALUE), true, false);
+        setValue(NetworkUtils.readStringSafe(buffer), true, false);
     }
 }

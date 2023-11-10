@@ -3,6 +3,8 @@ package com.cleanroommc.modularui.api.value.sync;
 import com.cleanroommc.modularui.api.value.IValue;
 import net.minecraft.network.PacketBuffer;
 
+import java.io.IOException;
+
 /**
  * A helper interface for syncing an object value.
  *
@@ -52,12 +54,12 @@ public interface IValueSyncHandler<T> extends IValue<T> {
      *
      * @param buffer buffer to write to
      */
-    void write(PacketBuffer buffer);
+    void write(PacketBuffer buffer) throws IOException;
 
     /**
      * Reads a value from the buffer and sets the current value
      *
      * @param buffer buffer to read from
      */
-    void read(PacketBuffer buffer);
+    void read(PacketBuffer buffer) throws IOException;
 }

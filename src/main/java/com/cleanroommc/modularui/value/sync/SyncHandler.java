@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.value.sync;
 
+import com.cleanroommc.modularui.api.IPacketWriter;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.packets.PacketSyncHandler;
 import io.netty.buffer.Unpooled;
@@ -45,10 +46,14 @@ public abstract class SyncHandler {
      * @param id             an internal denominator to identify this package
      * @param bufferConsumer the package builder
      */
-    public final void syncToClient(int id, @NotNull Consumer<PacketBuffer> bufferConsumer) {
+    public final void syncToClient(int id, @NotNull IPacketWriter bufferConsumer) {
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         buffer.writeVarInt(id);
-        bufferConsumer.accept(buffer);
+        try {
+            bufferConsumer.write(buffer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         sendToClient(buffer, this);
     }
 
@@ -59,10 +64,14 @@ public abstract class SyncHandler {
      * @param bufferConsumer the package builder
      */
     @SideOnly(Side.CLIENT)
-    public final void syncToServer(int id, @NotNull Consumer<PacketBuffer> bufferConsumer) {
+    public final void syncToServer(int id, @NotNull IPacketWriter bufferConsumer) {
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         buffer.writeVarInt(id);
-        bufferConsumer.accept(buffer);
+        try {
+            bufferConsumer.write(buffer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         sendToServer(buffer, this);
     }
 
@@ -72,10 +81,14 @@ public abstract class SyncHandler {
      * @param id             an internal denominator to identify this package
      * @param bufferConsumer the package builder
      */
-    public final void sync(int id, @NotNull Consumer<PacketBuffer> bufferConsumer) {
+    public final void sync(int id, @NotNull IPacketWriter bufferConsumer) {
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         buffer.writeVarInt(id);
-        bufferConsumer.accept(buffer);
+        try {
+            bufferConsumer.write(buffer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         if (getSyncManager().isClient()) {
             sendToServer(buffer, this);
         } else {

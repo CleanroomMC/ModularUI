@@ -27,13 +27,13 @@ public class PacketSyncHandler implements IPacket {
 
     @Override
     public void write(PacketBuffer buf) {
-        NetworkUtils.writeStringSafe(buf, this.key);
-        NetworkUtils.writePacketBuffer(buf, this.packet);
+        NetworkUtils.writeStringSafe(buf, this.key, 64, true);
+        NetworkUtils.writeByteBuf(buf, this.packet);
     }
 
     @Override
     public void read(PacketBuffer buf) {
-        this.key = buf.readString(64);
+        this.key = NetworkUtils.readStringSafe(buf);
         this.packet = NetworkUtils.readPacketBuffer(buf);
     }
 

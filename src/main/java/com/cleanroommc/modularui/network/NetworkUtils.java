@@ -36,16 +36,20 @@ public class NetworkUtils {
         return player.world == null ? player instanceof EntityPlayerSP : player.world.isRemote;
     }
 
-    public static void writePacketBuffer(PacketBuffer writeTo, PacketBuffer writeFrom) {
+    public static void writeByteBuf(PacketBuffer writeTo, ByteBuf writeFrom) {
         writeTo.writeVarInt(writeFrom.readableBytes());
         writeTo.writeBytes(writeFrom);
     }
 
-    public static PacketBuffer readPacketBuffer(PacketBuffer buf) {
+    public static ByteBuf readByteBuf(PacketBuffer buf) {
         ByteBuf directSliceBuffer = buf.readBytes(buf.readVarInt());
         ByteBuf copiedDataBuffer = Unpooled.copiedBuffer(directSliceBuffer);
         directSliceBuffer.release();
-        return new PacketBuffer(copiedDataBuffer);
+        return copiedDataBuffer;
+    }
+
+    public static PacketBuffer readPacketBuffer(PacketBuffer buf) {
+        return new PacketBuffer(readByteBuf(buf));
     }
 
     public static void writeItemStack(PacketBuffer buffer, ItemStack itemStack) {
@@ -85,17 +89,47 @@ public class NetworkUtils {
     }
 
     public static void writeStringSafe(PacketBuffer buffer, String string) {
-        byte[] bytesTest = string == null ? new byte[0] : string.getBytes(StandardCharsets.UTF_8);
+        writeStringSafe(buffer, string, Short.MAX_VALUE, false);
+    }
+
+    public static void writeStringSafe(PacketBuffer buffer, @Nullable String string, boolean crash) {
+        writeStringSafe(buffer, string, Short.MAX_VALUE, crash);
+    }
+
+    public static void writeStringSafe(PacketBuffer buffer, @Nullable String string, int maxBytes) {
+        writeStringSafe(buffer, string, maxBytes, false);
+    }
+
+    public static void writeStringSafe(PacketBuffer buffer, @Nullable String string, int maxBytes, boolean crash) {
+        maxBytes = Math.min(maxBytes, Short.MAX_VALUE);
+        if (string == null) {
+            buffer.writeVarInt(Short.MAX_VALUE + 1);
+            return;
+        }
+        byte[] bytesTest = string.getBytes(StandardCharsets.UTF_8);
         byte[] bytes;
 
-        if (bytesTest.length > 32767) {
-            bytes = new byte[32767];
-            System.arraycopy(bytesTest, 0, bytes, 0, 32767);
+        if (bytesTest.length > maxBytes) {
+            if (crash) {
+                throw new IllegalArgumentException("Max String size is " + maxBytes + ", but found " + bytesTest.length + " bytes for '" + string + "'!");
+            }
+            bytes = new byte[maxBytes];
+            System.arraycopy(bytesTest, 0, bytes, 0, maxBytes);
             ModularUI.LOGGER.warn("Warning! Synced string exceeds max length!");
         } else {
             bytes = bytesTest;
         }
         buffer.writeVarInt(bytes.length);
         buffer.writeBytes(bytes);
+    }
+
+    public static String readStringSafe(PacketBuffer buffer) {
+        int length = buffer.readVarInt();
+        if (length > Short.MAX_VALUE) {
+            return null;
+        }
+        String s = buffer.toString(buffer.readerIndex(), length, StandardCharsets.UTF_8);
+        buffer.readerIndex(buffer.readerIndex() + length);
+        return s;
     }
 }

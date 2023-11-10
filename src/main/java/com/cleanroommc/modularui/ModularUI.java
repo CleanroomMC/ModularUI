@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
 @Mod(modid = ModularUI.ID,
         name = ModularUI.NAME,
         version = ModularUI.VERSION,
-        dependencies = "required-after:mixinbooter@[5.0,);" +
+        dependencies = "required-after:mixinbooter@[8.0,);" +
                 "after:bogorter@[1.4.0,);")
 public class ModularUI {
 

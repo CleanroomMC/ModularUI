@@ -16,7 +16,6 @@ import java.util.Map;
 @IFMLLoadingPlugin.Name("ModularUI-Core")
 @IFMLLoadingPlugin.MCVersion(ForgeVersion.mcVersion)
 @IFMLLoadingPlugin.SortingIndex(2000) // after ae2uel and stackup
-@IFMLLoadingPlugin.TransformerExclusions({"com.cleanroommc.modularui.core"})
 public class ModularUICore implements IFMLLoadingPlugin, IEarlyMixinLoader {
 
     public static final Logger LOGGER = LogManager.getLogger("modularui");
