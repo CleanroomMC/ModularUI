@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.screen.viewport;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.widget.*;

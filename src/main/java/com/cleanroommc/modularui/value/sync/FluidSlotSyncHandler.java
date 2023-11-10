@@ -81,6 +81,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
         }
         return false;
     }
+
     @Override
     public void write(PacketBuffer buffer) {
         NetworkUtils.writeFluidStack(buffer, this.cache);

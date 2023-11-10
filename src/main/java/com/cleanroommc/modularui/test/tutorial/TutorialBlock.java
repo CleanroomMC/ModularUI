@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.test.tutorial;
 
 import com.cleanroommc.modularui.manager.GuiInfos;
-import com.cleanroommc.modularui.test.TestTile;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;

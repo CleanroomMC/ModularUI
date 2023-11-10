@@ -13,6 +13,7 @@ public class GuiUtils {
     public static FloatBuffer getTransformationBuffer() {
         return getTransformationBuffer(BufferUtils.createFloatBuffer(16));
     }
+
     public static FloatBuffer getTransformationBuffer(FloatBuffer floatBuffer) {
         GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, floatBuffer);
         floatBuffer.position(0);

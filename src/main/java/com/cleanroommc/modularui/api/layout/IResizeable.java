@@ -116,12 +116,14 @@ public interface IResizeable {
 
     /**
      * Sets if margin and padding on the x-axis is applied
+     *
      * @param b true if margin and padding are applied
      */
     void setXMarginPaddingApplied(boolean b);
 
     /**
      * Sets if margin and padding on the y-axis is applied
+     *
      * @param b true if margin and padding are applied
      */
     void setYMarginPaddingApplied(boolean b);

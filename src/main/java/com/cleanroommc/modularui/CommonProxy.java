@@ -45,7 +45,8 @@ public class CommonProxy {
         NetworkHandler.init();
     }
 
-    void postInit(FMLPostInitializationEvent event) {}
+    void postInit(FMLPostInitializationEvent event) {
+    }
 
     void onServerLoad(FMLServerStartingEvent event) {
         event.registerServerCommand(new ItemEditorGui.Command());

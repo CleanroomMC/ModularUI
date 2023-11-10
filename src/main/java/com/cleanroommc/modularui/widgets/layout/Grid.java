@@ -2,7 +2,9 @@ package com.cleanroommc.modularui.widgets.layout;
 
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.utils.*;
+import com.cleanroommc.modularui.utils.HorizontalScrollData;
+import com.cleanroommc.modularui.utils.ScrollData;
+import com.cleanroommc.modularui.utils.VerticalScrollData;
 import com.cleanroommc.modularui.widget.ScrollWidget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Box;

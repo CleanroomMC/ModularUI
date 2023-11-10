@@ -125,7 +125,7 @@ public class TextRenderer {
             drawMeasuredLines(Collections.singletonList(line));
             return;
         }
-        scroll = scroll % (int) (line.width + 1) ;
+        scroll = scroll % (int) (line.width + 1);
         String drawString = line.getText();//getFontRenderer().trimStringToWidth(line.getText(), (int) (this.maxWidth + scroll));
         Area.SHARED.set(this.x, Integer.MIN_VALUE, this.x + (int) this.maxWidth, Integer.MAX_VALUE);
         Stencil.apply(Area.SHARED, context);
