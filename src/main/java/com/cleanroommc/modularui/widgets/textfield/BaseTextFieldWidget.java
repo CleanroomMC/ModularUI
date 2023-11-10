@@ -8,8 +8,8 @@ import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.HorizontalScrollData;
 import com.cleanroommc.modularui.utils.ScrollData;
-import com.cleanroommc.modularui.utils.ScrollDirection;
 import com.cleanroommc.modularui.widget.ScrollWidget;
 import net.minecraft.client.gui.GuiScreen;
 import org.jetbrains.annotations.NotNull;
@@ -46,10 +46,9 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     protected boolean changedTextColor = false;
 
     public BaseTextFieldWidget() {
-        super(new ScrollData(ScrollDirection.HORIZONTAL));
+        super(new HorizontalScrollData());
         this.handler.setRenderer(this.renderer);
         this.handler.setScrollArea(getScrollArea());
-        getScrollArea().getScrollX().scrollItemSize = 4;
         padding(4, 0);
     }
 
@@ -95,7 +94,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
         this.renderer.setScale(this.scale);
         this.renderer.setAlignment(this.textAlignment, -2, getArea().height);
         this.renderer.draw(this.handler.getText());
-        getScrollArea().getScrollX().scrollSize = Math.max(0, (int) (this.renderer.getLastWidth() + 0.5f));
+        getScrollArea().getScrollX().setScrollSize(Math.max(0, (int) (this.renderer.getLastWidth() + 0.5f)));
     }
 
     @Override

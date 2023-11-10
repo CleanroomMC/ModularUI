@@ -2,8 +2,7 @@ package com.cleanroommc.modularui.widgets.layout;
 
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.utils.ScrollData;
-import com.cleanroommc.modularui.utils.ScrollDirection;
+import com.cleanroommc.modularui.utils.*;
 import com.cleanroommc.modularui.widget.ScrollWidget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Box;
@@ -90,10 +89,10 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
             y += height;
         }
         if (getScrollArea().getScrollX() != null) {
-            getScrollArea().getScrollX().scrollSize = x;
+            getScrollArea().getScrollX().setScrollSize(x);
         }
         if (getScrollArea().getScrollY() != null) {
-            getScrollArea().getScrollY().scrollSize = y;
+            getScrollArea().getScrollY().setScrollSize(y);
         }
     }
 
@@ -214,11 +213,7 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
     }
 
     public Grid scrollable() {
-        return scrollable(new ScrollData(ScrollDirection.VERTICAL), new ScrollData(ScrollDirection.HORIZONTAL));
-    }
-
-    public Grid scrollable(ScrollDirection direction) {
-        return scrollable(new ScrollData(direction));
+        return scrollable(new VerticalScrollData(), new HorizontalScrollData());
     }
 
     public Grid scrollable(ScrollData data) {
@@ -226,7 +221,7 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
         return this;
     }
 
-    public Grid scrollable(ScrollData data1, ScrollData data2) {
+    public Grid scrollable(VerticalScrollData data1, HorizontalScrollData data2) {
         getScrollArea().setScrollData(data1);
         getScrollArea().setScrollData(data2);
         return this;
