@@ -62,7 +62,7 @@ public class GuiContext extends GuiViewportStack {
     public GuiContext(ModularScreen screen) {
         this.screen = screen;
         this.hoveredWidgets = new HoveredIterable(this.screen.getWindowManager());
-        this.mc = ModularUI.getMC();
+        this.mc = Minecraft.getMinecraft();
         this.font = this.mc.fontRenderer;
     }
 

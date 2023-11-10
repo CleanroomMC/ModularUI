@@ -1,46 +1,29 @@
 # ModularUI TODO's
 
-## High Priority
-
-- [X]  syncing
-- [X]  vanilla slots compat (properly)
-- [X]  proper interaction managing
-- [X]  proper sizing & positioning with widgets that depend on children or parents
-- [X]  Text field
-- [X]  Tooltips
+:boom: = Potential breaking changes
 
 ## Widgets
 
-* [X]  Phantom Item Slot
-* [X]  Phantom Fluid Slot
-* [X]  Slider
-* [ ]  Trackpad
-* [X]  Color picker (button for setting number which can be dragged)
-* [X]  List (column but scrollable)
-* [X]  Sortable List (for bogosorter)
-* [X]  Slot Group (Builder, sorting)
-* [X]  Dialog
-* [X]  Popup menu
+* [ ]  Trackpad 
+* [X]  improve List (column but scrollable) :boom:
+* [X]  improve Sortable List (for bogosorter) :boom:
+* [X]  improve Slot Group (Builder, sorting) :boom:
+* [X]  improve Dialog :boom:
+* [X]  improve Popup menu :boom:
 * [ ]  Dropdown menu
 * [ ]  Pie menu
 
-## Low Priority
+## Medium Priority
 
-- [X]  Item slot features (like shift click)
-- [X]  Layout Widgets
-- [X]  Row
-- [X]  Column
-- [X]  Grid
-- [X]  Scrollable
-- [ ]  Text editor
-- [X]  Themes
-- [X]  Animations
+- [ ]  texture json registry improvements :boom:
+- [ ]  Entity drawable
+- [ ]  Fake world drawable
+- [ ]  Text editor :boom:
 - [ ]  Json Guis
-- [ ]  Inject to any mc gui
+- [ ]  Inject to any mc gui :boom:
 - [ ]  Error handling with on screen reports
-- [X]  Parent widgets can "cover" all children
 
-## In the future
+## Low Priority
 
 - [ ]  Config lib
 - [ ]  Keybind api
@@ -48,10 +31,7 @@
 - [ ]  properly add modularui elements to any gui screen
 - [ ]  a gui to create guis
 - [ ]  sounds ?
-- [x]  change color of themes to IDrawable
 
-## Internal changes
-
-## HoloUI
+## HoloUI :boom:
 - [ ] Fix/Remove current rotations
 - [ ] Implement interactions
