@@ -37,19 +37,12 @@ public class TileEntityGuiFactory extends AbstractUIFactory<PosGuiData> {
     }
 
     @Override
-    public ModularPanel createPanel(PosGuiData guiData, GuiSyncManager syncManager) {
-        TileEntity te = guiData.getTileEntity();
-        if (!(te instanceof IGuiHolder)) throw new NoSuchElementException();
-        IGuiHolder<PosGuiData> guiHolder = (IGuiHolder<PosGuiData>) te;
-        return guiHolder.buildUI(guiData, syncManager, guiData.getWorld().isRemote);
-    }
-
-    @Override
-    public ModularScreen createScreen(PosGuiData guiData, ModularPanel mainPanel) {
-        TileEntity te = guiData.getTileEntity();
-        if (!(te instanceof IGuiHolder)) throw new NoSuchElementException();
-        IGuiHolder<PosGuiData> guiHolder = (IGuiHolder<PosGuiData>) te;
-        return guiHolder.createScreen(guiData, mainPanel);
+    public @NotNull IGuiHolder<PosGuiData> getGuiHolder(PosGuiData data) {
+        TileEntity te = data.getTileEntity();
+        if (isGuiHolder(te)) {
+            return (IGuiHolder<PosGuiData>) te;
+        }
+        throw new IllegalStateException("Found TileEntity is not a gui holder!");
     }
 
     @Override

@@ -20,9 +20,18 @@ public class ItemGuiFactory extends AbstractUIFactory<HandGuiData> {
         super("mui:item");
     }
 
-    public <T extends Item & IGuiHolder<HandGuiData>> void open(EntityPlayerMP player, EnumHand hand, T item) {
+    public void open(EntityPlayerMP player, EnumHand hand) {
         HandGuiData guiData = new HandGuiData(player, hand);
         GuiManager.open(this, guiData, player);
+    }
+
+    @Override
+    public @NotNull IGuiHolder<HandGuiData> getGuiHolder(HandGuiData data) {
+        ItemStack item = data.getUsedItemStack();
+        if (isGuiHolder(item.getItem())) {
+            return (IGuiHolder<HandGuiData>) item.getItem();
+        }
+        throw new IllegalStateException("Item was not a gui holder!");
     }
 
     @Override

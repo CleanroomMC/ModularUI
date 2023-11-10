@@ -1,9 +1,6 @@
 package com.cleanroommc.modularui.factory;
 
 import com.cleanroommc.modularui.api.IGuiHolder;
-import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
@@ -28,15 +25,6 @@ public class SimpleGuiFactory extends AbstractUIFactory<GuiData> {
         GuiManager.open(this, new GuiData(player), player);
     }
 
-    @Override
-    public ModularPanel createPanel(GuiData guiData, GuiSyncManager syncManager) {
-        return this.guiHolderSupplier.get().buildUI(guiData, syncManager, guiData.isClient());
-    }
-
-    @Override
-    public ModularScreen createScreen(GuiData guiData, ModularPanel mainPanel) {
-        return this.guiHolderSupplier.get().createScreen(guiData, mainPanel);
-    }
 
     @Override
     public void writeGuiData(GuiData guiData, PacketBuffer buffer) {
@@ -45,5 +33,10 @@ public class SimpleGuiFactory extends AbstractUIFactory<GuiData> {
     @Override
     public @NotNull GuiData readGuiData(EntityPlayer player, PacketBuffer buffer) {
         return new GuiData(player);
+    }
+
+    @Override
+    public @NotNull IGuiHolder<GuiData> getGuiHolder(GuiData data) {
+        return this.guiHolderSupplier.get();
     }
 }

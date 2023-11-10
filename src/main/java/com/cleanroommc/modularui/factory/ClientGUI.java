@@ -8,7 +8,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Helper class to open client only GUIs.
+ * Helper class to open client only GUIs. This class is safe to use inside a Modular GUI.
+ * Direct calls to {@link net.minecraft.client.Minecraft#displayGuiScreen(GuiScreen)} are redirected to this class if
+ * the current screen is a Modular GUI.
  */
 @SideOnly(Side.CLIENT)
 public class ClientGUI {
@@ -36,7 +38,19 @@ public class ClientGUI {
         GuiManager.openScreen(screen, jeiSettings);
     }
 
+    /**
+     * Opens a {@link GuiScreen} on the next client tick.
+     *
+     * @param screen screen to open
+     */
     public static void open(@NotNull GuiScreen screen) {
         GuiManager.openScreen(screen);
+    }
+
+    /**
+     * Closes any GUI that is open in the next client tick.
+     */
+    public static void close() {
+        GuiManager.closeScreen();
     }
 }

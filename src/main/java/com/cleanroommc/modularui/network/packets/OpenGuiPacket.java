@@ -10,6 +10,8 @@ import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.PacketBuffer;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+
 public class OpenGuiPacket<T extends GuiData> implements IPacket {
 
     private int windowId;
@@ -26,10 +28,10 @@ public class OpenGuiPacket<T extends GuiData> implements IPacket {
     }
 
     @Override
-    public void write(PacketBuffer buf) {
+    public void write(PacketBuffer buf) throws IOException {
         buf.writeVarInt(this.windowId);
         buf.writeString(this.factory.getFactoryName());
-        NetworkUtils.writePacketBuffer(buf, this.data);
+        NetworkUtils.writeByteBuf(buf, this.data);
     }
 
     @Override

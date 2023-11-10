@@ -26,6 +26,8 @@ public class GuiManager {
     private static ModularScreen queuedClientScreen;
     private static JeiSettingsImpl queuedJeiSettings;
     private static GuiScreen queuedGuiScreen;
+    private static boolean closeScreen;
+    private static boolean openingQueue = false;
 
     public static void registerFactory(UIFactory<?> factory) {
         Objects.requireNonNull(factory);
@@ -82,6 +84,7 @@ public class GuiManager {
 
     @SideOnly(Side.CLIENT)
     public static void checkQueuedScreen() {
+        openingQueue = true;
         if (queuedClientScreen != null) {
             queuedClientScreen.getContext().setJeiSettings(queuedJeiSettings);
             GuiScreenWrapper screenWrapper = new GuiScreenWrapper(new ModularContainer(), queuedClientScreen);
@@ -91,7 +94,10 @@ public class GuiManager {
         } else if (queuedGuiScreen != null) {
             Minecraft.getMinecraft().displayGuiScreen(queuedGuiScreen);
             queuedGuiScreen = null;
+        } else if (closeScreen) {
+            Minecraft.getMinecraft().displayGuiScreen(null);
         }
+        openingQueue = false;
     }
 
     @SideOnly(Side.CLIENT)
@@ -99,6 +105,7 @@ public class GuiManager {
         queuedClientScreen = screen;
         queuedJeiSettings = jeiSettings;
         queuedGuiScreen = null;
+        closeScreen = false;
     }
 
     @SideOnly(Side.CLIENT)
@@ -106,5 +113,18 @@ public class GuiManager {
         queuedClientScreen = null;
         queuedJeiSettings = null;
         queuedGuiScreen = screen;
+        closeScreen = false;
+    }
+
+    @SideOnly(Side.CLIENT)
+    static void closeScreen() {
+        queuedClientScreen = null;
+        queuedJeiSettings = null;
+        queuedGuiScreen = null;
+        closeScreen = true;
+    }
+
+    public static boolean isOpeningQueue() {
+        return openingQueue;
     }
 }

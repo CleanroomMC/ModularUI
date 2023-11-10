@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui;
 
 import com.cleanroommc.modularui.drawable.Stencil;
+import com.cleanroommc.modularui.factory.ClientGUI;
 import com.cleanroommc.modularui.factory.GuiManager;
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import com.cleanroommc.modularui.screen.ModularScreen;
@@ -55,6 +56,13 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public static void onOpenScreen(GuiOpenEvent event) {
+        if (!GuiManager.isOpeningQueue() && Minecraft.getMinecraft().currentScreen instanceof GuiScreenWrapper) {
+            if (event.getGui() != null) {
+                ClientGUI.open(event.getGui());
+            } else {
+                ClientGUI.close();
+            }
+        }
         if (event.getGui() instanceof GuiScreenWrapper && Minecraft.getMinecraft().currentScreen != null) {
             // another screen is already open, don't fade in the dark background as it's already there
             ((GuiScreenWrapper) event.getGui()).setAlphaFade(false);
