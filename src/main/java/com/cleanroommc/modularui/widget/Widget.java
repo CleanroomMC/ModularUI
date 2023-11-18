@@ -6,7 +6,7 @@ import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.api.value.IValue;
 import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.drawable.DrawableArray;
-import com.cleanroommc.modularui.manager.GuiCreationContext;
+import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.Tooltip;
@@ -436,7 +436,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     /**
-     * This intended to only be used when build the main panel in methods like {@link com.cleanroommc.modularui.api.IGuiHolder#buildUI(GuiCreationContext, GuiSyncManager, boolean)}
+     * This intended to only be used when build the main panel in methods like {@link com.cleanroommc.modularui.api.IGuiHolder#buildUI(GuiData, GuiSyncManager, boolean)}
      * since it's called on server and client. Otherwise, this will not work.
      */
     protected void setSyncHandler(@Nullable SyncHandler syncHandler) {

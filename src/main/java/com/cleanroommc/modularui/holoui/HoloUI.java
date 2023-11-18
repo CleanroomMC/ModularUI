@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.holoui;
 
-import com.cleanroommc.modularui.screen.JeiSettings;
+import com.cleanroommc.modularui.screen.JeiSettingsImpl;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
@@ -79,7 +79,7 @@ public class HoloUI {
         }
 
         public void open(ModularScreen screen) {
-            JeiSettings jeiSettings = new JeiSettings();
+            JeiSettingsImpl jeiSettings = new JeiSettingsImpl();
             jeiSettings.disableJei();
             screen.getContext().setJeiSettings(jeiSettings);
             HoloScreenEntity holoScreenEntity = new HoloScreenEntity(Minecraft.getMinecraft().world, this.plane3D);

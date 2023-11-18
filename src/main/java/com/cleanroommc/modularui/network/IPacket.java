@@ -9,6 +9,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+
 public interface IPacket extends IMessage {
 
     /**
@@ -16,7 +18,7 @@ public interface IPacket extends IMessage {
      *
      * @param buf buffer to write to
      */
-    void write(PacketBuffer buf);
+    void write(PacketBuffer buf) throws IOException;
 
     /**
      * Read this packet from the buffer.
@@ -24,7 +26,7 @@ public interface IPacket extends IMessage {
      *
      * @param buf buffer to read from
      */
-    void read(PacketBuffer buf);
+    void read(PacketBuffer buf) throws IOException;
 
     /**
      * Called when packet is sent from server to client.
@@ -52,12 +54,20 @@ public interface IPacket extends IMessage {
     @Deprecated
     @Override
     default void fromBytes(ByteBuf buf) {
-        read(buf instanceof PacketBuffer ? (PacketBuffer) buf : new PacketBuffer(buf));
+        try {
+            read(buf instanceof PacketBuffer ? (PacketBuffer) buf : new PacketBuffer(buf));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Deprecated
     @Override
     default void toBytes(ByteBuf buf) {
-        write(buf instanceof PacketBuffer ? (PacketBuffer) buf : new PacketBuffer(buf));
+        try {
+            write(buf instanceof PacketBuffer ? (PacketBuffer) buf : new PacketBuffer(buf));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

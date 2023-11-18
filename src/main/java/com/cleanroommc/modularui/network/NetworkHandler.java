@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.network;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.network.packets.OpenGuiPacket;
 import com.cleanroommc.modularui.network.packets.PacketSyncHandler;
 import com.cleanroommc.modularui.network.packets.SClipboard;
 import com.cleanroommc.modularui.network.packets.SyncConfig;
@@ -25,6 +26,7 @@ public class NetworkHandler {
         registerS2C(PacketSyncHandler.class);
         registerC2S(PacketSyncHandler.class);
         registerC2S(SyncConfig.class);
+        registerS2C(OpenGuiPacket.class);
     }
 
     private static void registerC2S(Class<? extends IPacket> clazz) {

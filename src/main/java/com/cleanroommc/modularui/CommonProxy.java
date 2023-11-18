@@ -1,8 +1,10 @@
 package com.cleanroommc.modularui;
 
+import com.cleanroommc.modularui.factory.GuiManager;
+import com.cleanroommc.modularui.factory.ItemGuiFactory;
+import com.cleanroommc.modularui.factory.SidedTileEntityGuiFactory;
+import com.cleanroommc.modularui.factory.TileEntityGuiFactory;
 import com.cleanroommc.modularui.holoui.HoloScreenEntity;
-import com.cleanroommc.modularui.manager.GuiInfos;
-import com.cleanroommc.modularui.manager.GuiManager;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.test.ItemEditorGui;
@@ -20,7 +22,6 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.relauncher.Side;
@@ -31,8 +32,6 @@ public class CommonProxy {
 
     void preInit(FMLPreInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(CommonProxy.class);
-        NetworkRegistry.INSTANCE.registerGuiHandler(ModularUI.ID, GuiManager.INSTANCE);
-        GuiInfos.init();
 
         if (ModularUIConfig.enabledTestGuis) {
             MinecraftForge.EVENT_BUS.register(TestBlock.class);
@@ -43,6 +42,10 @@ public class CommonProxy {
         }
 
         NetworkHandler.init();
+
+        GuiManager.registerFactory(TileEntityGuiFactory.INSTANCE);
+        GuiManager.registerFactory(SidedTileEntityGuiFactory.INSTANCE);
+        GuiManager.registerFactory(ItemGuiFactory.INSTANCE);
     }
 
     void postInit(FMLPostInitializationEvent event) {
