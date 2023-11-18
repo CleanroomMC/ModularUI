@@ -7,10 +7,10 @@ import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.utils.HorizontalScrollData;
+import com.cleanroommc.modularui.widget.scroll.HorizontalScrollData;
 import com.cleanroommc.modularui.utils.HoveredWidgetList;
-import com.cleanroommc.modularui.utils.ScrollArea;
-import com.cleanroommc.modularui.utils.VerticalScrollData;
+import com.cleanroommc.modularui.widget.scroll.ScrollArea;
+import com.cleanroommc.modularui.widget.scroll.VerticalScrollData;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,8 +33,8 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
 
     public ScrollWidget(@Nullable HorizontalScrollData x, @Nullable VerticalScrollData y) {
         super();
-        this.scroll.setScrollData(x);
-        this.scroll.setScrollData(y);
+        this.scroll.setScrollDataX(x);
+        this.scroll.setScrollDataY(y);
         listenGuiAction((IGuiAction.MouseReleased) mouseButton -> {
             this.scroll.mouseReleased(getContext());
             return false;

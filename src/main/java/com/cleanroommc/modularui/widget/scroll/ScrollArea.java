@@ -1,7 +1,8 @@
-package com.cleanroommc.modularui.utils;
+package com.cleanroommc.modularui.widget.scroll;
 
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.relauncher.Side;
@@ -15,7 +16,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  */
 public class ScrollArea extends Area {
 
-    //private ScrollData scrollX, scrollY;
     private HorizontalScrollData scrollX;
     private VerticalScrollData scrollY;
     private int scrollBarBackgroundColor = Color.withAlpha(Color.BLACK.normal, 0.25f);
@@ -194,10 +194,12 @@ public class ScrollArea extends Area {
      */
     @SideOnly(Side.CLIENT)
     public void drawScrollbar() {
-        if (this.scrollX != null && this.scrollX.isScrollBarActive(this)) {
+        boolean b = false;
+        if (this.scrollX != null && this.scrollX.isScrollBarActive(this, false)) {
+            b = true;
             this.scrollX.drawScrollbar(this);
         }
-        if (this.scrollY != null && this.scrollY.isScrollBarActive(this)) {
+        if (this.scrollY != null && this.scrollY.isScrollBarActive(this, b)) {
             this.scrollY.drawScrollbar(this);
         }
     }

@@ -4,10 +4,11 @@ import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.widget.IValueWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.utils.HorizontalScrollData;
-import com.cleanroommc.modularui.utils.ScrollData;
+import com.cleanroommc.modularui.widget.scroll.HorizontalScrollData;
+import com.cleanroommc.modularui.widget.scroll.ScrollData;
 import com.cleanroommc.modularui.widget.ScrollWidget;
 import com.cleanroommc.modularui.widget.WidgetTree;
+import com.cleanroommc.modularui.widget.scroll.VerticalScrollData;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,10 +39,10 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
     }
 
     public ListWidget(Function<T, I> valueToWidgetMapper, Function<I, T> widgetToValueMapper) {
+        super(new VerticalScrollData());
         this.valueToWidgetMapper = Objects.requireNonNull(valueToWidgetMapper);
         this.widgetToValueMapper = Objects.requireNonNull(widgetToValueMapper);
-        this.scrollData = new HorizontalScrollData();
-        getScrollArea().setScrollData(this.scrollData);
+        this.scrollData = getScrollArea().getScrollY();
     }
 
     public static <T, V extends IValueWidget<T> & IWidget, W extends ListWidget<T, V, W>> ListWidget<T, V, W> of(Function<T, V> valueToWidgetMapper) {

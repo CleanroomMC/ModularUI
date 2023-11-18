@@ -1,7 +1,9 @@
-package com.cleanroommc.modularui.utils;
+package com.cleanroommc.modularui.widget.scroll;
 
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.drawable.GuiDraw;
+import com.cleanroommc.modularui.utils.Animator;
+import com.cleanroommc.modularui.utils.Interpolation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -71,16 +73,39 @@ public abstract class ScrollData {
         return this.axis.isHorizontal();
     }
 
-    public abstract int getFullVisibleSize(ScrollArea area);
+    protected final int getRawVisibleSize(ScrollArea area) {
+        return Math.max(0, getRawFullVisibleSize(area) - area.getPadding().getTotal(this.axis));
+    }
 
-    public abstract int getVisibleSize(ScrollArea area);
+    protected final int getRawFullVisibleSize(ScrollArea area) {
+        return area.getSize(this.axis);
+    }
+
+    public final int getFullVisibleSize(ScrollArea area) {
+        return getFullVisibleSize(area, false);
+    }
+
+    public final int getFullVisibleSize(ScrollArea area, boolean isOtherActive) {
+        int s = getRawVisibleSize(area);
+        ScrollData data = getOtherScrollData(area);
+        if (data != null && (isOtherActive || data.isScrollBarActive(area, true))) {
+            s -= data.getThickness();
+        }
+        return s;
+    }
+
+    public final int getVisibleSize(ScrollArea area) {
+        return getVisibleSize(area, false);
+    }
+
+    public final int getVisibleSize(ScrollArea area, boolean isOtherActive) {
+        return Math.max(0, getFullVisibleSize(area, isOtherActive) - area.getPadding().getTotal(this.axis));
+    }
 
     public abstract float getProgress(ScrollArea area, int x, int y);
 
     @Nullable
-    public abstract ScrollData getOtherScrollData();
-
-    //public abstract boolean isOtherScrollBarActive(ScrollArea area);
+    public abstract ScrollData getOtherScrollData(ScrollArea area);
 
     /**
      * Clamp scroll to the bounds of the scroll size;
@@ -116,16 +141,28 @@ public abstract class ScrollData {
     }
 
     public final boolean isScrollBarActive(ScrollArea area) {
-        return this.scrollSize > getVisibleSize(area);
+        return isScrollBarActive(area, false);
     }
 
-    public final boolean isOtherScrollBarActive(ScrollArea area) {
-        ScrollData data = getOtherScrollData();
-        return data != null && data.getScrollSize() > Math.max(0, data.getVisibleSize(area) - getThickness());
+    public final boolean isScrollBarActive(ScrollArea area, boolean isOtherActive) {
+        int s = getRawVisibleSize(area);
+        if (s < this.scrollSize) return true;
+        ScrollData data = getOtherScrollData(area);
+        if (data == null || s - data.getThickness() >= this.scrollSize) return false;
+        if (isOtherActive || data.isScrollBarActive(area, true)) {
+            s -= data.getThickness();
+        }
+        return s < this.scrollSize;
+    }
+
+    public final boolean isOtherScrollBarActive(ScrollArea area, boolean isSelfActive) {
+        ScrollData data = getOtherScrollData(area);
+        return data != null && data.isScrollBarActive(area, isSelfActive);
     }
 
     public int getScrollBarLength(ScrollArea area) {
-        return (int) (getVisibleSize(area) * getFullVisibleSize(area) / (float) this.scrollSize);
+        boolean isOtherActive = isOtherScrollBarActive(area, false);
+        return (int) (getVisibleSize(area, isOtherActive) * getFullVisibleSize(area, isOtherActive) / (float) this.scrollSize);
     }
 
     public abstract boolean isInsideScrollbarArea(ScrollArea area, int x, int y);

@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.utils;
+package com.cleanroommc.modularui.widget.scroll;
 
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.drawable.GuiDraw;
@@ -18,33 +18,23 @@ public class HorizontalScrollData extends ScrollData {
     }
 
     @Override
-    public int getFullVisibleSize(ScrollArea area) {
-        return area.w();
-    }
-
-    @Override
-    public int getVisibleSize(ScrollArea area) {
-        return Math.max(0, getFullVisibleSize(area) - area.getPadding().horizontal());
-    }
-
-    @Override
     public float getProgress(ScrollArea area, int x, int y) {
         return (x - area.x) / (float) getFullVisibleSize(area);
     }
 
     @Override
-    public VerticalScrollData getOtherScrollData() {
-        return null;
+    public VerticalScrollData getOtherScrollData(ScrollArea area) {
+        return area.getScrollY();
     }
 
     @Override
     public boolean isInsideScrollbarArea(ScrollArea area, int x, int y) {
-        if (!area.isInside(x, y) || !isScrollBarActive(area)) {
+        if (!area.isInside(x, y) || !isScrollBarActive(area, false)) {
             return false;
         }
         int scrollbar = getThickness();
-        ScrollData data = getOtherScrollData();
-        if (data != null && isOtherScrollBarActive(area)) {
+        ScrollData data = getOtherScrollData(area);
+        if (data != null && isOtherScrollBarActive(area, true)) {
             int thickness = data.getThickness();
             if (data.isOnAxisStart() ? x < area.x + thickness : x >= area.ex() - thickness) {
                 return false;
@@ -55,6 +45,7 @@ public class HorizontalScrollData extends ScrollData {
 
     @Override
     public void drawScrollbar(ScrollArea area) {
+        boolean isOtherActive = isOtherScrollBarActive(area, true);
         int l = getScrollBarLength(area);
         int x = 0;
         int y = isOnAxisStart() ? 0 : area.height - getThickness();
@@ -62,9 +53,9 @@ public class HorizontalScrollData extends ScrollData {
         int h = getThickness();
         GuiDraw.drawRect(x, y, w, h, area.getScrollBarBackgroundColor());
 
-        x = ((getFullVisibleSize(area) - l) * getScroll()) / (getScrollSize() - getVisibleSize(area));
-        ScrollData data2 = getOtherScrollData();
-        if (data2 != null && isOtherScrollBarActive(area) && data2.isOnAxisStart()) {
+        x = ((getFullVisibleSize(area, isOtherActive) - l) * getScroll()) / (getScrollSize() - getVisibleSize(area, isOtherActive));
+        ScrollData data2 = getOtherScrollData(area);
+        if (data2 != null && isOtherActive && data2.isOnAxisStart()) {
             x += data2.getThickness();
         }
 

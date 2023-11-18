@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.utils;
+package com.cleanroommc.modularui.widget.scroll;
 
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.drawable.GuiDraw;
@@ -18,23 +18,13 @@ public class VerticalScrollData extends ScrollData {
     }
 
     @Override
-    public int getFullVisibleSize(ScrollArea area) {
-        return area.w();
-    }
-
-    @Override
-    public int getVisibleSize(ScrollArea area) {
-        return Math.max(0, getFullVisibleSize(area) - area.getPadding().vertical());
-    }
-
-    @Override
     public float getProgress(ScrollArea area, int x, int y) {
         return (y - area.y) / (float) getFullVisibleSize(area);
     }
 
     @Override
-    public HorizontalScrollData getOtherScrollData() {
-        return null;
+    public HorizontalScrollData getOtherScrollData(ScrollArea area) {
+        return area.getScrollX();
     }
 
     @Override
@@ -43,8 +33,8 @@ public class VerticalScrollData extends ScrollData {
             return false;
         }
         int scrollbar = getThickness();
-        ScrollData data = getOtherScrollData();
-        if (data != null && isOtherScrollBarActive(area)) {
+        ScrollData data = getOtherScrollData(area);
+        if (data != null && isOtherScrollBarActive(area, true)) {
             int thickness = data.getThickness();
             if (data.isOnAxisStart() ? y < area.y + thickness : y >= area.ey() - thickness) {
                 return false;
@@ -55,6 +45,7 @@ public class VerticalScrollData extends ScrollData {
 
     @Override
     public void drawScrollbar(ScrollArea area) {
+        boolean isOtherActive = isOtherScrollBarActive(area, true);
         int l = this.getScrollBarLength(area);
         int x = isOnAxisStart() ? 0 : area.w() - getThickness();
         int y = 0;
@@ -62,9 +53,9 @@ public class VerticalScrollData extends ScrollData {
         int h = area.height;
         GuiDraw.drawRect(x, y, w, h, area.getScrollBarBackgroundColor());
 
-        y = ((getFullVisibleSize(area) - l) * getScroll()) / (getScrollSize() - getVisibleSize(area));
-        ScrollData data2 = getOtherScrollData();
-        if (data2 != null && isOtherScrollBarActive(area) && data2.isOnAxisStart()) {
+        y = ((getFullVisibleSize(area, isOtherActive) - l) * getScroll()) / (getScrollSize() - getVisibleSize(area, isOtherActive));
+        ScrollData data2 = getOtherScrollData(area);
+        if (data2 != null && isOtherActive && data2.isOnAxisStart()) {
             y += data2.getThickness();
         }
         h = l;
