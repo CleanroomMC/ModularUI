@@ -22,7 +22,8 @@ public interface IUnResizeable extends IResizeable {
     };
 
     @Override
-    default void initResizing() {}
+    default void initResizing() {
+    }
 
     @Override
     default boolean postResize(IGuiElement guiElement) {
@@ -50,13 +51,16 @@ public interface IUnResizeable extends IResizeable {
     }
 
     @Override
-    default void setResized(boolean x, boolean y, boolean w, boolean h) {}
+    default void setResized(boolean x, boolean y, boolean w, boolean h) {
+    }
 
     @Override
-    default void setXMarginPaddingApplied(boolean b) {}
+    default void setXMarginPaddingApplied(boolean b) {
+    }
 
     @Override
-    default void setYMarginPaddingApplied(boolean b) {}
+    default void setYMarginPaddingApplied(boolean b) {
+    }
 
     @Override
     default boolean isXMarginPaddingApplied() {

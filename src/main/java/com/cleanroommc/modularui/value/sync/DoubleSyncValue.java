@@ -3,13 +3,11 @@ package com.cleanroommc.modularui.value.sync;
 import com.cleanroommc.modularui.api.value.sync.IDoubleSyncValue;
 import com.cleanroommc.modularui.api.value.sync.IStringSyncValue;
 import com.cleanroommc.modularui.network.NetworkUtils;
-import com.cleanroommc.modularui.utils.BooleanConsumer;
 import net.minecraft.network.PacketBuffer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
@@ -27,7 +25,7 @@ public class DoubleSyncValue extends ValueSyncHandler<Double> implements IDouble
 
     @Contract("null, _, null, _ -> fail")
     public DoubleSyncValue(@Nullable DoubleSupplier clientGetter, @Nullable DoubleConsumer clientSetter,
-                            @Nullable DoubleSupplier serverGetter, @Nullable DoubleConsumer serverSetter) {
+                           @Nullable DoubleSupplier serverGetter, @Nullable DoubleConsumer serverSetter) {
         if (clientGetter == null && serverGetter == null) {
             throw new NullPointerException("Client or server getter must not be null!");
         }

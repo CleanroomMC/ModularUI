@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 /**
  * Base class for handling syncing of widgets.
@@ -102,7 +101,8 @@ public abstract class SyncHandler {
      * @param id identifier
      */
     public final void syncToClient(int id) {
-        syncToClient(id, buf -> {});
+        syncToClient(id, buf -> {
+        });
     }
 
     /**
@@ -111,7 +111,8 @@ public abstract class SyncHandler {
      * @param id identifier
      */
     public final void syncToServer(int id) {
-        syncToServer(id, buf -> {});
+        syncToServer(id, buf -> {
+        });
     }
 
     /**
@@ -120,7 +121,8 @@ public abstract class SyncHandler {
      * @param id identifier
      */
     public final void sync(int id) {
-        sync(id, buf -> {});
+        sync(id, buf -> {
+        });
     }
 
     /**

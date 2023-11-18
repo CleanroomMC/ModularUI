@@ -84,7 +84,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         this.renderer.setScale(this.scale);
         this.renderer.setAlignment(this.textAlignment, -1, getArea().height);
         this.renderer.draw(this.handler.getText());
-        getScrollData().scrollSize = Math.max(0, (int) this.renderer.getLastWidth());
+        getScrollData().setScrollSize(Math.max(0, (int) this.renderer.getLastWidth()));
     }
 
     @Override

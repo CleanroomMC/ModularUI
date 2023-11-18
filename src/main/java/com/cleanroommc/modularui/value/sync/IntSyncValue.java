@@ -7,8 +7,6 @@ import net.minecraft.network.PacketBuffer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.DoubleConsumer;
-import java.util.function.DoubleSupplier;
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 
@@ -25,7 +23,7 @@ public class IntSyncValue extends ValueSyncHandler<Integer> implements IIntSyncV
 
     @Contract("null, _, null, _ -> fail")
     public IntSyncValue(@Nullable IntSupplier clientGetter, @Nullable IntConsumer clientSetter,
-                           @Nullable IntSupplier serverGetter, @Nullable IntConsumer serverSetter) {
+                        @Nullable IntSupplier serverGetter, @Nullable IntConsumer serverSetter) {
         if (clientGetter == null && serverGetter == null) {
             throw new NullPointerException("Client or server getter must not be null!");
         }

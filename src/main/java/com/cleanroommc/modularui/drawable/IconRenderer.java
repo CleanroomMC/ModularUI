@@ -83,7 +83,7 @@ public class IconRenderer {
         TextRenderer.SHARED.setAlignment(this.alignment, this.maxWidth);
         // Look at GuiScreen#L239; height starts with 8, which is equal to `FontRenderer.FONT_HEIGHT - 1`
         int totalHeight = -1, maxWidth = 0;
-        if(this.useWholeWidth) {
+        if (this.useWholeWidth) {
             maxWidth = (int) this.maxWidth;
         }
         for (IIcon icon : lines) {

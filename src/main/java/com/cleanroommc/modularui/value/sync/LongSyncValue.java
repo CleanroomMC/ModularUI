@@ -8,8 +8,6 @@ import net.minecraft.network.PacketBuffer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.DoubleConsumer;
-import java.util.function.DoubleSupplier;
 import java.util.function.LongConsumer;
 import java.util.function.LongSupplier;
 
@@ -27,7 +25,7 @@ public class LongSyncValue extends ValueSyncHandler<Long> implements ILongSyncVa
 
     @Contract("null, _, null, _ -> fail")
     public LongSyncValue(@Nullable LongSupplier clientGetter, @Nullable LongConsumer clientSetter,
-                           @Nullable LongSupplier serverGetter, @Nullable LongConsumer serverSetter) {
+                         @Nullable LongSupplier serverGetter, @Nullable LongConsumer serverSetter) {
         if (clientGetter == null && serverGetter == null) {
             throw new NullPointerException("Client or server getter must not be null!");
         }

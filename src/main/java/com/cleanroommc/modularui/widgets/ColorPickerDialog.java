@@ -47,11 +47,11 @@ public class ColorPickerDialog extends Dialog<Integer> {
         align(Alignment.Center);
         flex().endDefaultMode();
         IWidget alphaSlider = controlAlpha ? new Row()
-                    .widthRel(1f).height(12)
-                    .child(IKey.str("A: ").asWidget().heightRel(1f))
-                    .child(createSlider(this.sliderBackgroundA)
-                            .bounds(0, 255)
-                            .value(new DoubleValue.Dynamic(() -> Color.getAlpha(this.color), val -> updateColor(Color.withAlpha(this.color, (int) val))))) : null;
+                .widthRel(1f).height(12)
+                .child(IKey.str("A: ").asWidget().heightRel(1f))
+                .child(createSlider(this.sliderBackgroundA)
+                        .bounds(0, 255)
+                        .value(new DoubleValue.Dynamic(() -> Color.getAlpha(this.color), val -> updateColor(Color.withAlpha(this.color, (int) val))))) : null;
 
         PagedWidget.Controller controller = new PagedWidget.Controller();
         child(new Column()

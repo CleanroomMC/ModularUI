@@ -3,7 +3,6 @@ package com.cleanroommc.modularui.drawable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
-import org.jetbrains.annotations.ApiStatus;
 
 public class AdaptableUITexture extends UITexture {
 

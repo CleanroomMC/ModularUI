@@ -67,7 +67,7 @@ public interface IKey extends IDrawable {
      * Creates a formatted string literal text with arguments. The arguments can be dynamic.
      * The string is formatted using {@link String#format(String, Object...)}.
      *
-     * @param key string
+     * @param key  string
      * @param args arguments
      * @return text key
      */
