@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 
 public class ColorPickerDialog extends Dialog<Integer> {
 
-    private static final IDrawable handleBackground = new Rectangle().setColor(Color.WHITE.normal);
+    private static final IDrawable handleBackground = new Rectangle().setColor(Color.WHITE.main);
 
     private int color;
     private final int alpha;

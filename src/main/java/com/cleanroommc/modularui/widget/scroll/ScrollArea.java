@@ -18,7 +18,7 @@ public class ScrollArea extends Area {
 
     private HorizontalScrollData scrollX;
     private VerticalScrollData scrollY;
-    private int scrollBarBackgroundColor = Color.withAlpha(Color.BLACK.normal, 0.25f);
+    private int scrollBarBackgroundColor = Color.withAlpha(Color.BLACK.main, 0.25f);
 
     public ScrollArea(int x, int y, int w, int h) {
         super(x, y, w, h);

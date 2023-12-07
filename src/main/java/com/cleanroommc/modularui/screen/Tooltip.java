@@ -35,7 +35,7 @@ public class Tooltip {
     private int x = 0, y = 0;
     private int maxWidth = Integer.MAX_VALUE;
     private boolean textShadow = true;
-    private int textColor = Color.WHITE.normal;
+    private int textColor = Color.WHITE.main;
     private float scale = 1.0f;
     private Alignment alignment = Alignment.TopLeft;
     private boolean autoUpdate = false;

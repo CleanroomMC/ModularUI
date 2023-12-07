@@ -70,7 +70,7 @@ public interface IDrawable {
      * @param widgetTheme widget theme to apply color of
      */
     default void applyThemeColor(ITheme theme, WidgetTheme widgetTheme) {
-        Color.setGlColorOpaque(Color.WHITE.normal);
+        Color.setGlColorOpaque(Color.WHITE.main);
     }
 
     /**

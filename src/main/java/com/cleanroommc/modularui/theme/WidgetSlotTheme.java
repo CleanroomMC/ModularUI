@@ -10,7 +10,7 @@ public class WidgetSlotTheme extends WidgetTheme {
     private final int slotHoverColor;
 
     public WidgetSlotTheme(IDrawable background, int slotHoverColor) {
-        super(background, null, Color.WHITE.normal, 0xFF404040, false);
+        super(background, null, Color.WHITE.main, 0xFF404040, false);
         this.slotHoverColor = slotHoverColor;
     }
 

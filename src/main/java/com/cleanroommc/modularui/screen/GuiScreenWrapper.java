@@ -277,7 +277,7 @@ public class GuiScreenWrapper extends GuiContainer {
             }
         }
         // dot at mouse pos
-        drawRect(mouseX, mouseY, mouseX + 1, mouseY + 1, Color.withAlpha(Color.GREEN.normal, 0.8f));
+        drawRect(mouseX, mouseY, mouseX + 1, mouseY + 1, Color.withAlpha(Color.GREEN.main, 0.8f));
     }
 
     private void drawSegmentLine(int y, int color) {

@@ -49,8 +49,8 @@ public class Circle implements IDrawable {
 
     @Override
     public void loadFromJson(JsonObject json) {
-        this.colorInner = JsonHelper.getColor(json, Color.WHITE.normal, "colorInner", "color");
-        this.colorOuter = JsonHelper.getColor(json, Color.WHITE.normal, "colorOuter", "color");
+        this.colorInner = JsonHelper.getColor(json, Color.WHITE.main, "colorInner", "color");
+        this.colorOuter = JsonHelper.getColor(json, Color.WHITE.main, "colorOuter", "color");
         this.segments = JsonHelper.getInt(json, 40, "segments");
     }
 }

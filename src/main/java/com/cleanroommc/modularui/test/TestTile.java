@@ -69,7 +69,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         IntSyncValue cycleStateValue = new IntSyncValue(() -> this.cycleState, val -> this.cycleState = val);
         guiSyncManager.syncValue("cycle_state", cycleStateValue);
 
-        Rectangle colorPickerBackground = new Rectangle().setColor(Color.RED.normal);
+        Rectangle colorPickerBackground = new Rectangle().setColor(Color.RED.main);
         ModularPanel panel = new ModularPanel("test_tile");
         PagedWidget.Controller tabController = new PagedWidget.Controller();
         panel.flex()                        // returns object which is responsible for sizing
@@ -121,7 +121,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                             tooltip.addLine(GuiTextures.LOGO.asIcon().size(50).alignment(Alignment.TopCenter));
                                                             tooltip.addLine(IKey.str("And here a circle:"));
                                                             tooltip.addLine(new Circle()
-                                                                            .setColor(Color.RED.dark(2), Color.RED.bright(2))
+                                                                            .setColor(Color.RED.darker(2), Color.RED.brighter(2))
                                                                             .asIcon()
                                                                             .size(20))
                                                                     .addLine(new ItemDrawable(new ItemStack(Items.DIAMOND)).asIcon())
