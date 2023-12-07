@@ -10,6 +10,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 /**
  * An interface to implement on {@link net.minecraft.tileentity.TileEntity} or {@link net.minecraft.item.Item}.
  */
+@FunctionalInterface
 public interface IGuiHolder<T extends GuiData> {
 
     /**

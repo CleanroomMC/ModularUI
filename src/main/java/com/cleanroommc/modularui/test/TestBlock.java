@@ -71,11 +71,7 @@ public class TestBlock extends Block implements ITileEntityProvider {
     @Override
     public boolean onBlockActivated(World worldIn, @NotNull BlockPos pos, @NotNull IBlockState state, @NotNull EntityPlayer playerIn, @NotNull EnumHand hand, @NotNull EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (!worldIn.isRemote) {
-            //GuiInfos.TILE_ENTITY.open(playerIn, worldIn, pos);
-            TileEntity te = worldIn.getTileEntity(pos);
-            if (te instanceof TestTile) {
-                TileEntityGuiFactory.INSTANCE.open(playerIn, (TestTile) te);
-            }
+            TileEntityGuiFactory.open(playerIn, pos);
         }
         return true;
     }

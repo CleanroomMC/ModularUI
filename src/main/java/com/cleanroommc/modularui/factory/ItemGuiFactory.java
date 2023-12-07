@@ -6,11 +6,12 @@ import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumHand;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 public class ItemGuiFactory extends AbstractUIFactory<HandGuiData> {
 
@@ -20,9 +21,11 @@ public class ItemGuiFactory extends AbstractUIFactory<HandGuiData> {
         super("mui:item");
     }
 
-    public void open(EntityPlayerMP player, EnumHand hand) {
+    public static void open(EntityPlayerMP player, EnumHand hand) {
+        Objects.requireNonNull(player);
+        Objects.requireNonNull(hand);
         HandGuiData guiData = new HandGuiData(player, hand);
-        GuiManager.open(this, guiData, player);
+        GuiManager.open(INSTANCE, guiData, player);
     }
 
     @Override

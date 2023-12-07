@@ -58,10 +58,7 @@ public class TutorialBlock extends Block implements ITileEntityProvider {
     @Override
     public boolean onBlockActivated(World worldIn, @NotNull BlockPos pos, @NotNull IBlockState state, @NotNull EntityPlayer playerIn, @NotNull EnumHand hand, @NotNull EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (!worldIn.isRemote) {
-            TileEntity te = worldIn.getTileEntity(pos);
-            if (te instanceof TutorialTile) {
-                TileEntityGuiFactory.INSTANCE.open(playerIn, (TutorialTile) te);
-            }
+            TileEntityGuiFactory.open(playerIn, pos);
         }
         return true;
     }

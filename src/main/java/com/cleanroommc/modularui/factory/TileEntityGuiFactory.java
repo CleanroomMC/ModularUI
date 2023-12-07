@@ -22,7 +22,7 @@ public class TileEntityGuiFactory extends AbstractUIFactory<PosGuiData> {
         super("mui:tile");
     }
 
-    public <T extends TileEntity & IGuiHolder<PosGuiData>> void open(EntityPlayer player, T tile) {
+    public static <T extends TileEntity & IGuiHolder<PosGuiData>> void open(EntityPlayer player, T tile) {
         Objects.requireNonNull(player);
         Objects.requireNonNull(tile);
         if (tile.isInvalid()) {
@@ -33,7 +33,14 @@ public class TileEntityGuiFactory extends AbstractUIFactory<PosGuiData> {
         }
         BlockPos pos = tile.getPos();
         PosGuiData data = new PosGuiData(player, pos.getX(), pos.getY(), pos.getZ());
-        GuiManager.open(this, data, (EntityPlayerMP) player);
+        GuiManager.open(INSTANCE, data, (EntityPlayerMP) player);
+    }
+
+    public static void open(EntityPlayer player, BlockPos pos) {
+        Objects.requireNonNull(player);
+        Objects.requireNonNull(pos);
+        PosGuiData data = new PosGuiData(player, pos.getX(), pos.getY(), pos.getZ());
+        GuiManager.open(INSTANCE, data, (EntityPlayerMP) player);
     }
 
     @Override
