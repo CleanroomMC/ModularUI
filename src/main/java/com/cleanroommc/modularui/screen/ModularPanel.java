@@ -165,7 +165,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         this.screen = screen;
         getArea().z(1);
         initialise(this);
-        if (ModularUIConfig.panelOpenCloseAnimationTime <= 0) return;
+        if (ModularUIConfig.panelOpenCloseAnimationTime <= 0 || !getScreen().getScreenWrapper().doAnimateTransition()) {
+            this.scale = 1f;
+            this.alpha = 1f;
+            return;
+        }
         this.scale = 0.75f;
         this.alpha = 0f;
         if (this.animator == null) {

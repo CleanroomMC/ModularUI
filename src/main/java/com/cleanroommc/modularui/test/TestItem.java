@@ -56,7 +56,7 @@ public class TestItem extends Item implements IGuiHolder<HandGuiData> {
     @Nonnull
     public ActionResult<ItemStack> onItemRightClick(World world, @NotNull EntityPlayer player, @Nonnull EnumHand hand) {
         if (!world.isRemote) {
-            ItemGuiFactory.INSTANCE.open((EntityPlayerMP) player, hand, this);
+            ItemGuiFactory.INSTANCE.open((EntityPlayerMP) player, hand);
         }
         return new ActionResult<>(EnumActionResult.SUCCESS, player.getHeldItem(hand));
     }

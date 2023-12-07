@@ -56,16 +56,19 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public static void onOpenScreen(GuiOpenEvent event) {
+        if (event.getGui() instanceof GuiScreenWrapper && Minecraft.getMinecraft().currentScreen != null) {
+            // another screen is already open, don't fade in the dark background as it's already there
+            ((GuiScreenWrapper) event.getGui()).setDoAnimateTransition(false);
+        }
         if (!GuiManager.isOpeningQueue() && Minecraft.getMinecraft().currentScreen instanceof GuiScreenWrapper) {
+            // opening a screen while a modular screen is open can cause crashes
+            // queue the screen to open it on next tick
             if (event.getGui() != null) {
                 ClientGUI.open(event.getGui());
             } else {
                 ClientGUI.close();
             }
-        }
-        if (event.getGui() instanceof GuiScreenWrapper && Minecraft.getMinecraft().currentScreen != null) {
-            // another screen is already open, don't fade in the dark background as it's already there
-            ((GuiScreenWrapper) event.getGui()).setAlphaFade(false);
+            event.setCanceled(true);
         }
     }
 

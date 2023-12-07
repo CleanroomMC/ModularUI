@@ -48,7 +48,7 @@ public class GuiScreenWrapper extends GuiContainer {
 
     private int fps, frameCount = 0;
     private long timer = Minecraft.getSystemTime();
-    private boolean alphaFade = true;
+    private boolean doAnimateTransition = true;
 
     public GuiScreenWrapper(ModularContainer container, ModularScreen screen) {
         super(container);
@@ -188,7 +188,7 @@ public class GuiScreenWrapper extends GuiContainer {
             super.drawWorldBackground(tint);
             return;
         }
-        float alpha = this.alphaFade ? this.screen.getMainPanel().getAlpha() : 1f;
+        float alpha = this.doAnimateTransition ? this.screen.getMainPanel().getAlpha() : 1f;
         // vanilla color values as hex
         int color = 0x101010;
         int startAlpha = 0xc0;
@@ -299,7 +299,7 @@ public class GuiScreenWrapper extends GuiContainer {
         super.onGuiClosed();
         this.screen.onClose();
         this.init = true;
-        this.alphaFade = true;
+        this.doAnimateTransition = true;
     }
 
     public ModularScreen getScreen() {
@@ -410,7 +410,11 @@ public class GuiScreenWrapper extends GuiContainer {
         return this.fontRenderer;
     }
 
-    public void setAlphaFade(boolean alphaFade) {
-        this.alphaFade = alphaFade;
+    public void setDoAnimateTransition(boolean doAnimateTransition) {
+        this.doAnimateTransition = doAnimateTransition;
+    }
+
+    public boolean doAnimateTransition() {
+        return doAnimateTransition;
     }
 }

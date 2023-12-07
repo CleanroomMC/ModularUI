@@ -89,14 +89,15 @@ public class GuiManager {
             queuedClientScreen.getContext().setJeiSettings(queuedJeiSettings);
             GuiScreenWrapper screenWrapper = new GuiScreenWrapper(new ModularContainer(), queuedClientScreen);
             Minecraft.getMinecraft().displayGuiScreen(screenWrapper);
-            queuedClientScreen = null;
-            queuedJeiSettings = null;
         } else if (queuedGuiScreen != null) {
             Minecraft.getMinecraft().displayGuiScreen(queuedGuiScreen);
-            queuedGuiScreen = null;
         } else if (closeScreen) {
             Minecraft.getMinecraft().displayGuiScreen(null);
         }
+        queuedClientScreen = null;
+        queuedJeiSettings = null;
+        queuedGuiScreen = null;
+        closeScreen = false;
         openingQueue = false;
     }
 

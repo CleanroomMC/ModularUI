@@ -118,13 +118,15 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
 
     @Override
     public void dispose() {
-        if (this.guiActionListeners != null) {
-            for (IGuiAction action : this.guiActionListeners) {
-                this.context.screen.removeGuiActionListener(action);
+        if (isValid()) {
+            if (this.guiActionListeners != null) {
+                for (IGuiAction action : this.guiActionListeners) {
+                    this.context.screen.removeGuiActionListener(action);
+                }
             }
-        }
-        if (!getPanel().isMainPanel() && this.syncHandler != null) {
-            getScreen().getSyncManager().disposeSyncHandler(this.syncHandler);
+            if (!getPanel().isMainPanel() && this.syncHandler != null) {
+                getScreen().getSyncManager().disposeSyncHandler(this.syncHandler);
+            }
         }
         if (hasChildren()) {
             for (IWidget child : getChildren()) {
