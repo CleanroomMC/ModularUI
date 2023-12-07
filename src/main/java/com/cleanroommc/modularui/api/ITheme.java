@@ -50,4 +50,8 @@ public interface ITheme {
     WidgetToggleButtonTheme getToggleButtonTheme();
 
     WidgetTheme getWidgetTheme(String id);
+
+    int getOpenCloseAnimationOverride();
+
+    boolean getSmoothProgressBarOverride();
 }

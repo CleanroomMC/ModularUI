@@ -274,7 +274,14 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
                 parentWidgetTheme = parent.getWidgetTheme(entry.getKey());
                 widgetThemes.put(entry.getKey(), entry.getValue().parse(parentWidgetTheme, widgetThemeJson, jsonBuilder.getJson()));
             }
-            return new Theme(this.id, parent, widgetThemes);
+            Theme theme = new Theme(this.id, parent, widgetThemes);
+            if (jsonBuilder.getJson().has("openCloseAnimation")) {
+                theme.setOpenCloseAnimationOverride(jsonBuilder.getJson().get("openCloseAnimation").getAsInt());
+            }
+            if (jsonBuilder.getJson().has("smoothProgressBar")) {
+                theme.setSmoothProgressBarOverride(jsonBuilder.getJson().get("smoothProgressBar").getAsBoolean());
+            }
+            return theme;
         }
     }
 
