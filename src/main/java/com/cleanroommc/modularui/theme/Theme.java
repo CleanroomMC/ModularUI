@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.theme;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.IThemeApi;
+import com.cleanroommc.modularui.screen.Tooltip;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.util.Map;
@@ -31,6 +32,7 @@ public class Theme implements ITheme {
 
     private int openCloseAnimationOverride = -1;
     private Boolean smoothProgressBarOverride = null;
+    private Tooltip.Pos tooltipPosOverride = null;
 
     Theme(String id, ITheme parent, Map<String, WidgetTheme> widgetThemes) {
         this.id = id;
@@ -67,6 +69,10 @@ public class Theme implements ITheme {
 
     void setSmoothProgressBarOverride(boolean smooth) {
         this.smoothProgressBarOverride = smooth;
+    }
+
+    void setTooltipPosOverride(Tooltip.Pos pos) {
+        this.tooltipPosOverride = pos;
     }
 
     public String getId() {
@@ -129,5 +135,13 @@ public class Theme implements ITheme {
             return this.smoothProgressBarOverride;
         }
         return ModularUIConfig.smoothProgressBar;
+    }
+
+    @Override
+    public Tooltip.Pos getTooltipPosOverride() {
+        if (this.tooltipPosOverride != null) {
+            return this.tooltipPosOverride;
+        }
+        return ModularUIConfig.tooltipPos;
     }
 }

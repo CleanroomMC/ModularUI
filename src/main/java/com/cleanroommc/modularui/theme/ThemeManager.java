@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.theme;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.utils.*;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -280,6 +281,10 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
             }
             if (jsonBuilder.getJson().has("smoothProgressBar")) {
                 theme.setSmoothProgressBarOverride(jsonBuilder.getJson().get("smoothProgressBar").getAsBoolean());
+            }
+            if (jsonBuilder.getJson().has("tooltipPos")) {
+                String posName = jsonBuilder.getJson().get("tooltipPos").getAsString();
+                theme.setTooltipPosOverride(Tooltip.Pos.valueOf(posName));
             }
             return theme;
         }

@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.theme;
 
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.screen.Tooltip;
 
 public abstract class AbstractDefaultTheme implements ITheme {
 
@@ -73,5 +74,10 @@ public abstract class AbstractDefaultTheme implements ITheme {
     @Override
     public boolean getSmoothProgressBarOverride() {
         return ModularUIConfig.smoothProgressBar;
+    }
+
+    @Override
+    public Tooltip.Pos getTooltipPosOverride() {
+        return ModularUIConfig.tooltipPos;
     }
 }

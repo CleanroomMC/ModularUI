@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.api;
 
+import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.theme.WidgetSlotTheme;
 import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -54,4 +55,6 @@ public interface ITheme {
     int getOpenCloseAnimationOverride();
 
     boolean getSmoothProgressBarOverride();
+
+    Tooltip.Pos getTooltipPosOverride();
 }

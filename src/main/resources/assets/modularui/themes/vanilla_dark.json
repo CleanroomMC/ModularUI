@@ -1,5 +1,6 @@
 {
   "color": "0x444444",
   "textColor": "0xEEEEEE",
-  "textShadow": false
+  "textShadow": false,
+  "tooltipPos": "NEXT_TO_MOUSE"
 }
