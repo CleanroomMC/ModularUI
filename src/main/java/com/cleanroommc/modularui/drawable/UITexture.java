@@ -18,6 +18,22 @@ public class UITexture implements IDrawable {
 
     public static final UITexture DEFAULT = fullImage("gui/options_background", true);
 
+    private static final ResourceLocation ICONS_LOCATION = new ResourceLocation(ModularUI.ID, "textures/gui/icons.png");
+
+    // only for usage in GuiTextures
+    static UITexture icon(String name, int x, int y, int w, int h) {
+        return UITexture.builder()
+                .location(ICONS_LOCATION)
+                .imageSize(256, 256)
+                .uv(x, y, w, h)
+                .name(name)
+                .build();
+    }
+
+    static UITexture icon(String name, int x, int y) {
+        return icon(name, x, y, 16, 16);
+    }
+
     private static final String TEXTURES_PREFIX = "textures/";
     private static final String PNG_SUFFIX = ".png";
 
@@ -139,7 +155,7 @@ public class UITexture implements IDrawable {
     public static IDrawable parseFromJson(JsonObject json) {
         String name = JsonHelper.getString(json, null, "name", "id");
         if (name != null) {
-            UITexture drawable = GuiTextures.get(name);
+            UITexture drawable = DrawableSerialization.getTexture(name);
             if (drawable != null) return drawable;
         }
         Builder builder = builder();
@@ -188,9 +204,8 @@ public class UITexture implements IDrawable {
         private int iw = defaultImageWidth, ih = defaultImageHeight;
         private int x, y, w, h;
         private float u0 = 0, v0 = 0, u1 = 1, v1 = 1;
-        private byte mode = 0;
+        private Mode mode = Mode.FULL;
         private int borderX = 0, borderY = 0;
-        private Type type;
         private String name;
         private boolean tiled = false;
         private boolean canApplyTheme = false;
@@ -254,7 +269,7 @@ public class UITexture implements IDrawable {
          * Will draw the whole image file.
          */
         public Builder fullImage() {
-            this.mode = 0;
+            this.mode = Mode.FULL;
             return this;
         }
 
@@ -267,7 +282,7 @@ public class UITexture implements IDrawable {
          * @param h height in pixels
          */
         public Builder uv(int x, int y, int w, int h) {
-            this.mode = 1;
+            this.mode = Mode.PIXEL;
             this.x = x;
             this.y = y;
             this.w = w;
@@ -284,7 +299,7 @@ public class UITexture implements IDrawable {
          * @param v1 y end
          */
         public Builder uv(float u0, float v0, float u1, float v1) {
-            this.mode = 2;
+            this.mode = Mode.RELATIVE;
             this.u0 = u0;
             this.v0 = v0;
             this.u1 = u1;
@@ -317,29 +332,12 @@ public class UITexture implements IDrawable {
          * Specify if theme color should apply to this texture.
          */
         public Builder canApplyTheme() {
-            this.canApplyTheme = true;
-            return this;
+            return canApplyTheme(true);
         }
 
-        /**
-         * Registers the texture with a name, so it can be used in json without creating the texture again.
-         *
-         * @param type texture type. Irrelevant
-         * @param name texture name
-         */
-        public Builder registerAs(Type type, String name) {
-            this.type = type;
-            this.name = name;
+        public Builder canApplyTheme(boolean canApplyTheme) {
+            this.canApplyTheme = canApplyTheme;
             return this;
-        }
-
-        /**
-         * Registers the texture with a name, so it can be used in json without creating the texture again.
-         *
-         * @param name texture name
-         */
-        public Builder registerAsIcon(String name) {
-            return registerAs(Type.ICON, name);
         }
 
         /**
@@ -348,19 +346,9 @@ public class UITexture implements IDrawable {
          *
          * @param name texture name
          */
-        public Builder registerAsBackground(String name) {
-            return registerAsBackground(name, true);
-        }
-
-        /**
-         * Registers the texture with a name, so it can be used in json without creating the texture again.
-         *
-         * @param name          texture name
-         * @param canApplyTheme if theme color can be applied
-         */
-        public Builder registerAsBackground(String name, boolean canApplyTheme) {
-            if (canApplyTheme) canApplyTheme();
-            return registerAs(Type.BACKGROUND, name);
+        public Builder name(String name) {
+            this.name = name;
+            return this;
         }
 
         /**
@@ -370,13 +358,15 @@ public class UITexture implements IDrawable {
          */
         public UITexture build() {
             UITexture texture = create();
-            if (this.type != null && this.name != null) {
-                if (this.type == Type.ICON) {
-                    GuiTextures.registerIcon(this.name, texture);
-                } else if (this.type == Type.BACKGROUND) {
-                    GuiTextures.registerBackground(this.name, texture);
+            if (this.name == null) {
+                String[] p = texture.location.getPath().split("/");
+                p = p[p.length - 1].split("\\.");
+                this.name = texture.location.getNamespace().equals(ModularUI.ID) ? p[0] : texture.location.getNamespace() + ":" + p[0];
+                if (DrawableSerialization.getTexture(this.name) != null) {
+                    return texture;
                 }
             }
+            DrawableSerialization.registerTexture(this.name, texture);
             return texture;
         }
 
@@ -385,21 +375,21 @@ public class UITexture implements IDrawable {
                 throw new NullPointerException("Location must not be null");
             }
             if (this.iw <= 0 || this.ih <= 0) throw new IllegalArgumentException("Image size must be > 0");
-            if (this.mode == 0) {
+            if (this.mode == Mode.FULL) {
                 this.u0 = 0;
                 this.v0 = 0;
                 this.u1 = 1;
                 this.v1 = 1;
-                this.mode = 2;
-            } else if (this.mode == 1) {
+                this.mode = Mode.RELATIVE;
+            } else if (this.mode == Mode.PIXEL) {
                 float tw = 1f / this.iw, th = 1f / this.ih;
                 this.u0 = this.x * tw;
                 this.v0 = this.y * th;
                 this.u1 = (this.x + this.w) * tw;
                 this.v1 = (this.y + this.h) * th;
-                this.mode = 2;
+                this.mode = Mode.RELATIVE;
             }
-            if (this.mode == 2) {
+            if (this.mode == Mode.RELATIVE) {
                 if (this.u0 < 0 || this.v0 < 0 || this.u1 > 1 || this.v1 > 1)
                     throw new IllegalArgumentException("UV values must be 0 - 1");
                 if (this.borderX > 0 || this.borderY > 0) {
@@ -414,7 +404,7 @@ public class UITexture implements IDrawable {
         }
     }
 
-    public enum Type {
-        ICON, BACKGROUND, OTHER
+    private enum Mode {
+        FULL, PIXEL, RELATIVE
     }
 }
