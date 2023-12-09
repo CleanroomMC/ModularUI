@@ -40,6 +40,7 @@ public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDes
     public static void init() {
         registerDrawableType("empty", json -> IDrawable.EMPTY);
         registerDrawableType("null", json -> IDrawable.EMPTY);
+        registerDrawableType("none", json -> IDrawable.NONE);
         registerDrawableType("texture", UITexture::parseFromJson);
         registerDrawableType("color", json -> new Rectangle());
         registerDrawableType("rectangle", json -> new Rectangle());

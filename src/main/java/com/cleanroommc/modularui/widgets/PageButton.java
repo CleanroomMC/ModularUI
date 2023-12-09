@@ -22,7 +22,15 @@ public class PageButton extends Widget<PageButton> implements Interactable {
 
     @Override
     public WidgetTheme getWidgetTheme(ITheme theme) {
-        return theme.getButtonTheme();
+        return theme.getToggleButtonTheme();
+    }
+
+    @Override
+    public void applyTheme(ITheme theme) {
+        super.applyTheme(theme);
+        if (this.inactiveTexture == null) {
+            this.inactiveTexture = theme.getToggleButtonTheme().getSelectedBackground();
+        }
     }
 
     @Override
@@ -60,6 +68,7 @@ public class PageButton extends Widget<PageButton> implements Interactable {
     public PageButton tab(TabTexture texture, int location) {
         return background(false, texture.get(location, false))
                 .background(true, texture.get(location, true))
+                .disableHoverBackground()
                 .size(texture.getWidth(), texture.getHeight());
     }
 }

@@ -205,12 +205,12 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
 
     public IDrawable getCurrentBackground() {
         IDrawable hoverBackground = getHoverBackground();
-        return hoverBackground != null && isHovering() ? hoverBackground : getBackground();
+        return hoverBackground != null && hoverBackground != IDrawable.NONE && isHovering() ? hoverBackground : getBackground();
     }
 
     public IDrawable getCurrentOverlay() {
         IDrawable hoverBackground = getHoverOverlay();
-        return hoverBackground != null && isHovering() ? hoverBackground : getOverlay();
+        return hoverBackground != null && hoverBackground != IDrawable.NONE && isHovering() ? hoverBackground : getOverlay();
     }
 
     @Nullable
@@ -235,7 +235,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     public W background(IDrawable... background) {
-        if (background.length == 0) {
+        if (background == null || background.length == 0) {
             this.background = null;
         } else if (background.length == 1) {
             this.background = background[0];
@@ -246,7 +246,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     public W overlay(IDrawable... overlay) {
-        if (overlay.length == 0) {
+        if (overlay == null || overlay.length == 0) {
             this.overlay = null;
         } else if (overlay.length == 1) {
             this.overlay = overlay[0];
@@ -257,7 +257,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     public W hoverBackground(IDrawable... background) {
-        if (background.length == 0) {
+        if (background == null || background.length == 0) {
             this.hoverBackground = null;
         } else if (background.length == 1) {
             this.hoverBackground = background[0];
@@ -268,7 +268,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     public W hoverOverlay(IDrawable... overlay) {
-        if (overlay.length == 0) {
+        if (overlay == null || overlay.length == 0) {
             this.hoverOverlay = null;
         } else if (overlay.length == 1) {
             this.hoverOverlay = overlay[0];
@@ -276,6 +276,14 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
             this.hoverOverlay = new DrawableArray(overlay);
         }
         return getThis();
+    }
+
+    public W disableHoverBackground() {
+        return hoverBackground(IDrawable.NONE);
+    }
+
+    public W disableHoverOverlay() {
+        return hoverOverlay(IDrawable.NONE);
     }
 
     // --------------

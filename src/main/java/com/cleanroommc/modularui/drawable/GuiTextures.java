@@ -90,6 +90,53 @@ public interface GuiTextures {
             .name("vanilla_background").canApplyTheme()
             .build();
 
+    UITexture MC_BUTTON = UITexture.builder()
+            .location(ModularUI.ID, "gui/widgets/mc_button")
+            .imageSize(16, 32) // texture is 32x64, but this looks nicer
+            .uv(0f, 0f, 1f, 0.5f)
+            .adaptable(2).tiled()
+            .name("mc_button")
+            .build();
+
+    UITexture MC_BUTTON_PRESSED = UITexture.builder()
+            .location(ModularUI.ID, "gui/widgets/mc_button")
+            .imageSize(16, 32)
+            .uv(0f, 0.5f, 1f, 1f)
+            .adaptable(2).tiled()
+            .name("mc_button_pressed")
+            .build();
+
+    UITexture MC_BUTTON_HOVERED = UITexture.builder()
+            .location(ModularUI.ID, "gui/widgets/mc_button_hovered")
+            .imageSize(16, 32)
+            .uv(0f, 0f, 1f, 0.5f)
+            .adaptable(2).tiled()
+            .name("mc_button_hovered")
+            .build();
+
+    UITexture MC_BUTTON_HOVERED_PRESSED = UITexture.builder()
+            .location(ModularUI.ID, "gui/widgets/mc_button_hovered")
+            .imageSize(16, 32)
+            .uv(0f, 0.5f, 1f, 1f)
+            .adaptable(2).tiled()
+            .name("mc_button_hovered_pressed")
+            .build();
+
+    UITexture MC_BUTTON_DISABLED = UITexture.builder()
+            .location(ModularUI.ID, "gui/widgets/mc_button_disabled")
+            .imageSize(16, 16)
+            .uv(0f, 0f, 1f, 0.5f)
+            .adaptable(1).tiled()
+            .name("mc_button_disabled")
+            .build();
+
+    UITexture BUTTON_CLEAN = UITexture.builder()
+            .location(ModularUI.ID, "gui/widgets/base_button")
+            .imageSize(18, 18)
+            .adaptable(1)
+            .name("vanilla_button").canApplyTheme()
+            .build();
+
     UITexture DISPLAY = UITexture.builder()
             .location(ModularUI.ID, "gui/background/display")
             .imageSize(143, 75)
@@ -102,13 +149,6 @@ public interface GuiTextures {
             .imageSize(18, 18)
             .adaptable(1)
             .name("display_small")
-            .build();
-
-    UITexture BUTTON_CLEAN = UITexture.builder()
-            .location(ModularUI.ID, "gui/widgets/base_button")
-            .imageSize(18, 18)
-            .adaptable(1)
-            .name("vanilla_button").canApplyTheme()
             .build();
 
     UITexture SLOT_ITEM = UITexture.builder()

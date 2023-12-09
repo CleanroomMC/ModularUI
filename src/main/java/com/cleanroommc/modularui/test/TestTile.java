@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IGuiHolder;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.*;
 import com.cleanroommc.modularui.factory.PosGuiData;
@@ -236,6 +237,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                         .debugName("color picker button")
                                         .top(25)
                                         .background(colorPickerBackground)
+                                        .disableHoverBackground()
                                         .onMousePressed(mouseButton -> {
                                             panel.getScreen().openPanel(new ColorPickerDialog(colorPickerBackground::setColor, colorPickerBackground.getColor(), true)
                                                     .setDraggable(true)

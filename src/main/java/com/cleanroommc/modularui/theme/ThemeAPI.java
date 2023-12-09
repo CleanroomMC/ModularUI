@@ -30,11 +30,11 @@ public class ThemeAPI implements IThemeApi {
 
     private ThemeAPI() {
         registerWidgetTheme(Theme.PANEL, new WidgetTheme(GuiTextures.MC_BACKGROUND, null, Color.WHITE.main, 0xFF404040, false), WidgetTheme::new);
-        registerWidgetTheme(Theme.BUTTON, new WidgetTheme(GuiTextures.BUTTON_CLEAN, null, Color.WHITE.main, Color.WHITE.main, true), WidgetTheme::new);
+        registerWidgetTheme(Theme.BUTTON, new WidgetTheme(GuiTextures.MC_BUTTON, GuiTextures.MC_BUTTON_HOVERED, Color.WHITE.main, Color.WHITE.main, true), WidgetTheme::new);
         registerWidgetTheme(Theme.ITEM_SLOT, new WidgetSlotTheme(GuiTextures.SLOT_ITEM, Color.withAlpha(Color.WHITE.main, 0x60)), WidgetSlotTheme::new);
         registerWidgetTheme(Theme.FLUID_SLOT, new WidgetSlotTheme(GuiTextures.SLOT_FLUID, Color.withAlpha(Color.WHITE.main, 0x60)), WidgetSlotTheme::new);
         registerWidgetTheme(Theme.TEXT_FIELD, new WidgetTextFieldTheme(0xFF2F72A8), (parent, json, fallback) -> new WidgetTextFieldTheme(parent, fallback, json));
-        registerWidgetTheme(Theme.TOGGLE_BUTTON, new WidgetToggleButtonTheme(GuiTextures.BUTTON_CLEAN, null, Color.WHITE.main, Color.WHITE.main, true, GuiTextures.SLOT_ITEM, null, 0xFFBBBBBB), WidgetToggleButtonTheme::new);
+        registerWidgetTheme(Theme.TOGGLE_BUTTON, new WidgetToggleButtonTheme(GuiTextures.MC_BUTTON, GuiTextures.MC_BUTTON_HOVERED, Color.WHITE.main, Color.WHITE.main, true, GuiTextures.MC_BUTTON_DISABLED, null, Color.WHITE.main), WidgetToggleButtonTheme::new);
     }
 
     @Override
