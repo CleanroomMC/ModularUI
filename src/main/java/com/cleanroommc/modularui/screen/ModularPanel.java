@@ -95,7 +95,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     public void animateClose() {
-        if (ModularUIConfig.panelOpenCloseAnimationTime <= 0) {
+        if (getScreen().getCurrentTheme().getOpenCloseAnimationOverride() <= 0) {
             closeIfOpen();
             return;
         }
@@ -165,7 +165,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         this.screen = screen;
         getArea().z(1);
         initialise(this);
-        if (ModularUIConfig.panelOpenCloseAnimationTime <= 0 || !getScreen().getScreenWrapper().doAnimateTransition()) {
+        int animationTime = getScreen().getCurrentTheme().getOpenCloseAnimationOverride();
+        if (animationTime <= 0 || !getScreen().getScreenWrapper().doAnimateTransition()) {
             this.scale = 1f;
             this.alpha = 1f;
             return;
@@ -173,7 +174,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         this.scale = 0.75f;
         this.alpha = 0f;
         if (this.animator == null) {
-            this.animator = new Animator(ModularUIConfig.panelOpenCloseAnimationTime, Interpolation.QUINT_OUT)
+            this.animator = new Animator(animationTime, Interpolation.QUINT_OUT)
                     .setValueBounds(0.0f, 1.0f)
                     .setCallback(val -> {
                         this.alpha = (float) val;

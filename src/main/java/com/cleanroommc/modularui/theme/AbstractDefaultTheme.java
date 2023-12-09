@@ -1,6 +1,8 @@
 package com.cleanroommc.modularui.theme;
 
+import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.screen.Tooltip;
 
 public abstract class AbstractDefaultTheme implements ITheme {
 
@@ -62,5 +64,20 @@ public abstract class AbstractDefaultTheme implements ITheme {
             this.toggleButtonTheme = (WidgetToggleButtonTheme) getWidgetTheme(Theme.TOGGLE_BUTTON);
         }
         return this.toggleButtonTheme;
+    }
+
+    @Override
+    public int getOpenCloseAnimationOverride() {
+        return ModularUIConfig.panelOpenCloseAnimationTime;
+    }
+
+    @Override
+    public boolean getSmoothProgressBarOverride() {
+        return ModularUIConfig.smoothProgressBar;
+    }
+
+    @Override
+    public Tooltip.Pos getTooltipPosOverride() {
+        return ModularUIConfig.tooltipPos;
     }
 }

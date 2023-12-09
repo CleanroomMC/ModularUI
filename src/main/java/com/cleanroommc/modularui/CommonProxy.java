@@ -9,7 +9,6 @@ import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.test.ItemEditorGui;
 import com.cleanroommc.modularui.test.TestBlock;
-import com.cleanroommc.modularui.test.tutorial.TutorialBlock;
 import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import net.minecraft.util.Timer;
 import net.minecraftforge.common.MinecraftForge;
@@ -36,9 +35,6 @@ public class CommonProxy {
         if (ModularUIConfig.enabledTestGuis) {
             MinecraftForge.EVENT_BUS.register(TestBlock.class);
             TestBlock.preInit();
-
-            MinecraftForge.EVENT_BUS.register(TutorialBlock.class);
-            TutorialBlock.preInit();
         }
 
         NetworkHandler.init();

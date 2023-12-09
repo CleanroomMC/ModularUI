@@ -29,6 +29,7 @@ public class Tooltip {
     private List<IDrawable> additionalLines = new ArrayList<>();
     private Area excludeArea;
     private Pos pos = ModularUIConfig.tooltipPos;
+    private boolean customPos = false;
     private Consumer<Tooltip> tooltipBuilder;
     private int showUpTimer = 0;
 
@@ -123,6 +124,10 @@ public class Tooltip {
     public Rectangle determineTooltipArea(GuiContext context, List<IDrawable> lines, IconRenderer renderer, int screenWidth, int screenHeight, int mouseX, int mouseY) {
         int width = (int) renderer.getLastWidth();
         int height = (int) renderer.getLastHeight();
+
+        if (!this.customPos) {
+            this.pos = context.screen.getCurrentTheme().getTooltipPosOverride();
+        }
 
         if (this.pos == null) {
             return new Rectangle(this.x, this.y, width, height);
@@ -279,11 +284,13 @@ public class Tooltip {
     }
 
     public Tooltip pos(Pos pos) {
+        this.customPos = true;
         this.pos = pos;
         return this;
     }
 
     public Tooltip pos(int x, int y) {
+        this.customPos = true;
         this.pos = null;
         this.x = x;
         this.y = y;

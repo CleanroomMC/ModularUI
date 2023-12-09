@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.theme;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.utils.*;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -274,7 +275,18 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
                 parentWidgetTheme = parent.getWidgetTheme(entry.getKey());
                 widgetThemes.put(entry.getKey(), entry.getValue().parse(parentWidgetTheme, widgetThemeJson, jsonBuilder.getJson()));
             }
-            return new Theme(this.id, parent, widgetThemes);
+            Theme theme = new Theme(this.id, parent, widgetThemes);
+            if (jsonBuilder.getJson().has("openCloseAnimation")) {
+                theme.setOpenCloseAnimationOverride(jsonBuilder.getJson().get("openCloseAnimation").getAsInt());
+            }
+            if (jsonBuilder.getJson().has("smoothProgressBar")) {
+                theme.setSmoothProgressBarOverride(jsonBuilder.getJson().get("smoothProgressBar").getAsBoolean());
+            }
+            if (jsonBuilder.getJson().has("tooltipPos")) {
+                String posName = jsonBuilder.getJson().get("tooltipPos").getAsString();
+                theme.setTooltipPosOverride(Tooltip.Pos.valueOf(posName));
+            }
+            return theme;
         }
     }
 
