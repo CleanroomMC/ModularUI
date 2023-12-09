@@ -372,7 +372,7 @@ public class ModularScreen {
     public <T> void openDialog(String name, Consumer<Dialog<T>> dialogBuilder, Consumer<T> resultConsumer) {
         Dialog<T> dialog = new Dialog<>(name, resultConsumer);
         dialog.flex().size(150, 100).align(Alignment.Center);
-        dialog.background(GuiTextures.BACKGROUND);
+        dialog.background(GuiTextures.MC_BACKGROUND);
         dialogBuilder.accept(dialog);
         openPanel(dialog);
     }

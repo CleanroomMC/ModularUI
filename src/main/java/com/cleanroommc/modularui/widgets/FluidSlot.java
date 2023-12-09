@@ -33,6 +33,8 @@ import org.lwjgl.input.Keyboard;
 
 public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGhostIngredientSlot<FluidStack>, JeiIngredientProvider {
 
+    public static final int DEFAULT_SIZE = 18;
+
     private static final String UNIT_BUCKET = "B";
     private static final String UNIT_LITER = "L";
 
@@ -47,7 +49,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
 
     public FluidSlot() {
         flex().startDefaultMode()
-                .size(18, 18)
+                .size(DEFAULT_SIZE, DEFAULT_SIZE)
                 .endDefaultMode();
         tooltip().setAutoUpdate(true).setHasTitleMargin(true);
         tooltipBuilder(tooltip -> {

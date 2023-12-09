@@ -77,13 +77,13 @@ public interface GuiTextures {
     UITexture DISABLED = icon("disabled", 16, 240);
     UITexture CURSOR = icon("cursor", 32, 240);
 
-    UITexture LOGO = UITexture.builder()
+    UITexture MUI_LOGO = UITexture.builder()
             .location(ModularUI.ID, "modular_ui_logo")
             .imageSize(603, 603)
             .name("logo")
             .build();
 
-    UITexture BACKGROUND = UITexture.builder()
+    UITexture MC_BACKGROUND = UITexture.builder()
             .location(ModularUI.ID, "gui/background/vanilla_background")
             .imageSize(195, 136)
             .adaptable(4)
@@ -104,21 +104,21 @@ public interface GuiTextures {
             .name("display_small")
             .build();
 
-    UITexture BUTTON = UITexture.builder()
+    UITexture BUTTON_CLEAN = UITexture.builder()
             .location(ModularUI.ID, "gui/widgets/base_button")
             .imageSize(18, 18)
             .adaptable(1)
             .name("vanilla_button").canApplyTheme()
             .build();
 
-    UITexture SLOT = UITexture.builder()
+    UITexture SLOT_ITEM = UITexture.builder()
             .location(ModularUI.ID, "gui/slot/item")
             .imageSize(18, 18)
             .adaptable(1)
             .name("slot_item")
             .build();
 
-    UITexture SLOT_DARK = UITexture.builder()
+    UITexture SLOT_FLUID = UITexture.builder()
             .location(ModularUI.ID, "gui/slot/fluid")
             .imageSize(18, 18)
             .adaptable(1)

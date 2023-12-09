@@ -19,7 +19,7 @@ public class TransformationTestGui extends CustomModularScreen {
                 .child(new Widget<>()
                         .align(Alignment.Center)
                         .size(50, 50)
-                        .background(GuiTextures.BUTTON));
+                        .background(GuiTextures.BUTTON_CLEAN));
     }
 
     private static class TestPanel extends ModularPanel {

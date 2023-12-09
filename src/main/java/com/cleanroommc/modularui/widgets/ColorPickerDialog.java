@@ -43,7 +43,7 @@ public class ColorPickerDialog extends Dialog<Integer> {
         updateColor(startColor);
         this.controlAlpha = controlAlpha;
         flex().startDefaultMode();
-        size(140, controlAlpha ? 106 : 94).background(GuiTextures.BACKGROUND);
+        size(140, controlAlpha ? 106 : 94).background(GuiTextures.MC_BACKGROUND);
         align(Alignment.Center);
         flex().endDefaultMode();
         IWidget alphaSlider = controlAlpha ? new Row()
@@ -60,13 +60,13 @@ public class ColorPickerDialog extends Dialog<Integer> {
                         .left(5).right(5).height(14)
                         .child(new PageButton(0, controller)
                                 .sizeRel(0.5f, 1f)
-                                .background(true, GuiTextures.BUTTON)
-                                .background(false, GuiTextures.SLOT_DARK)
+                                .background(true, GuiTextures.BUTTON_CLEAN)
+                                .background(false, GuiTextures.SLOT_FLUID)
                                 .overlay(IKey.str("RGB")))
                         .child(new PageButton(1, controller)
                                 .sizeRel(0.5f, 1f)
-                                .background(true, GuiTextures.BUTTON)
-                                .background(false, GuiTextures.SLOT_DARK)
+                                .background(true, GuiTextures.BUTTON_CLEAN)
+                                .background(false, GuiTextures.SLOT_FLUID)
                                 .overlay(IKey.str("HSV"))))
                 .child(new Row().widthRel(1f).height(12).marginTop(4)
                         .child(IKey.str("Hex: ").asWidget().heightRel(1f))

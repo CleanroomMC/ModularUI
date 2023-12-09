@@ -82,7 +82,7 @@ public class TestGui extends CustomModularScreen {
                 .pos(10, 10).right(10).bottom(10))*/
         SortableListWidget<String, SortableListWidget.Item<String>> sortableListWidget = SortableListWidget.sortableBuilder(this.lines, this.configuredOptions,
                 s -> new SortableListWidget.Item<>(s, new Widget<>()
-                        .background(GuiTextures.BUTTON)
+                        .background(GuiTextures.BUTTON_CLEAN)
                         .overlay(IKey.str(s))
                         .left(0).right(10))
                         .removeable()).debugName("sortable list");
@@ -143,8 +143,8 @@ public class TestGui extends CustomModularScreen {
     private static class AvailableElement extends ButtonWidget<AvailableElement> {
 
         private boolean available = true;
-        private final IDrawable activeBackground = GuiTextures.BUTTON;
-        private final IDrawable background = GuiTextures.SLOT_DARK;
+        private final IDrawable activeBackground = GuiTextures.BUTTON_CLEAN;
+        private final IDrawable background = GuiTextures.SLOT_FLUID;
 
         @Override
         public AvailableElement background(IDrawable... background) {

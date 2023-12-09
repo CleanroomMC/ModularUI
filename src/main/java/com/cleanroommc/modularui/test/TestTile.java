@@ -118,7 +118,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                             tooltip.showUpTimer(10);
                                                             tooltip.addLine(IKey.str("Test Line g"));
                                                             tooltip.addLine(IKey.str("An image inside of a tooltip:"));
-                                                            tooltip.addLine(GuiTextures.LOGO.asIcon().size(50).alignment(Alignment.TopCenter));
+                                                            tooltip.addLine(GuiTextures.MUI_LOGO.asIcon().size(50).alignment(Alignment.TopCenter));
                                                             tooltip.addLine(IKey.str("And here a circle:"));
                                                             tooltip.addLine(new Circle()
                                                                             .setColor(Color.RED.darker(2), Color.RED.brighter(2))
@@ -231,7 +231,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                         .widthRel(1f).height(16)
                                         .top(7)
                                         .stopper(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)
-                                        .background(GuiTextures.SLOT_DARK))
+                                        .background(GuiTextures.SLOT_FLUID))
                                 .child(new ButtonWidget<>()
                                         .debugName("color picker button")
                                         .top(25)
@@ -315,7 +315,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                 return true;
             }
         }.flex(flex -> flex.size(100, 100).align(Alignment.Center))
-                .background(GuiTextures.BACKGROUND);
+                .background(GuiTextures.MC_BACKGROUND);
         panel.child(new ButtonWidget<>()
                         .flex(flex -> flex.size(8, 8).top(5).right(5))
                         .overlay(IKey.str("x"))
