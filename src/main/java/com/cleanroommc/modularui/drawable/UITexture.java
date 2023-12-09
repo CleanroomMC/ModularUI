@@ -205,7 +205,7 @@ public class UITexture implements IDrawable {
         private int x, y, w, h;
         private float u0 = 0, v0 = 0, u1 = 1, v1 = 1;
         private Mode mode = Mode.FULL;
-        private int borderX = 0, borderY = 0;
+        private int bl = 0, bt = 0, br = 0, bb = 0;
         private String name;
         private boolean tiled = false;
         private boolean canApplyTheme = false;
@@ -310,13 +310,27 @@ public class UITexture implements IDrawable {
         /**
          * This will draw the border of the image separately, so it won't get stretched/tiled with the image body.
          *
+         * @param bl left border width. Can be 0.
+         * @param bt top border width. Can be 0.
+         * @param br right border width. Can be 0.
+         * @param bb bottom border width. Can be 0.
+         */
+        public Builder adaptable(int bl, int bt, int br, int bb) {
+            this.bl = bl;
+            this.bt = bt;
+            this.br = br;
+            this.bb = bb;
+            return this;
+        }
+
+        /**
+         * This will draw the border of the image separately, so it won't get stretched/tiled with the image body.
+         *
          * @param borderX left and right border width. Can be 0.
          * @param borderY top and bottom border width. Can be 0
          */
         public Builder adaptable(int borderX, int borderY) {
-            this.borderX = borderX;
-            this.borderY = borderY;
-            return this;
+            return adaptable(borderX, borderY, borderX, borderY);
         }
 
         /**
@@ -392,8 +406,8 @@ public class UITexture implements IDrawable {
             if (this.mode == Mode.RELATIVE) {
                 if (this.u0 < 0 || this.v0 < 0 || this.u1 > 1 || this.v1 > 1)
                     throw new IllegalArgumentException("UV values must be 0 - 1");
-                if (this.borderX > 0 || this.borderY > 0) {
-                    return new AdaptableUITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.canApplyTheme, this.iw, this.ih, this.borderX, this.borderY, this.tiled);
+                if (this.bl > 0 || this.bt > 0) {
+                    return new AdaptableUITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.canApplyTheme, this.iw, this.ih, this.bl, this.bt, this.br, this.bb, this.tiled);
                 }
                 if (this.tiled) {
                     return new TiledUITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.iw, this.ih, this.canApplyTheme);
