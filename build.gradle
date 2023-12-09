@@ -185,3 +185,23 @@ idea {
 tasks.named("processIdeaSettings").configure {
     dependsOn("injectTags")
 }
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            groupId project.group
+            artifactId project.archivesBaseName
+        }
+    }
+    repositories {
+        maven {
+            name 'CleanroomMC'
+            url 'https://repo.cleanroommc.com/releases'
+            credentials {
+                username System.getenv("MAVEN_USERNAME")
+                password System.getenv("MAVEN_PASSWORD")
+            }
+        }
+    }
+}
