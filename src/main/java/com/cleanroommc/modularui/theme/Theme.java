@@ -1,7 +1,9 @@
 package com.cleanroommc.modularui.theme;
 
+import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.IThemeApi;
+import com.cleanroommc.modularui.screen.Tooltip;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.util.Map;
@@ -27,6 +29,10 @@ public class Theme implements ITheme {
     private final WidgetSlotTheme fluidSlotTheme;
     private final WidgetTextFieldTheme textFieldTheme;
     private final WidgetToggleButtonTheme toggleButtonTheme;
+
+    private int openCloseAnimationOverride = -1;
+    private Boolean smoothProgressBarOverride = null;
+    private Tooltip.Pos tooltipPosOverride = null;
 
     Theme(String id, ITheme parent, Map<String, WidgetTheme> widgetThemes) {
         this.id = id;
@@ -55,6 +61,18 @@ public class Theme implements ITheme {
         this.fluidSlotTheme = (WidgetSlotTheme) this.widgetThemes.get(FLUID_SLOT);
         this.textFieldTheme = (WidgetTextFieldTheme) this.widgetThemes.get(TEXT_FIELD);
         this.toggleButtonTheme = (WidgetToggleButtonTheme) this.widgetThemes.get(TOGGLE_BUTTON);
+    }
+
+    void setOpenCloseAnimationOverride(int override) {
+        this.openCloseAnimationOverride = override;
+    }
+
+    void setSmoothProgressBarOverride(boolean smooth) {
+        this.smoothProgressBarOverride = smooth;
+    }
+
+    void setTooltipPosOverride(Tooltip.Pos pos) {
+        this.tooltipPosOverride = pos;
     }
 
     public String getId() {
@@ -101,5 +119,29 @@ public class Theme implements ITheme {
             return this.widgetThemes.get(id);
         }
         return getFallback();
+    }
+
+    @Override
+    public int getOpenCloseAnimationOverride() {
+        if (this.openCloseAnimationOverride != -1) {
+            return this.openCloseAnimationOverride;
+        }
+        return ModularUIConfig.panelOpenCloseAnimationTime;
+    }
+
+    @Override
+    public boolean getSmoothProgressBarOverride() {
+        if (this.smoothProgressBarOverride != null) {
+            return this.smoothProgressBarOverride;
+        }
+        return ModularUIConfig.smoothProgressBar;
+    }
+
+    @Override
+    public Tooltip.Pos getTooltipPosOverride() {
+        if (this.tooltipPosOverride != null) {
+            return this.tooltipPosOverride;
+        }
+        return ModularUIConfig.tooltipPos;
     }
 }
