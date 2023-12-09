@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.utils.ScrollArea;
+import com.cleanroommc.modularui.widget.scroll.ScrollArea;
 import com.google.common.base.Joiner;
 import org.jetbrains.annotations.Nullable;
 
@@ -95,11 +95,11 @@ public class TextFieldHandler {
                 this.renderer.setSimulate(true);
                 this.renderer.draw(this.text);
                 this.renderer.setSimulate(false);
-                this.scrollArea.getScrollX().scrollSize = (int) (this.renderer.getLastWidth() + 0.5f);
+                this.scrollArea.getScrollX().setScrollSize((int) (this.renderer.getLastWidth() + 0.5f));
                 if (this.scrollArea.getScrollX().isScrollBarActive(this.scrollArea)) {
                     String line = this.text.get(main.y);
                     int scrollTo = (int) this.renderer.getPosOf(this.renderer.measureLines(Collections.singletonList(line)), main).x;
-                    scrollTo -= this.scrollArea.getScrollX().direction.getSide(this.scrollArea) / 2;
+                    scrollTo -= this.scrollArea.getScrollX().getVisibleSize(this.scrollArea) / 2;
                     if (animate) {
                         this.scrollArea.getScrollX().animateTo(this.scrollArea, scrollTo);
                     } else {
@@ -277,7 +277,7 @@ public class TextFieldHandler {
         if (insertion.isEmpty() || (insertion.size() > 1 && text.size() + insertion.size() - 1 > this.maxLines)) {
             return null;
         }
-        int x = this.cursor.x, y = this.cursor.y;
+        int x, y = this.cursor.y;
         if (hasTextMarked()) {
             delete(false);
         }
@@ -301,11 +301,9 @@ public class TextFieldHandler {
             text.set(this.cursor.y, text.get(this.cursor.y) + lineEnd);
             return new Point(this.cursor.x + insertion.get(0).length(), this.cursor.y);
         } else {
-            if (insertion.size() > 1) {
-                text.add(this.cursor.y + 1, insertion.get(insertion.size() - 1) + lineEnd);
-                x = insertion.get(insertion.size() - 1).length();
-                y += 1;
-            }
+            text.add(this.cursor.y + 1, insertion.get(insertion.size() - 1) + lineEnd);
+            x = insertion.get(insertion.size() - 1).length();
+            y += 1;
             if (insertion.size() > 2) {
                 text.addAll(this.cursor.y + 1, text.subList(1, insertion.size() - 1));
                 x = insertion.get(insertion.size() - 1).length();

@@ -58,7 +58,7 @@ public class GameObjectHelper {
         return block;
     }
 
-    @SuppressWarnings({"rawtypes", "Guava"})
+    @SuppressWarnings({"rawtypes", "Guava", "unchecked"})
     private static IBlockState parseBlockStates(IBlockState defaultState, String[] properties) {
         for (String propertyName : properties) {
             String[] prop = propertyName.split(EQUALS, 2);

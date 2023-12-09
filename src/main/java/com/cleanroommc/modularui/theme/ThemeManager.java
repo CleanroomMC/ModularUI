@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 @SideOnly(Side.CLIENT)
 public class ThemeManager implements ISelectiveResourceReloadListener {
 
-    protected static final WidgetTheme defaultdefaultWidgetTheme = new WidgetTheme(null, null, Color.WHITE.normal, 0xFF404040, false);
+    protected static final WidgetTheme defaultdefaultWidgetTheme = new WidgetTheme(null, null, Color.WHITE.main, 0xFF404040, false);
 
     public static void reload() {
         ModularUI.LOGGER.info("Reloading Themes...");

@@ -33,6 +33,8 @@ import org.lwjgl.input.Keyboard;
 
 public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGhostIngredientSlot<FluidStack>, JeiIngredientProvider {
 
+    public static final int DEFAULT_SIZE = 18;
+
     private static final String UNIT_BUCKET = "B";
     private static final String UNIT_LITER = "L";
 
@@ -47,7 +49,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
 
     public FluidSlot() {
         flex().startDefaultMode()
-                .size(18, 18)
+                .size(DEFAULT_SIZE, DEFAULT_SIZE)
                 .endDefaultMode();
         tooltip().setAutoUpdate(true).setHasTitleMargin(true);
         tooltipBuilder(tooltip -> {
@@ -111,7 +113,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
     public void onInit() {
         this.textRenderer.setShadow(true);
         this.textRenderer.setScale(0.5f);
-        this.textRenderer.setColor(Color.WHITE.normal);
+        this.textRenderer.setColor(Color.WHITE.main);
         getContext().getJeiSettings().addJeiGhostIngredientSlot(this);
     }
 
@@ -133,7 +135,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
             float height = getArea().height - y * 2;
             if (!this.alwaysShowFull) {
                 float newHeight = height * content.amount * 1f / fluidTank.getCapacity();
-                y += height - newHeight;
+                y += (int) (height - newHeight);
                 height = newHeight;
             }
             GuiDraw.drawFluidTexture(content, this.contentOffsetX, y, getArea().width - this.contentOffsetX * 2, height, 0);

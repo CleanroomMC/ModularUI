@@ -6,7 +6,7 @@ import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.api.value.IValue;
 import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.drawable.DrawableArray;
-import com.cleanroommc.modularui.manager.GuiCreationContext;
+import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.Tooltip;
@@ -118,13 +118,15 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
 
     @Override
     public void dispose() {
-        if (this.guiActionListeners != null) {
-            for (IGuiAction action : this.guiActionListeners) {
-                this.context.screen.removeGuiActionListener(action);
+        if (isValid()) {
+            if (this.guiActionListeners != null) {
+                for (IGuiAction action : this.guiActionListeners) {
+                    this.context.screen.removeGuiActionListener(action);
+                }
             }
-        }
-        if (!getPanel().isMainPanel() && this.syncHandler != null) {
-            getScreen().getSyncManager().disposeSyncHandler(this.syncHandler);
+            if (!getPanel().isMainPanel() && this.syncHandler != null) {
+                getScreen().getSyncManager().disposeSyncHandler(this.syncHandler);
+            }
         }
         if (hasChildren()) {
             for (IWidget child : getChildren()) {
@@ -203,12 +205,12 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
 
     public IDrawable getCurrentBackground() {
         IDrawable hoverBackground = getHoverBackground();
-        return hoverBackground != null && isHovering() ? hoverBackground : getBackground();
+        return hoverBackground != null && hoverBackground != IDrawable.NONE && isHovering() ? hoverBackground : getBackground();
     }
 
     public IDrawable getCurrentOverlay() {
         IDrawable hoverBackground = getHoverOverlay();
-        return hoverBackground != null && isHovering() ? hoverBackground : getOverlay();
+        return hoverBackground != null && hoverBackground != IDrawable.NONE && isHovering() ? hoverBackground : getOverlay();
     }
 
     @Nullable
@@ -233,7 +235,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     public W background(IDrawable... background) {
-        if (background.length == 0) {
+        if (background == null || background.length == 0) {
             this.background = null;
         } else if (background.length == 1) {
             this.background = background[0];
@@ -244,7 +246,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     public W overlay(IDrawable... overlay) {
-        if (overlay.length == 0) {
+        if (overlay == null || overlay.length == 0) {
             this.overlay = null;
         } else if (overlay.length == 1) {
             this.overlay = overlay[0];
@@ -255,7 +257,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     public W hoverBackground(IDrawable... background) {
-        if (background.length == 0) {
+        if (background == null || background.length == 0) {
             this.hoverBackground = null;
         } else if (background.length == 1) {
             this.hoverBackground = background[0];
@@ -266,7 +268,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     public W hoverOverlay(IDrawable... overlay) {
-        if (overlay.length == 0) {
+        if (overlay == null || overlay.length == 0) {
             this.hoverOverlay = null;
         } else if (overlay.length == 1) {
             this.hoverOverlay = overlay[0];
@@ -274,6 +276,14 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
             this.hoverOverlay = new DrawableArray(overlay);
         }
         return getThis();
+    }
+
+    public W disableHoverBackground() {
+        return hoverBackground(IDrawable.NONE);
+    }
+
+    public W disableHoverOverlay() {
+        return hoverOverlay(IDrawable.NONE);
     }
 
     // --------------
@@ -323,9 +333,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     public W setEnabledIf(Predicate<W> condition) {
-        return onUpdateListener(w -> {
-            setEnabled(condition.test(w));
-        }, true);
+        return onUpdateListener(w -> setEnabled(condition.test(w)), true);
     }
 
     // ----------------
@@ -436,7 +444,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     /**
-     * This intended to only be used when build the main panel in methods like {@link com.cleanroommc.modularui.api.IGuiHolder#buildUI(GuiCreationContext, GuiSyncManager, boolean)}
+     * This intended to only be used when build the main panel in methods like {@link com.cleanroommc.modularui.api.IGuiHolder#buildUI(GuiData, GuiSyncManager)}
      * since it's called on server and client. Otherwise, this will not work.
      */
     protected void setSyncHandler(@Nullable SyncHandler syncHandler) {

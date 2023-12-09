@@ -59,7 +59,7 @@ public class ToggleButton extends Widget<ToggleButton> implements Interactable {
             } else if (bg.canApplyTheme()) {
                 bg.applyThemeColor(context.getTheme(), widgetTheme);
             } else {
-                Color.setGlColor(Color.WHITE.normal);
+                Color.setGlColor(Color.WHITE.main);
             }
             bg.drawAtZero(context, getArea());
         }

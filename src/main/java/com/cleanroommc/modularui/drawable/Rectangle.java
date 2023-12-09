@@ -70,7 +70,7 @@ public class Rectangle implements IDrawable {
         if (canApplyTheme()) {
             Color.setGlColor(widgetTheme.getColor());
         } else {
-            Color.setGlColorOpaque(Color.WHITE.normal);
+            Color.setGlColorOpaque(Color.WHITE.main);
         }
     }
 

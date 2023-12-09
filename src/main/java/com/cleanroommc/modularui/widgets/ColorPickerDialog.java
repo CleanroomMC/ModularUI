@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 
 public class ColorPickerDialog extends Dialog<Integer> {
 
-    private static final IDrawable handleBackground = new Rectangle().setColor(Color.WHITE.normal);
+    private static final IDrawable handleBackground = new Rectangle().setColor(Color.WHITE.main);
 
     private int color;
     private final int alpha;
@@ -43,15 +43,15 @@ public class ColorPickerDialog extends Dialog<Integer> {
         updateColor(startColor);
         this.controlAlpha = controlAlpha;
         flex().startDefaultMode();
-        size(140, controlAlpha ? 106 : 94).background(GuiTextures.BACKGROUND);
+        size(140, controlAlpha ? 106 : 94).background(GuiTextures.MC_BACKGROUND);
         align(Alignment.Center);
         flex().endDefaultMode();
         IWidget alphaSlider = controlAlpha ? new Row()
-                    .widthRel(1f).height(12)
-                    .child(IKey.str("A: ").asWidget().heightRel(1f))
-                    .child(createSlider(this.sliderBackgroundA)
-                            .bounds(0, 255)
-                            .value(new DoubleValue.Dynamic(() -> Color.getAlpha(this.color), val -> updateColor(Color.withAlpha(this.color, (int) val))))) : null;
+                .widthRel(1f).height(12)
+                .child(IKey.str("A: ").asWidget().heightRel(1f))
+                .child(createSlider(this.sliderBackgroundA)
+                        .bounds(0, 255)
+                        .value(new DoubleValue.Dynamic(() -> Color.getAlpha(this.color), val -> updateColor(Color.withAlpha(this.color, (int) val))))) : null;
 
         PagedWidget.Controller controller = new PagedWidget.Controller();
         child(new Column()
@@ -60,13 +60,13 @@ public class ColorPickerDialog extends Dialog<Integer> {
                         .left(5).right(5).height(14)
                         .child(new PageButton(0, controller)
                                 .sizeRel(0.5f, 1f)
-                                .background(true, GuiTextures.BUTTON)
-                                .background(false, GuiTextures.SLOT_DARK)
+                                .background(true, GuiTextures.BUTTON_CLEAN)
+                                .background(false, GuiTextures.SLOT_FLUID)
                                 .overlay(IKey.str("RGB")))
                         .child(new PageButton(1, controller)
                                 .sizeRel(0.5f, 1f)
-                                .background(true, GuiTextures.BUTTON)
-                                .background(false, GuiTextures.SLOT_DARK)
+                                .background(true, GuiTextures.BUTTON_CLEAN)
+                                .background(false, GuiTextures.SLOT_FLUID)
                                 .overlay(IKey.str("HSV"))))
                 .child(new Row().widthRel(1f).height(12).marginTop(4)
                         .child(IKey.str("Hex: ").asWidget().heightRel(1f))

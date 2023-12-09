@@ -19,6 +19,15 @@ import java.util.function.Function;
 public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDeserializer<IDrawable> {
 
     private static final Map<String, Function<JsonObject, IDrawable>> DRAWABLE_TYPES = new Object2ObjectOpenHashMap<>();
+    private static final Map<String, UITexture> TEXTURES = new Object2ObjectOpenHashMap<>();
+
+    public static void registerTexture(String s, UITexture texture) {
+        TEXTURES.put(s, texture);
+    }
+
+    public static UITexture getTexture(String s) {
+        return TEXTURES.get(s);
+    }
 
     public static void registerDrawableType(String id, Function<@NotNull JsonObject, @NotNull IDrawable> creator) {
         if (DRAWABLE_TYPES.containsKey(id)) {
@@ -31,6 +40,7 @@ public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDes
     public static void init() {
         registerDrawableType("empty", json -> IDrawable.EMPTY);
         registerDrawableType("null", json -> IDrawable.EMPTY);
+        registerDrawableType("none", json -> IDrawable.NONE);
         registerDrawableType("texture", UITexture::parseFromJson);
         registerDrawableType("color", json -> new Rectangle());
         registerDrawableType("rectangle", json -> new Rectangle());

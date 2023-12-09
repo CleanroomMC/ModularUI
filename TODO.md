@@ -21,7 +21,7 @@
 - [ ]  Text editor :boom:
 - [ ]  Json Guis
 - [ ]  Inject to any mc gui :boom:
-- [ ]  Error handling with on screen reports
+- [ ]  Error handling with on-screen reports
 
 ## Low Priority
 

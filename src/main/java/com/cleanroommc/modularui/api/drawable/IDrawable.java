@@ -70,7 +70,7 @@ public interface IDrawable {
      * @param widgetTheme widget theme to apply color of
      */
     default void applyThemeColor(ITheme theme, WidgetTheme widgetTheme) {
-        Color.setGlColorOpaque(Color.WHITE.normal);
+        Color.setGlColorOpaque(Color.WHITE.main);
     }
 
     /**
@@ -105,8 +105,12 @@ public interface IDrawable {
     /**
      * An empty drawable. Does nothing.
      */
-    IDrawable EMPTY = (context, x, y, width, height) -> {
-    };
+    IDrawable EMPTY = (context, x, y, width, height) -> {};
+
+    /**
+     * An empty drawable used to mark hover textures as "should not be used"!
+     */
+    IDrawable NONE = (context, x, y, width, height) -> {};
 
     /**
      * A widget wrapping a drawable. The drawable is drawn between the background and the overlay.

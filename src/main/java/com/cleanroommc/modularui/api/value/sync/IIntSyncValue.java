@@ -3,7 +3,7 @@ package com.cleanroommc.modularui.api.value.sync;
 import com.cleanroommc.modularui.api.value.IIntValue;
 
 /**
- * A helper interface for sync values which can be turned into a integer.
+ * A helper interface for sync values which can be turned into an integer.
  *
  * @param <T> value type
  */

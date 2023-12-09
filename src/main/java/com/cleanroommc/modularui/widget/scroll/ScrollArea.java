@@ -1,7 +1,8 @@
-package com.cleanroommc.modularui.utils;
+package com.cleanroommc.modularui.widget.scroll;
 
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.relauncher.Side;
@@ -15,8 +16,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  */
 public class ScrollArea extends Area {
 
-    private ScrollData scrollX, scrollY;
-    private int scrollBarBackgroundColor = Color.withAlpha(Color.BLACK.normal, 0.25f);
+    private HorizontalScrollData scrollX;
+    private VerticalScrollData scrollY;
+    private int scrollBarBackgroundColor = Color.withAlpha(Color.BLACK.main, 0.25f);
 
     public ScrollArea(int x, int y, int w, int h) {
         super(x, y, w, h);
@@ -26,37 +28,36 @@ public class ScrollArea extends Area {
     }
 
     public void setScrollData(ScrollData data) {
-        if (data != null) {
-            if (data.direction == ScrollDirection.HORIZONTAL) {
-                this.scrollX = data;
-            } else {
-                this.scrollY = data;
-            }
+        if (data instanceof HorizontalScrollData) {
+            this.scrollX = (HorizontalScrollData) data;
+        } else if (data instanceof VerticalScrollData) {
+            this.scrollY = (VerticalScrollData) data;
         }
     }
 
-    public void setScrollDataX(ScrollData scrollX) {
+    public void removeScrollData() {
+        this.scrollX = null;
+        this.scrollY = null;
+    }
+
+    public void setScrollDataX(HorizontalScrollData scrollX) {
         this.scrollX = scrollX;
     }
 
-    public void setScrollDataY(ScrollData data) {
+    public void setScrollDataY(VerticalScrollData data) {
         this.scrollY = data;
     }
 
-    public ScrollData getScrollX() {
+    public HorizontalScrollData getScrollX() {
         return this.scrollX;
     }
 
-    public ScrollData getScrollY() {
+    public VerticalScrollData getScrollY() {
         return this.scrollY;
     }
 
     public ScrollData getScrollData(GuiAxis axis) {
         return axis.isVertical() ? this.scrollY : this.scrollX;
-    }
-
-    public ScrollData getScrollData(ScrollDirection axis) {
-        return getScrollData(axis.axis);
     }
 
     /* GUI code for easier manipulations */
@@ -78,14 +79,7 @@ public class ScrollArea extends Area {
         } else {
             return false;
         }
-
-        data.dragging = true;
-        int scrollbar = data.getScrollbarThickness();
-        if (data.opposite) {
-            return data.direction == ScrollDirection.VERTICAL ? x <= this.x + scrollbar : y <= this.y + scrollbar;
-        } else {
-            return data.direction == ScrollDirection.VERTICAL ? x >= this.ex() - scrollbar : y >= this.ey() - scrollbar;
-        }
+        return data.onMouseClicked(this, x, y, 0);
     }
 
     @SideOnly(Side.CLIENT)
@@ -108,25 +102,26 @@ public class ScrollArea extends Area {
             return false;
         }
 
-        int scrollAmount = (int) Math.copySign(data.scrollSpeed, scroll);
+        int scrollAmount = (int) Math.copySign(data.getScrollSpeed(), scroll);
         int scrollTo;
         if (data.isAnimating()) {
             scrollTo = data.getAnimatingTo() - scrollAmount;
         } else {
-            scrollTo = data.scroll - scrollAmount;
+            scrollTo = data.getScroll() - scrollAmount;
         }
 
         // simulate scroll to determine whether event should be canceled
-        int oldScroll = data.scroll;
+        int oldScroll = data.getScroll();
         data.scrollTo(this, scrollTo);
-        boolean changed = data.scroll != oldScroll;
+        boolean changed = data.getScroll() != oldScroll;
         data.scrollTo(this, oldScroll);
         if (changed) {
             data.animateTo(this, scrollTo);
             return true;
         }
 
-        return data.cancelScrollEdge;
+        //return data.cancelScrollEdge;
+        return false;
     }
 
     @SideOnly(Side.CLIENT)
@@ -164,8 +159,8 @@ public class ScrollArea extends Area {
         } else {
             return;
         }
-        float progress = data.direction.getProgress(this, x, y);
-        data.animateTo(this, (int) (progress * (data.scrollSize - data.direction.getSide(this) + data.getScrollbarThickness())));
+        float progress = data.getProgress(this, x, y);
+        data.animateTo(this, (int) (progress * (data.getScrollSize() - data.getVisibleSize(this) + data.getThickness())));
     }
 
     public boolean isInsideScrollbarArea(int x, int y) {
@@ -179,11 +174,11 @@ public class ScrollArea extends Area {
     }
 
     public boolean isScrollBarXActive() {
-        return this.scrollX != null && this.scrollX.scrollSize > this.scrollX.direction.getSide(this);
+        return this.scrollX != null && this.scrollX.isScrollBarActive(this);
     }
 
     public boolean isScrollBarYActive() {
-        return this.scrollY != null && this.scrollY.scrollSize > this.scrollY.direction.getSide(this);
+        return this.scrollY != null && this.scrollY.isScrollBarActive(this);
     }
 
     public int getScrollBarBackgroundColor() {
@@ -199,10 +194,12 @@ public class ScrollArea extends Area {
      */
     @SideOnly(Side.CLIENT)
     public void drawScrollbar() {
-        if (this.scrollX != null) {
+        boolean b = false;
+        if (this.scrollX != null && this.scrollX.isScrollBarActive(this, false)) {
+            b = true;
             this.scrollX.drawScrollbar(this);
         }
-        if (this.scrollY != null) {
+        if (this.scrollY != null && this.scrollY.isScrollBarActive(this, b)) {
             this.scrollY.drawScrollbar(this);
         }
     }

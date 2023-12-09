@@ -3,7 +3,10 @@ package com.cleanroommc.modularui.config;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.google.gson.JsonElement;
 import net.minecraft.network.PacketBuffer;
+import org.jetbrains.annotations.ApiStatus;
 
+@ApiStatus.Experimental
+@Deprecated
 public class ValueDrawable extends Value {
 
     private IDrawable drawable;

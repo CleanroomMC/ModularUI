@@ -4,10 +4,10 @@ import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.widget.IValueWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.utils.ScrollData;
-import com.cleanroommc.modularui.utils.ScrollDirection;
 import com.cleanroommc.modularui.widget.ScrollWidget;
 import com.cleanroommc.modularui.widget.WidgetTree;
+import com.cleanroommc.modularui.widget.scroll.ScrollData;
+import com.cleanroommc.modularui.widget.scroll.VerticalScrollData;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,10 +38,10 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
     }
 
     public ListWidget(Function<T, I> valueToWidgetMapper, Function<I, T> widgetToValueMapper) {
+        super(new VerticalScrollData());
         this.valueToWidgetMapper = Objects.requireNonNull(valueToWidgetMapper);
         this.widgetToValueMapper = Objects.requireNonNull(widgetToValueMapper);
-        this.scrollData = new ScrollData(ScrollDirection.VERTICAL);
-        getScrollArea().setScrollData(this.scrollData);
+        this.scrollData = getScrollArea().getScrollY();
     }
 
     public static <T, V extends IValueWidget<T> & IWidget, W extends ListWidget<T, V, W>> ListWidget<T, V, W> of(Function<T, V> valueToWidgetMapper) {
@@ -64,10 +64,10 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
     @Override
     public void onResized() {
         if (this.keepScrollBarInArea) return;
-        if (this.scrollData.direction == ScrollDirection.VERTICAL) {
-            getArea().width += this.scrollData.getScrollbarThickness();
+        if (this.scrollData.isVertical()) {
+            getArea().width += this.scrollData.getThickness();
         } else {
-            getArea().height += this.scrollData.getScrollbarThickness();
+            getArea().height += this.scrollData.getThickness();
         }
     }
 
@@ -98,7 +98,7 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
 
     @Override
     public void layoutWidgets() {
-        GuiAxis axis = this.scrollData.direction.axis;
+        GuiAxis axis = this.scrollData.getAxis();
         int p = getArea().getPadding().getStart(axis);
         for (IWidget widget : getChildren()) {
             if (axis.isVertical() ?
@@ -115,18 +115,17 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
                 widget.resizer().setYResized(true);
             }
         }
-        getScrollData().scrollSize = p + getArea().getPadding().getEnd(axis);
+        getScrollData().setScrollSize(p + getArea().getPadding().getEnd(axis));
     }
 
     public ScrollData getScrollData() {
         return this.scrollData;
     }
 
-    public W scrollDirection(ScrollDirection direction) {
-        if (this.scrollData.direction != direction) {
-            this.scrollData = this.scrollData.copyWith(direction);
-            getScrollArea().setScrollDataY(null);
-            getScrollArea().setScrollDataX(null);
+    public W scrollDirection(ScrollData data) {
+        if (this.scrollData.getAxis() != data.getAxis()) {
+            this.scrollData = data;
+            getScrollArea().removeScrollData();
             getScrollArea().setScrollData(this.scrollData);
         }
         return getThis();

@@ -76,7 +76,7 @@ public class TextRenderer {
         for (Line measuredLine : measuredLines) {
             int x0 = getStartX(measuredLine.width);
             maxW = Math.max(draw(measuredLine.text, x0, y0), maxW);
-            y0 += getFontHeight();
+            y0 += (int) getFontHeight();
         }
         this.lastWidth = this.maxWidth > 0 ? Math.min(maxW, this.maxWidth) : maxW;
         this.lastHeight = measuredLines.size() * getFontHeight();
@@ -125,7 +125,7 @@ public class TextRenderer {
             drawMeasuredLines(Collections.singletonList(line));
             return;
         }
-        scroll = scroll % (int) (line.width + 1) ;
+        scroll = scroll % (int) (line.width + 1);
         String drawString = line.getText();//getFontRenderer().trimStringToWidth(line.getText(), (int) (this.maxWidth + scroll));
         Area.SHARED.set(this.x, Integer.MIN_VALUE, this.x + (int) this.maxWidth, Integer.MAX_VALUE);
         Stencil.apply(Area.SHARED, context);

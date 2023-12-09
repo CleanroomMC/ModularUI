@@ -147,7 +147,7 @@ public class CategoryList extends ParentWidget<CategoryList> implements Interact
                 y += widget instanceof CategoryList && ((CategoryList) widget).expanded ?
                         ((CategoryList) widget).totalHeight : widget.getArea().height;
             }
-            getScrollArea().getScrollY().scrollSize = y;
+            getScrollArea().getScrollY().setScrollSize(y);
         }
 
         public Root setCollapsedOverlay(IDrawable collapsedOverlay) {

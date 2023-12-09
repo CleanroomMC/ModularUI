@@ -37,6 +37,8 @@ import java.util.List;
 
 public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable, JeiGhostIngredientSlot<ItemStack>, JeiIngredientProvider {
 
+    public static final int SIZE = 18;
+
     private static final TextRenderer textRenderer = new TextRenderer();
     private ItemSlotSH syncHandler;
 
@@ -53,7 +55,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @Override
     public void onInit() {
-        size(18, 18);
+        size(SIZE, SIZE);
         getContext().getJeiSettings().addJeiGhostIngredientSlot(this);
     }
 
@@ -232,7 +234,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                     }
                     textRenderer.setShadow(true);
                     textRenderer.setScale(scale);
-                    textRenderer.setColor(Color.WHITE.normal);
+                    textRenderer.setColor(Color.WHITE.main);
                     textRenderer.setAlignment(Alignment.BottomRight, getArea().width - 1, getArea().height - 1);
                     textRenderer.setPos(1, 1);
                     GlStateManager.disableLighting();

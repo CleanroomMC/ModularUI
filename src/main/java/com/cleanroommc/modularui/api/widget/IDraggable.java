@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Marks a widget as draggable.
  * The dragging is handled by ModularUI.
+ *
  * @see com.cleanroommc.modularui.widget.DraggableWidget
  */
 public interface IDraggable extends IViewport {
@@ -32,7 +33,7 @@ public interface IDraggable extends IViewport {
     /**
      * The dragging has ended and getState == IDLE
      *
-     * @param successful is false if this returned to it's old position
+     * @param successful is false if this returned to its old position
      */
     void onDragEnd(boolean successful);
 
@@ -59,10 +60,6 @@ public interface IDraggable extends IViewport {
     void setMoving(boolean moving);
 
     void transform(IViewportStack viewportStack);
-
-    @Override
-    default void transformChildren(IViewportStack stack) {
-    }
 
     @Override
     default void getWidgetsAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {

@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.common.Loader;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -17,6 +18,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+@ApiStatus.Experimental
+@Deprecated
 public class Config {
 
     private static final Map<String, Config> configs = new Object2ObjectLinkedOpenHashMap<>();

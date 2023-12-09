@@ -4,8 +4,11 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.google.gson.JsonElement;
 import net.minecraft.network.PacketBuffer;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+@ApiStatus.Experimental
+@Deprecated
 public abstract class Value {
 
     private final String key;

@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.screen.viewport;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.widget.*;
@@ -57,7 +56,7 @@ public class GuiContext extends GuiViewportStack {
 
     public List<Consumer<GuiContext>> postRenderCallbacks = new ArrayList<>();
 
-    private JeiSettings jeiSettings;
+    private JeiSettingsImpl jeiSettings;
 
     public GuiContext(ModularScreen screen) {
         this.screen = screen;
@@ -234,7 +233,7 @@ public class GuiContext extends GuiViewportStack {
         IWidget grandparent = widget.getParent();
         boolean isRoot = grandparent instanceof ModularPanel;//grandparent == this.screen.getRoot();
 
-        if (grandparent != null && !stop && (isRoot || grandparent.canBeSeen(this))) {
+        if (!stop && (isRoot || grandparent.canBeSeen(this))) {
             List<IWidget> siblings = grandparent.getChildren();
             if (focus(grandparent, siblings.indexOf(widget), factor)) {
                 return true;
@@ -447,7 +446,7 @@ public class GuiContext extends GuiViewportStack {
         return this.screen.getCurrentTheme();
     }
 
-    public JeiSettings getJeiSettings() {
+    public JeiSettingsImpl getJeiSettings() {
         if (this.jeiSettings == null) {
             throw new IllegalStateException("The screen is not yet initialised!");
         }
@@ -455,7 +454,7 @@ public class GuiContext extends GuiViewportStack {
     }
 
     @ApiStatus.Internal
-    public void setJeiSettings(JeiSettings jeiSettings) {
+    public void setJeiSettings(JeiSettingsImpl jeiSettings) {
         if (this.jeiSettings != null) {
             throw new IllegalStateException("Tried to set jei settings twice");
         }

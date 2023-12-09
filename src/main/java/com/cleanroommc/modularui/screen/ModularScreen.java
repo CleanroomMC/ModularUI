@@ -101,7 +101,7 @@ public class ModularScreen {
         this(owner, Objects.requireNonNull(mainPanelCreator, "The main panel function must not be null!"), false);
     }
 
-    private ModularScreen(@NotNull String owner, @Nullable Function<GuiContext, ModularPanel> mainPanelCreator, boolean unused) {
+    private ModularScreen(@NotNull String owner, @Nullable Function<GuiContext, ModularPanel> mainPanelCreator, boolean ignored) {
         Objects.requireNonNull(owner, "The owner must not be null!");
         this.owner = owner;
         ModularPanel mainPanel = mainPanelCreator != null ? mainPanelCreator.apply(this.context) : buildUI(this.context);
@@ -372,7 +372,7 @@ public class ModularScreen {
     public <T> void openDialog(String name, Consumer<Dialog<T>> dialogBuilder, Consumer<T> resultConsumer) {
         Dialog<T> dialog = new Dialog<>(name, resultConsumer);
         dialog.flex().size(150, 100).align(Alignment.Center);
-        dialog.background(GuiTextures.BACKGROUND);
+        dialog.background(GuiTextures.MC_BACKGROUND);
         dialogBuilder.accept(dialog);
         openPanel(dialog);
     }
