@@ -1,13 +1,15 @@
 package com.cleanroommc.modularui.network.packets;
 
+import com.cleanroommc.modularui.api.UIFactory;
 import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.factory.GuiManager;
-import com.cleanroommc.modularui.api.UIFactory;
 import com.cleanroommc.modularui.network.IPacket;
 import com.cleanroommc.modularui.network.NetworkUtils;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.PacketBuffer;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;

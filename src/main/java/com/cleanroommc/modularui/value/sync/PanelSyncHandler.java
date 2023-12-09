@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.widget.WidgetTree;
+
 import net.minecraft.network.PacketBuffer;
 
 import java.io.IOException;

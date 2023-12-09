@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.utils;
 
 import com.cleanroommc.modularui.api.drawable.IInterpolation;
+
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;

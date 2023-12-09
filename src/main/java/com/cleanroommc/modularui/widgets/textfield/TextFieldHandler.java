@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.widgets.textfield;
 
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.widget.scroll.ScrollArea;
+
 import com.google.common.base.Joiner;
 import org.jetbrains.annotations.Nullable;
 

@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.config;
 
 import com.cleanroommc.modularui.screen.ModularPanel;
+
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Experimental

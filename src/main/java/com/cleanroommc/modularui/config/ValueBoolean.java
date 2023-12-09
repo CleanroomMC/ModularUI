@@ -1,8 +1,9 @@
 package com.cleanroommc.modularui.config;
 
+import net.minecraft.network.PacketBuffer;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
-import net.minecraft.network.PacketBuffer;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Experimental

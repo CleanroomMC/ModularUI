@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.theme.WidgetToggleButtonTheme;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.Widget;
+
 import org.jetbrains.annotations.NotNull;
 
 public class ToggleButton extends Widget<ToggleButton> implements Interactable {

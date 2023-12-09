@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.integration.jei;
 
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
+
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.IModRegistry;
 import mezz.jei.api.JEIPlugin;

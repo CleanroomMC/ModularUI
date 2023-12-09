@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui;
 
 import com.cleanroommc.modularui.screen.Tooltip;
+
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 

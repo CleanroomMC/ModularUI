@@ -16,6 +16,7 @@ import com.cleanroommc.modularui.utils.math.functions.string.StringStartsWith;
 import com.cleanroommc.modularui.utils.math.functions.trig.*;
 import com.cleanroommc.modularui.utils.math.functions.utility.*;
 import com.cleanroommc.modularui.widgets.textfield.BaseTextFieldWidget;
+
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.lang.reflect.Constructor;

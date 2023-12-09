@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.theme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.JsonHelper;
+
 import com.google.gson.JsonObject;
 
 public class WidgetSlotTheme extends WidgetTheme {

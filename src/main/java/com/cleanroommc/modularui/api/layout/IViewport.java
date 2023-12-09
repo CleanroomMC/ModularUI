@@ -16,8 +16,7 @@ public interface IViewport {
      *
      * @param stack viewport stack
      */
-    default void transformChildren(IViewportStack stack) {
-    }
+    default void transformChildren(IViewportStack stack) {}
 
     /**
      * Gathers all children at a position. Transformations from this viewport are already applied.
@@ -38,8 +37,7 @@ public interface IViewport {
      * @param x       x position
      * @param y       y position
      */
-    default void getSelfAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
-    }
+    default void getSelfAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {}
 
     /**
      * Called during drawing twice (before children are drawn). Once with transformation of this viewport and once without
@@ -47,8 +45,7 @@ public interface IViewport {
      * @param context     gui context
      * @param transformed if transformation from this viewport is active
      */
-    default void preDraw(GuiContext context, boolean transformed) {
-    }
+    default void preDraw(GuiContext context, boolean transformed) {}
 
     /**
      * Called during drawing twice (after children are drawn). Once with transformation of this viewport and once without
@@ -56,8 +53,7 @@ public interface IViewport {
      * @param context     gui context
      * @param transformed if transformation from this viewport is active
      */
-    default void postDraw(GuiContext context, boolean transformed) {
-    }
+    default void postDraw(GuiContext context, boolean transformed) {}
 
     static void getChildrenAt(IWidget parent, IViewportStack stack, HoveredWidgetList widgetList, int x, int y) {
         for (IWidget child : parent.getChildren()) {
@@ -123,6 +119,5 @@ public interface IViewport {
         return true;
     }
 
-    IViewport EMPTY = (viewports, widgets, x, y) -> {
-    };
+    IViewport EMPTY = (viewports, widgets, x, y) -> {};
 }

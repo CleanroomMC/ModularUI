@@ -10,6 +10,7 @@ import com.cleanroommc.modularui.utils.math.MathBuilder;
 import com.cleanroommc.modularui.value.StringValue;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;

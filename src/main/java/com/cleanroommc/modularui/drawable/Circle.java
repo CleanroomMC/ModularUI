@@ -4,9 +4,11 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.JsonHelper;
-import com.google.gson.JsonObject;
+
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Contract;
 
 public class Circle implements IDrawable {

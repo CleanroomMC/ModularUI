@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.HoveredWidgetList;
 import com.cleanroommc.modularui.widget.sizer.Area;
+
 import org.jetbrains.annotations.Nullable;
 
 public class DragHandle extends Widget<DragHandle> implements IDraggable {

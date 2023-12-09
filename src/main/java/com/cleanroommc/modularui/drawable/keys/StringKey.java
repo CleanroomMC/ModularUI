@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.drawable.keys;
 
 import com.cleanroommc.modularui.api.drawable.IKey;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;

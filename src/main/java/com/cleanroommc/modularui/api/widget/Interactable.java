@@ -1,12 +1,14 @@
 package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.screen.ModularScreen;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.init.SoundEvents;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 

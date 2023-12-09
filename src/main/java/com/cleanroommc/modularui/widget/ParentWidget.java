@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.widget;
 
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

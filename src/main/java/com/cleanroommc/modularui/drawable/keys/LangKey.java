@@ -2,7 +2,9 @@ package com.cleanroommc.modularui.drawable.keys;
 
 import com.cleanroommc.modularui.ClientEventHandler;
 import com.cleanroommc.modularui.api.drawable.IKey;
+
 import net.minecraft.client.resources.I18n;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

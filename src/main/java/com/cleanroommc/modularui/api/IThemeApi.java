@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.theme.ThemeAPI;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.theme.WidgetThemeParser;
 import com.cleanroommc.modularui.utils.JsonBuilder;
+
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

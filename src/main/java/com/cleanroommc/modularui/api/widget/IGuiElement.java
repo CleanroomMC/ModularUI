@@ -50,8 +50,7 @@ public interface IGuiElement {
      *
      * @param theme themes to apply
      */
-    default void applyTheme(ITheme theme) {
-    }
+    default void applyTheme(ITheme theme) {}
 
 
     /**
@@ -64,14 +63,12 @@ public interface IGuiElement {
     /**
      * Called when the mouse enters the area of this element
      */
-    default void onMouseStartHover() {
-    }
+    default void onMouseStartHover() {}
 
     /**
      * Called when the mouse leaves the area of this element
      */
-    default void onMouseEndHover() {
-    }
+    default void onMouseEndHover() {}
 
     /**
      * @return if this widget is currently right below the mouse

@@ -7,6 +7,7 @@ import com.cleanroommc.modularui.drawable.DrawableArray;
 import com.cleanroommc.modularui.drawable.TabTexture;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.widget.Widget;
+
 import org.jetbrains.annotations.NotNull;
 
 public class PageButton extends Widget<PageButton> implements Interactable {

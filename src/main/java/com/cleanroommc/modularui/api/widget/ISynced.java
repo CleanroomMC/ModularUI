@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
+
 import org.jetbrains.annotations.NotNull;
 
 /**

@@ -16,6 +16,5 @@ public interface ILayoutWidget {
      * Might be called multiple times.
      * The last call guarantees, that this widget is fully calculated.
      */
-    default void postLayoutWidgets() {
-    }
+    default void postLayoutWidgets() {}
 }

@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.theme;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.JsonHelper;
+
 import com.google.gson.JsonObject;
 
 public class WidgetTextFieldTheme extends WidgetTheme {

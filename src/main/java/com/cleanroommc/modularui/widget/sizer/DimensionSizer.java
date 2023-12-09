@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.widget.sizer;
 
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.IResizeable;
+
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.IntSupplier;

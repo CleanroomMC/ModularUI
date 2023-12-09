@@ -3,9 +3,11 @@ package com.cleanroommc.modularui.network.packets;
 import com.cleanroommc.modularui.config.Config;
 import com.cleanroommc.modularui.network.IPacket;
 import com.cleanroommc.modularui.network.NetworkUtils;
-import io.netty.buffer.Unpooled;
+
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.PacketBuffer;
+
+import io.netty.buffer.Unpooled;
 import org.jetbrains.annotations.Nullable;
 
 public class SyncConfig implements IPacket {

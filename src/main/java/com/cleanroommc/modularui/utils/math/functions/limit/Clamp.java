@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.utils.math.functions.limit;
 
 import com.cleanroommc.modularui.api.IMathValue;
 import com.cleanroommc.modularui.utils.math.functions.NNFunction;
+
 import net.minecraft.util.math.MathHelper;
 
 public class Clamp extends NNFunction {

@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Flex;
+
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -222,20 +223,17 @@ public interface IWidget extends IGuiElement {
     /**
      * Called before a widget is resized.
      */
-    default void beforeResize() {
-    }
+    default void beforeResize() {}
 
     /**
      * Called after a widget is fully resized.
      */
-    default void onResized() {
-    }
+    default void onResized() {}
 
     /**
      * Called after the full widget tree is resized and the absolute positions are calculated.
      */
-    default void postResize() {
-    }
+    default void postResize() {}
 
     /**
      * @return flex of this widget

@@ -1,8 +1,10 @@
 package com.cleanroommc.modularui.utils;
 
 import com.cleanroommc.modularui.api.drawable.IInterpolation;
+
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.MathHelper;
+
 import org.jetbrains.annotations.NotNull;
 
 /**

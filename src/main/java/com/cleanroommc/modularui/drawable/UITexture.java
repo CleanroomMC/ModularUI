@@ -8,11 +8,13 @@ import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 public class UITexture implements IDrawable {
 

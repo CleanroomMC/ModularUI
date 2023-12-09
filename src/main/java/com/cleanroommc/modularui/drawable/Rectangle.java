@@ -6,10 +6,12 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.JsonHelper;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import java.util.function.IntConsumer;
 

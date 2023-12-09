@@ -19,6 +19,7 @@ import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Box;
 import com.cleanroommc.modularui.widget.sizer.Flex;
 import com.cleanroommc.modularui.widget.sizer.IUnResizeable;
+
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
@@ -94,12 +95,10 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     @ApiStatus.OverrideOnly
-    public void onInit() {
-    }
+    public void onInit() {}
 
     @ApiStatus.OverrideOnly
-    public void afterInit() {
-    }
+    public void afterInit() {}
 
     @Override
     public void initialiseSyncHandler(GuiSyncManager syncManager) {
@@ -155,8 +154,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     @Override
-    public void draw(GuiContext context, WidgetTheme widgetTheme) {
-    }
+    public void draw(GuiContext context, WidgetTheme widgetTheme) {}
 
     @Override
     public void drawOverlay(GuiContext context, WidgetTheme widgetTheme) {

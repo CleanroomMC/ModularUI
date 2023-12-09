@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.widgets.slot;
 
 import net.minecraft.inventory.Slot;
+
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;

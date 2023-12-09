@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.utils;
 
-import com.google.common.base.Optional;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
@@ -8,6 +7,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
+
+import com.google.common.base.Optional;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.NoSuchElementException;

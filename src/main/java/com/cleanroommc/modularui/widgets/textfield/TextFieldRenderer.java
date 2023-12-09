@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.widgets.textfield;
 
 import com.cleanroommc.modularui.drawable.TextRenderer;
 import com.cleanroommc.modularui.utils.Color;
+
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;

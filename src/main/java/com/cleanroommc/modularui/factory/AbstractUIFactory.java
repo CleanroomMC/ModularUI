@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.UIFactory;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.value.sync.GuiSyncManager;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;

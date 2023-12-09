@@ -8,10 +8,12 @@ import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.widget.ScrollWidget;
 import com.cleanroommc.modularui.widget.scroll.HorizontalScrollData;
 import com.cleanroommc.modularui.widget.scroll.ScrollData;
-import com.cleanroommc.modularui.widget.ScrollWidget;
+
 import net.minecraft.client.gui.GuiScreen;
+
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 

@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.api;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
 import com.cleanroommc.modularui.screen.ModularScreen;
+
 import org.jetbrains.annotations.ApiStatus;
 
 import java.awt.*;

@@ -11,7 +11,9 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.value.sync.GuiSyncManager;
+
 import net.minecraft.client.renderer.GlStateManager;
+
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;

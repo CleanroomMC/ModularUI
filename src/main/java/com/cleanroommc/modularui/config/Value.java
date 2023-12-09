@@ -2,8 +2,10 @@ package com.cleanroommc.modularui.config;
 
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.google.gson.JsonElement;
+
 import net.minecraft.network.PacketBuffer;
+
+import com.google.gson.JsonElement;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 

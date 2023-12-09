@@ -37,8 +37,7 @@ public interface IResizeable {
      *
      * @param guiElement element that was resized
      */
-    default void applyPos(IGuiElement guiElement) {
-    }
+    default void applyPos(IGuiElement guiElement) {}
 
     /**
      * @return area of the element

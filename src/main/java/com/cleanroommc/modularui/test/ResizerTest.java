@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Row;
+
 import org.jetbrains.annotations.NotNull;
 
 public class ResizerTest extends CustomModularScreen {

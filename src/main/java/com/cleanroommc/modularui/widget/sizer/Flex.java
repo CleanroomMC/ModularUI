@@ -9,7 +9,9 @@ import com.cleanroommc.modularui.api.widget.IPositioned;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.utils.Alignment;
+
 import net.minecraft.inventory.Slot;
+
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;

@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui;
 
 import com.cleanroommc.modularui.api.widget.IGuiElement;
+
 import org.apache.logging.log4j.Level;
 
 import java.util.Objects;

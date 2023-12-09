@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.api.value.sync.IServerKeyboardAction;
 import com.cleanroommc.modularui.api.value.sync.IServerMouseAction;
 import com.cleanroommc.modularui.utils.KeyboardData;
 import com.cleanroommc.modularui.utils.MouseData;
+
 import net.minecraft.network.PacketBuffer;
 
 import java.io.IOException;

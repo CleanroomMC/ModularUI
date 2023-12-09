@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.factory;
 import com.cleanroommc.modularui.api.JeiSettings;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.screen.JeiSettingsImpl;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 

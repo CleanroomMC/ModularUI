@@ -3,7 +3,9 @@ package com.cleanroommc.modularui.core.mixin;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.utils.Animator;
+
 import net.minecraft.client.Minecraft;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

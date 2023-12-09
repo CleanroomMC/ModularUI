@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.util.ResourceLocation;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;

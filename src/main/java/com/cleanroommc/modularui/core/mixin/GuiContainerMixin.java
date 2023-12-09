@@ -1,8 +1,10 @@
 package com.cleanroommc.modularui.core.mixin;
 
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
+
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;

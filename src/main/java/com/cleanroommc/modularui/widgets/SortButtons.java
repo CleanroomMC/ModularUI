@@ -1,11 +1,12 @@
 package com.cleanroommc.modularui.widgets;
 
-import com.cleanroommc.bogosorter.api.IBogoSortAPI;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
+import com.cleanroommc.bogosorter.api.IBogoSortAPI;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;

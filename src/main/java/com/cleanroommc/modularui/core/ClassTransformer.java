@@ -1,7 +1,9 @@
 package com.cleanroommc.modularui.core;
 
 import com.cleanroommc.modularui.core.visitor.PacketByteBufferVisitor;
+
 import net.minecraft.launchwrapper.IClassTransformer;
+
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 

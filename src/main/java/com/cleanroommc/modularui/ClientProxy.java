@@ -7,6 +7,7 @@ import com.cleanroommc.modularui.keybind.KeyBindHandler;
 import com.cleanroommc.modularui.test.EventHandler;
 import com.cleanroommc.modularui.theme.ThemeManager;
 import com.cleanroommc.modularui.theme.ThemeReloadCommand;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.util.Timer;
