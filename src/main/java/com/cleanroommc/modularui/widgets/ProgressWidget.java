@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.widgets;
 
-import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.value.IDoubleValue;
 import com.cleanroommc.modularui.drawable.UITexture;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
