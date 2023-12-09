@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.factory;
 
 import com.cleanroommc.modularui.api.IGuiHolder;
+import com.cleanroommc.modularui.api.UIFactory;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.value.sync.GuiSyncManager;
@@ -27,7 +28,7 @@ public abstract class AbstractUIFactory<T extends GuiData> implements UIFactory<
     @Override
     public ModularPanel createPanel(T guiData, GuiSyncManager syncManager) {
         IGuiHolder<T> guiHolder = Objects.requireNonNull(getGuiHolder(guiData), "Gui holder must not be null!");
-        return guiHolder.buildUI(guiData, syncManager, guiData.isClient());
+        return guiHolder.buildUI(guiData, syncManager);
     }
 
     @Override
@@ -37,13 +38,12 @@ public abstract class AbstractUIFactory<T extends GuiData> implements UIFactory<
     }
 
     @SuppressWarnings("unchecked")
-    protected boolean isGuiHolder(Object o) {
-        if(!(o instanceof IGuiHolder)) return false;
+    protected IGuiHolder<T> castGuiHolder(Object o) {
+        if (!(o instanceof IGuiHolder)) return null;
         try {
-            IGuiHolder<T> o1 = (IGuiHolder<T>) o;
-            return true;
+            return (IGuiHolder<T>) o;
         } catch (ClassCastException e) {
-            return false;
+            return null;
         }
     }
 }

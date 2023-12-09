@@ -32,7 +32,7 @@ public class TestItem extends Item implements IGuiHolder<HandGuiData> {
     public static final TestItem testItem = new TestItem();
 
     @Override
-    public ModularPanel buildUI(HandGuiData guiData, GuiSyncManager guiSyncManager, boolean isClient) {
+    public ModularPanel buildUI(HandGuiData guiData, GuiSyncManager guiSyncManager) {
         IItemHandlerModifiable itemHandler = (IItemHandlerModifiable) guiData.getUsedItemStack().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
         guiSyncManager.registerSlotGroup("mixer_items", 2);
 

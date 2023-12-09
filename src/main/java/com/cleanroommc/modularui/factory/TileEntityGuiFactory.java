@@ -41,11 +41,7 @@ public class TileEntityGuiFactory extends AbstractUIFactory<PosGuiData> {
 
     @Override
     public @NotNull IGuiHolder<PosGuiData> getGuiHolder(PosGuiData data) {
-        TileEntity te = data.getTileEntity();
-        if (isGuiHolder(te)) {
-            return (IGuiHolder<PosGuiData>) te;
-        }
-        throw new IllegalStateException("Found TileEntity is not a gui holder!");
+        return Objects.requireNonNull(castGuiHolder(data.getTileEntity()), "Found TileEntity is not a gui holder!");
     }
 
     @Override

@@ -3,7 +3,10 @@ package com.cleanroommc.modularui.config;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.network.PacketBuffer;
+import org.jetbrains.annotations.ApiStatus;
 
+@ApiStatus.Experimental
+@Deprecated
 public class ValueInt extends Value {
 
     private int value;

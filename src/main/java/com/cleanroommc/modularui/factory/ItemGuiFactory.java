@@ -1,12 +1,8 @@
 package com.cleanroommc.modularui.factory;
 
 import com.cleanroommc.modularui.api.IGuiHolder;
-import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumHand;
 import org.jetbrains.annotations.NotNull;
@@ -30,29 +26,7 @@ public class ItemGuiFactory extends AbstractUIFactory<HandGuiData> {
 
     @Override
     public @NotNull IGuiHolder<HandGuiData> getGuiHolder(HandGuiData data) {
-        ItemStack item = data.getUsedItemStack();
-        if (isGuiHolder(item.getItem())) {
-            return (IGuiHolder<HandGuiData>) item.getItem();
-        }
-        throw new IllegalStateException("Item was not a gui holder!");
-    }
-
-    @Override
-    public ModularPanel createPanel(HandGuiData guiData, GuiSyncManager syncManager) {
-        ItemStack item = guiData.getUsedItemStack();
-        if (item.getItem() instanceof IGuiHolder) {
-            return ((IGuiHolder<HandGuiData>) item.getItem()).buildUI(guiData, syncManager, guiData.isClient());
-        }
-        return null;
-    }
-
-    @Override
-    public ModularScreen createScreen(HandGuiData guiData, ModularPanel mainPanel) {
-        ItemStack item = guiData.getUsedItemStack();
-        if (item.getItem() instanceof IGuiHolder) {
-            return ((IGuiHolder<HandGuiData>) item.getItem()).createScreen(guiData, mainPanel);
-        }
-        return null;
+        return Objects.requireNonNull(castGuiHolder(data.getUsedItemStack().getItem()), "Item was not a gui holder!");
     }
 
     @Override

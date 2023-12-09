@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.factory;
 
 import com.cleanroommc.modularui.api.JeiSettings;
+import com.cleanroommc.modularui.api.UIFactory;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.packets.OpenGuiPacket;
 import com.cleanroommc.modularui.screen.*;
@@ -54,7 +55,7 @@ public class GuiManager {
         ModularPanel panel = factory.createPanel(guiData, syncManager);
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularContainer container = new ModularContainer(syncManager);
-        // open container
+        // open container // this mimics forge behaviour
         player.getNextWindowId();
         player.closeContainer();
         int windowId = player.currentWindowId;

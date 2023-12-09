@@ -17,7 +17,7 @@ public interface IGuiHolder<T extends GuiData> {
      * Only called on client side.
      *
      * @param data      information about the creation context
-     * @param mainPanel the panel created in {@link #buildUI(GuiData, GuiSyncManager, boolean)}
+     * @param mainPanel the panel created in {@link #buildUI(GuiData, GuiSyncManager)}
      * @return a modular screen instance with the given panel
      */
     @SideOnly(Side.CLIENT)
@@ -32,7 +32,6 @@ public interface IGuiHolder<T extends GuiData> {
      *
      * @param data        information about the creation context
      * @param syncManager sync handler where widget sync handlers should be registered
-     * @param isClient    true if the world is a client world
      */
-    ModularPanel buildUI(T data, GuiSyncManager syncManager, boolean isClient);
+    ModularPanel buildUI(T data, GuiSyncManager syncManager);
 }
