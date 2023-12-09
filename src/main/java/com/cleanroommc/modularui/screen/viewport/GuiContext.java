@@ -233,7 +233,7 @@ public class GuiContext extends GuiViewportStack {
         IWidget grandparent = widget.getParent();
         boolean isRoot = grandparent instanceof ModularPanel;//grandparent == this.screen.getRoot();
 
-        if (grandparent != null && !stop && (isRoot || grandparent.canBeSeen(this))) {
+        if (!stop && (isRoot || grandparent.canBeSeen(this))) {
             List<IWidget> siblings = grandparent.getChildren();
             if (focus(grandparent, siblings.indexOf(widget), factor)) {
                 return true;

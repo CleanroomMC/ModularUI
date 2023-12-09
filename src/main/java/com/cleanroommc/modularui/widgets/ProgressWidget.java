@@ -165,7 +165,7 @@ public class ProgressWidget extends Widget<ProgressWidget> {
      *
      * @param emptyTexture empty bar, always rendered
      * @param fullTexture  full bar, partly rendered, based on progress
-     * @param imageSize    image size in direction of progress. used for non smooth rendering
+     * @param imageSize    image size in direction of progress. used for non-smooth rendering
      */
     public ProgressWidget texture(UITexture emptyTexture, UITexture fullTexture, int imageSize) {
         this.emptyTexture = emptyTexture;

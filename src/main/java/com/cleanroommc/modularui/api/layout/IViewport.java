@@ -123,14 +123,6 @@ public interface IViewport {
         return true;
     }
 
-    IViewport EMPTY = new IViewport() {
-
-        @Override
-        public void transformChildren(IViewportStack stack) {
-        }
-
-        @Override
-        public void getWidgetsAt(IViewportStack viewports, HoveredWidgetList widgets, int x, int y) {
-        }
+    IViewport EMPTY = (viewports, widgets, x, y) -> {
     };
 }

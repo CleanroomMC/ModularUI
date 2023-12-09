@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IGuiHolder;
-import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.*;
 import com.cleanroommc.modularui.factory.PosGuiData;

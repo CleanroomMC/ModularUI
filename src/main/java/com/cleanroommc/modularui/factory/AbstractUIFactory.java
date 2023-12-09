@@ -36,6 +36,7 @@ public abstract class AbstractUIFactory<T extends GuiData> implements UIFactory<
         return guiHolder.createScreen(guiData, mainPanel);
     }
 
+    @SuppressWarnings("unchecked")
     protected boolean isGuiHolder(Object o) {
         if(!(o instanceof IGuiHolder)) return false;
         try {

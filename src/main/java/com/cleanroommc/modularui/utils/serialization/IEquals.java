@@ -27,6 +27,7 @@ public interface IEquals<T> {
      * @param <T>    object type
      * @return null safe equals function
      */
+    @SuppressWarnings("ConstantValue")
     static <T> IEquals<T> wrapNullSafe(IEquals<T> equals) {
         return (t1, t2) -> {
             if (t1 == null || t2 == null) return t1 == t2;

@@ -47,11 +47,11 @@ public class Icon implements IIcon {
         width -= this.margin.horizontal();
         height -= this.margin.vertical();
         if (this.width > 0) {
-            x += width * this.alignment.x - this.width * this.alignment.x;
+            x += (int) (width * this.alignment.x - this.width * this.alignment.x);
             width = this.width;
         }
         if (this.height > 0) {
-            y += height * this.alignment.y - this.height * this.alignment.y;
+            y += (int) (height * this.alignment.y - this.height * this.alignment.y);
             height = this.height;
         }
         this.drawable.draw(context, x, y, width, height);

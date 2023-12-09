@@ -135,7 +135,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
             float height = getArea().height - y * 2;
             if (!this.alwaysShowFull) {
                 float newHeight = height * content.amount * 1f / fluidTank.getCapacity();
-                y += height - newHeight;
+                y += (int) (height - newHeight);
                 height = newHeight;
             }
             GuiDraw.drawFluidTexture(content, this.contentOffsetX, y, getArea().width - this.contentOffsetX * 2, height, 0);

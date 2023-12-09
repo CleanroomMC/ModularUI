@@ -55,16 +55,14 @@ public abstract class Function implements IMathValue {
 
     @Override
     public String toString() {
-        String args = "";
-
+        StringBuilder args = new StringBuilder();
         for (int i = 0; i < this.args.length; i++) {
-            args += this.args[i].toString();
+            args.append(this.args[i].toString());
 
             if (i < this.args.length - 1) {
-                args += ", ";
+                args.append(", ");
             }
         }
-
         return this.getName() + "(" + args + ")";
     }
 

@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.integration.jei;
 
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.widget.Widget;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -10,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
  * An interface for compat with JEI's ghost slots.
  * Implement this on any {@link IWidget}.
  * This slot must than be manually registered in something like {@link Widget#onInit()}
- * with {@link GuiContext#addJeiGhostIngredientSlot(IWidget)}
+ * with {@link com.cleanroommc.modularui.api.JeiSettings#addJeiGhostIngredientSlot(IWidget) JeiSettings.addJeiGhostIngredientSlot(IWidget)}
  *
  * @param <I> type of the ingredient
  */

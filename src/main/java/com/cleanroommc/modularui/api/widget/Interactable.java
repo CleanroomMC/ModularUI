@@ -99,7 +99,7 @@ public interface Interactable {
     }
 
     /**
-     * Called when this widget was clicked and mouse is now dragging..
+     * Called when this widget was clicked and mouse is now dragging.
      *
      * @param mouseButton    mouse button that drags
      * @param timeSinceClick time since drag began

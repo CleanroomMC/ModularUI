@@ -333,9 +333,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     public W setEnabledIf(Predicate<W> condition) {
-        return onUpdateListener(w -> {
-            setEnabled(condition.test(w));
-        }, true);
+        return onUpdateListener(w -> setEnabled(condition.test(w)), true);
     }
 
     // ----------------

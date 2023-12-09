@@ -277,7 +277,7 @@ public class TextFieldHandler {
         if (insertion.isEmpty() || (insertion.size() > 1 && text.size() + insertion.size() - 1 > this.maxLines)) {
             return null;
         }
-        int x = this.cursor.x, y = this.cursor.y;
+        int x, y = this.cursor.y;
         if (hasTextMarked()) {
             delete(false);
         }
@@ -301,11 +301,9 @@ public class TextFieldHandler {
             text.set(this.cursor.y, text.get(this.cursor.y) + lineEnd);
             return new Point(this.cursor.x + insertion.get(0).length(), this.cursor.y);
         } else {
-            if (insertion.size() > 1) {
-                text.add(this.cursor.y + 1, insertion.get(insertion.size() - 1) + lineEnd);
-                x = insertion.get(insertion.size() - 1).length();
-                y += 1;
-            }
+            text.add(this.cursor.y + 1, insertion.get(insertion.size() - 1) + lineEnd);
+            x = insertion.get(insertion.size() - 1).length();
+            y += 1;
             if (insertion.size() > 2) {
                 text.addAll(this.cursor.y + 1, text.subList(1, insertion.size() - 1));
                 x = insertion.get(insertion.size() - 1).length();

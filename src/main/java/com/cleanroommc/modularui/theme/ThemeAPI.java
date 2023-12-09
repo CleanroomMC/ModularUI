@@ -19,7 +19,7 @@ public class ThemeAPI implements IThemeApi {
 
     public static final ThemeAPI INSTANCE = new ThemeAPI();
     public static final String DEFAULT = "DEFAULT";
-    public static final ITheme DEFAULT_DEFAULT = new DefaultTheme(INSTANCE);
+    public static final ITheme DEFAULT_DEFAULT = new DefaultTheme();
 
     private final Object2ObjectMap<String, ITheme> THEMES = new Object2ObjectOpenHashMap<>();
     protected final Object2ObjectMap<String, List<JsonBuilder>> defaultThemes = new Object2ObjectOpenHashMap<>();
@@ -116,10 +116,7 @@ public class ThemeAPI implements IThemeApi {
 
     public static class DefaultTheme extends AbstractDefaultTheme {
 
-        private final ThemeAPI api;
-
-        private DefaultTheme(ThemeAPI api) {
-            this.api = api;
+        private DefaultTheme() {
         }
 
         @Override
@@ -134,7 +131,7 @@ public class ThemeAPI implements IThemeApi {
 
         @Override
         public WidgetTheme getWidgetTheme(String id) {
-            return this.api.defaultWidgetThemes.get(id);
+            return INSTANCE.defaultWidgetThemes.get(id);
         }
     }
 }

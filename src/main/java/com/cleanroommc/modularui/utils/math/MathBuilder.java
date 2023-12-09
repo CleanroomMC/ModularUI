@@ -51,7 +51,7 @@ public class MathBuilder {
     /**
      * Map of functions which can be used in the math expressions
      */
-    public final Map<String, Class<? extends Function>> functions = new Object2ObjectOpenHashMap<String, Class<? extends Function>>();
+    public final Map<String, Class<? extends Function>> functions = new Object2ObjectOpenHashMap<>();
 
     /**
      * Whether math expression parser should be strict about which characters
@@ -162,8 +162,8 @@ public class MathBuilder {
      * Breakdown characters into a list of math expression symbols.
      */
     public List<Object> breakdownChars(String[] chars) {
-        List<Object> symbols = new ArrayList<Object>();
-        String buffer = "";
+        List<Object> symbols = new ArrayList<>();
+        StringBuilder buffer = new StringBuilder();
         int len = chars.length;
         boolean string = false;
 
@@ -176,28 +176,28 @@ public class MathBuilder {
             }
 
             if (string) {
-                buffer += s;
+                buffer.append(s);
             } else if (this.isOperator(s) || longOperator || s.equals(",")) {
                 /* Taking care of a special case of using minus sign to
                  * invert the positive value */
                 if (s.equals("-")) {
                     int size = symbols.size();
 
-                    boolean isEmpty = buffer.trim().isEmpty();
+                    boolean isEmpty = buffer.toString().trim().isEmpty();
                     boolean isFirst = size == 0 && isEmpty;
                     boolean isOperatorBehind = size > 0 && (this.isOperator(symbols.get(size - 1)) || symbols.get(size - 1).equals(",")) && isEmpty;
 
                     if (isFirst || isOperatorBehind) {
-                        buffer += s;
+                        buffer.append(s);
 
                         continue;
                     }
                 }
 
                 /* Push buffer and operator */
-                if (!buffer.isEmpty()) {
-                    symbols.add(buffer);
-                    buffer = "";
+                if (buffer.length() > 0) {
+                    symbols.add(buffer.toString());
+                    buffer = new StringBuilder();
                 }
 
                 if (longOperator) {
@@ -208,9 +208,9 @@ public class MathBuilder {
                 }
             } else if (s.equals("(")) {
                 /* Push a list of symbols */
-                if (!buffer.isEmpty()) {
-                    symbols.add(buffer);
-                    buffer = "";
+                if (buffer.length() > 0) {
+                    symbols.add(buffer.toString());
+                    buffer = new StringBuilder();
                 }
 
                 int counter = 1;
@@ -225,24 +225,24 @@ public class MathBuilder {
                     }
 
                     if (counter == 0) {
-                        symbols.add(this.breakdownChars(buffer.split("(?!^)")));
+                        symbols.add(this.breakdownChars(buffer.toString().split("(?!^)")));
 
                         i = j;
-                        buffer = "";
+                        buffer = new StringBuilder();
 
                         break;
                     } else {
-                        buffer += c;
+                        buffer.append(c);
                     }
                 }
             } else {
                 /* Accumulate the buffer */
-                buffer += s;
+                buffer.append(s);
             }
         }
 
-        if (!buffer.isEmpty()) {
-            symbols.add(buffer);
+        if (buffer.length() > 0) {
+            symbols.add(buffer.toString());
         }
 
         return this.trimSymbols(symbols);
@@ -252,7 +252,7 @@ public class MathBuilder {
      * Trims spaces from individual symbols
      */
     private List<Object> trimSymbols(List<Object> symbols) {
-        List<Object> newSymbols = new ArrayList<Object>();
+        List<Object> newSymbols = new ArrayList<>();
 
         for (Object value : symbols) {
             if (value instanceof String) {
@@ -427,7 +427,7 @@ public class MathBuilder {
      * needs the name of the function and list of args (which can't be
      * stored in one object).
      * <p>
-     * This method will constructs {@link IMathValue}s from list of args
+     * This method will construct {@link IMathValue}s from list of args
      * mixed with operators, groups, values and commas. And then plug it
      * in to a class constructor with given name.
      */
@@ -454,8 +454,8 @@ public class MathBuilder {
             throw new Exception("Function '" + first + "' couldn't be found!");
         }
 
-        List<IMathValue> values = new ArrayList<IMathValue>();
-        List<Object> buffer = new ArrayList<Object>();
+        List<IMathValue> values = new ArrayList<>();
+        List<Object> buffer = new ArrayList<>();
 
         for (Object o : args) {
             if (o.equals(",")) {
@@ -472,9 +472,7 @@ public class MathBuilder {
 
         Class<? extends Function> function = this.functions.get(first);
         Constructor<? extends Function> ctor = function.getConstructor(IMathValue[].class, String.class);
-        Function func = ctor.newInstance(values.toArray(new IMathValue[values.size()]), first);
-
-        return func;
+        return ctor.newInstance(values.toArray(new IMathValue[0]), first);
     }
 
     /**

@@ -92,7 +92,7 @@ public class IconRenderer {
                 maxWidth = Math.max(maxWidth, icon.getWidth());
             }
         }
-        if (lines.size() > 0) {
+        if (!lines.isEmpty()) {
             // don't add padding to last line
             totalHeight -= this.linePadding;
         }
@@ -102,7 +102,7 @@ public class IconRenderer {
             if (!this.simulate) {
                 icon.draw(context, x, y, maxWidth, icon.getHeight());
             }
-            y += (icon.getHeight() + this.linePadding) * this.scale;
+            y += (int) ((icon.getHeight() + this.linePadding) * this.scale);
         }
         this.lastWidth = this.maxWidth > 0 ? Math.min(this.maxWidth, maxWidth) : maxWidth;
         this.lastHeight = totalHeight * this.scale;

@@ -101,7 +101,7 @@ public class ModularScreen {
         this(owner, Objects.requireNonNull(mainPanelCreator, "The main panel function must not be null!"), false);
     }
 
-    private ModularScreen(@NotNull String owner, @Nullable Function<GuiContext, ModularPanel> mainPanelCreator, boolean unused) {
+    private ModularScreen(@NotNull String owner, @Nullable Function<GuiContext, ModularPanel> mainPanelCreator, boolean ignored) {
         Objects.requireNonNull(owner, "The owner must not be null!");
         this.owner = owner;
         ModularPanel mainPanel = mainPanelCreator != null ? mainPanelCreator.apply(this.context) : buildUI(this.context);

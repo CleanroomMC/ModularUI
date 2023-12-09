@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IMathValue;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.value.IStringValue;
@@ -32,7 +33,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         try {
             return MathBuilder.INSTANCE.parse(num);
         } catch (Exception e) {
-            e.printStackTrace();
+            ModularUI.LOGGER.catching(e);
         }
         return new Constant(0);
     }

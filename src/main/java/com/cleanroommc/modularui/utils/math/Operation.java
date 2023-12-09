@@ -153,7 +153,7 @@ public enum Operation {
     public final String sign;
 
     /**
-     * Value of this operation in relation to other operations (i.e
+     * Value of this operation in relation to other operations (i.e.
      * precedence importance)
      */
     public final int value;
