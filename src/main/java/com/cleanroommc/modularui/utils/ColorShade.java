@@ -69,7 +69,7 @@ public class ColorShade implements IntIterable {
         public ColorShade build() {
             this.darker.trim();
             this.brighter.trim();
-            return new ColorShade(this.main, this.darker.elements(), this.brighter.elements());
+            return new ColorShade(this.main, this.brighter.elements(), this.darker.elements());
         }
     }
 }
