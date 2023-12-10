@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.theme;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.IThemeApi;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.JsonBuilder;
@@ -35,7 +36,7 @@ public class ThemeAPI implements IThemeApi {
         registerWidgetTheme(Theme.ITEM_SLOT, new WidgetSlotTheme(GuiTextures.SLOT_ITEM, Color.withAlpha(Color.WHITE.main, 0x60)), WidgetSlotTheme::new);
         registerWidgetTheme(Theme.FLUID_SLOT, new WidgetSlotTheme(GuiTextures.SLOT_FLUID, Color.withAlpha(Color.WHITE.main, 0x60)), WidgetSlotTheme::new);
         registerWidgetTheme(Theme.TEXT_FIELD, new WidgetTextFieldTheme(0xFF2F72A8), (parent, json, fallback) -> new WidgetTextFieldTheme(parent, fallback, json));
-        registerWidgetTheme(Theme.TOGGLE_BUTTON, new WidgetToggleButtonTheme(GuiTextures.MC_BUTTON, GuiTextures.MC_BUTTON_HOVERED, Color.WHITE.main, Color.WHITE.main, true, GuiTextures.MC_BUTTON_DISABLED, null, Color.WHITE.main), WidgetToggleButtonTheme::new);
+        registerWidgetTheme(Theme.TOGGLE_BUTTON, new WidgetToggleButtonTheme(GuiTextures.MC_BUTTON, GuiTextures.MC_BUTTON_HOVERED, Color.WHITE.main, Color.WHITE.main, true, GuiTextures.MC_BUTTON_DISABLED, IDrawable.NONE, Color.WHITE.main), WidgetToggleButtonTheme::new);
     }
 
     @Override

@@ -47,7 +47,9 @@ public class ToggleButton extends Widget<ToggleButton> implements Interactable {
     @Override
     public IDrawable getCurrentBackground() {
         if (isValueSelected()) {
-            return this.selectedHoverBackground != null && isHovering() ? this.selectedHoverBackground : this.selectedBackground;
+            return this.selectedHoverBackground != null &&
+                    this.selectedHoverBackground != IDrawable.NONE &&
+                    isHovering() ? this.selectedHoverBackground : this.selectedBackground;
         }
         return super.getCurrentBackground();
     }

@@ -19,6 +19,7 @@ public class PageButton extends Widget<PageButton> implements Interactable {
     public PageButton(int index, PagedWidget.Controller controller) {
         this.index = index;
         this.controller = controller;
+        disableHoverBackground();
     }
 
     @Override
