@@ -38,6 +38,7 @@ public class PageButton extends Widget<PageButton> implements Interactable {
     public @NotNull Result onMousePressed(int mouseButton) {
         if (!isActive()) {
             this.controller.setPage(this.index);
+            Interactable.playButtonClickSound();
             return Result.SUCCESS;
         }
         return Result.ACCEPT;

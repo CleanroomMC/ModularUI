@@ -22,6 +22,7 @@ public class ToggleButton extends Widget<ToggleButton> implements Interactable {
     public @NotNull Result onMousePressed(int mouseButton) {
         if (mouseButton == 0 || mouseButton == 1) {
             this.boolValue.setBoolValue(!this.boolValue.getBoolValue());
+            Interactable.playButtonClickSound();
             return Result.SUCCESS;
         }
         return Result.ACCEPT;
