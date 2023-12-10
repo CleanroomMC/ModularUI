@@ -74,10 +74,11 @@ jobs:
               echo "publish-gh=${{ inputs.publish-gh }}" >> $GITHUB_ENV
             fi
           fi
+          echo "file_name=${GITHUB_REPOSITORY#*/}-${{ github.event.inputs.version }}" >> $GITHUB_ENV
 
       - name: Set version
         if: env.UPDATED == 'false' # only change new version if it's not already updated
-        run: sed -i "s/mod_version.*=.*/mod_version = ${{ github.event.inputs.version }}/g" gradle.properties
+        run: sed -i "s/modVersion.*=.*/modVersion = ${{ github.event.inputs.version }}/g" gradle.properties
 
       - name: Commit and push gradle.properties
         if: env.UPDATED == 'false' # only push new version if it's not already updated
@@ -126,9 +127,9 @@ jobs:
           RELEASE_JSON=$(curl -sSL $RELEASE_URL)
           CHANGELOG="$(echo $RELEASE_JSON | jq -r '.body')"
           if [ "$CHANGELOG" == "null" ]; then
-            echo "No changelog found" > build/changelog.md
+            echo "No changelog found" > build/gh_changelog.md
           else
-            echo "$CHANGELOG" > build/changelog.md
+            echo "$CHANGELOG" > build/gh_changelog.md
           fi
 
       - name: Publish Minecraft Mods
@@ -144,10 +145,10 @@ jobs:
 
           files-primary: build/libs/!(*-@(dev|sources|javadoc)).jar
           files-secondary: build/libs/*-@(dev|sources|javadoc).jar
-          name: "${GITHUB_REPOSITORY#*/}-${{ github.event.inputs.version }}"
+          name: $file_name
           version: ${{ github.event.inputs.version }}
           version-type: ${{ github.event.inputs.release-type }}
-          changelog-file: build/changelog.md
+          changelog-file: build/gh_changelog.md
           loaders: |
             forge
           game-versions: |
@@ -167,5 +168,5 @@ jobs:
         with:
           arguments: publish
         env:
-          MAVEN_USERNAME: ${{ secrets.MAVEN_NAME }}
+          MAVEN_USER: ${{ secrets.MAVEN_NAME }}
           MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
