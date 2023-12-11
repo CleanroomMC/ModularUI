@@ -374,7 +374,7 @@ public class GuiScreenWrapper extends GuiContainer {
             return;
         }
         if (keyCode == 1 || this.mc.gameSettings.keyBindInventory.isActiveAndMatches(keyCode)) {
-            this.screen.close();
+            this.screen.closeTopPanel();
         }
 
         this.checkHotbarKeys(keyCode);

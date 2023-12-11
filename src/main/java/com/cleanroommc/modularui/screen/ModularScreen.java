@@ -183,6 +183,10 @@ public class ModularScreen {
         this.windowManager.openPanel(panel);
     }
 
+    public void closeTopPanel() {
+        this.windowManager.closeTopPanel();
+    }
+
     public void closePanel(ModularPanel panel) {
         this.windowManager.closePanel(panel);
     }

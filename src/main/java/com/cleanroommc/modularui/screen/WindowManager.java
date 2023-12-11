@@ -159,14 +159,9 @@ public class WindowManager {
         }
     }
 
-    public void closeTopPanel(boolean alsoCloseMain, boolean animate) {
+    public void closeTopPanel() {
         ModularPanel panel = getTopMostPanel();
-        if (panel == getMainPanel() && !alsoCloseMain) return;
-        if (animate) {
-            panel.animateClose();
-            return;
-        }
-        panel.closeIfOpen();
+        if (panel != null) closePanel(panel);
     }
 
     public void closeAll() {
