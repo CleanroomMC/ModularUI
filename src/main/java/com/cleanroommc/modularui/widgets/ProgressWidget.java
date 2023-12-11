@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.api.value.IDoubleValue;
 import com.cleanroommc.modularui.drawable.UITexture;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.value.DoubleValue;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
@@ -60,15 +61,15 @@ public class ProgressWidget extends Widget<ProgressWidget> {
         if (this.emptyTexture != null) {
             this.emptyTexture.applyThemeColor(context.getTheme(), widgetTheme);
             this.emptyTexture.draw(context, 0, 0, getArea().w(), getArea().h());
+            Color.setGlColorOpaque(Color.WHITE.main);
         }
         float progress = getCurrentProgress();
         if (this.fullTexture[0] != null && progress > 0) {
             if (this.direction == Direction.CIRCULAR_CW) {
-                drawCircular(context, widgetTheme, progress);
+                drawCircular(progress);
                 return;
             }
             if (progress >= 1) {
-                this.fullTexture[0].applyThemeColor(context.getTheme(), widgetTheme);
                 this.fullTexture[0].draw(context, 0, 0, getArea().w(), getArea().h());
             } else {
                 progress = getProgressUV(progress);
@@ -94,7 +95,6 @@ public class ProgressWidget extends Widget<ProgressWidget> {
                         y = getArea().height - height;
                         break;
                 }
-                this.fullTexture[0].applyThemeColor(context.getTheme(), widgetTheme);
                 this.fullTexture[0].drawSubArea(x, y, width, height, u0, v0, u1, v1);
             }
         }
@@ -107,7 +107,7 @@ public class ProgressWidget extends Widget<ProgressWidget> {
         return (float) (Math.floor(uv * this.imageSize) / this.imageSize);
     }
 
-    private void drawCircular(GuiContext context, WidgetTheme widgetTheme, float progress) {
+    private void drawCircular(float progress) {
         float[] subAreas = {
                 getProgressUV(MathHelper.clamp(progress / 0.25f, 0, 1)),
                 getProgressUV(MathHelper.clamp((progress - 0.25f) / 0.25f, 0, 1)),
@@ -118,7 +118,6 @@ public class ProgressWidget extends Widget<ProgressWidget> {
         float halfHeight = getArea().height / 2f;
 
         float progressScaled = subAreas[0] * halfHeight;
-        this.fullTexture[0].applyThemeColor(context.getTheme(), widgetTheme);
         this.fullTexture[0].drawSubArea(
                 0, getArea().height - progressScaled,
                 halfWidth, progressScaled,
@@ -127,7 +126,6 @@ public class ProgressWidget extends Widget<ProgressWidget> {
         ); // BL, draw UP
 
         progressScaled = subAreas[1] * halfWidth;
-        this.fullTexture[1].applyThemeColor(context.getTheme(), widgetTheme);
         this.fullTexture[1].drawSubArea(
                 0, 0,
                 progressScaled, halfHeight,
@@ -136,7 +134,6 @@ public class ProgressWidget extends Widget<ProgressWidget> {
         ); // TL, draw RIGHT
 
         progressScaled = subAreas[2] * halfHeight;
-        this.fullTexture[2].applyThemeColor(context.getTheme(), widgetTheme);
         this.fullTexture[2].drawSubArea(
                 halfWidth, 0,
                 halfWidth, progressScaled,
@@ -145,7 +142,6 @@ public class ProgressWidget extends Widget<ProgressWidget> {
         ); // TR, draw DOWN
 
         progressScaled = subAreas[3] * halfWidth;
-        this.fullTexture[3].applyThemeColor(context.getTheme(), widgetTheme);
         this.fullTexture[3].drawSubArea(
                 getArea().width - progressScaled, halfHeight,
                 progressScaled, halfHeight,
