@@ -37,10 +37,10 @@ public class ToggleButton extends Widget<ToggleButton> implements Interactable {
     public void applyTheme(ITheme theme) {
         super.applyTheme(theme);
         if (this.selectedBackground == null) {
-            this.selectedBackground = theme.getToggleButtonTheme().getSelectedBackground();
+            this.selectedBackground = theme.getToggleButtonTheme().getSelected().getBackground();
         }
         if (this.selectedHoverBackground == null) {
-            this.selectedHoverBackground = theme.getToggleButtonTheme().getSelectedHoverBackground();
+            this.selectedHoverBackground = theme.getToggleButtonTheme().getSelected().getHoverBackground();
         }
     }
 
@@ -58,14 +58,11 @@ public class ToggleButton extends Widget<ToggleButton> implements Interactable {
     public void drawBackground(GuiContext context, WidgetTheme widgetTheme) {
         IDrawable bg = getCurrentBackground();
         if (bg != null) {
-            if (isValueSelected()) {
-                Color.setGlColor(((WidgetToggleButtonTheme) widgetTheme).getSelectedColor());
-            } else if (bg.canApplyTheme()) {
-                bg.applyThemeColor(context.getTheme(), widgetTheme);
+            if (isValueSelected() && widgetTheme instanceof WidgetToggleButtonTheme) {
+                bg.drawAtZero(context, getArea(), ((WidgetToggleButtonTheme) widgetTheme).getSelected());
             } else {
-                Color.setGlColor(Color.WHITE.main);
+                bg.drawAtZero(context, getArea(), widgetTheme);
             }
-            bg.drawAtZero(context, getArea());
         }
     }
 

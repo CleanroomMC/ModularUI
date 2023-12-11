@@ -80,11 +80,11 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
                 if (this.axis.isHorizontal()) {
                     pos -= this.stopperWidth / 2;
                     int crossAxisPos = (int) (getArea().height / 2D - this.stopperHeight / 2D);
-                    this.stopperDrawable.draw(context, pos, crossAxisPos, this.stopperWidth, this.stopperHeight);
+                    this.stopperDrawable.draw(context, pos, crossAxisPos, this.stopperWidth, this.stopperHeight, WidgetTheme.getDefault());
                 } else {
                     pos -= this.stopperHeight / 2;
                     int crossAxisPos = (int) (getArea().width / 2D - this.stopperWidth / 2D);
-                    this.stopperDrawable.draw(context, crossAxisPos, pos, this.stopperWidth, this.stopperHeight);
+                    this.stopperDrawable.draw(context, crossAxisPos, pos, this.stopperWidth, this.stopperHeight, WidgetTheme.getDefault());
                 }
             }
         }
@@ -93,10 +93,7 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     @Override
     public void draw(GuiContext context, WidgetTheme widgetTheme) {
         if (this.handleDrawable != null) {
-            ITheme theme = getContext().getTheme();
-            WidgetTheme buttonTheme = theme.getButtonTheme();
-            this.handleDrawable.applyThemeColor(theme, buttonTheme);
-            this.handleDrawable.draw(context, this.sliderArea);
+            this.handleDrawable.draw(context, this.sliderArea, context.getTheme().getButtonTheme());
         }
     }
 

@@ -31,7 +31,7 @@ public class PageButton extends Widget<PageButton> implements Interactable {
     public void applyTheme(ITheme theme) {
         super.applyTheme(theme);
         if (this.inactiveTexture == null) {
-            this.inactiveTexture = theme.getToggleButtonTheme().getSelectedBackground();
+            this.inactiveTexture = theme.getToggleButtonTheme().getSelected().getBackground();
         }
     }
 

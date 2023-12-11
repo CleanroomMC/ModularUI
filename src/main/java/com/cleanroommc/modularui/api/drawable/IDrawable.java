@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.api.drawable;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.drawable.Icon;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.theme.ThemeAPI;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.Widget;
@@ -12,6 +13,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.google.gson.JsonObject;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * An object which can be drawn. This is mainly used for backgrounds and overlays in
@@ -29,18 +31,47 @@ public interface IDrawable {
      * @param height  draw height
      */
     @SideOnly(Side.CLIENT)
+    default void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
+        applyThemeColor(context.getTheme(), widgetTheme);
+        draw(context, x, y, width, height);
+    }
+
+    /**
+     * @deprecated use {@link #draw(GuiContext, int, int, int, int, WidgetTheme)}
+     */
+    @SideOnly(Side.CLIENT)
+    @Deprecated
     void draw(GuiContext context, int x, int y, int width, int height);
+
+    /**
+     * @deprecated use {@link #drawAtZero(GuiContext, int, int, WidgetTheme)}
+     */
+    @SideOnly(Side.CLIENT)
+    @Deprecated
+    default void drawAtZero(GuiContext context, int width, int height) {
+        drawAtZero(context, width, height, ThemeAPI.DEFAULT_DEFAULT.getFallback());
+    }
 
     /**
      * Draws this drawable at the current (0|0) with the given size.
      *
-     * @param context gui context
-     * @param width   draw width
-     * @param height  draw height
+     * @param context     gui context
+     * @param width       draw width
+     * @param height      draw height
+     * @param widgetTheme
      */
     @SideOnly(Side.CLIENT)
-    default void drawAtZero(GuiContext context, int width, int height) {
-        draw(context, 0, 0, width, height);
+    default void drawAtZero(GuiContext context, int width, int height, WidgetTheme widgetTheme) {
+        draw(context, 0, 0, width, height, widgetTheme);
+    }
+
+    /**
+     * @deprecated use {@link #draw(GuiContext, Area, WidgetTheme)}
+     */
+    @SideOnly(Side.CLIENT)
+    @Deprecated
+    default void draw(GuiContext context, Area area) {
+        draw(context, area.x, area.y, area.width, area.height, ThemeAPI.DEFAULT_DEFAULT.getFallback());
     }
 
     /**
@@ -50,8 +81,17 @@ public interface IDrawable {
      * @param area    draw area
      */
     @SideOnly(Side.CLIENT)
-    default void draw(GuiContext context, Area area) {
-        draw(context, area.x, area.y, area.width, area.height);
+    default void draw(GuiContext context, Area area, WidgetTheme widgetTheme) {
+        draw(context, area.x, area.y, area.width, area.height, widgetTheme);
+    }
+
+    /**
+     * @deprecated use {@link #drawAtZero(GuiContext, Area, WidgetTheme)}
+     */
+    @Deprecated
+    @SideOnly(Side.CLIENT)
+    default void drawAtZero(GuiContext context, Area area) {
+        draw(context, 0, 0, area.width, area.height, ThemeAPI.DEFAULT_DEFAULT.getFallback());
     }
 
     /**
@@ -61,8 +101,8 @@ public interface IDrawable {
      * @param area    draw area
      */
     @SideOnly(Side.CLIENT)
-    default void drawAtZero(GuiContext context, Area area) {
-        draw(context, 0, 0, area.width, area.height);
+    default void drawAtZero(GuiContext context, Area area, WidgetTheme widgetTheme) {
+        draw(context, 0, 0, area.width, area.height, widgetTheme);
     }
 
     /**
@@ -71,6 +111,8 @@ public interface IDrawable {
      * @param theme       theme to apply color of
      * @param widgetTheme widget theme to apply color of
      */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.6.0")
     default void applyThemeColor(ITheme theme, WidgetTheme widgetTheme) {
         Color.setGlColorOpaque(Color.WHITE.main);
     }
