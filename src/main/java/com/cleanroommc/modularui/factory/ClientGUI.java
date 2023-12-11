@@ -50,7 +50,7 @@ public class ClientGUI {
     }
 
     /**
-     * Closes any GUI that is open in the next client tick.
+     * Closes any GUI that is open in this tick.
      */
     public static void close() {
         GuiManager.closeScreen();
