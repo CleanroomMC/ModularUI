@@ -374,7 +374,15 @@ public class GuiScreenWrapper extends GuiContainer {
             return;
         }
         if (keyCode == 1 || this.mc.gameSettings.keyBindInventory.isActiveAndMatches(keyCode)) {
-            this.screen.closeTopPanel();
+            GuiContext context = this.screen.getContext();
+            if (context.hasDraggable()) {
+                // drop the dragged element first if escape/e is hit
+                context.dropDraggable();
+            } else {
+                // close the top-most panel next if escape/e is hit
+                // this will also handle closing the UI if the main panel is top-most
+                this.screen.closeTopPanel();
+            }
         }
 
         this.checkHotbarKeys(keyCode);

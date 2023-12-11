@@ -278,7 +278,8 @@ public class GuiContext extends GuiViewportStack {
         return false;
     }
 
-    private void dropDraggable() {
+    @ApiStatus.Internal
+    public void dropDraggable() {
         this.draggable.applyMatrix(this);
         this.draggable.getElement().onDragEnd(this.draggable.getElement().canDropHere(getAbsMouseX(), getAbsMouseY(), this.hovered));
         this.draggable.getElement().setMoving(false);
