@@ -67,10 +67,15 @@ public class ClientEventHandler {
             // queue the screen to open it on next tick
             if (event.getGui() != null) {
                 ClientGUI.open(event.getGui());
+                event.setCanceled(true);
             } else {
-                ClientGUI.close();
+                // clear any queued-for-opening screen if needed otherwise, just
+                // in case someone tries to close the screen before we actually
+                // open it. If that clears the queue, then we cancel the event.
+                if (GuiManager.resetState()) {
+                    event.setCanceled(true);
+                }
             }
-            event.setCanceled(true);
         }
     }
 

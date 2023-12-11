@@ -10,6 +10,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.PacketBuffer;
 
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -43,6 +45,7 @@ public class OpenGuiPacket<T extends GuiData> implements IPacket {
         this.data = NetworkUtils.readPacketBuffer(buf);
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
     public @Nullable IPacket executeClient(NetHandlerPlayClient handler) {
         GuiManager.open(this.windowId, this.factory, this.data, Minecraft.getMinecraft().player);
