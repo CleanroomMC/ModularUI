@@ -18,6 +18,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
@@ -86,7 +87,6 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
 
     public static void loadThemes(Map<String, List<String>> themesPaths) {
         Map<String, ThemeJson> themeMap = new Object2ObjectOpenHashMap<>();
-        SortedJsonThemeList themeList = new SortedJsonThemeList(themeMap);
 
         // load json files from the path and parse their parent
         for (Map.Entry<String, List<String>> entry : themesPaths.entrySet()) {
@@ -106,10 +106,26 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
         validateAncestorTree(themeMap);
         if (themeMap.isEmpty()) return;
         // create a sorted list of themes
-        themeList.addAll(themeMap.values());
+
+        Map<String, ThemeJson> sortedThemes = new Object2ObjectLinkedOpenHashMap<>();
+        Iterator<Map.Entry<String, ThemeJson>> iterator;
+        boolean changed;
+        do {
+            changed = false;
+            iterator = themeMap.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<String, ThemeJson> entry = iterator.next();
+                if (ThemeAPI.DEFAULT.equals(entry.getValue().parent) || sortedThemes.containsKey(entry.getValue().parent)) {
+                    sortedThemes.put(entry.getKey(), entry.getValue());
+                    iterator.remove();
+                    changed = true;
+                    break;
+                }
+            }
+        } while (changed);
 
         // finally parse and register themes
-        for (ThemeJson themeJson : themeList) {
+        for (ThemeJson themeJson : sortedThemes.values()) {
             Theme theme = themeJson.deserialize();
             ThemeAPI.INSTANCE.registerTheme(theme);
         }
@@ -289,45 +305,6 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
                 theme.setTooltipPosOverride(Tooltip.Pos.valueOf(posName));
             }
             return theme;
-        }
-    }
-
-    private static class SortedJsonThemeList extends ArrayList<ThemeJson> {
-
-        private final Map<String, ThemeJson> themeMap;
-
-        private SortedJsonThemeList(Map<String, ThemeJson> themeMap) {
-            this.themeMap = themeMap;
-        }
-
-        @Override
-        public boolean addAll(Collection<? extends ThemeJson> c) {
-            for (ThemeJson theme : c) {
-                add(theme);
-            }
-            return !c.isEmpty();
-        }
-
-        @Override
-        public boolean add(ThemeJson theme) {
-            for (int i = 0; i < size(); i++) {
-                if (!isAncestor(get(i), theme)) {
-                    add(i, theme);
-                    return true;
-                }
-            }
-            add(size(), theme);
-            return true;
-        }
-
-        private boolean isAncestor(ThemeJson potentialAncestor, ThemeJson theme) {
-            do {
-                if (ThemeAPI.DEFAULT.equals(theme.parent)) {
-                    return false;
-                }
-                theme = this.themeMap.get(theme.parent);
-            } while (potentialAncestor != theme);
-            return true;
         }
     }
 }
