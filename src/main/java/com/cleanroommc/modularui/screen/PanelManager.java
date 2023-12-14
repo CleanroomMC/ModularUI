@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.utils.ReverseIterable;
 import com.cleanroommc.modularui.widget.WidgetTree;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
@@ -15,68 +16,47 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class WindowManager {
+public class PanelManager {
 
     private final ModularScreen screen;
     /**
      * At least one panel must exist always exist.
      * If this panel is closed, all panels will close.
      */
-    private ModularPanel mainPanel;
+    private final ModularPanel mainPanel;
     /**
      * List of all open panels from top to bottom.
      */
     private final ObjectList<ModularPanel> panels = ObjectList.create();
-    private final List<ModularPanel> panelsView = Collections.unmodifiableList(this.panels);
+    private final List<ModularPanel> panelsClone = new ArrayList<>();
+    private final List<ModularPanel> panelsView = Collections.unmodifiableList(this.panelsClone);
     private final ReverseIterable<ModularPanel> reversePanels = new ReverseIterable<>(this.panelsView);
-    private final List<ModularPanel> queueOpenPanels = new ArrayList<>();
-    private final List<ModularPanel> queueClosePanels = new ArrayList<>();
-    private boolean isScreenClosing = false;
-    private boolean closed;
+    private boolean dirty = false;
+    private State state = State.INIT;
 
-    public WindowManager(ModularScreen screen) {
+    public PanelManager(ModularScreen screen, ModularPanel panel) {
         this.screen = screen;
-    }
-
-    void construct(ModularPanel panel) {
-        if (this.mainPanel != null) {
-            throw new IllegalStateException();
-        }
         this.mainPanel = Objects.requireNonNull(panel, "Main panel must not be null!");
     }
 
     void init() {
-        if (this.mainPanel == null) {
-            throw new IllegalStateException("WindowManager is not yet constructed!");
+        if (this.state == State.CLOSED) throw new IllegalStateException("Can't init in closed state!");
+        if (this.state == State.INIT || this.state == State.DISPOSED) {
+            this.state = State.OPEN;
+            openPanel(this.mainPanel, false);
+            checkDirty();
         }
-        openPanel(this.mainPanel, false);
     }
 
     public boolean isMainPanel(ModularPanel panel) {
         return this.mainPanel == panel;
     }
 
-    void clearQueue() {
-        if (!this.queueOpenPanels.isEmpty()) {
-            for (ModularPanel panel : this.queueOpenPanels) {
-                openPanel(panel, true);
-            }
-            this.queueOpenPanels.clear();
-        }
-
-        if (!this.queueClosePanels.isEmpty()) {
-            if (this.queueClosePanels.contains(this.mainPanel)) {
-                closeAll();
-                this.screen.close(true);
-            } else {
-                for (ModularPanel panel : this.queueClosePanels) {
-                    if (!this.panels.contains(panel)) throw new IllegalStateException();
-                    if (this.panels.remove(panel)) {
-                        panel.onClose();
-                    }
-                }
-            }
-            this.queueClosePanels.clear();
+    void checkDirty() {
+        if (this.dirty) {
+            this.panelsClone.clear();
+            this.panelsClone.addAll(this.panels);
+            this.dirty = false;
         }
     }
 
@@ -89,6 +69,7 @@ public class WindowManager {
         }
         panel.setPanelGuiContext(this.screen.getContext());
         this.panels.addFirst(panel);
+        this.dirty = true;
         panel.getArea().setPanelLayer((byte) this.panels.size());
         panel.onOpen(this.screen);
         if (resize) {
@@ -112,11 +93,8 @@ public class WindowManager {
 
     @NotNull
     public ModularPanel getMainPanel() {
-        if (this.mainPanel == null) {
-            throw new IllegalStateException("WindowManager has not been initialised yet!");
-        }
-        if (this.closed) {
-            throw new IllegalStateException("Screen has been closed");
+        if (isDisposed()) {
+            throw new IllegalStateException("Screen has been disposed");
         }
         return this.mainPanel;
     }
@@ -148,14 +126,21 @@ public class WindowManager {
     }
 
     public void openPanel(@NotNull ModularPanel panel) {
-        if (!this.queueOpenPanels.contains(panel)) {
-            this.queueOpenPanels.add(panel);
-        }
+        openPanel(panel, true);
     }
 
     public void closePanel(@NotNull ModularPanel panel) {
-        if (!this.queueClosePanels.contains(panel)) {
-            this.queueClosePanels.add(panel);
+        if (!hasOpenPanel(panel)) {
+            throw new IllegalArgumentException("Panel '" + panel.getName() + "' is open in this screen!");
+        }
+        if (panel == getMainPanel()) {
+            closeAll();
+            this.screen.close(true);
+            return;
+        }
+        if (this.panels.remove(panel)) {
+            panel.onClose();
+            this.dirty = true;
         }
     }
 
@@ -170,12 +155,36 @@ public class WindowManager {
     }
 
     public void closeAll() {
-        this.isScreenClosing = true;
         for (ModularPanel panel : this.panels) {
             panel.onClose();
         }
+        // this.panels.clear();
+        // this.dirty = true;
+        this.state = State.CLOSED;
+    }
+
+    @ApiStatus.Internal
+    public void dispose() {
+        if (!isClosed()) throw new IllegalStateException("Must close screen first before disposing!");
+        for (ModularPanel panel : this.panels) {
+            panel.dispose();
+        }
         this.panels.clear();
-        this.closed = true;
+        this.panelsClone.clear();
+        this.dirty = false;
+        this.state = State.DISPOSED;
+    }
+
+    @ApiStatus.Internal
+    public void reopen() {
+        if (this.panels.isEmpty()) {
+            throw new IllegalStateException("Screen is disposed. Can't be recovered!");
+        }
+        this.state = State.REOPENED;
+    }
+
+    public boolean hasOpenPanel(ModularPanel panel) {
+        return this.panels.contains(panel);
     }
 
     public void pushUp(@NotNull ModularPanel window) {
@@ -213,33 +222,50 @@ public class WindowManager {
     @NotNull
     @UnmodifiableView
     public List<ModularPanel> getOpenPanels() {
+        checkDirty();
         return this.panelsView;
     }
 
     @NotNull
     @UnmodifiableView
     public Iterable<ModularPanel> getReverseOpenPanels() {
+        checkDirty();
         return this.reversePanels;
     }
 
     public boolean isClosed() {
-        return this.closed;
+        return this.state == State.CLOSED || this.state == State.DISPOSED;
     }
 
-    void resetClosed() {
-        this.closed = false;
+    public boolean isDisposed() {
+        return this.state == State.DISPOSED;
     }
 
-    public boolean isAboutToClose(ModularPanel panel) {
-        for (ModularPanel panel1 : this.queueClosePanels) {
-            if (panel == panel1) {
-                return true;
-            }
+    public boolean isOpen() {
+        return this.state.isOpen;
+    }
+
+    public boolean isReopened() {
+        return this.state == State.REOPENED;
+    }
+
+    private void checkDisposed() {
+        if (isDisposed()) {
+            throw new IllegalStateException("Screen is disposed!");
         }
-        return false;
     }
 
-    public boolean isScreenClosing() {
-        return this.isScreenClosing;
+    public enum State {
+        INIT(false),
+        OPEN(true),
+        REOPENED(true),
+        CLOSED(false),
+        DISPOSED(false);
+
+        public final boolean isOpen;
+
+        State(boolean isOpen) {
+            this.isOpen = isOpen;
+        }
     }
 }

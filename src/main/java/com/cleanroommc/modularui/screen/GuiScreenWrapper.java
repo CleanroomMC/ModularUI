@@ -63,7 +63,6 @@ public class GuiScreenWrapper extends GuiContainer {
         GuiErrorHandler.INSTANCE.clear();
         super.initGui();
         if (this.init) {
-            this.screen.getWindowManager().resetClosed();
             this.screen.onOpen();
             this.init = false;
         }
@@ -230,7 +229,7 @@ public class GuiScreenWrapper extends GuiContainer {
         drawString(this.fontRenderer, "Mouse Pos: " + mouseX + ", " + mouseY, 5, lineY, color);
         lineY -= 11;
         drawString(this.fontRenderer, "FPS: " + this.fps, 5, screenH - 24, color);
-        LocatedWidget locatedHovered = this.screen.getWindowManager().getTopWidgetLocated(true);
+        LocatedWidget locatedHovered = this.screen.getPanelManager().getTopWidgetLocated(true);
         if (locatedHovered != null) {
             drawSegmentLine(lineY -= 4, color);
             lineY -= 10;

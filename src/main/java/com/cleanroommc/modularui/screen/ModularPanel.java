@@ -78,32 +78,54 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         getScreen().registerFrameUpdateListener(this, this::findHoveredWidgets, false);
     }
 
+    /**
+     * @return true if this panel is currently open on a screen
+     */
     public boolean isOpen() {
         return this.screen != null;
     }
 
+    /**
+     * @param screen screen to open this panel in
+     * @throws IllegalStateException if this panel is already open in any screen
+     */
     public void openIn(ModularScreen screen) {
-        if (this.screen != null) {
+        if (isOpen()) {
             throw new IllegalStateException("Panel is already open!");
         }
-        screen.getWindowManager().openPanel(this);
+        screen.getPanelManager().openPanel(this);
     }
 
-    public void closeIfOpen() {
-        if (isOpen()) {
+    /**
+     * If this panel is open it will be closed.
+     * If animating is enabled and an animation is already playing this method will do nothing.
+     *
+     * @param animate true if the closing animation should play first.
+     */
+    public void closeIfOpen(boolean animate) {
+        if (!animate || !shouldAnimate()) {
             this.screen.closePanel(this);
-        }
-    }
-
-    public void animateClose() {
-        if (getScreen().getCurrentTheme().getOpenCloseAnimationOverride() <= 0) {
-            closeIfOpen();
             return;
         }
         if (isOpen() && !isOpening() && !isClosing()) {
-            this.animator.setEndCallback(val -> this.screen.closePanel(this));
-            this.animator.backward();
+            if (isMainPanel()) {
+                // if this is the main panel, start closing animation for all panels
+                for (ModularPanel panel : getScreen().getPanelManager().getOpenPanels()) {
+                    if (!panel.isMainPanel()) {
+                        panel.closeIfOpen(true);
+                    }
+                }
+            }
+            getAnimator().setEndCallback(val -> this.screen.closePanel(this)).backward();
         }
+    }
+
+    public void closeIfOpen() {
+        closeIfOpen(false);
+    }
+
+    public void animateClose() {
+        closeIfOpen(true);
     }
 
     @Override
@@ -119,6 +141,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @Override
     public void transform(IViewportStack stack) {
         super.transform(stack);
+        // apply scaling for animation
         if (getScale() != 1f) {
             float x = getArea().w() / 2f;
             float y = getArea().h() / 2f;
@@ -165,33 +188,22 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     public void onOpen(ModularScreen screen) {
         this.screen = screen;
         getArea().z(1);
+        this.scale = 1f;
+        this.alpha = 1f;
         initialise(this);
-        int animationTime = getScreen().getCurrentTheme().getOpenCloseAnimationOverride();
-        if (animationTime <= 0 || !getScreen().getScreenWrapper().doAnimateTransition()) {
-            this.scale = 1f;
-            this.alpha = 1f;
-            return;
+        if (shouldAnimate()) {
+            this.scale = 0.75f;
+            this.alpha = 0f;
+            getAnimator().setEndCallback(value -> {
+                this.scale = 1f;
+                this.alpha = 1f;
+            }).forward();
         }
-        this.scale = 0.75f;
-        this.alpha = 0f;
-        if (this.animator == null) {
-            this.animator = new Animator(animationTime, Interpolation.QUINT_OUT)
-                    .setValueBounds(0.0f, 1.0f)
-                    .setCallback(val -> {
-                        this.alpha = (float) val;
-                        this.scale = (float) val * 0.25f + 0.75f;
-                    });
-        }
-        this.animator.setEndCallback(value -> {
-            this.scale = 1f;
-            this.alpha = 1f;
-        });
-        this.animator.forward();
     }
 
     @MustBeInvokedByOverriders
     public void onClose() {
-        dispose();
+        //dispose();
     }
 
     @Override
@@ -218,7 +230,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 widget.applyMatrix(getContext());
                 if (widget.getElement() instanceof Interactable) {
                     Interactable interactable = (Interactable) widget.getElement();
-                    switch (interactable.onMousePressed(mouseButton)) {
+                    Interactable.Result result1 = interactable.onMousePressed(mouseButton);
+                    if (isClosing() || !isValid()) {
+                        return true;
+                    }
+                    switch (result1) {
                         case IGNORE:
                             break;
                         case ACCEPT: {
@@ -542,8 +558,26 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return this.alpha;
     }
 
-    public boolean isMainPanel() {
+    public final boolean isMainPanel() {
         return getScreen().getMainPanel() == this;
+    }
+
+    @NotNull
+    protected Animator getAnimator() {
+        if (this.animator == null) {
+            this.animator = new Animator(getScreen().getCurrentTheme().getOpenCloseAnimationOverride(), Interpolation.QUINT_OUT)
+                    .setValueBounds(0.0f, 1.0f)
+                    .setCallback(val -> {
+                        this.alpha = (float) val;
+                        this.scale = (float) val * 0.25f + 0.75f;
+                    });
+        }
+        return this.animator;
+    }
+
+    public boolean shouldAnimate() {
+        return getScreen().getCurrentTheme().getOpenCloseAnimationOverride() > 0/* &&
+                getScreen().getScreenWrapper().doAnimateTransition()*/;
     }
 
     public ModularPanel bindPlayerInventory() {
