@@ -203,7 +203,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @MustBeInvokedByOverriders
     public void onClose() {
-        //dispose();
     }
 
     @Override

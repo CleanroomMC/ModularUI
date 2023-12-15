@@ -50,7 +50,6 @@ public class GuiScreenWrapper extends GuiContainer {
 
     private int fps, frameCount = 0;
     private long timer = Minecraft.getSystemTime();
-    private boolean doAnimateTransition = true;
 
     public GuiScreenWrapper(ModularContainer container, ModularScreen screen) {
         super(container);
@@ -189,7 +188,7 @@ public class GuiScreenWrapper extends GuiContainer {
             super.drawWorldBackground(tint);
             return;
         }
-        float alpha = this.doAnimateTransition ? this.screen.getMainPanel().getAlpha() : 1f;
+        float alpha = this.screen.getMainPanel().getAlpha();
         // vanilla color values as hex
         int color = 0x101010;
         int startAlpha = 0xc0;
@@ -300,7 +299,6 @@ public class GuiScreenWrapper extends GuiContainer {
         super.onGuiClosed();
         this.screen.onClose();
         this.init = true;
-        this.doAnimateTransition = true;
     }
 
     public ModularScreen getScreen() {
@@ -373,7 +371,11 @@ public class GuiScreenWrapper extends GuiContainer {
             return;
         }
         if (keyCode == 1 || this.mc.gameSettings.keyBindInventory.isActiveAndMatches(keyCode)) {
-            this.screen.close();
+            if (this.screen.getContext().hasDraggable()) {
+                this.screen.getContext().dropDraggable();
+            } else {
+                this.screen.getPanelManager().closeTopPanel(true);
+            }
         }
 
         this.checkHotbarKeys(keyCode);
@@ -409,13 +411,5 @@ public class GuiScreenWrapper extends GuiContainer {
 
     public FontRenderer getFontRenderer() {
         return this.fontRenderer;
-    }
-
-    public void setDoAnimateTransition(boolean doAnimateTransition) {
-        this.doAnimateTransition = doAnimateTransition;
-    }
-
-    public boolean doAnimateTransition() {
-        return doAnimateTransition;
     }
 }

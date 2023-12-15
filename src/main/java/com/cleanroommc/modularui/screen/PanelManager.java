@@ -28,6 +28,7 @@ public class PanelManager {
      * List of all open panels from top to bottom.
      */
     private final ObjectList<ModularPanel> panels = ObjectList.create();
+    // a clone of the list to avoid CMEs
     private final List<ModularPanel> panelsClone = new ArrayList<>();
     private final List<ModularPanel> panelsView = Collections.unmodifiableList(this.panelsClone);
     private final ReverseIterable<ModularPanel> reversePanels = new ReverseIterable<>(this.panelsView);
@@ -99,8 +100,15 @@ public class PanelManager {
         return this.mainPanel;
     }
 
+    /**
+     * Returns the panel that was opened last.
+     *
+     * @return last opened panel
+     * @throws IndexOutOfBoundsException if the current state is {@link State#DISPOSED}
+     */
+    @NotNull
     public ModularPanel getTopMostPanel() {
-        return this.panels.peekFirst();
+        return this.panels.getFirst();
     }
 
     @Nullable
@@ -144,22 +152,14 @@ public class PanelManager {
         }
     }
 
-    public void closeTopPanel(boolean alsoCloseMain, boolean animate) {
-        ModularPanel panel = getTopMostPanel();
-        if (panel == getMainPanel() && !alsoCloseMain) return;
-        if (animate) {
-            panel.animateClose();
-            return;
-        }
-        panel.closeIfOpen();
+    public void closeTopPanel(boolean animate) {
+        getTopMostPanel().closeIfOpen(animate);
     }
 
     public void closeAll() {
         for (ModularPanel panel : this.panels) {
             panel.onClose();
         }
-        // this.panels.clear();
-        // this.dirty = true;
         this.state = State.CLOSED;
     }
 
