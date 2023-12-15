@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * This must be added by {@link ModularScreen#openPanel}, not as child widget.
@@ -47,6 +48,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @NotNull
     private final String name;
     private ModularScreen screen;
+    private State state = State.IDLE;
+    private boolean cantDisposeNow = false;
     private final ObjectList<LocatedWidget> hovering = ObjectList.create();
     private final ObjectList<Interactable> acceptedInteractions = ObjectList.create();
     private boolean isMouseButtonHeld = false, isKeyHeld = false;
@@ -199,92 +202,111 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 this.alpha = 1f;
             }).forward();
         }
+        this.state = State.OPEN;
     }
 
     @MustBeInvokedByOverriders
     public void onClose() {
+        this.state = State.CLOSED;
     }
 
     @Override
     public void dispose() {
+        if (this.cantDisposeNow) {
+            this.state = State.WAIT_DISPOSING;
+            return;
+        }
         getContext().getJeiSettings().removeJeiExclusionArea(this);
         super.dispose();
         this.screen = null;
+        this.state = State.DISPOSED;
+    }
+
+    public <T> T doSafe(Supplier<T> runnable) {
+        if (this.state == State.DISPOSED) return null;
+        this.cantDisposeNow = true;
+        T t = runnable.get();
+        if (this.state == State.WAIT_DISPOSING) {
+            this.cantDisposeNow = false;
+            dispose();
+        }
+        return t;
     }
 
     @ApiStatus.OverrideOnly
     public boolean onMousePressed(int mouseButton) {
-        if (!isValid()) return false;
-        LocatedWidget pressed = LocatedWidget.EMPTY;
-        boolean result = false;
+        return doSafe(() -> {
+            LocatedWidget pressed = LocatedWidget.EMPTY;
+            boolean result = false;
 
-        if (this.hovering.isEmpty()) {
-            if (closeOnOutOfBoundsClick()) {
-                animateClose();
-                result = true;
-            }
-        } else {
-            loop:
-            for (LocatedWidget widget : this.hovering) {
-                widget.applyMatrix(getContext());
-                if (widget.getElement() instanceof Interactable) {
-                    Interactable interactable = (Interactable) widget.getElement();
-                    Interactable.Result result1 = interactable.onMousePressed(mouseButton);
-                    if (isClosing() || !isValid()) {
-                        return true;
-                    }
-                    switch (result1) {
-                        case IGNORE:
-                            break;
-                        case ACCEPT: {
-                            if (!this.isKeyHeld && !this.isMouseButtonHeld) {
-                                this.acceptedInteractions.add(interactable);
-                            }
-                            pressed = widget;
-                            // result = false;
-                            break;
-                        }
-                        case STOP: {
-                            pressed = LocatedWidget.EMPTY;
-                            result = true;
-                            widget.unapplyMatrix(getContext());
-                            break loop;
-                        }
-                        case SUCCESS: {
-                            if (!this.isKeyHeld && !this.isMouseButtonHeld) {
-                                this.acceptedInteractions.add(interactable);
-                            }
-                            pressed = widget;
-                            result = true;
-                            widget.unapplyMatrix(getContext());
-                            break loop;
-                        }
-                    }
-                }
-                if (getContext().onHoveredClick(mouseButton, widget)) {
-                    pressed = LocatedWidget.EMPTY;
+            if (this.hovering.isEmpty()) {
+                if (closeOnOutOfBoundsClick()) {
+                    animateClose();
                     result = true;
-                    widget.unapplyMatrix(getContext());
-                    break;
                 }
-                widget.unapplyMatrix(getContext());
+            } else {
+                loop:
+                for (LocatedWidget widget : this.hovering) {
+                    widget.applyMatrix(getContext());
+                    if (widget.getElement() instanceof Interactable) {
+                        Interactable interactable = (Interactable) widget.getElement();
+                        Interactable.Result result1 = interactable.onMousePressed(mouseButton);
+                        if (isClosing() || !isValid()) {
+                            return true;
+                        }
+                        switch (result1) {
+                            case IGNORE:
+                                break;
+                            case ACCEPT: {
+                                if (!this.isKeyHeld && !this.isMouseButtonHeld) {
+                                    this.acceptedInteractions.add(interactable);
+                                }
+                                pressed = widget;
+                                // result = false;
+                                break;
+                            }
+                            case STOP: {
+                                pressed = LocatedWidget.EMPTY;
+                                result = true;
+                                widget.unapplyMatrix(getContext());
+                                break loop;
+                            }
+                            case SUCCESS: {
+                                if (!this.isKeyHeld && !this.isMouseButtonHeld) {
+                                    this.acceptedInteractions.add(interactable);
+                                }
+                                pressed = widget;
+                                result = true;
+                                widget.unapplyMatrix(getContext());
+                                break loop;
+                            }
+                        }
+                    }
+                    if (getContext().onHoveredClick(mouseButton, widget)) {
+                        pressed = LocatedWidget.EMPTY;
+                        result = true;
+                        widget.unapplyMatrix(getContext());
+                        break;
+                    }
+                    widget.unapplyMatrix(getContext());
+                }
             }
-        }
 
-        if (result && pressed.getElement() instanceof IFocusedWidget) {
-            getContext().focus(pressed);
-        } else {
-            getContext().removeFocus();
-        }
-        if (!this.isKeyHeld && !this.isMouseButtonHeld) {
-            this.lastPressed = pressed;
-            if (this.lastPressed.getElement() != null) {
-                this.timePressed = Minecraft.getSystemTime();
+            if (result && pressed.getElement() instanceof IFocusedWidget) {
+                getContext().focus(pressed);
+            } else {
+                getContext().removeFocus();
             }
-            this.lastMouseButton = mouseButton;
-            this.isMouseButtonHeld = true;
-        }
-        return result;
+            if (!this.isKeyHeld && !this.isMouseButtonHeld) {
+                this.lastPressed = pressed;
+                if (this.lastPressed.getElement() != null) {
+                    this.timePressed = Minecraft.getSystemTime();
+                }
+                this.lastMouseButton = mouseButton;
+                this.isMouseButtonHeld = true;
+            }
+            return result;
+        });
     }
 
     @ApiStatus.OverrideOnly
@@ -586,5 +608,9 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @Override
     public String toString() {
         return super.toString() + "#" + getName();
+    }
+
+    public enum State {
+        IDLE, OPEN, CLOSED, DISPOSED, WAIT_DISPOSING
     }
 }
