@@ -18,9 +18,9 @@ import org.apache.logging.log4j.Logger;
                 "after:bogorter@[1.4.0,);")
 public class ModularUI {
 
-    public static final String ID = Tags.ID;
+    public static final String ID = MuiTags.MODID;
     public static final String NAME = "Modular UI";
-    public static final String VERSION = Tags.VERSION;
+    public static final String VERSION = MuiTags.VERSION;
     public static final Logger LOGGER = LogManager.getLogger(ID);
 
     public static final String BOGO_SORT = "bogosorter";
