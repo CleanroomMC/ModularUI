@@ -21,7 +21,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -106,6 +105,9 @@ public class GuiManager {
     @SubscribeEvent
     public static void onGuiOpen(GuiOpenEvent event) {
         if (lastMui != null && event.getGui() == null) {
+            if (lastMui.getScreen().getPanelManager().isOpen()) {
+                lastMui.getScreen().getPanelManager().closeAll();
+            }
             lastMui.getScreen().getPanelManager().dispose();
             lastMui = null;
         } else if (event.getGui() instanceof GuiScreenWrapper) {
@@ -114,6 +116,9 @@ public class GuiManager {
             } else if (lastMui == event.getGui()) {
                 lastMui.getScreen().getPanelManager().reopen();
             } else {
+                if (lastMui.getScreen().getPanelManager().isOpen()) {
+                    lastMui.getScreen().getPanelManager().closeAll();
+                }
                 lastMui.getScreen().getPanelManager().dispose();
                 lastMui = (GuiScreenWrapper) event.getGui();
             }

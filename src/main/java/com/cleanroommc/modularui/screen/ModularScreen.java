@@ -164,7 +164,6 @@ public class ModularScreen {
     public void close(boolean force) {
         if (isActive()) {
             if (force) {
-                getPanelManager().closeAll();
                 this.context.mc.player.closeScreen();
                 return;
             }

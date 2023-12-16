@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 public class PanelManager {
 
@@ -32,6 +33,8 @@ public class PanelManager {
     private final List<ModularPanel> panelsClone = new ArrayList<>();
     private final List<ModularPanel> panelsView = Collections.unmodifiableList(this.panelsClone);
     private final ReverseIterable<ModularPanel> reversePanels = new ReverseIterable<>(this.panelsView);
+    private final ObjectList<ModularPanel> disposal = ObjectList.create(20);
+    private boolean cantDisposeNow = false;
     private boolean dirty = false;
     private State state = State.INIT;
 
@@ -68,6 +71,7 @@ public class PanelManager {
         if (this.panels.contains(panel) || isPanelOpen(panel.getName())) {
             throw new IllegalStateException("Panel " + panel.getName() + " is already open.");
         }
+        this.disposal.remove(panel);
         panel.setPanelGuiContext(this.screen.getContext());
         this.panels.addFirst(panel);
         this.dirty = true;
@@ -147,7 +151,7 @@ public class PanelManager {
             return;
         }
         if (this.panels.remove(panel)) {
-            panel.onClose();
+            finalizePanel(panel);
             this.dirty = true;
         }
     }
@@ -157,18 +161,44 @@ public class PanelManager {
     }
 
     public void closeAll() {
-        for (ModularPanel panel : this.panels) {
-            panel.onClose();
+        if (this.state == State.OPEN) {
+            this.panels.forEach(this::finalizePanel);
+            this.state = State.CLOSED;
         }
-        this.state = State.CLOSED;
+    }
+
+    private void finalizePanel(ModularPanel panel) {
+        if (!this.disposal.contains(panel)) {
+            panel.onClose();
+            if (this.disposal.size() == 20) {
+                this.disposal.removeFirst().dispose();
+            }
+            this.disposal.add(panel);
+        }
+    }
+
+    public <T> T doSafe(Supplier<T> runnable) {
+        if (isDisposed()) return null;
+        this.cantDisposeNow = true;
+        T t = runnable.get();
+        this.cantDisposeNow = false;
+        if (this.state == State.WAIT_DISPOSAL) {
+            this.state = State.CLOSED;
+            dispose();
+        }
+        return t;
     }
 
     @ApiStatus.Internal
     public void dispose() {
-        if (!isClosed()) throw new IllegalStateException("Must close screen first before disposing!");
-        for (ModularPanel panel : this.panels) {
-            panel.dispose();
+        if (isDisposed()) return;
+        if (this.cantDisposeNow) {
+            this.state = State.WAIT_DISPOSAL;
+            return;
         }
+        if (!isClosed()) throw new IllegalStateException("Must close screen first before disposing!");
+        this.disposal.forEach(ModularPanel::dispose);
+        this.disposal.clear();
         this.panels.clear();
         this.panelsClone.clear();
         this.dirty = false;
@@ -260,6 +290,7 @@ public class PanelManager {
         OPEN(true),
         REOPENED(true),
         CLOSED(false),
+        WAIT_DISPOSAL(true),
         DISPOSED(false);
 
         public final boolean isOpen;
