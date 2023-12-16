@@ -10,16 +10,17 @@ import com.cleanroommc.modularui.widget.WidgetTree;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -27,10 +28,8 @@ import java.util.Objects;
 public class GuiManager {
 
     private static final Object2ObjectMap<String, UIFactory<?>> FACTORIES = new Object2ObjectOpenHashMap<>(16);
-    private static ModularScreen queuedClientScreen;
-    private static JeiSettingsImpl queuedJeiSettings;
-    private static GuiScreen queuedGuiScreen;
-    private static boolean openingQueue = false;
+
+    private static GuiScreenWrapper lastMui;
 
     public static void registerFactory(UIFactory<?> factory) {
         Objects.requireNonNull(factory);
@@ -44,13 +43,13 @@ public class GuiManager {
         FACTORIES.put(name, factory);
     }
 
-    public static UIFactory<?> getFactory(String name) {
+    public static @NotNull UIFactory<?> getFactory(String name) {
         UIFactory<?> factory = FACTORIES.get(name);
         if (factory == null) throw new NoSuchElementException();
         return factory;
     }
 
-    public static <T extends GuiData> void open(UIFactory<T> factory, T guiData, EntityPlayerMP player) {
+    public static <T extends GuiData> void open(@NotNull UIFactory<T> factory, @NotNull T guiData, EntityPlayerMP player) {
         // create panel, collect sync handlers and create container
         guiData.setJeiSettings(JeiSettings.DUMMY);
         GuiSyncManager syncManager = new GuiSyncManager(player);
@@ -71,7 +70,7 @@ public class GuiManager {
     }
 
     @SideOnly(Side.CLIENT)
-    public static <T extends GuiData> void open(int windowId, UIFactory<T> factory, PacketBuffer data, EntityPlayerSP player) {
+    public static <T extends GuiData> void open(int windowId, @NotNull UIFactory<T> factory, @NotNull PacketBuffer data, @NotNull EntityPlayerSP player) {
         T guiData = factory.readGuiData(player, data);
         JeiSettingsImpl jeiSettings = new JeiSettingsImpl();
         guiData.setJeiSettings(jeiSettings);
@@ -86,52 +85,32 @@ public class GuiManager {
     }
 
     @SideOnly(Side.CLIENT)
-    public static void checkQueuedScreen() {
-        openingQueue = true;
-        if (queuedClientScreen != null) {
-            queuedClientScreen.getContext().setJeiSettings(queuedJeiSettings);
-            GuiScreenWrapper screenWrapper = new GuiScreenWrapper(new ModularContainer(), queuedClientScreen);
-            Minecraft.getMinecraft().displayGuiScreen(screenWrapper);
-        } else if (queuedGuiScreen != null) {
-            Minecraft.getMinecraft().displayGuiScreen(queuedGuiScreen);
-        }
-        resetState();
-        openingQueue = false;
-    }
-
-    @SideOnly(Side.CLIENT)
     static void openScreen(ModularScreen screen, JeiSettingsImpl jeiSettings) {
-        queuedClientScreen = screen;
-        queuedJeiSettings = jeiSettings;
-        queuedGuiScreen = null;
+        screen.getContext().setJeiSettings(jeiSettings);
+        GuiScreenWrapper screenWrapper = new GuiScreenWrapper(new ModularContainer(), screen);
+        Minecraft.getMinecraft().displayGuiScreen(screenWrapper);
     }
 
-    @SideOnly(Side.CLIENT)
-    static void openScreen(GuiScreen screen) {
-        queuedClientScreen = null;
-        queuedJeiSettings = null;
-        queuedGuiScreen = screen;
-    }
-
-    @SideOnly(Side.CLIENT)
-    static void closeScreen() {
-        Minecraft.getMinecraft().displayGuiScreen(null);
-        resetState();
-    }
-
-    @ApiStatus.Internal
-    @SideOnly(Side.CLIENT)
-    public static boolean resetState() {
-        if (queuedClientScreen != null || queuedGuiScreen != null) {
-            queuedClientScreen = null;
-            queuedJeiSettings = null;
-            queuedGuiScreen = null;
-            return true;
+    @SubscribeEvent
+    public static void onGuiOpen(GuiOpenEvent event) {
+        if (lastMui != null && event.getGui() == null) {
+            if (lastMui.getScreen().getPanelManager().isOpen()) {
+                lastMui.getScreen().getPanelManager().closeAll();
+            }
+            lastMui.getScreen().getPanelManager().dispose();
+            lastMui = null;
+        } else if (event.getGui() instanceof GuiScreenWrapper) {
+            if (lastMui == null) {
+                lastMui = (GuiScreenWrapper) event.getGui();
+            } else if (lastMui == event.getGui()) {
+                lastMui.getScreen().getPanelManager().reopen();
+            } else {
+                if (lastMui.getScreen().getPanelManager().isOpen()) {
+                    lastMui.getScreen().getPanelManager().closeAll();
+                }
+                lastMui.getScreen().getPanelManager().dispose();
+                lastMui = (GuiScreenWrapper) event.getGui();
+            }
         }
-        return false;
-    }
-
-    public static boolean isOpeningQueue() {
-        return openingQueue;
     }
 }

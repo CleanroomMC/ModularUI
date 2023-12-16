@@ -23,7 +23,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.function.BooleanSupplier;
 import java.util.function.Function;
+import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 
 /**
  * This must be added by {@link ModularScreen#openPanel}, not as child widget.
@@ -47,6 +50,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @NotNull
     private final String name;
     private ModularScreen screen;
+    private State state = State.IDLE;
+    private boolean cantDisposeNow = false;
     private final ObjectList<LocatedWidget> hovering = ObjectList.create();
     private final ObjectList<Interactable> acceptedInteractions = ObjectList.create();
     private boolean isMouseButtonHeld = false, isKeyHeld = false;
@@ -78,32 +83,54 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         getScreen().registerFrameUpdateListener(this, this::findHoveredWidgets, false);
     }
 
+    /**
+     * @return true if this panel is currently open on a screen
+     */
     public boolean isOpen() {
-        return this.screen != null;
+        return this.state == State.OPEN;
     }
 
+    /**
+     * @param screen screen to open this panel in
+     * @throws IllegalStateException if this panel is already open in any screen
+     */
     public void openIn(ModularScreen screen) {
-        if (this.screen != null) {
+        if (isOpen()) {
             throw new IllegalStateException("Panel is already open!");
         }
-        screen.getWindowManager().openPanel(this);
+        screen.getPanelManager().openPanel(this);
     }
 
-    public void closeIfOpen() {
-        if (isOpen()) {
+    /**
+     * If this panel is open it will be closed.
+     * If animating is enabled and an animation is already playing this method will do nothing.
+     *
+     * @param animate true if the closing animation should play first.
+     */
+    public void closeIfOpen(boolean animate) {
+        if (!animate || !shouldAnimate()) {
             this.screen.closePanel(this);
-        }
-    }
-
-    public void animateClose() {
-        if (getScreen().getCurrentTheme().getOpenCloseAnimationOverride() <= 0) {
-            closeIfOpen();
             return;
         }
         if (isOpen() && !isOpening() && !isClosing()) {
-            this.animator.setEndCallback(val -> this.screen.closePanel(this));
-            this.animator.backward();
+            if (isMainPanel()) {
+                // if this is the main panel, start closing animation for all panels
+                for (ModularPanel panel : getScreen().getPanelManager().getOpenPanels()) {
+                    if (!panel.isMainPanel()) {
+                        panel.closeIfOpen(true);
+                    }
+                }
+            }
+            getAnimator().setEndCallback(val -> this.screen.closePanel(this)).backward();
         }
+    }
+
+    public void closeIfOpen() {
+        closeIfOpen(false);
+    }
+
+    public void animateClose() {
+        closeIfOpen(true);
     }
 
     @Override
@@ -119,6 +146,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @Override
     public void transform(IViewportStack stack) {
         super.transform(stack);
+        // apply scaling for animation
         if (getScale() != 1f) {
             float x = getArea().w() / 2f;
             float y = getArea().h() / 2f;
@@ -165,60 +193,210 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     public void onOpen(ModularScreen screen) {
         this.screen = screen;
         getArea().z(1);
+        this.scale = 1f;
+        this.alpha = 1f;
         initialise(this);
-        int animationTime = getScreen().getCurrentTheme().getOpenCloseAnimationOverride();
-        if (animationTime <= 0 || !getScreen().getScreenWrapper().doAnimateTransition()) {
-            this.scale = 1f;
-            this.alpha = 1f;
-            return;
+        if (shouldAnimate()) {
+            this.scale = 0.75f;
+            this.alpha = 0f;
+            getAnimator().setEndCallback(value -> {
+                this.scale = 1f;
+                this.alpha = 1f;
+            }).forward();
         }
-        this.scale = 0.75f;
-        this.alpha = 0f;
-        if (this.animator == null) {
-            this.animator = new Animator(animationTime, Interpolation.QUINT_OUT)
-                    .setValueBounds(0.0f, 1.0f)
-                    .setCallback(val -> {
-                        this.alpha = (float) val;
-                        this.scale = (float) val * 0.25f + 0.75f;
-                    });
-        }
-        this.animator.setEndCallback(value -> {
-            this.scale = 1f;
-            this.alpha = 1f;
-        });
-        this.animator.forward();
+        this.state = State.OPEN;
     }
 
     @MustBeInvokedByOverriders
     public void onClose() {
-        dispose();
+        this.state = State.CLOSED;
     }
 
+    @MustBeInvokedByOverriders
     @Override
     public void dispose() {
+        if (this.state == State.DISPOSED) return;
+        if (this.state != State.CLOSED && this.state != State.WAIT_DISPOSING) {
+            throw new IllegalStateException("Panel must be closed before disposing!");
+        }
+        if (this.cantDisposeNow) {
+            this.state = State.WAIT_DISPOSING;
+            return;
+        }
         getContext().getJeiSettings().removeJeiExclusionArea(this);
         super.dispose();
         this.screen = null;
+        this.state = State.DISPOSED;
+    }
+
+    /**
+     * Wraps a function so it can be called safely. This is needed in methods where the panel can be closed and disposed, but doing
+     * so will result in unexpected errors. This wrapper stops the disposal until the function has been fully executed.
+     * The return value of the function is then returned.
+     *
+     * @param runnable function to be called safely
+     * @param <T>      return type
+     * @return return value of function
+     */
+    public final <T> T doSafe(Supplier<T> runnable) {
+        if (this.state == State.DISPOSED) return null;
+        // make sure the screen is also not disposed
+        return getScreen().getPanelManager().doSafe(() -> {
+            this.cantDisposeNow = true;
+            T t = runnable.get();
+            this.cantDisposeNow = false;
+            if (this.state == State.WAIT_DISPOSING) {
+                this.state = State.CLOSED;
+                dispose();
+            }
+            return t;
+        });
+    }
+
+    public final boolean doSafeBool(BooleanSupplier runnable) {
+        return Objects.requireNonNull(doSafe(runnable::getAsBoolean));
+    }
+
+    public final int doSafeInt(IntSupplier runnable) {
+        return Objects.requireNonNull(doSafe(runnable::getAsInt));
     }
 
     @ApiStatus.OverrideOnly
     public boolean onMousePressed(int mouseButton) {
-        if (!isValid()) return false;
-        LocatedWidget pressed = LocatedWidget.EMPTY;
-        boolean result = false;
+        return doSafeBool(() -> {
+            LocatedWidget pressed = LocatedWidget.EMPTY;
+            boolean result = false;
 
-        if (this.hovering.isEmpty()) {
-            if (closeOnOutOfBoundsClick()) {
-                animateClose();
-                result = true;
+            if (this.hovering.isEmpty()) {
+                if (closeOnOutOfBoundsClick()) {
+                    animateClose();
+                    result = true;
+                }
+            } else {
+                loop:
+                for (LocatedWidget widget : this.hovering) {
+                    widget.applyMatrix(getContext());
+                    if (widget.getElement() instanceof Interactable) {
+                        Interactable interactable = (Interactable) widget.getElement();
+                        Interactable.Result result1 = interactable.onMousePressed(mouseButton);
+                        if (isClosing() || !isValid()) {
+                            return true;
+                        }
+                        switch (result1) {
+                            case IGNORE:
+                                break;
+                            case ACCEPT: {
+                                if (!this.isKeyHeld && !this.isMouseButtonHeld) {
+                                    this.acceptedInteractions.add(interactable);
+                                }
+                                pressed = widget;
+                                // result = false;
+                                break;
+                            }
+                            case STOP: {
+                                pressed = LocatedWidget.EMPTY;
+                                result = true;
+                                widget.unapplyMatrix(getContext());
+                                break loop;
+                            }
+                            case SUCCESS: {
+                                if (!this.isKeyHeld && !this.isMouseButtonHeld) {
+                                    this.acceptedInteractions.add(interactable);
+                                }
+                                pressed = widget;
+                                result = true;
+                                widget.unapplyMatrix(getContext());
+                                break loop;
+                            }
+                        }
+                    }
+                    if (getContext().onHoveredClick(mouseButton, widget)) {
+                        pressed = LocatedWidget.EMPTY;
+                        result = true;
+                        widget.unapplyMatrix(getContext());
+                        break;
+                    }
+                    widget.unapplyMatrix(getContext());
+                }
             }
-        } else {
-            loop:
+
+            if (result && pressed.getElement() instanceof IFocusedWidget) {
+                getContext().focus(pressed);
+            } else {
+                getContext().removeFocus();
+            }
+            if (!this.isKeyHeld && !this.isMouseButtonHeld) {
+                this.lastPressed = pressed;
+                if (this.lastPressed.getElement() != null) {
+                    this.timePressed = Minecraft.getSystemTime();
+                }
+                this.lastMouseButton = mouseButton;
+                this.isMouseButtonHeld = true;
+            }
+            return result;
+        });
+    }
+
+    @ApiStatus.OverrideOnly
+    public boolean onMouseRelease(int mouseButton) {
+        return isEnabled() && doSafeBool(() -> {
+            if (interactFocused(widget -> widget.onMouseRelease(mouseButton), false)) {
+                return true;
+            }
+            boolean result = false;
+            boolean tryTap = mouseButton == this.lastMouseButton && Minecraft.getSystemTime() - this.timePressed < tapTime;
             for (LocatedWidget widget : this.hovering) {
-                widget.applyMatrix(getContext());
                 if (widget.getElement() instanceof Interactable) {
                     Interactable interactable = (Interactable) widget.getElement();
-                    switch (interactable.onMousePressed(mouseButton)) {
+                    widget.applyMatrix(getContext());
+                    if (interactable.onMouseRelease(mouseButton)) {
+                        result = true;
+                        widget.applyMatrix(getContext());
+                        break;
+                    }
+                    if (tryTap && this.acceptedInteractions.remove(interactable)) {
+                        Interactable.Result tabResult = interactable.onMouseTapped(mouseButton);
+                        switch (tabResult) {
+                            case SUCCESS:
+                            case STOP:
+                                tryTap = false;
+                        }
+                    }
+                    widget.unapplyMatrix(getContext());
+                }
+            }
+            this.acceptedInteractions.clear();
+            this.lastMouseButton = -1;
+            this.timePressed = 0;
+            this.isMouseButtonHeld = false;
+            return result;
+        });
+    }
+
+    @ApiStatus.OverrideOnly
+    public boolean onKeyPressed(char typedChar, int keyCode) {
+        return doSafeBool(() -> {
+            switch (interactFocused(widget -> widget.onKeyPressed(typedChar, keyCode), Interactable.Result.IGNORE)) {
+                case STOP:
+                case SUCCESS:
+                    if (!this.isKeyHeld && !this.isMouseButtonHeld) {
+                        this.lastPressed = getContext().getFocusedWidget();
+                        if (this.lastPressed != null) {
+                            this.timePressed = Minecraft.getSystemTime();
+                        }
+                        this.lastMouseButton = keyCode;
+                        this.isKeyHeld = true;
+                    }
+                    return true;
+            }
+            LocatedWidget pressed = null;
+            boolean result = false;
+            loop:
+            for (LocatedWidget widget : this.hovering) {
+                if (widget.getElement() instanceof Interactable) {
+                    Interactable interactable = (Interactable) widget.getElement();
+                    widget.applyMatrix(getContext());
+                    switch (interactable.onKeyPressed(typedChar, keyCode)) {
                         case IGNORE:
                             break;
                         case ACCEPT: {
@@ -230,7 +408,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                             break;
                         }
                         case STOP: {
-                            pressed = LocatedWidget.EMPTY;
+                            pressed = null;
                             result = true;
                             widget.unapplyMatrix(getContext());
                             break loop;
@@ -246,197 +424,89 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                         }
                     }
                 }
-                if (getContext().onHoveredClick(mouseButton, widget)) {
-                    pressed = LocatedWidget.EMPTY;
-                    result = true;
-                    widget.unapplyMatrix(getContext());
-                    break;
-                }
-                widget.unapplyMatrix(getContext());
             }
-        }
-
-        if (result && pressed.getElement() instanceof IFocusedWidget) {
-            getContext().focus(pressed);
-        } else {
-            getContext().removeFocus();
-        }
-        if (!this.isKeyHeld && !this.isMouseButtonHeld) {
-            this.lastPressed = pressed;
-            if (this.lastPressed.getElement() != null) {
-                this.timePressed = Minecraft.getSystemTime();
-            }
-            this.lastMouseButton = mouseButton;
-            this.isMouseButtonHeld = true;
-        }
-        return result;
-    }
-
-    @ApiStatus.OverrideOnly
-    public boolean onMouseRelease(int mouseButton) {
-        if (!isValid() || !isEnabled()) return false;
-        if (interactFocused(widget -> widget.onMouseRelease(mouseButton), false)) {
-            return true;
-        }
-        boolean result = false;
-        boolean tryTap = mouseButton == this.lastMouseButton && Minecraft.getSystemTime() - this.timePressed < tapTime;
-        for (LocatedWidget widget : this.hovering) {
-            if (widget.getElement() instanceof Interactable) {
-                Interactable interactable = (Interactable) widget.getElement();
-                widget.applyMatrix(getContext());
-                if (interactable.onMouseRelease(mouseButton)) {
-                    result = true;
-                    widget.applyMatrix(getContext());
-                    break;
+            if (!this.isKeyHeld && !this.isMouseButtonHeld) {
+                this.lastPressed = pressed;
+                if (this.lastPressed != null) {
+                    this.timePressed = Minecraft.getSystemTime();
                 }
-                if (tryTap && this.acceptedInteractions.remove(interactable)) {
-                    Interactable.Result tabResult = interactable.onMouseTapped(mouseButton);
-                    switch (tabResult) {
-                        case SUCCESS:
-                        case STOP:
-                            tryTap = false;
-                    }
-                }
-                widget.unapplyMatrix(getContext());
+                this.lastMouseButton = keyCode;
+                this.isKeyHeld = true;
             }
-        }
-        this.acceptedInteractions.clear();
-        this.lastMouseButton = -1;
-        this.timePressed = 0;
-        this.isMouseButtonHeld = false;
-        return result;
-    }
-
-    @ApiStatus.OverrideOnly
-    public boolean onKeyPressed(char typedChar, int keyCode) {
-        if (!isValid()) return false;
-        switch (interactFocused(widget -> widget.onKeyPressed(typedChar, keyCode), Interactable.Result.IGNORE)) {
-            case STOP:
-            case SUCCESS:
-                if (!this.isKeyHeld && !this.isMouseButtonHeld) {
-                    this.lastPressed = getContext().getFocusedWidget();
-                    if (this.lastPressed != null) {
-                        this.timePressed = Minecraft.getSystemTime();
-                    }
-                    this.lastMouseButton = keyCode;
-                    this.isKeyHeld = true;
-                }
-                return true;
-        }
-        LocatedWidget pressed = null;
-        boolean result = false;
-        loop:
-        for (LocatedWidget widget : this.hovering) {
-            if (widget.getElement() instanceof Interactable) {
-                Interactable interactable = (Interactable) widget.getElement();
-                widget.applyMatrix(getContext());
-                switch (interactable.onKeyPressed(typedChar, keyCode)) {
-                    case IGNORE:
-                        break;
-                    case ACCEPT: {
-                        if (!this.isKeyHeld && !this.isMouseButtonHeld) {
-                            this.acceptedInteractions.add(interactable);
-                        }
-                        pressed = widget;
-                        // result = false;
-                        break;
-                    }
-                    case STOP: {
-                        pressed = null;
-                        result = true;
-                        widget.unapplyMatrix(getContext());
-                        break loop;
-                    }
-                    case SUCCESS: {
-                        if (!this.isKeyHeld && !this.isMouseButtonHeld) {
-                            this.acceptedInteractions.add(interactable);
-                        }
-                        pressed = widget;
-                        result = true;
-                        widget.unapplyMatrix(getContext());
-                        break loop;
-                    }
-                }
-            }
-        }
-        if (!this.isKeyHeld && !this.isMouseButtonHeld) {
-            this.lastPressed = pressed;
-            if (this.lastPressed != null) {
-                this.timePressed = Minecraft.getSystemTime();
-            }
-            this.lastMouseButton = keyCode;
-            this.isKeyHeld = true;
-        }
-        return result;
+            return result;
+        });
     }
 
     @ApiStatus.OverrideOnly
     public boolean onKeyRelease(char typedChar, int keyCode) {
-        if (!isValid()) return false;
-        if (interactFocused(widget -> widget.onKeyRelease(typedChar, keyCode), false)) {
-            return true;
-        }
-        boolean result = false;
-        boolean tryTap = keyCode == this.lastMouseButton && Minecraft.getSystemTime() - this.timePressed < tapTime;
-        for (LocatedWidget widget : this.hovering) {
-            if (widget.getElement() instanceof Interactable) {
-                Interactable interactable = (Interactable) widget.getElement();
-                widget.applyMatrix(getContext());
-                if (interactable.onKeyRelease(typedChar, keyCode)) {
-                    result = true;
-                    widget.unapplyMatrix(getContext());
-                    break;
-                }
-                if (tryTap && this.acceptedInteractions.remove(interactable)) {
-                    Interactable.Result tabResult = interactable.onKeyTapped(typedChar, keyCode);
-                    switch (tabResult) {
-                        case SUCCESS:
-                        case STOP:
-                            tryTap = false;
-                    }
-                }
-                widget.unapplyMatrix(getContext());
+        return doSafeBool(() -> {
+            if (interactFocused(widget -> widget.onKeyRelease(typedChar, keyCode), false)) {
+                return true;
             }
-        }
-        this.acceptedInteractions.clear();
-        this.lastMouseButton = -1;
-        this.timePressed = 0;
-        this.isKeyHeld = false;
-        return result;
+            boolean result = false;
+            boolean tryTap = keyCode == this.lastMouseButton && Minecraft.getSystemTime() - this.timePressed < tapTime;
+            for (LocatedWidget widget : this.hovering) {
+                if (widget.getElement() instanceof Interactable) {
+                    Interactable interactable = (Interactable) widget.getElement();
+                    widget.applyMatrix(getContext());
+                    if (interactable.onKeyRelease(typedChar, keyCode)) {
+                        result = true;
+                        widget.unapplyMatrix(getContext());
+                        break;
+                    }
+                    if (tryTap && this.acceptedInteractions.remove(interactable)) {
+                        Interactable.Result tabResult = interactable.onKeyTapped(typedChar, keyCode);
+                        switch (tabResult) {
+                            case SUCCESS:
+                            case STOP:
+                                tryTap = false;
+                        }
+                    }
+                    widget.unapplyMatrix(getContext());
+                }
+            }
+            this.acceptedInteractions.clear();
+            this.lastMouseButton = -1;
+            this.timePressed = 0;
+            this.isKeyHeld = false;
+            return result;
+        });
     }
 
     @ApiStatus.OverrideOnly
     public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
-        if (!isValid()) return false;
-        if (interactFocused(widget -> widget.onMouseScroll(scrollDirection, amount), false)) {
-            return true;
-        }
-        if (this.hovering.isEmpty()) return false;
-        for (LocatedWidget widget : this.hovering) {
-            if (widget.getElement() instanceof Interactable) {
-                Interactable interactable = (Interactable) widget.getElement();
-                widget.applyMatrix(getContext());
-                boolean result = interactable.onMouseScroll(scrollDirection, amount);
-                widget.unapplyMatrix(getContext());
-                if (result) return true;
+        return doSafeBool(() -> {
+            if (interactFocused(widget -> widget.onMouseScroll(scrollDirection, amount), false)) {
+                return true;
             }
-        }
-        return true;
+            if (this.hovering.isEmpty()) return false;
+            for (LocatedWidget widget : this.hovering) {
+                if (widget.getElement() instanceof Interactable) {
+                    Interactable interactable = (Interactable) widget.getElement();
+                    widget.applyMatrix(getContext());
+                    boolean result = interactable.onMouseScroll(scrollDirection, amount);
+                    widget.unapplyMatrix(getContext());
+                    if (result) return true;
+                }
+            }
+            return true;
+        });
     }
 
     @ApiStatus.OverrideOnly
     public boolean onMouseDrag(int mouseButton, long timeSinceClick) {
-        if (!isValid()) return false;
-        if (this.isMouseButtonHeld &&
-                mouseButton == this.lastMouseButton &&
-                this.lastPressed != null &&
-                this.lastPressed.getElement() instanceof Interactable) {
-            this.lastPressed.applyMatrix(getContext());
-            ((Interactable) this.lastPressed.getElement()).onMouseDrag(mouseButton, timeSinceClick);
-            this.lastPressed.unapplyMatrix(getContext());
-            return true;
-        }
-        return false;
+        return doSafeBool(() -> {
+            if (this.isMouseButtonHeld &&
+                    mouseButton == this.lastMouseButton &&
+                    this.lastPressed != null &&
+                    this.lastPressed.getElement() instanceof Interactable) {
+                this.lastPressed.applyMatrix(getContext());
+                ((Interactable) this.lastPressed.getElement()).onMouseDrag(mouseButton, timeSinceClick);
+                this.lastPressed.unapplyMatrix(getContext());
+                return true;
+            }
+            return false;
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -478,11 +548,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     @Override
-    public GuiContext getContext() {
-        return super.getContext();
-    }
-
-    @Override
     public ModularScreen getScreen() {
         if (!isValid()) {
             throw new IllegalStateException();
@@ -518,10 +583,10 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @Override
     public int getDefaultWidth() {
-        return 177;
+        return 176;
     }
 
-    protected final void setPanelGuiContext(@NotNull GuiContext context) {
+    final void setPanelGuiContext(@NotNull GuiContext context) {
         setContext(context);
         context.getJeiSettings().addJeiExclusionArea(this);
     }
@@ -542,8 +607,25 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return this.alpha;
     }
 
-    public boolean isMainPanel() {
+    public final boolean isMainPanel() {
         return getScreen().getMainPanel() == this;
+    }
+
+    @NotNull
+    protected Animator getAnimator() {
+        if (this.animator == null) {
+            this.animator = new Animator(getScreen().getCurrentTheme().getOpenCloseAnimationOverride(), Interpolation.QUINT_OUT)
+                    .setValueBounds(0.0f, 1.0f)
+                    .setCallback(val -> {
+                        this.alpha = (float) val;
+                        this.scale = (float) val * 0.25f + 0.75f;
+                    });
+        }
+        return this.animator;
+    }
+
+    public boolean shouldAnimate() {
+        return getScreen().getCurrentTheme().getOpenCloseAnimationOverride() > 0;
     }
 
     public ModularPanel bindPlayerInventory() {
@@ -553,5 +635,33 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @Override
     public String toString() {
         return super.toString() + "#" + getName();
+    }
+
+    public State getState() {
+        return this.state;
+    }
+
+    public enum State {
+        /**
+         * Initial state of any panel
+         */
+        IDLE,
+        /**
+         * State after the panel opened
+         */
+        OPEN,
+        /**
+         * State after panel closed
+         */
+        CLOSED,
+        /**
+         * State after panel disposed.
+         * Panel can still be reopened in this state.
+         */
+        DISPOSED,
+        /**
+         * Panel is closed and is waiting to be disposed.
+         */
+        WAIT_DISPOSING
     }
 }

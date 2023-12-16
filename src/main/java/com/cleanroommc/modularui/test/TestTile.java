@@ -23,6 +23,7 @@ import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Row;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -129,7 +130,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                     .pos(Tooltip.Pos.LEFT);
                                                         })
                                                         .onMousePressed(mouseButton -> {
-                                                            panel.getScreen().openDialog("dialog", this::buildDialog, ModularUI.LOGGER::info);
+                                                            panel.getScreen().close(true);
+                                                            //panel.getScreen().openDialog("dialog", this::buildDialog, ModularUI.LOGGER::info);
                                                             //openSecondWindow(context).openIn(panel.getScreen());
                                                             return true;
                                                         })

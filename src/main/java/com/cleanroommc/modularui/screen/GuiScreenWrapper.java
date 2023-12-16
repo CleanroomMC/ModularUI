@@ -50,7 +50,6 @@ public class GuiScreenWrapper extends GuiContainer {
 
     private int fps, frameCount = 0;
     private long timer = Minecraft.getSystemTime();
-    private boolean doAnimateTransition = true;
 
     public GuiScreenWrapper(ModularContainer container, ModularScreen screen) {
         super(container);
@@ -63,7 +62,6 @@ public class GuiScreenWrapper extends GuiContainer {
         GuiErrorHandler.INSTANCE.clear();
         super.initGui();
         if (this.init) {
-            this.screen.getWindowManager().resetClosed();
             this.screen.onOpen();
             this.init = false;
         }
@@ -190,7 +188,7 @@ public class GuiScreenWrapper extends GuiContainer {
             super.drawWorldBackground(tint);
             return;
         }
-        float alpha = this.doAnimateTransition ? this.screen.getMainPanel().getAlpha() : 1f;
+        float alpha = this.screen.getMainPanel().getAlpha();
         // vanilla color values as hex
         int color = 0x101010;
         int startAlpha = 0xc0;
@@ -230,7 +228,7 @@ public class GuiScreenWrapper extends GuiContainer {
         drawString(this.fontRenderer, "Mouse Pos: " + mouseX + ", " + mouseY, 5, lineY, color);
         lineY -= 11;
         drawString(this.fontRenderer, "FPS: " + this.fps, 5, screenH - 24, color);
-        LocatedWidget locatedHovered = this.screen.getWindowManager().getTopWidgetLocated(true);
+        LocatedWidget locatedHovered = this.screen.getPanelManager().getTopWidgetLocated(true);
         if (locatedHovered != null) {
             drawSegmentLine(lineY -= 4, color);
             lineY -= 10;
@@ -301,7 +299,6 @@ public class GuiScreenWrapper extends GuiContainer {
         super.onGuiClosed();
         this.screen.onClose();
         this.init = true;
-        this.doAnimateTransition = true;
     }
 
     public ModularScreen getScreen() {
@@ -374,7 +371,11 @@ public class GuiScreenWrapper extends GuiContainer {
             return;
         }
         if (keyCode == 1 || this.mc.gameSettings.keyBindInventory.isActiveAndMatches(keyCode)) {
-            this.screen.close();
+            if (this.screen.getContext().hasDraggable()) {
+                this.screen.getContext().dropDraggable();
+            } else {
+                this.screen.getPanelManager().closeTopPanel(true);
+            }
         }
 
         this.checkHotbarKeys(keyCode);
@@ -410,13 +411,5 @@ public class GuiScreenWrapper extends GuiContainer {
 
     public FontRenderer getFontRenderer() {
         return this.fontRenderer;
-    }
-
-    public void setDoAnimateTransition(boolean doAnimateTransition) {
-        this.doAnimateTransition = doAnimateTransition;
-    }
-
-    public boolean doAnimateTransition() {
-        return doAnimateTransition;
     }
 }
