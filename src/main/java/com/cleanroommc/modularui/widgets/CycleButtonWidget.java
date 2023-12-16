@@ -47,8 +47,8 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof IIntValue) {
-            this.intValue = (IIntValue<?>) syncHandler;
+        if (syncHandler instanceof IIntValue<?> iIntValue) {
+            this.intValue = iIntValue;
             return true;
         }
         return false;
@@ -145,8 +145,8 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
     public CycleButtonWidget value(IIntValue<?> value) {
         this.intValue = value;
         setValue(value);
-        if (value instanceof IEnumValue) {
-            length(((IEnumValue<?>) value).getEnumClass().getEnumConstants().length);
+        if (value instanceof IEnumValue<?> enumValue) {
+            length(enumValue.getEnumClass().getEnumConstants().length);
         } else if (value instanceof IBoolValue) {
             length(2);
         }

@@ -34,7 +34,7 @@ public class ModularUIHandler implements IAdvancedGuiHandler<GuiScreenWrapper>, 
     @Override
     public Object getIngredientUnderMouse(@NotNull GuiScreenWrapper guiContainer, int mouseX, int mouseY) {
         IGuiElement hovered = guiContainer.getScreen().getContext().getHovered();
-        return hovered instanceof JeiIngredientProvider ? ((JeiIngredientProvider) hovered).getIngredient() : null;
+        return hovered instanceof JeiIngredientProvider jip ? jip.getIngredient() : null;
     }
 
     @Override
@@ -61,8 +61,8 @@ public class ModularUIHandler implements IAdvancedGuiHandler<GuiScreenWrapper>, 
     @Override
     public IRecipeTransferError transferRecipe(@NotNull ModularContainer container, @NotNull IRecipeLayout recipeLayout, @NotNull EntityPlayer player, boolean maxTransfer, boolean doTransfer) {
         ModularScreen screen = ModularScreen.getCurrent();
-        if (screen instanceof JeiRecipeTransferHandler) {
-            return ((JeiRecipeTransferHandler) screen).transferRecipe(recipeLayout, maxTransfer, !doTransfer);
+        if (screen instanceof JeiRecipeTransferHandler recipeTransferHandler) {
+            return recipeTransferHandler.transferRecipe(recipeLayout, maxTransfer, !doTransfer);
         }
         return null;
     }

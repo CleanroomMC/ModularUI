@@ -144,7 +144,7 @@ public interface IKey extends IDrawable {
     @Override
     default void loadFromJson(JsonObject json) {
         if (json.has("color") || json.has("shadow") || json.has("align") || json.has("alignment") || json.has("scale")) {
-            StyledText styledText = this instanceof StyledText ? (StyledText) this : withStyle();
+            StyledText styledText = this instanceof StyledText styledText1 ? styledText1 : withStyle();
             if (json.has("color")) {
                 styledText.color(JsonHelper.getInt(json, 0, "color"));
             }

@@ -121,8 +121,8 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof FluidSlotSyncHandler) {
-            this.syncHandler = (FluidSlotSyncHandler) syncHandler;
+        if (syncHandler instanceof FluidSlotSyncHandler fluidSlotSyncHandler) {
+            this.syncHandler = fluidSlotSyncHandler;
             return true;
         }
         return false;
@@ -265,7 +265,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
 
     @Override
     public @Nullable FluidStack castGhostIngredientIfValid(@NotNull Object ingredient) {
-        return this.syncHandler.isPhantom() && ingredient instanceof FluidStack ? (FluidStack) ingredient : null;
+        return this.syncHandler.isPhantom() && ingredient instanceof FluidStack fluidStack ? fluidStack : null;
     }
 
     @Override

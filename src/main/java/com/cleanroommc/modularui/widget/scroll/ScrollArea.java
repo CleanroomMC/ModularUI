@@ -29,10 +29,10 @@ public class ScrollArea extends Area {
     }
 
     public void setScrollData(ScrollData data) {
-        if (data instanceof HorizontalScrollData) {
-            this.scrollX = (HorizontalScrollData) data;
-        } else if (data instanceof VerticalScrollData) {
-            this.scrollY = (VerticalScrollData) data;
+        if (data instanceof HorizontalScrollData scrollData) {
+            this.scrollX = scrollData;
+        } else if (data instanceof VerticalScrollData scrollData) {
+            this.scrollY = scrollData;
         }
     }
 

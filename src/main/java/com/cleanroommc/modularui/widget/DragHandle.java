@@ -20,8 +20,8 @@ public class DragHandle extends Widget<DragHandle> implements IDraggable {
     public void onInit() {
         IWidget parent = getParent();
         while (!(parent instanceof ModularPanel)) {
-            if (parent instanceof IDraggable) {
-                this.parentDraggable = (IDraggable) parent;
+            if (parent instanceof IDraggable draggable) {
+                this.parentDraggable = draggable;
                 return;
             }
             parent = parent.getParent();

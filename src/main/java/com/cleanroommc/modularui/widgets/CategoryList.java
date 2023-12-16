@@ -38,19 +38,19 @@ public class CategoryList extends ParentWidget<CategoryList> implements Interact
     public void onInit() {
         super.onInit();
         if (this.expandedOverlay == null) {
-            if (getParent() instanceof CategoryList) {
-                this.expandedOverlay = ((CategoryList) getParent()).expandedOverlay;
-            } else if (getParent() instanceof Root) {
-                this.expandedOverlay = ((Root) getParent()).expandedOverlay;
+            if (getParent() instanceof CategoryList categoryList) {
+                this.expandedOverlay = categoryList.expandedOverlay;
+            } else if (getParent() instanceof Root root) {
+                this.expandedOverlay = root.expandedOverlay;
             } else {
                 this.expandedOverlay = IDrawable.EMPTY;
             }
         }
         if (this.collapsedOverlay == null) {
-            if (getParent() instanceof CategoryList) {
-                this.collapsedOverlay = ((CategoryList) getParent()).collapsedOverlay;
-            } else if (getParent() instanceof Root) {
-                this.collapsedOverlay = ((Root) getParent()).collapsedOverlay;
+            if (getParent() instanceof CategoryList categoryList) {
+                this.collapsedOverlay = categoryList.collapsedOverlay;
+            } else if (getParent() instanceof Root root) {
+                this.collapsedOverlay = root.collapsedOverlay;
             } else {
                 this.collapsedOverlay = IDrawable.EMPTY;
             }
@@ -59,8 +59,8 @@ public class CategoryList extends ParentWidget<CategoryList> implements Interact
 
     @Override
     public void onChildAdd(IWidget child) {
-        if (child instanceof CategoryList) {
-            this.subCategories.add((CategoryList) child);
+        if (child instanceof CategoryList categoryList) {
+            this.subCategories.add(categoryList);
         }
         child.setEnabled(this.expanded);
     }
@@ -89,8 +89,8 @@ public class CategoryList extends ParentWidget<CategoryList> implements Interact
             for (IWidget widget : getChildren()) {
                 widget.getArea().ry = y;
                 widget.resizer().setYResized(true);
-                y += widget instanceof CategoryList && ((CategoryList) widget).expanded ?
-                        ((CategoryList) widget).totalHeight : widget.getArea().height;
+                y += widget instanceof CategoryList categoryList && categoryList.expanded ?
+                        categoryList.totalHeight : widget.getArea().height;
             }
             this.totalHeight = y;
         } else {
@@ -98,10 +98,10 @@ public class CategoryList extends ParentWidget<CategoryList> implements Interact
         }
 
         if (!calculateParents) return;
-        if (getParent() instanceof CategoryList) {
-            ((CategoryList) getParent()).calculateHeightAndLayout(true);
-        } else if (getParent() instanceof Root) {
-            ((Root) getParent()).updateHeight();
+        if (getParent() instanceof CategoryList categoryList) {
+            categoryList.calculateHeightAndLayout(true);
+        } else if (getParent() instanceof Root root) {
+            root.updateHeight();
         }
     }
 
@@ -129,8 +129,8 @@ public class CategoryList extends ParentWidget<CategoryList> implements Interact
 
         @Override
         public void onChildAdd(IWidget child) {
-            if (child instanceof CategoryList) {
-                this.categories.add((CategoryList) child);
+            if (child instanceof CategoryList categoryList) {
+                this.categories.add(categoryList);
             }
         }
 
@@ -145,8 +145,8 @@ public class CategoryList extends ParentWidget<CategoryList> implements Interact
             for (IWidget widget : getChildren()) {
                 widget.getArea().ry = y;
                 widget.resizer().setYResized(true);
-                y += widget instanceof CategoryList && ((CategoryList) widget).expanded ?
-                        ((CategoryList) widget).totalHeight : widget.getArea().height;
+                y += widget instanceof CategoryList categoryList && categoryList.expanded ?
+                        categoryList.totalHeight : widget.getArea().height;
             }
             getScrollArea().getScrollY().setScrollSize(y);
         }

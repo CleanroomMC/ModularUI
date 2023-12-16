@@ -249,8 +249,8 @@ public class WidgetTree {
             });
         }
 
-        if (widget instanceof ILayoutWidget) {
-            ((ILayoutWidget) widget).layoutWidgets();
+        if (widget instanceof ILayoutWidget layoutWidget) {
+            layoutWidget.layoutWidgets();
         }
 
         // post resize this widget if possible
@@ -258,8 +258,8 @@ public class WidgetTree {
             result = resizer.postResize(widget);
         }
 
-        if (widget instanceof ILayoutWidget) {
-            ((ILayoutWidget) widget).postLayoutWidgets();
+        if (widget instanceof ILayoutWidget layoutWidget) {
+            layoutWidget.postLayoutWidgets();
         }
 
         // now fully resize all children which needs it
@@ -323,8 +323,7 @@ public class WidgetTree {
         AtomicInteger id = new AtomicInteger(0);
         String syncKey = GuiSyncManager.AUTO_SYNC_PREFIX + panel.getName();
         foreachChildByLayer(panel, widget -> {
-            if (widget instanceof ISynced) {
-                ISynced<?> synced = (ISynced<?>) widget;
+            if (widget instanceof ISynced<?> synced) {
                 if (synced.isSynced() && !syncManager.hasSyncHandler(synced.getSyncHandler())) {
                     syncManager.syncValue(syncKey, id.getAndIncrement(), synced.getSyncHandler());
                 }

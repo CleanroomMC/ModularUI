@@ -108,8 +108,8 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
                 this.syncHandler = null;
                 throw new IllegalStateException("SyncHandler of type " + type + " is not valid for " + getClass().getName() + ", with key " + this.syncKey);
             }
-            if (this.syncHandler instanceof ValueSyncHandler && ((ValueSyncHandler<?>) this.syncHandler).getChangeListener() == null) {
-                ((ValueSyncHandler<?>) this.syncHandler).setChangeListener(this::markTooltipDirty);
+            if (this.syncHandler instanceof ValueSyncHandler<?> valueSyncHandler && valueSyncHandler.getChangeListener() == null) {
+                valueSyncHandler.setChangeListener(this::markTooltipDirty);
             }
         }
     }
@@ -427,8 +427,8 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
 
     protected void setValue(IValue<?> value) {
         this.value = value;
-        if (value instanceof SyncHandler) {
-            setSyncHandler((SyncHandler) value);
+        if (value instanceof SyncHandler syncHandler1) {
+            setSyncHandler(syncHandler1);
         }
     }
 

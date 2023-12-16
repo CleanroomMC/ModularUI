@@ -46,8 +46,8 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
         this.slotsKeyName = name;
         int i = 0;
         for (IWidget widget : getChildren()) {
-            if (widget instanceof ISynced) {
-                ((ISynced<?>) widget).syncHandler(name, i);
+            if (widget instanceof ISynced<?> synced) {
+                synced.syncHandler(name, i);
             }
             i++;
         }
@@ -105,18 +105,18 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
                     charCount.put(c, count + 1);
                     Object o = this.keys.get(c);
                     IWidget widget;
-                    if (o instanceof IWidget) {
-                        widget = (IWidget) o;
-                    } else if (o instanceof IntFunction) {
-                        widget = ((IntFunction<IWidget>) o).apply(count);
+                    if (o instanceof IWidget iWidget) {
+                        widget = iWidget;
+                    } else if (o instanceof IntFunction<?> function) {
+                        widget = (IWidget) function.apply(count);
                     } else {
                         x += 18;
                         continue;
                     }
                     widget.flex().left(x).top(y);
                     slotGroupWidget.child(widget);
-                    if (this.syncKey != null && widget instanceof ISynced) {
-                        ((ISynced<?>) widget).syncHandler(this.syncKey, syncId++);
+                    if (this.syncKey != null && widget instanceof ISynced<?> synced) {
+                        synced.syncHandler(this.syncKey, syncId++);
                     }
                     x += 18;
                     maxWidth = Math.max(maxWidth, x);

@@ -57,9 +57,9 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof IStringValue && syncHandler instanceof ValueSyncHandler) {
-            this.stringValue = (IStringValue<?>) syncHandler;
-            ((ValueSyncHandler<?>) this.stringValue).setChangeListener(() -> {
+        if (syncHandler instanceof IStringValue<?> iStringValue && syncHandler instanceof ValueSyncHandler<?> valueSyncHandler) {
+            this.stringValue = iStringValue;
+            valueSyncHandler.setChangeListener(() -> {
                 markTooltipDirty();
                 setText(this.stringValue.getValue().toString());
             });

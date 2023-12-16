@@ -28,8 +28,8 @@ public class StringKey implements IKey {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj instanceof StringKey) {
-            return this.string.equals(((StringKey) obj).string);
+        if (obj instanceof StringKey stringKey) {
+            return this.string.equals(stringKey.string);
         }
         return false;
     }

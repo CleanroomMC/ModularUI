@@ -70,8 +70,8 @@ public class CommonProxy {
 
     @SubscribeEvent
     public static void onCloseContainer(PlayerContainerEvent.Open event) {
-        if (event.getContainer() instanceof ModularContainer) {
-            GuiSyncManager syncManager = ((ModularContainer) event.getContainer()).getSyncManager();
+        if (event.getContainer() instanceof ModularContainer container) {
+            GuiSyncManager syncManager = container.getSyncManager();
             if (syncManager != null) {
                 syncManager.onOpen();
             }

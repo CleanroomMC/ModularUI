@@ -56,7 +56,7 @@ public interface IPacket extends IMessage {
     @Override
     default void fromBytes(ByteBuf buf) {
         try {
-            read(buf instanceof PacketBuffer ? (PacketBuffer) buf : new PacketBuffer(buf));
+            read(buf instanceof PacketBuffer packetBuffer ? packetBuffer : new PacketBuffer(buf));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -66,7 +66,7 @@ public interface IPacket extends IMessage {
     @Override
     default void toBytes(ByteBuf buf) {
         try {
-            write(buf instanceof PacketBuffer ? (PacketBuffer) buf : new PacketBuffer(buf));
+            write(buf instanceof PacketBuffer packetBuffer ? packetBuffer: new PacketBuffer(buf));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

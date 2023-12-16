@@ -115,7 +115,7 @@ public class ItemEditorGui implements IGuiHolder<GuiData> {
 
         @Override
         public void execute(@NotNull MinecraftServer server, @NotNull ICommandSender sender, String @NotNull [] args) throws CommandException {
-            if (sender instanceof EntityPlayerMP && ((EntityPlayer) sender).isCreative()) {
+            if (sender instanceof EntityPlayerMP entityPlayerMP && entityPlayerMP.isCreative()) {
                 GUI.open((EntityPlayerMP) sender);
             } else {
                 throw new CommandException("Player must be creative mode!");

@@ -44,8 +44,8 @@ import java.util.function.Function;
 public class ModularScreen {
 
     public static boolean isScreen(@Nullable GuiScreen guiScreen, String owner, String name) {
-        if (guiScreen instanceof GuiScreenWrapper) {
-            ModularScreen screen = ((GuiScreenWrapper) guiScreen).getScreen();
+        if (guiScreen instanceof GuiScreenWrapper screenWrapper) {
+            ModularScreen screen = screenWrapper.getScreen();
             return screen.getOwner().equals(owner) && screen.getName().equals(name);
         }
         return false;
@@ -57,8 +57,8 @@ public class ModularScreen {
 
     @Nullable
     public static ModularScreen getCurrent() {
-        if (Minecraft.getMinecraft().currentScreen instanceof GuiScreenWrapper) {
-            return ((GuiScreenWrapper) Minecraft.getMinecraft().currentScreen).getScreen();
+        if (Minecraft.getMinecraft().currentScreen instanceof GuiScreenWrapper screenWrapper) {
+            return screenWrapper.getScreen();
         }
         return null;
     }

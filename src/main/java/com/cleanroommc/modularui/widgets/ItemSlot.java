@@ -63,8 +63,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof ItemSlotSH) {
-            this.syncHandler = (ItemSlotSH) syncHandler;
+        if (syncHandler instanceof ItemSlotSH itemSlotSH) {
+            this.syncHandler = itemSlotSH;
             return true;
         }
         return false;
@@ -270,7 +270,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @Override
     public @Nullable ItemStack castGhostIngredientIfValid(@NotNull Object ingredient) {
-        return this.syncHandler.isPhantom() && ingredient instanceof ItemStack ? (ItemStack) ingredient : null;
+        return this.syncHandler.isPhantom() && ingredient instanceof ItemStack itemStack ? itemStack : null;
     }
 
     @Override

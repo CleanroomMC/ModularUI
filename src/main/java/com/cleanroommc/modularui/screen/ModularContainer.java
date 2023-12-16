@@ -37,9 +37,8 @@ import java.util.Objects;
 public class ModularContainer extends Container implements ISortableContainer {
 
     public static ModularContainer getCurrent(EntityPlayer player) {
-        Container container = player.openContainer;
-        if (container instanceof ModularContainer) {
-            return (ModularContainer) container;
+        if (player.openContainer instanceof ModularContainer container) {
+            return container;
         }
         return null;
     }
@@ -223,8 +222,8 @@ public class ModularContainer extends Container implements ISortableContainer {
         if (slot.inventory instanceof InventoryPlayer) {
             return slot.getSlotIndex() >= 0 && slot.getSlotIndex() < 36;
         }
-        if (slot instanceof SlotItemHandler) {
-            IItemHandler iItemHandler = ((SlotItemHandler) slot).getItemHandler();
+        if (slot instanceof SlotItemHandler slotItemHandler) {
+            IItemHandler iItemHandler = slotItemHandler.getItemHandler();
             if (iItemHandler instanceof PlayerMainInvWrapper || iItemHandler instanceof PlayerInvWrapper) {
                 return slot.getSlotIndex() >= 0 && slot.getSlotIndex() < 36;
             }

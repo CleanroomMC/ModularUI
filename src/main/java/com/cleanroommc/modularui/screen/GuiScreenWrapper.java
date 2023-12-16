@@ -116,8 +116,8 @@ public class GuiScreenWrapper extends GuiContainer {
 
         getAccessor().setHoveredSlot(null);
         IGuiElement hovered = this.screen.getContext().getHovered();
-        if (hovered instanceof IVanillaSlot) {
-            getAccessor().setHoveredSlot(((IVanillaSlot) hovered).getVanillaSlot());
+        if (hovered instanceof IVanillaSlot vanillaSlot) {
+            getAccessor().setHoveredSlot(vanillaSlot.getVanillaSlot());
         }
 
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
@@ -260,10 +260,9 @@ public class GuiScreenWrapper extends GuiContainer {
                 lineY -= 11;
                 GuiDraw.drawText("Parent: " + parent, 5, lineY, 1, color, false);
             }
-            if (hovered instanceof ItemSlot) {
+            if (hovered instanceof ItemSlot slotWidget) {
                 drawSegmentLine(lineY -= 4, color);
                 lineY -= 10;
-                ItemSlot slotWidget = (ItemSlot) hovered;
                 ModularSlot slot = slotWidget.getSlot();
                 GuiDraw.drawText("Slot Index: " + slot.getSlotIndex(), 5, lineY, 1, color, false);
                 lineY -= 11;

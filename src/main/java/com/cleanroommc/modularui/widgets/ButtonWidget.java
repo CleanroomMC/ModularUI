@@ -49,8 +49,8 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof InteractionSyncHandler) {
-            this.syncHandler = (InteractionSyncHandler) syncHandler;
+        if (syncHandler instanceof InteractionSyncHandler interactionSyncHandler) {
+            this.syncHandler = interactionSyncHandler;
             return true;
         }
         return false;

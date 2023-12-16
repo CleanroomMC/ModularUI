@@ -158,8 +158,8 @@ public class Tooltip {
 
         int minWidth = 0;
         for (IDrawable line : lines) {
-            if (line instanceof IIcon && !(line instanceof TextIcon)) {
-                minWidth = Math.max(minWidth, ((IIcon) line).getWidth());
+            if (line instanceof IIcon icon && !(line instanceof TextIcon)) {
+                minWidth = Math.max(minWidth, icon.getWidth());
             } else if (!(line instanceof IKey)) {
                 minWidth = Math.max(minWidth, 18);
             }
