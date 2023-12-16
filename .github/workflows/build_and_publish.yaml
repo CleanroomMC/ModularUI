@@ -81,7 +81,6 @@ jobs:
               echo "publish-gh=${{ inputs.publish-gh }}" >> $GITHUB_ENV
             fi
           fi
-          echo "file_name=${GITHUB_REPOSITORY#*/}-${{ github.event.inputs.version }}" >> $GITHUB_ENV
 
       - name: Set version
         if: env.UPDATED == 'false' # only change new version if it's not already updated
