@@ -67,18 +67,14 @@ public class Rectangle implements IDrawable {
         return this;
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
-    public void applyThemeColor(ITheme theme, WidgetTheme widgetTheme) {
+    public void draw(GuiContext context, int x0, int y0, int width, int height, WidgetTheme widgetTheme) {
         if (canApplyTheme()) {
             Color.setGlColor(widgetTheme.getColor());
         } else {
             Color.setGlColorOpaque(Color.WHITE.main);
         }
-    }
-
-    @SideOnly(Side.CLIENT)
-    @Override
-    public void draw(GuiContext context, int x0, int y0, int width, int height) {
         if (this.cornerRadius <= 0) {
             GuiDraw.drawRect(x0, y0, width, height, this.colorTL, this.colorTR, this.colorBL, this.colorBR);
             return;

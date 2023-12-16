@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.api.widget;
 
-import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
@@ -44,14 +43,6 @@ public interface IGuiElement {
     default Area getParentArea() {
         return getParent().getArea();
     }
-
-    /**
-     * Applies default backgrounds and colors if they haven't been set already.
-     *
-     * @param theme themes to apply
-     */
-    default void applyTheme(ITheme theme) {}
-
 
     /**
      * Draws this element

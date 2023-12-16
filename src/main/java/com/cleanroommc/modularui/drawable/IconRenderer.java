@@ -24,7 +24,7 @@ public class IconRenderer {
     protected Alignment alignment = Alignment.TopLeft;
     protected float scale = 1f;
     protected boolean shadow = false;
-    protected int color = 0;//Theme.INSTANCE.getText();
+    protected int color = 0;
     protected int linePadding = 1;
     protected boolean simulate;
     protected float lastWidth = 0, lastHeight = 0;

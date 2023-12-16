@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.api.drawable;
 
-import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.drawable.AnimatedText;
 import com.cleanroommc.modularui.drawable.StyledText;
 import com.cleanroommc.modularui.drawable.TextRenderer;
@@ -104,17 +103,13 @@ public interface IKey extends IDrawable {
 
     @SideOnly(Side.CLIENT)
     @Override
-    default void draw(GuiContext context, int x, int y, int width, int height) {
+    default void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
+        renderer.setColor(widgetTheme.getTextColor());
+        renderer.setShadow(widgetTheme.getTextShadow());
         renderer.setAlignment(Alignment.Center, width, height);
         renderer.setScale(1f);
         renderer.setPos(x, y);
         renderer.draw(get());
-    }
-
-    @Override
-    default void applyThemeColor(ITheme theme, WidgetTheme widgetTheme) {
-        renderer.setColor(widgetTheme.getTextColor());
-        renderer.setShadow(widgetTheme.getTextShadow());
     }
 
     @Override

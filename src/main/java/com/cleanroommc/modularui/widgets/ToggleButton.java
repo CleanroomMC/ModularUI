@@ -4,13 +4,12 @@ import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.value.IBoolValue;
 import com.cleanroommc.modularui.api.widget.Interactable;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.theme.WidgetToggleButtonTheme;
-import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.Widget;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ToggleButton extends Widget<ToggleButton> implements Interactable {
 
@@ -30,43 +29,24 @@ public class ToggleButton extends Widget<ToggleButton> implements Interactable {
 
     @Override
     public WidgetTheme getWidgetTheme(ITheme theme) {
-        return theme.getToggleButtonTheme();
+        WidgetToggleButtonTheme widgetTheme = theme.getToggleButtonTheme();
+        return isValueSelected() ? widgetTheme.getSelected() : widgetTheme;
     }
 
     @Override
-    public void applyTheme(ITheme theme) {
-        super.applyTheme(theme);
-        if (this.selectedBackground == null) {
-            this.selectedBackground = theme.getToggleButtonTheme().getSelectedBackground();
-        }
-        if (this.selectedHoverBackground == null) {
-            this.selectedHoverBackground = theme.getToggleButtonTheme().getSelectedHoverBackground();
-        }
-    }
-
-    @Override
-    public IDrawable getCurrentBackground() {
+    public @Nullable IDrawable getBackground() {
         if (isValueSelected()) {
-            return this.selectedHoverBackground != null &&
-                    this.selectedHoverBackground != IDrawable.NONE &&
-                    isHovering() ? this.selectedHoverBackground : this.selectedBackground;
+            return this.selectedBackground;
         }
-        return super.getCurrentBackground();
+        return super.getBackground();
     }
 
     @Override
-    public void drawBackground(GuiContext context, WidgetTheme widgetTheme) {
-        IDrawable bg = getCurrentBackground();
-        if (bg != null) {
-            if (isValueSelected()) {
-                Color.setGlColor(((WidgetToggleButtonTheme) widgetTheme).getSelectedColor());
-            } else if (bg.canApplyTheme()) {
-                bg.applyThemeColor(context.getTheme(), widgetTheme);
-            } else {
-                Color.setGlColor(Color.WHITE.main);
-            }
-            bg.drawAtZero(context, getArea());
+    public @Nullable IDrawable getHoverBackground() {
+        if (isValueSelected()) {
+            return this.selectedHoverBackground;
         }
+        return super.getHoverBackground();
     }
 
     public boolean isValueSelected() {
