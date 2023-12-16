@@ -19,8 +19,12 @@ on:
           - 'release'
           - 'beta'
           - 'alpha'
-      publish-cf-mr:
-        description: Publish to CF / MR
+      publish-cf:
+        description: Publish to CF
+        default: true
+        type: boolean
+      publish-mr:
+        description: Publish to MR
         default: true
         type: boolean
       publish-gh:
@@ -36,6 +40,9 @@ on:
         default: false
         required: true
         type: boolean
+
+env:
+  CHANGELOG_LOCATION: "build/gh_changelog.md"
 
 jobs:
   build:
@@ -68,7 +75,7 @@ jobs:
             fi
             echo "publish-gh=${{ inputs.publish-gh }}" >> $GITHUB_ENV
           else
-            if [ "${{ inputs.publish-cf-mr }}" == "true" ]; then
+            if [ "${{ inputs.publish-cf }}" == "true" ] || [ "${{ inputs.publish-mr }}" == "true" ]; then
               echo "publish-gh=true" >> $GITHUB_ENV
             else
               echo "publish-gh=${{ inputs.publish-gh }}" >> $GITHUB_ENV
@@ -127,40 +134,32 @@ jobs:
           RELEASE_JSON=$(curl -sSL $RELEASE_URL)
           CHANGELOG="$(echo $RELEASE_JSON | jq -r '.body')"
           if [ "$CHANGELOG" == "null" ]; then
-            echo "No changelog found" > build/gh_changelog.md
+            echo "No changelog found" > $CHANGELOG_LOCATION
           else
-            echo "$CHANGELOG" > build/gh_changelog.md
+            echo "$CHANGELOG" > $CHANGELOG_LOCATION
           fi
 
-      - name: Publish Minecraft Mods
-        if: ${{ inputs.publish-cf-mr }}
-        uses: Kir-Antipov/mc-publish@v3.2
+      - name: Publish to Curseforge
+        if: env.publish-cf == 'true'
+        uses: gradle/gradle-build-action@v2
+        env:
+          CURSEFORGE_API_KEY: "${{ secrets.CURSEFORGE_TOKEN }}"
+          CHANGELOG_LOCATION: $CHANGELOG_LOCATION
+          RELEASE_TYPE: "${{ inputs.release-type }}"
         with:
-          curseforge-id: 624243
-          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          arguments: 'curseforge'
+          generate-job-summary: false
 
-          modrinth-id: Ecvd12QC
-          modrinth-featured: true
-          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-
-          files-primary: build/libs/!(*-@(dev|sources|javadoc)).jar
-          files-secondary: build/libs/*-@(dev|sources|javadoc).jar
-          name: $file_name
-          version: ${{ github.event.inputs.version }}
-          version-type: ${{ github.event.inputs.release-type }}
-          changelog-file: build/gh_changelog.md
-          loaders: |
-            forge
-          game-versions: |
-            1.12.2
-          dependencies: |
-            mixin-booter@8.3(required)
-            jei(optional)
-            hei(optional)
-            blur(optional)
-          java: |
-            8
-          retry-attempts: 2
+      - name: Publish to Modrinth
+        if: env.publish-mr == 'true'
+        uses: gradle/gradle-build-action@v2
+        env:
+          MODRINTH_API_KEY: "${{ secrets.MODRINTH_TOKEN }}"
+          CHANGELOG_LOCATION: $CHANGELOG_LOCATION
+          RELEASE_TYPE: "${{ inputs.release-type }}"
+        with:
+          arguments: 'modrinth'
+          generate-job-summary: false
 
       - name: Publish to maven
         if: ${{ inputs.publish-maven }}
