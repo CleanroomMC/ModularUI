@@ -46,8 +46,8 @@ public class LangKey implements IKey {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj instanceof LangKey) {
-            return this.get().equals(((LangKey) obj).get());
+        if (obj instanceof LangKey langKey) {
+            return this.get().equals(langKey.get());
         }
         return false;
     }

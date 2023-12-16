@@ -99,9 +99,9 @@ public class GuiManager {
             }
             lastMui.getScreen().getPanelManager().dispose();
             lastMui = null;
-        } else if (event.getGui() instanceof GuiScreenWrapper) {
+        } else if (event.getGui() instanceof GuiScreenWrapper screenWrapper) {
             if (lastMui == null) {
-                lastMui = (GuiScreenWrapper) event.getGui();
+                lastMui = screenWrapper;
             } else if (lastMui == event.getGui()) {
                 lastMui.getScreen().getPanelManager().reopen();
             } else {
@@ -109,7 +109,7 @@ public class GuiManager {
                     lastMui.getScreen().getPanelManager().closeAll();
                 }
                 lastMui.getScreen().getPanelManager().dispose();
-                lastMui = (GuiScreenWrapper) event.getGui();
+                lastMui = screenWrapper;
             }
         }
     }

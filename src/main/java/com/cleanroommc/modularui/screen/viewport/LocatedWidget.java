@@ -26,8 +26,7 @@ public class LocatedWidget extends LocatedElement<IWidget> {
         // iterate through each parent starting at the root and apply each transformation
         GuiViewportStack stack = new GuiViewportStack();
         for (IWidget widget1 : ancestors) {
-            if (widget1 instanceof IViewport) {
-                IViewport viewport = (IViewport) widget1;
+            if (widget1 instanceof IViewport viewport) {
                 stack.pushViewport(viewport, widget1.getArea());
                 widget1.transform(stack);
                 viewport.transformChildren(stack);

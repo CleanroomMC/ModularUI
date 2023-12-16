@@ -39,8 +39,8 @@ public class Theme implements ITheme {
         this.id = id;
         this.parentTheme = parent;
         this.widgetThemes.putAll(widgetThemes);
-        if (parent instanceof Theme) {
-            for (Map.Entry<String, WidgetTheme> entry : ((Theme) parent).widgetThemes.entrySet()) {
+        if (parent instanceof Theme theme) {
+            for (Map.Entry<String, WidgetTheme> entry : theme.widgetThemes.entrySet()) {
                 if (!this.widgetThemes.containsKey(entry.getKey())) {
                     this.widgetThemes.put(entry.getKey(), entry.getValue());
                 }

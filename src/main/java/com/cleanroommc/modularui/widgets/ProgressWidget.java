@@ -38,8 +38,8 @@ public class ProgressWidget extends Widget<ProgressWidget> {
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof IDoubleValue) {
-            this.doubleValue = (IDoubleValue<?>) syncHandler;
+        if (syncHandler instanceof IDoubleValue<?> iDoubleValue) {
+            this.doubleValue = iDoubleValue;
             return true;
         }
         return false;

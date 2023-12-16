@@ -276,13 +276,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 loop:
                 for (LocatedWidget widget : this.hovering) {
                     widget.applyMatrix(getContext());
-                    if (widget.getElement() instanceof Interactable) {
-                        Interactable interactable = (Interactable) widget.getElement();
-                        Interactable.Result result1 = interactable.onMousePressed(mouseButton);
-                        if (isClosing() || !isValid()) {
-                            return true;
-                        }
-                        switch (result1) {
+                    if (widget.getElement() instanceof Interactable interactable) {
+                        switch (interactable.onMousePressed(mouseButton)) {
                             case IGNORE:
                                 break;
                             case ACCEPT: {
@@ -346,8 +341,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             boolean result = false;
             boolean tryTap = mouseButton == this.lastMouseButton && Minecraft.getSystemTime() - this.timePressed < tapTime;
             for (LocatedWidget widget : this.hovering) {
-                if (widget.getElement() instanceof Interactable) {
-                    Interactable interactable = (Interactable) widget.getElement();
+                if (widget.getElement() instanceof Interactable interactable) {
                     widget.applyMatrix(getContext());
                     if (interactable.onMouseRelease(mouseButton)) {
                         result = true;
@@ -356,11 +350,10 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                     }
                     if (tryTap && this.acceptedInteractions.remove(interactable)) {
                         Interactable.Result tabResult = interactable.onMouseTapped(mouseButton);
-                        switch (tabResult) {
-                            case SUCCESS:
-                            case STOP:
-                                tryTap = false;
-                        }
+                        tryTap = switch (tabResult) {
+                            case SUCCESS, STOP -> false;
+                            default -> true;
+                        };
                     }
                     widget.unapplyMatrix(getContext());
                 }
@@ -393,8 +386,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             boolean result = false;
             loop:
             for (LocatedWidget widget : this.hovering) {
-                if (widget.getElement() instanceof Interactable) {
-                    Interactable interactable = (Interactable) widget.getElement();
+                if (widget.getElement() instanceof Interactable interactable) {
                     widget.applyMatrix(getContext());
                     switch (interactable.onKeyPressed(typedChar, keyCode)) {
                         case IGNORE:
@@ -446,8 +438,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             boolean result = false;
             boolean tryTap = keyCode == this.lastMouseButton && Minecraft.getSystemTime() - this.timePressed < tapTime;
             for (LocatedWidget widget : this.hovering) {
-                if (widget.getElement() instanceof Interactable) {
-                    Interactable interactable = (Interactable) widget.getElement();
+                if (widget.getElement() instanceof Interactable interactable) {
                     widget.applyMatrix(getContext());
                     if (interactable.onKeyRelease(typedChar, keyCode)) {
                         result = true;
@@ -456,11 +447,10 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                     }
                     if (tryTap && this.acceptedInteractions.remove(interactable)) {
                         Interactable.Result tabResult = interactable.onKeyTapped(typedChar, keyCode);
-                        switch (tabResult) {
-                            case SUCCESS:
-                            case STOP:
-                                tryTap = false;
-                        }
+                        tryTap = switch (tabResult) {
+                            case SUCCESS, STOP -> false;
+                            default -> true;
+                        };
                     }
                     widget.unapplyMatrix(getContext());
                 }
@@ -481,8 +471,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             }
             if (this.hovering.isEmpty()) return false;
             for (LocatedWidget widget : this.hovering) {
-                if (widget.getElement() instanceof Interactable) {
-                    Interactable interactable = (Interactable) widget.getElement();
+                if (widget.getElement() instanceof Interactable interactable) {
                     widget.applyMatrix(getContext());
                     boolean result = interactable.onMouseScroll(scrollDirection, amount);
                     widget.unapplyMatrix(getContext());
@@ -499,9 +488,9 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             if (this.isMouseButtonHeld &&
                     mouseButton == this.lastMouseButton &&
                     this.lastPressed != null &&
-                    this.lastPressed.getElement() instanceof Interactable) {
+                    this.lastPressed.getElement() instanceof Interactable interactable) {
                 this.lastPressed.applyMatrix(getContext());
-                ((Interactable) this.lastPressed.getElement()).onMouseDrag(mouseButton, timeSinceClick);
+                interactable.onMouseDrag(mouseButton, timeSinceClick);
                 this.lastPressed.unapplyMatrix(getContext());
                 return true;
             }
@@ -513,8 +502,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     private <T, W extends IWidget & IFocusedWidget & Interactable> T interactFocused(Function<W, T> function, T defaultValue) {
         LocatedWidget focused = this.getContext().getFocusedWidget();
         T result = defaultValue;
-        if (focused.getElement() instanceof Interactable) {
-            Interactable interactable = (Interactable) focused.getElement();
+        if (focused.getElement() instanceof Interactable interactable) {
             focused.applyMatrix(getContext());
             result = function.apply((W) interactable);
             focused.unapplyMatrix(getContext());

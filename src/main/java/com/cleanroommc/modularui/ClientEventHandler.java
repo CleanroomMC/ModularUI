@@ -26,6 +26,13 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent
+    public static void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.START) {
+            ticks++;
+        }
+    }
+
+    @SubscribeEvent
     public static void onScroll(GuiScreenEvent.MouseInputEvent.Pre event) {
         ModularScreen screen = ModularScreen.getCurrent();
         if (screen != null) {
@@ -71,6 +78,6 @@ public class ClientEventHandler {
     }
 
     private static boolean hasDraggable(GuiScreenEvent event) {
-        return event.getGui() instanceof GuiScreenWrapper && ((GuiScreenWrapper) event.getGui()).getScreen().getContext().hasDraggable();
+        return event.getGui() instanceof GuiScreenWrapper screenWrapper && screenWrapper.getScreen().getContext().hasDraggable();
     }
 }

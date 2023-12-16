@@ -11,8 +11,8 @@ import javax.annotation.Nullable;
 public class FluidTankHandler implements IFluidHandler {
 
     public static IFluidHandler getTankFluidHandler(IFluidTank tank) {
-        if (tank instanceof IFluidHandler) {
-            return (IFluidHandler) tank;
+        if (tank instanceof IFluidHandler fluidHandler) {
+            return fluidHandler;
         }
         return new FluidTankHandler(tank);
     }

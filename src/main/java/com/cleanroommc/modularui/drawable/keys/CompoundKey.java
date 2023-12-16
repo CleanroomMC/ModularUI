@@ -35,8 +35,8 @@ public class CompoundKey implements IKey {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj instanceof CompoundKey) {
-            return this.get().equals(((CompoundKey) obj).get());
+        if (obj instanceof CompoundKey compoundKey) {
+            return this.get().equals(compoundKey.get());
         }
         return false;
     }

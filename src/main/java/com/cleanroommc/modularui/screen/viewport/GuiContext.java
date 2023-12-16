@@ -219,8 +219,8 @@ public class GuiContext extends GuiViewportStack {
                 continue;
             }
 
-            if (child instanceof IFocusedWidget) {
-                focus((IFocusedWidget) child);
+            if (child instanceof IFocusedWidget focusedWidget1) {
+                focus(focusedWidget1);
 
                 return true;
             } else {
@@ -233,7 +233,7 @@ public class GuiContext extends GuiViewportStack {
         }
 
         IWidget grandparent = widget.getParent();
-        boolean isRoot = grandparent instanceof ModularPanel;//grandparent == this.screen.getRoot();
+        boolean isRoot = grandparent instanceof ModularPanel;
 
         if (!stop && (isRoot || grandparent.canBeSeen(this))) {
             List<IWidget> siblings = grandparent.getChildren();
@@ -294,10 +294,9 @@ public class GuiContext extends GuiViewportStack {
         if ((button == 0 || button == 1) && isMouseItemEmpty() && !hasDraggable()) {
             IWidget widget = hovered.getElement();
             LocatedElement<IDraggable> draggable;
-            if (widget instanceof IDraggable) {
-                draggable = new LocatedElement<>((IDraggable) widget, hovered.getTransformationMatrix());
-            } else if (widget instanceof ModularPanel) {
-                ModularPanel panel = (ModularPanel) widget;
+            if (widget instanceof IDraggable iDraggable) {
+                draggable = new LocatedElement<>(iDraggable, hovered.getTransformationMatrix());
+            } else if (widget instanceof ModularPanel panel) {
                 if (panel.isDraggable()) {
                     if (!panel.flex().hasFixedSize()) {
                         throw new IllegalStateException("Panel must have a fixed size. It can't specify left AND right or top AND bottom!");
@@ -364,8 +363,8 @@ public class GuiContext extends GuiViewportStack {
             this.timeHovered = 0;
             if (this.hovered != null) {
                 this.hovered.onMouseStartHover();
-                if (this.hovered instanceof IVanillaSlot) {
-                    ((GuiContainerAccessor) this.screen.getScreenWrapper()).setHoveredSlot(((IVanillaSlot) this.hovered).getVanillaSlot());
+                if (this.hovered instanceof IVanillaSlot vanillaSlot) {
+                    ((GuiContainerAccessor) this.screen.getScreenWrapper()).setHoveredSlot(vanillaSlot.getVanillaSlot());
                 } else {
                     ((GuiContainerAccessor) this.screen.getScreenWrapper()).setHoveredSlot(null);
                 }

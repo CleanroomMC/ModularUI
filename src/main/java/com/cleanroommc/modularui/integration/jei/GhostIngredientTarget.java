@@ -17,10 +17,10 @@ public class GhostIngredientTarget<I> implements IGhostIngredientHandler.Target<
     private final JeiGhostIngredientSlot<I> ghostSlot;
 
     public static <I> GhostIngredientTarget<I> of(JeiGhostIngredientSlot<I> slot) {
-        if (!(slot instanceof IGuiElement)) {
-            throw new IllegalArgumentException();
+        if (slot instanceof IGuiElement guiElement) {
+            return new GhostIngredientTarget<>(guiElement, slot);
         }
-        return new GhostIngredientTarget<>((IGuiElement) slot, slot);
+        throw new IllegalArgumentException();
     }
 
     public static <I, W extends IWidget & JeiGhostIngredientSlot<I>> GhostIngredientTarget<I> of(W slot) {

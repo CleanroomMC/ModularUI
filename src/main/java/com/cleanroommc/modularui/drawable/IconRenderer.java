@@ -112,16 +112,16 @@ public class IconRenderer {
     public List<IIcon> measureLines(List<IDrawable> lines) {
         List<IIcon> icons = new ArrayList<>();
         for (IDrawable element : lines) {
-            if (element instanceof IIcon) {
-                icons.add((IIcon) element);
-            } else if (element instanceof IKey) {
+            if (element instanceof IIcon icon) {
+                icons.add(icon);
+            } else if (element instanceof IKey key) {
                 float scale = this.scale;
                 Alignment alignment1 = this.alignment;
-                if (element instanceof StyledText) {
-                    scale = ((StyledText) element).getScale();
-                    alignment1 = ((StyledText) element).getAlignment();
+                if (element instanceof StyledText styledText) {
+                    scale = styledText.getScale();
+                    alignment1 = styledText.getAlignment();
                 }
-                String text = ((IKey) element).get();
+                String text = key.get();
                 for (String subLine : text.split("\\\\n")) {
                     for (String subSubLine : wrapLine(subLine, scale)) {
                         int width = (int) (getFontRenderer().getStringWidth(subSubLine) * scale);
