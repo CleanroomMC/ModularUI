@@ -29,7 +29,7 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
                         if (panelSyncHandler != null) {
                             panelSyncHandler.closePanel();
                         } else {
-                            buttonWidget.getPanel().animateClose();
+                            buttonWidget.getPanel().closeIfOpen(true);
                         }
                         return true;
                     }

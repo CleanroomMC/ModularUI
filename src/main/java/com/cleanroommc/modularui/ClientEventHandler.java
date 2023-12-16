@@ -1,13 +1,9 @@
 package com.cleanroommc.modularui;
 
 import com.cleanroommc.modularui.drawable.Stencil;
-import com.cleanroommc.modularui.factory.ClientGUI;
-import com.cleanroommc.modularui.factory.GuiManager;
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import com.cleanroommc.modularui.screen.ModularScreen;
 
-import net.minecraft.client.Minecraft;
-import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -46,32 +42,6 @@ public class ClientEventHandler {
             GL11.glEnable(GL11.GL_STENCIL_TEST);
         }
         Stencil.reset();
-    }
-
-    @SubscribeEvent
-    public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.START) {
-            ticks++;
-            GuiManager.checkQueuedScreen();
-        }
-    }
-
-    @SubscribeEvent
-    public static void onOpenScreen(GuiOpenEvent event) {
-        if (event.getGui() instanceof GuiScreenWrapper && Minecraft.getMinecraft().currentScreen != null) {
-            // another screen is already open, don't fade in the dark background as it's already there
-            ((GuiScreenWrapper) event.getGui()).setDoAnimateTransition(false);
-        }
-        if (!GuiManager.isOpeningQueue() && Minecraft.getMinecraft().currentScreen instanceof GuiScreenWrapper) {
-            // opening a screen while a modular screen is open can cause crashes
-            // queue the screen to open it on next tick
-            if (event.getGui() != null) {
-                ClientGUI.open(event.getGui());
-            } else {
-                ClientGUI.close();
-            }
-            event.setCanceled(true);
-        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

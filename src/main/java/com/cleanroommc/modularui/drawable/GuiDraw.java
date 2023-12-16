@@ -5,9 +5,7 @@ import com.cleanroommc.modularui.utils.Color;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -336,6 +334,22 @@ public class GuiDraw {
         }
 
         tessellator.draw();
+    }
+
+    public static void drawItem(ItemStack item, int x, int y, float width, float height) {
+        if (item.isEmpty()) return;
+        GlStateManager.pushMatrix();
+        RenderHelper.enableGUIStandardItemLighting();
+        GlStateManager.enableDepth();
+        GlStateManager.scale(width / 16f, height / 16f, 1);
+        RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
+        renderItem.zLevel = 200;
+        renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().player, item, x, y);
+        renderItem.zLevel = 0;
+        GlStateManager.disableDepth();
+        RenderHelper.enableStandardItemLighting();
+        GlStateManager.disableLighting();
+        GlStateManager.popMatrix();
     }
 
     public static void drawFluidTexture(FluidStack content, float x0, float y0, float width, float height, float z) {

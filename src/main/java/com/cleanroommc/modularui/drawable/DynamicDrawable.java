@@ -25,20 +25,10 @@ public class DynamicDrawable implements IDrawable {
 
     @SideOnly(Side.CLIENT)
     @Override
-    public void draw(GuiContext context, int x, int y, int width, int height) {
+    public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
         IDrawable drawable = this.supplier.get();
         if (drawable != null) {
-            drawable.draw(context, x, y, width, height);
-        }
-    }
-
-    @Override
-    public void applyThemeColor(ITheme theme, WidgetTheme widgetTheme) {
-        IDrawable drawable = this.supplier.get();
-        if (drawable != null) {
-            drawable.applyThemeColor(theme, widgetTheme);
-        } else {
-            IDrawable.super.applyThemeColor(theme, widgetTheme);
+            drawable.draw(context, x, y, width, height, widgetTheme);
         }
     }
 

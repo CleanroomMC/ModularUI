@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.factory;
 import com.cleanroommc.modularui.screen.JeiSettingsImpl;
 import com.cleanroommc.modularui.screen.ModularScreen;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -45,14 +46,14 @@ public class ClientGUI {
      *
      * @param screen screen to open
      */
-    public static void open(@NotNull GuiScreen screen) {
-        GuiManager.openScreen(screen);
+    public static void open(GuiScreen screen) {
+        Minecraft.getMinecraft().displayGuiScreen(screen);
     }
 
     /**
-     * Closes any GUI that is open in the next client tick.
+     * Closes any GUI that is open in this tick.
      */
     public static void close() {
-        GuiManager.closeScreen();
+        Minecraft.getMinecraft().displayGuiScreen(null);
     }
 }

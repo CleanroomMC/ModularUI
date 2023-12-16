@@ -115,8 +115,7 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
         // make sure texture is up-to-date
         getState();
         // draw state texture after background, but before overlay
-        this.texture.applyThemeColor(context.getTheme(), getWidgetTheme(context.getTheme()));
-        this.texture.draw(context, 0, 0, getArea().w(), getArea().h());
+        this.texture.draw(context, 0, 0, getArea().w(), getArea().h(), widgetTheme);
     }
 
     @Override

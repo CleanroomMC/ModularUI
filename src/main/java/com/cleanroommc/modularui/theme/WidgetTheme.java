@@ -8,6 +8,10 @@ import org.jetbrains.annotations.Nullable;
 
 public class WidgetTheme {
 
+    public static WidgetTheme getDefault() {
+        return ThemeAPI.DEFAULT_DEFAULT.getFallback();
+    }
+
     @Nullable
     private final IDrawable background;
     @Nullable

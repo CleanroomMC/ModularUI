@@ -28,9 +28,9 @@ public class CategoryList extends ParentWidget<CategoryList> implements Interact
     public void drawOverlay(GuiContext context, WidgetTheme widgetTheme) {
         super.drawOverlay(context, widgetTheme);
         if (this.expanded) {
-            this.expandedOverlay.drawAtZero(context, getArea());
+            this.expandedOverlay.drawAtZero(context, getArea(), widgetTheme);
         } else {
-            this.collapsedOverlay.drawAtZero(context, getArea());
+            this.collapsedOverlay.drawAtZero(context, getArea(), widgetTheme);
         }
     }
 
