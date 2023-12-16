@@ -139,7 +139,7 @@ jobs:
           fi
 
       - name: Publish to Curseforge
-        if: env.publish-cf == 'true'
+        if: ${{ inputs.publish-cf }}
         uses: gradle/gradle-build-action@v2
         env:
           CURSEFORGE_API_KEY: "${{ secrets.CURSEFORGE_TOKEN }}"
@@ -150,7 +150,7 @@ jobs:
           generate-job-summary: false
 
       - name: Publish to Modrinth
-        if: env.publish-mr == 'true'
+        if: ${{ inputs.publish-mr }}
         uses: gradle/gradle-build-action@v2
         env:
           MODRINTH_API_KEY: "${{ secrets.MODRINTH_TOKEN }}"
