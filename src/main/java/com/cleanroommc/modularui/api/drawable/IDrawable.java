@@ -31,17 +31,16 @@ public interface IDrawable {
      * @param height  draw height
      */
     @SideOnly(Side.CLIENT)
-    default void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
-        applyThemeColor(context.getTheme(), widgetTheme);
-        draw(context, x, y, width, height);
-    }
+    void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme);
 
     /**
      * @deprecated use {@link #draw(GuiContext, int, int, int, int, WidgetTheme)}
      */
     @SideOnly(Side.CLIENT)
     @Deprecated
-    void draw(GuiContext context, int x, int y, int width, int height);
+    default void draw(GuiContext context, int x, int y, int width, int height) {
+        draw(context, x, y, width, height, WidgetTheme.getDefault());
+    }
 
     /**
      * @deprecated use {@link #drawAtZero(GuiContext, int, int, WidgetTheme)}
@@ -49,7 +48,7 @@ public interface IDrawable {
     @SideOnly(Side.CLIENT)
     @Deprecated
     default void drawAtZero(GuiContext context, int width, int height) {
-        drawAtZero(context, width, height, ThemeAPI.DEFAULT_DEFAULT.getFallback());
+        drawAtZero(context, width, height, WidgetTheme.getDefault());
     }
 
     /**
@@ -71,7 +70,7 @@ public interface IDrawable {
     @SideOnly(Side.CLIENT)
     @Deprecated
     default void draw(GuiContext context, Area area) {
-        draw(context, area.x, area.y, area.width, area.height, ThemeAPI.DEFAULT_DEFAULT.getFallback());
+        draw(context, area.x, area.y, area.width, area.height, WidgetTheme.getDefault());
     }
 
     /**
@@ -91,7 +90,7 @@ public interface IDrawable {
     @Deprecated
     @SideOnly(Side.CLIENT)
     default void drawAtZero(GuiContext context, Area area) {
-        draw(context, 0, 0, area.width, area.height, ThemeAPI.DEFAULT_DEFAULT.getFallback());
+        draw(context, 0, 0, area.width, area.height, WidgetTheme.getDefault());
     }
 
     /**
@@ -148,12 +147,12 @@ public interface IDrawable {
     /**
      * An empty drawable. Does nothing.
      */
-    IDrawable EMPTY = (context, x, y, width, height) -> {};
+    IDrawable EMPTY = (context, x, y, width, height, widgetTheme) -> {};
 
     /**
      * An empty drawable used to mark hover textures as "should not be used"!
      */
-    IDrawable NONE = (context, x, y, width, height) -> {};
+    IDrawable NONE = (context, x, y, width, height, widgetTheme) -> {};
 
     /**
      * A widget wrapping a drawable. The drawable is drawn between the background and the overlay.

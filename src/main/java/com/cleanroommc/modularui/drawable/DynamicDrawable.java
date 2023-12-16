@@ -33,11 +33,6 @@ public class DynamicDrawable implements IDrawable {
     }
 
     @Override
-    public void draw(GuiContext context, int x, int y, int width, int height) {
-
-    }
-
-    @Override
     public boolean canApplyTheme() {
         IDrawable drawable = this.supplier.get();
         if (drawable != null) {

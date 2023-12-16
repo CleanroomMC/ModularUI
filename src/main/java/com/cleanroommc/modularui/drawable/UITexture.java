@@ -128,7 +128,12 @@ public class UITexture implements IDrawable {
 
     @SideOnly(Side.CLIENT)
     @Override
-    public void draw(GuiContext context, int x, int y, int width, int height) {
+    public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
+        if (canApplyTheme()) {
+            Color.setGlColor(widgetTheme.getColor());
+        } else {
+            Color.setGlColorOpaque(Color.WHITE.main);
+        }
         draw((float) x, y, width, height);
     }
 
@@ -138,15 +143,6 @@ public class UITexture implements IDrawable {
 
     public void drawSubArea(float x, float y, float width, float height, float uStart, float vStart, float uEnd, float vEnd) {
         GuiDraw.drawTexture(this.location, x, y, x + width, y + height, calcU(uStart), calcV(vStart), calcU(uEnd), calcV(vEnd));
-    }
-
-    @Override
-    public void applyThemeColor(ITheme theme, WidgetTheme widgetTheme) {
-        if (canApplyTheme()) {
-            Color.setGlColor(widgetTheme.getColor());
-        } else {
-            Color.setGlColorOpaque(Color.WHITE.main);
-        }
     }
 
     @Override

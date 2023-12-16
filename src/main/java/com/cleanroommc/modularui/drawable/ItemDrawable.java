@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.GameObjectHelper;
 import com.cleanroommc.modularui.utils.JsonHelper;
 
@@ -35,7 +36,7 @@ public class ItemDrawable implements IDrawable {
 
     @SideOnly(Side.CLIENT)
     @Override
-    public void draw(GuiContext context, int x, int y, int width, int height) {
+    public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
         if (this.item.isEmpty()) return;
         GlStateManager.pushMatrix();
         RenderHelper.enableGUIStandardItemLighting();

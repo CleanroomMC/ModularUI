@@ -59,8 +59,7 @@ public class ProgressWidget extends Widget<ProgressWidget> {
     @Override
     public void draw(GuiContext context, WidgetTheme widgetTheme) {
         if (this.emptyTexture != null) {
-            this.emptyTexture.applyThemeColor(context.getTheme(), widgetTheme);
-            this.emptyTexture.draw(context, 0, 0, getArea().w(), getArea().h());
+            this.emptyTexture.draw(context, 0, 0, getArea().w(), getArea().h(), widgetTheme);
             Color.setGlColorOpaque(Color.WHITE.main);
         }
         float progress = getCurrentProgress();

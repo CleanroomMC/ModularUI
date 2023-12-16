@@ -26,11 +26,6 @@ public class DrawableArray implements IDrawable {
     }
 
     @Override
-    public void draw(GuiContext context, int x, int y, int width, int height) {
-        draw(context, x, y, width, height, WidgetTheme.getDefault());
-    }
-
-    @Override
     public boolean canApplyTheme() {
         for (IDrawable drawable : this.drawables) {
             if (drawable.canApplyTheme()) {

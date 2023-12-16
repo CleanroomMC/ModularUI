@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.drawable;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
 
 public class HueBar implements IDrawable {
@@ -23,7 +24,7 @@ public class HueBar implements IDrawable {
     }
 
     @Override
-    public void draw(GuiContext context, int x, int y, int width, int height) {
+    public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
         int size = this.axis.isHorizontal() ? width : height;
         float step = size / 6f;
         int previous = COLORS[5];
