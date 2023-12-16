@@ -28,23 +28,13 @@ public class TextWidget extends Widget<TextWidget> {
     @Override
     public void draw(GuiContext context, WidgetTheme widgetTheme) {
         TextRenderer renderer = TextRenderer.SHARED;
-        renderer.setColor(this.color);
+        renderer.setColor(this.colorChanged ? this.color : widgetTheme.getTextColor());
         renderer.setAlignment(this.alignment, getArea().w() + 1, getArea().h());
-        renderer.setShadow(this.shadow);
+        renderer.setShadow(this.shadowChanged ? this.shadow : widgetTheme.getTextShadow());
         renderer.setPos(getArea().getPadding().left, getArea().getPadding().top);
         renderer.setScale(this.scale);
         renderer.setSimulate(false);
         renderer.draw(this.key.get());
-    }
-
-    @Override
-    public void applyTheme(ITheme theme) {
-        if (!this.colorChanged) {
-            this.color = getWidgetTheme(theme).getTextColor();
-        }
-        if (!this.shadowChanged) {
-            this.shadow = getWidgetTheme(theme).getTextShadow();
-        }
     }
 
     @Override
