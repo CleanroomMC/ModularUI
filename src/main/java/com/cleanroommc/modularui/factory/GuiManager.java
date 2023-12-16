@@ -10,7 +10,6 @@ import com.cleanroommc.modularui.widget.WidgetTree;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.client.event.GuiOpenEvent;
@@ -21,6 +20,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -43,13 +43,13 @@ public class GuiManager {
         FACTORIES.put(name, factory);
     }
 
-    public static UIFactory<?> getFactory(String name) {
+    public static @NotNull UIFactory<?> getFactory(String name) {
         UIFactory<?> factory = FACTORIES.get(name);
         if (factory == null) throw new NoSuchElementException();
         return factory;
     }
 
-    public static <T extends GuiData> void open(UIFactory<T> factory, T guiData, EntityPlayerMP player) {
+    public static <T extends GuiData> void open(@NotNull UIFactory<T> factory, @NotNull T guiData, EntityPlayerMP player) {
         // create panel, collect sync handlers and create container
         guiData.setJeiSettings(JeiSettings.DUMMY);
         GuiSyncManager syncManager = new GuiSyncManager(player);
@@ -70,7 +70,7 @@ public class GuiManager {
     }
 
     @SideOnly(Side.CLIENT)
-    public static <T extends GuiData> void open(int windowId, UIFactory<T> factory, PacketBuffer data, EntityPlayerSP player) {
+    public static <T extends GuiData> void open(int windowId, @NotNull UIFactory<T> factory, @NotNull PacketBuffer data, @NotNull EntityPlayerSP player) {
         T guiData = factory.readGuiData(player, data);
         JeiSettingsImpl jeiSettings = new JeiSettingsImpl();
         guiData.setJeiSettings(jeiSettings);
@@ -90,17 +90,6 @@ public class GuiManager {
         GuiScreenWrapper screenWrapper = new GuiScreenWrapper(new ModularContainer(), screen);
         Minecraft.getMinecraft().displayGuiScreen(screenWrapper);
     }
-
-    @SideOnly(Side.CLIENT)
-    static void openScreen(GuiScreen screen) {
-        Minecraft.getMinecraft().displayGuiScreen(screen);
-    }
-
-    @SideOnly(Side.CLIENT)
-    static void closeScreen() {
-        Minecraft.getMinecraft().displayGuiScreen(null);
-    }
-
 
     @SubscribeEvent
     public static void onGuiOpen(GuiOpenEvent event) {

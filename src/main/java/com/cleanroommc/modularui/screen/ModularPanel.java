@@ -240,6 +240,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
      */
     public final <T> T doSafe(Supplier<T> runnable) {
         if (this.state == State.DISPOSED) return null;
+        // make sure the screen is also not disposed
         return getScreen().getPanelManager().doSafe(() -> {
             this.cantDisposeNow = true;
             T t = runnable.get();
