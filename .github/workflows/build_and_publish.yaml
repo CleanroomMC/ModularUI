@@ -142,9 +142,9 @@ jobs:
         if: ${{ inputs.publish-cf }}
         uses: gradle/gradle-build-action@v2
         env:
-          CURSEFORGE_API_KEY: "${{ secrets.CURSEFORGE_TOKEN }}"
-          CHANGELOG_LOCATION: $CHANGELOG_LOCATION
-          RELEASE_TYPE: "${{ inputs.release-type }}"
+          CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_TOKEN }}
+          CHANGELOG_LOCATION: ${{ env.CHANGELOG_LOCATION }}
+          RELEASE_TYPE: ${{ inputs.release-type }}
         with:
           arguments: 'curseforge'
           generate-job-summary: false
@@ -153,9 +153,9 @@ jobs:
         if: ${{ inputs.publish-mr }}
         uses: gradle/gradle-build-action@v2
         env:
-          MODRINTH_API_KEY: "${{ secrets.MODRINTH_TOKEN }}"
-          CHANGELOG_LOCATION: $CHANGELOG_LOCATION
-          RELEASE_TYPE: "${{ inputs.release-type }}"
+          MODRINTH_API_KEY: ${{ secrets.MODRINTH_TOKEN }}
+          CHANGELOG_LOCATION: ${{ env.CHANGELOG_LOCATION }}
+          RELEASE_TYPE: ${{ inputs.release-type }}"
         with:
           arguments: 'modrinth'
           generate-job-summary: false
