@@ -46,7 +46,7 @@ public class PanelManager {
     void init() {
         if (this.state == State.CLOSED) throw new IllegalStateException("Can't init in closed state!");
         if (this.state == State.INIT || this.state == State.DISPOSED) {
-            this.state = State.OPEN;
+            setState(State.OPEN);
             openPanel(this.mainPanel, false);
             checkDirty();
         }
@@ -161,9 +161,9 @@ public class PanelManager {
     }
 
     public void closeAll() {
-        if (this.state == State.OPEN) {
+        if (this.state.isOpen) {
             this.panels.forEach(this::finalizePanel);
-            this.state = State.CLOSED;
+            setState(State.CLOSED);
         }
     }
 
@@ -183,7 +183,7 @@ public class PanelManager {
         T t = runnable.get();
         this.cantDisposeNow = false;
         if (this.state == State.WAIT_DISPOSAL) {
-            this.state = State.CLOSED;
+            setState(State.CLOSED);
             dispose();
         }
         return t;
@@ -193,7 +193,7 @@ public class PanelManager {
     public void dispose() {
         if (isDisposed()) return;
         if (this.cantDisposeNow) {
-            this.state = State.WAIT_DISPOSAL;
+            setState(State.WAIT_DISPOSAL);
             return;
         }
         if (!isClosed()) throw new IllegalStateException("Must close screen first before disposing!");
@@ -202,7 +202,7 @@ public class PanelManager {
         this.panels.clear();
         this.panelsClone.clear();
         this.dirty = false;
-        this.state = State.DISPOSED;
+        setState(State.DISPOSED);
     }
 
     @ApiStatus.Internal
@@ -210,7 +210,9 @@ public class PanelManager {
         if (this.panels.isEmpty()) {
             throw new IllegalStateException("Screen is disposed. Can't be recovered!");
         }
-        this.state = State.REOPENED;
+        this.panels.forEach(ModularPanel::reopen);
+        this.disposal.removeIf(this.panels::contains);
+        setState(State.REOPENED);
     }
 
     public boolean hasOpenPanel(ModularPanel panel) {
@@ -261,6 +263,10 @@ public class PanelManager {
     public Iterable<ModularPanel> getReverseOpenPanels() {
         checkDirty();
         return this.reversePanels;
+    }
+
+    private void setState(State state) {
+        this.state = state;
     }
 
     public boolean isClosed() {
