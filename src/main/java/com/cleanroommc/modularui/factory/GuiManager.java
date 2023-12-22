@@ -13,7 +13,11 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -30,6 +34,7 @@ public class GuiManager {
     private static final Object2ObjectMap<String, UIFactory<?>> FACTORIES = new Object2ObjectOpenHashMap<>(16);
 
     private static GuiScreenWrapper lastMui;
+    private static boolean canOpen = true;
 
     public static void registerFactory(UIFactory<?> factory) {
         Objects.requireNonNull(factory);
@@ -50,6 +55,9 @@ public class GuiManager {
     }
 
     public static <T extends GuiData> void open(@NotNull UIFactory<T> factory, @NotNull T guiData, EntityPlayerMP player) {
+        if (player instanceof FakePlayer) return;
+        if (!canOpen) return;
+        canOpen = false;
         // create panel, collect sync handlers and create container
         guiData.setJeiSettings(JeiSettings.DUMMY);
         GuiSyncManager syncManager = new GuiSyncManager(player);
@@ -67,6 +75,8 @@ public class GuiManager {
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         factory.writeGuiData(guiData, buffer);
         NetworkHandler.sendToPlayer(new OpenGuiPacket<>(windowId, factory, buffer), player);
+        // finally invoke event
+        MinecraftForge.EVENT_BUS.post(new PlayerContainerEvent.Open(player, container));
     }
 
     @SideOnly(Side.CLIENT)
@@ -89,6 +99,13 @@ public class GuiManager {
         screen.getContext().setJeiSettings(jeiSettings);
         GuiScreenWrapper screenWrapper = new GuiScreenWrapper(new ModularContainer(), screen);
         Minecraft.getMinecraft().displayGuiScreen(screenWrapper);
+    }
+
+    @SubscribeEvent
+    public static void onTick(TickEvent.ServerTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            canOpen = true;
+        }
     }
 
     @SubscribeEvent

@@ -41,8 +41,7 @@ public class TestItem extends Item implements IGuiHolder<HandGuiData> {
         ModularPanel panel = ModularPanel.defaultPanel("knapping_gui");
         panel.child(new Column()
                 //.coverChildren()
-                .padding(7)
-                .child(SlotGroupWidget.playerInventory())
+                //.child(SlotGroupWidget.playerInventory())
                 .child(SlotGroupWidget.builder()
                         .row("II")
                         .row("II")
