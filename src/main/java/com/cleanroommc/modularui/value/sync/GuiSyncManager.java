@@ -39,13 +39,13 @@ public class GuiSyncManager {
         this.player = player;
         this.playerInventory = new PlayerMainInvWrapper(player.inventory);
         syncValue(CURSOR_KEY, this.cursorSlotSyncHandler);
-        /*String key = "player";
+        String key = "player";
         for (int i = 0; i < 36; i++) {
             itemSlot(key, i, SyncHandlers.itemSlot(this.playerInventory, i).slotGroup(PLAYER_INVENTORY));
         }
         // player inv sorting is handled by bogosorter
         registerSlotGroup(new SlotGroup(PLAYER_INVENTORY, 9, SlotGroup.PLAYER_INVENTORY_PRIO, true).setAllowSorting(false));
-    */}
+    }
 
     @ApiStatus.Internal
     public void construct(ModularContainer container) {
