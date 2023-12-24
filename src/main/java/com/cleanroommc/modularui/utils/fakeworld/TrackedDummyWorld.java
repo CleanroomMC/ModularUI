@@ -75,6 +75,15 @@ public class TrackedDummyWorld extends DummyWorld {
         return super.setBlockState(pos, newState, flags);
     }
 
+    public Vector3f getCenter() {
+        Vector3f center = (Vector3f) Vector3f.sub(maxPos, minPos, null).scale(0.5f);
+        return Vector3f.add(center, minPos, center);
+    }
+
+    public float getMaxSize() {
+        return Math.max(maxPos.x - minPos.x, Math.max(maxPos.y - minPos.y, maxPos.z - minPos.z));
+    }
+
     public Vector3f getSize() {
         Vector3f result = new Vector3f();
         result.setX(maxPos.getX() - minPos.getX() + 1);

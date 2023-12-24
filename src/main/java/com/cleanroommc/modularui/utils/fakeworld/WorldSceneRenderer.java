@@ -21,6 +21,7 @@ import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 import org.lwjgl.util.vector.Vector3f;
@@ -30,17 +31,12 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Created with IntelliJ IDEA.
- *
- * @Author: KilaBash
- * @Date: 2021/08/23
- * @Description: Abstract class, and extend a lot of features compared with the original one.
+ * Abstract class, and extend a lot of features compared with the original one.
  */
 @SideOnly(Side.CLIENT)
 public abstract class WorldSceneRenderer {
@@ -57,7 +53,7 @@ public abstract class WorldSceneRenderer {
             .order(ByteOrder.nativeOrder()).asFloatBuffer();
 
     public final World world;
-    public final Map<Collection<BlockPos>, ISceneRenderHook> renderedBlocksMap;
+    public final List<Pair<Collection<BlockPos>, ISceneRenderHook>> renderedBlocksMap;
     private Consumer<WorldSceneRenderer> beforeRender;
     private Consumer<WorldSceneRenderer> afterRender;
     private Consumer<RayTraceResult> onLookingAt;
@@ -69,7 +65,7 @@ public abstract class WorldSceneRenderer {
 
     public WorldSceneRenderer(World world) {
         this.world = world;
-        renderedBlocksMap = new LinkedHashMap<>();
+        renderedBlocksMap = new ArrayList<>();
     }
 
     public WorldSceneRenderer setBeforeWorldRender(Consumer<WorldSceneRenderer> callback) {
@@ -84,7 +80,7 @@ public abstract class WorldSceneRenderer {
 
     public WorldSceneRenderer addRenderedBlocks(Collection<BlockPos> blocks, ISceneRenderHook renderHook) {
         if (blocks != null) {
-            this.renderedBlocksMap.put(blocks, renderHook);
+            this.renderedBlocksMap.add(Pair.of(blocks, renderHook));
         }
         return this;
     }
@@ -237,9 +233,9 @@ public abstract class WorldSceneRenderer {
                 ForgeHooksClient.setRenderLayer(layer);
                 int pass = layer == BlockRenderLayer.TRANSLUCENT ? 1 : 0;
 
-                renderedBlocksMap.forEach((renderedBlocks, hook) -> {
-                    if (hook != null) {
-                        hook.apply(false, pass, layer);
+                renderedBlocksMap.forEach(pair -> {
+                    if (pair.getValue() != null) {
+                        pair.getValue().apply(false, pass, layer);
                     } else {
                         setDefaultPassRenderState(pass);
                     }
@@ -248,7 +244,7 @@ public abstract class WorldSceneRenderer {
                     buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
                     BlockRendererDispatcher blockrendererdispatcher = mc.getBlockRendererDispatcher();
 
-                    for (BlockPos pos : renderedBlocks) {
+                    for (BlockPos pos : pair.getKey()) {
                         IBlockState state = world.getBlockState(pos);
                         Block block = state.getBlock();
                         if (block == Blocks.AIR) continue;
@@ -273,13 +269,13 @@ public abstract class WorldSceneRenderer {
         for (int pass = 0; pass < 2; pass++) {
             ForgeHooksClient.setRenderPass(pass);
             int finalPass = pass;
-            renderedBlocksMap.forEach((renderedBlocks, hook) -> {
-                if (hook != null) {
-                    hook.apply(true, finalPass, null);
+            renderedBlocksMap.forEach(pair -> {
+                if (pair.getValue() != null) {
+                    pair.getValue().apply(true, finalPass, null);
                 } else {
                     setDefaultPassRenderState(finalPass);
                 }
-                for (BlockPos pos : renderedBlocks) {
+                for (BlockPos pos : pair.getKey()) {
                     TileEntity tile = world.getTileEntity(pos);
                     if (tile != null) {
                         if (tile.shouldRenderInPass(finalPass)) {

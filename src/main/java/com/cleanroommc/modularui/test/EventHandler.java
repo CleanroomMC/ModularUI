@@ -16,7 +16,7 @@ public class EventHandler {
                     .inFrontOf(Minecraft.getMinecraft().player, 5, false)
                     .screenScale(0.5f)
                     .open(new TestGui());*/
-            ClientGUI.open(new TestGui());
+            ClientGUI.open(new ResizerTest());
         }
     }
 }
