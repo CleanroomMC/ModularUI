@@ -180,12 +180,12 @@ public class ModularContainer extends Container implements ISortableContainer {
                         slot.putStack(stack.copy());
                         return stack;
                     }
-                } else if (ItemHandlerHelper.canItemStacksStack(stack, itemstack)) {
+                } else if (itemstack.isEmpty() || ItemHandlerHelper.canItemStacksStack(stack, itemstack)) {
                     int j = itemstack.getCount() + stack.getCount();
                     int maxSize = Math.min(slot.getSlotStackLimit(), stack.getMaxStackSize());
 
                     if (j <= maxSize) {
-                        stack.setCount(0);
+                        fromSlot.putStack(ItemStack.EMPTY);
                         itemstack.setCount(j);
                         slot.onSlotChanged();
                     } else if (itemstack.getCount() < maxSize) {
