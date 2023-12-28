@@ -5,9 +5,12 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import com.google.common.base.Preconditions;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * BlockInfo represents immutable information for block in world
@@ -17,29 +20,33 @@ import com.google.common.base.Preconditions;
 public class BlockInfo {
 
     public static final BlockInfo EMPTY = new BlockInfo(Blocks.AIR);
+    public static final BlockInfo INVALID = new BlockInfo(Blocks.AIR);
 
-    private final IBlockState blockState;
-    private final TileEntity tileEntity;
-    private final Object info;
+    public static BlockInfo of(IBlockAccess world, BlockPos pos) {
+        IBlockState blockState = world.getBlockState(pos);
+        if (blockState.getBlock().isAir(blockState, world, pos)) {
+            return EMPTY;
+        }
+        TileEntity tile = null;
+        if (blockState.getBlock().hasTileEntity(blockState)) {
+            tile = world.getTileEntity(pos);
+        }
+        return new BlockInfo(blockState, tile);
+    }
 
-    public BlockInfo(Block block) {
+    private IBlockState blockState;
+    private TileEntity tileEntity;
+
+    public BlockInfo(@NotNull Block block) {
         this(block.getDefaultState());
     }
 
-    public BlockInfo(IBlockState blockState) {
+    public BlockInfo(@NotNull IBlockState blockState) {
         this(blockState, null);
     }
 
-    public BlockInfo(IBlockState blockState, TileEntity tileEntity) {
-        this(blockState, tileEntity, null);
-    }
-
-    public BlockInfo(IBlockState blockState, TileEntity tileEntity, Object info) {
-        this.blockState = blockState;
-        this.tileEntity = tileEntity;
-        this.info = info;
-        Preconditions.checkArgument(tileEntity == null || blockState.getBlock().hasTileEntity(blockState),
-                "Cannot create block info with tile entity for block not having it");
+    public BlockInfo(@NotNull IBlockState blockState, @Nullable TileEntity tileEntity) {
+        set(blockState, tileEntity);
     }
 
     public IBlockState getBlockState() {
@@ -50,14 +57,92 @@ public class BlockInfo {
         return tileEntity;
     }
 
-    public Object getInfo() {
-        return info;
-    }
-
     public void apply(World world, BlockPos pos) {
         world.setBlockState(pos, blockState);
         if (tileEntity != null) {
             world.setTileEntity(pos, tileEntity);
+        } else {
+            tileEntity = world.getTileEntity(pos);
+        }
+    }
+
+    BlockInfo set(IBlockState state, TileEntity tile) {
+        Preconditions.checkNotNull(state, "Block state must not be null!");
+        Preconditions.checkArgument(tile == null || state.getBlock().hasTileEntity(state),
+                "Cannot create block info with tile entity for block not having it!");
+        this.blockState = state;
+        this.tileEntity = tile;
+        return this;
+    }
+
+    public boolean isMutable() {
+        return false;
+    }
+
+    public Mut toMutable() {
+        return new Mut(this.blockState, this.tileEntity);
+    }
+
+    public BlockInfo toImmutable() {
+        return this;
+    }
+
+    public BlockInfo copy() {
+        return new BlockInfo(this.blockState, this.tileEntity);
+    }
+
+    public static class Mut extends BlockInfo {
+
+        public static final Mut SHARED = new Mut();
+
+        public Mut() {
+            this(Blocks.AIR);
+        }
+
+        public Mut(@NotNull Block block) {
+            super(block);
+        }
+
+        public Mut(@NotNull IBlockState blockState) {
+            super(blockState);
+        }
+
+        public Mut(@NotNull IBlockState blockState, @Nullable TileEntity tileEntity) {
+            super(blockState, tileEntity);
+        }
+
+        @Override
+        public Mut set(IBlockState state, TileEntity tile) {
+            return (Mut) super.set(state, tile);
+        }
+
+        public Mut set(IBlockAccess world, BlockPos pos) {
+            IBlockState blockState = world.getBlockState(pos);
+            TileEntity tile = null;
+            if (blockState.getBlock().hasTileEntity(blockState)) {
+                tile = world.getTileEntity(pos);
+            }
+            return set(blockState, tile);
+        }
+
+        @Override
+        public boolean isMutable() {
+            return true;
+        }
+
+        @Override
+        public Mut toMutable() {
+            return this;
+        }
+
+        @Override
+        public BlockInfo toImmutable() {
+            return new BlockInfo(getBlockState(), getTileEntity());
+        }
+
+        @Override
+        public Mut copy() {
+            return new Mut(getBlockState(), getTileEntity());
         }
     }
 }

@@ -3,9 +3,6 @@ package com.cleanroommc.modularui.drawable;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.utils.fakeworld.FBOWorldSceneRenderer;
-import com.cleanroommc.modularui.utils.fakeworld.TrackedDummyWorld;
-import com.cleanroommc.modularui.utils.fakeworld.WorldSceneRenderer;
 
 import net.minecraft.client.shader.Framebuffer;
 

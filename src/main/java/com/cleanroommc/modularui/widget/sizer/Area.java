@@ -14,6 +14,11 @@ import java.awt.geom.Rectangle2D;
  */
 public class Area extends Rectangle implements IUnResizeable {
 
+    public static boolean isInside(int x, int y, int w, int h, int px, int py) {
+        SHARED.set(x, y, w, h);
+        return SHARED.isInside(px, py);
+    }
+
     public static final Area SHARED = new Area();
 
     /**
