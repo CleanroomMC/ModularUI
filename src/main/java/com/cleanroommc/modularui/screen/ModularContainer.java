@@ -163,59 +163,60 @@ public class ModularContainer extends Container implements ISortableContainer {
             if (!stack.isEmpty()) {
                 ItemStack remainder = transferItem(slot, stack.copy());
                 stack.setCount(remainder.getCount());
+                slot.putStack(stack);
                 return ItemStack.EMPTY;
             }
         }
         return ItemStack.EMPTY;
     }
 
-    protected ItemStack transferItem(ModularSlot fromSlot, ItemStack stack) {
+    protected ItemStack transferItem(ModularSlot fromSlot, ItemStack fromStack) {
         @Nullable SlotGroup fromSlotGroup = fromSlot.getSlotGroup();
-        for (ModularSlot slot : this.shiftClickSlots) {
-            SlotGroup slotGroup = Objects.requireNonNull(slot.getSlotGroup());
-            if (slotGroup != fromSlotGroup && slot.isEnabled() && slot.isItemValid(stack)) {
-                ItemStack itemstack = slot.getStack();
-                if (slot.isPhantom()) {
-                    if (itemstack.isEmpty() || (ItemHandlerHelper.canItemStacksStack(stack, itemstack) && itemstack.getCount() < slot.getItemStackLimit(itemstack))) {
-                        slot.putStack(stack.copy());
-                        return stack;
+        for (ModularSlot toSlot : this.shiftClickSlots) {
+            SlotGroup slotGroup = Objects.requireNonNull(toSlot.getSlotGroup());
+            if (slotGroup != fromSlotGroup && toSlot.isEnabled() && toSlot.isItemValid(fromStack)) {
+                ItemStack toStack = toSlot.getStack().copy();
+                if (toSlot.isPhantom()) {
+                    if (toStack.isEmpty() || (ItemHandlerHelper.canItemStacksStack(fromStack, toStack) && toStack.getCount() < toSlot.getItemStackLimit(toStack))) {
+                        toSlot.putStack(fromStack.copy());
+                        return fromStack;
                     }
-                } else if (ItemHandlerHelper.canItemStacksStack(stack, itemstack)) {
-                    int j = itemstack.getCount() + stack.getCount();
-                    int maxSize = Math.min(slot.getSlotStackLimit(), stack.getMaxStackSize());
+                } else if (ItemHandlerHelper.canItemStacksStack(fromStack, toStack)) {
+                    int j = toStack.getCount() + fromStack.getCount();
+                    int maxSize = Math.min(toSlot.getSlotStackLimit(), fromStack.getMaxStackSize());
 
                     if (j <= maxSize) {
-                        fromSlot.putStack(ItemStack.EMPTY);
-                        itemstack.setCount(j);
-                        slot.onSlotChanged();
-                    } else if (itemstack.getCount() < maxSize) {
-                        stack.shrink(maxSize - itemstack.getCount());
-                        itemstack.setCount(maxSize);
-                        slot.onSlotChanged();
+                        fromStack.setCount(0);
+                        toStack.setCount(j);
+                        toSlot.putStack(toStack);
+                    } else if (toStack.getCount() < maxSize) {
+                        fromStack.shrink(maxSize - toStack.getCount());
+                        toStack.setCount(maxSize);
+                        toSlot.putStack(toStack);
                     }
 
-                    if (stack.isEmpty()) {
-                        return stack;
+                    if (fromStack.isEmpty()) {
+                        return fromStack;
                     }
                 }
             }
         }
-        for (ModularSlot slot : this.shiftClickSlots) {
-            ItemStack itemstack = slot.getStack();
-            SlotGroup slotGroup = Objects.requireNonNull(slot.getSlotGroup());
-            if (slotGroup != fromSlotGroup && slot.isEnabled() && itemstack.isEmpty() && slot.isItemValid(stack)) {
-                if (stack.getCount() > slot.getSlotStackLimit()) {
-                    slot.putStack(stack.splitStack(slot.getSlotStackLimit()));
+        for (ModularSlot emptySlot : this.shiftClickSlots) {
+            ItemStack itemstack = emptySlot.getStack();
+            SlotGroup slotGroup = Objects.requireNonNull(emptySlot.getSlotGroup());
+            if (slotGroup != fromSlotGroup && emptySlot.isEnabled() && itemstack.isEmpty() && emptySlot.isItemValid(fromStack)) {
+                if (fromStack.getCount() > emptySlot.getSlotStackLimit()) {
+                    emptySlot.putStack(fromStack.splitStack(emptySlot.getSlotStackLimit()));
                 } else {
-                    slot.putStack(stack.splitStack(stack.getCount()));
+                    emptySlot.putStack(fromStack.splitStack(fromStack.getCount()));
                 }
-                if (stack.getCount() < 1) {
+                if (fromStack.getCount() < 1) {
                     fromSlot.putStack(ItemStack.EMPTY);
                     break;
                 }
             }
         }
-        return stack;
+        return fromStack;
     }
 
     private static boolean isPlayerSlot(Slot slot) {
