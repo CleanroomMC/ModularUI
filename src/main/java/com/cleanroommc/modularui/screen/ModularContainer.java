@@ -190,7 +190,7 @@ public class ModularContainer extends Container implements ISortableContainer {
             } else {
                 Slot clickedSlot = getSlot(slotId);
 
-                ItemStack slotStack = clickedSlot.getStack().copy();
+                ItemStack slotStack = clickedSlot.getStack();
                 ItemStack heldStack = inventoryplayer.getItemStack();
 
                 if (slotStack.isEmpty()) {
