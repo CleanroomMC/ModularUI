@@ -50,7 +50,8 @@ public class ModularContainer extends Container implements ISortableContainer {
     private final List<ModularSlot> shiftClickSlots = new ArrayList<>();
 
     private static final int DROP_TO_WORLD = -999;
-    private static final int LEFT_MOUSE_CLICK = 0;
+    private static final int LEFT_MOUSE = 0;
+    private static final int RIGHT_MOUSE = 1;
 
     public ModularContainer(GuiSyncManager guiSyncManager) {
         this.guiSyncManager = Objects.requireNonNull(guiSyncManager);
@@ -159,19 +160,20 @@ public class ModularContainer extends Container implements ISortableContainer {
         return true;
     }
 
-    public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, EntityPlayer player) {
+    public ItemStack slotClick(int slotId, int mouseButton, ClickType clickTypeIn, EntityPlayer player) {
         ItemStack returnable = ItemStack.EMPTY;
         InventoryPlayer inventoryplayer = player.inventory;
 
-        if ((clickTypeIn == ClickType.PICKUP || clickTypeIn == ClickType.QUICK_MOVE) && (dragType == 0 || dragType == 1)) {
+        if ((clickTypeIn == ClickType.PICKUP || clickTypeIn == ClickType.QUICK_MOVE) &&
+                (mouseButton == LEFT_MOUSE || mouseButton == RIGHT_MOUSE)) {
             if (slotId == DROP_TO_WORLD) {
                 if (!inventoryplayer.getItemStack().isEmpty()) {
-                    if (dragType == 0) {
+                    if (mouseButton == LEFT_MOUSE) {
                         player.dropItem(inventoryplayer.getItemStack(), true);
                         inventoryplayer.setItemStack(ItemStack.EMPTY);
                     }
 
-                    if (dragType == 1) {
+                    if (mouseButton == RIGHT_MOUSE) {
                         player.dropItem(inventoryplayer.getItemStack().splitStack(1), true);
                     }
                 }
@@ -193,7 +195,7 @@ public class ModularContainer extends Container implements ISortableContainer {
 
                 if (slotStack.isEmpty()) {
                     if (!heldStack.isEmpty() && clickedSlot.isItemValid(heldStack)) {
-                        int stackCount = dragType == LEFT_MOUSE_CLICK ? heldStack.getCount() : 1;
+                        int stackCount = mouseButton == LEFT_MOUSE ? heldStack.getCount() : 1;
 
                         if (stackCount > clickedSlot.getItemStackLimit(heldStack)) {
                             stackCount = clickedSlot.getItemStackLimit(heldStack);
@@ -203,7 +205,7 @@ public class ModularContainer extends Container implements ISortableContainer {
                     }
                 } else if (clickedSlot.canTakeStack(player)) {
                     if (heldStack.isEmpty() && !slotStack.isEmpty()) {
-                        int toRemove = dragType == 0 ? slotStack.getCount() : (slotStack.getCount() + 1) / 2;
+                        int toRemove = mouseButton == 0 ? slotStack.getCount() : (slotStack.getCount() + 1) / 2;
                         inventoryplayer.setItemStack(slotStack.splitStack(toRemove));
                         clickedSlot.putStack(slotStack);
 
@@ -212,7 +214,7 @@ public class ModularContainer extends Container implements ISortableContainer {
                         if (slotStack.getItem() == heldStack.getItem() &&
                                 slotStack.getMetadata() == heldStack.getMetadata() &&
                                 ItemStack.areItemStackTagsEqual(slotStack, heldStack)) {
-                            int stackCount = dragType == LEFT_MOUSE_CLICK ? heldStack.getCount() : 1;
+                            int stackCount = mouseButton == LEFT_MOUSE ? heldStack.getCount() : 1;
 
                             if (stackCount > clickedSlot.getItemStackLimit(heldStack) - slotStack.getCount()) {
                                 stackCount = clickedSlot.getItemStackLimit(heldStack) - slotStack.getCount();
@@ -255,7 +257,7 @@ public class ModularContainer extends Container implements ISortableContainer {
             return returnable;
         }
 
-        return super.slotClick(slotId, dragType, clickTypeIn, player);
+        return super.slotClick(slotId, mouseButton, clickTypeIn, player);
     }
 
 
