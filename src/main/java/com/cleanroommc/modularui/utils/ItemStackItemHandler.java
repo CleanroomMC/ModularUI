@@ -46,14 +46,6 @@ public class ItemStackItemHandler extends ItemStackHandler implements ICapabilit
         return nbt.getTagList(KEY_ITEMS, Constants.NBT.TAG_COMPOUND);
     }
 
-    @NotNull
-    @Override
-    public ItemStack extractItem(int slot, int amount, boolean simulate) {
-        var stack = super.extractItem(slot, amount, simulate);
-        onContentsChanged(slot);
-        return stack;
-    }
-
     @Override
     public boolean hasCapability(@NotNull Capability<?> capability, @Nullable EnumFacing facing) {
         return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY;
