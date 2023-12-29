@@ -115,12 +115,6 @@ public class ItemStackItemHandler implements IItemHandlerModifiable, ICapability
     protected void onContentsChanged(int slot) {
     }
 
-    protected void validateSlotIndex(int slot) {
-        if (slot < 0 || slot >= this.slots) {
-            throw new RuntimeException("Slot " + slot + " not in valid range - [0," + this.slots + ")");
-        }
-    }
-
     public NBTTagList getItemsNbt() {
         NBTTagCompound nbt = this.container.getTagCompound();
         if (nbt == null) {
@@ -135,6 +129,12 @@ public class ItemStackItemHandler implements IItemHandlerModifiable, ICapability
             nbt.setTag(KEY_ITEMS, list);
         }
         return nbt.getTagList(KEY_ITEMS, Constants.NBT.TAG_COMPOUND);
+    }
+
+    protected void validateSlotIndex(int slot) {
+        if (slot < 0 || slot >= this.slots) {
+            throw new RuntimeException("Slot " + slot + " not in valid range - [0," + this.slots + ")");
+        }
     }
 
     @Override
