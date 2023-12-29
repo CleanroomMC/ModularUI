@@ -205,7 +205,7 @@ public class ModularContainer extends Container implements ISortableContainer {
                     }
                 } else if (clickedSlot.canTakeStack(player)) {
                     if (heldStack.isEmpty() && !slotStack.isEmpty()) {
-                        int toRemove = mouseButton == 0 ? slotStack.getCount() : (slotStack.getCount() + 1) / 2;
+                        int toRemove = mouseButton == LEFT_MOUSE ? slotStack.getCount() : (slotStack.getCount() + 1) / 2;
                         inventoryplayer.setItemStack(slotStack.splitStack(toRemove));
                         clickedSlot.putStack(slotStack);
 
