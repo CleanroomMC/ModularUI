@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.factory.HandGuiData;
 import com.cleanroommc.modularui.factory.ItemGuiFactory;
 import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.utils.ItemCapabilityProvider;
 import com.cleanroommc.modularui.utils.ItemStackItemHandler;
 import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandlers;
@@ -20,6 +21,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -40,16 +42,15 @@ public class TestItem extends Item implements IGuiHolder<HandGuiData> {
 
         ModularPanel panel = ModularPanel.defaultPanel("knapping_gui");
         panel.child(new Column()
-                //.coverChildren()
-                .padding(7)
+                .paddingTop(7)
                 .child(SlotGroupWidget.playerInventory())
                 .child(SlotGroupWidget.builder()
                         .row("II")
                         .row("II")
-                        .key('I', index -> new ItemSlot().slot(SyncHandlers.phantomItemSlot(itemHandler, index)
+                        .key('I', index -> new ItemSlot().slot(SyncHandlers.itemSlot(itemHandler, index)
                                 .ignoreMaxStackSize(true)
                                 .slotGroup("mixer_items")))
-                        .build()));
+                        .build()).marginTop(8));
 
         return panel;
     }
@@ -66,6 +67,14 @@ public class TestItem extends Item implements IGuiHolder<HandGuiData> {
     @Nullable
     @Override
     public ICapabilityProvider initCapabilities(@NotNull ItemStack stack, @Nullable NBTTagCompound nbt) {
-        return new ItemStackItemHandler(stack, 4);
+        return new ItemCapabilityProvider() {
+            @Override
+            public <T> @Nullable T getCapability(@NotNull Capability<T> capability) {
+                if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+                    return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(new ItemStackItemHandler(stack, 4));
+                }
+                return null;
+            }
+        };
     }
 }
