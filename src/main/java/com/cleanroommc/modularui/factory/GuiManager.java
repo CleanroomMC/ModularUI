@@ -10,6 +10,7 @@ import com.cleanroommc.modularui.widget.WidgetTree;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.client.event.GuiOpenEvent;
@@ -26,6 +27,8 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
@@ -34,7 +37,7 @@ public class GuiManager {
     private static final Object2ObjectMap<String, UIFactory<?>> FACTORIES = new Object2ObjectOpenHashMap<>(16);
 
     private static GuiScreenWrapper lastMui;
-    private static boolean canOpen = true;
+    private static final List<EntityPlayer> openedContainers = new ArrayList<>(4);
 
     public static void registerFactory(UIFactory<?> factory) {
         Objects.requireNonNull(factory);
@@ -55,9 +58,8 @@ public class GuiManager {
     }
 
     public static <T extends GuiData> void open(@NotNull UIFactory<T> factory, @NotNull T guiData, EntityPlayerMP player) {
-        if (player instanceof FakePlayer) return;
-        if (!canOpen) return;
-        canOpen = false;
+        if (player instanceof FakePlayer || openedContainers.contains(player)) return;
+        openedContainers.add(player);
         // create panel, collect sync handlers and create container
         guiData.setJeiSettings(JeiSettings.DUMMY);
         GuiSyncManager syncManager = new GuiSyncManager(player);
@@ -105,7 +107,7 @@ public class GuiManager {
     @SubscribeEvent
     public static void onTick(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
-            canOpen = true;
+            openedContainers.clear();
         }
     }
 
