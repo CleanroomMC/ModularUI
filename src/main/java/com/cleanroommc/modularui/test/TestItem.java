@@ -40,16 +40,15 @@ public class TestItem extends Item implements IGuiHolder<HandGuiData> {
 
         ModularPanel panel = ModularPanel.defaultPanel("knapping_gui");
         panel.child(new Column()
-                //.coverChildren()
-                .padding(7)
+                .paddingTop(7)
                 .child(SlotGroupWidget.playerInventory())
                 .child(SlotGroupWidget.builder()
                         .row("II")
                         .row("II")
-                        .key('I', index -> new ItemSlot().slot(SyncHandlers.phantomItemSlot(itemHandler, index)
+                        .key('I', index -> new ItemSlot().slot(SyncHandlers.itemSlot(itemHandler, index)
                                 .ignoreMaxStackSize(true)
                                 .slotGroup("mixer_items")))
-                        .build()));
+                        .build()).marginTop(8));
 
         return panel;
     }

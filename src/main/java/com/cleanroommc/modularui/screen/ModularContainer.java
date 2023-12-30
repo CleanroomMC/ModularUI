@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.core.mixin.ContainerAccessor;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
@@ -62,6 +63,10 @@ public class ModularContainer extends Container implements ISortableContainer {
     @SideOnly(Side.CLIENT)
     public ModularContainer() {
         this.guiSyncManager = null;
+    }
+
+    public ContainerAccessor acc() {
+        return (ContainerAccessor) this;
     }
 
     @Override
@@ -160,9 +165,14 @@ public class ModularContainer extends Container implements ISortableContainer {
         return true;
     }
 
-    public ItemStack slotClick(int slotId, int mouseButton, ClickType clickTypeIn, EntityPlayer player) {
+    @Override
+    public @NotNull ItemStack slotClick(int slotId, int mouseButton, @NotNull ClickType clickTypeIn, EntityPlayer player) {
         ItemStack returnable = ItemStack.EMPTY;
         InventoryPlayer inventoryplayer = player.inventory;
+
+        if (clickTypeIn == ClickType.QUICK_CRAFT || acc().getDragEvent() != 0) {
+            return super.slotClick(slotId, mouseButton, clickTypeIn, player);
+        }
 
         if ((clickTypeIn == ClickType.PICKUP || clickTypeIn == ClickType.QUICK_MOVE) &&
                 (mouseButton == LEFT_MOUSE || mouseButton == RIGHT_MOUSE)) {
@@ -267,7 +277,8 @@ public class ModularContainer extends Container implements ISortableContainer {
             ItemStack stack = slot.getStack();
             if (!stack.isEmpty()) {
                 ItemStack remainder = transferItem(slot, stack.copy());
-                stack.setCount(remainder.getCount());
+                if (remainder.isEmpty()) stack = ItemStack.EMPTY;
+                else stack.setCount(remainder.getCount());
                 slot.putStack(stack);
                 return ItemStack.EMPTY;
             }
