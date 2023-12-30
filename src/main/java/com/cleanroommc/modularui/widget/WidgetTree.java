@@ -1,5 +1,7 @@
 package com.cleanroommc.modularui.widget;
 
+import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.api.layout.IViewport;
@@ -11,12 +13,16 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.value.sync.GuiSyncManager;
+import com.cleanroommc.modularui.widget.sizer.Area;
+import com.cleanroommc.modularui.widgets.layout.IExpander;
 
 import net.minecraft.client.renderer.GlStateManager;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
@@ -49,11 +55,11 @@ public class WidgetTree {
         return children;
     }
 
-    public static boolean foreachChildByLayer(IWidget parent, Predicate<IWidget> consumer) {
-        return foreachChildByLayer(parent, consumer, false);
+    public static boolean foreachChildBFS(IWidget parent, Predicate<IWidget> consumer) {
+        return foreachChildBFS(parent, consumer, false);
     }
 
-    public static boolean foreachChildByLayer(IWidget parent, Predicate<IWidget> consumer, boolean includeSelf) {
+    public static boolean foreachChildBFS(IWidget parent, Predicate<IWidget> consumer, boolean includeSelf) {
         if (includeSelf && !consumer.test(parent)) return false;
         ObjectList<IWidget> parents = ObjectList.create();
         parents.add(parent);
@@ -207,7 +213,7 @@ public class WidgetTree {
 
     @ApiStatus.Internal
     public static void onUpdate(IWidget parent) {
-        foreachChildByLayer(parent, widget -> {
+        foreachChildBFS(parent, widget -> {
             widget.onUpdate();
             return true;
         }, true);
@@ -221,63 +227,71 @@ public class WidgetTree {
         }
         // now apply the calculated pos
         applyPos(parent);
-        WidgetTree.foreachChildByLayer(parent, child -> {
+        WidgetTree.foreachChildBFS(parent, child -> {
             child.postResize();
             return true;
         }, true);
     }
 
     private static boolean resizeWidget(IWidget widget, boolean init) {
-        boolean result = false;
+        boolean result = false, alreadyCalculated = false;
         // first try to resize this widget
         IResizeable resizer = widget.resizer();
         if (resizer != null) {
             if (init) {
                 widget.beforeResize();
                 resizer.initResizing();
+            } else {
+                // if this is not the first time check if this widget is already resized
+                alreadyCalculated = resizer.isFullyCalculated();
             }
-            result = resizer.resize(widget);
+            result = alreadyCalculated || resizer.resize(widget);
+        } else if (!init) {
+            // weird case that is not supposed to happen
+            result = true;
+            alreadyCalculated = true;
         }
 
+        GuiAxis expandAxis = widget instanceof IExpander expander ? expander.getExpandAxis() : null;
         // now resize all children and collect children which could not be fully calculated
-        List<IWidget> anotherResize = new ArrayList<>();
+        List<IWidget> anotherResize = Collections.emptyList();
         if (widget.hasChildren()) {
-            widget.getChildren().forEach(iWidget -> {
-                if (!resizeWidget(iWidget, init)) {
-                    anotherResize.add(iWidget);
+            anotherResize = new ArrayList<>();
+            for (IWidget child : widget.getChildren()) {
+                if (init && expandAxis != null) child.flex().checkExpanded(expandAxis);
+                if (!resizeWidget(child, init)) {
+                    anotherResize.add(child);
                 }
-            });
+            }
         }
 
-        if (widget instanceof ILayoutWidget layoutWidget) {
-            layoutWidget.layoutWidgets();
-        }
+        if (!alreadyCalculated) {
+            if (widget instanceof ILayoutWidget layoutWidget) {
+                layoutWidget.layoutWidgets();
+            }
 
-        // post resize this widget if possible
-        if (resizer != null && !result) {
-            result = resizer.postResize(widget);
-        }
+            // post resize this widget if possible
+            if (resizer != null && !result) {
+                result = resizer.postResize(widget);
+            }
 
-        if (widget instanceof ILayoutWidget layoutWidget) {
-            layoutWidget.postLayoutWidgets();
+            if (widget instanceof ILayoutWidget layoutWidget) {
+                layoutWidget.postLayoutWidgets();
+            }
         }
 
         // now fully resize all children which needs it
         if (!anotherResize.isEmpty()) {
-            anotherResize.forEach(iWidget -> {
-                if (!iWidget.resizer().isFullyCalculated()) {
-                    resizeWidget(iWidget, false);
-                }
-            });
+            anotherResize.removeIf(iWidget -> resizeWidget(iWidget, false));
         }
 
-        if (result) widget.onResized();
+        if (result && !alreadyCalculated) widget.onResized();
 
-        return result;
+        return result && anotherResize.isEmpty();
     }
 
     public static void applyPos(IWidget parent) {
-        WidgetTree.foreachChildByLayer(parent, child -> {
+        WidgetTree.foreachChildBFS(parent, child -> {
             IResizeable resizer = child.resizer();
             if (resizer != null) {
                 resizer.applyPos(child);
@@ -322,7 +336,7 @@ public class WidgetTree {
     public static void collectSyncValues(GuiSyncManager syncManager, ModularPanel panel) {
         AtomicInteger id = new AtomicInteger(0);
         String syncKey = GuiSyncManager.AUTO_SYNC_PREFIX + panel.getName();
-        foreachChildByLayer(panel, widget -> {
+        foreachChildBFS(panel, widget -> {
             if (widget instanceof ISynced<?> synced) {
                 if (synced.isSynced() && !syncManager.hasSyncHandler(synced.getSyncHandler())) {
                     syncManager.syncValue(syncKey, id.getAndIncrement(), synced.getSyncHandler());
@@ -330,5 +344,36 @@ public class WidgetTree {
             }
             return true;
         }, true);
+    }
+
+    public static void print(IWidget parent, Predicate<IWidget> test) {
+        StringBuilder builder = new StringBuilder("Widget tree of ")
+                .append(parent)
+                .append('\n');
+        getTree(parent.getArea(), parent, test, builder, 0);
+        ModularUI.LOGGER.info(builder.toString());
+    }
+
+    private static void getTree(Area root, IWidget parent, Predicate<IWidget> test, StringBuilder builder, int indent) {
+        if (indent >= 2) {
+            builder.append(StringUtils.repeat(' ', indent - 2))
+                    .append("- ");
+        }
+        builder.append(parent).append(" {")
+                .append(parent.getArea().x - root.x)
+                .append(", ")
+                .append(parent.getArea().y - root.y)
+                .append(" | ")
+                .append(parent.getArea().width)
+                .append(", ")
+                .append(parent.getArea().height)
+                .append("}\n");
+        if (parent.hasChildren()) {
+            for (IWidget child : parent.getChildren()) {
+                if (test.test(child)) {
+                    getTree(root, child, test, builder, indent + 2);
+                }
+            }
+        }
     }
 }
