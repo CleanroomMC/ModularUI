@@ -291,6 +291,12 @@ public class Flex implements IResizeable, IPositioned<Flex> {
         return this.x.hasFixedSize() && this.y.hasFixedSize();
     }
 
+    @ApiStatus.Internal
+    public void checkExpanded(GuiAxis axis) {
+        if (axis.isHorizontal()) this.x.setExpanded(this.expanded);
+        else this.y.setExpanded(this.expanded);
+    }
+
     @Override
     public void initResizing() {
         setMarginPaddingApplied(false);

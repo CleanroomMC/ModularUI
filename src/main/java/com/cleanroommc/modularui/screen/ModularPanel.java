@@ -625,6 +625,10 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return child(SlotGroupWidget.playerInventory());
     }
 
+    public ModularPanel bindPlayerInventory(int bottom) {
+        return child(SlotGroupWidget.playerInventory(bottom));
+    }
+
     @Override
     public String toString() {
         return super.toString() + "#" + getName();

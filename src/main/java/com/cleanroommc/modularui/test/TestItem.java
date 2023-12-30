@@ -4,10 +4,12 @@ import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.factory.HandGuiData;
 import com.cleanroommc.modularui.factory.ItemGuiFactory;
 import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.ItemCapabilityProvider;
 import com.cleanroommc.modularui.utils.ItemStackItemHandler;
 import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandlers;
+import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widgets.ItemSlot;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import com.cleanroommc.modularui.widgets.layout.Column;
@@ -41,16 +43,17 @@ public class TestItem extends Item implements IGuiHolder<HandGuiData> {
         guiSyncManager.registerSlotGroup("mixer_items", 2);
 
         ModularPanel panel = ModularPanel.defaultPanel("knapping_gui");
-        panel.child(new Column()
-                .paddingTop(7)
-                .child(SlotGroupWidget.playerInventory())
-                .child(SlotGroupWidget.builder()
-                        .row("II")
-                        .row("II")
-                        .key('I', index -> new ItemSlot().slot(SyncHandlers.itemSlot(itemHandler, index)
-                                .ignoreMaxStackSize(true)
-                                .slotGroup("mixer_items")))
-                        .build()).marginTop(8));
+        panel.child(new Column().margin(7)
+                .child(new ParentWidget<>().widthRel(1f).expanded()
+                        .child(SlotGroupWidget.builder()
+                                .row("II")
+                                .row("II")
+                                .key('I', index -> new ItemSlot().slot(SyncHandlers.itemSlot(itemHandler, index)
+                                        .ignoreMaxStackSize(true)
+                                        .slotGroup("mixer_items")))
+                                .build()
+                                .align(Alignment.Center)))
+                .child(SlotGroupWidget.playerInventory(0)));
 
         return panel;
     }
