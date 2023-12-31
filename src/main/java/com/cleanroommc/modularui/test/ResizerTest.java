@@ -29,12 +29,15 @@ public class ResizerTest extends CustomModularScreen {
         world.addBlock(new BlockPos(0, 0, 0), new BlockInfo(Blocks.DIAMOND_BLOCK.getDefaultState()));
         world.addBlock(new BlockPos(0, 1, 0), new BlockInfo(Blocks.BEDROCK.getDefaultState()));
         world.addBlock(new BlockPos(1, 0, 1), new BlockInfo(Blocks.GOLD_BLOCK.getDefaultState()));*/
-        double pitch = Math.PI / 4;
-        double yaw = Math.PI / 4;
         return ModularPanel.defaultPanel("main")
                 .size(150)
                 .overlay(new SchemaRenderer(BoxSchema.of(Minecraft.getMinecraft().world, new BlockPos(Minecraft.getMinecraft().player), 5))
-                        .cameraFunc((camera, schema) -> camera.setLookAt(new BlockPos(Minecraft.getMinecraft().player), 20, pitch, yaw))
+                        .cameraFunc((camera, schema) -> {
+                            double pitch = Math.PI / 4;
+                            double T = 4000D;
+                            double yaw = Minecraft.getSystemTime() % T / T * Math.PI * 2;
+                            camera.setLookAt(new BlockPos(Minecraft.getMinecraft().player), 20, yaw, pitch);
+                        })
                         .isometric(true)
                         .asIcon().size(140));
     }

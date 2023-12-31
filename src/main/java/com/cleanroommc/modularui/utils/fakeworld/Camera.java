@@ -32,18 +32,18 @@ public class Camera {
         return this;
     }
 
-    public Camera setLookAt(Vector3f lookAt, double radius, double rotationPitch, double rotationYaw) {
-        return setLookAt(lookAt.x, lookAt.y, lookAt.z, radius, rotationPitch, rotationYaw);
+    public Camera setLookAt(Vector3f lookAt, double radius, double yaw, double pitch) {
+        return setLookAt(lookAt.x, lookAt.y, lookAt.z, radius, yaw, pitch);
     }
 
-    public Camera setLookAt(Vec3i lookAt, double radius, double rotationPitch, double rotationYaw) {
-        return setLookAt(lookAt.getX(), lookAt.getY(), lookAt.getZ(), radius, rotationPitch, rotationYaw);
+    public Camera setLookAt(Vec3i lookAt, double radius, double yaw, double pitch) {
+        return setLookAt(lookAt.getX(), lookAt.getY(), lookAt.getZ(), radius, yaw, pitch);
     }
 
-    public Camera setLookAt(float lookAtX, float lookAtY, float lookAtZ, double radius, double rotationPitch, double rotationYaw) {
+    public Camera setLookAt(float lookAtX, float lookAtY, float lookAtZ, double radius, double yaw, double pitch) {
         setLookAt(lookAtX, lookAtY, lookAtZ);
-        Vector3f pos = new Vector3f((float) Math.cos(rotationPitch), (float) 0, (float) Math.sin(rotationPitch));
-        pos.y += (float) (Math.tan(rotationYaw) * pos.length());
+        Vector3f pos = new Vector3f((float) Math.cos(yaw), (float) 0, (float) Math.sin(yaw));
+        pos.y += (float) (Math.tan(pitch) * pos.length());
         pos.normalise().scale((float) radius);
         this.pos.set(pos.translate(lookAtX, lookAtY, lookAtZ));
         return this;
