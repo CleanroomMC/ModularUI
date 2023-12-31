@@ -111,6 +111,7 @@ public class GuiManager {
         }
     }
 
+    @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public static void onGuiOpen(GuiOpenEvent event) {
         if (lastMui != null && event.getGui() == null) {
