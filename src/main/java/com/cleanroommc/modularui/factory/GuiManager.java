@@ -10,10 +10,15 @@ import com.cleanroommc.modularui.widget.WidgetTree;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -22,6 +27,8 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
@@ -30,6 +37,7 @@ public class GuiManager {
     private static final Object2ObjectMap<String, UIFactory<?>> FACTORIES = new Object2ObjectOpenHashMap<>(16);
 
     private static GuiScreenWrapper lastMui;
+    private static final List<EntityPlayer> openedContainers = new ArrayList<>(4);
 
     public static void registerFactory(UIFactory<?> factory) {
         Objects.requireNonNull(factory);
@@ -50,6 +58,8 @@ public class GuiManager {
     }
 
     public static <T extends GuiData> void open(@NotNull UIFactory<T> factory, @NotNull T guiData, EntityPlayerMP player) {
+        if (player instanceof FakePlayer || openedContainers.contains(player)) return;
+        openedContainers.add(player);
         // create panel, collect sync handlers and create container
         guiData.setJeiSettings(JeiSettings.DUMMY);
         GuiSyncManager syncManager = new GuiSyncManager(player);
@@ -67,6 +77,8 @@ public class GuiManager {
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         factory.writeGuiData(guiData, buffer);
         NetworkHandler.sendToPlayer(new OpenGuiPacket<>(windowId, factory, buffer), player);
+        // finally invoke event
+        MinecraftForge.EVENT_BUS.post(new PlayerContainerEvent.Open(player, container));
     }
 
     @SideOnly(Side.CLIENT)
@@ -82,6 +94,7 @@ public class GuiManager {
         GuiScreenWrapper guiScreenWrapper = new GuiScreenWrapper(new ModularContainer(syncManager), screen);
         guiScreenWrapper.inventorySlots.windowId = windowId;
         Minecraft.getMinecraft().displayGuiScreen(guiScreenWrapper);
+        player.openContainer = guiScreenWrapper.inventorySlots;
     }
 
     @SideOnly(Side.CLIENT)
@@ -89,6 +102,13 @@ public class GuiManager {
         screen.getContext().setJeiSettings(jeiSettings);
         GuiScreenWrapper screenWrapper = new GuiScreenWrapper(new ModularContainer(), screen);
         Minecraft.getMinecraft().displayGuiScreen(screenWrapper);
+    }
+
+    @SubscribeEvent
+    public static void onTick(TickEvent.ServerTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            openedContainers.clear();
+        }
     }
 
     @SubscribeEvent

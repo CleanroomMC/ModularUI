@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.test;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.*;
@@ -23,14 +22,16 @@ import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Row;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -215,7 +216,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                         .size(14, 14)
                                                         .length(3)
                                                         .texture(GuiTextures.CYCLE_BUTTON_DEMO)
-                                                        .value(new IntValue.Dynamic(() -> this.val2, val -> this.val2 = val))
+                                                        .value(new IntSyncValue(() -> this.val2, val -> this.val2 = val))
                                                         .margin(8, 0))
                                                 .child(IKey.str("Hello World").asWidget().height(18)))
                                         .child(new SpecialButton(IKey.str("A very long string that looks cool when animated").withAnimation())
@@ -354,10 +355,27 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
             if (this.time++ % 20 == 0) {
                 this.val++;
             }
+        } else {
+            if (this.time++ % 20 == 0 && ++this.val2 == 3) {
+                this.val2 = 0;
+            }
         }
         if (++this.progress == this.duration) {
             this.progress = 0;
         }
+    }
+
+    @Override
+    public @NotNull NBTTagCompound writeToNBT(@NotNull NBTTagCompound compound) {
+        compound = super.writeToNBT(compound);
+        compound.setTag("item_inv", this.bigInventory.serializeNBT());
+        return compound;
+    }
+
+    @Override
+    public void readFromNBT(@NotNull NBTTagCompound compound) {
+        super.readFromNBT(compound);
+        this.bigInventory.deserializeNBT(compound.getCompoundTag("item_inv"));
     }
 
     private static class SpecialButton extends ButtonWidget<SpecialButton> {
