@@ -66,17 +66,17 @@ public class GuiManager {
         ModularPanel panel = factory.createPanel(guiData, syncManager);
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularContainer container = new ModularContainer(syncManager);
-        // open container // this mimics forge behaviour
+        // sync to client
         player.getNextWindowId();
         player.closeContainer();
         int windowId = player.currentWindowId;
-        player.openContainer = container;
-        player.openContainer.windowId = windowId;
-        player.openContainer.addListener(player);
-        // sync to client
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         factory.writeGuiData(guiData, buffer);
         NetworkHandler.sendToPlayer(new OpenGuiPacket<>(windowId, factory, buffer), player);
+        // open container // this mimics forge behaviour
+        player.openContainer = container;
+        player.openContainer.windowId = windowId;
+        player.openContainer.addListener(player);
         // finally invoke event
         MinecraftForge.EVENT_BUS.post(new PlayerContainerEvent.Open(player, container));
     }

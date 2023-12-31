@@ -50,7 +50,6 @@ public class OpenGuiPacket<T extends GuiData> implements IPacket {
     @Override
     public @Nullable IPacket executeClient(NetHandlerPlayClient handler) {
         GuiManager.open(this.windowId, this.factory, this.data, Minecraft.getMinecraft().player);
-        NetworkHandler.sendToServer(new OpenGuiHandshake(this.windowId));
         return null;
     }
 }
