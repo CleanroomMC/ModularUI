@@ -41,6 +41,7 @@ public class SchemaRenderer implements IDrawable {
     private Consumer<Projection> afterRender;
     private BiConsumer<Camera, ISchema> cameraFunc;
     private int clearColor = 0;
+    private boolean isometric = false;
 
     public SchemaRenderer(ISchema schema, Framebuffer framebuffer) {
         this.schema = schema;
@@ -63,6 +64,11 @@ public class SchemaRenderer implements IDrawable {
 
     public SchemaRenderer afterRender(Consumer<Projection> consumer) {
         this.afterRender = consumer;
+        return this;
+    }
+
+    public SchemaRenderer isometric(boolean isometric) {
+        this.isometric = isometric;
         return this;
     }
 
@@ -206,13 +212,27 @@ public class SchemaRenderer implements IDrawable {
         GlStateManager.pushMatrix();
         GlStateManager.loadIdentity();
 
-        float aspectRatio = width / (height * 1.0f);
-        GLU.gluPerspective(60.0f, aspectRatio, 0.1f, 10000.0f);
+        float near = this.isometric ? 1f : 0.1f;
+        float far = 10000.0f;
+        float fovY = 60.0f; // Field of view in the Y direction
+        float aspect = (float) width / height; // width and height are the dimensions of your window
+        float top = near * (float) Math.tan(Math.toRadians(fovY) / 2.0);
+        float bottom = -top;
+        float left = aspect * bottom;
+        float right = aspect * top;
+        if (this.isometric) {
+            GL11.glOrtho(left, right, bottom, top, near, far);
+        } else {
+            GL11.glFrustum(left, right, bottom, top, near, far);
+        }
 
         // setup modelview matrix
         GlStateManager.matrixMode(GL11.GL_MODELVIEW);
         GlStateManager.pushMatrix();
         GlStateManager.loadIdentity();
+        if (this.isometric) {
+            GlStateManager.scale(0.1, 0.1, 0.1);
+        }
         var c = this.camera.getPos();
         var lookAt = this.camera.getLookAt();
         GLU.gluLookAt(c.x, c.y, c.z, lookAt.x, lookAt.y, lookAt.z, 0, 1, 0);

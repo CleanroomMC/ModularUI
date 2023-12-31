@@ -25,16 +25,17 @@ public class ResizerTest extends CustomModularScreen {
                         .background(new SpriteDrawable(sprite))
                         .size(20)
                         .align(Alignment.Center));*/
-        TrackedDummyWorld world = new TrackedDummyWorld();
+        /*TrackedDummyWorld world = new TrackedDummyWorld();
         world.addBlock(new BlockPos(0, 0, 0), new BlockInfo(Blocks.DIAMOND_BLOCK.getDefaultState()));
         world.addBlock(new BlockPos(0, 1, 0), new BlockInfo(Blocks.BEDROCK.getDefaultState()));
-        world.addBlock(new BlockPos(1, 0, 1), new BlockInfo(Blocks.GOLD_BLOCK.getDefaultState()));
+        world.addBlock(new BlockPos(1, 0, 1), new BlockInfo(Blocks.GOLD_BLOCK.getDefaultState()));*/
         double pitch = Math.PI / 4;
         double yaw = Math.PI / 4;
         return ModularPanel.defaultPanel("main")
                 .size(150)
                 .overlay(new SchemaRenderer(BoxSchema.of(Minecraft.getMinecraft().world, new BlockPos(Minecraft.getMinecraft().player), 5))
-                        .cameraFunc((camera, schema) -> camera.setLookAt(new BlockPos(Minecraft.getMinecraft().player), 10, pitch, yaw))
+                        .cameraFunc((camera, schema) -> camera.setLookAt(new BlockPos(Minecraft.getMinecraft().player), 20, pitch, yaw))
+                        .isometric(true)
                         .asIcon().size(140));
     }
 }
