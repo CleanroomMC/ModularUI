@@ -1,12 +1,13 @@
 package com.cleanroommc.modularui.widgets.layout;
 
+import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.sizer.Box;
 
-public class Column extends ParentWidget<Column> implements ILayoutWidget {
+public class Column extends ParentWidget<Column> implements ILayoutWidget, IExpander {
 
     private Alignment.MainAxis maa = Alignment.MainAxis.START;
     private Alignment.CrossAxis caa = Alignment.CrossAxis.CENTER;
@@ -123,5 +124,10 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget {
     public Column mainAxisAlignment(Alignment.MainAxis maa) {
         this.maa = maa;
         return this;
+    }
+
+    @Override
+    public GuiAxis getExpandAxis() {
+        return GuiAxis.Y;
     }
 }

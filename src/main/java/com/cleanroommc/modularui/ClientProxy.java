@@ -31,7 +31,6 @@ public class ClientProxy extends CommonProxy {
         super.preInit(event);
 
         MinecraftForge.EVENT_BUS.register(ClientEventHandler.class);
-        MinecraftForge.EVENT_BUS.register(GuiManager.class);
         MinecraftForge.EVENT_BUS.register(KeyBindHandler.class);
 
         if (ModularUIConfig.enabledTestGuis) {

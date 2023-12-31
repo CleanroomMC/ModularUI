@@ -3,18 +3,13 @@ package com.cleanroommc.modularui.utils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public class ItemStackItemHandler implements IItemHandlerModifiable, ICapabilityProvider {
+public class ItemStackItemHandler implements IItemHandlerModifiable {
 
     private static final String KEY_ITEMS = "Items";
 
@@ -135,16 +130,5 @@ public class ItemStackItemHandler implements IItemHandlerModifiable, ICapability
         if (slot < 0 || slot >= this.slots) {
             throw new RuntimeException("Slot " + slot + " not in valid range - [0," + this.slots + ")");
         }
-    }
-
-    @Override
-    public boolean hasCapability(@NotNull Capability<?> capability, @Nullable EnumFacing facing) {
-        return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY;
-    }
-
-    @Override
-    @Nullable
-    public <T> T getCapability(@NotNull Capability<T> capability, @Nullable EnumFacing facing) {
-        return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY ? CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(this) : null;
     }
 }

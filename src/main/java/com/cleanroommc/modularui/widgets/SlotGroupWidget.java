@@ -17,12 +17,23 @@ import java.util.function.IntFunction;
 public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
 
     public static SlotGroupWidget playerInventory() {
+        return playerInventory(7);
+    }
+
+    /**
+     * Automatically creates and places the player inventory.
+     *
+     * @param bottom margin to the bottom border of the parent or 0 for no y placement (useful for columns)
+     * @return player inventory group
+     */
+    public static SlotGroupWidget playerInventory(int bottom) {
         SlotGroupWidget slotGroupWidget = new SlotGroupWidget();
         slotGroupWidget.flex()
                 .coverChildren()
                 .startDefaultMode()
-                .leftRel(0.5f).bottom(7)
-                .endDefaultMode();
+                .leftRel(0.5f);
+        if (bottom != 0) slotGroupWidget.flex().bottom(bottom);
+        slotGroupWidget.flex().endDefaultMode();
         slotGroupWidget.debugName("player_inventory");
         String key = "player";
         for (int i = 0; i < 9; i++) {

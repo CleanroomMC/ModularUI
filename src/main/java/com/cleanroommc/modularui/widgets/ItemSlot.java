@@ -32,6 +32,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import net.minecraftforge.items.IItemHandlerModifiable;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -167,6 +169,10 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         this.syncHandler = new ItemSlotSH(slot);
         setSyncHandler(this.syncHandler);
         return this;
+    }
+
+    public ItemSlot slot(IItemHandlerModifiable itemHandler, int index) {
+        return slot(new ModularSlot(itemHandler, index));
     }
 
     @SideOnly(Side.CLIENT)
