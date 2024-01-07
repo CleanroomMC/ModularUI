@@ -172,7 +172,7 @@ public class WidgetTree {
         // render all children if there are any
         List<IWidget> children = parent.getChildren();
         if (!children.isEmpty()) {
-            children.forEach(widget -> drawTree(widget, context, false));
+            children.forEach(widget -> drawTree(widget, context, ignoreEnabled));
         }
 
         if (viewport != null) {
