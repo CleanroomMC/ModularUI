@@ -85,6 +85,8 @@ public class ItemSlotSH extends SyncHandler {
             if (!isPhantom()) return;
             ItemStack stack = buf.readItemStack();
             this.slot.putStack(stack);
+        } else if (id == 6) {
+            getSlot().setEnabled(false);
         }
     }
 
