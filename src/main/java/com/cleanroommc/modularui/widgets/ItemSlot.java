@@ -283,4 +283,11 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     public @Nullable Object getIngredient() {
         return this.syncHandler.getSlot().getStack();
     }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        this.getSlot().setEnabled(enabled);
+        if (this.isSynced()) this.getSyncHandler().syncToServer(6);
+        super.setEnabled(enabled);
+    }
 }

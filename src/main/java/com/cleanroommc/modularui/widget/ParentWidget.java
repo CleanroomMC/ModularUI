@@ -97,4 +97,13 @@ public class ParentWidget<W extends ParentWidget<W>> extends Widget<W> {
         if (condition.getAsBoolean()) return child(child.get());
         return getThis();
     }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        WidgetTree.foreachChild(this, w -> {
+            w.setEnabled(enabled);
+            return true;
+        }, false);
+    }
 }
