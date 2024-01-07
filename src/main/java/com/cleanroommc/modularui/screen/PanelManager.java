@@ -71,12 +71,21 @@ public class PanelManager {
         if (this.panels.contains(panel) || isPanelOpen(panel.getName())) {
             throw new IllegalStateException("Panel " + panel.getName() + " is already open.");
         }
-        this.disposal.remove(panel);
-        panel.setPanelGuiContext(this.screen.getContext());
-        this.panels.addFirst(panel);
+        var toOpen = panel;
+        int i = this.disposal.lastIndexOf(toOpen);
+        if (i != -1) {
+            toOpen = this.disposal.get(i);
+            this.disposal.remove(i);
+            toOpen.setEnabled(true);
+            toOpen.reopen();
+        }
+        this.panels.addFirst(toOpen);
         this.dirty = true;
         panel.getArea().setPanelLayer((byte) this.panels.size());
-        panel.onOpen(this.screen);
+        if (i == -1) {
+            toOpen.setPanelGuiContext(this.screen.getContext());
+            panel.onOpen(this.screen);
+        }
         if (resize) {
             WidgetTree.resize(panel);
         }
@@ -143,7 +152,7 @@ public class PanelManager {
 
     public void closePanel(@NotNull ModularPanel panel) {
         if (!hasOpenPanel(panel)) {
-            throw new IllegalArgumentException("Panel '" + panel.getName() + "' is open in this screen!");
+            throw new IllegalArgumentException("Panel '" + panel.getName() + "' is not open in this screen!");
         }
         if (panel == getMainPanel()) {
             closeAll();
@@ -174,6 +183,7 @@ public class PanelManager {
                 this.disposal.removeFirst().dispose();
             }
             this.disposal.add(panel);
+            panel.setEnabled(false);
         }
     }
 
