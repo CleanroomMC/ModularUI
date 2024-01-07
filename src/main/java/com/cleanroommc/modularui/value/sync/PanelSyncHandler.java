@@ -11,10 +11,12 @@ import java.util.Objects;
 public abstract class PanelSyncHandler extends SyncHandler {
 
     private final ModularPanel mainPanel;
-    private ModularPanel openedPanel;
+    private ModularPanel syncedPanel;
 
-    protected PanelSyncHandler(ModularPanel mainPanel) {
+    protected PanelSyncHandler(ModularPanel mainPanel, GuiSyncManager syncManager) {
         this.mainPanel = mainPanel;
+        this.syncedPanel = createUI(mainPanel, syncManager);
+        WidgetTree.collectSyncValues(syncManager, this.syncedPanel);
     }
 
     public abstract ModularPanel createUI(ModularPanel mainPanel, GuiSyncManager syncManager);
@@ -25,32 +27,35 @@ public abstract class PanelSyncHandler extends SyncHandler {
 
     private void openPanel(boolean syncToServer) {
         boolean client = getSyncManager().isClient();
-        if (syncToServer && client) {
-            syncToServer(0);
-            return;
+        checkPanel();
+        if (client && !this.mainPanel.getScreen().isPanelOpen(this.syncedPanel.getName())) {
+            this.mainPanel.getScreen().openPanel(this.syncedPanel);
+            if (syncToServer) syncToServer(0);
         }
+    }
+
+    public void checkPanel() {
         ModularPanel panel = Objects.requireNonNull(createUI(this.mainPanel, getSyncManager()));
         if (panel == this.mainPanel) {
             throw new IllegalArgumentException("New panel must not be the main panel!");
         }
-        WidgetTree.collectSyncValues(getSyncManager(), panel);
-        if (client && !this.mainPanel.getScreen().isPanelOpen(panel.getName())) {
-            this.mainPanel.getScreen().openPanel(panel);
-            this.openedPanel = panel;
+
+        if (!panel.equals(this.syncedPanel)) {
+            this.syncedPanel = panel;
+            WidgetTree.collectSyncValues(getSyncManager(), this.syncedPanel);
         }
     }
 
     public void closePanel() {
         if (getSyncManager().isClient()) {
-            if (this.openedPanel != null) this.openedPanel.closeIfOpen(true);
+            this.syncedPanel.closeIfOpen(true);
         } else {
             syncToClient(2);
         }
-        this.openedPanel = null;
     }
 
     public boolean isPanelOpen() {
-        return this.openedPanel != null && (!getSyncManager().isClient() || this.openedPanel.isOpen());
+        return this.syncedPanel != null && (!getSyncManager().isClient() || this.syncedPanel.isOpen());
     }
 
     @Override
