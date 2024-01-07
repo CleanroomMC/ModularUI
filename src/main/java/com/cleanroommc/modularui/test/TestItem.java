@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.api.IGuiHolder;
+import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.factory.HandGuiData;
 import com.cleanroommc.modularui.factory.ItemGuiFactory;
 import com.cleanroommc.modularui.screen.ModularPanel;
@@ -8,11 +9,15 @@ import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.ItemCapabilityProvider;
 import com.cleanroommc.modularui.utils.ItemStackItemHandler;
 import com.cleanroommc.modularui.value.sync.GuiSyncManager;
+import com.cleanroommc.modularui.value.sync.PanelSyncHandler;
 import com.cleanroommc.modularui.value.sync.SyncHandlers;
 import com.cleanroommc.modularui.widget.ParentWidget;
+import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.ItemSlot;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import com.cleanroommc.modularui.widgets.layout.Column;
+
+import com.cleanroommc.modularui.widgets.layout.Row;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -43,6 +48,23 @@ public class TestItem extends Item implements IGuiHolder<HandGuiData> {
         guiSyncManager.registerSlotGroup("mixer_items", 2);
 
         ModularPanel panel = ModularPanel.defaultPanel("knapping_gui");
+        PanelSyncHandler panelSH = new PanelSyncHandler(panel, guiSyncManager) {
+            @Override
+            public ModularPanel createUI(ModularPanel mainPanel, GuiSyncManager syncManager) {
+                syncManager.registerSlotGroup("popup_items", 2, 1000);
+                return ModularPanel.defaultPanel("popup_test", 18 * 3, 18 * 3)
+                        .child(SlotGroupWidget.builder()
+                                .row("II")
+                                .row("II")
+                                .key('I', index -> new ItemSlot()
+                                        .slot(SyncHandlers.itemSlot(itemHandler, index + 5)
+                                                .ignoreMaxStackSize(true)
+                                                .slotGroup("popup_items")))
+                                .build().align(Alignment.Center));
+            }
+        };
+        guiSyncManager.syncValue("popup_panel_sync", panelSH);
+
         panel.child(new Column().margin(7)
                 .child(new ParentWidget<>().widthRel(1f).expanded()
                         .child(SlotGroupWidget.builder()
@@ -52,7 +74,23 @@ public class TestItem extends Item implements IGuiHolder<HandGuiData> {
                                         .ignoreMaxStackSize(true)
                                         .slotGroup("mixer_items")))
                                 .build()
-                                .align(Alignment.Center)))
+                                .align(Alignment.Center))
+                        .child(new Row().align(Alignment.TopCenter)
+                                .coverChildren()
+                                .child(new ItemSlot()
+                                        .slot(SyncHandlers.itemSlot(itemHandler, 4)
+                                                .singletonSlotGroup()))
+                                .child(new ButtonWidget<>()
+                                        .setEnabledIf(w -> !itemHandler.getStackInSlot(4).isEmpty())
+                                        .onMousePressed(mouseButton -> {
+                                            if (!panelSH.isPanelOpen()) {
+                                                panelSH.openPanel();
+                                            } else {
+                                                panelSH.closePanel();
+                                            }
+                                            Interactable.playButtonClickSound();
+                                            return true;
+                                        }))))
                 .child(SlotGroupWidget.playerInventory(0)));
 
         return panel;
@@ -74,7 +112,7 @@ public class TestItem extends Item implements IGuiHolder<HandGuiData> {
             @Override
             public <T> @Nullable T getCapability(@NotNull Capability<T> capability) {
                 if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-                    return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(new ItemStackItemHandler(stack, 4));
+                    return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(new ItemStackItemHandler(stack, 9));
                 }
                 return null;
             }
