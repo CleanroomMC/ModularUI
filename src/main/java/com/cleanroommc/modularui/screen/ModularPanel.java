@@ -208,8 +208,19 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     void reopen() {
-        if (this.state != State.CLOSED) throw new IllegalStateException();
+        if (this.state != State.CLOSED) throw new IllegalStateException("Panel '" + getName() + "' must be fully closed to be reopened!");
         this.state = State.OPEN;
+        getArea().z(1);
+        this.scale = 1f;
+        this.alpha = 1f;
+        if (shouldAnimate()) {
+            this.scale = 0.75f;
+            this.alpha = 0f;
+            getAnimator().setEndCallback(value -> {
+                this.scale = 1f;
+                this.alpha = 1f;
+            }).forward();
+        }
     }
 
     @MustBeInvokedByOverriders
@@ -637,6 +648,15 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     public State getState() {
         return this.state;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ModularPanel other) {
+            return this.getName().equals(other.getName());
+        }
+        return super.equals(obj);
+    }
+
 
     public enum State {
         /**
