@@ -198,6 +198,7 @@ public class ModularContainer extends Container implements ISortableContainer {
 
                 returnable = this.transferStackInSlot(player, slotId);
             } else {
+                if (slotId < 0) return ItemStack.EMPTY;
                 Slot clickedSlot = getSlot(slotId);
 
                 ItemStack slotStack = clickedSlot.getStack();
