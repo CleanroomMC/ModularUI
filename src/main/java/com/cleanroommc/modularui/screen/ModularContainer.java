@@ -3,13 +3,15 @@ package com.cleanroommc.modularui.screen;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.core.mixin.ContainerAccessor;
 import com.cleanroommc.modularui.network.NetworkUtils;
-import com.cleanroommc.modularui.value.sync.GuiSyncManager;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import com.cleanroommc.bogosorter.api.IPosSetter;
 import com.cleanroommc.bogosorter.api.ISortableContainer;
 import com.cleanroommc.bogosorter.api.ISortingContextBuilder;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
@@ -45,7 +47,11 @@ public class ModularContainer extends Container implements ISortableContainer {
         return null;
     }
 
-    private final GuiSyncManager guiSyncManager;
+    private final EntityPlayer player;
+    private final ModularSyncManager syncManager;
+    //private final GuiSyncManager mainPanelSyncManager;
+    //private final Object2ObjectLinkedOpenHashMap<String, AbstractPanelSyncManager> panelSyncManagers = new Object2ObjectLinkedOpenHashMap<>();
+    //private final GuiSyncManager guiSyncManager;
     private boolean init = true;
     private final List<ModularSlot> slots = new ArrayList<>();
     private final List<ModularSlot> shiftClickSlots = new ArrayList<>();
@@ -54,33 +60,41 @@ public class ModularContainer extends Container implements ISortableContainer {
     private static final int LEFT_MOUSE = 0;
     private static final int RIGHT_MOUSE = 1;
 
-    public ModularContainer(GuiSyncManager guiSyncManager) {
-        this.guiSyncManager = Objects.requireNonNull(guiSyncManager);
-        this.guiSyncManager.construct(this);
+    public ModularContainer(EntityPlayer player, PanelSyncManager panelSyncManager, String mainPanelName) {
+        this.player = player;
+        this.syncManager = new ModularSyncManager(this);
+        this.syncManager.construct(mainPanelName, panelSyncManager);
+        //this.mainPanelSyncManager = Objects.requireNonNull(panelSyncManager);
+        //this.mainPanelSyncManager.construct(this);
+        //this.panelSyncManagers.put(mainPanelName, panelSyncManager);
         sortShiftClickSlots();
     }
 
     @SideOnly(Side.CLIENT)
     public ModularContainer() {
-        this.guiSyncManager = null;
+        this.player = Minecraft.getMinecraft().player;
+        this.syncManager = null;
+        //this.mainPanelSyncManager = null;
     }
 
     public ContainerAccessor acc() {
         return (ContainerAccessor) this;
     }
 
+    public void openPanel() {
+
+    }
+
     @Override
     public void onContainerClosed(@NotNull EntityPlayer playerIn) {
         super.onContainerClosed(playerIn);
-        if (this.guiSyncManager != null) {
-            this.guiSyncManager.onClose();
-        }
+        this.syncManager.onClose();
     }
 
     @Override
     public void detectAndSendChanges() {
         super.detectAndSendChanges();
-        this.guiSyncManager.detectAndSendChanges(this.init);
+        this.syncManager.detectAndSendChanges(this.init);
         this.init = false;
     }
 
@@ -99,14 +113,14 @@ public class ModularContainer extends Container implements ISortableContainer {
     }
 
     @ApiStatus.Internal
-    public void registerSlot(ModularSlot slot) {
+    public void registerSlot(String panelName, ModularSlot slot) {
         if (this.inventorySlots.contains(slot)) {
             throw new IllegalArgumentException("Tried to register slot which already exists!");
         }
         addSlotToContainer(slot);
         this.slots.add(slot);
         if (slot.getSlotGroupName() != null) {
-            SlotGroup slotGroup = getSyncManager().getSlotGroup(slot.getSlotGroupName());
+            SlotGroup slotGroup = getSyncManager().getSlotGroup(panelName, slot.getSlotGroupName());
             if (slotGroup == null) {
                 ModularUI.LOGGER.throwing(new IllegalArgumentException("SlotGroup '" + slot.getSlotGroupName() + "' is not registered!"));
                 return;
@@ -124,18 +138,18 @@ public class ModularContainer extends Container implements ISortableContainer {
         }
     }
 
-    @Contract("null, null -> fail")
+    @Contract("_, null, null -> fail")
     @NotNull
     @ApiStatus.Internal
-    public SlotGroup validateSlotGroup(@Nullable String slotGroupName, @Nullable SlotGroup slotGroup) {
+    public SlotGroup validateSlotGroup(String panelName, @Nullable String slotGroupName, @Nullable SlotGroup slotGroup) {
         if (slotGroup != null) {
-            if (getSyncManager().getSlotGroup(slotGroup.getName()) == null) {
+            if (getSyncManager().getSlotGroup(panelName, slotGroup.getName()) == null) {
                 throw new IllegalArgumentException("Slot group is not registered in the GUI.");
             }
             return slotGroup;
         }
         if (slotGroupName != null) {
-            slotGroup = getSyncManager().getSlotGroup(slotGroupName);
+            slotGroup = getSyncManager().getSlotGroup(panelName, slotGroupName);
             if (slotGroup == null) {
                 throw new IllegalArgumentException("Can't find slot group for name " + slotGroupName);
             }
@@ -144,20 +158,23 @@ public class ModularContainer extends Container implements ISortableContainer {
         throw new IllegalArgumentException("Either the slot group or the name must not be null!");
     }
 
-
-    public GuiSyncManager getSyncManager() {
-        if (this.guiSyncManager == null) {
+    public ModularSyncManager getSyncManager() {
+        if (this.syncManager == null) {
             throw new IllegalStateException("GuiSyncManager is not available for client only GUI's.");
         }
-        return this.guiSyncManager;
+        return this.syncManager;
     }
 
     public boolean isClient() {
-        return this.guiSyncManager == null || NetworkUtils.isClient(this.guiSyncManager.getPlayer());
+        return this.syncManager == null || NetworkUtils.isClient(this.player);
     }
 
     public boolean isClientOnly() {
-        return this.guiSyncManager == null;
+        return this.syncManager == null;
+    }
+
+    public EntityPlayer getPlayer() {
+        return player;
     }
 
     @Override
@@ -334,29 +351,9 @@ public class ModularContainer extends Container implements ISortableContainer {
         return fromStack;
     }
 
-    private static boolean isPlayerSlot(Slot slot) {
-        if (slot == null) return false;
-        if (slot.inventory instanceof InventoryPlayer) {
-            return slot.getSlotIndex() >= 0 && slot.getSlotIndex() < 36;
-        }
-        if (slot instanceof SlotItemHandler slotItemHandler) {
-            IItemHandler iItemHandler = slotItemHandler.getItemHandler();
-            if (iItemHandler instanceof PlayerMainInvWrapper || iItemHandler instanceof PlayerInvWrapper) {
-                return slot.getSlotIndex() >= 0 && slot.getSlotIndex() < 36;
-            }
-        }
-        return false;
-    }
-
     @Override
     public void buildSortingContext(ISortingContextBuilder builder) {
-        for (SlotGroup slotGroup : this.getSyncManager().getSlotGroups()) {
-            if (slotGroup.isAllowSorting() && !isPlayerSlot(slotGroup.getSlots().get(0))) {
-                builder.addSlotGroupOf(slotGroup.getSlots(), slotGroup.getRowSize())
-                        .buttonPosSetter(null)
-                        .priority(slotGroup.getShiftClickPriority());
-            }
-        }
+        this.syncManager.buildSortingContext(builder);
     }
 
     @Override

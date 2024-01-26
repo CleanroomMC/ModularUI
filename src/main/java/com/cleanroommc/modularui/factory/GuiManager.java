@@ -5,7 +5,7 @@ import com.cleanroommc.modularui.api.UIFactory;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.packets.OpenGuiPacket;
 import com.cleanroommc.modularui.screen.*;
-import com.cleanroommc.modularui.value.sync.GuiSyncManager;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widget.WidgetTree;
 
 import net.minecraft.client.Minecraft;
@@ -62,10 +62,10 @@ public class GuiManager {
         openedContainers.add(player);
         // create panel, collect sync handlers and create container
         guiData.setJeiSettings(JeiSettings.DUMMY);
-        GuiSyncManager syncManager = new GuiSyncManager(player);
+        PanelSyncManager syncManager = new PanelSyncManager();
         ModularPanel panel = factory.createPanel(guiData, syncManager);
         WidgetTree.collectSyncValues(syncManager, panel);
-        ModularContainer container = new ModularContainer(syncManager);
+        ModularContainer container = new ModularContainer(player, syncManager, panel.getName());
         // sync to client
         player.getNextWindowId();
         player.closeContainer();
@@ -86,12 +86,12 @@ public class GuiManager {
         T guiData = factory.readGuiData(player, data);
         JeiSettingsImpl jeiSettings = new JeiSettingsImpl();
         guiData.setJeiSettings(jeiSettings);
-        GuiSyncManager syncManager = new GuiSyncManager(player);
+        PanelSyncManager syncManager = new PanelSyncManager();
         ModularPanel panel = factory.createPanel(guiData, syncManager);
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularScreen screen = factory.createScreen(guiData, panel);
         screen.getContext().setJeiSettings(jeiSettings);
-        GuiScreenWrapper guiScreenWrapper = new GuiScreenWrapper(new ModularContainer(syncManager), screen);
+        GuiScreenWrapper guiScreenWrapper = new GuiScreenWrapper(new ModularContainer(player, syncManager, panel.getName()), screen);
         guiScreenWrapper.inventorySlots.windowId = windowId;
         Minecraft.getMinecraft().displayGuiScreen(guiScreenWrapper);
         player.openContainer = guiScreenWrapper.inventorySlots;

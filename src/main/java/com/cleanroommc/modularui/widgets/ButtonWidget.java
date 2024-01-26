@@ -27,7 +27,7 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
                 .onMousePressed(mouseButton -> {
                     if (mouseButton == 0 || mouseButton == 1) {
                         if (panelSyncHandler != null) {
-                            panelSyncHandler.closePanel();
+                            panelSyncHandler.closePanel(false);
                         } else {
                             buttonWidget.getPanel().closeIfOpen(true);
                         }
@@ -49,11 +49,8 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof InteractionSyncHandler interactionSyncHandler) {
-            this.syncHandler = interactionSyncHandler;
-            return true;
-        }
-        return false;
+        this.syncHandler = castIfTypeElseNull(syncHandler, InteractionSyncHandler.class);
+        return this.syncHandler != null;
     }
 
     @Override

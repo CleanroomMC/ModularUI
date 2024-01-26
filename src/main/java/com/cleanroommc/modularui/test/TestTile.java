@@ -13,8 +13,9 @@ import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.value.IntValue;
 import com.cleanroommc.modularui.value.StringValue;
-import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.cleanroommc.modularui.value.sync.IntSyncValue;
+import com.cleanroommc.modularui.value.sync.PanelSyncHandler;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandlers;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widgets.*;
@@ -63,7 +64,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
     private int num = 2;
 
     @Override
-    public ModularPanel buildUI(PosGuiData guiData, GuiSyncManager guiSyncManager) {
+    public ModularPanel buildUI(PosGuiData guiData, PanelSyncManager guiSyncManager) {
         guiSyncManager.registerSlotGroup("item_inv", 3);
         guiSyncManager.registerSlotGroup("mixer_items", 2);
 
@@ -72,8 +73,10 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         IntSyncValue cycleStateValue = new IntSyncValue(() -> this.cycleState, val -> this.cycleState = val);
         guiSyncManager.syncValue("cycle_state", cycleStateValue);
 
+
         Rectangle colorPickerBackground = new Rectangle().setColor(Color.RED.main);
         ModularPanel panel = new ModularPanel("test_tile");
+        PanelSyncHandler panelSyncHandler = guiSyncManager.panel("other_panel", panel, this::openSecondWindow);
         PagedWidget.Controller tabController = new PagedWidget.Controller();
         panel.flex()                        // returns object which is responsible for sizing
                 .size(176, 220)       // set a static size for the main panel
@@ -131,9 +134,10 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                     .pos(Tooltip.Pos.LEFT);
                                                         })
                                                         .onMousePressed(mouseButton -> {
-                                                            panel.getScreen().close(true);
+                                                            //panel.getScreen().close(true);
                                                             //panel.getScreen().openDialog("dialog", this::buildDialog, ModularUI.LOGGER::info);
                                                             //openSecondWindow(context).openIn(panel.getScreen());
+                                                            panelSyncHandler.openPanel();
                                                             return true;
                                                         })
                                                         //.flex(flex -> flex.left(3)) // ?
@@ -308,7 +312,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         return panel;
     }
 
-    public ModularPanel openSecondWindow(GuiContext context) {
+    public ModularPanel openSecondWindow(PanelSyncManager syncManager) {
         ModularPanel panel = new ModularPanel("second_window") {
             @Override
             public boolean disablePanelsBelow() {

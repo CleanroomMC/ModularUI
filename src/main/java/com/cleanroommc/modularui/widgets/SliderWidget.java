@@ -64,11 +64,8 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof IDoubleValue<?> iDoubleValue) {
-            this.doubleValue = iDoubleValue;
-            return true;
-        }
-        return false;
+        this.doubleValue = castIfTypeElseNull(syncHandler, IDoubleValue.class);
+        return this.doubleValue != null;
     }
 
     @Override

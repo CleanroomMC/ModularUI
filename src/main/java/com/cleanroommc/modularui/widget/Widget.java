@@ -12,7 +12,7 @@ import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.value.sync.GuiSyncManager;
+import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -101,9 +101,9 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     public void afterInit() {}
 
     @Override
-    public void initialiseSyncHandler(GuiSyncManager syncManager) {
+    public void initialiseSyncHandler(ModularSyncManager syncManager) {
         if (this.syncKey != null) {
-            this.syncHandler = syncManager.getSyncHandler(this.syncKey);
+            this.syncHandler = syncManager.getSyncHandler(getPanel().getName(), this.syncKey);
             if (!isValidSyncHandler(this.syncHandler)) {
                 String type = this.syncHandler == null ? null : this.syncHandler.getClass().getName();
                 this.syncHandler = null;
@@ -123,9 +123,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
                     this.context.screen.removeGuiActionListener(action);
                 }
             }
-            if (!getPanel().isMainPanel() && this.syncHandler != null) {
-                getScreen().getSyncManager().disposeSyncHandler(this.syncHandler);
-            }
+
         }
         if (hasChildren()) {
             for (IWidget child : getChildren()) {
@@ -422,7 +420,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
 
     @Override
     public W syncHandler(String name, int id) {
-        this.syncKey = GuiSyncManager.makeSyncKey(name, id);
+        this.syncKey = ModularSyncManager.makeSyncKey(name, id);
         return getThis();
     }
 
@@ -434,7 +432,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     /**
-     * This intended to only be used when build the main panel in methods like {@link com.cleanroommc.modularui.api.IGuiHolder#buildUI(GuiData, GuiSyncManager)}
+     * This intended to only be used when build the main panel in methods like {@link com.cleanroommc.modularui.api.IGuiHolder#buildUI(GuiData, com.cleanroommc.modularui.value.sync.PanelSyncManager)}
      * since it's called on server and client. Otherwise, this will not work.
      */
     protected void setSyncHandler(@Nullable SyncHandler syncHandler) {

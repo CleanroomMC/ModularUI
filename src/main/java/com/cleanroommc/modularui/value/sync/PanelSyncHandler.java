@@ -5,19 +5,28 @@ import com.cleanroommc.modularui.widget.WidgetTree;
 
 import net.minecraft.network.PacketBuffer;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.util.Objects;
 
-public abstract class PanelSyncHandler extends SyncHandler {
+public class PanelSyncHandler extends SyncHandler {
 
-    private final ModularPanel mainPanel;
+    private ModularPanel mainPanel;
+    private final IPanelBuilder panelBuilder;
+    private String panelName;
     private ModularPanel openedPanel;
+    private PanelSyncManager syncManager;
+    private boolean open = false;
 
-    protected PanelSyncHandler(ModularPanel mainPanel) {
+    public PanelSyncHandler(ModularPanel mainPanel, IPanelBuilder panelBuilder) {
         this.mainPanel = mainPanel;
+        this.panelBuilder = panelBuilder;
     }
 
-    public abstract ModularPanel createUI(ModularPanel mainPanel, GuiSyncManager syncManager);
+    public ModularPanel createUI(PanelSyncManager syncManager) {
+        return this.panelBuilder.buildUI(syncManager);
+    }
 
     public void openPanel() {
         openPanel(true);
@@ -29,28 +38,43 @@ public abstract class PanelSyncHandler extends SyncHandler {
             syncToServer(0);
             return;
         }
-        ModularPanel panel = Objects.requireNonNull(createUI(this.mainPanel, getSyncManager()));
-        if (panel == this.mainPanel) {
-            throw new IllegalArgumentException("New panel must not be the main panel!");
+        if (this.openedPanel == null) {
+            if (this.syncManager != null && this.syncManager.getModularSyncManager() != getSyncManager().getModularSyncManager()) {
+                throw new IllegalStateException("Can't reopen synced panel in another screen!");
+            } else {
+                this.syncManager = new PanelSyncManager();
+            }
+            this.openedPanel = Objects.requireNonNull(createUI(this.syncManager));
+            if (this.openedPanel == this.mainPanel) {
+                throw new IllegalArgumentException("New panel must not be the main panel!");
+            }
+            this.panelName = this.openedPanel.getName();
+            this.openedPanel.setSyncHandler(this);
+            WidgetTree.collectSyncValues(getSyncManager(), this.openedPanel);
+            if (!client) {
+                // only keep panel on client
+                this.openedPanel = null;
+            }
         }
-        WidgetTree.collectSyncValues(getSyncManager(), panel);
-        if (client && !this.mainPanel.getScreen().isPanelOpen(panel.getName())) {
-            this.mainPanel.getScreen().openPanel(panel);
-            this.openedPanel = panel;
+        if (client && !this.mainPanel.getScreen().isPanelOpen(this.openedPanel.getName())) {
+            this.mainPanel.getScreen().openPanel(this.openedPanel);
         }
+        getSyncManager().getModularSyncManager().open(this.panelName, this.syncManager);
+        this.open = true;
     }
 
-    public void closePanel() {
+    public void closePanel(boolean alreadyClosedOnClient) {
         if (getSyncManager().isClient()) {
-            if (this.openedPanel != null) this.openedPanel.closeIfOpen(true);
+            if (this.openedPanel != null && !alreadyClosedOnClient) this.openedPanel.closeIfOpen(true);
         } else {
             syncToClient(2);
         }
-        this.openedPanel = null;
+        getSyncManager().getModularSyncManager().close(this.panelName);
+        this.open = false;
     }
 
     public boolean isPanelOpen() {
-        return this.openedPanel != null && (!getSyncManager().isClient() || this.openedPanel.isOpen());
+        return this.open;
     }
 
     @Override
@@ -58,7 +82,7 @@ public abstract class PanelSyncHandler extends SyncHandler {
         if (i == 1) {
             openPanel(false);
         } else if (i == 2) {
-            closePanel();
+            closePanel(false);
         }
     }
 
@@ -68,5 +92,11 @@ public abstract class PanelSyncHandler extends SyncHandler {
             openPanel(false);
             syncToClient(1);
         }
+    }
+
+    public interface IPanelBuilder {
+
+        @NotNull
+        ModularPanel buildUI(@NotNull PanelSyncManager syncManager);
     }
 }

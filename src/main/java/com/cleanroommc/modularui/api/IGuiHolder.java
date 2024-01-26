@@ -3,7 +3,8 @@ package com.cleanroommc.modularui.api;
 import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.value.sync.GuiSyncManager;
+
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -18,7 +19,7 @@ public interface IGuiHolder<T extends GuiData> {
      * Only called on client side.
      *
      * @param data      information about the creation context
-     * @param mainPanel the panel created in {@link #buildUI(GuiData, GuiSyncManager)}
+     * @param mainPanel the panel created in {@link #buildUI(GuiData, PanelSyncManager)}
      * @return a modular screen instance with the given panel
      */
     @SideOnly(Side.CLIENT)
@@ -29,10 +30,10 @@ public interface IGuiHolder<T extends GuiData> {
     /**
      * Called on server and client. Create only the main panel here. Only here you can add sync handlers to widgets directly.
      * If the widget to be synced is not in this panel yet (f.e. in another panel) the sync handler must be registered here
-     * with {@link GuiSyncManager}.
+     * with {@link PanelSyncManager}.
      *
      * @param data        information about the creation context
      * @param syncManager sync handler where widget sync handlers should be registered
      */
-    ModularPanel buildUI(T data, GuiSyncManager syncManager);
+    ModularPanel buildUI(T data, PanelSyncManager syncManager);
 }

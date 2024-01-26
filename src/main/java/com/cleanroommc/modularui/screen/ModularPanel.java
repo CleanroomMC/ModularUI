@@ -11,6 +11,7 @@ import com.cleanroommc.modularui.screen.viewport.GuiViewportStack;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.*;
+import com.cleanroommc.modularui.value.sync.PanelSyncHandler;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
@@ -215,6 +216,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @MustBeInvokedByOverriders
     public void onClose() {
         this.state = State.CLOSED;
+        if (!getScreen().getContainer().isClientOnly() &&
+                getSyncHandler() instanceof PanelSyncHandler panelSyncHandler &&
+                panelSyncHandler.isValid()) {
+            panelSyncHandler.closePanel(true);
+        }
     }
 
     @MustBeInvokedByOverriders
@@ -602,6 +608,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     public final boolean isMainPanel() {
         return getScreen().getMainPanel() == this;
+    }
+
+    @ApiStatus.Internal
+    public void setSyncHandler(@Nullable PanelSyncHandler syncHandler) {
+        super.setSyncHandler(syncHandler);
     }
 
     @NotNull

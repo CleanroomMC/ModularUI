@@ -10,7 +10,7 @@ import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
-import com.cleanroommc.modularui.value.sync.GuiSyncManager;
+import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.Dialog;
@@ -427,7 +427,7 @@ public class ModularScreen {
         return panelManager;
     }
 
-    public GuiSyncManager getSyncManager() {
+    public ModularSyncManager getSyncManager() {
         return getContainer().getSyncManager();
     }
 
