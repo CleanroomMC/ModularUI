@@ -189,6 +189,9 @@ public class ModularContainer extends Container implements ISortableContainer {
                 }
                 return inventoryplayer.getItemStack();
             }
+
+            if (slotId < 0) return ItemStack.EMPTY;
+
             if (clickTypeIn == ClickType.QUICK_MOVE) {
                 Slot fromSlot = getSlot(slotId);
 
@@ -198,7 +201,6 @@ public class ModularContainer extends Container implements ISortableContainer {
 
                 returnable = this.transferStackInSlot(player, slotId);
             } else {
-                if (slotId < 0) return ItemStack.EMPTY;
                 Slot clickedSlot = getSlot(slotId);
 
                 ItemStack slotStack = clickedSlot.getStack();
