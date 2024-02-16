@@ -41,7 +41,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     public static ModularPanel defaultPanel(@NotNull String name, int width, int height) {
         ModularPanel panel = new ModularPanel(name);
         panel.flex().startDefaultMode();
-        panel.flex().size(width, height).align(Alignment.Center);
+        panel.flex().size(width, height);
         panel.flex().endDefaultMode();
         return panel;
     }
@@ -67,6 +67,9 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     public ModularPanel(@NotNull String name) {
         this.name = Objects.requireNonNull(name, "A panels name must not be null and should be unique!");
+        flex().startDefaultMode()
+                .align(Alignment.Center)
+                .endDefaultMode();
     }
 
     @Override
