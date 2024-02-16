@@ -26,7 +26,7 @@ import java.util.Map;
 public class ModularSyncManager {
 
     public static final String AUTO_SYNC_PREFIX = "auto_sync:";
-    private static final String PLAYER_INVENTORY = "player_inventory";
+    protected static final String PLAYER_INVENTORY = "player_inventory";
     private static final String CURSOR_KEY = makeSyncKey("cursor_slot", 255255);
 
     private final Map<String, PanelSyncManager> panelSyncManagerMap = new Object2ObjectOpenHashMap<>();
@@ -41,7 +41,9 @@ public class ModularSyncManager {
     @ApiStatus.Internal
     public void construct(String mainPanelName, PanelSyncManager mainPSM) {
         this.mainPSM = mainPSM;
-        bindPlayerInventory();
+        if (this.mainPSM.getSlotGroup(PLAYER_INVENTORY) == null) {
+            this.mainPSM.bindPlayerInventory(getPlayer());
+        }
         open(mainPanelName, mainPSM);
         mainPSM.syncValue(CURSOR_KEY, this.cursorSlotSyncHandler);
     }
@@ -81,23 +83,14 @@ public class ModularSyncManager {
         this.cursorSlotSyncHandler.sync();
     }
 
-    public void bindPlayerInventory() {
-        PlayerMainInvWrapper playerInventory = new PlayerMainInvWrapper(getPlayer().inventory);
-        String key = "player";
-        for (int i = 0; i < 36; i++) {
-            this.mainPSM.itemSlot(key, i, SyncHandlers.itemSlot(playerInventory, i).slotGroup(PLAYER_INVENTORY));
-        }
-        // player inv sorting is handled by bogosorter
-        this.mainPSM.registerSlotGroup(new SlotGroup(PLAYER_INVENTORY, 9, SlotGroup.PLAYER_INVENTORY_PRIO, true).setAllowSorting(false));
-    }
-
     public void open(String name, PanelSyncManager syncManager) {
         this.panelSyncManagerMap.put(name, syncManager);
         syncManager.initialize(name, this);
     }
 
     public void close(String name) {
-        this.panelSyncManagerMap.remove(name).onClose();
+        PanelSyncManager psm = this.panelSyncManagerMap.remove(name);
+        if (psm != null) psm.onClose();
     }
 
     public boolean isOpen(String panelName) {

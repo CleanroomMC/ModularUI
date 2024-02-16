@@ -12,7 +12,11 @@ import net.minecraft.network.PacketBuffer;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
+import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
+
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.*;
@@ -156,6 +160,30 @@ public class PanelSyncManager implements IPanelSyncManager {
 
     public PanelSyncManager registerSlotGroup(String name, int rowSize) {
         return registerSlotGroup(new SlotGroup(name, rowSize, 100, true));
+    }
+
+    public PanelSyncManager bindPlayerInventory(EntityPlayer player) {
+        return bindPlayerInventory(player, ModularSlot::new);
+    }
+
+    public PanelSyncManager bindPlayerInventory(EntityPlayer player, @NotNull SlotFunction slotFunction) {
+        if (getSlotGroup(ModularSyncManager.PLAYER_INVENTORY) != null) {
+            throw new IllegalStateException("The player slot group is already registered!");
+        }
+        PlayerMainInvWrapper playerInventory = new PlayerMainInvWrapper(player.inventory);
+        String key = "player";
+        for (int i = 0; i < 36; i++) {
+            itemSlot(key, i, slotFunction.apply(playerInventory, i).slotGroup(ModularSyncManager.PLAYER_INVENTORY));
+        }
+        // player inv sorting is handled by bogosorter
+        registerSlotGroup(new SlotGroup(ModularSyncManager.PLAYER_INVENTORY, 9, SlotGroup.PLAYER_INVENTORY_PRIO, true).setAllowSorting(false));
+        return this;
+    }
+
+    public interface SlotFunction {
+
+        @NotNull
+        ModularSlot apply(@NotNull PlayerMainInvWrapper playerInv, int index);
     }
 
     public PanelSyncManager addOpenListener(Consumer<EntityPlayer> listener) {

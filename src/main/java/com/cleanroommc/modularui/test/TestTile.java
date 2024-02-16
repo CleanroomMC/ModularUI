@@ -75,7 +75,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         guiSyncManager.syncValue("mixer_fluids", 1, SyncHandlers.fluidSlot(this.mixerFluids2));
         IntSyncValue cycleStateValue = new IntSyncValue(() -> this.cycleState, val -> this.cycleState = val);
         guiSyncManager.syncValue("cycle_state", cycleStateValue);
-
+        guiSyncManager.bindPlayerInventory(guiData.getPlayer());
 
         Rectangle colorPickerBackground = new Rectangle().setColor(Color.RED.main);
         ModularPanel panel = new ModularPanel("test_tile");

@@ -20,13 +20,21 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
         return playerInventory(7);
     }
 
-    /**
-     * Automatically creates and places the player inventory.
-     *
-     * @param bottom margin to the bottom border of the parent or 0 for no y placement (useful for columns)
-     * @return player inventory group
-     */
+    public static SlotGroupWidget playerInventory(SlotConsumer slotConsumer) {
+        return playerInventory(7, slotConsumer);
+    }
+
     public static SlotGroupWidget playerInventory(int bottom) {
+        return playerInventory(bottom, (index, slot) -> slot);
+    }
+
+        /**
+         * Automatically creates and places the player inventory.
+         *
+         * @param bottom margin to the bottom border of the parent or 0 for no y placement (useful for columns)
+         * @return player inventory group
+         */
+    public static SlotGroupWidget playerInventory(int bottom, SlotConsumer slotConsume) {
         SlotGroupWidget slotGroupWidget = new SlotGroupWidget();
         slotGroupWidget.flex()
                 .coverChildren()
@@ -37,18 +45,22 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
         slotGroupWidget.debugName("player_inventory");
         String key = "player";
         for (int i = 0; i < 9; i++) {
-            slotGroupWidget.child(new ItemSlot()
+            slotGroupWidget.child(slotConsumer.apply(i, new ItemSlot())
                     .syncHandler(key, i)
                     .pos(i * 18, 3 * 18 + 5)
                     .debugName("slot_" + i));
         }
         for (int i = 0; i < 27; i++) {
-            slotGroupWidget.child(new ItemSlot()
+            slotGroupWidget.child(slotConsumer.apply(i + 9, new ItemSlot())
                     .syncHandler(key, i + 9)
                     .pos(i % 9 * 18, i / 9 * 18)
                     .debugName("slot_" + (i + 9)));
         }
         return slotGroupWidget;
+    }
+
+    public interface SlotConsumer {
+        ItemSlot apply(int index, ItemSlot slot);
     }
 
     private String slotsKeyName;
