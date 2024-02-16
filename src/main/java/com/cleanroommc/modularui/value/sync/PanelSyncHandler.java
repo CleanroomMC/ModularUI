@@ -86,6 +86,9 @@ public class PanelSyncHandler extends SyncHandler {
     public void closePanelInternal() {
         getSyncManager().getModularSyncManager().close(this.panelName);
         this.open = false;
+        if (getSyncManager().isClient()) {
+            syncToServer(2);
+        }
     }
 
     public boolean isPanelOpen() {
@@ -106,6 +109,8 @@ public class PanelSyncHandler extends SyncHandler {
         if (i == 0) {
             openPanel(false);
             syncToClient(1);
+        } else if (i == 2) {
+            closePanelInternal();
         }
     }
 
