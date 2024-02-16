@@ -72,18 +72,19 @@ public class PanelSyncHandler extends SyncHandler {
         this.open = true;
     }
 
-    @ApiStatus.Internal
-    public void closePanel(boolean alreadyClosedOnClient) {
+    public void closePanel() {
         if (getSyncManager().isClient()) {
-            if (this.openedPanel != null && !alreadyClosedOnClient) {
-                this.openedPanel.closeIfOpen(true);
-            } else {
-                getSyncManager().getModularSyncManager().close(this.panelName);
+            if (this.openedPanel != null) {
+                this.openedPanel.closeIfOpen();
             }
         } else {
             syncToClient(2);
-            getSyncManager().getModularSyncManager().close(this.panelName);
         }
+    }
+
+    @ApiStatus.Internal
+    public void closePanelInternal() {
+        getSyncManager().getModularSyncManager().close(this.panelName);
         this.open = false;
     }
 
@@ -96,7 +97,7 @@ public class PanelSyncHandler extends SyncHandler {
         if (i == 1) {
             openPanel(false);
         } else if (i == 2) {
-            closePanel(false);
+            closePanel();
         }
     }
 

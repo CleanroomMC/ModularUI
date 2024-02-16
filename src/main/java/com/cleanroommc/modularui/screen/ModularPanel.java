@@ -223,7 +223,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 isSynced() &&
                 getSyncHandler() instanceof PanelSyncHandler panelSyncHandler &&
                 panelSyncHandler.isValid()) {
-            panelSyncHandler.closePanel(true);
+            panelSyncHandler.closePanelInternal();
         }
     }
 
