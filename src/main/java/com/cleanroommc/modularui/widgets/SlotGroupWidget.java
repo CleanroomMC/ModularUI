@@ -34,7 +34,7 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
          * @param bottom margin to the bottom border of the parent or 0 for no y placement (useful for columns)
          * @return player inventory group
          */
-    public static SlotGroupWidget playerInventory(int bottom, SlotConsumer slotConsume) {
+    public static SlotGroupWidget playerInventory(int bottom, SlotConsumer slotConsumer) {
         SlotGroupWidget slotGroupWidget = new SlotGroupWidget();
         slotGroupWidget.flex()
                 .coverChildren()
