@@ -206,6 +206,9 @@ public class ModularContainer extends Container implements ISortableContainer {
                 }
                 return inventoryplayer.getItemStack();
             }
+
+            if (slotId < 0) return ItemStack.EMPTY;
+
             if (clickTypeIn == ClickType.QUICK_MOVE) {
                 Slot fromSlot = getSlot(slotId);
 
