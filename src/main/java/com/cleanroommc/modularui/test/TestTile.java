@@ -21,6 +21,8 @@ import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widgets.*;
 import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Row;
+import com.cleanroommc.modularui.widgets.slot.ModularSlot;
+import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
 import net.minecraft.init.Items;
@@ -58,6 +60,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
     private final ItemStackHandler bigInventory = new ItemStackHandler(9);
 
     private final ItemStackHandler mixerItems = new ItemStackHandler(4);
+    private final ItemStackHandler smallInv = new ItemStackHandler(4);
     private final FluidTank mixerFluids1 = new FluidTank(16000);
     private final FluidTank mixerFluids2 = new FluidTank(16000);
 
@@ -312,29 +315,24 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         return panel;
     }
 
-    public ModularPanel openSecondWindow(PanelSyncManager syncManager) {
-        ModularPanel panel = new ModularPanel("second_window") {
-            @Override
-            public boolean disablePanelsBelow() {
-                return true;
-            }
-
-            @Override
-            public boolean closeOnOutOfBoundsClick() {
-                return true;
-            }
-        }.flex(flex -> flex.size(100, 100).align(Alignment.Center))
+    public ModularPanel openSecondWindow(PanelSyncManager syncManager, PanelSyncHandler syncHandler) {
+        ModularPanel panel = new Dialog<>("second_window", null)
+                .setDisablePanelsBelow(false)
+                .setCloseOnOutOfBoundsClick(false)
+                .size(100, 100)
                 .background(GuiTextures.MC_BACKGROUND);
-        panel.child(new ButtonWidget<>()
-                        .flex(flex -> flex.size(8, 8).top(5).right(5))
-                        .overlay(IKey.str("x"))
-                        .onMousePressed(mouseButton -> {
-                            panel.animateClose();
-                            return true;
-                        }))
+        SlotGroup slotGroup = new SlotGroup("small_inv", 2);
+        syncManager.registerSlotGroup(slotGroup);
+        panel.child(ButtonWidget.panelCloseButton())
                 .child(IKey.str("2nd Panel")
                         .asWidget()
-                        .flex(flex -> flex.align(Alignment.Center)));
+                        .pos(5, 5))
+                .child(SlotGroupWidget.builder()
+                        .row("II")
+                        .row("II")
+                        .key('I', i -> new ItemSlot().slot(new ModularSlot(smallInv, i).slotGroup(slotGroup)))
+                        .build()
+                        .center());
         return panel;
     }
 

@@ -168,8 +168,8 @@ public class PanelManager {
     }
 
     private void finalizePanel(ModularPanel panel) {
+        panel.onClose();
         if (!this.disposal.contains(panel)) {
-            panel.onClose();
             if (this.disposal.size() == 20) {
                 this.disposal.removeFirst().dispose();
             }

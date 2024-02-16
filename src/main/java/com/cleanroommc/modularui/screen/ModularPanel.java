@@ -220,6 +220,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     public void onClose() {
         this.state = State.CLOSED;
         if (!getScreen().getContainer().isClientOnly() &&
+                isSynced() &&
                 getSyncHandler() instanceof PanelSyncHandler panelSyncHandler &&
                 panelSyncHandler.isValid()) {
             panelSyncHandler.closePanel(true);
