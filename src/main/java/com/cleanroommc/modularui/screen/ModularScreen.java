@@ -171,20 +171,6 @@ public class ModularScreen {
         }
     }
 
-    public void openPanel(ModularPanel panel) {
-        this.panelManager.openPanel(panel);
-    }
-
-    /**
-     * Closes the given panel as soon as possible.
-     *
-     * @param panel panel to close
-     * @throws IllegalArgumentException if the panel is not open in this screen
-     */
-    public void closePanel(ModularPanel panel) {
-        this.panelManager.closePanel(panel);
-    }
-
     /**
      * Checks if a panel with a given name is currently open in this screen.
      *
@@ -378,18 +364,6 @@ public class ModularScreen {
         return false;
     }
 
-    public <T> void openDialog(String name, Consumer<Dialog<T>> dialogBuilder) {
-        openDialog(name, dialogBuilder, null);
-    }
-
-    public <T> void openDialog(String name, Consumer<Dialog<T>> dialogBuilder, Consumer<T> resultConsumer) {
-        Dialog<T> dialog = new Dialog<>(name, resultConsumer);
-        dialog.flex().size(150, 100).align(Alignment.Center);
-        dialog.background(GuiTextures.MC_BACKGROUND);
-        dialogBuilder.accept(dialog);
-        openPanel(dialog);
-    }
-
     @ApiStatus.Internal
     public void setFocused(boolean focus) {
         this.screenWrapper.setFocused(focus);
@@ -415,12 +389,6 @@ public class ModularScreen {
 
     public GuiContext getContext() {
         return this.context;
-    }
-
-    @ApiStatus.ScheduledForRemoval
-    @Deprecated
-    public PanelManager getWindowManager() {
-        return this.panelManager;
     }
 
     public PanelManager getPanelManager() {

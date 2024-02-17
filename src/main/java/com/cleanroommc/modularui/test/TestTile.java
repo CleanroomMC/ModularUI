@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.api.IGuiHolder;
+import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.*;
 import com.cleanroommc.modularui.factory.PosGuiData;
@@ -80,6 +81,11 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         Rectangle colorPickerBackground = new Rectangle().setColor(Color.RED.main);
         ModularPanel panel = new ModularPanel("test_tile");
         PanelSyncHandler panelSyncHandler = guiSyncManager.panel("other_panel", panel, this::openSecondWindow);
+        IPanelHandler colorPicker = IPanelHandler.simple(panel, (mainPanel, player) -> new ColorPickerDialog(colorPickerBackground::setColor, colorPickerBackground.getColor(), true)
+                .setDraggable(true)
+                .relative(panel)
+                .top(0)
+                .rightRel(1f));
         PagedWidget.Controller tabController = new PagedWidget.Controller();
         panel.flex()                        // returns object which is responsible for sizing
                 .size(176, 220)       // set a static size for the main panel
@@ -249,11 +255,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                         .background(colorPickerBackground)
                                         .disableHoverBackground()
                                         .onMousePressed(mouseButton -> {
-                                            panel.getScreen().openPanel(new ColorPickerDialog(colorPickerBackground::setColor, colorPickerBackground.getColor(), true)
-                                                    .setDraggable(true)
-                                                    .relative(panel)
-                                                    .top(0)
-                                                    .rightRel(1f));
+                                            colorPicker.openPanel();
                                             return true;
                                         }))
                                 .child(new ListWidget<>()
@@ -391,7 +393,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
 
         @Override
         public void draw(GuiContext context, WidgetTheme widgetTheme) {
-            this.animatedKey.draw(context, 0, 0, getArea().w(), getArea().h());
+            this.animatedKey.draw(context, 0, 0, getArea().w(), getArea().h(), widgetTheme);
         }
 
         @Override

@@ -66,7 +66,7 @@ public class ProgressWidget extends Widget<ProgressWidget> {
                 return;
             }
             if (progress >= 1) {
-                this.fullTexture[0].draw(context, 0, 0, getArea().w(), getArea().h());
+                this.fullTexture[0].draw(context, 0, 0, getArea().w(), getArea().h(), widgetTheme);
             } else {
                 progress = getProgressUV(progress);
                 float u0 = 0, v0 = 0, u1 = 1, v1 = 1;

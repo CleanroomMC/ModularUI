@@ -3,8 +3,8 @@ package com.cleanroommc.modularui.screen;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.core.mixin.ContainerAccessor;
 import com.cleanroommc.modularui.network.NetworkUtils;
-import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import com.cleanroommc.bogosorter.api.IPosSetter;
@@ -21,11 +21,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.items.SlotItemHandler;
-import net.minecraftforge.items.wrapper.PlayerInvWrapper;
-import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -49,9 +45,6 @@ public class ModularContainer extends Container implements ISortableContainer {
 
     private final EntityPlayer player;
     private final ModularSyncManager syncManager;
-    //private final GuiSyncManager mainPanelSyncManager;
-    //private final Object2ObjectLinkedOpenHashMap<String, AbstractPanelSyncManager> panelSyncManagers = new Object2ObjectLinkedOpenHashMap<>();
-    //private final GuiSyncManager guiSyncManager;
     private boolean init = true;
     private final List<ModularSlot> slots = new ArrayList<>();
     private final List<ModularSlot> shiftClickSlots = new ArrayList<>();
@@ -64,9 +57,6 @@ public class ModularContainer extends Container implements ISortableContainer {
         this.player = player;
         this.syncManager = new ModularSyncManager(this);
         this.syncManager.construct(mainPanelName, panelSyncManager);
-        //this.mainPanelSyncManager = Objects.requireNonNull(panelSyncManager);
-        //this.mainPanelSyncManager.construct(this);
-        //this.panelSyncManagers.put(mainPanelName, panelSyncManager);
         sortShiftClickSlots();
     }
 
@@ -74,27 +64,26 @@ public class ModularContainer extends Container implements ISortableContainer {
     public ModularContainer() {
         this.player = Minecraft.getMinecraft().player;
         this.syncManager = null;
-        //this.mainPanelSyncManager = null;
     }
 
     public ContainerAccessor acc() {
         return (ContainerAccessor) this;
     }
 
-    public void openPanel() {
-
-    }
-
     @Override
     public void onContainerClosed(@NotNull EntityPlayer playerIn) {
         super.onContainerClosed(playerIn);
-        this.syncManager.onClose();
+        if (this.syncManager != null) {
+            this.syncManager.onClose();
+        }
     }
 
     @Override
     public void detectAndSendChanges() {
         super.detectAndSendChanges();
-        this.syncManager.detectAndSendChanges(this.init);
+        if (this.syncManager != null) {
+            this.syncManager.detectAndSendChanges(this.init);
+        }
         this.init = false;
     }
 
@@ -356,7 +345,9 @@ public class ModularContainer extends Container implements ISortableContainer {
 
     @Override
     public void buildSortingContext(ISortingContextBuilder builder) {
-        this.syncManager.buildSortingContext(builder);
+        if (this.syncManager != null) {
+            this.syncManager.buildSortingContext(builder);
+        }
     }
 
     @Override

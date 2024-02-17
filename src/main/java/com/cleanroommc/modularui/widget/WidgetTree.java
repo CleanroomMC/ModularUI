@@ -347,6 +347,10 @@ public class WidgetTree {
         }, true);
     }
 
+    public static boolean hasSyncedValues(ModularPanel panel) {
+        return !foreachChildBFS(panel, widget -> !(widget instanceof ISynced<?> synced) || !synced.isSynced(), true);
+    }
+
     public static void print(IWidget parent, Predicate<IWidget> test) {
         StringBuilder builder = new StringBuilder("Widget tree of ")
                 .append(parent)

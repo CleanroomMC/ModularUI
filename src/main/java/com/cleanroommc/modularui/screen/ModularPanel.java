@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.screen;
 
+import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
@@ -30,7 +31,10 @@ import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 /**
- * This must be added by {@link ModularScreen#openPanel}, not as child widget.
+ * This class is like a window in windows. It can hold any amount of widgets. It may also be draggable.
+ * To open another panel on top of the main panel you must use {@link IPanelHandler#simple(ModularPanel, SecondaryPanel.IPanelBuilder)}
+ * or {@link com.cleanroommc.modularui.value.sync.PanelSyncManager#panel(String, ModularPanel, PanelSyncHandler.IPanelBuilder) PanelSyncManager#panel(String, ModularPanel, PanelSyncHandler.IPanelBuilder)}
+ * if the panel should be synced.
  */
 public class ModularPanel extends ParentWidget<ModularPanel> implements IViewport {
 
@@ -51,6 +55,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @NotNull
     private final String name;
     private ModularScreen screen;
+    private IPanelHandler panelHandler;
     private State state = State.IDLE;
     private boolean cantDisposeNow = false;
     private final ObjectList<LocatedWidget> hovering = ObjectList.create();
@@ -95,17 +100,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     /**
-     * @param screen screen to open this panel in
-     * @throws IllegalStateException if this panel is already open in any screen
-     */
-    public void openIn(ModularScreen screen) {
-        if (isOpen()) {
-            throw new IllegalStateException("Panel is already open!");
-        }
-        screen.getPanelManager().openPanel(this);
-    }
-
-    /**
      * If this panel is open it will be closed.
      * If animating is enabled and an animation is already playing this method will do nothing.
      *
@@ -113,7 +107,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
      */
     public void closeIfOpen(boolean animate) {
         if (!animate || !shouldAnimate()) {
-            this.screen.closePanel(this);
+            this.screen.getPanelManager().closePanel(this);
             return;
         }
         if (isOpen() && !isOpening() && !isClosing()) {
@@ -125,16 +119,16 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                     }
                 }
             }
-            getAnimator().setEndCallback(val -> this.screen.closePanel(this)).backward();
+            getAnimator().setEndCallback(val -> this.screen.getPanelManager().closePanel(this)).backward();
         }
-    }
-
-    public void closeIfOpen() {
-        closeIfOpen(false);
     }
 
     public void animateClose() {
         closeIfOpen(true);
+    }
+
+    void setPanelHandler(IPanelHandler panelHandler) {
+        this.panelHandler = panelHandler;
     }
 
     @Override
@@ -219,11 +213,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @MustBeInvokedByOverriders
     public void onClose() {
         this.state = State.CLOSED;
-        if (!getScreen().getContainer().isClientOnly() &&
-                isSynced() &&
-                getSyncHandler() instanceof PanelSyncHandler panelSyncHandler &&
-                panelSyncHandler.isValid()) {
-            panelSyncHandler.closePanelInternal();
+        if (this.panelHandler != null) {
+            this.panelHandler.closePanelInternal();
         }
     }
 
@@ -617,6 +608,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @ApiStatus.Internal
     public void setSyncHandler(@Nullable PanelSyncHandler syncHandler) {
         super.setSyncHandler(syncHandler);
+        setPanelHandler(syncHandler);
     }
 
     @NotNull

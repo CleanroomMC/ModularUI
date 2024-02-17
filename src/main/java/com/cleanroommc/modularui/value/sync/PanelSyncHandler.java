@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.value.sync;
 
+import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.widget.WidgetTree;
 
@@ -14,9 +15,9 @@ import java.util.Objects;
 /**
  * If you want another panel where some widgets may be able to sync data, you will need this.
  * Register it in any {@link PanelSyncManager} (preferably the main one).
- * Then you can call {@link #openPanel()} and {@link #closePanel(boolean)} from any side.
+ * Then you can call {@link #openPanel()} and {@link #closePanel()} from any side.
  */
-public class PanelSyncHandler extends SyncHandler {
+public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
 
     private ModularPanel mainPanel;
     private final IPanelBuilder panelBuilder;
@@ -40,6 +41,7 @@ public class PanelSyncHandler extends SyncHandler {
         return this.panelBuilder.buildUI(syncManager, this);
     }
 
+    @Override
     public void openPanel() {
         openPanel(true);
     }
@@ -66,16 +68,17 @@ public class PanelSyncHandler extends SyncHandler {
             }
         }
         if (client && !this.mainPanel.getScreen().isPanelOpen(this.openedPanel.getName())) {
-            this.mainPanel.getScreen().openPanel(this.openedPanel);
+            this.mainPanel.getScreen().getPanelManager().openPanel(this.openedPanel, this);
         }
         getSyncManager().getModularSyncManager().open(this.panelName, this.syncManager);
         this.open = true;
     }
 
+    @Override
     public void closePanel() {
         if (getSyncManager().isClient()) {
             if (this.openedPanel != null) {
-                this.openedPanel.closeIfOpen();
+                this.openedPanel.closeIfOpen(true);
             }
         } else {
             syncToClient(2);
@@ -83,12 +86,20 @@ public class PanelSyncHandler extends SyncHandler {
     }
 
     @ApiStatus.Internal
+    @Override
     public void closePanelInternal() {
         getSyncManager().getModularSyncManager().close(this.panelName);
         this.open = false;
         if (getSyncManager().isClient()) {
             syncToServer(2);
         }
+    }
+
+    @Override
+    public void deleteCachedPanel() {
+        // This is because we can't guarantee that the sync handlers of the new panel are the same.
+        // Dynamic sync handler changing is very error-prone.
+        throw new UnsupportedOperationException("Can't delete cached panel in synced panel handlers!");
     }
 
     public boolean isPanelOpen() {
