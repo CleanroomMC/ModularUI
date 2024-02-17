@@ -98,9 +98,9 @@ public class GuiManager {
     }
 
     @SideOnly(Side.CLIENT)
-    static void openScreen(ModularScreen screen, JeiSettingsImpl jeiSettings) {
+    static void openScreen(ModularScreen screen, JeiSettingsImpl jeiSettings, ContainerCustomizer containerCustomizer) {
         screen.getContext().setJeiSettings(jeiSettings);
-        GuiScreenWrapper screenWrapper = new GuiScreenWrapper(new ModularContainer(), screen);
+        GuiScreenWrapper screenWrapper = new GuiScreenWrapper(new ModularContainer(containerCustomizer), screen);
         Minecraft.getMinecraft().displayGuiScreen(screenWrapper);
     }
 

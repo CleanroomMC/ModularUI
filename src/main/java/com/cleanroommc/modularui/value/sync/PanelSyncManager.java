@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.api.IPanelSyncManager;
+import com.cleanroommc.modularui.screen.ContainerCustomizer;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
@@ -30,6 +31,7 @@ public class PanelSyncManager implements IPanelSyncManager {
     private ModularSyncManager modularSyncManager;
     private String panelName;
     private boolean init = true;
+    private ContainerCustomizer containerCustomizer;
 
     private final List<Consumer<EntityPlayer>> openListener = new ArrayList<>();
     private final List<Consumer<EntityPlayer>> closeListener = new ArrayList<>();
@@ -86,6 +88,14 @@ public class PanelSyncManager implements IPanelSyncManager {
 
     public boolean hasSyncHandler(SyncHandler syncHandler) {
         return syncHandler.isValid() && syncHandler.getSyncManager() == this && this.reverseSyncHandlers.containsKey(syncHandler);
+    }
+
+    public ContainerCustomizer getContainerCustomizer() {
+        return containerCustomizer;
+    }
+
+    public void setContainerCustomizer(ContainerCustomizer containerCustomizer) {
+        this.containerCustomizer = containerCustomizer;
     }
 
     private void putSyncValue(String name, int id, SyncHandler syncHandler) {
