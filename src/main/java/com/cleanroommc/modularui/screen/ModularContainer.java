@@ -186,8 +186,16 @@ public class ModularContainer extends Container implements ISortableContainer {
         return this.containerCustomizer.slotClick(slotId, mouseButton, clickTypeIn, player);
     }
 
+    public @NotNull ItemStack superSlotClick(int slotId, int mouseButton, @NotNull ClickType clickTypeIn, @NotNull EntityPlayer player) {
+        return super.slotClick(slotId, mouseButton, clickTypeIn, player);
+    }
+
     @Override
     public @NotNull ItemStack transferStackInSlot(@NotNull EntityPlayer playerIn, int index) {
+        return this.containerCustomizer.transferStackInSlot(playerIn, index);
+    }
+
+    public @NotNull ItemStack superTransferStackInSlot(@NotNull EntityPlayer playerIn, int index) {
         return this.containerCustomizer.transferStackInSlot(playerIn, index);
     }
 
@@ -196,14 +204,26 @@ public class ModularContainer extends Container implements ISortableContainer {
         return this.containerCustomizer.canMergeSlot(stack, slotIn);
     }
 
+    public boolean superCanMergeSlot(@NotNull ItemStack stack, @NotNull Slot slotIn) {
+        return super.canMergeSlot(stack, slotIn);
+    }
+
     @Override
     protected boolean mergeItemStack(@NotNull ItemStack stack, int startIndex, int endIndex, boolean reverseDirection) {
         return this.containerCustomizer.mergeItemStack(stack, startIndex, endIndex, reverseDirection);
     }
 
+    public boolean superMergeItemStack(@NotNull ItemStack stack, int startIndex, int endIndex, boolean reverseDirection) {
+        return super.mergeItemStack(stack, startIndex, endIndex, reverseDirection);
+    }
+
     @Override
     protected void clearContainer(@NotNull EntityPlayer playerIn, @NotNull World worldIn, @NotNull IInventory inventoryIn) {
         this.containerCustomizer.clearContainer(playerIn, worldIn, inventoryIn);
+    }
+
+    public void superClearContainer(@NotNull EntityPlayer playerIn, @NotNull World worldIn, @NotNull IInventory inventoryIn) {
+        super.clearContainer(playerIn, worldIn, inventoryIn);
     }
 
     @Override

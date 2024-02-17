@@ -50,7 +50,7 @@ public class ContainerCustomizer {
         InventoryPlayer inventoryplayer = player.inventory;
 
         if (clickTypeIn == ClickType.QUICK_CRAFT || container.acc().getDragEvent() != 0) {
-            return container.slotClick(slotId, mouseButton, clickTypeIn, player);
+            return container.superSlotClick(slotId, mouseButton, clickTypeIn, player);
         }
 
         if ((clickTypeIn == ClickType.PICKUP || clickTypeIn == ClickType.QUICK_MOVE) &&
@@ -78,7 +78,7 @@ public class ContainerCustomizer {
                     return ItemStack.EMPTY;
                 }
 
-                returnable = container.transferStackInSlot(player, slotId);
+                returnable = transferStackInSlot(player, slotId);
             } else {
                 Slot clickedSlot = container.getSlot(slotId);
 
@@ -148,7 +148,7 @@ public class ContainerCustomizer {
             return returnable;
         }
 
-        return container.slotClick(slotId, mouseButton, clickTypeIn, player);
+        return container.superSlotClick(slotId, mouseButton, clickTypeIn, player);
     }
 
     public @NotNull ItemStack transferStackInSlot(@NotNull EntityPlayer playerIn, int index) {
@@ -215,14 +215,14 @@ public class ContainerCustomizer {
     }
 
     public boolean canMergeSlot(ItemStack stack, Slot slotIn) {
-        return this.container.canMergeSlot(stack, slotIn);
+        return this.container.superCanMergeSlot(stack, slotIn);
     }
 
     protected boolean mergeItemStack(ItemStack stack, int startIndex, int endIndex, boolean reverseDirection) {
-        return this.container.acc().invokeMergeItemStack(stack, startIndex, endIndex, reverseDirection);
+        return this.container.superMergeItemStack(stack, startIndex, endIndex, reverseDirection);
     }
 
     protected void clearContainer(EntityPlayer playerIn, World worldIn, IInventory inventoryIn) {
-        this.container.acc().invokeClearContainer(playerIn, worldIn, inventoryIn);
+        this.container.superClearContainer(playerIn, worldIn, inventoryIn);
     }
 }
