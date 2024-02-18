@@ -6,14 +6,11 @@ import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.GuiDraw;
-import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import com.cleanroommc.modularui.widgets.Dialog;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -33,7 +30,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -433,7 +429,8 @@ public class ModularScreen {
      * @param action action listener
      */
     public void registerGuiActionListener(IGuiAction action) {
-        this.guiActionListeners.computeIfAbsent(getGuiActionClass(action), key -> new ArrayList<>()).add(action);
+        List<IGuiAction> list = this.guiActionListeners.computeIfAbsent(getGuiActionClass(action), key -> new ArrayList<>());
+        if (!list.contains(action)) list.add(action);
     }
 
     /**
