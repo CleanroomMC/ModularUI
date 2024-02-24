@@ -3,9 +3,12 @@ package com.cleanroommc.modularui.holoui;
 import com.cleanroommc.modularui.utils.GuiUtils;
 
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Quaternion;
 
 /**
  * Highly experimental
@@ -17,6 +20,7 @@ public class Plane3D {
     private float scale = 1f;
     private float aX = 0.5f, aY = 0.5f;
     private float nX = 0, nY = 0, nZ = 1;
+    private final Quaternion facer = new Quaternion();
 
     public void transformRectangle() {
         // translate to anchor
@@ -73,6 +77,14 @@ public class Plane3D {
         this.nX = x;
         this.nY = y;
         this.nZ = z;
+    }
+
+    public void setTarget(Entity entity) {
+        BlockPos pos = entity.getPosition();
+        this.facer.x = pos.getX();
+        this.facer.y = pos.getY();
+        this.facer.z = pos.getZ();
+        this.facer.w = 1;
     }
 
     public void setAnchor(float x, float y) {
