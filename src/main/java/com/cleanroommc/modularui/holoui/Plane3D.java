@@ -3,8 +3,6 @@ package com.cleanroommc.modularui.holoui;
 import com.cleanroommc.modularui.utils.GuiUtils;
 
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
 
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.ApiStatus;
@@ -20,7 +18,7 @@ public class Plane3D {
     private float w = 480, h = 270;
     private float scale = 1f;
     private float aX = 0.5f, aY = 0.5f;
-    private Vec3d normal = Direction.ORIGIN.asVec3d();
+    private Vec3d normal = Direction.NORTH.asVec3d();
 
 
     public void transform() {
@@ -51,7 +49,7 @@ public class Plane3D {
         Matrix4f mYaw = new Matrix4f()
                 .rotate((float) yaw, Direction.UP.asVector3f());
         Matrix4f mPitch = new Matrix4f()
-                .rotate((float) pitch, Direction.LEFT.asVector3f());
+                .rotate((float) pitch, Direction.EAST.asVector3f());
 
         GuiUtils.applyTransformationMatrix(mYaw);
         GuiUtils.applyTransformationMatrix(mPitch);
@@ -103,12 +101,12 @@ public class Plane3D {
 
     private enum Direction {
         ORIGIN(0, 0, 0),
-        LEFT(1, 0, 0),
         UP(0, 1, 0),
-        NORTH(0, 0, 1),
-        RIGHT(-1, 0, 0),
         DOWN(0, -1, 0),
-        SOUTH(0, 0, -1);
+        NORTH(0, 0, -1),
+        SOUTH(0, 0, 1),
+        EAST(1, 0, 0),
+        WEST(-1, 0, 0);
 
         private final Vector3f vector3f;
         private final Vec3d vec3d;
