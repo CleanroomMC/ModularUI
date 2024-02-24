@@ -6,6 +6,8 @@ import com.cleanroommc.modularui.screen.ModularScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -41,6 +43,13 @@ public class HoloUI {
             this.x = x;
             this.y = y;
             this.z = z;
+            return this;
+        }
+
+        public Builder at(BlockPos pos) {
+            this.x = pos.getX() + 0.5D;
+            this.y = pos.getY() + 0.5D;
+            this.z = pos.getZ() + 0.5D;
             return this;
         }
 
