@@ -35,16 +35,14 @@ public class ScreenEntityRender extends Render<HoloScreenEntity> {
         if (screenWrapper == null) return;
 
         Plane3D plane3D = entity.getPlane3D();
-        if (entity.getOrientation() == ScreenOrientation.TO_PLAYER) {
-            EntityPlayer player = Minecraft.getMinecraft().player;
-            float xN = (float) (player.posX - entity.posX);
-            float yN = (float) (player.posY - entity.posY);
-            float zN = (float) (player.posZ - entity.posZ);
-            plane3D.setNormal(xN, yN, zN);
-        }
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, z);
-        plane3D.transformRectangle();
+        if (entity.getOrientation() == ScreenOrientation.TO_PLAYER) {
+            EntityPlayer player = Minecraft.getMinecraft().player;
+            plane3D.transform(player.getPositionVector(), entity.getPositionVector(), player.getLookVec());
+        } else {
+            plane3D.transform();
+        }
         screenWrapper.drawScreen(0, 0, partialTicks);
         GlStateManager.popMatrix();
     }
