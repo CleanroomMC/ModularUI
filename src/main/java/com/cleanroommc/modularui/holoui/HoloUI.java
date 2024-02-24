@@ -56,6 +56,7 @@ public class HoloUI {
         public Builder inFrontOf(EntityPlayer player, double distance, boolean fixed) {
             Vec3d look = player.getLookVec();
             this.orientation = fixed ? ScreenOrientation.FIXED : ScreenOrientation.TO_PLAYER;
+            if (fixed) plane3D.setNormal((float) -look.x, 0, (float) -look.z);
             return at(player.posX + look.x * distance, player.posY + player.getEyeHeight() + look.y * distance, player.posZ + look.z * distance);
         }
 
