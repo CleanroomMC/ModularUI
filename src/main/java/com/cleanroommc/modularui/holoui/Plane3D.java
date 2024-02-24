@@ -19,6 +19,7 @@ public class Plane3D {
     private float scale = 1f;
     private float aX = 0.5f, aY = 0.5f;
     private Vec3d normal = Direction.NORTH.asVec3d();
+    private Vec3d rotation = this.normal;
 
 
     public void transform() {
@@ -45,6 +46,7 @@ public class Plane3D {
         // handle pitch (up-down)
         Vec3d vec = new Vec3d(looking.x, 0, looking.z);
         double pitch = Math.atan(looking.y / vec.length());
+        this.rotation = new Vec3d(pitch, yaw, 0);
 
         Matrix4f mYaw = new Matrix4f()
                 .rotate((float) yaw, Direction.UP.asVector3f());
@@ -76,6 +78,10 @@ public class Plane3D {
 
     public void setNormal(float x, float y, float z) {
         this.normal = new Vec3d(x, y, z).normalize();
+    }
+
+    public Vec3d getRotation() {
+        return this.rotation;
     }
 
     public void setAnchor(float x, float y) {
