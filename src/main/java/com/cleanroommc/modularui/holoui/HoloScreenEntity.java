@@ -84,14 +84,13 @@ public class HoloScreenEntity extends Entity {
         this.prevPosZ = this.posZ;
         this.prevRotationPitch = this.rotationPitch;
         this.prevRotationYaw = this.rotationYaw;
-        if (this.world.isRemote) {
-            this.extinguish();
-        }
+
         if (this.posY < -64.0D) {
             this.outOfWorld();
         }
 
         if (this.world.isRemote) {
+            this.extinguish();
             int w = (int) this.plane3D.getWidth(), h = (int) this.plane3D.getHeight();
             if (w != this.wrapper.width || h != this.wrapper.height) {
                 this.wrapper.onResize(Minecraft.getMinecraft(), w, h);
