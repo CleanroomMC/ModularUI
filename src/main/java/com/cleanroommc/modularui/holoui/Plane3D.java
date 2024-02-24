@@ -36,15 +36,17 @@ public class Plane3D {
         GlStateManager.scale(0.0625 * this.scale, 0.0625 * this.scale, 0.0625 * this.scale);
         // rotate 180 deg
         GlStateManager.rotate(180, 0, 0, 1);
+
         // apply facing direction
+        // handle yaw (left-right)
         Vec3d diff = orig.subtract(target);
         double yaw = Math.atan(diff.z / diff.x);
         if (diff.x < 0) yaw += (Math.PI / 2);
         else yaw -= (Math.PI / 2);
 
+        // handle pitch (up-down)
         Vec3d vec = new Vec3d(looking.x, 0, looking.z);
         double pitch = Math.atan(looking.y / vec.length());
-//        if (orig.x < 0) pitch -= (Math.PI / 2);
 
         Matrix4f mYaw = new Matrix4f()
                 .rotate((float) yaw, Direction.UP.asVector3f());
