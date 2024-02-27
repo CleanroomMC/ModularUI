@@ -42,7 +42,11 @@ public class HoloScreenEntity extends Entity {
 
     public void setScreen(ModularScreen screen) {
         this.screen = screen;
-        this.wrapper = new GuiContainerWrapper(new ModularContainer(null), screen);
+    }
+
+    public void setWrapper(GuiContainerWrapper wrapper) {
+        this.setScreen(wrapper.getScreen());
+        this.wrapper = wrapper;
         this.wrapper.setWorldAndResolution(Minecraft.getMinecraft(), (int) this.plane3D.getWidth(), (int) this.plane3D.getHeight());
     }
 
