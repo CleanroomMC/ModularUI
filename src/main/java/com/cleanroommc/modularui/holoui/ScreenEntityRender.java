@@ -69,6 +69,7 @@ public class ScreenEntityRender extends Render<HoloScreenEntity> {
         var holoR = holoPos.rotateYaw((float) (planeRot.y - worldAngle));
 
         // x should be the left-right offset from the player to the holo screen
+        // y should be the up-down offset from the player to the holo screen
         // z should be the distance from the player to the holo screen's plane
         var diff = holoR.subtract(posR);
 
