@@ -1,14 +1,18 @@
 package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.factory.HandGuiData;
+import com.cleanroommc.modularui.factory.HoloGuiFactory;
 import com.cleanroommc.modularui.holoui.HoloUI;
 
 import com.cleanroommc.modularui.screen.ModularScreen;
 
 import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 
+import com.cleanroommc.modularui.widget.WidgetTree;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
@@ -25,15 +29,8 @@ public class TestHoloItem extends TestItem {
     @NotNull
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, @NotNull EntityPlayer player, @NotNull EnumHand hand) {
-        if (world.isRemote) {
-            Objects.requireNonNull(player);
-            Objects.requireNonNull(hand);
-            HandGuiData guiData = new HandGuiData(player, hand);
-            GuiSyncManager manager = new GuiSyncManager(player);
-            ModularScreen s = new ModularScreen(buildUI(guiData, manager));
-            HoloUI.builder()
-                    .inFrontOf(Minecraft.getMinecraft().player, 5, true)
-                    .open(s);
+        if (!world.isRemote) {
+            HoloGuiFactory.open((EntityPlayerMP) player, hand);
         }
         return new ActionResult<>(EnumActionResult.SUCCESS, player.getHeldItem(hand));
     }
