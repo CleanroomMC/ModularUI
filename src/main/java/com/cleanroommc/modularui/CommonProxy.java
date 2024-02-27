@@ -40,6 +40,7 @@ public class CommonProxy {
         NetworkHandler.init();
 
         GuiFactories.init();
+        GuiManager.registerFactory(HoloGuiFactory.INSTANCE);
     }
 
     void postInit(FMLPostInitializationEvent event) {
