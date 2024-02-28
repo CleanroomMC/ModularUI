@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.utils.Animator;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.crash.CrashReport;
@@ -78,10 +79,19 @@ public class ScreenEntityRender extends Render<HoloScreenEntity> {
         }
     }
 
-    private static Vec3i calculateMousePos(Vec3d player, HoloScreenEntity entity, Vec3d looking) {
-        var holoPos = entity.getPositionVector();
+    @Override
+    public boolean shouldRender(HoloScreenEntity screen, ICamera camera, double camX, double camY, double camZ) {
+        boolean render = super.shouldRender(screen, camera, camX, camY, camZ);
+        if (!render) {
+            lookingPlayers.remove(Minecraft.getMinecraft().player);
+        }
+        return render;
+    }
 
-        var plane = entity.getPlane3D();
+    private static Vec3i calculateMousePos(Vec3d player, HoloScreenEntity screen, Vec3d looking) {
+        var holoPos = screen.getPositionVector();
+
+        var plane = screen.getPlane3D();
         var planeRot = plane.getRotation();
 
         // get the difference of the player's eye position and holo position
