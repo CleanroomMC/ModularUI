@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.holoui;
 
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
-import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.screen.ModularScreen;
 
 import net.minecraft.block.Block;
