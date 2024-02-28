@@ -100,6 +100,7 @@ public class HoloScreenEntity extends Entity {
             }
         }
 
+        this.screen.onUpdate();
         this.firstUpdate = false;
         this.world.profiler.endSection();
     }
