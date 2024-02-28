@@ -24,10 +24,14 @@ import net.minecraftforge.client.MinecraftForgeClient;
 import org.lwjgl.opengl.EXTFramebufferObject;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
+import org.lwjgl.util.vector.ReadableVector3f;
 import org.lwjgl.util.vector.Vector3f;
 
+import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import java.util.function.DoubleSupplier;
 
 public class SchemaRenderer implements IDrawable {
 
@@ -37,6 +41,8 @@ public class SchemaRenderer implements IDrawable {
     private final Framebuffer framebuffer;
     private final Camera camera = new Camera(new Vector3f(), new Vector3f());
     private boolean cameraSetup = false;
+    private DoubleSupplier scale;
+    private BooleanSupplier disableTESR;
     private Consumer<IRayTracer> onRayTrace;
     private Consumer<Projection> afterRender;
     private BiConsumer<Camera, ISchema> cameraFunc;
@@ -72,6 +78,24 @@ public class SchemaRenderer implements IDrawable {
         return this;
     }
 
+    public SchemaRenderer scale(double scale) {
+        return scale(() -> scale);
+    }
+
+    public SchemaRenderer scale(DoubleSupplier scale) {
+        this.scale = scale;
+        return this;
+    }
+
+    public SchemaRenderer disableTESR(boolean disable) {
+        return disableTESR(() -> disable);
+    }
+
+    public SchemaRenderer disableTESR(BooleanSupplier disable) {
+        this.disableTESR = disable;
+        return this;
+    }
+
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
         render(x, y, width, height, context.getMouseX(), context.getMouseY());
@@ -80,6 +104,14 @@ public class SchemaRenderer implements IDrawable {
     public void render(int x, int y, int width, int height, int mouseX, int mouseY) {
         if (this.cameraFunc != null) {
             this.cameraFunc.accept(this.camera, this.schema);
+        }
+        if (Objects.nonNull(scale)) {
+            Vector3f cameraPos = camera.getPos();
+            Vector3f looking = camera.getLookAt();
+            Vector3f.sub(cameraPos, looking, cameraPos);
+            if (cameraPos.length() != 0.0f) cameraPos.normalise();
+            cameraPos.scale((float) scale.getAsDouble());
+            Vector3f.add(looking, cameraPos, cameraPos);
         }
         int lastFbo = bindFBO();
         setupCamera(this.framebuffer.framebufferWidth, this.framebuffer.framebufferHeight);
@@ -159,18 +191,20 @@ public class SchemaRenderer implements IDrawable {
         GlStateManager.enableLighting();
 
         // render TESR
-        for (int pass = 0; pass < 2; pass++) {
-            ForgeHooksClient.setRenderPass(pass);
-            int finalPass = pass;
-            GlStateManager.color(1, 1, 1, 1);
-            setDefaultPassRenderState(pass);
-            this.schema.forEach(pair -> {
-                BlockPos pos = pair.getKey();
-                TileEntity tile = pair.getValue().getTileEntity();
-                if (tile != null && tile.shouldRenderInPass(finalPass)) {
-                    TileEntityRendererDispatcher.instance.render(tile, pos.getX(), pos.getY(), pos.getZ(), 0);
-                }
-            });
+        if (disableTESR == null || !disableTESR.getAsBoolean()) {
+            for (int pass = 0; pass < 2; pass++) {
+                ForgeHooksClient.setRenderPass(pass);
+                int finalPass = pass;
+                GlStateManager.color(1, 1, 1, 1);
+                setDefaultPassRenderState(pass);
+                this.schema.forEach(pair -> {
+                    BlockPos pos = pair.getKey();
+                    TileEntity tile = pair.getValue().getTileEntity();
+                    if (tile != null && tile.shouldRenderInPass(finalPass)) {
+                        TileEntityRendererDispatcher.instance.render(tile, pos.getX(), pos.getY(), pos.getZ(), 0);
+                    }
+                });
+            }
         }
         ForgeHooksClient.setRenderPass(-1);
         GlStateManager.enableDepth();
