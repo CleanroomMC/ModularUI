@@ -44,8 +44,8 @@ public class Plane3D {
         else yaw -= (Math.PI / 2);
 
         // handle pitch (up-down)
-        Vec3d vec = new Vec3d(looking.x, 0, looking.z);
-        double pitch = Math.atan(looking.y / vec.length());
+        Vec3d vec = new Vec3d(diff.x, 0, diff.z);
+        double pitch = Math.atan(diff.y / vec.length());
         this.rotation = new Vec3d(pitch, yaw, 0);
 
         Matrix4f mYaw = new Matrix4f()
