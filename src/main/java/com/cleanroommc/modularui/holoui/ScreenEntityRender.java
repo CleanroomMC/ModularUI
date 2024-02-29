@@ -22,13 +22,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Highly experimental
  */
 @ApiStatus.Experimental
 public class ScreenEntityRender extends Render<HoloScreenEntity> {
-    private static final Map<EntityPlayer, GuiContainerWrapper> lookingPlayers = new Object2ObjectOpenHashMap<>();
+    private static final Map<UUID, GuiContainerWrapper> lookingPlayers = new Object2ObjectOpenHashMap<>();
 
     public ScreenEntityRender(RenderManager renderManager) {
         super(renderManager);
@@ -44,36 +45,40 @@ public class ScreenEntityRender extends Render<HoloScreenEntity> {
     public void doRender(@NotNull HoloScreenEntity entity, double x, double y, double z, float entityYaw, float partialTicks) {
         GuiContainerWrapper screenWrapper = entity.getWrapper();
         if (screenWrapper == null) return;
+        var screen = screenWrapper.getScreen();
 
         Plane3D plane3D = entity.getPlane3D();
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, z);
         EntityPlayer player = Minecraft.getMinecraft().player;
         if (entity.getOrientation() == ScreenOrientation.TO_PLAYER) {
-            plane3D.transform(player.getPositionVector(), entity.getPositionVector(), player.getLookVec());
+            plane3D.transform(player.getPositionVector(), entity.getPositionVector());
         } else {
             plane3D.transform();
         }
         var mouse = calculateMousePos(player.getPositionVector().add(0, player.getEyeHeight(), 0), entity, player.getLookVec());
         screenWrapper.drawScreen(mouse.getX(), mouse.getY(), partialTicks);
-        screenWrapper.getScreen().onFrameUpdate();
+//        screen.drawScreen(mouse.getX(), mouse.getY(), partialTicks);
+        screen.onFrameUpdate();
+
+        UUID id = player.getUniqueID();
         Animator.advance();
-        if (withinScreen(mouse, entity.getPlane3D()) && !lookingPlayers.containsKey(player)) {
-            lookingPlayers.put(player, screenWrapper);
+        if (withinScreen(mouse, entity.getPlane3D()) && !lookingPlayers.containsKey(id)) {
+            lookingPlayers.put(id, screenWrapper);
         } else if (!withinScreen(mouse, entity.getPlane3D())) {
-            lookingPlayers.remove(player);
+            lookingPlayers.remove(id);
         }
         GlStateManager.popMatrix();
     }
 
     public static void clickScreen(EntityPlayer player) {
-        if (lookingPlayers.containsKey(player)) {
+        if (lookingPlayers.containsKey(player.getUniqueID())) {
             try {
-                lookingPlayers.get(player).handleMouseInput();
+                lookingPlayers.get(player.getUniqueID()).handleMouseInput();
             } catch (Throwable throwable1) {
                 CrashReport c = CrashReport.makeCrashReport(throwable1, "Updating screen events");
                 c.makeCategory("Affected screen")
-                    .addDetail("Screen name", () -> lookingPlayers.get(player).getClass().getCanonicalName());
+                    .addDetail("Screen name", () -> lookingPlayers.get(player.getUniqueID()).getClass().getCanonicalName());
                 throw new ReportedException(c);
             }
         }
