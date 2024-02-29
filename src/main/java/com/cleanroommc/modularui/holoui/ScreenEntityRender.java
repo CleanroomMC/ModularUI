@@ -107,8 +107,7 @@ public class ScreenEntityRender extends Render<HoloScreenEntity> {
 
         // rotate to make x zero
         var lookRot = looking
-                .rotateYaw((float) (planeRot.y - worldAngle))
-                .rotatePitch((float) planeRot.x);
+                .rotateYaw((float) (planeRot.y - worldAngle));
 
         // the x, y of look rot should be the mouse pos if scaled by looRot z
         // the scale factor should be the distance from the player to the plane by the z component of lookRot
