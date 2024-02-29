@@ -27,8 +27,10 @@ public class HoloUI {
     private static final Map<ResourceLocation, Supplier<ModularScreen>> syncedHolos = new Object2ObjectOpenHashMap<>();
 
     public static void registerSyncedHoloUI(ResourceLocation loc, Supplier<ModularScreen> screen) {
-        if (!syncedHolos.containsKey(loc))
-            syncedHolos.put(loc, screen);
+        var old = syncedHolos.put(loc, screen);
+        if (old != null && old.get() != null) {
+            old.get().close(true);
+        }
     }
 
     public static Builder builder() {
