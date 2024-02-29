@@ -44,6 +44,7 @@ public class GuiContext extends GuiViewportStack {
     /* Render states */
     private float partialTicks;
     private long tick = 0;
+    public boolean isHoloScreen = false;
 
     public boolean isAbove(IGuiElement widget) {
         return isMouseAbove(widget.getArea());
