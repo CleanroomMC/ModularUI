@@ -41,6 +41,7 @@ public class HoloScreenEntity extends Entity {
 
     public void setScreen(ModularScreen screen) {
         this.screen = screen;
+        this.screen.getContext().holoScreen = this;
     }
 
     public void setWrapper(GuiContainerWrapper wrapper) {
