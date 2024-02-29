@@ -363,9 +363,17 @@ public class GuiScreenWrapper extends GuiContainer {
         this.mc.dispatchKeypresses();
     }
 
+    @SuppressWarnings({"NullableProblems", "ConstantValue"})
     @Override
-    protected void handleMouseClick(Slot slotIn, int slotId, int mouseButton, ClickType type) {
-        super.handleMouseClick(slotIn, slotId, mouseButton, type);
+    protected void handleMouseClick(Slot slotIn, int slotId, int mouseButton, @NotNull ClickType type) {
+        if (screen.getContext().isHoloScreen) {
+            slotId = slotIn == null ? slotId : slotIn.slotNumber;
+            short id = inventorySlots.getNextTransactionID(this.mc.player.inventory);
+            ItemStack stack = inventorySlots.slotClick(slotId, mouseButton, type, this.mc.player);
+            this.mc.getConnection().sendPacket(new CPacketClickWindow(this.inventorySlots.windowId, slotId, mouseButton, type, stack, id));
+        } else {
+            super.handleMouseClick(slotIn, slotId, mouseButton, type);
+        }
     }
 
     @Override
