@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
+import com.cleanroommc.modularui.holoui.HoloScreenEntity;
 import com.cleanroommc.modularui.screen.*;
 
 import net.minecraft.client.Minecraft;
@@ -56,6 +57,7 @@ public class GuiContext extends GuiViewportStack {
     private float partialTicks;
     private long tick;
     public boolean isHoloScreen = false;
+    public HoloScreenEntity holoScreen = null;
 
     public List<Consumer<GuiContext>> postRenderCallbacks = new ArrayList<>();
 
