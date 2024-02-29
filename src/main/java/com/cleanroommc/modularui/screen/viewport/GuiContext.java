@@ -55,6 +55,7 @@ public class GuiContext extends GuiViewportStack {
     /* Render states */
     private float partialTicks;
     private long tick;
+    public boolean isHoloScreen = false;
 
     public List<Consumer<GuiContext>> postRenderCallbacks = new ArrayList<>();
 
