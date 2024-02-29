@@ -363,6 +363,11 @@ public class GuiScreenWrapper extends GuiContainer {
     }
 
     @Override
+    protected void handleMouseClick(Slot slotIn, int slotId, int mouseButton, ClickType type) {
+        super.handleMouseClick(slotIn, slotId, mouseButton, type);
+    }
+
+    @Override
     protected void keyTyped(char typedChar, int keyCode) {
         // debug mode C + CTRL + SHIFT + ALT
         if (keyCode == 46 && isCtrlKeyDown() && isShiftKeyDown() && isAltKeyDown()) {
