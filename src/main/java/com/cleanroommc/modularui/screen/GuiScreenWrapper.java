@@ -29,6 +29,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.client.CPacketClickWindow;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.GuiContainerEvent;
@@ -36,6 +37,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
@@ -184,6 +186,7 @@ public class GuiScreenWrapper extends GuiContainer {
 
     @Override
     public void drawWorldBackground(int tint) {
+        if (screen.getContext().isHoloScreen) return;
         if (ModularUI.isBlurLoaded() || this.mc.world == null) {
             super.drawWorldBackground(tint);
             return;
@@ -198,11 +201,13 @@ public class GuiScreenWrapper extends GuiContainer {
 
     private void drawItemStack(ItemStack stack, int x, int y, String altText) {
         GlStateManager.translate(0.0F, 0.0F, 32.0F);
-        this.zLevel = 200.0F;
-        this.itemRender.zLevel = 200.0F;
+        float z = screen.getContext().isHoloScreen ? -150 - 32 : 200;
+        this.zLevel = z;
+        this.itemRender.zLevel = z;
         FontRenderer font = stack.getItem().getFontRenderer(stack);
         if (font == null) font = this.fontRenderer;
         GlStateManager.enableDepth();
+        // todo handle item block rendering weirdness with holo screen
         this.itemRender.renderItemAndEffectIntoGUI(stack, x, y);
         this.itemRender.renderItemOverlayIntoGUI(font, stack, x, y - (getAccessor().getDraggedStack().isEmpty() ? 0 : 8), altText);
         GlStateManager.disableDepth();

@@ -105,7 +105,7 @@ public class Plane3D {
         return this.scale;
     }
 
-    private enum Direction {
+    public enum Direction {
         ORIGIN(0, 0, 0),
         UP(0, 1, 0),
         DOWN(0, -1, 0),
@@ -121,11 +121,11 @@ public class Plane3D {
             vec3d = new Vec3d(x, y, z);
         }
 
-        Vector3f asVector3f() {
+        public Vector3f asVector3f() {
             return vector3f;
         }
 
-        Vec3d asVec3d() {
+         public Vec3d asVec3d() {
             return vec3d;
         }
     }
