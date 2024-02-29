@@ -90,7 +90,6 @@ public class ScreenEntityRender extends Render<HoloScreenEntity> {
 
     private static Vec3i calculateMousePos(Vec3d player, HoloScreenEntity screen, Vec3d looking) {
         var holoPos = screen.getPositionVector();
-
         var plane = screen.getPlane3D();
         var planeRot = plane.getRotation();
 
@@ -103,15 +102,15 @@ public class ScreenEntityRender extends Render<HoloScreenEntity> {
         var holoR = holoPos.rotateYaw((float) (planeRot.y - worldAngle))
                 .rotatePitch((float) (planeRot.x + verticalAngle));
 
+        // rotate looking so that 0, 0, 0 is facing exactly at the origin of the screen
+        var lookRot = looking
+                .rotateYaw((float) (planeRot.y - worldAngle))
+                .rotatePitch((float) (planeRot.x + verticalAngle));
+
         // x should be the left-right offset from the player to the holo screen
         // y should be the up-down offset from the player to the holo screen
         // z should be the distance from the player to the holo screen's plane
         var diff = holoR.subtract(posR);
-
-        // rotate to make x zero
-        var lookRot = looking
-                .rotateYaw((float) (planeRot.y - worldAngle))
-                .rotatePitch((float) (planeRot.x + verticalAngle));
 
         // the x, y of look rot should be the mouse pos if scaled by looRot z
         // the scale factor should be the distance from the player to the plane by the z component of lookRot
