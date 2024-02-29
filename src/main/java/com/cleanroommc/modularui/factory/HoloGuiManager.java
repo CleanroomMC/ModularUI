@@ -76,7 +76,7 @@ public class HoloGuiManager extends GuiManager {
         guiScreenWrapper.inventorySlots.windowId = windowId;
         HoloUI.registerSyncedHoloUI(new ResourceLocation("holo", panel.getName()), panel::getScreen);
         HoloUI.builder()
-                .inFrontOf(player, 5, true)
+                .inFrontOf(player, 5, false)
                 .open(guiScreenWrapper);
     }
 
