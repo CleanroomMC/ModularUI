@@ -1,22 +1,19 @@
 package com.cleanroommc.modularui.holoui;
 
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
-import com.cleanroommc.modularui.screen.JeiSettingsImpl;
-import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.ModularPanel;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import org.jetbrains.annotations.ApiStatus;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
-import java.util.function.Supplier;
 
 /**
  * Highly experimental
@@ -24,13 +21,18 @@ import java.util.function.Supplier;
 @ApiStatus.Experimental
 public class HoloUI {
 
-    private static final Map<ResourceLocation, Supplier<ModularScreen>> syncedHolos = new Object2ObjectOpenHashMap<>();
+    private final Map<ResourceLocation, Data> syncedHolos = new Object2ObjectOpenHashMap<>();
+    private static final HoloUI INSTANCE = new HoloUI();
 
-    public static void registerSyncedHoloUI(ResourceLocation loc, Supplier<ModularScreen> screen) {
-        var old = syncedHolos.put(loc, screen);
-        if (old != null && old.get() != null) {
-            old.get().close(true);
-        }
+    public static void registerSyncedHoloUI(ResourceLocation loc, ModularPanel mainPanel, GuiScreenWrapper screenWrapperSupplier) {
+        var old = INSTANCE.register(loc, mainPanel, screenWrapperSupplier);
+//        if (old != null && old.getPanel() != null) {
+//            old.getPanel().closeIfOpen(true);
+//        }
+    }
+
+    private Data register(ResourceLocation location, ModularPanel panelSupplier, GuiScreenWrapper screenWrapperSupplier) {
+        return this.syncedHolos.put(location, new Data(panelSupplier, screenWrapperSupplier));
     }
 
     public static Builder builder() {
@@ -99,11 +101,36 @@ public class HoloUI {
 //            JeiSettingsImpl jeiSettings = new JeiSettingsImpl();
 //            jeiSettings.disableJei();
 //            screen.getContext().setJeiSettings(jeiSettings);
+            wrapper.getScreen().getContext().isHoloScreen = true;
             HoloScreenEntity holoScreenEntity = new HoloScreenEntity(Minecraft.getMinecraft().world, this.plane3D);
             holoScreenEntity.setPosition(this.x, this.y, this.z);
             holoScreenEntity.setWrapper(wrapper);
             holoScreenEntity.spawnInWorld();
             holoScreenEntity.setOrientation(this.orientation);
+        }
+    }
+
+    public static class Data {
+        private final ModularPanel panelSupplier;
+        @Nullable
+        private final GuiScreenWrapper screenWrapperSupplier;
+
+        Data(ModularPanel panelSupplier, GuiScreenWrapper screenWrapperSupplier) {
+            this.panelSupplier = panelSupplier;
+            this.screenWrapperSupplier = screenWrapperSupplier;
+        }
+
+        Data(ModularPanel panelSupplier) {
+            this.panelSupplier = panelSupplier;
+            this.screenWrapperSupplier = null;
+        }
+
+        public ModularPanel getPanel() {
+            return panelSupplier;
+        }
+
+        public GuiScreenWrapper getScreenWrapper() {
+            return screenWrapperSupplier;
         }
     }
 }
