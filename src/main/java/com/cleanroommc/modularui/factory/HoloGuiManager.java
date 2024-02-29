@@ -84,7 +84,7 @@ public class HoloGuiManager extends GuiManager {
     @SubscribeEvent
     public static void onClick(InputEvent.MouseInputEvent event) {
         var player = Minecraft.getMinecraft().player;
-        if (player != null) {
+        if (player != null && player.getHeldItemMainhand().isEmpty() && player.getHeldItemOffhand().isEmpty()) {
             ScreenEntityRender.clickScreen(player);
         }
     }
