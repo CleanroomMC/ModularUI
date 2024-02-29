@@ -46,14 +46,14 @@ public class HoloGuiManager extends GuiManager {
         ModularPanel panel = factory.createPanel(guiData, syncManager);
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularContainer container = new ModularContainer(syncManager);
-        HoloUI.registerSyncedHoloUI(new ResourceLocation("holo", panel.getName()), () -> null);
+        HoloUI.registerSyncedHoloUI(new ResourceLocation("holo", panel.getName()), panel, null);
         // sync to client
-//        player.getNextWindowId();
+        player.getNextWindowId();
 //        player.closeContainer();
-//        int windowId = player.currentWindowId;
+        int windowId = player.currentWindowId;
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         factory.writeGuiData(guiData, buffer);
-        NetworkHandler.sendToPlayer(new OpenGuiPacket<>(0, factory, buffer), player);
+        NetworkHandler.sendToPlayer(new OpenGuiPacket<>(windowId, factory, buffer), player);
         // open container // this mimics forge behaviour
 //        player.openContainer = container;
 //        player.openContainer.windowId = windowId;
@@ -74,7 +74,7 @@ public class HoloGuiManager extends GuiManager {
         screen.getContext().setJeiSettings(jeiSettings);
         GuiScreenWrapper guiScreenWrapper = new GuiScreenWrapper(new ModularContainer(syncManager), screen);
         guiScreenWrapper.inventorySlots.windowId = windowId;
-        HoloUI.registerSyncedHoloUI(new ResourceLocation("holo", panel.getName()), panel::getScreen);
+        HoloUI.registerSyncedHoloUI(new ResourceLocation("holo", panel.getName()), panel, guiScreenWrapper);
         HoloUI.builder()
 //                .screenScale(0.25f)
                 .inFrontOf(player, 5, true)
