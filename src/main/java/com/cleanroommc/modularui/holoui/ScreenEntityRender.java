@@ -133,7 +133,7 @@ public class ScreenEntityRender extends Render<HoloScreenEntity> {
                 mousePos.getY() > 0 && mousePos.getY() < plane.getHeight();
     }
 
-    private static double calculateAngle(double opposite, double adjacent) {
+    public static double calculateAngle(double opposite, double adjacent) {
         // x is opposite, z is adjacent, theta = atan(x/z)
         double a3 = Math.atan(opposite / adjacent);
         if (adjacent < 0) {
