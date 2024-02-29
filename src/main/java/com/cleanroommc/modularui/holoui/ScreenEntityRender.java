@@ -96,9 +96,12 @@ public class ScreenEntityRender extends Render<HoloScreenEntity> {
 
         // get the difference of the player's eye position and holo position
         // rotate diff based on plane rotation
-        double worldAngle = calculateHorizontalAngle(holoPos);
-        var posR = player.rotateYaw((float) (planeRot.y - worldAngle));
-        var holoR = holoPos.rotateYaw((float) (planeRot.y - worldAngle));
+        double worldAngle = calculateAngle(holoPos.x, holoPos.z);
+        double verticalAngle = calculateAngle(holoPos.y,  holoPos.z);
+        var posR = player.rotateYaw((float) (planeRot.y - worldAngle))
+                .rotatePitch((float) (planeRot.x + verticalAngle));
+        var holoR = holoPos.rotateYaw((float) (planeRot.y - worldAngle))
+                .rotatePitch((float) (planeRot.x + verticalAngle));
 
         // x should be the left-right offset from the player to the holo screen
         // y should be the up-down offset from the player to the holo screen
@@ -107,13 +110,14 @@ public class ScreenEntityRender extends Render<HoloScreenEntity> {
 
         // rotate to make x zero
         var lookRot = looking
-                .rotateYaw((float) (planeRot.y - worldAngle));
+                .rotateYaw((float) (planeRot.y - worldAngle))
+                .rotatePitch((float) (planeRot.x + verticalAngle));
 
         // the x, y of look rot should be the mouse pos if scaled by looRot z
         // the scale factor should be the distance from the player to the plane by the z component of lookRot
         double sf = diff.z / lookRot.z;
         double mX = ((lookRot.x * sf) - diff.x) * 16;
-        double mY = ((lookRot.y * -sf) + diff.y) * 16;
+        double mY = ((lookRot.y * sf) - diff.y) * 16;
         mY += plane.getHeight() / 2;
         mX += plane.getWidth() / 2;
 
@@ -125,12 +129,12 @@ public class ScreenEntityRender extends Render<HoloScreenEntity> {
                 mousePos.getY() > 0 && mousePos.getY() < plane.getHeight();
     }
 
-    private static double calculateHorizontalAngle(Vec3d vec) {
+    private static double calculateAngle(double opposite, double adjacent) {
         // x is opposite, z is adjacent, theta = atan(x/z)
-        double a3 = Math.atan(vec.x / vec.z);
-        if (vec.z < 0) {
+        double a3 = Math.atan(opposite / adjacent);
+        if (adjacent < 0) {
             // if z is negative, the angle returned by atan has to be offset by PI
-            a3 += vec.x < 0 ? -Math.PI : Math.PI;
+            a3 += opposite < 0 ? -Math.PI : Math.PI;
         }
         return a3;
     }
