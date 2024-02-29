@@ -23,10 +23,10 @@ public class Plane3D {
 
 
     public void transform() {
-        transform(this.normal, Direction.ORIGIN.asVec3d(), this.normal.scale(-1));
+        transform(this.normal, Direction.ORIGIN.asVec3d());
     }
 
-    public void transform(Vec3d target, Vec3d orig, Vec3d looking) {
+    public void transform(Vec3d target, Vec3d orig) {
         // translate to anchor
         GlStateManager.translate(-this.w * this.aX, -this.h * this.aY, 0);
         // translate for scale and rotation
