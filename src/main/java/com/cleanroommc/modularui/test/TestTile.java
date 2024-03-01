@@ -191,7 +191,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                         .background(GuiTextures.BUTTON)
                                                         .value(SyncHandlers.intNumber(() -> this.cycleState, val -> this.cycleState = val)))*/
                                                 .child(new ItemSlot()
-                                                        .slot(SyncHandlers.phantomItemSlot(this.inventory, 0).ignoreMaxStackSize(true)))
+                                                        .slot(SyncHandlers.itemSlot(this.inventory, 0).ignoreMaxStackSize(true).singletonSlotGroup()))
                                                 .child(new FluidSlot()
                                                         .margin(2)
                                                         .width(30)

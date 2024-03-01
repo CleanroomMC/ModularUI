@@ -97,10 +97,10 @@ public class ContainerCustomizer {
                     }
                 } else if (clickedSlot.canTakeStack(player)) {
                     if (heldStack.isEmpty() && !slotStack.isEmpty()) {
-                        int toRemove = mouseButton == LEFT_MOUSE ? slotStack.getCount() : (slotStack.getCount() + 1) / 2;
+                        int s = Math.min(slotStack.getCount(), slotStack.getMaxStackSize());
+                        int toRemove = mouseButton == LEFT_MOUSE ? s : (s + 1) / 2;
                         inventoryplayer.setItemStack(slotStack.splitStack(toRemove));
                         clickedSlot.putStack(slotStack);
-
                         clickedSlot.onTake(player, inventoryplayer.getItemStack());
                     } else if (clickedSlot.isItemValid(heldStack)) {
                         if (slotStack.getItem() == heldStack.getItem() &&
@@ -110,10 +110,6 @@ public class ContainerCustomizer {
 
                             if (stackCount > clickedSlot.getItemStackLimit(heldStack) - slotStack.getCount()) {
                                 stackCount = clickedSlot.getItemStackLimit(heldStack) - slotStack.getCount();
-                            }
-
-                            if (stackCount > heldStack.getMaxStackSize() - slotStack.getCount()) {
-                                stackCount = heldStack.getMaxStackSize() - slotStack.getCount();
                             }
 
                             heldStack.shrink(stackCount);
@@ -156,9 +152,15 @@ public class ContainerCustomizer {
         if (!slot.isPhantom()) {
             ItemStack stack = slot.getStack();
             if (!stack.isEmpty()) {
+                stack = stack.copy();
+                int base = 0;
+                if(stack.getCount() > stack.getMaxStackSize()) {
+                    base = stack.getCount() - stack.getMaxStackSize();
+                    stack.setCount(stack.getMaxStackSize());
+                }
                 ItemStack remainder = transferItem(slot, stack.copy());
-                if (remainder.isEmpty()) stack = ItemStack.EMPTY;
-                else stack.setCount(remainder.getCount());
+                if (base == 0 && remainder.isEmpty()) stack = ItemStack.EMPTY;
+                else stack.setCount(base + remainder.getCount());
                 slot.putStack(stack);
                 return ItemStack.EMPTY;
             }
@@ -179,7 +181,7 @@ public class ContainerCustomizer {
                     }
                 } else if (ItemHandlerHelper.canItemStacksStack(fromStack, toStack)) {
                     int j = toStack.getCount() + fromStack.getCount();
-                    int maxSize = Math.min(toSlot.getSlotStackLimit(), fromStack.getMaxStackSize());
+                    int maxSize = toSlot.getItemStackLimit(fromStack);//Math.min(toSlot.getSlotStackLimit(), fromStack.getMaxStackSize());
 
                     if (j <= maxSize) {
                         fromStack.setCount(0);
@@ -201,8 +203,8 @@ public class ContainerCustomizer {
             ItemStack itemstack = emptySlot.getStack();
             SlotGroup slotGroup = Objects.requireNonNull(emptySlot.getSlotGroup());
             if (slotGroup != fromSlotGroup && emptySlot.isEnabled() && itemstack.isEmpty() && emptySlot.isItemValid(fromStack)) {
-                if (fromStack.getCount() > emptySlot.getSlotStackLimit()) {
-                    emptySlot.putStack(fromStack.splitStack(emptySlot.getSlotStackLimit()));
+                if (fromStack.getCount() > emptySlot.getItemStackLimit(fromStack)) {
+                    emptySlot.putStack(fromStack.splitStack(emptySlot.getItemStackLimit(fromStack)));
                 } else {
                     emptySlot.putStack(fromStack.splitStack(fromStack.getCount()));
                 }
