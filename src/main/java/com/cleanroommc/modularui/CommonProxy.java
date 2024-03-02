@@ -63,6 +63,7 @@ public class CommonProxy {
                 .id("modular_screen", 0)
                 .name("ModularScreen")
                 .entity(HoloScreenEntity.class)
+                .tracker(100, 20, false)
                 .factory(HoloScreenEntity::new)
                 .build());
     }
