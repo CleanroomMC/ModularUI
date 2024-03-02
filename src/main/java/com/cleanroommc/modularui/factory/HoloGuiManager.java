@@ -38,6 +38,13 @@ public class HoloGuiManager extends GuiManager {
         guiData.setJeiSettings(JeiSettings.DUMMY);
         GuiSyncManager syncManager = new GuiSyncManager(player);
         ModularPanel panel = factory.createPanel(guiData, syncManager);
+        if (HoloUI.isOpen(panel)) {
+            HoloUI.builder()
+                    .inFrontOf(player, 5, true)
+                    .reposition(panel.getName());
+            ModularUI.LOGGER.warn("reposition the holo, sync to client");
+            return;
+        }
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularContainer container = new ModularContainer(syncManager);
         HoloUI.builder()
