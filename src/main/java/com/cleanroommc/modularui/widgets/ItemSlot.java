@@ -207,9 +207,9 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             }
         }
 
-        float z = getContext().isHoloScreen ? -150 : 100f;
-        guiScreen.setZ(z);
-        guiScreen.getItemRenderer().zLevel = z;
+        float z = 100f;
+        guiScreen.setZ(guiScreen.getZ() + z);
+        guiScreen.getItemRenderer().zLevel += z;
 
         if (!flag1) {
             if (flag) {
@@ -261,8 +261,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             }
         }
 
-        guiScreen.getItemRenderer().zLevel = 0.0F;
-        guiScreen.setZ(0f);
+        guiScreen.getItemRenderer().zLevel -= z;
+        guiScreen.setZ(guiScreen.getZ() - z);
     }
 
     @Override
