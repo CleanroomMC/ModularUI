@@ -108,10 +108,14 @@ public class HoloUI {
 //            holoScreenEntity.setOrientation(this.orientation);
         }
 
-        public void reposition(String name) {
+        public void reposition(String name, EntityPlayer player) {
             var screen = syncedHolos.get(name);
             screen.setPosition(this.x, this.y, this.z);
             screen.setOrientation(this.orientation);
+            if (player.world.isRemote){
+                var vec = screen.getPositionVector().subtract(player.getPositionVector());
+                screen.getPlane3D().setNormal((float) -vec.x, 0, (float) -vec.z);
+            }
         }
     }
 }
