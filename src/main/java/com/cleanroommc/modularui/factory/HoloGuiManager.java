@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.factory;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.JeiSettings;
 import com.cleanroommc.modularui.api.UIFactory;
 import com.cleanroommc.modularui.holoui.HoloUI;
@@ -12,10 +13,8 @@ import com.cleanroommc.modularui.widget.WidgetTree;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
@@ -28,32 +27,33 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import io.netty.buffer.Unpooled;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class HoloGuiManager extends GuiManager {
 
 
     private static GuiScreenWrapper lastMui;
-    private static final List<EntityPlayer> openedContainers = new ArrayList<>(4);
 
     public static <T extends GuiData> void open(@NotNull UIFactory<T> factory, @NotNull T guiData, EntityPlayerMP player) {
-        if (player instanceof FakePlayer || openedContainers.contains(player)) return;
-        openedContainers.add(player);
+        if (player instanceof FakePlayer) return;
         // create panel, collect sync handlers and create container
         guiData.setJeiSettings(JeiSettings.DUMMY);
         GuiSyncManager syncManager = new GuiSyncManager(player);
         ModularPanel panel = factory.createPanel(guiData, syncManager);
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularContainer container = new ModularContainer(syncManager);
-        HoloUI.registerSyncedHoloUI(new ResourceLocation("holo", panel.getName()), panel, null);
+        HoloUI.builder()
+                .inFrontOf(player, 5, true)
+                .open(screen -> {
+                    screen.setContainer(container);
+                    screen.setPanel(panel);
+                    HoloUI.registerSyncedHoloUI(panel, screen);
+                }, player.getEntityWorld());
         // sync to client
-        player.getNextWindowId();
+//        player.getNextWindowId();
 //        player.closeContainer();
-        int windowId = player.currentWindowId;
+//        int windowId = player.currentWindowId;
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         factory.writeGuiData(guiData, buffer);
-        NetworkHandler.sendToPlayer(new OpenGuiPacket<>(windowId, factory, buffer), player);
+        NetworkHandler.sendToPlayer(new OpenGuiPacket<>(0, factory, buffer), player);
         // open container // this mimics forge behaviour
 //        player.openContainer = container;
 //        player.openContainer.windowId = windowId;
@@ -74,11 +74,14 @@ public class HoloGuiManager extends GuiManager {
         screen.getContext().setJeiSettings(jeiSettings);
         GuiScreenWrapper guiScreenWrapper = new GuiScreenWrapper(new ModularContainer(syncManager), screen);
         guiScreenWrapper.inventorySlots.windowId = windowId;
-        HoloUI.registerSyncedHoloUI(new ResourceLocation("holo", panel.getName()), panel, guiScreenWrapper);
         HoloUI.builder()
 //                .screenScale(0.25f)
                 .inFrontOf(player, 5, true)
-                .open(guiScreenWrapper);
+                .open(screen1 -> {
+                    screen1.setPanel(panel);
+                    screen1.setWrapper(guiScreenWrapper);
+                    HoloUI.registerSyncedHoloUI(panel, screen1);
+                }, player.getEntityWorld());
     }
 
     //todo make this a mixin instead of using event to cancel arm animation stuff
