@@ -25,15 +25,11 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.RenderItem;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.CPacketClickWindow;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.GuiContainerEvent;
@@ -62,75 +58,6 @@ public class GuiScreenWrapper extends GuiContainer {
         super(container);
         this.screen = screen;
         this.screen.construct(this);
-    }
-
-    @Override
-    public void setWorldAndResolution(Minecraft mc, int width, int height) {
-        super.setWorldAndResolution(mc, width, height);
-        this.itemRender = new RenderItemTest(mc, this.screen.getContext());
-    }
-
-    public static class RenderItemTest extends RenderItem {
-
-        private final TextureManager textureManager;
-        private final GuiContext context;
-        public RenderItemTest(Minecraft mc, GuiContext context) {
-            super(mc.renderEngine, mc.getRenderItem().getItemModelMesher().getModelManager(), mc.getItemColors());
-            this.textureManager = mc.getTextureManager();
-            this.context = context;
-        }
-
-        @Override
-        public void renderItem(ItemStack stack, IBakedModel model) {
-            if (!stack.isEmpty()) {
-                GlStateManager.pushMatrix();
-                GlStateManager.translate(-0.5F, -0.5F, -0.5F);
-
-                if (model.isBuiltInRenderer()) {
-                    GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                    GlStateManager.enableRescaleNormal();
-                    stack.getItem().getTileEntityItemStackRenderer().renderByItem(stack);
-                }
-                else {
-                    this.renderModel(model, stack);
-
-                    if (stack.hasEffect()) {
-                        this.renderEffect(model);
-                    }
-                }
-
-                GlStateManager.popMatrix();
-            }
-        }
-
-        private void renderEffect(IBakedModel model) {
-            GlStateManager.depthMask(false);
-            GlStateManager.depthFunc(514);
-            GlStateManager.disableLighting();
-            GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_COLOR, GlStateManager.DestFactor.ONE);
-            this.textureManager.bindTexture(new ResourceLocation("textures/misc/enchanted_item_glint.png"));
-            GlStateManager.matrixMode(5890);
-            GlStateManager.pushMatrix();
-            GlStateManager.scale(8.0F, 8.0F, 8.0F);
-            float f = (float)(Minecraft.getSystemTime() % 3000L) / 3000.0F / 8.0F;
-            GlStateManager.translate(f, 0.0F, 0.0F);
-            GlStateManager.rotate(-50.0F, 0.0F, 0.0F, 1.0F);
-            this.renderModel(model, -8372020);
-            GlStateManager.popMatrix();
-            GlStateManager.pushMatrix();
-            GlStateManager.scale(8.0F, 8.0F, 8.0F);
-            float f1 = (float)(Minecraft.getSystemTime() % 4873L) / 4873.0F / 8.0F;
-            GlStateManager.translate(-f1, 0.0F, 0.0F);
-            GlStateManager.rotate(10.0F, 0.0F, 0.0F, 1.0F);
-            this.renderModel(model, -8372020);
-            GlStateManager.popMatrix();
-            GlStateManager.matrixMode(5888);
-            GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-            GlStateManager.enableLighting();
-            GlStateManager.depthFunc(515);
-            GlStateManager.depthMask(true);
-            this.textureManager.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-        }
     }
 
     @Override
@@ -236,6 +163,7 @@ public class GuiScreenWrapper extends GuiContainer {
             int i3 = getAccessor().getReturningStackDestSlot().yPos - getAccessor().getTouchUpY();
             int l1 = getAccessor().getTouchUpX() + (int) ((float) l2 * f);
             int i2 = getAccessor().getTouchUpY() + (int) ((float) i3 * f);
+//            GlStateManager.translate(); ?
             this.drawItemStack(getAccessor().getReturningStack(), l1, i2, null);
         }
 
@@ -273,18 +201,31 @@ public class GuiScreenWrapper extends GuiContainer {
         this.drawGradientRect(0, 0, this.width, this.height, Color.withAlpha(color, (int) (startAlpha * alpha)), Color.withAlpha(color, (int) (endAlpha * alpha)));
     }
 
-    private void drawItemStack(ItemStack stack, int x, int y, String altText) {
-        GlStateManager.translate(0.0F, 0.0F, 32.0F);
-        float z = screen.getContext().isHoloScreen ? -150 - 32 : 200;
-        this.zLevel = z;
-        this.itemRender.zLevel = z;
+    public void drawItem(ItemStack stack, int x, int y) {
+        GlStateManager.enableDepth();
+        GlStateManager.pushMatrix();
+        if (this.screen.getContext().isHoloScreen) {
+            GlStateManager.scale(1, 1, 0.0001);
+        }
+        // todo handle item block brightness weirdness with holo screen
+        this.itemRender.renderItemAndEffectIntoGUI(stack, x, y);
+        GlStateManager.popMatrix();
+        GlStateManager.disableDepth();
+    }
+
+    public void drawEffects(ItemStack stack, int x, int y, String altText) {
         FontRenderer font = stack.getItem().getFontRenderer(stack);
         if (font == null) font = this.fontRenderer;
-        GlStateManager.enableDepth();
-        // todo handle item block rendering weirdness with holo screen
-        this.itemRender.renderItemAndEffectIntoGUI(stack, x, y);
+        GlStateManager.pushMatrix();
         this.itemRender.renderItemOverlayIntoGUI(font, stack, x, y - (getAccessor().getDraggedStack().isEmpty() ? 0 : 8), altText);
-        GlStateManager.disableDepth();
+        GlStateManager.popMatrix();
+    }
+
+    public void drawItemStack(ItemStack stack, int x, int y, String altText) {
+        this.zLevel = 200.0f;
+        this.itemRender.zLevel = 200.0f;
+        this.drawItem(stack, x, y);
+        this.drawEffects(stack, x, y, altText);
         this.zLevel = 0.0F;
         this.itemRender.zLevel = 0.0F;
     }
