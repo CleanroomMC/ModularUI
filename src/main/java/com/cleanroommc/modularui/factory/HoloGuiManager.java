@@ -7,12 +7,14 @@ import com.cleanroommc.modularui.holoui.HoloUI;
 import com.cleanroommc.modularui.holoui.ScreenEntityRender;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.packets.OpenGuiPacket;
+import com.cleanroommc.modularui.network.packets.SyncHoloPacket;
 import com.cleanroommc.modularui.screen.*;
 import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.cleanroommc.modularui.widget.WidgetTree;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.client.event.GuiOpenEvent;
@@ -41,7 +43,8 @@ public class HoloGuiManager extends GuiManager {
         if (HoloUI.isOpen(panel)) {
             HoloUI.builder()
                     .inFrontOf(player, 5, true)
-                    .reposition(panel.getName());
+                    .reposition(panel.getName(), player);
+            NetworkHandler.sendToPlayer(new SyncHoloPacket(panel.getName()), player);
             ModularUI.LOGGER.warn("reposition the holo, sync to client");
             return;
         }
@@ -89,6 +92,13 @@ public class HoloGuiManager extends GuiManager {
                     screen1.setWrapper(guiScreenWrapper);
                     HoloUI.registerSyncedHoloUI(panel, screen1);
                 }, player.getEntityWorld());
+    }
+
+    public static void reposition(String panel, EntityPlayer player) {
+        HoloUI.builder()
+//                .screenScale(0.25f)
+                .inFrontOf(player, 5, true)
+                .reposition(panel, player);
     }
 
     //todo make this a mixin instead of using event to cancel arm animation stuff
