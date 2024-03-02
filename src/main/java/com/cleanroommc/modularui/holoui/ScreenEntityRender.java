@@ -88,7 +88,7 @@ public class ScreenEntityRender extends Render<HoloScreenEntity> {
     public boolean shouldRender(HoloScreenEntity screen, ICamera camera, double camX, double camY, double camZ) {
         boolean render = super.shouldRender(screen, camera, camX, camY, camZ);
         if (!render) {
-            lookingPlayers.remove(Minecraft.getMinecraft().player);
+            lookingPlayers.remove(Minecraft.getMinecraft().player.getUniqueID());
         }
         return render;
     }
