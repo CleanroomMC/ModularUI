@@ -93,7 +93,8 @@ public class GuiScreenWrapper extends GuiContainer {
 
         Stencil.reset();
         Stencil.apply(this.screen.getScreenArea(), null);
-        drawDefaultBackground();
+        if (!this.screen.getContext().isHoloScreen)
+            drawDefaultBackground();
         int i = this.guiLeft;
         int j = this.guiTop;
 
