@@ -222,12 +222,13 @@ public class GuiScreenWrapper extends GuiContainer {
     }
 
     public void drawItemStack(ItemStack stack, int x, int y, String altText) {
-        this.zLevel = 200.0f;
-        this.itemRender.zLevel = 200.0f;
+        float z = -200f;
+        this.zLevel += z;
+        this.itemRender.zLevel += z;
         this.drawItem(stack, x, y);
         this.drawEffects(stack, x, y, altText);
-        this.zLevel = 0.0F;
-        this.itemRender.zLevel = 0.0F;
+        this.zLevel -= z;
+        this.itemRender.zLevel -= z;
     }
 
     protected void drawVanillaElements(int mouseX, int mouseY, float partialTicks) {
