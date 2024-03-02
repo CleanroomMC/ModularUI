@@ -236,7 +236,9 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             if (!itemstack.isEmpty()) {
                 GlStateManager.enableDepth();
                 // render the item itself
-                renderItem.renderItemAndEffectIntoGUI(guiScreen.mc.player, itemstack, 1, 1);
+//                renderItem.renderItemAndEffectIntoGUI(guiScreen.mc.player, itemstack, 1, 1);
+//                guiScreen.getItemRenderer().renderItemAndEffectIntoGUI(guiScreen.mc.player, itemstack, 1, 1);
+                guiScreen.drawItem(itemstack, 1, 1);
                 if (amount < 0) {
                     amount = itemstack.getCount();
                 }
