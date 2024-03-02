@@ -81,6 +81,7 @@ public class HoloGuiManager extends GuiManager {
                 .open(guiScreenWrapper);
     }
 
+    //todo make this a mixin instead of using event to cancel arm animation stuff
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public static void onClick(InputEvent.MouseInputEvent event) {
