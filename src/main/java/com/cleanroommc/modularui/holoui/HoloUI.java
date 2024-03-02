@@ -1,19 +1,17 @@
 package com.cleanroommc.modularui.holoui;
 
-import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import com.cleanroommc.modularui.screen.ModularPanel;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Highly experimental
@@ -21,18 +19,14 @@ import java.util.Map;
 @ApiStatus.Experimental
 public class HoloUI {
 
-    private final Map<ResourceLocation, Data> syncedHolos = new Object2ObjectOpenHashMap<>();
-    private static final HoloUI INSTANCE = new HoloUI();
+    private static final Map<String, HoloScreenEntity> syncedHolos = new Object2ObjectOpenHashMap<>();
 
-    public static void registerSyncedHoloUI(ResourceLocation loc, ModularPanel mainPanel, GuiScreenWrapper screenWrapperSupplier) {
-        var old = INSTANCE.register(loc, mainPanel, screenWrapperSupplier);
-//        if (old != null && old.getPanel() != null) {
-//            old.getPanel().closeIfOpen(true);
-//        }
+    public static void registerSyncedHoloUI(ModularPanel mainPanel, HoloScreenEntity entity) {
+        syncedHolos.put(mainPanel.getName(), entity);
     }
 
-    private Data register(ResourceLocation location, ModularPanel panelSupplier, GuiScreenWrapper screenWrapperSupplier) {
-        return this.syncedHolos.put(location, new Data(panelSupplier, screenWrapperSupplier));
+    public static boolean isOpen(ModularPanel panel) {
+        return syncedHolos.containsKey(panel.getName());
     }
 
     public static Builder builder() {
@@ -97,40 +91,27 @@ public class HoloUI {
             return this;
         }
 
-        public void open(GuiScreenWrapper wrapper) {
+        public void open(Consumer<HoloScreenEntity> entityConsumer, World world) {
 //            JeiSettingsImpl jeiSettings = new JeiSettingsImpl();
 //            jeiSettings.disableJei();
 //            screen.getContext().setJeiSettings(jeiSettings);
-            wrapper.getScreen().getContext().isHoloScreen = true;
-            HoloScreenEntity holoScreenEntity = new HoloScreenEntity(Minecraft.getMinecraft().world, this.plane3D);
-            holoScreenEntity.setPosition(this.x, this.y, this.z);
-            holoScreenEntity.setWrapper(wrapper);
-            holoScreenEntity.spawnInWorld();
-            holoScreenEntity.setOrientation(this.orientation);
-        }
-    }
 
-    public static class Data {
-        private final ModularPanel panelSupplier;
-        @Nullable
-        private final GuiScreenWrapper screenWrapperSupplier;
-
-        Data(ModularPanel panelSupplier, GuiScreenWrapper screenWrapperSupplier) {
-            this.panelSupplier = panelSupplier;
-            this.screenWrapperSupplier = screenWrapperSupplier;
+//            wrapper.getScreen().getContext().isHoloScreen = true;
+            HoloScreenEntity screen = new HoloScreenEntity(world, this.plane3D);
+            screen.setPosition(this.x, this.y, this.z);
+            screen.setOrientation(this.orientation);
+            entityConsumer.accept(screen);
+            screen.spawnInWorld();
+//            holoScreenEntity.setPosition(this.x, this.y, this.z);
+//            holoScreenEntity.setWrapper(wrapper);
+//            holoScreenEntity.spawnInWorld();
+//            holoScreenEntity.setOrientation(this.orientation);
         }
 
-        Data(ModularPanel panelSupplier) {
-            this.panelSupplier = panelSupplier;
-            this.screenWrapperSupplier = null;
-        }
-
-        public ModularPanel getPanel() {
-            return panelSupplier;
-        }
-
-        public GuiScreenWrapper getScreenWrapper() {
-            return screenWrapperSupplier;
+        public void reposition(String name) {
+            var screen = syncedHolos.get(name);
+            screen.setPosition(this.x, this.y, this.z);
+            screen.setOrientation(this.orientation);
         }
     }
 }
