@@ -120,8 +120,8 @@ public class ScreenEntityRender extends Render<HoloScreenEntity> {
         // the x, y of look rot should be the mouse pos if scaled by looRot z
         // the scale factor should be the distance from the player to the plane by the z component of lookRot
         double sf = diff.z / lookRot.z;
-        double mX = ((lookRot.x * sf) - diff.x) * 16;
-        double mY = ((lookRot.y * sf) - diff.y) * 16;
+        double mX = ((lookRot.x * sf) - diff.x) * 16 / plane.getScale();
+        double mY = ((lookRot.y * sf) - diff.y) * 16 / plane.getScale();
         mY += plane.getHeight() / 2;
         mX += plane.getWidth() / 2;
 
