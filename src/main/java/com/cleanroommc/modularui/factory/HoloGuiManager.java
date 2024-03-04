@@ -51,6 +51,7 @@ public class HoloGuiManager extends GuiManager {
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularContainer container = new ModularContainer(syncManager);
         HoloUI.builder()
+                .screenScale(0.5f)
                 .inFrontOf(player, 5, true)
                 .open(screen -> {
                     screen.setContainer(container);
@@ -87,6 +88,7 @@ public class HoloGuiManager extends GuiManager {
         HoloUI.builder()
 //                .screenScale(0.25f)
                 .inFrontOf(player, 5, true)
+                .screenScale(0.5f)
                 .open(screen1 -> {
                     screen1.setPanel(panel);
                     screen1.setWrapper(guiScreenWrapper);
