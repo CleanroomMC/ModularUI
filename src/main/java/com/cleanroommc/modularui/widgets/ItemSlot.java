@@ -65,11 +65,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof ItemSlotSH itemSlotSH) {
-            this.syncHandler = itemSlotSH;
-            return true;
-        }
-        return false;
+        this.syncHandler = castIfTypeElseNull(syncHandler, ItemSlotSH.class);
+        return this.syncHandler != null;
     }
 
     @Override

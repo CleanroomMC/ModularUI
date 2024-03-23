@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.api.IGuiHolder;
+import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.*;
 import com.cleanroommc.modularui.factory.PosGuiData;
@@ -13,13 +14,16 @@ import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.value.IntValue;
 import com.cleanroommc.modularui.value.StringValue;
-import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.cleanroommc.modularui.value.sync.IntSyncValue;
+import com.cleanroommc.modularui.value.sync.PanelSyncHandler;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandlers;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widgets.*;
 import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Row;
+import com.cleanroommc.modularui.widgets.slot.ModularSlot;
+import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
 import net.minecraft.init.Items;
@@ -57,13 +61,14 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
     private final ItemStackHandler bigInventory = new ItemStackHandler(9);
 
     private final ItemStackHandler mixerItems = new ItemStackHandler(4);
+    private final ItemStackHandler smallInv = new ItemStackHandler(4);
     private final FluidTank mixerFluids1 = new FluidTank(16000);
     private final FluidTank mixerFluids2 = new FluidTank(16000);
 
     private int num = 2;
 
     @Override
-    public ModularPanel buildUI(PosGuiData guiData, GuiSyncManager guiSyncManager) {
+    public ModularPanel buildUI(PosGuiData guiData, PanelSyncManager guiSyncManager) {
         guiSyncManager.registerSlotGroup("item_inv", 3);
         guiSyncManager.registerSlotGroup("mixer_items", 2);
 
@@ -71,9 +76,16 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         guiSyncManager.syncValue("mixer_fluids", 1, SyncHandlers.fluidSlot(this.mixerFluids2));
         IntSyncValue cycleStateValue = new IntSyncValue(() -> this.cycleState, val -> this.cycleState = val);
         guiSyncManager.syncValue("cycle_state", cycleStateValue);
+        guiSyncManager.bindPlayerInventory(guiData.getPlayer());
 
         Rectangle colorPickerBackground = new Rectangle().setColor(Color.RED.main);
         ModularPanel panel = new ModularPanel("test_tile");
+        PanelSyncHandler panelSyncHandler = guiSyncManager.panel("other_panel", panel, this::openSecondWindow);
+        IPanelHandler colorPicker = IPanelHandler.simple(panel, (mainPanel, player) -> new ColorPickerDialog(colorPickerBackground::setColor, colorPickerBackground.getColor(), true)
+                .setDraggable(true)
+                .relative(panel)
+                .top(0)
+                .rightRel(1f));
         PagedWidget.Controller tabController = new PagedWidget.Controller();
         panel.flex()                        // returns object which is responsible for sizing
                 .size(176, 220)       // set a static size for the main panel
@@ -131,9 +143,10 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                     .pos(Tooltip.Pos.LEFT);
                                                         })
                                                         .onMousePressed(mouseButton -> {
-                                                            panel.getScreen().close(true);
+                                                            //panel.getScreen().close(true);
                                                             //panel.getScreen().openDialog("dialog", this::buildDialog, ModularUI.LOGGER::info);
                                                             //openSecondWindow(context).openIn(panel.getScreen());
+                                                            panelSyncHandler.openPanel();
                                                             return true;
                                                         })
                                                         //.flex(flex -> flex.left(3)) // ?
@@ -178,7 +191,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                         .background(GuiTextures.BUTTON)
                                                         .value(SyncHandlers.intNumber(() -> this.cycleState, val -> this.cycleState = val)))*/
                                                 .child(new ItemSlot()
-                                                        .slot(SyncHandlers.phantomItemSlot(this.inventory, 0).ignoreMaxStackSize(true)))
+                                                        .slot(SyncHandlers.itemSlot(this.inventory, 0).ignoreMaxStackSize(true).singletonSlotGroup()))
                                                 .child(new FluidSlot()
                                                         .margin(2)
                                                         .width(30)
@@ -232,7 +245,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                 .padding(7)
                                 //.child(SlotGroupWidget.playerInventory())
                                 .child(new SliderWidget()
-                                        .widthRel(1f).height(16)
+                                        .widthRel(1f).bottom(50).height(16) // test overwriting of units
                                         .top(7)
                                         .stopper(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)
                                         .background(GuiTextures.SLOT_FLUID))
@@ -242,11 +255,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                         .background(colorPickerBackground)
                                         .disableHoverBackground()
                                         .onMousePressed(mouseButton -> {
-                                            panel.getScreen().openPanel(new ColorPickerDialog(colorPickerBackground::setColor, colorPickerBackground.getColor(), true)
-                                                    .setDraggable(true)
-                                                    .relative(panel)
-                                                    .top(0)
-                                                    .rightRel(1f));
+                                            colorPicker.openPanel();
                                             return true;
                                         }))
                                 .child(new ListWidget<>()
@@ -308,29 +317,24 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         return panel;
     }
 
-    public ModularPanel openSecondWindow(GuiContext context) {
-        ModularPanel panel = new ModularPanel("second_window") {
-            @Override
-            public boolean disablePanelsBelow() {
-                return true;
-            }
-
-            @Override
-            public boolean closeOnOutOfBoundsClick() {
-                return true;
-            }
-        }.flex(flex -> flex.size(100, 100).align(Alignment.Center))
+    public ModularPanel openSecondWindow(PanelSyncManager syncManager, PanelSyncHandler syncHandler) {
+        ModularPanel panel = new Dialog<>("second_window", null)
+                .setDisablePanelsBelow(false)
+                .setCloseOnOutOfBoundsClick(false)
+                .size(100, 100)
                 .background(GuiTextures.MC_BACKGROUND);
-        panel.child(new ButtonWidget<>()
-                        .flex(flex -> flex.size(8, 8).top(5).right(5))
-                        .overlay(IKey.str("x"))
-                        .onMousePressed(mouseButton -> {
-                            panel.animateClose();
-                            return true;
-                        }))
+        SlotGroup slotGroup = new SlotGroup("small_inv", 2);
+        syncManager.registerSlotGroup(slotGroup);
+        panel.child(ButtonWidget.panelCloseButton())
                 .child(IKey.str("2nd Panel")
                         .asWidget()
-                        .flex(flex -> flex.align(Alignment.Center)));
+                        .pos(5, 5))
+                .child(SlotGroupWidget.builder()
+                        .row("II")
+                        .row("II")
+                        .key('I', i -> new ItemSlot().slot(new ModularSlot(smallInv, i).slotGroup(slotGroup)))
+                        .build()
+                        .center());
         return panel;
     }
 
@@ -389,7 +393,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
 
         @Override
         public void draw(GuiContext context, WidgetTheme widgetTheme) {
-            this.animatedKey.draw(context, 0, 0, getArea().w(), getArea().h());
+            this.animatedKey.draw(context, 0, 0, getArea().w(), getArea().h(), widgetTheme);
         }
 
         @Override

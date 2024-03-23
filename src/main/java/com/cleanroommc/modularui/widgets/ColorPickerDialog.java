@@ -42,10 +42,7 @@ public class ColorPickerDialog extends Dialog<Integer> {
         this.alpha = Color.getAlpha(startColor);
         updateColor(startColor);
         this.controlAlpha = controlAlpha;
-        flex().startDefaultMode();
         size(140, controlAlpha ? 106 : 94).background(GuiTextures.MC_BACKGROUND);
-        align(Alignment.Center);
-        flex().endDefaultMode();
         IWidget alphaSlider = controlAlpha ? new Row()
                 .widthRel(1f).height(12)
                 .child(IKey.str("A: ").asWidget().heightRel(1f))

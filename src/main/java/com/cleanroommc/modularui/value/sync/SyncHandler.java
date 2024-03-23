@@ -24,12 +24,12 @@ import java.util.Objects;
  */
 public abstract class SyncHandler {
 
-    private GuiSyncManager syncManager;
+    private PanelSyncManager syncManager;
     private String key;
 
     @ApiStatus.OverrideOnly
     @MustBeInvokedByOverriders
-    public void init(String key, GuiSyncManager syncManager) {
+    public void init(String key, PanelSyncManager syncManager) {
         this.key = key;
         this.syncManager = syncManager;
     }
@@ -55,7 +55,7 @@ public abstract class SyncHandler {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        sendToClient(buffer, this);
+        sendToClient(getSyncManager().getPanelName(), buffer, this);
     }
 
     /**
@@ -73,7 +73,7 @@ public abstract class SyncHandler {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        sendToServer(buffer, this);
+        sendToServer(getSyncManager().getPanelName(), buffer, this);
     }
 
     /**
@@ -91,40 +91,37 @@ public abstract class SyncHandler {
             throw new RuntimeException(e);
         }
         if (getSyncManager().isClient()) {
-            sendToServer(buffer, this);
+            sendToServer(getSyncManager().getPanelName(), buffer, this);
         } else {
-            sendToClient(buffer, this);
+            sendToClient(getSyncManager().getPanelName(), buffer, this);
         }
     }
 
     /**
-     * Sends an empty packte to the client with an id.
+     * Sends an empty packet to the client with an id.
      *
      * @param id identifier
      */
     public final void syncToClient(int id) {
-        syncToClient(id, buf -> {
-        });
+        syncToClient(id, buf -> {});
     }
 
     /**
-     * Sends an empty packte to the server with an id.
+     * Sends an empty packet to the server with an id.
      *
      * @param id identifier
      */
     public final void syncToServer(int id) {
-        syncToServer(id, buf -> {
-        });
+        syncToServer(id, buf -> {});
     }
 
     /**
-     * Sends an empty packte to the other side with an id.
+     * Sends an empty packet to the other side with an id.
      *
      * @param id identifier
      */
     public final void sync(int id) {
-        sync(id, buf -> {
-        });
+        sync(id, buf -> {});
     }
 
     /**
@@ -174,28 +171,28 @@ public abstract class SyncHandler {
     /**
      * @return the sync handler manager handling this sync handler
      */
-    public GuiSyncManager getSyncManager() {
+    public PanelSyncManager getSyncManager() {
         if (!isValid()) {
             throw new IllegalStateException("Sync handler is not yet initialised!");
         }
         return this.syncManager;
     }
 
-    public static void sendToClient(PacketBuffer buffer, SyncHandler syncHandler) {
+    public static void sendToClient(String panel, PacketBuffer buffer, SyncHandler syncHandler) {
         Objects.requireNonNull(buffer);
         Objects.requireNonNull(syncHandler);
         if (!syncHandler.isValid()) {
             throw new IllegalStateException();
         }
-        NetworkHandler.sendToPlayer(new PacketSyncHandler(syncHandler.getKey(), buffer), (EntityPlayerMP) syncHandler.syncManager.getPlayer());
+        NetworkHandler.sendToPlayer(new PacketSyncHandler(panel, syncHandler.getKey(), buffer), (EntityPlayerMP) syncHandler.syncManager.getPlayer());
     }
 
-    public static void sendToServer(PacketBuffer buffer, SyncHandler syncHandler) {
+    public static void sendToServer(String panel, PacketBuffer buffer, SyncHandler syncHandler) {
         Objects.requireNonNull(buffer);
         Objects.requireNonNull(syncHandler);
         if (!syncHandler.isValid()) {
             throw new IllegalStateException();
         }
-        NetworkHandler.sendToServer(new PacketSyncHandler(syncHandler.getKey(), buffer));
+        NetworkHandler.sendToServer(new PacketSyncHandler(panel, syncHandler.getKey(), buffer));
     }
 }

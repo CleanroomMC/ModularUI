@@ -12,7 +12,8 @@ import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.ObjectList;
-import com.cleanroommc.modularui.value.sync.GuiSyncManager;
+import com.cleanroommc.modularui.value.sync.ModularSyncManager;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.layout.IExpander;
 
@@ -333,9 +334,9 @@ public class WidgetTree {
         return type.isAssignableFrom(parent.getClass()) ? (T) parent : null;
     }
 
-    public static void collectSyncValues(GuiSyncManager syncManager, ModularPanel panel) {
+    public static void collectSyncValues(PanelSyncManager syncManager, ModularPanel panel) {
         AtomicInteger id = new AtomicInteger(0);
-        String syncKey = GuiSyncManager.AUTO_SYNC_PREFIX + panel.getName();
+        String syncKey = ModularSyncManager.AUTO_SYNC_PREFIX + panel.getName();
         foreachChildBFS(panel, widget -> {
             if (widget instanceof ISynced<?> synced) {
                 if (synced.isSynced() && !syncManager.hasSyncHandler(synced.getSyncHandler())) {
@@ -344,6 +345,10 @@ public class WidgetTree {
             }
             return true;
         }, true);
+    }
+
+    public static boolean hasSyncedValues(ModularPanel panel) {
+        return !foreachChildBFS(panel, widget -> !(widget instanceof ISynced<?> synced) || !synced.isSynced(), true);
     }
 
     public static void print(IWidget parent, Predicate<IWidget> test) {

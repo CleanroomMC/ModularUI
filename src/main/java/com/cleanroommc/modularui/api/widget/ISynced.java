@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.api.widget;
 
-import com.cleanroommc.modularui.value.sync.GuiSyncManager;
+import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +25,7 @@ public interface ISynced<W extends IWidget> {
      *
      * @param syncManager sync manager
      */
-    void initialiseSyncHandler(GuiSyncManager syncManager);
+    void initialiseSyncHandler(ModularSyncManager syncManager);
 
     /**
      * Checks if the received sync handler is valid for this widget.
@@ -36,6 +36,13 @@ public interface ISynced<W extends IWidget> {
      */
     default boolean isValidSyncHandler(SyncHandler syncHandler) {
         return false;
+    }
+
+    default <T> T castIfTypeElseNull(SyncHandler syncHandler, Class<T> clazz) {
+        if (syncHandler != null && clazz.isAssignableFrom(syncHandler.getClass())) {
+            return (T) syncHandler;
+        }
+        return null;
     }
 
     /**

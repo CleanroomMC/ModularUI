@@ -1,24 +1,47 @@
 package com.cleanroommc.modularui.value.sync;
 
+import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.widget.WidgetTree;
 
 import net.minecraft.network.PacketBuffer;
 
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.util.Objects;
 
-public abstract class PanelSyncHandler extends SyncHandler {
+/**
+ * If you want another panel where some widgets may be able to sync data, you will need this.
+ * Register it in any {@link PanelSyncManager} (preferably the main one).
+ * Then you can call {@link #openPanel()} and {@link #closePanel()} from any side.
+ */
+public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
 
-    private final ModularPanel mainPanel;
+    private ModularPanel mainPanel;
+    private final IPanelBuilder panelBuilder;
+    private String panelName;
     private ModularPanel openedPanel;
+    private PanelSyncManager syncManager;
+    private boolean open = false;
 
-    protected PanelSyncHandler(ModularPanel mainPanel) {
+    /**
+     * Creates a PanelSyncHandler
+     *
+     * @param mainPanel    the main panel of the current GUI
+     * @param panelBuilder a panel builder function
+     */
+    public PanelSyncHandler(ModularPanel mainPanel, IPanelBuilder panelBuilder) {
         this.mainPanel = mainPanel;
+        this.panelBuilder = panelBuilder;
     }
 
-    public abstract ModularPanel createUI(ModularPanel mainPanel, GuiSyncManager syncManager);
+    public ModularPanel createUI(PanelSyncManager syncManager) {
+        return this.panelBuilder.buildUI(syncManager, this);
+    }
 
+    @Override
     public void openPanel() {
         openPanel(true);
     }
@@ -29,28 +52,58 @@ public abstract class PanelSyncHandler extends SyncHandler {
             syncToServer(0);
             return;
         }
-        ModularPanel panel = Objects.requireNonNull(createUI(this.mainPanel, getSyncManager()));
-        if (panel == this.mainPanel) {
-            throw new IllegalArgumentException("New panel must not be the main panel!");
+        if (this.syncManager != null && this.syncManager.getModularSyncManager() != getSyncManager().getModularSyncManager()) {
+            throw new IllegalStateException("Can't reopen synced panel in another screen!");
+        } else if (this.syncManager == null) {
+            this.syncManager = new PanelSyncManager();
+            this.openedPanel = Objects.requireNonNull(createUI(this.syncManager));
+            if (this.openedPanel == this.mainPanel) {
+                throw new IllegalArgumentException("New panel must not be the main panel!");
+            }
+            this.panelName = this.openedPanel.getName();
+            this.openedPanel.setSyncHandler(this);
+            WidgetTree.collectSyncValues(getSyncManager(), this.openedPanel);
+            if (!client) {
+                this.openedPanel = null;
+            }
         }
-        WidgetTree.collectSyncValues(getSyncManager(), panel);
-        if (client && !this.mainPanel.getScreen().isPanelOpen(panel.getName())) {
-            this.mainPanel.getScreen().openPanel(panel);
-            this.openedPanel = panel;
+        if (client && !this.mainPanel.getScreen().isPanelOpen(this.openedPanel.getName())) {
+            this.mainPanel.getScreen().getPanelManager().openPanel(this.openedPanel, this);
         }
+        getSyncManager().getModularSyncManager().open(this.panelName, this.syncManager);
+        this.open = true;
     }
 
+    @Override
     public void closePanel() {
         if (getSyncManager().isClient()) {
-            if (this.openedPanel != null) this.openedPanel.closeIfOpen(true);
+            if (this.openedPanel != null) {
+                this.openedPanel.closeIfOpen(true);
+            }
         } else {
             syncToClient(2);
         }
-        this.openedPanel = null;
+    }
+
+    @ApiStatus.Internal
+    @Override
+    public void closePanelInternal() {
+        getSyncManager().getModularSyncManager().close(this.panelName);
+        this.open = false;
+        if (getSyncManager().isClient()) {
+            syncToServer(2);
+        }
+    }
+
+    @Override
+    public void deleteCachedPanel() {
+        // This is because we can't guarantee that the sync handlers of the new panel are the same.
+        // Dynamic sync handler changing is very error-prone.
+        throw new UnsupportedOperationException("Can't delete cached panel in synced panel handlers!");
     }
 
     public boolean isPanelOpen() {
-        return this.openedPanel != null && (!getSyncManager().isClient() || this.openedPanel.isOpen());
+        return this.open;
     }
 
     @Override
@@ -67,6 +120,24 @@ public abstract class PanelSyncHandler extends SyncHandler {
         if (i == 0) {
             openPanel(false);
             syncToClient(1);
+        } else if (i == 2) {
+            closePanelInternal();
         }
+    }
+
+    /**
+     * A function which creates a secondary {@link ModularPanel}
+     */
+    public interface IPanelBuilder {
+
+        /**
+         * Creates a {@link ModularPanel}. It must NOT return null or the main panel.
+         *
+         * @param syncManager the sync manager for this panel
+         * @param syncHandler the sync handler that sync opening and closing of this panel
+         * @return the created panel
+         */
+        @NotNull
+        ModularPanel buildUI(@NotNull PanelSyncManager syncManager, @NotNull PanelSyncHandler syncHandler);
     }
 }

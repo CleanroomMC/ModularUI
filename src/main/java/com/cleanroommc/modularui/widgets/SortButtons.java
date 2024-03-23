@@ -25,7 +25,7 @@ public class SortButtons extends Widget<SortButtons> {
     @Override
     public void onInit() {
         super.onInit();
-        this.slotGroup = getScreen().getContainer().validateSlotGroup(this.slotGroupName, this.slotGroup);
+        this.slotGroup = getScreen().getContainer().validateSlotGroup(getPanel().getName(), this.slotGroupName, this.slotGroup);
         if (!this.slotGroup.isAllowSorting()) {
             throw new IllegalStateException("Slot group can't be sorted!");
         }

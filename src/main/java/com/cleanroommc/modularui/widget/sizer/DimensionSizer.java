@@ -1,7 +1,11 @@
 package com.cleanroommc.modularui.widget.sizer;
 
+import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.IResizeable;
+import com.cleanroommc.modularui.api.widget.IGuiElement;
+import com.cleanroommc.modularui.network.NetworkUtils;
 
 import org.jetbrains.annotations.ApiStatus;
 
@@ -18,10 +22,10 @@ public class DimensionSizer {
 
     private final Unit p1 = new Unit(), p2 = new Unit();
     private Unit start, end, size;
+    private Unit next = p1;
 
     private boolean coverChildren = false, expanded = false;
     private boolean cancelAutoMovement = false;
-    private boolean defaultMode = false;
 
     private boolean posCalculated = false, sizeCalculated = false;
     private boolean marginPaddingApplied = false;
@@ -36,6 +40,7 @@ public class DimensionSizer {
         this.start = null;
         this.end = null;
         this.size = null;
+        this.next = this.p1;
     }
 
     public void resetPosition() {
@@ -47,6 +52,11 @@ public class DimensionSizer {
             this.end.reset();
             this.end = null;
         }
+        if (this.p1.isUnused()) {
+            this.next = this.p1;
+        } else if (this.p2.isUnused()) {
+            this.next = this.p2;
+        }
     }
 
     public void resetSize() {
@@ -54,14 +64,15 @@ public class DimensionSizer {
             this.size.reset();
             this.size = null;
         }
+        if (this.p1.isUnused()) {
+            this.next = this.p1;
+        } else if (this.p2.isUnused()) {
+            this.next = this.p2;
+        }
     }
 
-    public void setDefaultMode(boolean defaultMode) {
-        this.defaultMode = defaultMode;
-    }
-
-    public void setCoverChildren(boolean coverChildren) {
-        getSize();
+    public void setCoverChildren(boolean coverChildren, IGuiElement widget) {
+        getSize(widget);
         this.coverChildren = coverChildren;
     }
 
@@ -281,73 +292,51 @@ public class DimensionSizer {
         return (int) val;
     }
 
-    // the following methods try to find a unit from p1 and p2 and apply it to start, end or size
-    // if one of the units was applied in default mode, they can be overwritten
-    // if p1 and p2 are already in use and none is in default mode, an exception is thrown
-
-    protected Unit getStart() {
-        if (this.start == null) {
-            Unit u = null;
-            if (this.p1.type == Unit.UNUSED) u = this.p1;
-            else if (this.p2.type == Unit.UNUSED) u = this.p2;
-            else if (!this.defaultMode) {
-                if (this.end.type == Unit.DEFAULT) {
-                    u = this.end;
-                    this.end = null;
-                } else if (this.size.type == Unit.DEFAULT) {
-                    u = this.size;
-                    this.size = null;
-                }
+    /**
+     * Tries to find a unit for start, end or size. If p1 and p2 are already used, the first one will be overwritten.
+     *
+     * @param widget   widget this sizer belongs to. Used for logging
+     * @param newState the new unit type for the found unit
+     * @return a used or unused unit.
+     */
+    private Unit getNext(IGuiElement widget, Unit.State newState) {
+        Unit ret = this.next;
+        Unit other = ret == this.p1 ? this.p2 : this.p1;
+        if (ret.state != Unit.State.UNUSED) {
+            if (ret.state == newState) return ret;
+            if (other.state == newState) return other;
+            if (ret == this.start) this.start = null;
+            if (ret == this.end) this.end = null;
+            if (ret == this.size) this.size = null;
+            if (ModularUIConfig.guiDebugMode && NetworkUtils.isClient()) {
+                // only log on client in debug mode since its sometimes intentional
+                ModularUI.LOGGER.info("unit {} of widget {} was already used and will be overwritten with unit {}", ret.state.getText(this.axis), widget, newState.getText(this.axis));
             }
-            if (u == null) throw new IllegalStateException();
-            this.start = u;
-            this.start.reset();
         }
-        this.start.type = this.defaultMode ? Unit.DEFAULT : Unit.START;
+        ret.reset();
+        ret.state = newState;
+        this.next = other;
+        return ret;
+    }
+
+    protected Unit getStart(IGuiElement widget) {
+        if (this.start == null) {
+            this.start = getNext(widget, Unit.State.START);
+        }
         return this.start;
     }
 
-    protected Unit getEnd() {
+    protected Unit getEnd(IGuiElement widget) {
         if (this.end == null) {
-            Unit u = null;
-            if (this.p1.type == Unit.UNUSED) u = this.p1;
-            else if (this.p2.type == Unit.UNUSED) u = this.p2;
-            else if (!this.defaultMode) {
-                if (this.start.type == Unit.DEFAULT) {
-                    u = this.start;
-                    this.start = null;
-                } else if (this.size.type == Unit.DEFAULT) {
-                    u = this.size;
-                    this.size = null;
-                }
-            }
-            if (u == null) throw new IllegalStateException();
-            this.end = u;
-            this.end.reset();
+            this.end = getNext(widget, Unit.State.END);
         }
-        this.end.type = this.defaultMode ? Unit.DEFAULT : Unit.END;
         return this.end;
     }
 
-    protected Unit getSize() {
+    protected Unit getSize(IGuiElement widget) {
         if (this.size == null) {
-            Unit u = null;
-            if (this.p1.type == Unit.UNUSED) u = this.p1;
-            else if (this.p2.type == Unit.UNUSED) u = this.p2;
-            else if (!this.defaultMode) {
-                if (this.end.type == Unit.DEFAULT) {
-                    u = this.end;
-                    this.end = null;
-                } else if (this.start.type == Unit.DEFAULT) {
-                    u = this.start;
-                    this.start = null;
-                }
-            }
-            if (u == null) throw new IllegalStateException();
-            this.size = u;
-            this.size.reset();
+            this.size = getNext(widget, Unit.State.SIZE);
         }
-        this.size.type = this.defaultMode ? Unit.DEFAULT : Unit.SIZE;
         return this.size;
     }
 }

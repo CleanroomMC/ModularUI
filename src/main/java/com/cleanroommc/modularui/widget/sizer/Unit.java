@@ -1,12 +1,31 @@
 package com.cleanroommc.modularui.widget.sizer;
 
-import org.intellij.lang.annotations.MagicConstant;
+import com.cleanroommc.modularui.api.GuiAxis;
+
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.DoubleSupplier;
 
 @ApiStatus.Internal
 public class Unit {
+
+    public enum State {
+        UNUSED("", ""),
+        START("LEFT", "TOP"),
+        END("RIGHT", "BOTTOM"),
+        SIZE("WIDTH", "HEIGHT");
+
+        public final String xText, yText;
+
+        State(String xText, String yText) {
+            this.xText = xText;
+            this.yText = yText;
+        }
+
+        public String getText(GuiAxis axis) {
+            return axis.isHorizontal() ? this.xText : this.yText;
+        }
+    }
 
     public static final byte UNUSED = -2;
     public static final byte DEFAULT = -1;
@@ -21,14 +40,13 @@ public class Unit {
     private float anchor = 0f;
     private int offset = 0;
 
-    @MagicConstant(intValues = {UNUSED, DEFAULT, START, END, SIZE})
-    public byte type = UNUSED;
+    public State state = State.UNUSED;
 
     public Unit() {
     }
 
     public void reset() {
-        this.type = UNUSED;
+        this.state = State.UNUSED;
         this.autoAnchor = true;
         this.value = 0f;
         this.valueSupplier = null;
@@ -85,6 +103,10 @@ public class Unit {
 
     public boolean isRelative() {
         return this.measure == Measure.RELATIVE;
+    }
+
+    public boolean isUnused() {
+        return this.state == State.UNUSED;
     }
 
     public enum Measure {

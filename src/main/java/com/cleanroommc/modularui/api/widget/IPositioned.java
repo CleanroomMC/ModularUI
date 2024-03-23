@@ -376,6 +376,10 @@ public interface IPositioned<W extends IPositioned<W>> {
                 alignY(alignment.y);
     }
 
+    default W center() {
+        return align(Alignment.Center);
+    }
+
     default W flex(Consumer<Flex> flexConsumer) {
         flexConsumer.accept(flex());
         return getThis();

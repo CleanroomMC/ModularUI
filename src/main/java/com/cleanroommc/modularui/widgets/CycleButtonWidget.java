@@ -47,11 +47,8 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof IIntValue<?> iIntValue) {
-            this.intValue = iIntValue;
-            return true;
-        }
-        return false;
+        this.intValue = castIfTypeElseNull(syncHandler, IIntValue.class);
+        return this.intValue != null;
     }
 
     private int getState() {
