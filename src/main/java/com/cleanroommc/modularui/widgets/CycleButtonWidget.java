@@ -182,9 +182,9 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
 
     public CycleButtonWidget length(int length) {
         this.length = length;
+        // adjust tooltip buffer size
         while (this.stateTooltip.size() < this.length) {
-            Tooltip tooltip = new Tooltip().excludeArea(getArea());
-            this.stateTooltip.add(tooltip);
+            this.stateTooltip.add(new Tooltip(this));
         }
         while (this.stateTooltip.size() > this.length) {
             this.stateTooltip.remove(this.stateTooltip.size() - 1);

@@ -50,6 +50,7 @@ public class TestGui extends CustomModularScreen {
         List<List<AvailableElement>> availableMatrix = Grid.mapToMatrix(2, this.lines, (index, value) -> {
             AvailableElement availableElement = new AvailableElement().overlay(IKey.str(value))
                     .size(60, 14)
+                    .addTooltipLine(value)
                     .onMousePressed(mouseButton1 -> {
                         if (this.availableElements.get(value).available) {
                             ref.get().add(value, -1);
@@ -85,6 +86,7 @@ public class TestGui extends CustomModularScreen {
                 .pos(10, 10).right(10).bottom(10))*/
         SortableListWidget<String, SortableListWidget.Item<String>> sortableListWidget = SortableListWidget.sortableBuilder(this.lines, this.configuredOptions,
                 s -> new SortableListWidget.Item<>(s, new Widget<>()
+                        .addTooltipLine(s)
                         .background(GuiTextures.BUTTON_CLEAN)
                         .overlay(IKey.str(s))
                         .left(0).right(10))

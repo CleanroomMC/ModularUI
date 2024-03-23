@@ -202,14 +202,24 @@ public class WidgetTree {
     }
 
     public static void drawTreeForeground(IWidget parent, GuiContext context) {
+        IViewport viewport = parent instanceof IViewport viewport1 ? viewport1 : null;
+        context.pushMatrix();
+        parent.transform(context);
+
         GlStateManager.color(1, 1, 1, 1);
         GlStateManager.enableBlend();
         parent.drawForeground(context);
 
         List<IWidget> children = parent.getChildren();
         if (!children.isEmpty()) {
+            if (viewport != null) {
+                context.pushViewport(viewport, parent.getArea());
+                viewport.transformChildren(context);
+            }
             children.forEach(widget -> drawTreeForeground(widget, context));
+            if (viewport != null) context.popViewport(viewport);
         }
+        context.popMatrix();
     }
 
     @ApiStatus.Internal

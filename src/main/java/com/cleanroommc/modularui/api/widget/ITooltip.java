@@ -4,7 +4,6 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.utils.Alignment;
-import com.cleanroommc.modularui.widget.sizer.Area;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -66,17 +65,6 @@ public interface ITooltip<W extends IWidget> {
      */
     default W tooltipBuilder(Consumer<Tooltip> tooltipBuilder) {
         tooltip().tooltipBuilder(tooltipBuilder);
-        return getThis();
-    }
-
-    /**
-     * Sets an excluded area. The tooltip will always try to avoid the excluded area.
-     *
-     * @param area area to exclude
-     * @return this
-     */
-    default W excludeTooltipArea(Area area) {
-        tooltip().excludeArea(area);
         return getThis();
     }
 

@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.*;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
@@ -27,9 +28,9 @@ import java.util.stream.Collectors;
 
 public class Tooltip {
 
+    private final IWidget parent;
     private final List<IDrawable> lines = new ArrayList<>();
     private List<IDrawable> additionalLines = new ArrayList<>();
-    private Area excludeArea;
     private Pos pos = ModularUIConfig.tooltipPos;
     private boolean customPos = false;
     private Consumer<Tooltip> tooltipBuilder;
@@ -46,6 +47,10 @@ public class Tooltip {
     private int linePadding = 1;
 
     private boolean dirty = true;
+
+    public Tooltip(IWidget parent) {
+        this.parent = parent;
+    }
 
     public void buildTooltip() {
         this.dirty = false;
@@ -136,24 +141,24 @@ public class Tooltip {
         }
 
         if (this.pos == Pos.NEXT_TO_MOUSE) {
-            final int PADDING = 8;
+            final int padding = 8;
             // magic number to place tooltip nicer. Look at GuiScreen#L237
-            final int MOUSE_OFFSET = 12;
-            int x = mouseX + MOUSE_OFFSET, y = mouseY - MOUSE_OFFSET;
-            if (x < PADDING) {
-                x = PADDING;
-            } else if (x + width + PADDING > screenWidth) {
-                x -= MOUSE_OFFSET * 2 + width; // flip side of cursor
-                if (x < PADDING) {
-                    x = PADDING;
+            final int mouseOffset = 12;
+            int x = mouseX + mouseOffset, y = mouseY - mouseOffset;
+            if (x < padding) {
+                x = padding;
+            } else if (x + width + padding > screenWidth) {
+                x -= mouseOffset * 2 + width; // flip side of cursor
+                if (x < padding) {
+                    x = padding;
                 }
             }
-            y = MathHelper.clamp(y, PADDING, screenHeight - PADDING - height);
+            y = MathHelper.clamp(y, padding, screenHeight - padding - height);
             return new Rectangle(x, y, width, height);
         }
 
-        if (this.excludeArea == null) {
-            throw new IllegalStateException();
+        if (this.parent == null) {
+            throw new IllegalStateException("Tooltip pos is " + this.pos.name() + ", but no widget parent is set!");
         }
 
         int minWidth = 0;
@@ -168,13 +173,16 @@ public class Tooltip {
         int shiftAmount = 10;
         int padding = 7;
 
+        Area area = Area.SHARED;
+        area.set(this.parent.getArea());
+        area.setPos(0, 0); // context is transformed to this widget
+        area.transformAndRectanglerize(context);
         int x = 0, y = 0;
         if (this.pos.vertical) {
-            int xArea = this.excludeArea.x;
-            if (width < this.excludeArea.width) {
-                x = xArea + shiftAmount;
+            if (width < area.width) {
+                x = area.x + shiftAmount;
             } else {
-                x = xArea - shiftAmount;
+                x = area.x - shiftAmount;
                 if (x < padding) {
                     x = padding;
                 } else if (x + width > screenWidth - padding) {
@@ -188,33 +196,32 @@ public class Tooltip {
 
             Pos pos = this.pos;
             if (this.pos == Pos.VERTICAL) {
-                int bottomSpace = screenHeight - this.excludeArea.ey();
-                pos = bottomSpace < height + padding && bottomSpace < this.excludeArea.y ? Pos.ABOVE : Pos.BELOW;
+                int bottomSpace = screenHeight - area.ey();
+                pos = bottomSpace < height + padding && bottomSpace < area.y ? Pos.ABOVE : Pos.BELOW;
             }
 
             if (pos == Pos.BELOW) {
-                y = this.excludeArea.y + this.excludeArea.height + padding;
+                y = area.ey() + padding;
             } else if (pos == Pos.ABOVE) {
-                y = this.excludeArea.y - height - padding;
+                y = area.y - height - padding;
             }
         } else if (this.pos.horizontal) {
             boolean usedMoreSpaceSide = false;
             Pos pos = this.pos;
             if (this.pos == Pos.HORIZONTAL) {
-                if (this.excludeArea.x > screenWidth - this.excludeArea.x - this.excludeArea.width) {
+                if (area.x > screenWidth - area.ex()) {
                     pos = Pos.LEFT;
                     x = 0;
                 } else {
                     pos = Pos.RIGHT;
-                    x = screenWidth - this.excludeArea.x - this.excludeArea.width + padding;
+                    x = screenWidth - area.ex() + padding;
                 }
             }
 
-            int yArea = this.excludeArea.y;
-            if (height < this.excludeArea.height) {
-                y = yArea + shiftAmount;
+            if (height < area.height) {
+                y = area.y + shiftAmount;
             } else {
-                y = yArea - shiftAmount;
+                y = area.y - shiftAmount;
                 if (y < padding) {
                     y = padding;
                 }
@@ -223,9 +230,9 @@ public class Tooltip {
             if (x + width > screenWidth - padding) {
                 int maxWidth;
                 if (pos == Pos.LEFT) {
-                    maxWidth = Math.max(minWidth, this.excludeArea.x - padding * 2);
+                    maxWidth = Math.max(minWidth, area.x - padding * 2);
                 } else {
-                    maxWidth = Math.max(minWidth, screenWidth - this.excludeArea.x - this.excludeArea.width - padding * 2);
+                    maxWidth = Math.max(minWidth, screenWidth - area.ex() - padding * 2);
                 }
                 usedMoreSpaceSide = true;
                 renderer.setAlignment(this.alignment, maxWidth);
@@ -235,14 +242,14 @@ public class Tooltip {
             }
 
             if (this.pos == Pos.HORIZONTAL && !usedMoreSpaceSide) {
-                int rightSpace = screenWidth - this.excludeArea.x - this.excludeArea.width;
-                pos = rightSpace < width + padding && rightSpace < this.excludeArea.x ? Pos.LEFT : Pos.RIGHT;
+                int rightSpace = screenWidth - area.ex();
+                pos = rightSpace < width + padding && rightSpace < area.x ? Pos.LEFT : Pos.RIGHT;
             }
 
             if (pos == Pos.RIGHT) {
-                x = this.excludeArea.x + this.excludeArea.width + padding;
+                x = area.ex() + padding;
             } else if (pos == Pos.LEFT) {
-                x = this.excludeArea.x - width - padding;
+                x = area.x - width - padding;
             }
         }
         return new Rectangle(x, y, width, height);
@@ -257,10 +264,6 @@ public class Tooltip {
 
     public void markDirty() {
         this.dirty = true;
-    }
-
-    public Area getExcludeArea() {
-        return this.excludeArea;
     }
 
     public int getShowUpTimer() {
@@ -278,11 +281,6 @@ public class Tooltip {
 
     public boolean hasTitleMargin() {
         return this.hasTitleMargin;
-    }
-
-    public Tooltip excludeArea(Area area) {
-        this.excludeArea = area;
-        return this;
     }
 
     public Tooltip pos(Pos pos) {

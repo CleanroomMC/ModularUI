@@ -150,9 +150,7 @@ public class GuiViewportStack implements IViewportStack {
     }
 
     public void rotateZ(float angle) {
-        checkViewport();
-        this.top.getMatrix().rotate(angle, vec(0f, 0f, 1f));
-        this.top.markDirty();
+        rotate(angle, 0f, 0f, 1f);
     }
 
     public void scale(float x, float y) {
