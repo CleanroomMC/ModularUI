@@ -36,12 +36,8 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
          */
     public static SlotGroupWidget playerInventory(int bottom, SlotConsumer slotConsumer) {
         SlotGroupWidget slotGroupWidget = new SlotGroupWidget();
-        slotGroupWidget.flex()
-                .coverChildren()
-                .startDefaultMode()
-                .leftRel(0.5f);
-        if (bottom != 0) slotGroupWidget.flex().bottom(bottom);
-        slotGroupWidget.flex().endDefaultMode();
+        slotGroupWidget.coverChildren().leftRel(0.5f);
+        if (bottom != 0) slotGroupWidget.bottom(bottom);
         slotGroupWidget.debugName("player_inventory");
         String key = "player";
         for (int i = 0; i < 9; i++) {

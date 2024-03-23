@@ -50,9 +50,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
     private IDrawable overlayTexture = null;
 
     public FluidSlot() {
-        flex().startDefaultMode()
-                .size(DEFAULT_SIZE, DEFAULT_SIZE)
-                .endDefaultMode();
+        size(DEFAULT_SIZE);
         tooltip().setAutoUpdate(true).setHasTitleMargin(true);
         tooltipBuilder(tooltip -> {
             IFluidTank fluidTank = getFluidTank();

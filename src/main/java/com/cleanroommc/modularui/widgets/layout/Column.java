@@ -13,9 +13,7 @@ public class Column extends ParentWidget<Column> implements ILayoutWidget, IExpa
     private Alignment.CrossAxis caa = Alignment.CrossAxis.CENTER;
 
     public Column() {
-        flex().startDefaultMode()
-                .sizeRel(1f, 1f)
-                .endDefaultMode();
+        sizeRel(1f, 1f);
     }
 
     @Override

@@ -245,7 +245,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                 .padding(7)
                                 //.child(SlotGroupWidget.playerInventory())
                                 .child(new SliderWidget()
-                                        .widthRel(1f).height(16)
+                                        .widthRel(1f).bottom(50).height(16) // test overwriting of units
                                         .top(7)
                                         .stopper(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)
                                         .background(GuiTextures.SLOT_FLUID))

@@ -22,10 +22,7 @@ public class SpriteDrawable implements IDrawable {
 
     @Override
     public Widget<?> asWidget() {
-        return IDrawable.super.asWidget().flex(flex ->
-                flex.startDefaultMode()
-                        .size(this.sprite.getIconWidth(), this.sprite.getIconHeight())
-                        .endDefaultMode());
+        return IDrawable.super.asWidget().size(this.sprite.getIconWidth(), this.sprite.getIconHeight());
     }
 
     @Override

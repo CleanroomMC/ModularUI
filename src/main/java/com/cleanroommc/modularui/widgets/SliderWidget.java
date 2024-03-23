@@ -147,7 +147,7 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     }
 
     public double getSliderValue() {
-        return this.doubleValue.getDoubleValue();
+        return this.doubleValue == null ? 0.0 : this.doubleValue.getDoubleValue();
     }
 
     public void setValue(double value, boolean setSource) {
