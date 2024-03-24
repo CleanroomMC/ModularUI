@@ -3,6 +3,8 @@ package com.cleanroommc.modularui.widget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
 
+import com.cleanroommc.modularui.theme.WidgetTheme;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -25,7 +27,13 @@ public class ParentWidget<W extends ParentWidget<W>> extends Widget<W> {
         return getBackground() != null ||
                 getHoverBackground() != null ||
                 getHoverOverlay() != null ||
-                getTooltip() != null;
+                getTooltip() != null ||
+                hasThemeBackground();
+    }
+
+    protected boolean hasThemeBackground() {
+        WidgetTheme widgetTheme = getWidgetTheme(getContext().getTheme());
+        return widgetTheme.getBackground() != null || widgetTheme.getHoverBackground() != null;
     }
 
     public boolean addChild(IWidget child, int index) {
