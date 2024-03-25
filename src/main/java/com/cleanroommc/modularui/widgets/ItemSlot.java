@@ -49,7 +49,6 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     public ItemSlot() {
         tooltip().setAutoUpdate(true).setHasTitleMargin(true);
         tooltipBuilder(tooltip -> {
-            tooltip.excludeArea(getArea());
             if (!isSynced()) return;
             ItemStack stack = getSlot().getStack();
             if (stack.isEmpty()) return;

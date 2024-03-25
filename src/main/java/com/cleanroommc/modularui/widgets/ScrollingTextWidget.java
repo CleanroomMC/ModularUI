@@ -19,8 +19,7 @@ public class ScrollingTextWidget extends TextWidget {
     public ScrollingTextWidget(IKey key) {
         super(key);
         tooltipBuilder(tooltip -> {
-            tooltip.excludeArea(getArea())
-                    .showUpTimer(10);
+            tooltip.showUpTimer(10);
             if (this.line.getWidth() > getArea().width) {
                 tooltip.addLine(key);
             }

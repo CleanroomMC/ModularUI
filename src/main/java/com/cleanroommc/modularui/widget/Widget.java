@@ -210,7 +210,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @Override
     public @NotNull Tooltip tooltip() {
         if (this.tooltip == null) {
-            this.tooltip = new Tooltip().excludeArea(getArea());
+            this.tooltip = new Tooltip(this);
         }
         return this.tooltip;
     }
