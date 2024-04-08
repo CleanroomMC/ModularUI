@@ -9,7 +9,7 @@ import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.packets.OpenGuiPacket;
 import com.cleanroommc.modularui.network.packets.SyncHoloPacket;
 import com.cleanroommc.modularui.screen.*;
-import com.cleanroommc.modularui.value.sync.GuiSyncManager;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widget.WidgetTree;
 
 import net.minecraft.client.Minecraft;
@@ -38,7 +38,7 @@ public class HoloGuiManager extends GuiManager {
         if (player instanceof FakePlayer) return;
         // create panel, collect sync handlers and create container
         guiData.setJeiSettings(JeiSettings.DUMMY);
-        GuiSyncManager syncManager = new GuiSyncManager(player);
+        PanelSyncManager syncManager = new PanelSyncManager();
         ModularPanel panel = factory.createPanel(guiData, syncManager);
         if (HoloUI.isOpen(panel)) {
             HoloUI.builder()
@@ -49,7 +49,7 @@ public class HoloGuiManager extends GuiManager {
             return;
         }
         WidgetTree.collectSyncValues(syncManager, panel);
-        ModularContainer container = new ModularContainer(syncManager);
+        ModularContainer container = new ModularContainer(null);
         HoloUI.builder()
                 .screenScale(0.5f)
                 .inFrontOf(player, 5, true)
@@ -78,12 +78,12 @@ public class HoloGuiManager extends GuiManager {
         T guiData = factory.readGuiData(player, data);
         JeiSettingsImpl jeiSettings = new JeiSettingsImpl();
         guiData.setJeiSettings(jeiSettings);
-        GuiSyncManager syncManager = new GuiSyncManager(player);
+        PanelSyncManager syncManager = new PanelSyncManager();
         ModularPanel panel = factory.createPanel(guiData, syncManager);
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularScreen screen = factory.createScreen(guiData, panel);
         screen.getContext().setJeiSettings(jeiSettings);
-        GuiScreenWrapper guiScreenWrapper = new GuiScreenWrapper(new ModularContainer(syncManager), screen);
+        GuiScreenWrapper guiScreenWrapper = new GuiScreenWrapper(new ModularContainer(null), screen);
         guiScreenWrapper.inventorySlots.windowId = windowId;
         HoloUI.builder()
 //                .screenScale(0.25f)
