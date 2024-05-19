@@ -1,16 +1,15 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
-
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
+import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-
 import net.minecraft.world.World;
 import net.minecraftforge.items.ItemHandlerHelper;
 
@@ -142,6 +141,40 @@ public class ContainerCustomizer {
             }
             container.detectAndSendChanges();
             return returnable;
+        } else if (clickTypeIn == ClickType.PICKUP_ALL && slotId >= 0) {
+            Slot slot = container.inventorySlots.get(slotId);
+            ItemStack itemstack1 = inventoryplayer.getItemStack();
+
+            if (!itemstack1.isEmpty() && (slot == null || !slot.getHasStack() || !slot.canTakeStack(player))) {
+                int i = mouseButton == 0 ? 0 : container.inventorySlots.size() - 1;
+                int j = mouseButton == 0 ? 1 : -1;
+
+                for (int k = 0; k < 2; ++k) {
+                    for (int l = i; l >= 0 && l < container.inventorySlots.size() && itemstack1.getCount() < itemstack1.getMaxStackSize(); l += j) {
+                        Slot slot1 = container.inventorySlots.get(l);
+                        if (slot1 instanceof ModularSlot modularSlot && modularSlot.isPhantom()) continue;
+
+                        if (slot1.getHasStack() && Container.canAddItemToSlot(slot1, itemstack1, true) && slot1.canTakeStack(player) && canMergeSlot(itemstack1, slot1)) {
+                            ItemStack itemstack2 = slot1.getStack();
+
+                            if (k != 0 || itemstack2.getCount() != itemstack2.getMaxStackSize()) {
+                                int i1 = Math.min(itemstack1.getMaxStackSize() - itemstack1.getCount(), itemstack2.getCount());
+                                ItemStack itemstack3 = slot1.decrStackSize(i1);
+                                itemstack1.grow(i1);
+
+                                if (itemstack3.isEmpty()) {
+                                    slot1.putStack(ItemStack.EMPTY);
+                                }
+
+                                slot1.onTake(player, itemstack3);
+                            }
+                        }
+                    }
+                }
+            }
+
+            container.detectAndSendChanges();
+            return returnable;
         }
 
         return container.superSlotClick(slotId, mouseButton, clickTypeIn, player);
@@ -154,7 +187,7 @@ public class ContainerCustomizer {
             if (!stack.isEmpty()) {
                 stack = stack.copy();
                 int base = 0;
-                if(stack.getCount() > stack.getMaxStackSize()) {
+                if (stack.getCount() > stack.getMaxStackSize()) {
                     base = stack.getCount() - stack.getMaxStackSize();
                     stack.setCount(stack.getMaxStackSize());
                 }

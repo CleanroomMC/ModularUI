@@ -7,8 +7,7 @@ public interface IOnSlotChanged {
     /**
      * An empty listener.
      */
-    IOnSlotChanged DEFAULT = (newItem, onlyAmountChanged, client, init) -> {
-    };
+    IOnSlotChanged DEFAULT = (newItem, onlyAmountChanged, client, init) -> {};
 
     /**
      * Called when an item stack in a {@link ModularSlot} changes.
