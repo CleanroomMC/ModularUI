@@ -7,6 +7,8 @@ import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Map;
+import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 
 public interface ISchema extends Iterable<Map.Entry<BlockPos, BlockInfo>> {
 
@@ -15,4 +17,5 @@ public interface ISchema extends Iterable<Map.Entry<BlockPos, BlockInfo>> {
     Vec3d getFocus();
 
     BlockPos getOrigin();
+
 }

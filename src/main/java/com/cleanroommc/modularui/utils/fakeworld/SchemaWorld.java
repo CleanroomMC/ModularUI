@@ -12,16 +12,42 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.function.BiPredicate;
 
-public class SchemaWorld extends DummyWorld implements ISchema {
+public class SchemaWorld extends DummyWorld implements IFilteredSchema {
 
     private final ObjectLinkedOpenHashSet<BlockPos> blocks = new ObjectLinkedOpenHashSet<>();
+    private BiPredicate<BlockPos, BlockInfo> renderFilter;
     private final BlockPos.MutableBlockPos min = new BlockPos.MutableBlockPos();
     private final BlockPos.MutableBlockPos max = new BlockPos.MutableBlockPos();
 
+    public SchemaWorld() {
+        this((blockPos, blockInfo) -> true);
+    }
+
+    public SchemaWorld(BiPredicate<BlockPos, BlockInfo> renderFilter) {
+        this.renderFilter = renderFilter;
+    }
+
+    @Override
+    public void setRenderFilter(@NotNull BiPredicate<BlockPos, BlockInfo> renderFilter) {
+        this.renderFilter = renderFilter;
+    }
+
+    @Override
+    public @NotNull BiPredicate<BlockPos, BlockInfo> getRenderFilter() {
+        return renderFilter;
+    }
+
     @Override
     public boolean setBlockState(@NotNull BlockPos pos, @NotNull IBlockState newState, int flags) {
-        boolean b = super.setBlockState(pos, newState, flags);
+        boolean renderTest;
+        boolean state;
+        if (renderFilter.test(pos, BlockInfo.of(this, pos))) {
+            renderTest = true;
+            state = super.setBlockState(pos, newState, flags);
+        } else renderTest = state = false;
+
         if (newState.getBlock().isAir(newState, this, pos)) {
             if (this.blocks.remove(pos) && BlockPosUtil.isOnBorder(min, max, pos)) {
                 if (this.blocks.isEmpty()) {
@@ -37,14 +63,15 @@ public class SchemaWorld extends DummyWorld implements ISchema {
                 }
             }
         } else if (this.blocks.isEmpty()) {
+            if (!renderTest) return false;
             this.blocks.add(pos);
             this.min.setPos(pos);
             this.max.setPos(pos);
-        } else if (this.blocks.add(pos)) {
+        } else if (renderTest && this.blocks.add(pos)) {
             BlockPosUtil.setMin(this.min, pos);
             BlockPosUtil.setMax(this.max, pos);
         }
-        return b;
+        return renderTest && state;
     }
 
     @Override

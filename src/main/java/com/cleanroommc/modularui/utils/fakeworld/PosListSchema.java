@@ -9,15 +9,28 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.function.BiPredicate;
 
-public abstract class PosListSchema implements ISchema {
+public abstract class PosListSchema implements IFilteredSchema {
 
     private final World world;
     private final Iterable<? extends BlockPos> posList;
+    private BiPredicate<BlockPos, BlockInfo> renderFilter;
 
-    public PosListSchema(World world, Iterable<? extends BlockPos> posList) {
+    public PosListSchema(World world, Iterable<? extends BlockPos> posList, BiPredicate<BlockPos, BlockInfo> renderFilter) {
         this.world = world;
         this.posList = posList;
+        this.renderFilter = renderFilter;
+    }
+
+    @Override
+    public void setRenderFilter(@NotNull BiPredicate<BlockPos, BlockInfo> renderFilter) {
+        this.renderFilter = renderFilter;
+    }
+
+    @Override
+    public @NotNull BiPredicate<BlockPos, BlockInfo> getRenderFilter() {
+        return renderFilter;
     }
 
     @Override
@@ -42,7 +55,10 @@ public abstract class PosListSchema implements ISchema {
             public Pair<BlockPos, BlockInfo> next() {
                 BlockPos pos = posIt.next();
                 pair.setLeft(pos);
-                pair.setRight(BlockInfo.Mut.SHARED.set(PosListSchema.this.world, pos));
+                BlockInfo.Mut.SHARED.set(PosListSchema.this.world, pos);
+                if (renderFilter.test(pos, BlockInfo.Mut.SHARED)) {
+                    pair.setRight(BlockInfo.Mut.SHARED);
+                } else pair.setRight(BlockInfo.EMPTY);
                 return pair;
             }
         };
