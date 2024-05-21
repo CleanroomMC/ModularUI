@@ -55,9 +55,8 @@ public class ResizerTest extends CustomModularScreen {
                 .build();
 
         var schemaRenderer = new SchemaRenderer(world);
-        var layerUpDown = new SchemaWidget.LayerUpDown();
+        var layerUpDown = new SchemaWidget.LayerUpDown(0, 3);
         world.setRenderFilter(layerUpDown.makeSchemaFilter());
-        world.applyRenderFilter();
 
         plane.child(layerUpDown.bottom(1).left(1).size(16));
 

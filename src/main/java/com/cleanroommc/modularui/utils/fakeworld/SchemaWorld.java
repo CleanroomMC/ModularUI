@@ -9,12 +9,13 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.Map;
 import java.util.function.BiPredicate;
 
-public class SchemaWorld extends DummyWorld implements IFilteredSchema {
+public class SchemaWorld extends DummyWorld implements ISchema{
 
     private final ObjectLinkedOpenHashSet<BlockPos> blocks = new ObjectLinkedOpenHashSet<>();
     private BiPredicate<BlockPos, BlockInfo> renderFilter;
@@ -30,12 +31,12 @@ public class SchemaWorld extends DummyWorld implements IFilteredSchema {
     }
 
     @Override
-    public void setRenderFilter(@NotNull BiPredicate<BlockPos, BlockInfo> renderFilter) {
+    public void setRenderFilter(@Nullable BiPredicate<BlockPos, BlockInfo> renderFilter) {
         this.renderFilter = renderFilter;
     }
 
     @Override
-    public @NotNull BiPredicate<BlockPos, BlockInfo> getRenderFilter() {
+    public @Nullable BiPredicate<BlockPos, BlockInfo> getRenderFilter() {
         return renderFilter;
     }
 
@@ -43,10 +44,12 @@ public class SchemaWorld extends DummyWorld implements IFilteredSchema {
     public boolean setBlockState(@NotNull BlockPos pos, @NotNull IBlockState newState, int flags) {
         boolean renderTest;
         boolean state;
-        if (renderFilter.test(pos, BlockInfo.of(this, pos))) {
+        if (renderFilter == null || renderFilter.test(pos, BlockInfo.of(this, pos))) {
             renderTest = true;
             state = super.setBlockState(pos, newState, flags);
-        } else renderTest = state = false;
+        } else {
+            renderTest = state = false;
+        }
 
         if (newState.getBlock().isAir(newState, this, pos)) {
             if (this.blocks.remove(pos) && BlockPosUtil.isOnBorder(min, max, pos)) {

@@ -18,13 +18,13 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
 
 import org.lwjgl.opengl.EXTFramebufferObject;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
-import org.lwjgl.util.vector.ReadableVector3f;
 import org.lwjgl.util.vector.Vector3f;
 
 import java.util.Objects;
@@ -38,6 +38,7 @@ public class SchemaRenderer implements IDrawable {
     private static final Framebuffer FBO = new Framebuffer(1080, 1080, true);
 
     private final ISchema schema;
+    private final IBlockAccess renderWorld;
     private final Framebuffer framebuffer;
     private final Camera camera = new Camera(new Vector3f(), new Vector3f());
     private boolean cameraSetup = false;
@@ -52,6 +53,7 @@ public class SchemaRenderer implements IDrawable {
     public SchemaRenderer(ISchema schema, Framebuffer framebuffer) {
         this.schema = schema;
         this.framebuffer = framebuffer;
+        this.renderWorld = new RenderWorld(schema);
     }
 
     public SchemaRenderer(ISchema schema) {
@@ -176,8 +178,8 @@ public class SchemaRenderer implements IDrawable {
                 this.schema.forEach(pair -> {
                     BlockPos pos = pair.getKey();
                     IBlockState state = pair.getValue().getBlockState();
-                    if (!state.getBlock().isAir(state, this.schema.getWorld(), pos) && state.getBlock().canRenderInLayer(state, layer)) {
-                        blockrendererdispatcher.renderBlock(state, pos, this.schema.getWorld(), buffer);
+                    if (!state.getBlock().isAir(state, this.renderWorld, pos) && state.getBlock().canRenderInLayer(state, layer)) {
+                        blockrendererdispatcher.renderBlock(state, pos, this.renderWorld, buffer);
                     }
                 });
                 Tessellator.getInstance().draw();

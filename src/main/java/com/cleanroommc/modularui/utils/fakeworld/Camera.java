@@ -6,8 +6,6 @@ import org.lwjgl.util.vector.Vector3f;
 
 public class Camera {
 
-    public static final double PI2 = 2 * Math.PI;
-
     private final Vector3f pos;
     private final Vector3f lookAt;
 

@@ -7,10 +7,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
+import com.google.common.collect.AbstractIterator;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -18,17 +20,16 @@ import java.util.Map;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
-public class SimpleSchema implements IMemorizingFilteredSchema {
+public class SimpleSchema implements ISchema {
 
     private final World world;
-    private final Object2ObjectOpenHashMap<BlockPos, BlockInfo> originalBlocks = new Object2ObjectOpenHashMap<>();
-    private final Object2ObjectOpenHashMap<BlockPos, BlockInfo> filteredBlocks = new Object2ObjectOpenHashMap<>();
+    private final Object2ObjectOpenHashMap<BlockPos, BlockInfo> blocks = new Object2ObjectOpenHashMap<>();
     private BiPredicate<BlockPos, BlockInfo> renderFilter;
     private final BlockPos origin;
     private final Vec3d center;
 
     public SimpleSchema(Map<BlockPos, BlockInfo> blocks) {
-        this(blocks, (blockPos, blockInfo) -> true);
+        this(blocks, null);
     }
 
     public SimpleSchema(Map<BlockPos, BlockInfo> blocks, BiPredicate<BlockPos, BlockInfo> renderFilter) {
@@ -39,7 +40,7 @@ public class SimpleSchema implements IMemorizingFilteredSchema {
         if (!blocks.isEmpty()) {
             for (var entry : blocks.entrySet()) {
                 if (entry.getValue().getBlockState().getBlock() != Blocks.AIR) {
-                    this.originalBlocks.put(entry.getKey(), entry.getValue());
+                    this.blocks.put(entry.getKey(), entry.getValue());
                     entry.getValue().apply(this.world, entry.getKey());
                     BlockPosUtil.setMin(min, entry.getKey());
                     BlockPosUtil.setMax(max, entry.getKey());
@@ -51,32 +52,15 @@ public class SimpleSchema implements IMemorizingFilteredSchema {
         }
         this.origin = min.toImmutable();
         this.center = BlockPosUtil.getCenterD(min, max);
-        applyRenderFilter();
     }
 
     @Override
-    public Map<BlockPos, BlockInfo> getOriginalSchema() {
-        return Collections.unmodifiableMap(originalBlocks);
-    }
-
-    @Override
-    public void applyRenderFilter() {
-        filteredBlocks.clear();
-        originalBlocks.forEach((pos, bInfo) -> {
-            if (getRenderFilter().test(pos, bInfo)) {
-                bInfo.apply(getWorld(), pos);
-                filteredBlocks.put(pos, bInfo);
-            } else getWorld().setBlockToAir(pos);
-        });
-    }
-
-    @Override
-    public void setRenderFilter(@NotNull BiPredicate<BlockPos, BlockInfo> renderFilter) {
+    public void setRenderFilter(@Nullable BiPredicate<BlockPos, BlockInfo> renderFilter) {
         this.renderFilter = renderFilter;
     }
 
     @Override
-    public @NotNull BiPredicate<BlockPos, BlockInfo> getRenderFilter() {
+    public @Nullable BiPredicate<BlockPos, BlockInfo> getRenderFilter() {
         return renderFilter;
     }
 
@@ -98,18 +82,20 @@ public class SimpleSchema implements IMemorizingFilteredSchema {
     @NotNull
     @Override
     public Iterator<Map.Entry<BlockPos, BlockInfo>> iterator() {
-        return new Iterator<>() {
+        return new AbstractIterator<>() {
 
-            private final ObjectIterator<Object2ObjectMap.Entry<BlockPos, BlockInfo>> it = filteredBlocks.object2ObjectEntrySet().fastIterator();
-
-            @Override
-            public boolean hasNext() {
-                return it.hasNext();
-            }
+            private final ObjectIterator<Object2ObjectMap.Entry<BlockPos, BlockInfo>> it = blocks.object2ObjectEntrySet().fastIterator();
 
             @Override
-            public Map.Entry<BlockPos, BlockInfo> next() {
-                return it.next();
+            protected Map.Entry<BlockPos, BlockInfo> computeNext() {
+                while (it.hasNext()) {
+                    Map.Entry<BlockPos, BlockInfo> entry = it.next();
+                    if (renderFilter == null || renderFilter.test(entry.getKey(), entry.getValue())) {
+                        return entry;
+                    }
+                }
+                endOfData();
+                return null;
             }
         };
     }
