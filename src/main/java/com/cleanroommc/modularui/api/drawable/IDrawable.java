@@ -1,11 +1,8 @@
 package com.cleanroommc.modularui.api.drawable;
 
-import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.drawable.Icon;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.theme.ThemeAPI;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
@@ -13,7 +10,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.google.gson.JsonObject;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * An object which can be drawn. This is mainly used for backgrounds and overlays in
@@ -105,18 +101,6 @@ public interface IDrawable {
     }
 
     /**
-     * Applies a theme color before drawing. Do not call, only override.
-     *
-     * @param theme       theme to apply color of
-     * @param widgetTheme widget theme to apply color of
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval(inVersion = "2.6.0")
-    default void applyThemeColor(ITheme theme, WidgetTheme widgetTheme) {
-        Color.setGlColorOpaque(Color.WHITE.main);
-    }
-
-    /**
      * @return if theme color can be applied on this drawable
      */
     default boolean canApplyTheme() {
@@ -168,7 +152,7 @@ public interface IDrawable {
         @SideOnly(Side.CLIENT)
         @Override
         public void draw(GuiContext context, WidgetTheme widgetTheme) {
-            this.drawable.drawAtZero(context, getArea());
+            this.drawable.drawAtZero(context, getArea(), widgetTheme);
         }
     }
 }

@@ -6,8 +6,8 @@ import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.factory.SimpleGuiFactory;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.utils.Alignment;
-import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.cleanroommc.modularui.value.sync.IntSyncValue;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.StringSyncValue;
 import com.cleanroommc.modularui.widgets.ItemSlot;
 import com.cleanroommc.modularui.widgets.layout.Column;
@@ -18,7 +18,6 @@ import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
@@ -44,7 +43,7 @@ public class ItemEditorGui implements IGuiHolder<GuiData> {
     }
 
     @Override
-    public ModularPanel buildUI(GuiData data, GuiSyncManager syncManager) {
+    public ModularPanel buildUI(GuiData data, PanelSyncManager syncManager) {
         ItemStack itemStack = syncManager.getPlayer().getHeldItemMainhand();
         if (!itemStack.isEmpty()) {
             setStack(itemStack.copy());

@@ -13,9 +13,7 @@ public class Row extends ParentWidget<Row> implements ILayoutWidget, IExpander {
     private Alignment.CrossAxis caa = Alignment.CrossAxis.START;
 
     public Row() {
-        flex().startDefaultMode()
-                .sizeRel(1f, 1f)
-                .endDefaultMode();
+        sizeRel(1f, 1f);
     }
 
     @Override

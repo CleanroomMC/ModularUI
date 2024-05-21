@@ -43,18 +43,6 @@ public class Flex implements IResizeable, IPositioned<Flex> {
         this.y.resetPosition();
     }
 
-    public Flex startDefaultMode() {
-        this.x.setDefaultMode(true);
-        this.y.setDefaultMode(true);
-        return this;
-    }
-
-    public Flex endDefaultMode() {
-        this.x.setDefaultMode(false);
-        this.y.setDefaultMode(false);
-        return this;
-    }
-
     @Override
     public Flex flex() {
         return this;
@@ -86,12 +74,12 @@ public class Flex implements IResizeable, IPositioned<Flex> {
     }
 
     public Flex coverChildrenWidth() {
-        this.x.setCoverChildren(true);
+        this.x.setCoverChildren(true, this.parent);
         return this;
     }
 
     public Flex coverChildrenHeight() {
-        this.y.setCoverChildren(true);
+        this.y.setCoverChildren(true, this.parent);
         return this;
     }
 
@@ -480,26 +468,26 @@ public class Flex implements IResizeable, IPositioned<Flex> {
     }
 
     private Unit getLeft() {
-        return this.x.getStart();
+        return this.x.getStart(this.parent);
     }
 
     private Unit getRight() {
-        return this.x.getEnd();
+        return this.x.getEnd(this.parent);
     }
 
     private Unit getTop() {
-        return this.y.getStart();
+        return this.y.getStart(this.parent);
     }
 
     private Unit getBottom() {
-        return this.y.getEnd();
+        return this.y.getEnd(this.parent);
     }
 
     private Unit getWidth() {
-        return this.x.getSize();
+        return this.x.getSize(this.parent);
     }
 
     private Unit getHeight() {
-        return this.y.getSize();
+        return this.y.getSize(this.parent);
     }
 }

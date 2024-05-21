@@ -50,9 +50,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
     private IDrawable overlayTexture = null;
 
     public FluidSlot() {
-        flex().startDefaultMode()
-                .size(DEFAULT_SIZE, DEFAULT_SIZE)
-                .endDefaultMode();
+        size(DEFAULT_SIZE);
         tooltip().setAutoUpdate(true).setHasTitleMargin(true);
         tooltipBuilder(tooltip -> {
             IFluidTank fluidTank = getFluidTank();
@@ -121,11 +119,8 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof FluidSlotSyncHandler fluidSlotSyncHandler) {
-            this.syncHandler = fluidSlotSyncHandler;
-            return true;
-        }
-        return false;
+        this.syncHandler = castIfTypeElseNull(syncHandler, FluidSlotSyncHandler.class);
+        return this.syncHandler != null;
     }
 
     @Override

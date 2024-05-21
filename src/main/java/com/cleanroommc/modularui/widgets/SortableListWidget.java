@@ -43,9 +43,7 @@ public class SortableListWidget<T, I extends SortableListWidget.Item<T>> extends
 
     public SortableListWidget(Function<T, I> valueToWidgetMapper) {
         super(valueToWidgetMapper, Item::getWidgetValue);
-        flex().startDefaultMode()
-                .width(80)
-                .endDefaultMode();
+        width(80);
     }
 
     @Override

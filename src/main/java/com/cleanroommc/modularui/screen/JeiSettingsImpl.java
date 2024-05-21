@@ -125,7 +125,9 @@ public class JeiSettingsImpl implements JeiSettings {
      */
     @Override
     public <W extends IWidget & JeiGhostIngredientSlot<?>> void addJeiGhostIngredientSlot(W slot) {
-        this.jeiGhostIngredientSlots.add(slot);
+        if (!this.jeiGhostIngredientSlots.contains(slot)) {
+            this.jeiGhostIngredientSlots.add(slot);
+        }
     }
 
     /**

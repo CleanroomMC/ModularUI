@@ -1,112 +1,101 @@
 package com.cleanroommc.modularui.value.sync;
 
-import com.cleanroommc.modularui.network.NetworkUtils;
+import com.cleanroommc.modularui.api.IPanelSyncManager;
+import com.cleanroommc.modularui.screen.ContainerCustomizer;
 import com.cleanroommc.modularui.screen.ModularContainer;
+import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
+import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
+
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class GuiSyncManager {
+public class PanelSyncManager implements IPanelSyncManager {
 
-    public static final String AUTO_SYNC_PREFIX = "auto_sync:";
-    private static final String PLAYER_INVENTORY = "player_inventory";
-
-    private static final String CURSOR_KEY = makeSyncKey("cursor_slot", 255255);
-    private final CursorSlotSyncHandler cursorSlotSyncHandler = new CursorSlotSyncHandler();
-    private final EntityPlayer player;
-    private final PlayerMainInvWrapper playerInventory;
     private final Map<String, SyncHandler> syncHandlers = new Object2ObjectLinkedOpenHashMap<>();
     private final Map<String, SlotGroup> slotGroups = new Object2ObjectOpenHashMap<>();
     private final Map<SyncHandler, String> reverseSyncHandlers = new Object2ObjectOpenHashMap<>();
-    private ModularContainer container;
+    private ModularSyncManager modularSyncManager;
+    private String panelName;
+    private boolean init = true;
+    private ContainerCustomizer containerCustomizer;
 
     private final List<Consumer<EntityPlayer>> openListener = new ArrayList<>();
     private final List<Consumer<EntityPlayer>> closeListener = new ArrayList<>();
 
-    public GuiSyncManager(EntityPlayer player) {
-        this.player = player;
-        this.playerInventory = new PlayerMainInvWrapper(player.inventory);
-        syncValue(CURSOR_KEY, this.cursorSlotSyncHandler);
-        String key = "player";
-        for (int i = 0; i < 36; i++) {
-            itemSlot(key, i, SyncHandlers.itemSlot(this.playerInventory, i).slotGroup(PLAYER_INVENTORY));
-        }
-        // player inv sorting is handled by bogosorter
-        registerSlotGroup(new SlotGroup(PLAYER_INVENTORY, 9, SlotGroup.PLAYER_INVENTORY_PRIO, true).setAllowSorting(false));
-    }
+    public PanelSyncManager() {}
 
     @ApiStatus.Internal
-    public void construct(ModularContainer container) {
-        if (this.container != null) {
-            throw new IllegalStateException("Tried to initialise GuiSyncManager twice!");
-        }
-        this.container = Objects.requireNonNull(container, "ModularContainer must not be null!");
+    public void initialize(String panelName, ModularSyncManager msm) {
+        this.modularSyncManager = msm;
+        this.panelName = panelName;
         this.syncHandlers.forEach((mapKey, syncHandler) -> syncHandler.init(mapKey, this));
+        this.init = true;
     }
 
     @ApiStatus.Internal
     public void onOpen() {
-        this.openListener.forEach(listener -> listener.accept(this.player));
+        this.openListener.forEach(listener -> listener.accept(getPlayer()));
     }
 
     @ApiStatus.Internal
     public void onClose() {
-        this.closeListener.forEach(listener -> listener.accept(this.player));
+        this.closeListener.forEach(listener -> listener.accept(getPlayer()));
     }
 
     public boolean isInitialised() {
-        return this.container != null;
-    }
-
-    public ItemStack getCursorItem() {
-        return getPlayer().inventory.getItemStack();
-    }
-
-    public void setCursorItem(ItemStack item) {
-        getPlayer().inventory.setItemStack(item);
-        this.cursorSlotSyncHandler.sync();
+        return this.modularSyncManager != null;
     }
 
     public void detectAndSendChanges(boolean init) {
-        if (!NetworkUtils.isClient(this.player)) {
+        if (!isClient()) {
             for (SyncHandler syncHandler : this.syncHandlers.values()) {
-                syncHandler.detectAndSendChanges(init);
+                syncHandler.detectAndSendChanges(init || this.init);
             }
         }
+        this.init = false;
     }
 
     public void receiveWidgetUpdate(String mapKey, int id, PacketBuffer buf) throws IOException {
         SyncHandler syncHandler = this.syncHandlers.get(mapKey);
-        if (NetworkUtils.isClient(this.player)) {
+        if (isClient()) {
             syncHandler.readOnClient(id, buf);
         } else {
             syncHandler.readOnServer(id, buf);
         }
     }
 
-    @ApiStatus.Internal
-    public void disposeSyncHandler(SyncHandler syncHandler) {
-        String key = this.reverseSyncHandlers.remove(syncHandler);
-        if (key != null) {
-            this.syncHandlers.remove(key);
-            syncHandler.dispose();
-        }
+    public ItemStack getCursorItem() {
+        return getModularSyncManager().getCursorItem();
+    }
+
+    public void setCursorItem(ItemStack stack) {
+        getModularSyncManager().setCursorItem(stack);
     }
 
     public boolean hasSyncHandler(SyncHandler syncHandler) {
         return syncHandler.isValid() && syncHandler.getSyncManager() == this && this.reverseSyncHandlers.containsKey(syncHandler);
+    }
+
+    public ContainerCustomizer getContainerCustomizer() {
+        return containerCustomizer;
+    }
+
+    public void setContainerCustomizer(ContainerCustomizer containerCustomizer) {
+        this.containerCustomizer = containerCustomizer;
     }
 
     private void putSyncValue(String name, int id, SyncHandler syncHandler) {
@@ -114,8 +103,8 @@ public class GuiSyncManager {
         String currentKey = this.reverseSyncHandlers.get(syncHandler);
         if (currentKey != null) {
             if (!currentKey.equals(key)) {
-                boolean auto = name.startsWith(AUTO_SYNC_PREFIX);
-                if (auto != currentKey.startsWith(AUTO_SYNC_PREFIX)) {
+                boolean auto = name.startsWith(ModularSyncManager.AUTO_SYNC_PREFIX);
+                if (auto != currentKey.startsWith(ModularSyncManager.AUTO_SYNC_PREFIX)) {
                     throw new IllegalStateException("Old and new sync handler must both be either not auto or auto!");
                 }
                 if (auto && !currentKey.startsWith(name)) {
@@ -131,58 +120,88 @@ public class GuiSyncManager {
         }
     }
 
-    public GuiSyncManager syncValue(String name, SyncHandler syncHandler) {
+    public PanelSyncManager syncValue(String name, SyncHandler syncHandler) {
         return syncValue(name, 0, syncHandler);
     }
 
-    public GuiSyncManager syncValue(String name, int id, SyncHandler syncHandler) {
+    public PanelSyncManager syncValue(String name, int id, SyncHandler syncHandler) {
         Objects.requireNonNull(name, "Name must not be null");
         Objects.requireNonNull(syncHandler, "Sync Handler must not be null");
         putSyncValue(name, id, syncHandler);
         return this;
     }
 
-    public GuiSyncManager syncValue(int id, SyncHandler syncHandler) {
+    public PanelSyncManager syncValue(int id, SyncHandler syncHandler) {
         return syncValue("_", id, syncHandler);
     }
 
-    public GuiSyncManager itemSlot(String key, ModularSlot slot) {
+    public PanelSyncManager itemSlot(String key, ModularSlot slot) {
         return itemSlot(key, 0, slot);
     }
 
-    public GuiSyncManager itemSlot(String key, int id, ModularSlot slot) {
+    public PanelSyncManager itemSlot(String key, int id, ModularSlot slot) {
         return syncValue(key, id, new ItemSlotSH(slot));
     }
 
-    public GuiSyncManager itemSlot(int id, ModularSlot slot) {
+    public PanelSyncManager itemSlot(int id, ModularSlot slot) {
         return itemSlot("_", id, slot);
     }
 
-    public GuiSyncManager registerSlotGroup(SlotGroup slotGroup) {
+    public PanelSyncHandler panel(String key, ModularPanel mainPanel, PanelSyncHandler.IPanelBuilder panelBuilder) {
+        PanelSyncHandler syncHandler = new PanelSyncHandler(mainPanel, panelBuilder);
+        syncValue(key, syncHandler);
+        return syncHandler;
+    }
+
+    public PanelSyncManager registerSlotGroup(SlotGroup slotGroup) {
         if (!slotGroup.isSingleton()) {
             this.slotGroups.put(slotGroup.getName(), slotGroup);
         }
         return this;
     }
 
-    public GuiSyncManager registerSlotGroup(String name, int rowSize, int shiftClickPriority) {
+    public PanelSyncManager registerSlotGroup(String name, int rowSize, int shiftClickPriority) {
         return registerSlotGroup(new SlotGroup(name, rowSize, shiftClickPriority, true));
     }
 
-    public GuiSyncManager registerSlotGroup(String name, int rowSize, boolean allowShiftTransfer) {
+    public PanelSyncManager registerSlotGroup(String name, int rowSize, boolean allowShiftTransfer) {
         return registerSlotGroup(new SlotGroup(name, rowSize, 100, allowShiftTransfer));
     }
 
-    public GuiSyncManager registerSlotGroup(String name, int rowSize) {
+    public PanelSyncManager registerSlotGroup(String name, int rowSize) {
         return registerSlotGroup(new SlotGroup(name, rowSize, 100, true));
     }
 
-    public GuiSyncManager addOpenListener(Consumer<EntityPlayer> listener) {
+    public PanelSyncManager bindPlayerInventory(EntityPlayer player) {
+        return bindPlayerInventory(player, ModularSlot::new);
+    }
+
+    public PanelSyncManager bindPlayerInventory(EntityPlayer player, @NotNull SlotFunction slotFunction) {
+        if (getSlotGroup(ModularSyncManager.PLAYER_INVENTORY) != null) {
+            throw new IllegalStateException("The player slot group is already registered!");
+        }
+        PlayerMainInvWrapper playerInventory = new PlayerMainInvWrapper(player.inventory);
+        String key = "player";
+        for (int i = 0; i < 36; i++) {
+            itemSlot(key, i, slotFunction.apply(playerInventory, i).slotGroup(ModularSyncManager.PLAYER_INVENTORY));
+        }
+        // player inv sorting is handled by bogosorter
+        registerSlotGroup(new SlotGroup(ModularSyncManager.PLAYER_INVENTORY, 9, SlotGroup.PLAYER_INVENTORY_PRIO, true).setAllowSorting(false));
+        return this;
+    }
+
+    public interface SlotFunction {
+
+        @NotNull
+        ModularSlot apply(@NotNull PlayerMainInvWrapper playerInv, int index);
+    }
+
+    public PanelSyncManager addOpenListener(Consumer<EntityPlayer> listener) {
         this.openListener.add(listener);
         return this;
     }
 
-    public GuiSyncManager addCloseListener(Consumer<EntityPlayer> listener) {
+    public PanelSyncManager addCloseListener(Consumer<EntityPlayer> listener) {
         this.closeListener.add(listener);
         return this;
     }
@@ -200,19 +219,26 @@ public class GuiSyncManager {
     }
 
     public EntityPlayer getPlayer() {
-        return this.player;
+        return getModularSyncManager().getPlayer();
+    }
+
+    public ModularSyncManager getModularSyncManager() {
+        if (!isInitialised()) {
+            throw new IllegalStateException("PanelSyncManager is not yet initialised!");
+        }
+        return modularSyncManager;
     }
 
     public ModularContainer getContainer() {
-        return this.container;
+        return getModularSyncManager().getContainer();
     }
 
-    public PlayerMainInvWrapper getPlayerInventory() {
-        return this.playerInventory;
+    public String getPanelName() {
+        return panelName;
     }
 
     public boolean isClient() {
-        return NetworkUtils.isClient(this.player);
+        return getModularSyncManager().isClient();
     }
 
     public static String makeSyncKey(String name, int id) {

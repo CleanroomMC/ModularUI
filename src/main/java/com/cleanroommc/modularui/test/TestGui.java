@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.GuiTextures;
@@ -49,6 +50,7 @@ public class TestGui extends CustomModularScreen {
         List<List<AvailableElement>> availableMatrix = Grid.mapToMatrix(2, this.lines, (index, value) -> {
             AvailableElement availableElement = new AvailableElement().overlay(IKey.str(value))
                     .size(60, 14)
+                    .addTooltipLine(value)
                     .onMousePressed(mouseButton1 -> {
                         if (this.availableElements.get(value).available) {
                             ref.get().add(value, -1);
@@ -84,6 +86,7 @@ public class TestGui extends CustomModularScreen {
                 .pos(10, 10).right(10).bottom(10))*/
         SortableListWidget<String, SortableListWidget.Item<String>> sortableListWidget = SortableListWidget.sortableBuilder(this.lines, this.configuredOptions,
                 s -> new SortableListWidget.Item<>(s, new Widget<>()
+                        .addTooltipLine(s)
                         .background(GuiTextures.BUTTON_CLEAN)
                         .overlay(IKey.str(s))
                         .left(0).right(10))
@@ -100,26 +103,19 @@ public class TestGui extends CustomModularScreen {
                 .pos(10, 10)
                 .bottom(23)
                 .width(100));
+        IPanelHandler otherPanel = IPanelHandler.simple(panel, (mainPanel, player) -> {
+            ModularPanel panel1 = ModularPanel.defaultPanel("Option Selection", 150, 120);
+            return panel1.child(ButtonWidget.panelCloseButton())
+                    .child(new Grid()
+                            .matrix(availableMatrix)
+                            .scrollable()
+                            .pos(7, 7).right(14).bottom(7).debugName("available list"));
+        });
         panel.child(new ButtonWidget<>()
                 .bottom(7).size(12, 12).leftRel(0.5f)
                 .overlay(GuiTextures.ADD)
                 .onMouseTapped(mouseButton -> {
-                    if (!isPanelOpen("Option Selection")) {
-                        ModularPanel panel1 = ModularPanel.defaultPanel("Option Selection", 150, 120);
-                        openPanel(panel1
-                                .child(new ButtonWidget<>()
-                                        .size(8, 8)
-                                        .top(7).right(7)
-                                        .overlay(GuiTextures.CLOSE)
-                                        .onMousePressed(mouseButton1 -> {
-                                            closePanel(panel1);
-                                            return true;
-                                        }))
-                                .child(new Grid()
-                                        .matrix(availableMatrix)
-                                        .scrollable()
-                                        .pos(7, 7).right(14).bottom(7).debugName("available list")));
-                    }
+                    otherPanel.openPanel();
                     return true;
                 }));
         /*IDrawable optionHoverEffect = new Rectangle().setColor(Color.withAlpha(Color.WHITE.dark(5), 50));

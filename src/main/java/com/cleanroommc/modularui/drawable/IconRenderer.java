@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 
 import net.minecraft.client.Minecraft;
@@ -101,7 +102,7 @@ public class IconRenderer {
         for (IIcon icon : lines) {
             int x = icon.getWidth() > 0 ? getStartX(icon.getWidth()) : this.x;
             if (!this.simulate) {
-                icon.draw(context, x, y, maxWidth, icon.getHeight());
+                icon.draw(context, x, y, maxWidth, icon.getHeight(), WidgetTheme.getDefault());
             }
             y += (int) ((icon.getHeight() + this.linePadding) * this.scale);
         }

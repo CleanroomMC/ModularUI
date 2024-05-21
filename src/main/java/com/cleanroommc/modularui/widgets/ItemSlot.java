@@ -49,7 +49,6 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     public ItemSlot() {
         tooltip().setAutoUpdate(true).setHasTitleMargin(true);
         tooltipBuilder(tooltip -> {
-            tooltip.excludeArea(getArea());
             if (!isSynced()) return;
             ItemStack stack = getSlot().getStack();
             if (stack.isEmpty()) return;
@@ -65,11 +64,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof ItemSlotSH itemSlotSH) {
-            this.syncHandler = itemSlotSH;
-            return true;
-        }
-        return false;
+        this.syncHandler = castIfTypeElseNull(syncHandler, ItemSlotSH.class);
+        return this.syncHandler != null;
     }
 
     @Override

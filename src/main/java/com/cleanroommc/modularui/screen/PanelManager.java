@@ -1,20 +1,20 @@
 package com.cleanroommc.modularui.screen;
 
+import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
 import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.utils.ReverseIterable;
 import com.cleanroommc.modularui.widget.WidgetTree;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Supplier;
 
 public class PanelManager {
@@ -34,6 +34,7 @@ public class PanelManager {
     private final List<ModularPanel> panelsView = Collections.unmodifiableList(this.panelsClone);
     private final ReverseIterable<ModularPanel> reversePanels = new ReverseIterable<>(this.panelsView);
     private final ObjectList<ModularPanel> disposal = ObjectList.create(20);
+    private final Map<String, IPanelHandler> panelHandlerMap = new Object2ObjectOpenHashMap<>();
     private boolean cantDisposeNow = false;
     private boolean dirty = false;
     private State state = State.INIT;
@@ -137,7 +138,16 @@ public class PanelManager {
         return null;
     }
 
-    public void openPanel(@NotNull ModularPanel panel) {
+    @ApiStatus.Internal
+    public void openPanel(@NotNull ModularPanel panel, @NotNull IPanelHandler panelHandler) {
+        IPanelHandler existing = this.panelHandlerMap.get(panel.getName());
+        if (existing == null) {
+            this.panelHandlerMap.put(panel.getName(), panelHandler);
+        } else if (existing != panelHandler) {
+            ModularUI.LOGGER.error("Tried to open a panel, but a panel handler that opens the same panel already exists. Using existing panel handler!");
+            existing.openPanel();
+            return;
+        }
         openPanel(panel, true);
     }
 
@@ -168,8 +178,8 @@ public class PanelManager {
     }
 
     private void finalizePanel(ModularPanel panel) {
+        panel.onClose();
         if (!this.disposal.contains(panel)) {
-            panel.onClose();
             if (this.disposal.size() == 20) {
                 this.disposal.removeFirst().dispose();
             }

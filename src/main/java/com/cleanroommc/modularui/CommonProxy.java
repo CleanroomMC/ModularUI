@@ -9,7 +9,8 @@ import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.test.ItemEditorGui;
 import com.cleanroommc.modularui.test.TestBlock;
-import com.cleanroommc.modularui.value.sync.GuiSyncManager;
+
+import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 
 import net.minecraft.util.Timer;
 import net.minecraftforge.common.MinecraftForge;
@@ -72,7 +73,7 @@ public class CommonProxy {
     @SubscribeEvent
     public static void onCloseContainer(PlayerContainerEvent.Open event) {
         if (event.getContainer() instanceof ModularContainer container) {
-            GuiSyncManager syncManager = container.getSyncManager();
+            ModularSyncManager syncManager = container.getSyncManager();
             if (syncManager != null) {
                 syncManager.onOpen();
             }

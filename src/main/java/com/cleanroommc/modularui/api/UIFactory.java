@@ -3,7 +3,8 @@ package com.cleanroommc.modularui.api;
 import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.value.sync.GuiSyncManager;
+
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
@@ -37,13 +38,13 @@ public interface UIFactory<D extends GuiData> {
      * @return new main panel
      */
     @ApiStatus.OverrideOnly
-    ModularPanel createPanel(D guiData, GuiSyncManager syncManager);
+    ModularPanel createPanel(D guiData, PanelSyncManager syncManager);
 
     /**
      * Creates the screen for the GUI. Is only called on client side.
      *
      * @param guiData   gui data
-     * @param mainPanel main panel created in {@link #createPanel(GuiData, GuiSyncManager)}
+     * @param mainPanel main panel created in {@link #createPanel(GuiData, PanelSyncManager)}
      * @return new main panel
      */
     @SideOnly(Side.CLIENT)

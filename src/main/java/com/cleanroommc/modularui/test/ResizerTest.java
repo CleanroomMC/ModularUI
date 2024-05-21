@@ -13,7 +13,15 @@ import net.minecraft.init.MobEffects;
 import net.minecraft.potion.Potion;
 import net.minecraft.tileentity.TileEntityBeacon;
 import net.minecraft.util.math.BlockPos;
+import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.layout.IViewportStack;
+import com.cleanroommc.modularui.drawable.GuiTextures;
+import com.cleanroommc.modularui.screen.CustomModularScreen;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.widget.Widget;
 
+import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.NotNull;
 
 public class ResizerTest extends CustomModularScreen {
@@ -70,5 +78,4 @@ public class ResizerTest extends CustomModularScreen {
 
         return plane;
     }
-
  }
