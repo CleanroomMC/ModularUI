@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.widgets;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
@@ -10,7 +9,6 @@ import com.cleanroommc.modularui.api.value.IIntValue;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.UITexture;
 import com.cleanroommc.modularui.screen.Tooltip;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.value.IntValue;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
@@ -20,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
@@ -29,8 +28,10 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
     private int length = 1;
     private IIntValue<?> intValue;
     private int lastValue = -1;
-    private IntFunction<IDrawable> textureGetter;
-    private IDrawable texture = IDrawable.EMPTY;
+    private IDrawable[] background = null;
+    private IDrawable[] hoverBackground = null;
+    private IDrawable[] overlay = null;
+    private IDrawable[] hoverOverlay = null;
     private final List<Tooltip> stateTooltip = new ArrayList<>();
 
     @Override
@@ -38,11 +39,6 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
         if (this.intValue == null) {
             this.intValue = new IntValue(0);
         }
-        if (this.textureGetter == null) {
-            ModularUI.LOGGER.warn("Texture Getter of {} was not set!", this);
-            this.textureGetter = val -> IDrawable.EMPTY;
-        }
-        this.texture = this.textureGetter.apply(getState());
     }
 
     @Override
@@ -82,7 +78,6 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
         if (setSource) {
             this.intValue.setIntValue(state);
         }
-        this.texture = this.textureGetter.apply(state);
         this.lastValue = state;
     }
 
@@ -107,12 +102,24 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
     }
 
     @Override
-    public void draw(GuiContext context, WidgetTheme widgetTheme) {
-        super.draw(context, widgetTheme);
+    public IDrawable getCurrentBackground(ITheme theme, WidgetTheme widgetTheme) {
         // make sure texture is up-to-date
-        getState();
-        // draw state texture after background, but before overlay
-        this.texture.draw(context, 0, 0, getArea().w(), getArea().h(), widgetTheme);
+        int state = getState();
+        if (isHovering()) {
+            if (this.hoverBackground != null && this.hoverBackground[state] != null) return this.hoverBackground[state];
+            return this.background != null && this.background[state] != null ? this.background[state] : super.getCurrentBackground(theme, widgetTheme);
+        }
+        return this.background != null && this.background[state] != null ? this.background[state] : super.getCurrentBackground(theme, widgetTheme);
+    }
+
+    @Override
+    public IDrawable getCurrentOverlay(ITheme theme, WidgetTheme widgetTheme) {
+        int state = getState();
+        if (isHovering()) {
+            if (this.hoverOverlay != null && this.hoverOverlay[state] != null) return this.hoverOverlay[state];
+            return this.overlay != null && this.overlay[state] != null ? this.overlay[state] : super.getCurrentBackground(theme, widgetTheme);
+        }
+        return this.overlay != null && this.overlay[state] != null ? this.overlay[state] : super.getCurrentBackground(theme, widgetTheme);
     }
 
     @Override
@@ -127,7 +134,7 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
         for (Tooltip tooltip : this.stateTooltip) {
             tooltip.markDirty();
         }
-        this.texture = this.textureGetter.apply(getState());
+        getState();
     }
 
     @Override
@@ -150,16 +157,134 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
         return this;
     }
 
+    @Deprecated
     public CycleButtonWidget textureGetter(IntFunction<IDrawable> textureGetter) {
-        this.textureGetter = textureGetter;
+        throw new UnsupportedOperationException("'textureGetter()' is no longer supported in CycleButtonWidget. Use 'stateBackground()'");
+    }
+
+    @Deprecated
+    public CycleButtonWidget texture(UITexture texture) {
+        return stateBackground(texture);
+    }
+
+    /**
+     * Sets the state dependent background. The images should be vertically stacked images from top to bottom
+     * Note: The length must be already set!
+     *
+     * @param texture background
+     * @return this
+     */
+    public CycleButtonWidget stateBackground(UITexture texture) {
+        for (int i = 0; i < this.length; i++) {
+            float a = 1f / this.length;
+            this.background[i] = texture.getSubArea(0, i * a, 1, i * a + a);
+        }
         return this;
     }
 
-    public CycleButtonWidget texture(UITexture texture) {
-        return textureGetter(val -> {
+    /**
+     * Sets the state dependent overlay. The images should be vertically stacked images from top to bottom
+     * Note: The length must be already set!
+     *
+     * @param texture background
+     * @return this
+     */
+    public CycleButtonWidget stateOverlay(UITexture texture) {
+        for (int i = 0; i < this.length; i++) {
             float a = 1f / this.length;
-            return texture.getSubArea(0, val * a, 1, val * a + a);
-        });
+            this.overlay[i] = texture.getSubArea(0, i * a, 1, i * a + a);
+        }
+        return this;
+    }
+
+    /**
+     * Sets the state dependent hover background. The images should be vertically stacked images from top to bottom
+     * Note: The length must be already set!
+     *
+     * @param texture background
+     * @return this
+     */
+    public CycleButtonWidget stateHoverBackground(UITexture texture) {
+        for (int i = 0; i < this.length; i++) {
+            float a = 1f / this.length;
+            this.hoverBackground[i] = texture.getSubArea(0, i * a, 1, i * a + a);
+        }
+        return this;
+    }
+
+    /**
+     * Sets the state dependent hover overlay. The images should be vertically stacked images from top to bottom
+     * Note: The length must be already set!
+     *
+     * @param texture background
+     * @return this
+     */
+    public CycleButtonWidget stateHoverOverlay(UITexture texture) {
+        for (int i = 0; i < this.length; i++) {
+            float a = 1f / this.length;
+            this.hoverOverlay[i] = texture.getSubArea(0, i * a, 1, i * a + a);
+        }
+        return this;
+    }
+
+    public CycleButtonWidget stateBackground(int state, IDrawable drawable) {
+        this.background = addToArray(this.background, drawable, state);
+        return this;
+    }
+
+    public CycleButtonWidget stateHoverBackground(int state, IDrawable drawable) {
+        this.hoverBackground = addToArray(this.hoverBackground, drawable, state);
+        return this;
+    }
+
+    public CycleButtonWidget stateOverlay(int state, IDrawable drawable) {
+        this.overlay = addToArray(this.overlay, drawable, state);
+        return this;
+    }
+
+    public CycleButtonWidget stateHoverOverlay(int state, IDrawable drawable) {
+        this.hoverOverlay = addToArray(this.hoverOverlay, drawable, state);
+        return this;
+    }
+
+    public CycleButtonWidget stateBackground(boolean state, IDrawable drawable) {
+        this.background = addToArray(this.background, drawable, state ? 1 : 0);
+        return this;
+    }
+
+    public CycleButtonWidget stateHoverBackground(boolean state, IDrawable drawable) {
+        this.hoverBackground = addToArray(this.hoverBackground, drawable, state ? 1 : 0);
+        return this;
+    }
+
+    public CycleButtonWidget stateOverlay(boolean state, IDrawable drawable) {
+        this.overlay = addToArray(this.overlay, drawable, state ? 1 : 0);
+        return this;
+    }
+
+    public CycleButtonWidget stateHoverOverlay(boolean state, IDrawable drawable) {
+        this.hoverOverlay = addToArray(this.hoverOverlay, drawable, state ? 1 : 0);
+        return this;
+    }
+
+    public <T extends Enum<T>> CycleButtonWidget stateBackground(T state, IDrawable drawable) {
+        this.background = addToArray(this.background, drawable, state.ordinal());
+        return this;
+    }
+
+    public <T extends Enum<T>> CycleButtonWidget stateHoverBackground(T state, IDrawable drawable) {
+        this.hoverBackground = addToArray(this.hoverBackground, drawable, state.ordinal());
+        return this;
+    }
+
+    public <T extends Enum<T>> CycleButtonWidget stateOverlay(T state, IDrawable drawable) {
+        this.overlay = addToArray(this.overlay, drawable, state.ordinal());
+        return this;
+    }
+
+    public <T extends Enum<T>> CycleButtonWidget stateHoverOverlay(T state, IDrawable drawable) {
+        this.hoverOverlay = addToArray(this.hoverOverlay, drawable, state.ordinal());
+        return this;
     }
 
     /**
@@ -189,7 +314,25 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
         while (this.stateTooltip.size() > this.length) {
             this.stateTooltip.remove(this.stateTooltip.size() - 1);
         }
+        this.background = checkArray(this.background, length);
+        this.overlay = checkArray(this.overlay, length);
+        this.hoverBackground = checkArray(this.hoverBackground, length);
+        this.hoverOverlay = checkArray(this.hoverOverlay, length);
         return this;
+    }
+
+    private static IDrawable[] checkArray(IDrawable[] array, int length) {
+        if (array == null) return new IDrawable[length];
+        return array.length < length ? Arrays.copyOf(array, length) : array;
+    }
+
+    private IDrawable[] addToArray(IDrawable[] array, IDrawable drawable, int index) {
+        if (index < 0) throw new IndexOutOfBoundsException();
+        if (array == null || index >= array.length) {
+            array = new IDrawable[(int) (Math.ceil((index + 1) / 4.0) * 4)];
+        }
+        array[index] = drawable;
+        return array;
     }
 
     public CycleButtonWidget tooltip(int index, Consumer<Tooltip> builder) {
