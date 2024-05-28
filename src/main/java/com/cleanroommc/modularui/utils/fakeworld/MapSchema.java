@@ -14,13 +14,12 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
-public class SimpleSchema implements ISchema {
+public class MapSchema implements ISchema {
 
     private final World world;
     private final Object2ObjectOpenHashMap<BlockPos, BlockInfo> blocks = new Object2ObjectOpenHashMap<>();
@@ -28,11 +27,11 @@ public class SimpleSchema implements ISchema {
     private final BlockPos origin;
     private final Vec3d center;
 
-    public SimpleSchema(Map<BlockPos, BlockInfo> blocks) {
+    public MapSchema(Map<BlockPos, BlockInfo> blocks) {
         this(blocks, null);
     }
 
-    public SimpleSchema(Map<BlockPos, BlockInfo> blocks, BiPredicate<BlockPos, BlockInfo> renderFilter) {
+    public MapSchema(Map<BlockPos, BlockInfo> blocks, BiPredicate<BlockPos, BlockInfo> renderFilter) {
         this.world = new DummyWorld();
         this.renderFilter = renderFilter;
         BlockPos.MutableBlockPos min = new BlockPos.MutableBlockPos(BlockPosUtil.MAX);
@@ -94,8 +93,7 @@ public class SimpleSchema implements ISchema {
                         return entry;
                     }
                 }
-                endOfData();
-                return null;
+                return endOfData();
             }
         };
     }
@@ -138,11 +136,11 @@ public class SimpleSchema implements ISchema {
             return this;
         }
 
-        public SimpleSchema build() {
+        public MapSchema build() {
             if (renderFilter == null) {
-                return new SimpleSchema(this.blocks);
+                return new MapSchema(this.blocks);
             }
-            return new SimpleSchema(this.blocks, renderFilter);
+            return new MapSchema(this.blocks, renderFilter);
         }
     }
 }

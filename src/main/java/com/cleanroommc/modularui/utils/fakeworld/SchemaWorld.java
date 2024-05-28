@@ -5,8 +5,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import it.unimi.dsi.fastutil.objects.ObjectIterator;
+import com.google.common.collect.AbstractIterator;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ObjectListIterator;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,7 +16,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.function.BiPredicate;
 
-public class SchemaWorld extends DummyWorld implements ISchema{
+public class SchemaWorld extends DummyWorld implements ISchema {
 
     private final ObjectLinkedOpenHashSet<BlockPos> blocks = new ObjectLinkedOpenHashSet<>();
     private BiPredicate<BlockPos, BlockInfo> renderFilter;
@@ -95,23 +96,22 @@ public class SchemaWorld extends DummyWorld implements ISchema{
     @NotNull
     @Override
     public Iterator<Map.Entry<BlockPos, BlockInfo>> iterator() {
-        return new Iterator<>() {
-
-            private final ObjectIterator<BlockPos> it = blocks.iterator();
+        return new AbstractIterator<>() {
+            private final ObjectListIterator<BlockPos> it = blocks.iterator();
             private final BlockInfo.Mut info = new BlockInfo.Mut();
             private final MutablePair<BlockPos, BlockInfo> pair = new MutablePair<>(null, this.info);
 
             @Override
-            public boolean hasNext() {
-                return it.hasNext();
-            }
-
-            @Override
-            public Map.Entry<BlockPos, BlockInfo> next() {
-                BlockPos pos = it.next();
-                this.info.set(SchemaWorld.this, pos);
-                this.pair.setLeft(pos);
-                return this.pair;
+            protected Map.Entry<BlockPos, BlockInfo> computeNext() {
+                while (it.hasNext()) {
+                    var pos = it.next();
+                    this.info.set(SchemaWorld.this, pos);
+                    this.pair.setLeft(pos);
+                    if (renderFilter == null || renderFilter.test(pos, info)) {
+                        return this.pair;
+                    }
+                }
+                return endOfData();
             }
         };
     }

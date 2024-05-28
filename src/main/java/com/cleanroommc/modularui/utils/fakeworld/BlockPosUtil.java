@@ -77,4 +77,8 @@ public class BlockPosUtil {
                 p.getY() == boxMin.getY() || p.getY() == boxMax.getY() ||
                 p.getZ() == boxMin.getZ() || p.getZ() == boxMax.getZ();
     }
+
+    public static BlockPos.MutableBlockPos add(BlockPos.MutableBlockPos pos, int x, int y, int z) {
+        return pos.setPos(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
+    }
 }

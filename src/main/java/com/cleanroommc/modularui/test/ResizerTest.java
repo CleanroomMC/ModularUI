@@ -3,25 +3,10 @@ package com.cleanroommc.modularui.test;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.utils.fakeworld.*;
-
+import com.cleanroommc.modularui.utils.fakeworld.ArraySchema;
+import com.cleanroommc.modularui.utils.fakeworld.ISchema;
 import com.cleanroommc.modularui.widgets.SchemaWidget;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.MobEffects;
-import net.minecraft.potion.Potion;
-import net.minecraft.tileentity.TileEntityBeacon;
-import net.minecraft.util.math.BlockPos;
-import com.cleanroommc.modularui.api.drawable.IKey;
-import com.cleanroommc.modularui.api.layout.IViewportStack;
-import com.cleanroommc.modularui.drawable.GuiTextures;
-import com.cleanroommc.modularui.screen.CustomModularScreen;
-import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.widget.Widget;
-
-import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.NotNull;
 
 public class ResizerTest extends CustomModularScreen {
@@ -52,30 +37,34 @@ public class ResizerTest extends CustomModularScreen {
                         .isometric(true)
                         .asIcon().size(140));*/
 
-        var plane = ModularPanel.defaultPanel("main").size(170);
 
-        SimpleSchema world = new SimpleSchema.Builder()
+        /*MapSchema world = new MapSchema.Builder()
                 .add(new BlockPos(0, 0, 0), Blocks.DIAMOND_BLOCK.getDefaultState())
                 .add(new BlockPos(0, 1, 0), Blocks.BEDROCK.getDefaultState())
                 .add(new BlockPos(0, 2, 0), Blocks.WOOL.getDefaultState())
                 .add(new BlockPos(1, 0, 1), Blocks.GOLD_BLOCK.getDefaultState())
                 .add(new BlockPos(0, 3, 0), Blocks.BEACON.getDefaultState())
+                .build();*/
+
+        ISchema schema = ArraySchema.builder()
+                .layer("D   D", "     ", "     ", "     ")
+                .layer(" DDD ", " E E ", "     ", "     ")
+                .layer(" DDD ", "  E  ", "  G  ", "  B  ")
+                .layer(" DDD ", " E E ", "     ", "     ")
+                .layer("D   D", "     ", "     ", "     ")
+                .where('D', "minecraft:gold_block")
+                .where('E', "minecraft:emerald_block")
+                .where('G', "minecraft:diamond_block")
+                .where('B', "minecraft:beacon")
                 .build();
 
-        var schemaRenderer = new SchemaRenderer(world);
+
         var layerUpDown = new SchemaWidget.LayerUpDown(0, 3);
-        world.setRenderFilter(layerUpDown.makeSchemaFilter());
+        schema.setRenderFilter(layerUpDown.makeSchemaFilter());
 
-        plane.child(layerUpDown.bottom(1).left(1).size(16));
-
-        var disableTESR = new SchemaWidget.DisableTESR().bottom(1).left(18).size(16);
-        schemaRenderer.disableTESR(disableTESR.makeSuppler());
-        plane.child(disableTESR);
-
-
-        var shnemaW = new SchemaWidget(schemaRenderer).size(120);
-        plane.child(shnemaW);
-
-        return plane;
+        var panel = ModularPanel.defaultPanel("main").size(170);
+        panel.child(new SchemaWidget(schema).full())
+                .child(layerUpDown.bottom(1).left(1).size(16));
+        return panel;
     }
- }
+}

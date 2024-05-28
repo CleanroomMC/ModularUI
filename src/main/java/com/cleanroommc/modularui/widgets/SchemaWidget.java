@@ -5,7 +5,9 @@ import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.utils.VectorUtil;
 import com.cleanroommc.modularui.utils.fakeworld.BlockInfo;
+import com.cleanroommc.modularui.utils.fakeworld.ISchema;
 import com.cleanroommc.modularui.utils.fakeworld.SchemaRenderer;
 import com.cleanroommc.modularui.widget.Widget;
 
@@ -17,7 +19,6 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.util.vector.Vector3f;
 
 import java.util.function.BiPredicate;
-import java.util.function.BooleanSupplier;
 
 public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
 
@@ -25,26 +26,35 @@ public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
     public static final float PI2 = 2 * PI;
 
     private final SchemaRenderer schema;
-    private boolean invertMouseScrollScaleAction = false;
-    private double scale = 10;
-
+    private boolean enableRotation = true;
+    private boolean enableTranslation = true;
+    private boolean enableScaling = true;
     private int lastMouseX;
     private int lastMouseY;
+    private double scale = 10;
     private float pitch = (float) (Math.PI / 4f);
     private float yaw = (float) (Math.PI / 4f);
     private final Vector3f offset = new Vector3f();
 
+    public SchemaWidget(ISchema schema) {
+        this(new SchemaRenderer(schema));
+    }
+
     public SchemaWidget(SchemaRenderer schema) {
         this.schema = schema;
         schema.cameraFunc((camera, $schema) -> {
-            camera.setLookAt($schema.getOriginF().translate(offset.x, offset.y, offset.z), scale, yaw, pitch);
+            Vector3f focus = VectorUtil.vec3fAdd(this.offset, null, $schema.getFocus());
+            camera.setLookAt(focus, scale, yaw, pitch);
         });
     }
 
     @Override
     public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
-        modifyScale(-scrollDirection.modifier * amount / 120.0);
-        return true;
+        if (this.enableScaling) {
+            modifyScale(-scrollDirection.modifier * amount / 120.0);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -60,11 +70,11 @@ public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
         int mouseY = getContext().getAbsMouseY();
         int dx = mouseX - lastMouseX;
         int dy = mouseY - lastMouseY;
-        if (mouseButton == 0) {
+        if (mouseButton == 0 && this.enableRotation) {
             float moveScale = 0.025f;
             yaw = (yaw + dx * moveScale + PI2) % PI2;
             pitch = MathHelper.clamp(pitch + dy * moveScale, -PI2 / 4 + 0.001f, PI2 / 4 - 0.001f);
-        } else if (mouseButton == 2) {
+        } else if (mouseButton == 2 && this.enableTranslation) {
             // the idea is to construct a vector which points upwards from the camerae pov (y-axis on screen)
             // but force dy we force x = y = 0
             float y = (float) Math.cos(pitch);
@@ -87,36 +97,28 @@ public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
         return this;
     }
 
-    public SchemaWidget invertMouseScrollScaleAction(boolean invert) {
-        invertMouseScrollScaleAction = invert;
+    public SchemaWidget enableDragRotation(boolean enable) {
+        this.enableRotation = enable;
         return this;
+    }
+
+    public SchemaWidget enableDragTranslation(boolean enable) {
+        this.enableTranslation = enable;
+        return this;
+    }
+
+    public SchemaWidget enableScrollScaling(boolean enable) {
+        this.enableScaling = enable;
+        return this;
+    }
+
+    public SchemaWidget enableAllInteraction(boolean enable) {
+        return enableDragRotation(enable).enableDragTranslation(enable).enableScrollScaling(enable);
     }
 
     @Override
     public @Nullable IDrawable getOverlay() {
         return schema;
-    }
-
-    public static class DisableTESR extends ButtonWidget<DisableTESR> {
-
-        private boolean disable = false;
-
-        public DisableTESR() {
-            background(GuiTextures.MC_BACKGROUND);
-            overlay(IKey.str("TESR").scale(0.5f));
-            onMousePressed(mouseButton -> {
-                if (mouseButton == 0) {
-                    disable = !disable;
-                    return true;
-                }
-
-                return false;
-            });
-        }
-
-        public BooleanSupplier makeSuppler() {
-            return () -> disable;
-        }
     }
 
     public static class LayerUpDown extends ButtonWidget<LayerUpDown> {
