@@ -6,19 +6,15 @@ import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.utils.VectorUtil;
-import com.cleanroommc.modularui.utils.fakeworld.BlockInfo;
 import com.cleanroommc.modularui.utils.fakeworld.ISchema;
 import com.cleanroommc.modularui.utils.fakeworld.SchemaRenderer;
 import com.cleanroommc.modularui.widget.Widget;
 
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.util.vector.Vector3f;
-
-import java.util.function.BiPredicate;
 
 public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
 
@@ -51,7 +47,7 @@ public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
     @Override
     public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
         if (this.enableScaling) {
-            modifyScale(-scrollDirection.modifier * amount / 120.0);
+            scale(-scrollDirection.modifier * amount / 120.0);
             return true;
         }
         return false;
@@ -76,7 +72,7 @@ public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
             pitch = MathHelper.clamp(pitch + dy * moveScale, -PI2 / 4 + 0.001f, PI2 / 4 - 0.001f);
         } else if (mouseButton == 2 && this.enableTranslation) {
             // the idea is to construct a vector which points upwards from the camerae pov (y-axis on screen)
-            // but force dy we force x = y = 0
+            // this vector determines the amount of z offset from mouse movement in y
             float y = (float) Math.cos(pitch);
             float moveScale = 0.06f;
             // with this the offset can be moved by dy
@@ -92,8 +88,23 @@ public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
         this.lastMouseY = mouseY;
     }
 
-    public SchemaWidget modifyScale(double scale) {
+    public SchemaWidget scale(double scale) {
         this.scale += scale;
+        return this;
+    }
+
+    public SchemaWidget pitch(float pitch) {
+        this.pitch += pitch;
+        return this;
+    }
+
+    public SchemaWidget yaw(float yaw) {
+        this.yaw += yaw;
+        return this;
+    }
+
+    public SchemaWidget offset(float x, float y, float z) {
+        this.offset.set(x, y, z);
         return this;
     }
 
@@ -112,8 +123,14 @@ public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
         return this;
     }
 
+    public SchemaWidget enableInteraction(boolean rotation, boolean translation, boolean scaling) {
+        return enableDragRotation(rotation)
+                .enableDragTranslation(translation)
+                .enableScrollScaling(scaling);
+    }
+
     public SchemaWidget enableAllInteraction(boolean enable) {
-        return enableDragRotation(enable).enableDragTranslation(enable).enableScrollScaling(enable);
+        return enableInteraction(enable, enable, enable);
     }
 
     @Override
@@ -121,13 +138,13 @@ public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
         return schema;
     }
 
-    public static class LayerUpDown extends ButtonWidget<LayerUpDown> {
+    public static class LayerButton extends ButtonWidget<LayerButton> {
 
         private final int minLayer;
         private final int maxLayer;
         private int currentLayer = Integer.MIN_VALUE;
 
-        public LayerUpDown(int minLayer, int maxLayer) {
+        public LayerButton(ISchema schema, int minLayer, int maxLayer) {
             this.minLayer = minLayer;
             this.maxLayer = maxLayer;
             background(GuiTextures.MC_BACKGROUND);
@@ -155,13 +172,10 @@ public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
                 }
                 return false;
             });
+            schema.setRenderFilter((blockPos, blockInfo) -> currentLayer == Integer.MIN_VALUE || currentLayer >= blockPos.getY());
         }
 
-        public BiPredicate<BlockPos, BlockInfo> makeSchemaFilter() {
-            return (blockPos, blockInfo) -> currentLayer == Integer.MIN_VALUE || currentLayer >= blockPos.getY();
-        }
-
-        public LayerUpDown startLayer(int start) {
+        public LayerButton startLayer(int start) {
             this.currentLayer = start;
             return this;
         }

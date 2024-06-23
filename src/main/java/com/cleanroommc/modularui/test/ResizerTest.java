@@ -58,13 +58,13 @@ public class ResizerTest extends CustomModularScreen {
                 .where('B', "minecraft:beacon")
                 .build();
 
-
-        var layerUpDown = new SchemaWidget.LayerUpDown(0, 3);
-        schema.setRenderFilter(layerUpDown.makeSchemaFilter());
-
         var panel = ModularPanel.defaultPanel("main").size(170);
-        panel.child(new SchemaWidget(schema).full())
-                .child(layerUpDown.bottom(1).left(1).size(16));
+        panel.child(new SchemaWidget(schema)
+                        .full())
+                .child(new SchemaWidget.LayerButton(schema, 0, 3)
+                        .bottom(1)
+                        .left(1)
+                        .size(16));
         return panel;
     }
 }
