@@ -25,23 +25,23 @@ public class GuiUtils {
     }
 
     public static Matrix4f getTransformationMatrix(Matrix4f matrix4f) {
-        floatBuffer.position(0);
+        floatBuffer.rewind();
         getTransformationBuffer(floatBuffer);
         matrix4f.load(floatBuffer);
         return matrix4f;
     }
 
     public static void setTransformationMatrix(Matrix4f matrix) {
-        floatBuffer.position(0);
+        floatBuffer.rewind();
         matrix.store(floatBuffer);
-        floatBuffer.position(0);
+        floatBuffer.rewind();
         GL11.glLoadMatrix(floatBuffer);
     }
 
     public static void applyTransformationMatrix(Matrix4f matrix) {
-        floatBuffer.position(0);
+        floatBuffer.rewind();
         matrix.store(floatBuffer);
-        floatBuffer.position(0);
+        floatBuffer.rewind();
         GL11.glMultMatrix(floatBuffer);
     }
 }
