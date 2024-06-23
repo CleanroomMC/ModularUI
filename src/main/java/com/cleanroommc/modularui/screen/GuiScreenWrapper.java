@@ -29,6 +29,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.client.CPacketClickWindow;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.GuiContainerEvent;
@@ -36,6 +37,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
@@ -92,7 +94,8 @@ public class GuiScreenWrapper extends GuiContainer {
 
         Stencil.reset();
         Stencil.apply(this.screen.getScreenArea(), null);
-        drawDefaultBackground();
+        if (!this.screen.getContext().isHoloScreen)
+            drawDefaultBackground();
         int i = this.guiLeft;
         int j = this.guiTop;
 
@@ -161,6 +164,7 @@ public class GuiScreenWrapper extends GuiContainer {
             int i3 = getAccessor().getReturningStackDestSlot().yPos - getAccessor().getTouchUpY();
             int l1 = getAccessor().getTouchUpX() + (int) ((float) l2 * f);
             int i2 = getAccessor().getTouchUpY() + (int) ((float) i3 * f);
+//            GlStateManager.translate(); ?
             this.drawItemStack(getAccessor().getReturningStack(), l1, i2, null);
         }
 
@@ -185,6 +189,7 @@ public class GuiScreenWrapper extends GuiContainer {
 
     @Override
     public void drawWorldBackground(int tint) {
+        if (screen.getContext().isHoloScreen) return;
         if (ModularUI.isBlurLoaded() || this.mc.world == null) {
             super.drawWorldBackground(tint);
             return;
@@ -197,18 +202,34 @@ public class GuiScreenWrapper extends GuiContainer {
         this.drawGradientRect(0, 0, this.width, this.height, Color.withAlpha(color, (int) (startAlpha * alpha)), Color.withAlpha(color, (int) (endAlpha * alpha)));
     }
 
-    private void drawItemStack(ItemStack stack, int x, int y, String altText) {
-        GlStateManager.translate(0.0F, 0.0F, 32.0F);
-        this.zLevel = 200.0F;
-        this.itemRender.zLevel = 200.0F;
+    public void drawItem(ItemStack stack, int x, int y) {
+        GlStateManager.enableDepth();
+        GlStateManager.pushMatrix();
+        if (this.screen.getContext().isHoloScreen) {
+            GlStateManager.scale(1, 1, 0.0001);
+        }
+        // todo handle item block brightness weirdness with holo screen
+        this.itemRender.renderItemAndEffectIntoGUI(stack, x, y);
+        GlStateManager.popMatrix();
+        GlStateManager.disableDepth();
+    }
+
+    public void drawEffects(ItemStack stack, int x, int y, String altText) {
         FontRenderer font = stack.getItem().getFontRenderer(stack);
         if (font == null) font = this.fontRenderer;
-        GlStateManager.enableDepth();
-        this.itemRender.renderItemAndEffectIntoGUI(stack, x, y);
+        GlStateManager.pushMatrix();
         this.itemRender.renderItemOverlayIntoGUI(font, stack, x, y - (getAccessor().getDraggedStack().isEmpty() ? 0 : 8), altText);
-        GlStateManager.disableDepth();
-        this.zLevel = 0.0F;
-        this.itemRender.zLevel = 0.0F;
+        GlStateManager.popMatrix();
+    }
+
+    public void drawItemStack(ItemStack stack, int x, int y, String altText) {
+        float z = -200f;
+        this.zLevel += z;
+        this.itemRender.zLevel += z;
+        this.drawItem(stack, x, y);
+        this.drawEffects(stack, x, y, altText);
+        this.zLevel -= z;
+        this.itemRender.zLevel -= z;
     }
 
     protected void drawVanillaElements(int mouseX, int mouseY, float partialTicks) {
@@ -361,6 +382,19 @@ public class GuiScreenWrapper extends GuiContainer {
         }
 
         this.mc.dispatchKeypresses();
+    }
+
+    @SuppressWarnings({"NullableProblems", "ConstantValue"})
+    @Override
+    protected void handleMouseClick(Slot slotIn, int slotId, int mouseButton, @NotNull ClickType type) {
+        if (screen.getContext().isHoloScreen) {
+            slotId = slotIn == null ? slotId : slotIn.slotNumber;
+            short id = inventorySlots.getNextTransactionID(this.mc.player.inventory);
+            ItemStack stack = inventorySlots.slotClick(slotId, mouseButton, type, this.mc.player);
+            this.mc.getConnection().sendPacket(new CPacketClickWindow(this.inventorySlots.windowId, slotId, mouseButton, type, stack, id));
+        } else {
+            super.handleMouseClick(slotIn, slotId, mouseButton, type);
+        }
     }
 
     @Override

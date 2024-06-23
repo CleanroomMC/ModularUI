@@ -1,18 +1,17 @@
 package com.cleanroommc.modularui.holoui;
 
-import com.cleanroommc.modularui.screen.JeiSettingsImpl;
-import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.ModularPanel;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Map;
-import java.util.function.Supplier;
+import java.util.function.Consumer;
 
 /**
  * Highly experimental
@@ -20,10 +19,14 @@ import java.util.function.Supplier;
 @ApiStatus.Experimental
 public class HoloUI {
 
-    private static final Map<ResourceLocation, Supplier<ModularScreen>> syncedHolos = new Object2ObjectOpenHashMap<>();
+    private static final Map<String, HoloScreenEntity> syncedHolos = new Object2ObjectOpenHashMap<>();
 
-    public static void registerSyncedHoloUI(ResourceLocation loc, Supplier<ModularScreen> screen) {
-        syncedHolos.put(loc, screen);
+    public static void registerSyncedHoloUI(ModularPanel mainPanel, HoloScreenEntity entity) {
+        syncedHolos.put(mainPanel.getName(), entity);
+    }
+
+    public static boolean isOpen(ModularPanel panel) {
+        return syncedHolos.containsKey(panel.getName());
     }
 
     public static Builder builder() {
@@ -43,9 +46,17 @@ public class HoloUI {
             return this;
         }
 
+        public Builder at(BlockPos pos) {
+            this.x = pos.getX() + 0.5D;
+            this.y = pos.getY() + 0.5D;
+            this.z = pos.getZ() + 0.5D;
+            return this;
+        }
+
         public Builder inFrontOf(EntityPlayer player, double distance, boolean fixed) {
             Vec3d look = player.getLookVec();
             this.orientation = fixed ? ScreenOrientation.FIXED : ScreenOrientation.TO_PLAYER;
+            if (fixed) plane3D.setNormal((float) -look.x, 0, (float) -look.z);
             return at(player.posX + look.x * distance, player.posY + player.getEyeHeight() + look.y * distance, player.posZ + look.z * distance);
         }
 
@@ -80,15 +91,31 @@ public class HoloUI {
             return this;
         }
 
-        public void open(ModularScreen screen) {
-            JeiSettingsImpl jeiSettings = new JeiSettingsImpl();
-            jeiSettings.disableJei();
-            screen.getContext().setJeiSettings(jeiSettings);
-            HoloScreenEntity holoScreenEntity = new HoloScreenEntity(Minecraft.getMinecraft().world, this.plane3D);
-            holoScreenEntity.setPosition(this.x, this.y, this.z);
-            holoScreenEntity.setScreen(screen);
-            holoScreenEntity.spawnInWorld();
-            holoScreenEntity.setOrientation(this.orientation);
+        public void open(Consumer<HoloScreenEntity> entityConsumer, World world) {
+//            JeiSettingsImpl jeiSettings = new JeiSettingsImpl();
+//            jeiSettings.disableJei();
+//            screen.getContext().setJeiSettings(jeiSettings);
+
+//            wrapper.getScreen().getContext().isHoloScreen = true;
+            HoloScreenEntity screen = new HoloScreenEntity(world, this.plane3D);
+            screen.setPosition(this.x, this.y, this.z);
+            screen.setOrientation(this.orientation);
+            entityConsumer.accept(screen);
+            screen.spawnInWorld();
+//            holoScreenEntity.setPosition(this.x, this.y, this.z);
+//            holoScreenEntity.setWrapper(wrapper);
+//            holoScreenEntity.spawnInWorld();
+//            holoScreenEntity.setOrientation(this.orientation);
+        }
+
+        public void reposition(String name, EntityPlayer player) {
+            var screen = syncedHolos.get(name);
+            screen.setPosition(this.x, this.y, this.z);
+            screen.setOrientation(this.orientation);
+            if (player.world.isRemote){
+                var vec = screen.getPositionVector().subtract(player.getPositionVector());
+                screen.getPlane3D().setNormal((float) -vec.x, 0, (float) -vec.z);
+            }
         }
     }
 }
