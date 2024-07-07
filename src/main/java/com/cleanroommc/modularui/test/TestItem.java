@@ -38,6 +38,10 @@ public class TestItem extends Item implements IGuiHolder<HandGuiData> {
 
     public static final TestItem testItem = new TestItem();
 
+    public TestItem() {
+        setTranslationKey("mui.test");
+    }
+
     @Override
     public ModularPanel buildUI(HandGuiData guiData, PanelSyncManager guiSyncManager) {
         IItemHandlerModifiable itemHandler = (IItemHandlerModifiable) guiData.getUsedItemStack().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);

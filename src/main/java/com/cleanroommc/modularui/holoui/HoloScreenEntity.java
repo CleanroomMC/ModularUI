@@ -1,6 +1,9 @@
 package com.cleanroommc.modularui.holoui;
 
-import com.cleanroommc.modularui.screen.*;
+import com.cleanroommc.modularui.screen.GuiScreenWrapper;
+import com.cleanroommc.modularui.screen.ModularContainer;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.ModularScreen;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -73,6 +76,11 @@ public class HoloScreenEntity extends Entity {
 
     public ScreenOrientation getOrientation() {
         return ScreenOrientation.values()[this.dataManager.get(ORIENTATION)];
+    }
+
+    public boolean isName(String name) {
+        if (this.panel == null) return false;
+        return this.panel.getName().equals(name);
     }
 
     public Plane3D getPlane3D() {

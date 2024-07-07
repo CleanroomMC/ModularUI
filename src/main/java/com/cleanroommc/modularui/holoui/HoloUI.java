@@ -1,16 +1,13 @@
 package com.cleanroommc.modularui.holoui;
 
-import com.cleanroommc.modularui.screen.ModularPanel;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.Map;
+import java.util.Collection;
 import java.util.function.Consumer;
 
 /**
@@ -18,16 +15,6 @@ import java.util.function.Consumer;
  */
 @ApiStatus.Experimental
 public class HoloUI {
-
-    private static final Map<String, HoloScreenEntity> syncedHolos = new Object2ObjectOpenHashMap<>();
-
-    public static void registerSyncedHoloUI(ModularPanel mainPanel, HoloScreenEntity entity) {
-        syncedHolos.put(mainPanel.getName(), entity);
-    }
-
-    public static boolean isOpen(ModularPanel panel) {
-        return syncedHolos.containsKey(panel.getName());
-    }
 
     public static Builder builder() {
         return new Builder();
@@ -108,13 +95,14 @@ public class HoloUI {
 //            holoScreenEntity.setOrientation(this.orientation);
         }
 
-        public void reposition(String name, EntityPlayer player) {
-            var screen = syncedHolos.get(name);
-            screen.setPosition(this.x, this.y, this.z);
-            screen.setOrientation(this.orientation);
-            if (player.world.isRemote){
-                var vec = screen.getPositionVector().subtract(player.getPositionVector());
-                screen.getPlane3D().setNormal((float) -vec.x, 0, (float) -vec.z);
+        public void reposition(EntityPlayer player, Collection<HoloScreenEntity> screens) {
+            for (HoloScreenEntity screen : screens) {
+                screen.setPosition(this.x, this.y, this.z);
+                screen.setOrientation(this.orientation);
+                if (player.world.isRemote) {
+                    var vec = screen.getPositionVector().subtract(player.getPositionVector());
+                    screen.getPlane3D().setNormal((float) -vec.x, 0, (float) -vec.z);
+                }
             }
         }
     }
