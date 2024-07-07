@@ -15,6 +15,11 @@ import org.jetbrains.annotations.NotNull;
 public class TestHoloItem extends TestItem {
 
     public static final TestHoloItem testHoloItem = new TestHoloItem();
+
+    public TestHoloItem() {
+        setTranslationKey("mui.test_holo");
+    }
+
     @NotNull
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, @NotNull EntityPlayer player, @NotNull EnumHand hand) {

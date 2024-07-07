@@ -1,13 +1,12 @@
 package com.cleanroommc.modularui.factory;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.JeiSettings;
 import com.cleanroommc.modularui.api.UIFactory;
+import com.cleanroommc.modularui.holoui.HoloScreenEntity;
 import com.cleanroommc.modularui.holoui.HoloUI;
 import com.cleanroommc.modularui.holoui.ScreenEntityRender;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.packets.OpenGuiPacket;
-import com.cleanroommc.modularui.network.packets.SyncHoloPacket;
 import com.cleanroommc.modularui.screen.*;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widget.WidgetTree;
@@ -29,6 +28,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import io.netty.buffer.Unpooled;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 public class HoloGuiManager extends GuiManager {
 
 
@@ -40,23 +41,27 @@ public class HoloGuiManager extends GuiManager {
         guiData.setJeiSettings(JeiSettings.DUMMY);
         PanelSyncManager syncManager = new PanelSyncManager();
         ModularPanel panel = factory.createPanel(guiData, syncManager);
-        if (HoloUI.isOpen(panel)) {
-            HoloUI.builder()
+        List<HoloScreenEntity> screens = player.world.getEntities(HoloScreenEntity.class, entity -> entity.isName(panel.getName()));
+        if (!screens.isEmpty()) {
+            for (HoloScreenEntity screen : screens) {
+                screen.setDead();
+            }
+            /*HoloUI.builder()
                     .inFrontOf(player, 5, true)
-                    .reposition(panel.getName(), player);
+                    .reposition(player, screens);
             NetworkHandler.sendToPlayer(new SyncHoloPacket(panel.getName()), player);
             ModularUI.LOGGER.warn("reposition the holo, sync to client");
-            return;
+            return;*/
         }
         WidgetTree.collectSyncValues(syncManager, panel);
-        ModularContainer container = new ModularContainer(null);
+        ModularContainer container = new ModularContainer(player, syncManager, panel.getName());
         HoloUI.builder()
                 .screenScale(0.5f)
                 .inFrontOf(player, 5, true)
                 .open(screen -> {
                     screen.setContainer(container);
                     screen.setPanel(panel);
-                    HoloUI.registerSyncedHoloUI(panel, screen);
+                    //HoloUI.registerSyncedHoloUI(panel, screen);
                 }, player.getEntityWorld());
         // sync to client
 //        player.getNextWindowId();
@@ -83,7 +88,7 @@ public class HoloGuiManager extends GuiManager {
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularScreen screen = factory.createScreen(guiData, panel);
         screen.getContext().setJeiSettings(jeiSettings);
-        GuiScreenWrapper guiScreenWrapper = new GuiScreenWrapper(new ModularContainer(null), screen);
+        GuiScreenWrapper guiScreenWrapper = new GuiScreenWrapper(new ModularContainer(player, syncManager, panel.getName()), screen);
         guiScreenWrapper.inventorySlots.windowId = windowId;
         HoloUI.builder()
 //                .screenScale(0.25f)
@@ -92,7 +97,7 @@ public class HoloGuiManager extends GuiManager {
                 .open(screen1 -> {
                     screen1.setPanel(panel);
                     screen1.setWrapper(guiScreenWrapper);
-                    HoloUI.registerSyncedHoloUI(panel, screen1);
+                    //HoloUI.registerSyncedHoloUI(panel, screen1);
                 }, player.getEntityWorld());
     }
 
@@ -100,7 +105,7 @@ public class HoloGuiManager extends GuiManager {
         HoloUI.builder()
 //                .screenScale(0.25f)
                 .inFrontOf(player, 5, true)
-                .reposition(panel, player);
+                .reposition(player, player.world.getEntities(HoloScreenEntity.class, entity -> entity.isName(panel)));
     }
 
     //todo make this a mixin instead of using event to cancel arm animation stuff
