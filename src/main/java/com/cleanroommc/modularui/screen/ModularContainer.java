@@ -46,6 +46,7 @@ public class ModularContainer extends Container implements ISortableContainer {
     private final List<ModularSlot> slots = new ArrayList<>();
     private final List<ModularSlot> shiftClickSlots = new ArrayList<>();
     private ContainerCustomizer containerCustomizer;
+    private ModularScreen modularScreen = null;
 
     public ModularContainer(EntityPlayer player, PanelSyncManager panelSyncManager, String mainPanelName) {
         this.player = player;
@@ -65,6 +66,15 @@ public class ModularContainer extends Container implements ISortableContainer {
         this.syncManager = null;
         this.containerCustomizer = containerCustomizer != null ? containerCustomizer : new ContainerCustomizer();
         this.containerCustomizer.initialize(this);
+    }
+
+    public void setScreen(ModularScreen screen) {
+        this.modularScreen = screen;
+    }
+
+    @Nullable
+    public ModularScreen getScreen() {
+        return modularScreen;
     }
 
     public ContainerAccessor acc() {
