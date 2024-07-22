@@ -5,8 +5,10 @@
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_8",
   "client": [
+    "GuiAccessor",
     "GuiContainerAccessor",
     "GuiContainerMixin",
+    "GuiScreenAccessor",
     "KeyBindAccess",
     "MinecraftMixin"
   ],

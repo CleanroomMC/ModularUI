@@ -4,6 +4,8 @@ import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import com.cleanroommc.modularui.screen.ModularScreen;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -11,6 +13,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
@@ -76,6 +79,8 @@ public class ClientEventHandler {
             event.setCanceled(true);
         }
     }
+
+
 
     private static boolean hasDraggable(GuiScreenEvent event) {
         return event.getGui() instanceof GuiScreenWrapper screenWrapper && screenWrapper.getScreen().getContext().hasDraggable();
