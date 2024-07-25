@@ -1,5 +1,13 @@
 package com.cleanroommc.modularui;
 
+import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.drawable.GuiTextures;
+import com.cleanroommc.modularui.screen.CustomModularScreen;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.utils.Color;
+
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -10,6 +18,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 @Mod(modid = ModularUI.ID,
         name = ModularUI.NAME,
@@ -42,6 +51,28 @@ public class ModularUI {
         blurLoaded = Loader.isModLoaded("blur");
         sorterLoaded = Loader.isModLoaded(BOGO_SORT);
         proxy.preInit(event);
+
+        OverlayManager.register(new OverlayHandler(screen -> screen instanceof GuiContainer, screen -> {
+            GuiContainer gui = (GuiContainer) screen;
+            return new CustomModularScreen() {
+                @Override
+                public @NotNull ModularPanel buildUI(GuiContext context) {
+                    return ModularPanel.defaultPanel("watermark_overlay", gui.getXSize(), gui.getYSize())
+                            .pos(gui.getGuiLeft(), gui.getGuiTop())
+                            .background(IDrawable.EMPTY)
+                            .child(GuiTextures.MUI_LOGO.asIcon().asWidget()
+                                    .top(5).right(5)
+                                    .size(18));
+                }
+
+                @Override
+                public void onResize(int width, int height) {
+                    getMainPanel().pos(gui.getGuiLeft(), gui.getGuiTop())
+                            .size(gui.getXSize(), gui.getYSize());
+                    super.onResize(width, height);
+                }
+            };
+        }));
     }
 
     @Mod.EventHandler

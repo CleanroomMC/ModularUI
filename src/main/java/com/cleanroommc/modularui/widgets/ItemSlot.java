@@ -62,6 +62,9 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @Override
     public void onInit() {
+        if (getScreen().isOverlay()) {
+            throw new IllegalStateException("Overlays can't have slots!");
+        }
         size(SIZE, SIZE);
         getContext().getJeiSettings().addJeiGhostIngredientSlot(this);
     }
@@ -181,7 +184,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     @SideOnly(Side.CLIENT)
     private void drawSlot(Slot slotIn) {
         GuiScreen guiScreen = getScreen().getScreenWrapper();
-        if (!(guiScreen instanceof GuiContainer)) throw new IllegalStateException("The gui must be an instance of GuiContainer if it contains slots!");
+        if (!(guiScreen instanceof GuiContainer))
+            throw new IllegalStateException("The gui must be an instance of GuiContainer if it contains slots!");
         GuiContainerAccessor acc = (GuiContainerAccessor) guiScreen;
         RenderItem renderItem = ((GuiScreenAccessor) guiScreen).getItemRender();
         ItemStack itemstack = slotIn.getStack();

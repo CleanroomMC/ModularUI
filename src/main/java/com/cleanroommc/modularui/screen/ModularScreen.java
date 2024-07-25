@@ -71,6 +71,7 @@ public class ModularScreen {
 
     private ITheme currentTheme;
     private GuiScreen screenWrapper;
+    private boolean overlay = false;
 
     /**
      * Creates a new screen with a ModularUI as its owner and a given {@link ModularPanel}.
@@ -132,6 +133,16 @@ public class ModularScreen {
         if (!(wrapper instanceof IMuiScreen)) throw new IllegalArgumentException("GuiScreen must be an instance of IMuiScreen!");
         this.screenWrapper = wrapper;
         ((IMuiScreen) this.screenWrapper).updateGuiArea(this.panelManager.getMainPanel().getArea());
+        this.overlay = false;
+    }
+
+    @ApiStatus.Internal
+    @MustBeInvokedByOverriders
+    public void constructOverlay(GuiScreen wrapper) {
+        if (this.screenWrapper != null) throw new IllegalStateException("ModularScreen is already constructed!");
+        if (wrapper == null) throw new NullPointerException("GuiScreenWrapper must not be null!");
+        this.screenWrapper = wrapper;
+        this.overlay = true;
     }
 
     @MustBeInvokedByOverriders
@@ -148,7 +159,9 @@ public class ModularScreen {
         }
 
         this.context.popViewport(null);
-        ((IMuiScreen) this.screenWrapper).updateGuiArea(this.panelManager.getMainPanel().getArea());
+        if (!isOverlay()) {
+            ((IMuiScreen) this.screenWrapper).updateGuiArea(this.panelManager.getMainPanel().getArea());
+        }
     }
 
     public final void onCloseParent() {
@@ -395,6 +408,10 @@ public class ModularScreen {
         return new ResourceLocation(this.owner, this.name);
     }
 
+    public boolean isOverlay() {
+        return overlay;
+    }
+
     public GuiContext getContext() {
         return this.context;
     }
@@ -420,10 +437,13 @@ public class ModularScreen {
     }
 
     public boolean isClientOnly() {
-        return getContainer().isClientOnly();
+        return isOverlay() || getContainer().isClientOnly();
     }
 
     public ModularContainer getContainer() {
+        if (isOverlay()) {
+            throw new IllegalStateException("Can't get ModularContainer for overlay");
+        }
         if (this.screenWrapper instanceof GuiContainer container) {
             return (ModularContainer) container.inventorySlots;
         }

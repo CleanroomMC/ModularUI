@@ -32,6 +32,7 @@ public class ClientProxy extends CommonProxy {
 
         MinecraftForge.EVENT_BUS.register(ClientEventHandler.class);
         MinecraftForge.EVENT_BUS.register(ClientScreenHandler.class);
+        MinecraftForge.EVENT_BUS.register(OverlayManager.class);
         MinecraftForge.EVENT_BUS.register(GuiStack.INSTANCE);
         MinecraftForge.EVENT_BUS.register(KeyBindHandler.class);
 

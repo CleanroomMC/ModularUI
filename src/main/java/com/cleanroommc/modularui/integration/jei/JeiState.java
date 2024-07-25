@@ -21,7 +21,7 @@ public enum JeiState implements Predicate<ModularScreen> {
     DEFAULT {
         @Override
         public boolean test(ModularScreen screen) {
-            return !screen.getContainer().isClientOnly();
+            return !screen.isClientOnly();
         }
     }
 }
