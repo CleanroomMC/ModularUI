@@ -21,10 +21,19 @@ public interface GuiScreenAccessor {
     int getTouchValue();
 
     @Accessor
+    void setTouchValue(int value);
+
+    @Accessor
     int getEventButton();
 
     @Accessor
+    void setEventButton(int button);
+
+    @Accessor
     long getLastMouseEvent();
+
+    @Accessor
+    void setLastMouseEvent(long event);
 
     @Accessor
     RenderItem getItemRender();

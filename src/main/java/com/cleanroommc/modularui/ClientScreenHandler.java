@@ -124,16 +124,37 @@ public class ClientScreenHandler {
     private static boolean handleMouseInput(ModularScreen muiScreen, GuiScreen mcScreen) throws IOException {
         int button = muiScreen.getContext().getMouseButton();
         GameSettings gameSettings = Minecraft.getMinecraft().gameSettings;
-        int touchValue = ((GuiScreenAccessor) mcScreen).getTouchValue();
+        GuiScreenAccessor acc = (GuiScreenAccessor) mcScreen;
         if (Mouse.getEventButtonState()) {
-            return gameSettings.touchscreen && touchValue > 0 || muiScreen.onMousePressed(button);
+            if (gameSettings.touchscreen) {
+                int val = acc.getTouchValue();
+                if (val > 0) {
+                    // we will cancel the event now, so we have to set the value
+                    // otherwise the screen will handle it
+                    acc.setTouchValue(val + 1);
+                    return true;
+                }
+            }
+            acc.setEventButton(button);
+            acc.setLastMouseEvent(Minecraft.getSystemTime());
+            return muiScreen.onMousePressed(button);
         }
         if (button != -1) {
-            return gameSettings.touchscreen && --touchValue > 0 || muiScreen.onMouseRelease(button);
+            if (gameSettings.touchscreen) {
+                int val = acc.getTouchValue();
+                if (val - 1 > 0) {
+                    // we will cancel the event now, so we have to set the value
+                    // otherwise the screen will handle it
+                    acc.setTouchValue(val - 1);
+                    return true;
+                }
+            }
+            acc.setEventButton(-1);
+            return muiScreen.onMouseRelease(button);
         }
-        if (((GuiScreenAccessor) mcScreen).getEventButton() != -1 && ((GuiScreenAccessor) mcScreen).getLastMouseEvent() > 0L) {
-            long l = Minecraft.getSystemTime() - ((GuiScreenAccessor) mcScreen).getLastMouseEvent();
-            return muiScreen.onMouseDrag(button, l);
+        if (acc.getEventButton() != -1 && acc.getLastMouseEvent() > 0L) {
+            long l = Minecraft.getSystemTime() - acc.getLastMouseEvent();
+            return muiScreen.onMouseDrag(acc.getEventButton(), l);
         }
         return false;
     }
