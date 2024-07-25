@@ -49,11 +49,11 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
         return new ListWidget<>(valueToWidgetMapper, IValueWidget::getWidgetValue);
     }
 
-    public static <T, I extends IWidget, W extends ListWidget<T, I, W>> ListWidget<T, I, W> builder(List<T> list, Function<T, I> creator) {
+    public static <T, I extends IWidget, W extends ListWidget<T, I, W>> ListWidget<T, I, W> builder(Iterable<T> iterable, Function<T, I> creator) {
         Map<T, I> map = new Object2ObjectOpenHashMap<>();
         Map<I, T> map_reverse = new Object2ObjectOpenHashMap<>();
         ListWidget<T, I, W> listWidget = new ListWidget<>(map::get, map_reverse::get);
-        for (T t : list) {
+        for (T t : iterable) {
             I widget = creator.apply(t);
             map.put(t, widget);
             map_reverse.put(widget, t);
@@ -80,6 +80,10 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
             return true;
         }
         return false;
+    }
+
+    public boolean add(T value) {
+        return add(value, getChildren().size());
     }
 
     @Nullable
