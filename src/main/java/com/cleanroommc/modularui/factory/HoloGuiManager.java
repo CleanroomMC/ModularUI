@@ -2,6 +2,9 @@ package com.cleanroommc.modularui.factory;
 
 import com.cleanroommc.modularui.api.JeiSettings;
 import com.cleanroommc.modularui.api.UIFactory;
+import com.cleanroommc.modularui.holoui.HoloScreenEntity;
+import com.cleanroommc.modularui.holoui.HoloUI;
+import com.cleanroommc.modularui.holoui.ScreenEntityRender;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.packets.OpenGuiPacket;
 import com.cleanroommc.modularui.screen.*;
@@ -18,65 +21,59 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import io.netty.buffer.Unpooled;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
 
-public class GuiManager {
+public class HoloGuiManager extends GuiManager {
 
-    protected static final Object2ObjectMap<String, UIFactory<?>> FACTORIES = new Object2ObjectOpenHashMap<>(16);
 
     private static GuiScreenWrapper lastMui;
-    private static final List<EntityPlayer> openedContainers = new ArrayList<>(4);
-
-    public static void registerFactory(UIFactory<?> factory) {
-        Objects.requireNonNull(factory);
-        String name = Objects.requireNonNull(factory.getFactoryName());
-        if (name.length() > 32) {
-            throw new IllegalArgumentException("The factory name length must not exceed 32!");
-        }
-        if (FACTORIES.containsKey(name)) {
-            throw new IllegalArgumentException("Factory with name '" + name + "' is already registered!");
-        }
-        FACTORIES.put(name, factory);
-    }
-
-    public static @NotNull UIFactory<?> getFactory(String name) {
-        UIFactory<?> factory = FACTORIES.get(name);
-        if (factory == null) throw new NoSuchElementException();
-        return factory;
-    }
 
     public static <T extends GuiData> void open(@NotNull UIFactory<T> factory, @NotNull T guiData, EntityPlayerMP player) {
-        if (player instanceof FakePlayer || openedContainers.contains(player)) return;
-        openedContainers.add(player);
+        if (player instanceof FakePlayer) return;
         // create panel, collect sync handlers and create container
         guiData.setJeiSettings(JeiSettings.DUMMY);
         PanelSyncManager syncManager = new PanelSyncManager();
         ModularPanel panel = factory.createPanel(guiData, syncManager);
+        List<HoloScreenEntity> screens = player.world.getEntities(HoloScreenEntity.class, entity -> entity.isName(panel.getName()));
+        if (!screens.isEmpty()) {
+            for (HoloScreenEntity screen : screens) {
+                screen.setDead();
+            }
+            /*HoloUI.builder()
+                    .inFrontOf(player, 5, true)
+                    .reposition(player, screens);
+            NetworkHandler.sendToPlayer(new SyncHoloPacket(panel.getName()), player);
+            ModularUI.LOGGER.warn("reposition the holo, sync to client");
+            return;*/
+        }
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularContainer container = new ModularContainer(player, syncManager, panel.getName());
+        HoloUI.builder()
+                .screenScale(0.5f)
+                .inFrontOf(player, 5, true)
+                .open(screen -> {
+                    screen.setContainer(container);
+                    screen.setPanel(panel);
+                    //HoloUI.registerSyncedHoloUI(panel, screen);
+                }, player.getEntityWorld());
         // sync to client
-        player.getNextWindowId();
-        player.closeContainer();
-        int windowId = player.currentWindowId;
+//        player.getNextWindowId();
+//        player.closeContainer();
+//        int windowId = player.currentWindowId;
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         factory.writeGuiData(guiData, buffer);
-        NetworkHandler.sendToPlayer(new OpenGuiPacket<>(windowId, factory, buffer), player);
+        NetworkHandler.sendToPlayer(new OpenGuiPacket<>(0, factory, buffer), player);
         // open container // this mimics forge behaviour
-        player.openContainer = container;
-        player.openContainer.windowId = windowId;
-        player.openContainer.addListener(player);
+//        player.openContainer = container;
+//        player.openContainer.windowId = windowId;
+//        player.openContainer.addListener(player);
         // finally invoke event
         MinecraftForge.EVENT_BUS.post(new PlayerContainerEvent.Open(player, container));
     }
@@ -93,23 +90,34 @@ public class GuiManager {
         screen.getContext().setJeiSettings(jeiSettings);
         GuiScreenWrapper guiScreenWrapper = new GuiScreenWrapper(new ModularContainer(player, syncManager, panel.getName()), screen);
         guiScreenWrapper.inventorySlots.windowId = windowId;
-        Minecraft.getMinecraft().displayGuiScreen(guiScreenWrapper);
-        player.openContainer = guiScreenWrapper.inventorySlots;
+        HoloUI.builder()
+//                .screenScale(0.25f)
+                .inFrontOf(player, 5, true)
+                .screenScale(0.5f)
+                .open(screen1 -> {
+                    screen1.setPanel(panel);
+                    screen1.setWrapper(guiScreenWrapper);
+                    //HoloUI.registerSyncedHoloUI(panel, screen1);
+                }, player.getEntityWorld());
     }
 
+    public static void reposition(String panel, EntityPlayer player) {
+        HoloUI.builder()
+//                .screenScale(0.25f)
+                .inFrontOf(player, 5, true)
+                .reposition(player, player.world.getEntities(HoloScreenEntity.class, entity -> entity.isName(panel)));
+    }
+
+    //todo make this a mixin instead of using event to cancel arm animation stuff
     @SideOnly(Side.CLIENT)
-    static void openScreen(ModularScreen screen, JeiSettingsImpl jeiSettings, ContainerCustomizer containerCustomizer) {
-        screen.getContext().setJeiSettings(jeiSettings);
-        GuiScreenWrapper screenWrapper = new GuiScreenWrapper(new ModularContainer(containerCustomizer), screen);
-        Minecraft.getMinecraft().displayGuiScreen(screenWrapper);
-    }
-
     @SubscribeEvent
-    public static void onTick(TickEvent.ServerTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) {
-            openedContainers.clear();
+    public static void onClick(InputEvent.MouseInputEvent event) {
+        var player = Minecraft.getMinecraft().player;
+        if (player != null && player.getHeldItemMainhand().isEmpty() && player.getHeldItemOffhand().isEmpty()) {
+            ScreenEntityRender.clickScreen(player);
         }
     }
+
 
     @SideOnly(Side.CLIENT)
     @SubscribeEvent

@@ -1,9 +1,6 @@
 package com.cleanroommc.modularui;
 
-import com.cleanroommc.modularui.factory.GuiManager;
-import com.cleanroommc.modularui.factory.ItemGuiFactory;
-import com.cleanroommc.modularui.factory.SidedTileEntityGuiFactory;
-import com.cleanroommc.modularui.factory.TileEntityGuiFactory;
+import com.cleanroommc.modularui.factory.*;
 import com.cleanroommc.modularui.holoui.HoloScreenEntity;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.screen.ModularContainer;
@@ -34,6 +31,7 @@ public class CommonProxy {
     void preInit(FMLPreInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(CommonProxy.class);
         MinecraftForge.EVENT_BUS.register(GuiManager.class);
+        MinecraftForge.EVENT_BUS.register(HoloGuiManager.class);
 
         if (ModularUIConfig.enabledTestGuis) {
             MinecraftForge.EVENT_BUS.register(TestBlock.class);
@@ -45,6 +43,7 @@ public class CommonProxy {
         GuiManager.registerFactory(TileEntityGuiFactory.INSTANCE);
         GuiManager.registerFactory(SidedTileEntityGuiFactory.INSTANCE);
         GuiManager.registerFactory(ItemGuiFactory.INSTANCE);
+        GuiManager.registerFactory(HoloGuiFactory.INSTANCE);
     }
 
     void postInit(FMLPostInitializationEvent event) {
@@ -66,6 +65,7 @@ public class CommonProxy {
                 .id("modular_screen", 0)
                 .name("ModularScreen")
                 .entity(HoloScreenEntity.class)
+                .tracker(100, 20, false)
                 .factory(HoloScreenEntity::new)
                 .build());
     }
