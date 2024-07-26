@@ -54,7 +54,7 @@ public class Alignment {
     }
 
     /**
-     * Defines how elements should be aligned on the cross axis.
+     * Defines how elements should be aligned on the main axis.
      * In a row this would mean the x coordinates.
      */
     public enum MainAxis {

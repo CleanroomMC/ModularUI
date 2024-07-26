@@ -101,12 +101,28 @@ public interface IResizeable {
         setResized(isXCalculated(), v, isWidthCalculated(), isHeightCalculated());
     }
 
+    default void setPosResized(GuiAxis axis, boolean v) {
+        if (axis.isHorizontal()) {
+            setXResized(v);
+        } else {
+            setYResized(v);
+        }
+    }
+
     default void setWidthResized(boolean v) {
         setResized(isXCalculated(), isYCalculated(), v, isHeightCalculated());
     }
 
     default void setHeightResized(boolean v) {
         setResized(isXCalculated(), isYCalculated(), isWidthCalculated(), v);
+    }
+
+    default void setSizeResized(GuiAxis axis, boolean v) {
+        if (axis.isHorizontal()) {
+            setWidthResized(v);
+        } else {
+            setHeightResized(v);
+        }
     }
 
     default void setResized(boolean b) {
@@ -130,6 +146,14 @@ public interface IResizeable {
     default void setMarginPaddingApplied(boolean b) {
         setXMarginPaddingApplied(b);
         setYMarginPaddingApplied(b);
+    }
+
+    default void setMarginPaddingApplied(GuiAxis axis, boolean b) {
+        if (axis.isHorizontal()) {
+            setXMarginPaddingApplied(b);
+        } else {
+            setYMarginPaddingApplied(b);
+        }
     }
 
     /**
