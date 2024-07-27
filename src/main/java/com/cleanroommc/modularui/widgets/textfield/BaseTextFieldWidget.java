@@ -100,7 +100,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     }
 
     @Override
-    public WidgetTextFieldTheme getWidgetTheme(ITheme theme) {
+    public WidgetTextFieldTheme getWidgetThemeInternal(ITheme theme) {
         return theme.getTextFieldTheme();
     }
 

@@ -46,6 +46,12 @@ public interface IThemeApi {
     boolean hasTheme(String id);
 
     /**
+     * @param id id of the widget theme
+     * @return if a widget theme with the id is registered
+     */
+    boolean hasWidgetTheme(String id);
+
+    /**
      * Registers a theme json object. Themes from resource packs always have greater priority.
      *
      * @param id   id of the theme

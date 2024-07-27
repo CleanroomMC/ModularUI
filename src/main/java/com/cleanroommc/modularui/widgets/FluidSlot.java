@@ -154,7 +154,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
     }
 
     @Override
-    public WidgetSlotTheme getWidgetTheme(ITheme theme) {
+    public WidgetSlotTheme getWidgetThemeInternal(ITheme theme) {
         return theme.getFluidSlotTheme();
     }
 

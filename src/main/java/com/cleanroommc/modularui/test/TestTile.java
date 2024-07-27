@@ -227,7 +227,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                 .coverChildrenHeight()
                                                 .child(new CycleButtonWidget()
                                                         .size(14, 14)
-                                                        .length(3)
+                                                        .stateCount(3)
                                                         .stateBackground(GuiTextures.CYCLE_BUTTON_DEMO)
                                                         .value(new IntSyncValue(() -> this.val2, val -> this.val2 = val))
                                                         .margin(8, 0))

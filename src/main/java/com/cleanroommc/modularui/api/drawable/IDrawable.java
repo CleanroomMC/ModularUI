@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.api.drawable;
 
+import com.cleanroommc.modularui.drawable.DrawableArray;
 import com.cleanroommc.modularui.drawable.Icon;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -16,6 +17,16 @@ import com.google.gson.JsonObject;
  * {@link com.cleanroommc.modularui.api.widget.IWidget}.
  */
 public interface IDrawable {
+
+    static IDrawable of(IDrawable... drawables) {
+        if (drawables == null || drawables.length == 0) {
+            return null;
+        } else if (drawables.length == 1) {
+            return drawables[0];
+        } else {
+            return new DrawableArray(drawables);
+        }
+    }
 
     /**
      * Draws this drawable at the given position with the given size.

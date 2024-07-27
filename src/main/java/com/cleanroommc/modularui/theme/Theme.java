@@ -29,7 +29,7 @@ public class Theme implements ITheme {
     private final WidgetSlotTheme itemSlotTheme;
     private final WidgetSlotTheme fluidSlotTheme;
     private final WidgetTextFieldTheme textFieldTheme;
-    private final WidgetToggleButtonTheme toggleButtonTheme;
+    private final WidgetThemeSelectable toggleButtonTheme;
 
     private int openCloseAnimationOverride = -1;
     private Boolean smoothProgressBarOverride = null;
@@ -61,7 +61,7 @@ public class Theme implements ITheme {
         this.itemSlotTheme = (WidgetSlotTheme) this.widgetThemes.get(ITEM_SLOT);
         this.fluidSlotTheme = (WidgetSlotTheme) this.widgetThemes.get(FLUID_SLOT);
         this.textFieldTheme = (WidgetTextFieldTheme) this.widgetThemes.get(TEXT_FIELD);
-        this.toggleButtonTheme = (WidgetToggleButtonTheme) this.widgetThemes.get(TOGGLE_BUTTON);
+        this.toggleButtonTheme = (WidgetThemeSelectable) this.widgetThemes.get(TOGGLE_BUTTON);
     }
 
     void setOpenCloseAnimationOverride(int override) {
@@ -111,7 +111,7 @@ public class Theme implements ITheme {
     }
 
     @Override
-    public WidgetToggleButtonTheme getToggleButtonTheme() {
+    public WidgetThemeSelectable getToggleButtonTheme() {
         return this.toggleButtonTheme;
     }
 
