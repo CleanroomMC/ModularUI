@@ -1,6 +1,8 @@
 package com.cleanroommc.modularui.core.mixin;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.OverlayManager;
+import com.cleanroommc.modularui.OverlayStack;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.utils.Animator;
 
@@ -27,6 +29,7 @@ public class MinecraftMixin {
         ModularScreen screen = ModularScreen.getCurrent();
         if (screen != null) {
             for (int j = 0; j < Math.min(20, ModularUI.proxy.getTimer60Fps().elapsedTicks); ++j) {
+                OverlayStack.foreach(ModularScreen::onFrameUpdate, true);
                 screen.onFrameUpdate();
                 Animator.advance();
             }

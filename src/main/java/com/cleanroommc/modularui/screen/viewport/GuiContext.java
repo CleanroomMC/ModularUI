@@ -30,6 +30,7 @@ public class GuiContext extends GuiViewportStack {
     public final FontRenderer font;
 
     /* GUI elements */
+    @Deprecated
     public final ModularScreen screen;
     private LocatedWidget focusedWidget = LocatedWidget.EMPTY;
     @Nullable
@@ -65,6 +66,10 @@ public class GuiContext extends GuiViewportStack {
         this.hoveredWidgets = new HoveredIterable(this.screen.getPanelManager());
         this.mc = Minecraft.getMinecraft();
         this.font = this.mc.fontRenderer;
+    }
+
+    public ModularScreen getScreen() {
+        return screen;
     }
 
     /**
@@ -449,6 +454,9 @@ public class GuiContext extends GuiViewportStack {
     }
 
     public JeiSettingsImpl getJeiSettings() {
+        if (this.screen.isOverlay()) {
+            throw new IllegalStateException("Overlays don't have JEI settings!");
+        }
         if (this.jeiSettings == null) {
             throw new IllegalStateException("The screen is not yet initialised!");
         }

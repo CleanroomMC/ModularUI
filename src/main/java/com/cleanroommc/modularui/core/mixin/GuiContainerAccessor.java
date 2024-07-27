@@ -8,8 +8,22 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
+import java.util.Set;
+
 @Mixin(GuiContainer.class)
 public interface GuiContainerAccessor {
+
+    @Accessor
+    void setXSize(int v);
+
+    @Accessor
+    void setYSize(int v);
+
+    @Accessor
+    void setGuiLeft(int v);
+
+    @Accessor
+    void setGuiTop(int v);
 
     @Accessor
     void setHoveredSlot(Slot slot);
@@ -25,6 +39,12 @@ public interface GuiContainerAccessor {
 
     @Accessor
     boolean getIsRightMouseClick();
+
+    @Accessor
+    boolean getDragSplitting();
+
+    @Accessor
+    Set<Slot> getDragSplittingSlots();
 
     @Accessor
     int getDragSplittingLimit();
@@ -52,4 +72,10 @@ public interface GuiContainerAccessor {
 
     @Accessor
     long getReturningStackTime();
+
+    @Invoker
+    void invokeDrawGuiContainerForegroundLayer(int mouseX, int mouseY);
+
+    @Invoker
+    void invokeDrawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY);
 }

@@ -44,13 +44,15 @@ public class PanelManager {
         this.mainPanel = Objects.requireNonNull(panel, "Main panel must not be null!");
     }
 
-    void init() {
+    boolean tryInit() {
         if (this.state == State.CLOSED) throw new IllegalStateException("Can't init in closed state!");
         if (this.state == State.INIT || this.state == State.DISPOSED) {
             setState(State.OPEN);
             openPanel(this.mainPanel, false);
             checkDirty();
+            return true;
         }
+        return false;
     }
 
     public boolean isMainPanel(ModularPanel panel) {
@@ -170,11 +172,13 @@ public class PanelManager {
         getTopMostPanel().closeIfOpen(animate);
     }
 
-    public void closeAll() {
+    public boolean closeAll() {
         if (this.state.isOpen) {
             this.panels.forEach(this::finalizePanel);
             setState(State.CLOSED);
+            return true;
         }
+        return false;
     }
 
     private void finalizePanel(ModularPanel panel) {

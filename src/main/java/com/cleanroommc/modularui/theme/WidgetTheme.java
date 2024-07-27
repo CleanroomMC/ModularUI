@@ -56,4 +56,9 @@ public class WidgetTheme {
     public boolean getTextShadow() {
         return this.textShadow;
     }
+
+    public WidgetTheme withColor(int color) {
+        // TODO it is currently somewhat difficult to color drawable with a custom color. This is a dirty solution.
+        return new WidgetTheme(this.background, this.hoverBackground, color, this.textColor, this.textShadow);
+    }
 }

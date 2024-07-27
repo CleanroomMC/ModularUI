@@ -22,6 +22,7 @@ public class Icon implements IIcon {
     private int width = 0, height = 0;
     private Alignment alignment = Alignment.Center;
     private final Box margin = new Box();
+    private int color = 0;
 
     public Icon(IDrawable drawable) {
         this.drawable = drawable;
@@ -57,6 +58,9 @@ public class Icon implements IIcon {
             y += (int) (height * this.alignment.y - this.height * this.alignment.y);
             height = this.height;
         }
+        if (this.color != 0 && this.color != widgetTheme.getColor()) {
+            widgetTheme = widgetTheme.withColor(this.color);
+        }
         this.drawable.draw(context, x, y, width, height, widgetTheme);
     }
 
@@ -84,6 +88,11 @@ public class Icon implements IIcon {
 
     public Icon alignment(Alignment alignment) {
         this.alignment = alignment;
+        return this;
+    }
+
+    public Icon color(int color) {
+        this.color = color;
         return this;
     }
 

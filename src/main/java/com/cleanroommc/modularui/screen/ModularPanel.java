@@ -576,7 +576,9 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     final void setPanelGuiContext(@NotNull GuiContext context) {
         setContext(context);
-        context.getJeiSettings().addJeiExclusionArea(this);
+        if (!context.screen.isOverlay()) {
+            context.getJeiSettings().addJeiExclusionArea(this);
+        }
     }
 
     public boolean isOpening() {
@@ -619,7 +621,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     public boolean shouldAnimate() {
-        return getScreen().getCurrentTheme().getOpenCloseAnimationOverride() > 0;
+        return !getScreen().isOverlay() && getScreen().getCurrentTheme().getOpenCloseAnimationOverride() > 0;
     }
 
     public ModularPanel bindPlayerInventory() {
