@@ -9,7 +9,7 @@ import com.cleanroommc.bogosorter.api.ISortingContextBuilder;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.items.IItemHandler;

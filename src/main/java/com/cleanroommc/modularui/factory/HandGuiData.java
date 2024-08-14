@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.factory;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.util.EnumHand;
 
 public class HandGuiData extends GuiData {

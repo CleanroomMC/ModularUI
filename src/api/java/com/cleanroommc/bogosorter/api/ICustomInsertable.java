@@ -1,7 +1,7 @@
 package com.cleanroommc.bogosorter.api;
 
 import net.minecraft.inventory.Container;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 

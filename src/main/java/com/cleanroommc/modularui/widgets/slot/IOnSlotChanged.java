@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.widgets.slot;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public interface IOnSlotChanged {
 

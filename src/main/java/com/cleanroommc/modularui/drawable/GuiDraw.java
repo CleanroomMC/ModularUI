@@ -2,14 +2,25 @@ package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.utils.Color;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+
+import com.mojang.blaze3d.vertex.BufferBuilder;
+
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.Tesselator;
+
+import com.mojang.blaze3d.vertex.VertexFormat;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -45,15 +56,15 @@ public class GuiDraw {
         GlStateManager.disableAlpha();
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder bufferbuilder = tessellator.getBuilder();
         float x1 = x0 + w, y1 = y0 + h;
         bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-        bufferbuilder.pos(x0, y0, 0.0f).color(Color.getRed(colorTL), Color.getGreen(colorTL), Color.getBlue(colorTL), Color.getAlpha(colorTL)).endVertex();
-        bufferbuilder.pos(x0, y1, 0.0f).color(Color.getRed(colorBL), Color.getGreen(colorBL), Color.getBlue(colorBL), Color.getAlpha(colorBL)).endVertex();
-        bufferbuilder.pos(x1, y1, 0.0f).color(Color.getRed(colorBR), Color.getGreen(colorBR), Color.getBlue(colorBR), Color.getAlpha(colorBR)).endVertex();
-        bufferbuilder.pos(x1, y0, 0.0f).color(Color.getRed(colorTR), Color.getGreen(colorTR), Color.getBlue(colorTR), Color.getAlpha(colorTR)).endVertex();
-        tessellator.draw();
+        bufferbuilder.vertex(x0, y0, 0.0f).color(Color.getRed(colorTL), Color.getGreen(colorTL), Color.getBlue(colorTL), Color.getAlpha(colorTL)).endVertex();
+        bufferbuilder.vertex(x0, y1, 0.0f).color(Color.getRed(colorBL), Color.getGreen(colorBL), Color.getBlue(colorBL), Color.getAlpha(colorBL)).endVertex();
+        bufferbuilder.vertex(x1, y1, 0.0f).color(Color.getRed(colorBR), Color.getGreen(colorBR), Color.getBlue(colorBR), Color.getAlpha(colorBR)).endVertex();
+        bufferbuilder.vertex(x1, y0, 0.0f).color(Color.getRed(colorTR), Color.getGreen(colorTR), Color.getBlue(colorTR), Color.getAlpha(colorTR)).endVertex();
+        tessellator.end();
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.disableBlend();
         GlStateManager.enableAlpha();
@@ -117,48 +128,48 @@ public class GuiDraw {
         GlStateManager.disableAlpha();
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder bufferbuilder = tessellator.getBuilder();
         float x1 = x0 + w, y1 = y0 + h;
-        bufferbuilder.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_COLOR);
+        bufferbuilder.begin(VertexFormat.Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
         int color = Color.average(colorBL, colorBR, colorTR, colorTL);
         // start at center
-        bufferbuilder.pos(x0 + w / 2f, y0 + h / 2f, 0.0f).color(Color.getRed(color), Color.getGreen(color), Color.getBlue(color), Color.getAlpha(color)).endVertex();
+        bufferbuilder.vertex(x0 + w / 2f, y0 + h / 2f, 0.0f).color(Color.getRed(color), Color.getGreen(color), Color.getBlue(color), Color.getAlpha(color)).endVertex();
         // left side
-        bufferbuilder.pos(x0, y0 + cornerRadius, 0.0f).color(Color.getRed(colorTL), Color.getGreen(colorTL), Color.getBlue(colorTL), Color.getAlpha(colorTL)).endVertex();
-        bufferbuilder.pos(x0, y1 - cornerRadius, 0.0f).color(Color.getRed(colorBL), Color.getGreen(colorBL), Color.getBlue(colorBL), Color.getAlpha(colorBL)).endVertex();
+        bufferbuilder.vertex(x0, y0 + cornerRadius, 0.0f).color(Color.getRed(colorTL), Color.getGreen(colorTL), Color.getBlue(colorTL), Color.getAlpha(colorTL)).endVertex();
+        bufferbuilder.vertex(x0, y1 - cornerRadius, 0.0f).color(Color.getRed(colorBL), Color.getGreen(colorBL), Color.getBlue(colorBL), Color.getAlpha(colorBL)).endVertex();
         // bottom left corner
         for (int i = 1; i <= segments; i++) {
             float x = (float) (x0 + cornerRadius - Math.cos(PI_2 / segments * i) * cornerRadius);
             float y = (float) (y1 - cornerRadius + Math.sin(PI_2 / segments * i) * cornerRadius);
-            bufferbuilder.pos(x, y, 0.0f).color(Color.getRed(colorBL), Color.getGreen(colorBL), Color.getBlue(colorBL), Color.getAlpha(colorBL)).endVertex();
+            bufferbuilder.vertex(x, y, 0.0f).color(Color.getRed(colorBL), Color.getGreen(colorBL), Color.getBlue(colorBL), Color.getAlpha(colorBL)).endVertex();
         }
         // bottom side
-        bufferbuilder.pos(x1 - cornerRadius, y1, 0.0f).color(Color.getRed(colorBR), Color.getGreen(colorBR), Color.getBlue(colorBR), Color.getAlpha(colorBR)).endVertex();
+        bufferbuilder.vertex(x1 - cornerRadius, y1, 0.0f).color(Color.getRed(colorBR), Color.getGreen(colorBR), Color.getBlue(colorBR), Color.getAlpha(colorBR)).endVertex();
         // bottom right corner
         for (int i = 1; i <= segments; i++) {
             float x = (float) (x1 - cornerRadius + Math.sin(PI_2 / segments * i) * cornerRadius);
             float y = (float) (y1 - cornerRadius + Math.cos(PI_2 / segments * i) * cornerRadius);
-            bufferbuilder.pos(x, y, 0.0f).color(Color.getRed(colorBR), Color.getGreen(colorBR), Color.getBlue(colorBR), Color.getAlpha(colorBR)).endVertex();
+            bufferbuilder.vertex(x, y, 0.0f).color(Color.getRed(colorBR), Color.getGreen(colorBR), Color.getBlue(colorBR), Color.getAlpha(colorBR)).endVertex();
         }
         // right side
-        bufferbuilder.pos(x1, y0 + cornerRadius, 0.0f).color(Color.getRed(colorTR), Color.getGreen(colorTR), Color.getBlue(colorTR), Color.getAlpha(colorTR)).endVertex();
+        bufferbuilder.vertex(x1, y0 + cornerRadius, 0.0f).color(Color.getRed(colorTR), Color.getGreen(colorTR), Color.getBlue(colorTR), Color.getAlpha(colorTR)).endVertex();
         // top right corner
         for (int i = 1; i <= segments; i++) {
             float x = (float) (x1 - cornerRadius + Math.cos(PI_2 / segments * i) * cornerRadius);
             float y = (float) (y0 + cornerRadius - Math.sin(PI_2 / segments * i) * cornerRadius);
-            bufferbuilder.pos(x, y, 0.0f).color(Color.getRed(colorTR), Color.getGreen(colorTR), Color.getBlue(colorTR), Color.getAlpha(colorTR)).endVertex();
+            bufferbuilder.vertex(x, y, 0.0f).color(Color.getRed(colorTR), Color.getGreen(colorTR), Color.getBlue(colorTR), Color.getAlpha(colorTR)).endVertex();
         }
         // top side
-        bufferbuilder.pos(x0 + cornerRadius, y0, 0.0f).color(Color.getRed(colorTL), Color.getGreen(colorTL), Color.getBlue(colorTL), Color.getAlpha(colorTL)).endVertex();
+        bufferbuilder.vertex(x0 + cornerRadius, y0, 0.0f).color(Color.getRed(colorTL), Color.getGreen(colorTL), Color.getBlue(colorTL), Color.getAlpha(colorTL)).endVertex();
         // top left corner
         for (int i = 1; i <= segments; i++) {
             float x = (float) (x0 + cornerRadius - Math.sin(PI_2 / segments * i) * cornerRadius);
             float y = (float) (y0 + cornerRadius - Math.cos(PI_2 / segments * i) * cornerRadius);
-            bufferbuilder.pos(x, y, 0.0f).color(Color.getRed(colorTL), Color.getGreen(colorTL), Color.getBlue(colorTL), Color.getAlpha(colorTL)).endVertex();
+            bufferbuilder.vertex(x, y, 0.0f).color(Color.getRed(colorTL), Color.getGreen(colorTL), Color.getBlue(colorTL), Color.getAlpha(colorTL)).endVertex();
         }
-        bufferbuilder.pos(x0, y0 + cornerRadius, 0.0f).color(Color.getRed(colorTL), Color.getGreen(colorTL), Color.getBlue(colorTL), Color.getAlpha(colorTL)).endVertex();
-        tessellator.draw();
+        bufferbuilder.vertex(x0, y0 + cornerRadius, 0.0f).color(Color.getRed(colorTL), Color.getGreen(colorTL), Color.getBlue(colorTL), Color.getAlpha(colorTL)).endVertex();
+        tessellator.end();
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.disableBlend();
         GlStateManager.enableAlpha();
@@ -169,7 +180,7 @@ public class GuiDraw {
         GlStateManager.disableAlpha();
         GlStateManager.enableBlend();
         GlStateManager.enableTexture2D();
-        Minecraft.getMinecraft().renderEngine.bindTexture(location);
+        Minecraft.getInstance().textureManager.bindForSetup(location);
         drawTexture(x, y, u, v, w, h, textureWidth, textureHeight);
         GlStateManager.disableBlend();
         GlStateManager.enableAlpha();
@@ -183,22 +194,22 @@ public class GuiDraw {
      * Draw a textured quad with given UV, dimensions and custom texture size
      */
     public static void drawTexture(float x, float y, int u, int v, float w, float h, int textureW, int textureH, float z) {
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
 
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
         drawTexture(buffer, x, y, u, v, w, h, textureW, textureH, z);
-        tessellator.draw();
+        tessellator.end();
     }
 
     public static void drawTexture(BufferBuilder buffer, float x, float y, int u, int v, float w, float h, int textureW, int textureH, float z) {
         float tw = 1F / textureW;
         float th = 1F / textureH;
 
-        buffer.pos(x, y + h, z).tex(u * tw, (v + h) * th).endVertex();
-        buffer.pos(x + w, y + h, z).tex((u + w) * tw, (v + h) * th).endVertex();
-        buffer.pos(x + w, y, z).tex((u + w) * tw, v * th).endVertex();
-        buffer.pos(x, y, z).tex(u * tw, v * th).endVertex();
+        buffer.vertex(x, y + h, z).uv(u * tw, (v + h) * th).endVertex();
+        buffer.vertex(x + w, y + h, z).uv((u + w) * tw, (v + h) * th).endVertex();
+        buffer.vertex(x + w, y, z).uv((u + w) * tw, v * th).endVertex();
+        buffer.vertex(x, y, z).uv(u * tw, v * th).endVertex();
     }
 
     public static void drawTexture(float x, float y, int u, int v, float w, float h, int textureW, int textureH, int tu, int tv) {
@@ -209,29 +220,29 @@ public class GuiDraw {
      * Draw a textured quad with given UV, dimensions and custom texture size
      */
     public static void drawTexture(float x, float y, int u, int v, float w, float h, int textureW, int textureH, int tu, int tv, float z) {
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
 
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
         drawTexture(buffer, x, y, u, v, w, h, textureW, textureH, tu, tv, z);
-        tessellator.draw();
+        tessellator.end();
     }
 
     public static void drawTexture(BufferBuilder buffer, float x, float y, int u, int v, float w, float h, int textureW, int textureH, int tu, int tv, float z) {
         float tw = 1F / textureW;
         float th = 1F / textureH;
 
-        buffer.pos(x, y + h, z).tex(u * tw, tv * th).endVertex();
-        buffer.pos(x + w, y + h, z).tex(tu * tw, tv * th).endVertex();
-        buffer.pos(x + w, y, z).tex(tu * tw, v * th).endVertex();
-        buffer.pos(x, y, z).tex(u * tw, v * th).endVertex();
+        buffer.vertex(x, y + h, z).uv(u * tw, tv * th).endVertex();
+        buffer.vertex(x + w, y + h, z).uv(tu * tw, tv * th).endVertex();
+        buffer.vertex(x + w, y, z).uv(tu * tw, v * th).endVertex();
+        buffer.vertex(x, y, z).uv(u * tw, v * th).endVertex();
     }
 
     public static void drawTexture(ResourceLocation location, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1) {
         GlStateManager.disableAlpha();
         GlStateManager.enableBlend();
         GlStateManager.enableTexture2D();
-        Minecraft.getMinecraft().renderEngine.bindTexture(location);
+        Minecraft.getInstance().textureManager.bindForSetup(location);
         drawTexture(x0, y0, x1, y1, u0, v0, u1, v1, 0);
         GlStateManager.disableBlend();
         GlStateManager.enableAlpha();
@@ -242,26 +253,26 @@ public class GuiDraw {
     }
 
     public static void drawTexture(float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1, float z) {
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
 
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
         drawTexture(buffer, x0, y0, x1, y1, u0, v0, u1, v1, z);
-        tessellator.draw();
+        tessellator.end();
     }
 
     public static void drawTexture(BufferBuilder buffer, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1, float z) {
-        buffer.pos(x0, y1, z).tex(u0, v1).endVertex();
-        buffer.pos(x1, y1, z).tex(u1, v1).endVertex();
-        buffer.pos(x1, y0, z).tex(u1, v0).endVertex();
-        buffer.pos(x0, y0, z).tex(u0, v0).endVertex();
+        buffer.vertex(x0, y1, z).uv(u0, v1).endVertex();
+        buffer.vertex(x1, y1, z).uv(u1, v1).endVertex();
+        buffer.vertex(x1, y0, z).uv(u1, v0).endVertex();
+        buffer.vertex(x0, y0, z).uv(u0, v0).endVertex();
     }
 
     public static void drawTiledTexture(ResourceLocation location, float x, float y, float w, float h, int u, int v, int tileW, int tileH, int tw, int th, float z) {
         GlStateManager.disableAlpha();
         GlStateManager.enableBlend();
         GlStateManager.enableTexture2D();
-        Minecraft.getMinecraft().renderEngine.bindTexture(location);
+        Minecraft.getInstance().textureManager.bindForSetup(location);
         drawTiledTexture(x, y, w, h, u, v, tileW, tileH, tw, th, z);
         GlStateManager.disableBlend();
         GlStateManager.enableAlpha();
@@ -273,10 +284,10 @@ public class GuiDraw {
         float fillerX = w - (countX - 1) * tileW;
         float fillerY = h - (countY - 1) * tileH;
 
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
 
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
 
         for (int i = 0, c = countX * countY; i < c; i++) {
             int ix = i % countX;
@@ -289,14 +300,14 @@ public class GuiDraw {
             drawTexture(buffer, xx, yy, u, v, xw, yh, tw, th, z);
         }
 
-        tessellator.draw();
+        tessellator.end();
     }
 
     public static void drawTiledTexture(ResourceLocation location, float x, float y, float w, float h, float u0, float v0, float u1, float v1, int textureWidth, int textureHeight, float z) {
         GlStateManager.disableAlpha();
         GlStateManager.enableBlend();
         GlStateManager.enableTexture2D();
-        Minecraft.getMinecraft().renderEngine.bindTexture(location);
+        Minecraft.getInstance().textureManager.bindForSetup(location);
         drawTiledTexture(x, y, w, h, u0, v0, u1, v1, textureWidth, textureHeight, z);
         GlStateManager.disableBlend();
         GlStateManager.enableAlpha();
@@ -310,10 +321,10 @@ public class GuiDraw {
         float fillerU = u0 + (u1 - u0) * fillerX / tileWidth;
         float fillerV = v0 + (v1 - v0) * fillerY / tileHeight;
 
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
 
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
 
         for (int i = 0, c = countX * countY; i < c; i++) {
             int ix = i % countX;
@@ -333,7 +344,7 @@ public class GuiDraw {
             drawTexture(buffer, xx, yy, xx + xw, yy + yh, u0, v0, uEnd, vEnd, z);
         }
 
-        tessellator.draw();
+        tessellator.end();
     }
 
     public static void drawItem(ItemStack item, int x, int y, float width, float height) {
@@ -342,7 +353,7 @@ public class GuiDraw {
         RenderHelper.enableGUIStandardItemLighting();
         GlStateManager.enableDepth();
         GlStateManager.scale(width / 16f, height / 16f, 1);
-        RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
+        ItemRenderer renderItem = Minecraft.getInstance().getItemRenderer();
         renderItem.zLevel = 200;
         renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().player, item, x, y);
         renderItem.zLevel = 0;

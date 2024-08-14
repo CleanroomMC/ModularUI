@@ -3,7 +3,7 @@ package com.cleanroommc.bogosorter.api;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * A custom slot interface. Useful if mods have a slot that does not implement the necessary methods.

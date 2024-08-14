@@ -1,0 +1,35 @@
+apply plugin: "dev.architectury.loom"
+
+shadowJar {
+    exclude "fabric.mod.json"
+    exclude "architectury.common.json"
+
+    configurations = [project.configurations.shadow]
+    archiveClassifier = "dev-shadow"
+}
+
+remapJar {
+    inputFile.set shadowJar.archiveFile
+    dependsOn shadowJar
+    archiveClassifier = null
+}
+
+jar {
+    archiveClassifier = "dev"
+}
+
+remapSlimJar {
+    addNestedDependencies = false
+    archiveClassifier = "slim"
+}
+
+tasks.register('sourcesJar', Jar) {
+    from delombok.outputs.files
+    dependsOn delombok
+    archiveClassifier = "sources"
+}
+
+tasks.remapJar.dependsOn('remapSlimJar')
+
+
+archivesBaseName = "${project.name}-${libs.versions.minecraft.get()}"

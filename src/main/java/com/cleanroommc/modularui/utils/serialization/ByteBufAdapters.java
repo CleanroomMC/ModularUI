@@ -2,7 +2,7 @@ package com.cleanroommc.modularui.utils.serialization;
 
 import com.cleanroommc.modularui.network.NetworkUtils;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fluids.FluidStack;
