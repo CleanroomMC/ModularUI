@@ -1,14 +1,16 @@
 package com.cleanroommc.modularui.core.mixin;
 
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
+
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.world.inventory.Slot;
+
+import net.minecraft.world.item.ItemStack;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(GuiContainer.class)
+@Mixin(AbstractContainerScreen.class)
 public interface GuiContainerAccessor {
 
     @Accessor
@@ -21,35 +23,35 @@ public interface GuiContainerAccessor {
     Slot getClickedSlot();
 
     @Accessor
-    ItemStack getDraggedStack();
+    ItemStack getDraggingItem();
 
     @Accessor
-    boolean getIsRightMouseClick();
+    boolean getIsSplittingStack();
 
     @Accessor
-    int getDragSplittingLimit();
+    int getQuickCraftingType();
 
     @Invoker
-    void invokeUpdateDragSplitting();
+    void invokeRecalculateQuickCraftRemaining();
 
     @Accessor
-    int getDragSplittingRemnant();
+    int getQuickCraftingRemainder();
 
     @Accessor
-    ItemStack getReturningStack();
+    ItemStack getSnapbackItem();
 
     @Accessor
-    void setReturningStack(ItemStack stack);
+    void setSnapbackItem(ItemStack stack);
 
     @Accessor
-    Slot getReturningStackDestSlot();
+    Slot getSnapbackEnd();
 
     @Accessor
-    int getTouchUpX();
+    int getSnapbackStartX();
 
     @Accessor
-    int getTouchUpY();
+    int getSnapbackStartY();
 
     @Accessor
-    long getReturningStackTime();
+    long getSnapbackTime();
 }

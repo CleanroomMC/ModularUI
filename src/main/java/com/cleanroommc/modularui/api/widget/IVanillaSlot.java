@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.api.widget;
 
-import net.minecraft.inventory.Slot;
+import net.minecraft.world.inventory.Slot;
 
 /**
  * Marks a {@link IWidget}, that this is a vanilla item slot.

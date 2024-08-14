@@ -4,21 +4,21 @@ import com.cleanroommc.modularui.api.JeiSettings;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.screen.JeiSettingsImpl;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.Objects;
 
 public class GuiData {
 
-    private final EntityPlayer player;
+    private final Player player;
     private JeiSettings jeiSettings;
 
-    public GuiData(EntityPlayer player) {
+    public GuiData(Player player) {
         this.player = Objects.requireNonNull(player);
     }
 
-    public EntityPlayer getPlayer() {
+    public Player getPlayer() {
         return this.player;
     }
 
@@ -27,11 +27,11 @@ public class GuiData {
     }
 
     public ItemStack getMainHandItem() {
-        return this.player.getHeldItemMainhand();
+        return this.player.getMainHandItem();
     }
 
     public ItemStack getOffHandItem() {
-        return this.player.getHeldItemOffhand();
+        return this.player.getOffhandItem();
     }
 
     public JeiSettings getJeiSettings() {

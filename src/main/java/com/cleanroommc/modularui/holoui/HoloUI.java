@@ -5,10 +5,16 @@ import com.cleanroommc.modularui.screen.ModularScreen;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
+import net.minecraft.world.entity.player.Player;
+
+import net.minecraft.world.phys.Vec3;
+
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Map;
@@ -43,10 +49,10 @@ public class HoloUI {
             return this;
         }
 
-        public Builder inFrontOf(EntityPlayer player, double distance, boolean fixed) {
-            Vec3d look = player.getLookVec();
+        public Builder inFrontOf(Player player, double distance, boolean fixed) {
+            Vec3 look = player.getLookAngle();
             this.orientation = fixed ? ScreenOrientation.FIXED : ScreenOrientation.TO_PLAYER;
-            return at(player.posX + look.x * distance, player.posY + player.getEyeHeight() + look.y * distance, player.posZ + look.z * distance);
+            return at(player.position().x + look.x * distance, player.position().y + player.getEyeHeight() + look.y * distance, player.position().z + look.z * distance);
         }
 
         public Builder faceToPlayer() {
@@ -84,7 +90,7 @@ public class HoloUI {
             JeiSettingsImpl jeiSettings = new JeiSettingsImpl();
             jeiSettings.disableJei();
             screen.getContext().setJeiSettings(jeiSettings);
-            HoloScreenEntity holoScreenEntity = new HoloScreenEntity(Minecraft.getMinecraft().world, this.plane3D);
+            HoloScreenEntity holoScreenEntity = new HoloScreenEntity(Minecraft, this.plane3D);
             holoScreenEntity.setPosition(this.x, this.y, this.z);
             holoScreenEntity.setScreen(screen);
             holoScreenEntity.spawnInWorld();

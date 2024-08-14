@@ -4,12 +4,14 @@ import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.packets.SyncConfig;
 import com.cleanroommc.modularui.screen.ModularScreen;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.common.Loader;
+import net.minecraft.network.FriendlyByteBuf;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+
+import net.minecraftforge.fml.loading.FMLPaths;
+
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +27,7 @@ import java.util.stream.Collectors;
 public class Config {
 
     private static final Map<String, Config> configs = new Object2ObjectLinkedOpenHashMap<>();
-    private static final Path configPath = Loader.instance().getConfigDir().toPath();
+    private static final Path configPath = FMLPaths.CONFIGDIR.get();
 
     @NotNull
     public static Config getConfig(String name) {
@@ -117,28 +119,28 @@ public class Config {
         NetworkHandler.sendToServer(new SyncConfig(this));
     }
 
-    public void writeToBuffer(PacketBuffer buffer) {
+    public void writeToBuffer(FriendlyByteBuf buffer) {
         List<Config> categories = this.categories.values().stream().filter(Config::isSynced).collect(Collectors.toList());
         List<Value> values = this.values.values().stream().filter(Value::isSynced).collect(Collectors.toList());
         buffer.writeVarInt(categories.size());
         for (Config category : categories) {
-            buffer.writeString(category.getName());
+            buffer.writeUtf(category.getName());
             category.writeToBuffer(buffer);
         }
         buffer.writeVarInt(values.size());
         for (Value value : values) {
-            buffer.writeString(value.getKey());
+            buffer.writeUtf(value.getKey());
             value.writeToPacket(buffer);
         }
     }
 
-    public void readFromBuffer(PacketBuffer buffer) {
+    public void readFromBuffer(FriendlyByteBuf buffer) {
         for (int i = 0, n = buffer.readVarInt(); i < n; i++) {
-            Config category = this.categories.get(buffer.readString(64));
+            Config category = this.categories.get(buffer.readUtf(64));
             category.readFromBuffer(buffer);
         }
         for (int i = 0, n = buffer.readVarInt(); i < n; i++) {
-            Value value = this.values.get(buffer.readString(64));
+            Value value = this.values.get(buffer.readUtf(64));
             value.readFromPacket(buffer);
         }
     }

@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.config;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
@@ -30,12 +30,12 @@ public class ValueBoolean extends Value {
     }
 
     @Override
-    public void writeToPacket(PacketBuffer buffer) {
+    public void writeToPacket(FriendlyByteBuf buffer) {
         buffer.writeBoolean(this.value);
     }
 
     @Override
-    public void readFromPacket(PacketBuffer buffer) {
+    public void readFromPacket(FriendlyByteBuf buffer) {
         this.value = buffer.readBoolean();
     }
 

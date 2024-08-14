@@ -1,23 +1,26 @@
 package com.cleanroommc.modularui.core.mixin;
 
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.settings.KeyBindingMap;
+
+import net.minecraftforge.client.settings.KeyMappingLookup;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(KeyBinding.class)
+@Mixin(KeyMapping.class)
 public interface KeyBindAccess {
 
     @Accessor
-    KeyBindingMap getHASH();
+    KeyMappingLookup getMap();
 
     @Accessor
-    void setPressed(boolean pressed);
+    void setIsDown(boolean pressed);
 
     @Accessor
-    int getPressTime();
+    int getClickCount();
 
     @Accessor
-    void setPressTime(int time);
+    void setClickCount(int time);
 }

@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -20,7 +21,7 @@ public class UITexture implements IDrawable {
 
     public static final UITexture DEFAULT = fullImage("gui/options_background", true);
 
-    private static final ResourceLocation ICONS_LOCATION = new ResourceLocation(ModularUI.ID, "textures/gui/icons.png");
+    private static final ResourceLocation ICONS_LOCATION = new ResourceLocation(ModularUI.MOD_ID, "textures/gui/icons.png");
 
     // only for usage in GuiTextures
     static UITexture icon(String name, int x, int y, int w, int h) {

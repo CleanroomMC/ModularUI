@@ -1,68 +1,47 @@
 package com.cleanroommc.modularui;
 
-import net.minecraftforge.fml.common.Loader;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Mod(modid = ModularUI.ID,
-        name = ModularUI.NAME,
-        version = ModularUI.VERSION,
-        dependencies = "required-after:mixinbooter@[8.0,);" +
-                "after:bogorter@[1.4.0,);")
+@Mod(ModularUI.MOD_ID)
 public class ModularUI {
 
-    public static final String ID = MuiTags.MODID;
+    public static final String MOD_ID = "modularui";
     public static final String NAME = "Modular UI";
-    public static final String VERSION = MuiTags.VERSION;
-    public static final Logger LOGGER = LogManager.getLogger(ID);
+    public static final String VERSION = "2.5.0-rc1";
+    public static final Logger LOGGER = LoggerFactory.getLogger(NAME);
 
     public static final String BOGO_SORT = "bogosorter";
 
-    @SidedProxy(
-            modId = ID,
-            clientSide = "com.cleanroommc.modularui.ClientProxy",
-            serverSide = "com.cleanroommc.modularui.CommonProxy")
-    public static CommonProxy proxy;
 
-    @Mod.Instance
+
     public static ModularUI INSTANCE;
 
     private static boolean blurLoaded = false;
     private static boolean sorterLoaded = false;
 
-    @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
-        blurLoaded = Loader.isModLoaded("blur");
-        sorterLoaded = Loader.isModLoaded(BOGO_SORT);
-        proxy.preInit(event);
+    public ModularUI() {
+        ModularUI.init();
+        DistExecutor.unsafeRunForDist(() -> ClientProxy::new, () -> CommonProxy::new);
     }
 
-    @Mod.EventHandler
-    public void postInit(FMLPostInitializationEvent event) {
-        proxy.postInit(event);
+    public static void init() {
+        LOGGER.info("{} is initializing on platform: {}", NAME, "forge");
     }
 
-    @Mod.EventHandler
-    public void onLoadComplete(FMLLoadCompleteEvent event) {
+    public static ResourceLocation id(String path) {
+        return new ResourceLocation(MOD_ID, path);
     }
 
-    @Mod.EventHandler
-    public void onServerLoad(FMLServerStartingEvent event) {
-        proxy.onServerLoad(event);
-    }
-
-    public static boolean isBlurLoaded() {
+    /*public static boolean isBlurLoaded() {
         return blurLoaded;
     }
 
     public static boolean isSortModLoaded() {
         return sorterLoaded;
-    }
+    }*/
 }

@@ -2,8 +2,9 @@ package com.cleanroommc.modularui.core.mixin;
 
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.inventory.Slot;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+
+import net.minecraft.world.inventory.Slot;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -11,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(GuiContainer.class)
+@Mixin(AbstractContainerScreen.class)
 public class GuiContainerMixin {
 
     @Shadow
@@ -22,8 +23,8 @@ public class GuiContainerMixin {
      * The method is private and only the mouse pos is ever passed to this method.
      * That's why we can just return the current hovered slot.
      */
-    @Inject(method = "getSlotAtPosition", at = @At("HEAD"), cancellable = true)
-    public void getSlot(int x, int y, CallbackInfoReturnable<Slot> cir) {
+    @Inject(method = "findSlot", at = @At("HEAD"), cancellable = true)
+    public void getSlot(double x, double y, CallbackInfoReturnable<Slot> cir) {
         if (((Object) this).getClass() == GuiScreenWrapper.class) {
             cir.setReturnValue(this.hoveredSlot);
         }

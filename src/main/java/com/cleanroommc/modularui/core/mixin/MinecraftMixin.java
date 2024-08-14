@@ -14,11 +14,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Minecraft.class)
 public class MinecraftMixin {
 
-    @Inject(
-            method = "runGameLoop",
-            at = @At(
+    @Inject(method = "runTick", at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/profiler/Profiler;startSection(Ljava/lang/String;)V",
+                    target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V" ,
                     ordinal = 2,
                     shift = At.Shift.AFTER))
     public void timer(CallbackInfo ci) {

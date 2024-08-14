@@ -6,6 +6,8 @@ import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -36,7 +38,7 @@ public class AnimatedText extends StyledText {
     private void advance() {
         if (!this.isAnimating || (this.forward && this.currentIndex >= this.fullString.length()) || (!this.forward && this.currentIndex < 0))
             return;
-        long time = Minecraft.getSystemTime();
+        long time = Minecraft.getInstance().getFrameTimeNs();
         int amount = (int) ((time - this.timeLastDraw) / this.speed);
         if (amount == 0) return;
         if (this.forward) {
@@ -66,7 +68,7 @@ public class AnimatedText extends StyledText {
         this.timeLastDraw += (long) amount * this.speed;
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
         if (this.fullString == null || !this.fullString.equals(super.get())) {
@@ -74,7 +76,7 @@ public class AnimatedText extends StyledText {
                 this.fullString = super.get();
                 this.currentString = this.forward ? "" : this.fullString;
                 this.currentIndex = this.forward ? 0 : this.fullString.length() - 1;
-                this.timeLastDraw = Minecraft.getSystemTime();
+                this.timeLastDraw = Minecraft.getInstance().getFrameTimeNs();
             } else {
                 this.currentString = this.forward ? "" : this.fullString;
             }

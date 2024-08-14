@@ -2,7 +2,7 @@ package com.cleanroommc.modularui.config;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 import com.google.gson.JsonElement;
 import org.jetbrains.annotations.ApiStatus;
@@ -33,11 +33,11 @@ public class ValueDrawable extends Value {
     }
 
     @Override
-    public void writeToPacket(PacketBuffer buffer) {
+    public void writeToPacket(FriendlyByteBuf buffer) {
     }
 
     @Override
-    public void readFromPacket(PacketBuffer buffer) {
+    public void readFromPacket(FriendlyByteBuf buffer) {
     }
 
     @Override

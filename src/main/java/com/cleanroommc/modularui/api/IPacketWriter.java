@@ -1,11 +1,11 @@
 package com.cleanroommc.modularui.api;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 import java.io.IOException;
 
 /**
- * A function that can write any data to an {@link PacketBuffer}.
+ * A function that can write any data to an {@link FriendlyByteBuf}.
  */
 public interface IPacketWriter {
 
@@ -15,5 +15,5 @@ public interface IPacketWriter {
      * @param buffer buffer to write to
      * @throws IOException if data can not be written for some reason
      */
-    void write(PacketBuffer buffer) throws IOException;
+    void write(FriendlyByteBuf buffer) throws IOException;
 }

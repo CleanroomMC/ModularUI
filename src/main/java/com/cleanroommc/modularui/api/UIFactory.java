@@ -6,10 +6,10 @@ import com.cleanroommc.modularui.screen.ModularScreen;
 
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +47,7 @@ public interface UIFactory<D extends GuiData> {
      * @param mainPanel main panel created in {@link #createPanel(GuiData, PanelSyncManager)}
      * @return new main panel
      */
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @ApiStatus.OverrideOnly
     ModularScreen createScreen(D guiData, ModularPanel mainPanel);
 
@@ -58,7 +58,7 @@ public interface UIFactory<D extends GuiData> {
      * @param buffer  buffer
      */
     @ApiStatus.OverrideOnly
-    void writeGuiData(D guiData, PacketBuffer buffer);
+    void writeGuiData(D guiData, FriendlyByteBuf buffer);
 
     /**
      * Reads and creates the gui data from the buffer.
@@ -69,5 +69,5 @@ public interface UIFactory<D extends GuiData> {
      */
     @NotNull
     @ApiStatus.OverrideOnly
-    D readGuiData(EntityPlayer player, PacketBuffer buffer);
+    D readGuiData(Player player, FriendlyByteBuf buffer);
 }

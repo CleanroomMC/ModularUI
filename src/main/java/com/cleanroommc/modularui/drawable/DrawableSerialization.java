@@ -73,7 +73,8 @@ public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDes
             return new DrawableArray(list.toArray(new IDrawable[0]));
         }
         if (!element.isJsonObject()) {
-            ModularUI.LOGGER.throwing(new JsonParseException("Drawable json should be an object or an array."));
+
+            ModularUI.LOGGER.error("", new JsonParseException("Drawable json should be an object or an array."));
             return IDrawable.EMPTY;
         }
         JsonObject json = element.getAsJsonObject();
@@ -82,7 +83,7 @@ public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDes
         }
         String type = JsonHelper.getString(json, "empty", "type");
         if (!DRAWABLE_TYPES.containsKey(type)) {
-            ModularUI.LOGGER.throwing(new JsonParseException("Drawable type '" + type + "' is either not specified or invalid!"));
+            ModularUI.LOGGER.error("", new JsonParseException("Drawable type '" + type + "' is either not specified or invalid!"));
             return IDrawable.EMPTY;
         }
         IDrawable drawable = DRAWABLE_TYPES.get(type).apply(json);

@@ -7,6 +7,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
@@ -33,9 +34,9 @@ public class NetworkUtils {
         return DEDICATED_CLIENT;
     }
 
-    public static boolean isClient(EntityPlayer player) {
+    public static boolean isClient(Player player) {
         if (player == null) throw new NullPointerException("Can't get side of null player!");
-        return player.world == null ? player instanceof EntityPlayerSP : player.world.isRemote;
+        return player.level == null ? player instanceof Player : player.level().isClientSide;
     }
 
     public static void writeByteBuf(PacketBuffer writeTo, ByteBuf writeFrom) {

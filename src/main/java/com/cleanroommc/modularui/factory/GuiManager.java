@@ -12,7 +12,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
@@ -37,7 +40,7 @@ public class GuiManager {
     private static final Object2ObjectMap<String, UIFactory<?>> FACTORIES = new Object2ObjectOpenHashMap<>(16);
 
     private static GuiScreenWrapper lastMui;
-    private static final List<EntityPlayer> openedContainers = new ArrayList<>(4);
+    private static final List<Player> openedContainers = new ArrayList<>(4);
 
     public static void registerFactory(UIFactory<?> factory) {
         Objects.requireNonNull(factory);
@@ -57,7 +60,7 @@ public class GuiManager {
         return factory;
     }
 
-    public static <T extends GuiData> void open(@NotNull UIFactory<T> factory, @NotNull T guiData, EntityPlayerMP player) {
+    public static <T extends GuiData> void open(@NotNull UIFactory<T> factory, @NotNull T guiData, ServerPlayer player) {
         if (player instanceof FakePlayer || openedContainers.contains(player)) return;
         openedContainers.add(player);
         // create panel, collect sync handlers and create container
@@ -67,10 +70,10 @@ public class GuiManager {
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularContainer container = new ModularContainer(player, syncManager, panel.getName());
         // sync to client
-        player.getNextWindowId();
+        player.nextContainerCounter();
         player.closeContainer();
-        int windowId = player.currentWindowId;
-        PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
+        int windowId = player.containerCounter;
+        FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
         factory.writeGuiData(guiData, buffer);
         NetworkHandler.sendToPlayer(new OpenGuiPacket<>(windowId, factory, buffer), player);
         // open container // this mimics forge behaviour

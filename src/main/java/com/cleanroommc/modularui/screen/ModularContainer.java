@@ -19,6 +19,11 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.common.Optional.Interface;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -30,17 +35,17 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-@Interface(modid = ModularUI.BOGO_SORT, iface = "com.cleanroommc.bogosorter.api.ISortableContainer")
-public class ModularContainer extends Container implements ISortableContainer {
+//@Interface(modid = ModularUI.BOGO_SORT, iface = "com.cleanroommc.bogosorter.api.ISortableContainer")
+public class ModularContainer extends AbstractContainerMenu { //  implements ISortableContainer
 
-    public static ModularContainer getCurrent(EntityPlayer player) {
-        if (player.openContainer instanceof ModularContainer container) {
+    public static ModularContainer getCurrent(Player player) {
+        if (player.containerMenu instanceof ModularContainer container) {
             return container;
         }
         return null;
     }
 
-    private final EntityPlayer player;
+    private final Player player;
     private final ModularSyncManager syncManager;
     private boolean init = true;
     private final List<ModularSlot> slots = new ArrayList<>();
@@ -49,7 +54,7 @@ public class ModularContainer extends Container implements ISortableContainer {
 
     private Optional<?> optionalScreen = Optional.empty();
 
-    public ModularContainer(EntityPlayer player, PanelSyncManager panelSyncManager, String mainPanelName) {
+    public ModularContainer(Player player, PanelSyncManager panelSyncManager, String mainPanelName) {
         this.player = player;
         this.syncManager = new ModularSyncManager(this);
         this.syncManager.construct(mainPanelName, panelSyncManager);
@@ -61,21 +66,21 @@ public class ModularContainer extends Container implements ISortableContainer {
         sortShiftClickSlots();
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public ModularContainer(ContainerCustomizer containerCustomizer) {
-        this.player = Minecraft.getMinecraft().player;
+        this.player = Minecraft.getInstance().player;
         this.syncManager = null;
         this.containerCustomizer = containerCustomizer != null ? containerCustomizer : new ContainerCustomizer();
         this.containerCustomizer.initialize(this);
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void setScreen(ModularScreen screen) {
         this.optionalScreen = Optional.ofNullable(screen);
     }
 
     @Nullable
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public ModularScreen getScreen() {
         return (ModularScreen) optionalScreen.orElse(null);
     }
@@ -85,8 +90,8 @@ public class ModularContainer extends Container implements ISortableContainer {
     }
 
     @Override
-    public void onContainerClosed(@NotNull EntityPlayer playerIn) {
-        super.onContainerClosed(playerIn);
+    public void removed(@NotNull Player playerIn) {
+        super.removed(playerIn);
         if (this.syncManager != null) {
             this.syncManager.onClose();
         }
@@ -94,8 +99,8 @@ public class ModularContainer extends Container implements ISortableContainer {
     }
 
     @Override
-    public void detectAndSendChanges() {
-        super.detectAndSendChanges();
+    public void sendAllDataToRemote() {
+        super.sendAllDataToRemote();
         if (this.syncManager != null) {
             this.syncManager.detectAndSendChanges(this.init);
         }
@@ -177,7 +182,7 @@ public class ModularContainer extends Container implements ISortableContainer {
         return this.syncManager == null;
     }
 
-    public EntityPlayer getPlayer() {
+    public Player getPlayer() {
         return player;
     }
 
@@ -190,7 +195,7 @@ public class ModularContainer extends Container implements ISortableContainer {
     }
 
     @Override
-    public boolean canInteractWith(@NotNull EntityPlayer playerIn) {
+    public boolean canInteractWith(@NotNull Player playerIn) {
         return true;
     }
 

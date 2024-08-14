@@ -6,6 +6,9 @@ import com.cleanroommc.modularui.screen.ModularScreen;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -17,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
  * Direct calls to {@link net.minecraft.client.Minecraft#displayGuiScreen(GuiScreen)} are redirected to this class if
  * the current screen is a Modular GUI.
  */
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class ClientGUI {
 
     private ClientGUI() {
@@ -71,14 +74,14 @@ public class ClientGUI {
      *
      * @param screen screen to open
      */
-    public static void open(GuiScreen screen) {
-        Minecraft.getMinecraft().displayGuiScreen(screen);
+    public static void open(Screen screen) {
+        Minecraft.getInstance().setScreen(screen);
     }
 
     /**
      * Closes any GUI that is open in this tick.
      */
     public static void close() {
-        Minecraft.getMinecraft().displayGuiScreen(null);
+        Minecraft.getInstance().setScreen(null);
     }
 }

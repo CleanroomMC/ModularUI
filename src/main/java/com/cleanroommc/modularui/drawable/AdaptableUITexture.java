@@ -1,8 +1,10 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class AdaptableUITexture extends UITexture {
 
@@ -46,10 +48,9 @@ public class AdaptableUITexture extends UITexture {
             super.draw(x, y, width, height);
             return;
         }
-        GlStateManager.disableAlpha();
-        GlStateManager.enableBlend();
-        GlStateManager.enableTexture2D();
-        Minecraft.getMinecraft().renderEngine.bindTexture(this.location);
+
+        GlStateManager._enableBlend();
+        Minecraft.getInstance().textureManager.bindForSetup(this.location);
 
         float uBl = this.bl * 1f / this.imageWidth, uBr = this.br * 1f / this.imageWidth;
         float vBt = this.bt * 1f / this.imageHeight, vBb = this.bb * 1f / this.imageHeight;
@@ -101,9 +102,9 @@ public class AdaptableUITexture extends UITexture {
             return;
         }
         GlStateManager.disableAlpha();
-        GlStateManager.enableBlend();
+        GlStateManager._enableBlend();
         GlStateManager.enableTexture2D();
-        Minecraft.getMinecraft().renderEngine.bindTexture(this.location);
+        Minecraft.getInstance().textureManager.bindForSetup(this.location);
 
         float uBl = this.bl * 1f / this.imageWidth, uBr = this.br * 1f / this.imageWidth;
         float vBt = this.bt * 1f / this.imageHeight, vBb = this.bb * 1f / this.imageHeight;

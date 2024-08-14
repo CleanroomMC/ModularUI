@@ -6,11 +6,11 @@ import com.cleanroommc.modularui.screen.ModularScreen;
 
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
- * An interface to implement on {@link net.minecraft.tileentity.TileEntity} or {@link net.minecraft.item.Item}.
+ * An interface to implement on {@link net.minecraft.world.level.block.entity.BlockEntity} or {@link net.minecraft.world.item.Item}.
  */
 @FunctionalInterface
 public interface IGuiHolder<T extends GuiData> {
@@ -22,7 +22,7 @@ public interface IGuiHolder<T extends GuiData> {
      * @param mainPanel the panel created in {@link #buildUI(GuiData, PanelSyncManager)}
      * @return a modular screen instance with the given panel
      */
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     default ModularScreen createScreen(T data, ModularPanel mainPanel) {
         return new ModularScreen(mainPanel);
     }

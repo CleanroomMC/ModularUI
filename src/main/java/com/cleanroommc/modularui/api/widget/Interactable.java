@@ -2,15 +2,18 @@ package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.screen.ModularScreen;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.init.SoundEvents;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.input.Keyboard;
 
 /**
  * An interface that handles user interactions on {@link IWidget} objects.
@@ -112,42 +115,42 @@ public interface Interactable {
     /**
      * @return if left or right ctrl/cmd is pressed
      */
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     static boolean hasControlDown() {
-        return GuiScreen.isCtrlKeyDown();
+        return Screen.hasControlDown();
     }
 
     /**
      * @return if left or right shift is pressed
      */
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     static boolean hasShiftDown() {
-        return GuiScreen.isShiftKeyDown();
+        return Screen.hasShiftDown();
     }
 
     /**
      * @return if alt or alt gr is pressed
      */
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     static boolean hasAltDown() {
-        return GuiScreen.isAltKeyDown();
+        return Screen.hasAltDown();
     }
 
     /**
-     * @param key key id, see {@link Keyboard}
+     * @param key key id, see {@link InputConstants}
      * @return if the key is pressed
      */
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     static boolean isKeyPressed(int key) {
-        return Keyboard.isKeyDown(key);
+        return InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), key);
     }
 
     /**
      * Plays the default button click sound
      */
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     static void playButtonClickSound() {
-        Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
     }
 
     enum Result {

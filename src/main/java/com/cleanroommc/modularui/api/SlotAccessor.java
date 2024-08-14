@@ -1,9 +1,9 @@
 package com.cleanroommc.modularui.api;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 /**
- * Accessor interface for accessing protected methods from {@link net.minecraft.inventory.Slot}.
+ * Accessor interface for accessing protected methods from {@link net.minecraft.world.inventory.Slot}.
  */
 public interface SlotAccessor {
 

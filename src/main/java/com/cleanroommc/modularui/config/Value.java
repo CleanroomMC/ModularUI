@@ -3,7 +3,7 @@ package com.cleanroommc.modularui.config;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 import com.google.gson.JsonElement;
 import org.jetbrains.annotations.ApiStatus;
@@ -30,9 +30,9 @@ public abstract class Value {
 
     public abstract void readJson(JsonElement json);
 
-    public abstract void writeToPacket(PacketBuffer buffer);
+    public abstract void writeToPacket(FriendlyByteBuf buffer);
 
-    public abstract void readFromPacket(PacketBuffer buffer);
+    public abstract void readFromPacket(FriendlyByteBuf buffer);
 
     public abstract void resetToDefault();
 
