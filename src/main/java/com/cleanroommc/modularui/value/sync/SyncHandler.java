@@ -4,8 +4,11 @@ import com.cleanroommc.modularui.api.IPacketWriter;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.packets.PacketSyncHandler;
 
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -48,7 +51,7 @@ public abstract class SyncHandler {
      * @param bufferConsumer the package builder
      */
     public final void syncToClient(int id, @NotNull IPacketWriter bufferConsumer) {
-        PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
+        FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
         buffer.writeVarInt(id);
         try {
             bufferConsumer.write(buffer);
@@ -64,9 +67,9 @@ public abstract class SyncHandler {
      * @param id             an internal denominator to identify this package
      * @param bufferConsumer the package builder
      */
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public final void syncToServer(int id, @NotNull IPacketWriter bufferConsumer) {
-        PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
+        FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
         buffer.writeVarInt(id);
         try {
             bufferConsumer.write(buffer);
@@ -83,7 +86,7 @@ public abstract class SyncHandler {
      * @param bufferConsumer the package builder
      */
     public final void sync(int id, @NotNull IPacketWriter bufferConsumer) {
-        PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
+        FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
         buffer.writeVarInt(id);
         try {
             bufferConsumer.write(buffer);
@@ -132,8 +135,8 @@ public abstract class SyncHandler {
      * @throws IOException package read error
      */
     @ApiStatus.OverrideOnly
-    @SideOnly(Side.CLIENT)
-    public abstract void readOnClient(int id, PacketBuffer buf) throws IOException;
+    @OnlyIn(Dist.CLIENT)
+    public abstract void readOnClient(int id, FriendlyByteBuf buf) throws IOException;
 
     /**
      * Called when this sync handler receives a packet on server.
@@ -143,7 +146,7 @@ public abstract class SyncHandler {
      * @throws IOException package read error
      */
     @ApiStatus.OverrideOnly
-    public abstract void readOnServer(int id, PacketBuffer buf) throws IOException;
+    public abstract void readOnServer(int id, FriendlyByteBuf buf) throws IOException;
 
     /**
      * Called at least every tick. Use it to compare a cached value to its original and sync it.
@@ -178,16 +181,16 @@ public abstract class SyncHandler {
         return this.syncManager;
     }
 
-    public static void sendToClient(String panel, PacketBuffer buffer, SyncHandler syncHandler) {
+    public static void sendToClient(String panel, FriendlyByteBuf buffer, SyncHandler syncHandler) {
         Objects.requireNonNull(buffer);
         Objects.requireNonNull(syncHandler);
         if (!syncHandler.isValid()) {
             throw new IllegalStateException();
         }
-        NetworkHandler.sendToPlayer(new PacketSyncHandler(panel, syncHandler.getKey(), buffer), (EntityPlayerMP) syncHandler.syncManager.getPlayer());
+        NetworkHandler.sendToPlayer(new PacketSyncHandler(panel, syncHandler.getKey(), buffer), (ServerPlayer) syncHandler.syncManager.getPlayer());
     }
 
-    public static void sendToServer(String panel, PacketBuffer buffer, SyncHandler syncHandler) {
+    public static void sendToServer(String panel, FriendlyByteBuf buffer, SyncHandler syncHandler) {
         Objects.requireNonNull(buffer);
         Objects.requireNonNull(syncHandler);
         if (!syncHandler.isValid()) {

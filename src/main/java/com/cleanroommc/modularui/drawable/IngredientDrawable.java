@@ -7,6 +7,9 @@ import com.cleanroommc.modularui.theme.WidgetTheme;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -15,14 +18,14 @@ public class IngredientDrawable implements IDrawable {
     private ItemStack[] items;
 
     public IngredientDrawable(Ingredient ingredient) {
-        this(ingredient.getMatchingStacks());
+        this(ingredient.getItems());
     }
 
     public IngredientDrawable(ItemStack... items) {
         setItems(items);
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
         if (this.items.length == 0) return;
@@ -41,6 +44,6 @@ public class IngredientDrawable implements IDrawable {
     }
 
     public void setItems(Ingredient ingredient) {
-        setItems(ingredient.getMatchingStacks());
+        setItems(ingredient.getItems());
     }
 }

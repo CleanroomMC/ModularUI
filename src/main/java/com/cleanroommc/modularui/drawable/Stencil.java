@@ -4,10 +4,16 @@ import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+
+import com.mojang.blaze3d.systems.RenderSystem;
+
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.Tesselator;
+
+import com.mojang.blaze3d.vertex.VertexFormat;
+
+import net.minecraft.client.renderer.GameRenderer;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.Nullable;
@@ -104,33 +110,30 @@ public class Stencil {
 
         if (hideStencilShape) {
             // disable colors and depth
-            GlStateManager.colorMask(false, false, false, false);
-            GlStateManager.depthMask(false);
+            RenderSystem.colorMask(false, false, false, false);
+            RenderSystem.depthMask(false);
         }
         stencilShape.run();
         if (hideStencilShape) {
             // Re-enable drawing to color buffer + depth buffer
-            GlStateManager.colorMask(true, true, true, true);
-            GlStateManager.depthMask(true);
+            RenderSystem.colorMask(true, true, true, true);
+            RenderSystem.depthMask(true);
         }
     }
 
     private static void drawRectangleStencilShape(int x, int y, int w, int h) {
-        GlStateManager.disableTexture2D();
-        GlStateManager.disableAlpha();
-        GlStateManager.enableBlend();
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
+        RenderSystem.enableBlend();
+        RenderSystem.setShader(GameRenderer::getPositionShader);
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder bufferbuilder = tessellator.getBuilder();
         float x0 = x, x1 = x + w, y0 = y, y1 = y + h;
-        bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-        bufferbuilder.pos(x0, y0, 0.0f).endVertex();
-        bufferbuilder.pos(x0, y1, 0.0f).endVertex();
-        bufferbuilder.pos(x1, y1, 0.0f).endVertex();
-        bufferbuilder.pos(x1, y0, 0.0f).endVertex();
-        tessellator.draw();
-        GlStateManager.disableBlend();
-        GlStateManager.enableAlpha();
-        GlStateManager.enableTexture2D();
+        bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
+        bufferbuilder.vertex(x0, y0, 0.0f).endVertex();
+        bufferbuilder.vertex(x0, y1, 0.0f).endVertex();
+        bufferbuilder.vertex(x1, y1, 0.0f).endVertex();
+        bufferbuilder.vertex(x1, y0, 0.0f).endVertex();
+        tessellator.end();
+        RenderSystem.disableBlend();
     }
 
     /**

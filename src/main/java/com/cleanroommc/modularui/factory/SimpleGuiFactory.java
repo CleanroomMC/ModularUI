@@ -2,9 +2,10 @@ package com.cleanroommc.modularui.factory;
 
 import com.cleanroommc.modularui.api.IGuiHolder;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.network.PacketBuffer;
+
+import net.minecraft.world.entity.player.Player;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -23,17 +24,17 @@ public class SimpleGuiFactory extends AbstractUIFactory<GuiData> {
     public void init() {
     }
 
-    public void open(EntityPlayerMP player) {
+    public void open(ServerPlayer player) {
         GuiManager.open(this, new GuiData(player), player);
     }
 
 
     @Override
-    public void writeGuiData(GuiData guiData, PacketBuffer buffer) {
+    public void writeGuiData(GuiData guiData, FriendlyByteBuf buffer) {
     }
 
     @Override
-    public @NotNull GuiData readGuiData(EntityPlayer player, PacketBuffer buffer) {
+    public @NotNull GuiData readGuiData(Player player, FriendlyByteBuf buffer) {
         return new GuiData(player);
     }
 

@@ -2,10 +2,11 @@ package com.cleanroommc.modularui.factory;
 
 import com.cleanroommc.modularui.api.IGuiHolder;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.EnumHand;
+
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -19,7 +20,7 @@ public class ItemGuiFactory extends AbstractUIFactory<HandGuiData> {
         super("mui:item");
     }
 
-    public static void open(EntityPlayerMP player, EnumHand hand) {
+    public static void open(ServerPlayer player, InteractionHand hand) {
         Objects.requireNonNull(player);
         Objects.requireNonNull(hand);
         HandGuiData guiData = new HandGuiData(player, hand);
@@ -32,12 +33,12 @@ public class ItemGuiFactory extends AbstractUIFactory<HandGuiData> {
     }
 
     @Override
-    public void writeGuiData(HandGuiData guiData, PacketBuffer buffer) {
+    public void writeGuiData(HandGuiData guiData, FriendlyByteBuf buffer) {
         buffer.writeByte(guiData.getHand().ordinal());
     }
 
     @Override
-    public @NotNull HandGuiData readGuiData(EntityPlayer player, PacketBuffer buffer) {
-        return new HandGuiData(player, EnumHand.values()[buffer.readByte()]);
+    public @NotNull HandGuiData readGuiData(Player player, FriendlyByteBuf buffer) {
+        return new HandGuiData(player, InteractionHand.values()[buffer.readByte()]);
     }
 }

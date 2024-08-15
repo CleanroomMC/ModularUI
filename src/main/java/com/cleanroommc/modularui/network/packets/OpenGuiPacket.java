@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.network.NetworkUtils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketBuffer;
 
 import net.minecraftforge.fml.relauncher.Side;
@@ -21,21 +22,21 @@ public class OpenGuiPacket<T extends GuiData> implements IPacket {
 
     private int windowId;
     private UIFactory<T> factory;
-    private PacketBuffer data;
+    private FriendlyByteBuf data;
 
     public OpenGuiPacket() {
     }
 
-    public OpenGuiPacket(int windowId, UIFactory<T> factory, PacketBuffer data) {
+    public OpenGuiPacket(int windowId, UIFactory<T> factory, FriendlyByteBuf data) {
         this.windowId = windowId;
         this.factory = factory;
         this.data = data;
     }
 
     @Override
-    public void write(PacketBuffer buf) throws IOException {
+    public void write(FriendlyByteBuf buf) throws IOException {
         buf.writeVarInt(this.windowId);
-        buf.writeString(this.factory.getFactoryName());
+        buf.writeUtf(this.factory.getFactoryName());
         NetworkUtils.writeByteBuf(buf, this.data);
     }
 

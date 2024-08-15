@@ -6,16 +6,13 @@ import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.GameObjectHelper;
 import com.cleanroommc.modularui.utils.JsonHelper;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.RenderItem;
+import com.mojang.serialization.JsonOps;
+
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.NBTException;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -34,7 +31,7 @@ public class ItemDrawable implements IDrawable {
         this.item = item;
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
         GuiDraw.drawItem(this.item, x, y, width, height);
@@ -71,12 +68,8 @@ public class ItemDrawable implements IDrawable {
             throw new JsonParseException(e);
         }
         if (json.has("nbt")) {
-            try {
-                NBTTagCompound nbt = JsonToNBT.getTagFromJson(JsonHelper.getObject(json, new JsonObject(), o -> o, "nbt").toString());
-                item.setTagCompound(nbt);
-            } catch (NBTException e) {
-                throw new JsonParseException(e);
-            }
+                CompoundTag nbt = (CompoundTag)JsonOps.INSTANCE.convertTo(NbtOps.INSTANCE, json);
+                item.setTag(nbt);
         }
         return new ItemDrawable(item);
     }

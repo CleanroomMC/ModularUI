@@ -4,9 +4,19 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.font.FontManager;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -86,6 +96,7 @@ public class TextRenderer {
     }
 
     public void drawSimple(String text) {
+        getFontRenderer()
         float w = getFontRenderer().getStringWidth(text) * this.scale;
         int y = getStartY(1), x = getStartX(w);
         draw(text, x, y);
@@ -136,8 +147,8 @@ public class TextRenderer {
         Stencil.remove();
     }
 
-    public List<String> wrapLine(String line) {
-        return this.maxWidth > 0 ? getFontRenderer().listFormattedStringToWidth(line, (int) (this.maxWidth / this.scale)) : Collections.singletonList(line);
+    public List<FormattedCharSequence> wrapLine(String line) {
+        return this.maxWidth > 0 ? getFontRenderer().split(FormattedText.of(line), (int) (this.maxWidth / this.scale)) : Collections.singletonList(FormattedText.of(line));
     }
 
     public boolean wouldFit(List<String> text) {
@@ -146,7 +157,7 @@ public class TextRenderer {
         }
         if (this.maxWidth > 0) {
             for (String line : text) {
-                if (this.maxWidth < getFontRenderer().getStringWidth(line)) {
+                if (this.maxWidth < getFontRenderer().width(line)) {
                     return false;
                 }
             }
@@ -183,19 +194,22 @@ public class TextRenderer {
 
     protected float draw(String text, float x, float y) {
         if (this.simulate) {
-            return getFontRenderer().getStringWidth(text);
+            return getFontRenderer().width(text);
         }
-        GlStateManager.disableBlend();
+        RenderSystem.disableBlend();
+        PoseStack stack = PoseStack.
         GlStateManager.pushMatrix();
         GlStateManager.scale(this.scale, this.scale, 0f);
+
+        getFontRenderer().drawInBatch(text, x / this.scale, y / this.scale, this.color, this.shadow, )
         int width = getFontRenderer().drawString(text, x / this.scale, y / this.scale, this.color, this.shadow);
         GlStateManager.popMatrix();
-        GlStateManager.enableBlend();
+        RenderSystem.enableBlend();
         return width * this.scale;
     }
 
     public float getFontHeight() {
-        return getFontRenderer().FONT_HEIGHT * this.scale;
+        return getFontRenderer().lineHeight * this.scale;
     }
 
     public float getLastHeight() {
@@ -206,13 +220,13 @@ public class TextRenderer {
         return this.lastWidth;
     }
 
-    @SideOnly(Side.CLIENT)
-    public static FontRenderer getFontRenderer() {
-        return Minecraft.getMinecraft().fontRenderer;
+    @OnlyIn(Dist.CLIENT)
+    public static Font getFontRenderer() {
+        return Minecraft.getInstance().font;
     }
 
     public Line line(String text) {
-        return new Line(text, getFontRenderer().getStringWidth(text) * this.scale);
+        return new Line(text, getFontRenderer().width(text) * this.scale);
     }
 
     public static class Line {

@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.utils.Color;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
@@ -52,21 +53,21 @@ public class GuiDraw {
 
     public static void drawRect(float x0, float y0, float w, float h, int colorTL, int colorTR, int colorBL, int colorBR) {
         GlStateManager.disableTexture2D();
-        GlStateManager.enableBlend();
+        RenderSystem.enableBlend();
         GlStateManager.disableAlpha();
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
         Tesselator tessellator = Tesselator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuilder();
         float x1 = x0 + w, y1 = y0 + h;
-        bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+        bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
         bufferbuilder.vertex(x0, y0, 0.0f).color(Color.getRed(colorTL), Color.getGreen(colorTL), Color.getBlue(colorTL), Color.getAlpha(colorTL)).endVertex();
         bufferbuilder.vertex(x0, y1, 0.0f).color(Color.getRed(colorBL), Color.getGreen(colorBL), Color.getBlue(colorBL), Color.getAlpha(colorBL)).endVertex();
         bufferbuilder.vertex(x1, y1, 0.0f).color(Color.getRed(colorBR), Color.getGreen(colorBR), Color.getBlue(colorBR), Color.getAlpha(colorBR)).endVertex();
         bufferbuilder.vertex(x1, y0, 0.0f).color(Color.getRed(colorTR), Color.getGreen(colorTR), Color.getBlue(colorTR), Color.getAlpha(colorTR)).endVertex();
         tessellator.end();
         GlStateManager.shadeModel(GL11.GL_FLAT);
-        GlStateManager.disableBlend();
+        RenderSystem.disableBlend();
         GlStateManager.enableAlpha();
         GlStateManager.enableTexture2D();
     }
@@ -89,21 +90,21 @@ public class GuiDraw {
         GlStateManager.disableAlpha();
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder bufferbuilder = tessellator.getBuilder();
         float x_2 = x0 + w / 2f, y_2 = y0 + h / 2f;
-        bufferbuilder.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_COLOR);
+        bufferbuilder.begin(VertexFormat.Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
         // start at center
-        bufferbuilder.pos(x_2, y_2, 0.0f).color(Color.getRed(centerColor), Color.getGreen(centerColor), Color.getBlue(centerColor), Color.getAlpha(centerColor)).endVertex();
+        bufferbuilder.vertex(x_2, y_2, 0.0f).color(Color.getRed(centerColor), Color.getGreen(centerColor), Color.getBlue(centerColor), Color.getAlpha(centerColor)).endVertex();
         int a = Color.getAlpha(outerColor), r = Color.getRed(outerColor), g = Color.getGreen(outerColor), b = Color.getBlue(outerColor);
         float incr = (float) (PI2 / segments);
         for (int i = 0; i <= segments; i++) {
             float angle = incr * i;
             float x = (float) (Math.sin(angle) * (w / 2) + x_2);
             float y = (float) (Math.cos(angle) * (h / 2) + y_2);
-            bufferbuilder.pos(x, y, 0.0f).color(r, g, b, a).endVertex();
+            bufferbuilder.vertex(x, y, 0.0f).color(r, g, b, a).endVertex();
         }
-        tessellator.draw();
+        tessellator.end();
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.disableBlend();
         GlStateManager.enableAlpha();

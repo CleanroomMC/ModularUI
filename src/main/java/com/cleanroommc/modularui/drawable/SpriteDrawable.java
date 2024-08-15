@@ -22,11 +22,11 @@ public class SpriteDrawable implements IDrawable {
 
     @Override
     public Widget<?> asWidget() {
-        return IDrawable.super.asWidget().size(this.sprite.getIconWidth(), this.sprite.getIconHeight());
+        return IDrawable.super.asWidget().size(this.sprite.contents().width(), this.sprite.contents().height());
     }
 
     @Override
     public Icon asIcon() {
-        return IDrawable.super.asIcon().size(this.sprite.getIconWidth(), this.sprite.getIconHeight());
+        return IDrawable.super.asIcon().size(this.sprite.contents().width(), this.sprite.contents().height());
     }
 }

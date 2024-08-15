@@ -1,36 +1,38 @@
 package com.cleanroommc.modularui.factory;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.util.EnumHand;
 
 public class HandGuiData extends GuiData {
 
-    private final EnumHand hand;
+    private final InteractionHand hand;
 
-    public HandGuiData(EntityPlayer player, EnumHand hand) {
+    public HandGuiData(Player player, InteractionHand hand) {
         super(player);
         this.hand = hand;
     }
 
-    public EnumHand getHand() {
+    public InteractionHand getHand() {
         return this.hand;
     }
 
     public ItemStack getUsedItemStack() {
-        return getPlayer().getHeldItem(this.hand);
+        return getPlayer().getItemInHand(this.hand);
     }
 
     public void setItemInMainHand(ItemStack item) {
-        getPlayer().setHeldItem(EnumHand.MAIN_HAND, item);
+        getPlayer().setItemInHand(InteractionHand.MAIN_HAND, item);
     }
 
     public void setItemInOffHand(ItemStack item) {
-        getPlayer().setHeldItem(EnumHand.OFF_HAND, item);
+        getPlayer().setItemInHand(InteractionHand.OFF_HAND, item);
     }
 
     public void setItemInUsedHand(ItemStack item) {
-        getPlayer().setHeldItem(this.hand, item);
+        getPlayer().setItemInHand(this.hand, item);
     }
 
 }
