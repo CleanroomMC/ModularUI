@@ -84,6 +84,7 @@ public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Inte
         }
         this.texture = this.textureGetter.apply(state);
         this.lastValue = state;
+        markTooltipDirty();
     }
 
     @Override
