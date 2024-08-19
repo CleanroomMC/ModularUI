@@ -2,12 +2,12 @@ package com.cleanroommc.modularui.utils.serialization;
 
 import com.cleanroommc.modularui.ModularUI;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 import java.io.IOException;
 
 /**
- * A function to read an object from a {@link PacketBuffer}.
+ * A function to read an object from a {@link FriendlyByteBuf}.
  *
  * @param <T> object type
  */
@@ -20,13 +20,13 @@ public interface IByteBufDeserializer<T> {
      * @return the read object
      * @throws IOException if reading failed
      */
-    T deserialize(PacketBuffer buffer) throws IOException;
+    T deserialize(FriendlyByteBuf buffer) throws IOException;
 
-    default T deserializeSafe(PacketBuffer buffer) {
+    default T deserializeSafe(FriendlyByteBuf buffer) {
         try {
             return deserialize(buffer);
         } catch (IOException e) {
-            ModularUI.LOGGER.catching(e);
+            ModularUI.LOGGER.error("Failed to deserialize!", e);
             return null;
         }
     }

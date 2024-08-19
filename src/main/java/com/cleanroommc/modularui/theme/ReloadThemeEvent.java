@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.theme;
 
-import net.minecraftforge.event.;
+import net.minecraftforge.eventbus.api.Event;
 
 public class ReloadThemeEvent extends Event {
 

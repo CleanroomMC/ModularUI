@@ -2,12 +2,12 @@ package com.cleanroommc.modularui.utils.serialization;
 
 import com.cleanroommc.modularui.ModularUI;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 import java.io.IOException;
 
 /**
- * A function that writes an object to a {@link PacketBuffer}.
+ * A function that writes an object to a {@link FriendlyByteBuf}.
  *
  * @param <T> object type
  */
@@ -20,13 +20,13 @@ public interface IByteBufSerializer<T> {
      * @param value  object to write
      * @throws IOException if writing failed
      */
-    void serialize(PacketBuffer buffer, T value) throws IOException;
+    void serialize(FriendlyByteBuf buffer, T value) throws IOException;
 
-    default void serializeSafe(PacketBuffer buffer, T value) {
+    default void serializeSafe(FriendlyByteBuf buffer, T value) {
         try {
             serialize(buffer, value);
         } catch (IOException e) {
-            ModularUI.LOGGER.catching(e);
+            ModularUI.LOGGER.error("Failed to serialize!", e);
         }
     }
 }

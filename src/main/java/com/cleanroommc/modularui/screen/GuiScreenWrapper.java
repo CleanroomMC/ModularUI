@@ -16,11 +16,17 @@ import com.cleanroommc.modularui.widgets.ItemSlot;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.GuiLabel;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
@@ -28,9 +34,13 @@ import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.GuiContainerEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
@@ -42,8 +52,8 @@ import org.lwjgl.opengl.GL11;
 import java.io.IOException;
 import java.util.Set;
 
-@SideOnly(Side.CLIENT)
-public class GuiScreenWrapper extends GuiContainer {
+@OnlyIn(Dist.CLIENT)
+public abstract class GuiScreenWrapper extends AbstractContainerScreen {
 
     private final ModularScreen screen;
     private boolean init = true;
@@ -52,17 +62,17 @@ public class GuiScreenWrapper extends GuiContainer {
     private int fps, frameCount = 0;
     private long timer = Minecraft.getSystemTime();
 
-    public GuiScreenWrapper(ModularContainer container, ModularScreen screen) {
-        super(container);
+    public GuiScreenWrapper(ModularContainer container, ModularScreen screen, Inventory playerInv, Component title) {
+        super(container, playerInv, title);
         this.screen = screen;
         this.screen.construct(this);
         container.setScreen(this.screen);
     }
 
     @Override
-    public void initGui() {
+    public void init() {
         GuiErrorHandler.INSTANCE.clear();
-        super.initGui();
+        super.init();
         if (this.init) {
             this.screen.onOpen();
             this.init = false;
@@ -71,10 +81,10 @@ public class GuiScreenWrapper extends GuiContainer {
     }
 
     public void updateArea(Area mainViewport) {
-        this.guiLeft = mainViewport.x;
-        this.guiTop = mainViewport.y;
-        this.xSize = mainViewport.width;
-        this.ySize = mainViewport.height;
+        this.titleLabelX = mainViewport.x;
+        this.titleLabelY = mainViewport.y;
+        this.imageWidth = mainViewport.width;
+        this.imageHeight = mainViewport.height;
     }
 
     public GuiContainerAccessor getAccessor() {
@@ -82,7 +92,7 @@ public class GuiScreenWrapper extends GuiContainer {
     }
 
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         this.frameCount++;
         long time = Minecraft.getSystemTime();
         if (time - this.timer >= 1000) {
@@ -94,14 +104,14 @@ public class GuiScreenWrapper extends GuiContainer {
         Stencil.reset();
         Stencil.apply(this.screen.getScreenArea(), null);
         drawDefaultBackground();
-        int i = this.guiLeft;
-        int j = this.guiTop;
+        int i = this.titleLabelX;
+        int j = this.titleLabelY;
 
         this.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
         this.screen.drawScreen(mouseX, mouseY, partialTicks);
 
-        GlStateManager.disableLighting();
-        GlStateManager.disableDepth();
+        RenderSystem.disableLighting();
+        RenderSystem.disableDepth();
         // mainly for invtweaks compat
         drawVanillaElements(mouseX, mouseY, partialTicks);
         GlStateManager.pushMatrix();

@@ -5,6 +5,7 @@ import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.FluidTankProperties;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
+import net.minecraftforge.fluids.capability.templates.FluidTank;
 
 import javax.annotation.Nullable;
 
@@ -23,31 +24,31 @@ public class FluidTankHandler implements IFluidHandler {
         this.fluidTank = tank;
     }
 
-    @Override
+    /*@Override
     public IFluidTankProperties[] getTankProperties() {
         return new IFluidTankProperties[]{
-                new FluidTankProperties(this.fluidTank.getFluid(), this.fluidTank.getCapacity())
+                new FluidTank(this.fluidTank.getFluid(), this.fluidTank.getCapacity())
         };
-    }
+    }*/
 
     @Override
-    public int fill(FluidStack resource, boolean doFill) {
-        return this.fluidTank.fill(resource, doFill);
+    public int fill(FluidStack resource, FluidAction action) {
+        return this.fluidTank.fill(resource, action);
     }
 
     @Nullable
     @Override
-    public FluidStack drain(FluidStack resource, boolean doDrain) {
+    public FluidStack drain(FluidStack resource, FluidAction action) {
         FluidStack currentFluid = this.fluidTank.getFluid();
         if (currentFluid == null || currentFluid.amount <= 0 || !currentFluid.isFluidEqual(resource)) {
             return null;
         }
-        return this.fluidTank.drain(resource.amount, doDrain);
+        return this.fluidTank.drain(resource.amount, action);
     }
 
     @Nullable
     @Override
-    public FluidStack drain(int maxDrain, boolean doDrain) {
-        return this.fluidTank.drain(maxDrain, doDrain);
+    public FluidStack drain(int maxDrain, FluidAction action) {
+        return this.fluidTank.drain(maxDrain, action);
     }
 }
