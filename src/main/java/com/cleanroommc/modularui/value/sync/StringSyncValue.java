@@ -3,7 +3,7 @@ package com.cleanroommc.modularui.value.sync;
 import com.cleanroommc.modularui.api.value.sync.IStringSyncValue;
 import com.cleanroommc.modularui.network.NetworkUtils;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
@@ -76,12 +76,12 @@ public class StringSyncValue extends ValueSyncHandler<String> implements IString
     }
 
     @Override
-    public void write(PacketBuffer buffer) {
+    public void write(FriendlyByteBuf buffer) {
         NetworkUtils.writeStringSafe(buffer, getValue(), Short.MAX_VALUE - 74);
     }
 
     @Override
-    public void read(PacketBuffer buffer) {
+    public void read(FriendlyByteBuf buffer) {
         setValue(NetworkUtils.readStringSafe(buffer), true, false);
     }
 }

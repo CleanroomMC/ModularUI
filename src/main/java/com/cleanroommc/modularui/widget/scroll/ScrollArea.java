@@ -5,9 +5,9 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * Scrollable area
@@ -63,7 +63,7 @@ public class ScrollArea extends Area {
 
     /* GUI code for easier manipulations */
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public boolean mouseClicked(GuiContext context) {
         return this.mouseClicked(context.getAbsMouseX(), context.getAbsMouseY());
     }
@@ -83,9 +83,9 @@ public class ScrollArea extends Area {
         return data.onMouseClicked(this, x, y, 0);
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public boolean mouseScroll(GuiContext context) {
-        return this.mouseScroll(context.getAbsMouseX(), context.getAbsMouseY(), context.getMouseWheel(), GuiScreen.isShiftKeyDown());
+        return this.mouseScroll(context.getAbsMouseX(), context.getAbsMouseY(), context.getMouseWheel(), Screen.hasShiftDown());
     }
 
     /**
@@ -125,7 +125,7 @@ public class ScrollArea extends Area {
         return false;
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void mouseReleased(GuiContext context) {
         this.mouseReleased(context.getAbsMouseX(), context.getAbsMouseY());
     }
@@ -142,7 +142,7 @@ public class ScrollArea extends Area {
         }
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void drag(GuiContext context) {
         this.drag(context.getMouseX(), context.getMouseY());
     }
@@ -193,7 +193,7 @@ public class ScrollArea extends Area {
     /**
      * This method is responsible for drawing a scroll bar
      */
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void drawScrollbar() {
         boolean b = false;
         if (this.scrollX != null && this.scrollX.isScrollBarActive(this, false)) {

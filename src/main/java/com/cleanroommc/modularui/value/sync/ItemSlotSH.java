@@ -4,8 +4,8 @@ import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import org.jetbrains.annotations.ApiStatus;
@@ -32,16 +32,16 @@ public class ItemSlotSH extends SyncHandler {
     public void init(String key, PanelSyncManager syncHandler) {
         super.init(key, syncHandler);
         syncHandler.getContainer().registerSlot(syncHandler.getPanelName(), this.slot);
-        this.lastStoredItem = getSlot().getStack().copy();
-        if (isPhantom() && !getSlot().getStack().isEmpty()) {
-            this.lastStoredPhantomItem = getSlot().getStack().copy();
+        this.lastStoredItem = getSlot().getItem().copy();
+        if (isPhantom() && !getSlot().getItem().isEmpty()) {
+            this.lastStoredPhantomItem = getSlot().getItem().copy();
             this.lastStoredPhantomItem.setCount(1);
         }
     }
 
     @Override
     public void detectAndSendChanges(boolean init) {
-        ItemStack itemStack = getSlot().getStack();
+        ItemStack itemStack = getSlot().getItem();
         if (itemStack.isEmpty() && this.lastStoredItem.isEmpty()) return;
         boolean onlyAmountChanged = false;
         if (init ||
@@ -56,14 +56,14 @@ public class ItemSlotSH extends SyncHandler {
             final boolean finalOnlyAmountChanged = onlyAmountChanged;
             syncToClient(1, buffer -> {
                 buffer.writeBoolean(finalOnlyAmountChanged);
-                buffer.writeItemStack(itemStack);
+                buffer.writeItemStack(itemStack, false);
                 buffer.writeBoolean(init);
             });
         }
     }
 
     @Override
-    public void readOnClient(int id, PacketBuffer buf) {
+    public void readOnClient(int id, FriendlyByteBuf buf) {
         if (id == 1) {
             boolean onlyAmountChanged = buf.readBoolean();
             this.lastStoredItem = NetworkUtils.readItemStack(buf);
@@ -74,7 +74,7 @@ public class ItemSlotSH extends SyncHandler {
     }
 
     @Override
-    public void readOnServer(int id, PacketBuffer buf) throws IOException {
+    public void readOnServer(int id, FriendlyByteBuf buf) throws IOException {
         if (id == 2) {
             phantomClick(MouseData.readPacket(buf));
         } else if (id == 3) {
@@ -83,21 +83,21 @@ public class ItemSlotSH extends SyncHandler {
             setEnabled(buf.readBoolean(), false);
         } else if (id == 5) {
             if (!isPhantom()) return;
-            ItemStack stack = buf.readItemStack();
-            this.slot.putStack(stack);
+            ItemStack stack = buf.readItem();
+            this.slot.set(stack);
         }
     }
 
     protected void phantomClick(MouseData mouseData) {
         ItemStack cursorStack = getSyncManager().getCursorItem();
-        ItemStack slotStack = getSlot().getStack();
+        ItemStack slotStack = getSlot().getItem();
         ItemStack stackToPut;
         if (!cursorStack.isEmpty() && !slotStack.isEmpty() && !ItemHandlerHelper.canItemStacksStack(cursorStack, slotStack)) {
             stackToPut = cursorStack.copy();
             if (mouseData.mouseButton == 1) {
                 stackToPut.setCount(1);
             }
-            getSlot().putStack(stackToPut);
+            getSlot().set(stackToPut);
             this.lastStoredPhantomItem = stackToPut.copy();
         } else if (slotStack.isEmpty()) {
             if (cursorStack.isEmpty()) {
@@ -112,12 +112,12 @@ public class ItemSlotSH extends SyncHandler {
             if (mouseData.mouseButton == 1) {
                 stackToPut.setCount(1);
             }
-            getSlot().putStack(stackToPut);
+            getSlot().set(stackToPut);
             this.lastStoredPhantomItem = stackToPut.copy();
         } else {
             if (mouseData.mouseButton == 0) {
                 if (mouseData.shift) {
-                    this.slot.putStack(ItemStack.EMPTY);
+                    this.slot.set(ItemStack.EMPTY);
                 } else {
                     incrementStackCount(-1);
                 }
@@ -128,7 +128,7 @@ public class ItemSlotSH extends SyncHandler {
     }
 
     protected void phantomScroll(MouseData mouseData) {
-        ItemStack currentItem = this.slot.getStack();
+        ItemStack currentItem = this.slot.getItem();
         int amount = mouseData.mouseButton;
         if (mouseData.shift) amount *= 4;
         if (mouseData.ctrl) amount *= 16;
@@ -136,14 +136,14 @@ public class ItemSlotSH extends SyncHandler {
         if (amount > 0 && currentItem.isEmpty() && !this.lastStoredPhantomItem.isEmpty()) {
             ItemStack stackToPut = this.lastStoredPhantomItem.copy();
             stackToPut.setCount(amount);
-            this.slot.putStack(stackToPut);
+            this.slot.set(stackToPut);
         } else {
             incrementStackCount(amount);
         }
     }
 
     public void incrementStackCount(int amount) {
-        ItemStack stack = getSlot().getStack();
+        ItemStack stack = getSlot().getItem();
         if (stack.isEmpty()) {
             return;
         }
@@ -154,7 +154,7 @@ public class ItemSlotSH extends SyncHandler {
             if (Integer.MAX_VALUE - amount < oldAmount) {
                 amount = Integer.MAX_VALUE;
             } else {
-                int maxSize = getSlot().getSlotStackLimit();
+                int maxSize = getSlot().getMaxStackSize();
                 if (!this.slot.isIgnoreMaxStackSize() && stack.getMaxStackSize() < maxSize) {
                     maxSize = stack.getMaxStackSize();
                 }
@@ -164,7 +164,7 @@ public class ItemSlotSH extends SyncHandler {
         if (oldAmount != amount) {
             stack = stack.copy();
             stack.setCount(amount);
-            getSlot().putStack(stack);
+            getSlot().set(stack);
         }
     }
 
@@ -176,7 +176,7 @@ public class ItemSlotSH extends SyncHandler {
     }
 
     public void updateFromClient(ItemStack stack) {
-        syncToServer(5, buf -> buf.writeItemStack(stack));
+        syncToServer(5, buf -> buf.writeItemStack(stack, false));
     }
 
     public ModularSlot getSlot() {
@@ -184,7 +184,7 @@ public class ItemSlotSH extends SyncHandler {
     }
 
     public boolean isItemValid(ItemStack itemStack) {
-        return getSlot().isItemValid(itemStack);
+        return getSlot().mayPlace(itemStack);
     }
 
     public boolean isPhantom() {

@@ -7,6 +7,7 @@ import com.cleanroommc.modularui.screen.ModularScreen;
 
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.inventory.Container;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.PacketBuffer;
 
@@ -18,26 +19,26 @@ public class PacketSyncHandler implements IPacket {
 
     private String panel;
     private String key;
-    private PacketBuffer packet;
+    private FriendlyByteBuf packet;
 
     public PacketSyncHandler() {
     }
 
-    public PacketSyncHandler(String panel, String key, PacketBuffer packet) {
+    public PacketSyncHandler(String panel, String key, FriendlyByteBuf packet) {
         this.panel = panel;
         this.key = key;
         this.packet = packet;
     }
 
     @Override
-    public void write(PacketBuffer buf) {
+    public void write(FriendlyByteBuf buf) {
         NetworkUtils.writeStringSafe(buf, this.panel);
         NetworkUtils.writeStringSafe(buf, this.key, 64, true);
         NetworkUtils.writeByteBuf(buf, this.packet);
     }
 
     @Override
-    public void read(PacketBuffer buf) {
+    public void read(FriendlyByteBuf buf) {
         this.panel = NetworkUtils.readStringSafe(buf);
         this.key = NetworkUtils.readStringSafe(buf);
         this.packet = NetworkUtils.readPacketBuffer(buf);

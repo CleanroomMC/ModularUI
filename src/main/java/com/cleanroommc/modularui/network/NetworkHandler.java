@@ -9,6 +9,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.util.IThreadListener;
 import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -51,7 +52,7 @@ public class NetworkHandler {
         CHANNEL.sendToDimension(packet, world.provider.getDimension());
     }
 
-    public static void sendToPlayer(IPacket packet, EntityPlayerMP player) {
+    public static void sendToPlayer(IPacket packet, ServerPlayer player) {
         CHANNEL.sendTo(packet, player);
     }
 

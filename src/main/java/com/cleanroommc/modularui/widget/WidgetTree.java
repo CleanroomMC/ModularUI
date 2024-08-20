@@ -17,6 +17,8 @@ import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.layout.IExpander;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.renderer.GlStateManager;
 
 import org.apache.commons.lang3.StringUtils;
@@ -140,7 +142,7 @@ public class WidgetTree {
             // draw widget
             GlStateManager.colorMask(true, true, true, true);
             GlStateManager.color(1f, 1f, 1f, alpha);
-            GlStateManager.enableBlend();
+            RenderSystem.enableBlend();
             WidgetTheme widgetTheme = parent.getWidgetTheme(context.getTheme());
             parent.drawBackground(context, widgetTheme);
             parent.draw(context, widgetTheme);
@@ -151,7 +153,7 @@ public class WidgetTree {
             if (canBeSeen) {
                 // draw viewport without children transformation
                 GlStateManager.color(1f, 1f, 1f, alpha);
-                GlStateManager.enableBlend();
+                RenderSystem.enableBlend();
                 viewport.preDraw(context, false);
                 GlStateManager.popMatrix();
                 // apply children transformation of the viewport
@@ -180,7 +182,7 @@ public class WidgetTree {
             if (canBeSeen) {
                 // apply opengl transformations again and draw
                 GlStateManager.color(1f, 1f, 1f, alpha);
-                GlStateManager.enableBlend();
+                RenderSystem.enableBlend();
                 GlStateManager.pushMatrix();
                 context.applyToOpenGl();
                 viewport.postDraw(context, true);
@@ -207,7 +209,7 @@ public class WidgetTree {
         parent.transform(context);
 
         GlStateManager.color(1, 1, 1, 1);
-        GlStateManager.enableBlend();
+        RenderSystem.enableBlend();
         parent.drawForeground(context);
 
         List<IWidget> children = parent.getChildren();

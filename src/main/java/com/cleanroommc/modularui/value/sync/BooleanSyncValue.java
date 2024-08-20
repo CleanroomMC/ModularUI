@@ -6,7 +6,7 @@ import com.cleanroommc.modularui.api.value.sync.IStringSyncValue;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.utils.BooleanConsumer;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -78,12 +78,12 @@ public class BooleanSyncValue extends ValueSyncHandler<Boolean> implements IBool
     }
 
     @Override
-    public void write(PacketBuffer buffer) {
+    public void write(FriendlyByteBuf buffer) {
         buffer.writeBoolean(getBoolValue());
     }
 
     @Override
-    public void read(PacketBuffer buffer) {
+    public void read(FriendlyByteBuf buffer) {
         setBoolValue(buffer.readBoolean(), true, false);
     }
 

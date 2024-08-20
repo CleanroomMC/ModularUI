@@ -6,11 +6,8 @@ import com.cleanroommc.modularui.network.packets.PacketSyncHandler;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import io.netty.buffer.Unpooled;
 import org.jetbrains.annotations.ApiStatus;

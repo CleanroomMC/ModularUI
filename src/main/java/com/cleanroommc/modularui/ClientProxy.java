@@ -40,8 +40,8 @@ public class ClientProxy extends CommonProxy {
         RenderingRegistry.registerEntityRenderingHandler(HoloScreenEntity.class, ScreenEntityRender::new);
 
         // enable stencil buffer
-        if (!Minecraft.getMinecraft().getFramebuffer().isStencilEnabled()) {
-            Minecraft.getMinecraft().getFramebuffer().enableStencil();
+        if (!Minecraft.getInstance().getFramebuffer().isStencilEnabled()) {
+            Minecraft.getInstance().getFramebuffer().enableStencil();
         }
     }
 

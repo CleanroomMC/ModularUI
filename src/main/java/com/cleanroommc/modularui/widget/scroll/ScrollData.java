@@ -5,9 +5,9 @@ import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.utils.Animator;
 import com.cleanroommc.modularui.utils.Interpolation;
 
-import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.util.Mth;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -118,7 +118,7 @@ public abstract class ScrollData {
         if (this.scrollSize <= size) {
             this.scroll = 0;
         } else {
-            this.scroll = MathHelper.clamp(this.scroll, 0, this.scrollSize - size);
+            this.scroll = Mth.clamp(this.scroll, 0, this.scrollSize - size);
         }
     }
 
@@ -177,10 +177,10 @@ public abstract class ScrollData {
         return this.animatingTo;
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public abstract void drawScrollbar(ScrollArea area);
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     protected void drawScrollBar(int x, int y, int w, int h) {
         GuiDraw.drawRect(x, y, w, h, 0xffeeeeee);
         GuiDraw.drawRect(x + 1, y + 1, w - 1, h - 1, 0xff666666);

@@ -7,7 +7,7 @@ import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
 import com.cleanroommc.modularui.screen.*;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.Font;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +27,7 @@ import java.util.function.Consumer;
 public class GuiContext extends GuiViewportStack {
 
     public final Minecraft mc;
-    public final FontRenderer font;
+    public final Font font;
 
     /* GUI elements */
     public final ModularScreen screen;
@@ -63,8 +63,8 @@ public class GuiContext extends GuiViewportStack {
     public GuiContext(ModularScreen screen) {
         this.screen = screen;
         this.hoveredWidgets = new HoveredIterable(this.screen.getPanelManager());
-        this.mc = Minecraft.getMinecraft();
-        this.font = this.mc.fontRenderer;
+        this.mc = Minecraft.getInstance();
+        this.font = this.mc.font;
     }
 
     /**
@@ -255,7 +255,7 @@ public class GuiContext extends GuiViewportStack {
     }
 
     public boolean isMouseItemEmpty() {
-        return this.mc.player.inventory.getItemStack().isEmpty();
+        return this.mc.player.getInventory().getSelected().isEmpty();
     }
 
     @ApiStatus.Internal

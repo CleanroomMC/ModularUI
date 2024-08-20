@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.value.sync;
 
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketBuffer;
 
 import java.io.IOException;
@@ -11,12 +12,12 @@ public class CursorSlotSyncHandler extends SyncHandler {
     }
 
     @Override
-    public void readOnClient(int id, PacketBuffer buf) throws IOException {
-        getSyncManager().getPlayer().inventory.setItemStack(buf.readItemStack());
+    public void readOnClient(int id, FriendlyByteBuf buf) throws IOException {
+        getSyncManager().getPlayer().getInventory().setPickedItem(buf.readItem());
     }
 
     @Override
-    public void readOnServer(int id, PacketBuffer buf) throws IOException {
-        getSyncManager().getPlayer().inventory.setItemStack(buf.readItemStack());
+    public void readOnServer(int id, FriendlyByteBuf buf) throws IOException {
+        getSyncManager().getPlayer().getInventory().setPickedItem(buf.readItem());
     }
 }

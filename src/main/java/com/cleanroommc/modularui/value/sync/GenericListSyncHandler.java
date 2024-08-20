@@ -6,7 +6,7 @@ import com.cleanroommc.modularui.utils.serialization.IByteBufDeserializer;
 import com.cleanroommc.modularui.utils.serialization.IByteBufSerializer;
 import com.cleanroommc.modularui.utils.serialization.IEquals;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -85,7 +85,7 @@ public class GenericListSyncHandler<T> extends ValueSyncHandler<List<T>> {
     }
 
     @Override
-    public void write(PacketBuffer buffer) throws IOException {
+    public void write(FriendlyByteBuf buffer) throws IOException {
         buffer.writeVarInt(this.cache.size());
         for (T t : this.cache) {
             this.serializer.serialize(buffer, t);
@@ -93,7 +93,7 @@ public class GenericListSyncHandler<T> extends ValueSyncHandler<List<T>> {
     }
 
     @Override
-    public void read(PacketBuffer buffer) throws IOException {
+    public void read(FriendlyByteBuf buffer) throws IOException {
         this.cache.clear();
         for (int i = 0, n = buffer.readVarInt(); i < n; i++) {
             this.cache.add(this.deserializer.deserialize(buffer));

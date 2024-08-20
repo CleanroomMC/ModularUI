@@ -7,9 +7,9 @@ import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -33,8 +33,8 @@ public class PanelSyncManager implements IPanelSyncManager {
     private boolean init = true;
     private ContainerCustomizer containerCustomizer;
 
-    private final List<Consumer<EntityPlayer>> openListener = new ArrayList<>();
-    private final List<Consumer<EntityPlayer>> closeListener = new ArrayList<>();
+    private final List<Consumer<Player>> openListener = new ArrayList<>();
+    private final List<Consumer<Player>> closeListener = new ArrayList<>();
 
     public PanelSyncManager() {}
 
@@ -69,7 +69,7 @@ public class PanelSyncManager implements IPanelSyncManager {
         this.init = false;
     }
 
-    public void receiveWidgetUpdate(String mapKey, int id, PacketBuffer buf) throws IOException {
+    public void receiveWidgetUpdate(String mapKey, int id, FriendlyByteBuf buf) throws IOException {
         SyncHandler syncHandler = this.syncHandlers.get(mapKey);
         if (isClient()) {
             syncHandler.readOnClient(id, buf);
@@ -172,15 +172,15 @@ public class PanelSyncManager implements IPanelSyncManager {
         return registerSlotGroup(new SlotGroup(name, rowSize, 100, true));
     }
 
-    public PanelSyncManager bindPlayerInventory(EntityPlayer player) {
+    public PanelSyncManager bindPlayerInventory(Player player) {
         return bindPlayerInventory(player, ModularSlot::new);
     }
 
-    public PanelSyncManager bindPlayerInventory(EntityPlayer player, @NotNull SlotFunction slotFunction) {
+    public PanelSyncManager bindPlayerInventory(Player player, @NotNull SlotFunction slotFunction) {
         if (getSlotGroup(ModularSyncManager.PLAYER_INVENTORY) != null) {
             throw new IllegalStateException("The player slot group is already registered!");
         }
-        PlayerMainInvWrapper playerInventory = new PlayerMainInvWrapper(player.inventory);
+        PlayerMainInvWrapper playerInventory = new PlayerMainInvWrapper(player.getInventory());
         String key = "player";
         for (int i = 0; i < 36; i++) {
             itemSlot(key, i, slotFunction.apply(playerInventory, i).slotGroup(ModularSyncManager.PLAYER_INVENTORY));
@@ -196,12 +196,12 @@ public class PanelSyncManager implements IPanelSyncManager {
         ModularSlot apply(@NotNull PlayerMainInvWrapper playerInv, int index);
     }
 
-    public PanelSyncManager addOpenListener(Consumer<EntityPlayer> listener) {
+    public PanelSyncManager addOpenListener(Consumer<Player> listener) {
         this.openListener.add(listener);
         return this;
     }
 
-    public PanelSyncManager addCloseListener(Consumer<EntityPlayer> listener) {
+    public PanelSyncManager addCloseListener(Consumer<Player> listener) {
         this.closeListener.add(listener);
         return this;
     }
@@ -218,7 +218,7 @@ public class PanelSyncManager implements IPanelSyncManager {
         return this.syncHandlers.get(mapKey);
     }
 
-    public EntityPlayer getPlayer() {
+    public Player getPlayer() {
         return getModularSyncManager().getPlayer();
     }
 

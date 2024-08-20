@@ -5,7 +5,7 @@ import com.cleanroommc.modularui.api.value.sync.IServerMouseAction;
 import com.cleanroommc.modularui.utils.KeyboardData;
 import com.cleanroommc.modularui.utils.MouseData;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 import java.io.IOException;
 
@@ -20,11 +20,11 @@ public class InteractionSyncHandler extends SyncHandler {
     private IServerKeyboardAction keyTapped;
 
     @Override
-    public void readOnClient(int id, PacketBuffer buf) throws IOException {
+    public void readOnClient(int id, FriendlyByteBuf buf) throws IOException {
     }
 
     @Override
-    public void readOnServer(int id, PacketBuffer buf) throws IOException {
+    public void readOnServer(int id, FriendlyByteBuf buf) throws IOException {
         if (id < 10) {
             MouseData mouseData = MouseData.readPacket(buf);
             switch (id) {

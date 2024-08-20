@@ -15,7 +15,6 @@ import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import com.cleanroommc.modularui.widgets.layout.Column;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -25,6 +24,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
@@ -72,7 +72,7 @@ public class TestItem extends Item implements IGuiHolder<HandGuiData> {
     public ICapabilityProvider initCapabilities(@NotNull ItemStack stack, @Nullable NBTTagCompound nbt) {
         return new ItemCapabilityProvider() {
             @Override
-            public <T> @Nullable T getCapability(@NotNull Capability<T> capability) {
+            public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> capability) {
                 if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
                     return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(new ItemStackItemHandler(stack, 4));
                 }

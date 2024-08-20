@@ -4,7 +4,7 @@ import com.cleanroommc.modularui.api.value.IEnumValue;
 import com.cleanroommc.modularui.api.value.sync.IIntSyncValue;
 import com.cleanroommc.modularui.network.NetworkUtils;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
@@ -74,13 +74,13 @@ public class EnumSyncValue<T extends Enum<T>> extends ValueSyncHandler<T> implem
     }
 
     @Override
-    public void write(PacketBuffer buffer) {
-        buffer.writeEnumValue(getValue());
+    public void write(FriendlyByteBuf buffer) {
+        buffer.writeEnum(getValue());
     }
 
     @Override
-    public void read(PacketBuffer buffer) {
-        setValue(buffer.readEnumValue(this.enumCLass), true, false);
+    public void read(FriendlyByteBuf buffer) {
+        setValue(buffer.readEnum(this.enumCLass), true, false);
     }
 
     @Override

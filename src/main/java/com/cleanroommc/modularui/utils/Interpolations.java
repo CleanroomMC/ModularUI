@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.utils;
 
+import net.minecraft.util.Mth;
 import net.minecraft.util.math.MathHelper;
 
 /**
@@ -28,8 +29,8 @@ public class Interpolations {
      * This interpolation method fixes this problem.
      */
     public static float lerpYaw(float a, float b, float position) {
-        a = MathHelper.wrapDegrees(a);
-        b = MathHelper.wrapDegrees(b);
+        a = Mth.wrapDegrees(a);
+        b = Mth.wrapDegrees(b);
 
         return lerp(a, normalizeYaw(a, b), position);
     }
@@ -56,10 +57,10 @@ public class Interpolations {
      * Yaw normalization for cubic interpolation
      */
     public static double cubicHermiteYaw(float y0, float y1, float y2, float y3, float position) {
-        y0 = MathHelper.wrapDegrees(y0);
-        y1 = MathHelper.wrapDegrees(y1);
-        y2 = MathHelper.wrapDegrees(y2);
-        y3 = MathHelper.wrapDegrees(y3);
+        y0 = Mth.wrapDegrees(y0);
+        y1 = Mth.wrapDegrees(y1);
+        y2 = Mth.wrapDegrees(y2);
+        y3 = Mth.wrapDegrees(y3);
 
         y1 = normalizeYaw(y0, y1);
         y2 = normalizeYaw(y1, y2);
@@ -89,10 +90,10 @@ public class Interpolations {
      * Yaw normalization for cubic interpolation
      */
     public static float cubicYaw(float y0, float y1, float y2, float y3, float position) {
-        y0 = MathHelper.wrapDegrees(y0);
-        y1 = MathHelper.wrapDegrees(y1);
-        y2 = MathHelper.wrapDegrees(y2);
-        y3 = MathHelper.wrapDegrees(y3);
+        y0 = Mth.wrapDegrees(y0);
+        y1 = Mth.wrapDegrees(y1);
+        y2 = Mth.wrapDegrees(y2);
+        y3 = Mth.wrapDegrees(y3);
 
         y1 = normalizeYaw(y0, y1);
         y2 = normalizeYaw(y1, y2);
@@ -211,8 +212,8 @@ public class Interpolations {
      * This interpolation method fixes this problem.
      */
     public static double lerpYaw(double a, double b, double position) {
-        a = MathHelper.wrapDegrees(a);
-        b = MathHelper.wrapDegrees(b);
+        a = Mth.wrapDegrees(a);
+        b = Mth.wrapDegrees(b);
 
         return lerp(a, normalizeYaw(a, b), position);
     }
@@ -238,10 +239,10 @@ public class Interpolations {
      * Yaw normalization for cubic interpolation
      */
     public static double cubicYaw(double y0, double y1, double y2, double y3, double position) {
-        y0 = MathHelper.wrapDegrees(y0);
-        y1 = MathHelper.wrapDegrees(y1);
-        y2 = MathHelper.wrapDegrees(y2);
-        y3 = MathHelper.wrapDegrees(y3);
+        y0 = Mth.wrapDegrees(y0);
+        y1 = Mth.wrapDegrees(y1);
+        y2 = Mth.wrapDegrees(y2);
+        y3 = Mth.wrapDegrees(y3);
 
         y1 = normalizeYaw(y0, y1);
         y2 = normalizeYaw(y1, y2);

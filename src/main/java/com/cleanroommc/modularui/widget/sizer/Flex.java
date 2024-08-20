@@ -12,6 +12,8 @@ import com.cleanroommc.modularui.utils.Alignment;
 
 import net.minecraft.inventory.Slot;
 
+import net.minecraft.world.inventory.Slot;
+
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
@@ -474,8 +476,8 @@ public class Flex implements IResizeable, IPositioned<Flex> {
         if (parent instanceof IVanillaSlot vanillaSlot) {
             // special treatment for minecraft slots
             Slot slot = vanillaSlot.getVanillaSlot();
-            slot.xPos = parent.getArea().x;
-            slot.yPos = parent.getArea().y;
+            slot.x = parent.getArea().x;
+            slot.y = parent.getArea().y;
         }
     }
 

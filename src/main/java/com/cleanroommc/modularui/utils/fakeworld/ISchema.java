@@ -1,8 +1,9 @@
 package com.cleanroommc.modularui.utils.fakeworld;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -11,9 +12,9 @@ import java.util.function.BiPredicate;
 
 public interface ISchema extends Iterable<Map.Entry<BlockPos, BlockInfo>> {
 
-    World getWorld();
+    Level getWorld();
 
-    Vec3d getFocus();
+    Vec3 getFocus();
 
     BlockPos getOrigin();
 

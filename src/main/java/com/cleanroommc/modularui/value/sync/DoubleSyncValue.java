@@ -4,7 +4,7 @@ import com.cleanroommc.modularui.api.value.sync.IDoubleSyncValue;
 import com.cleanroommc.modularui.api.value.sync.IStringSyncValue;
 import com.cleanroommc.modularui.network.NetworkUtils;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -77,12 +77,12 @@ public class DoubleSyncValue extends ValueSyncHandler<Double> implements IDouble
     }
 
     @Override
-    public void write(PacketBuffer buffer) {
+    public void write(FriendlyByteBuf buffer) {
         buffer.writeDouble(getDoubleValue());
     }
 
     @Override
-    public void read(PacketBuffer buffer) {
+    public void read(FriendlyByteBuf buffer) {
         setDoubleValue(buffer.readDouble(), true, false);
     }
 

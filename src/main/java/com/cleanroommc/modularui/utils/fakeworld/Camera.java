@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.utils.fakeworld;
 
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.core.Vec3i;
 
-import org.lwjgl.util.vector.Vector3f;
+import org.joml.Vector3f;
 
 public class Camera {
 
@@ -42,8 +42,8 @@ public class Camera {
         setLookAt(lookAtX, lookAtY, lookAtZ);
         Vector3f pos = new Vector3f((float) Math.cos(yaw), (float) 0, (float) Math.sin(yaw));
         pos.y += (float) (Math.tan(pitch) * pos.length());
-        pos.normalise().scale((float) radius);
-        this.pos.set(pos.translate(lookAtX, lookAtY, lookAtZ));
+        pos.normalize().mul((float) radius);
+        this.pos.set(pos.add(lookAtX, lookAtY, lookAtZ));
         return this;
     }
 

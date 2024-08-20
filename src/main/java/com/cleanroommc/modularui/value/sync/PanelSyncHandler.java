@@ -4,7 +4,7 @@ import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.widget.WidgetTree;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -107,7 +107,7 @@ public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
     }
 
     @Override
-    public void readOnClient(int i, PacketBuffer packetBuffer) throws IOException {
+    public void readOnClient(int i, FriendlyByteBuf packetBuffer) throws IOException {
         if (i == 1) {
             openPanel(false);
         } else if (i == 2) {
@@ -116,7 +116,7 @@ public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
     }
 
     @Override
-    public void readOnServer(int i, PacketBuffer packetBuffer) throws IOException {
+    public void readOnServer(int i, FriendlyByteBuf packetBuffer) throws IOException {
         if (i == 0) {
             openPanel(false);
             syncToClient(1);

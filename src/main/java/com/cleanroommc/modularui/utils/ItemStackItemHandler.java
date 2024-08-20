@@ -1,5 +1,7 @@
 package com.cleanroommc.modularui.utils;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -30,15 +32,15 @@ public class ItemStackItemHandler implements IItemHandlerModifiable {
     @Override
     public ItemStack getStackInSlot(int slot) {
         validateSlotIndex(slot);
-        NBTTagCompound item = (NBTTagCompound) getItemsNbt().get(slot);
-        return item.isEmpty() ? ItemStack.EMPTY : new ItemStack(item);
+        CompoundTag item = (CompoundTag) getItemsNbt().get(slot);
+        return item.isEmpty() ? ItemStack.EMPTY : ItemStack.of(item);
     }
 
     @Override
     public void setStackInSlot(int slot, @NotNull ItemStack stack) {
         validateSlotIndex(slot);
-        NBTTagList list = getItemsNbt();
-        list.set(slot, stack.isEmpty() ? new NBTTagCompound() : stack.serializeNBT());
+        ListTag list = getItemsNbt();
+        list.set(slot, stack.isEmpty() ? new CompoundTag() : stack.serializeNBT());
     }
 
     @NotNull
@@ -110,20 +112,20 @@ public class ItemStackItemHandler implements IItemHandlerModifiable {
     protected void onContentsChanged(int slot) {
     }
 
-    public NBTTagList getItemsNbt() {
-        NBTTagCompound nbt = this.container.getTagCompound();
+    public ListTag getItemsNbt() {
+        CompoundTag nbt = this.container.getTag();
         if (nbt == null) {
-            nbt = new NBTTagCompound();
-            this.container.setTagCompound(nbt);
+            nbt = new CompoundTag();
+            this.container.setTag(nbt);
         }
-        if (!nbt.hasKey(KEY_ITEMS)) {
-            NBTTagList list = new NBTTagList();
+        if (!nbt.contains(KEY_ITEMS)) {
+            ListTag list = new ListTag();
             for (int i = 0; i < getSlots(); i++) {
-                list.appendTag(new NBTTagCompound());
+                list.addTag(i, new CompoundTag());
             }
-            nbt.setTag(KEY_ITEMS, list);
+            nbt.put(KEY_ITEMS, list);
         }
-        return nbt.getTagList(KEY_ITEMS, Constants.NBT.TAG_COMPOUND);
+        return nbt.getList(KEY_ITEMS, ListTag.TAG_COMPOUND);
     }
 
     protected void validateSlotIndex(int slot) {

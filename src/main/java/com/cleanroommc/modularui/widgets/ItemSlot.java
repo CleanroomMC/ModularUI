@@ -27,8 +27,11 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -50,7 +53,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         tooltip().setAutoUpdate(true).setHasTitleMargin(true);
         tooltipBuilder(tooltip -> {
             if (!isSynced()) return;
-            ItemStack stack = getSlot().getStack();
+            ItemStack stack = getSlot().getItem();
             if (stack.isEmpty()) return;
             tooltip.addStringLines(getItemTooltip(stack));
         });
@@ -72,7 +75,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     public void onUpdate() {
         super.onUpdate();
         boolean shouldBeEnabled = areAncestorsEnabled();
-        if (shouldBeEnabled != getSlot().isEnabled()) {
+        if (shouldBeEnabled != getSlot().isActive()) {
             this.syncHandler.setEnabled(shouldBeEnabled, true);
         }
     }
@@ -171,18 +174,18 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         return slot(new ModularSlot(itemHandler, index));
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     private void drawSlot(Slot slotIn) {
         GuiScreenWrapper guiScreen = getScreen().getScreenWrapper();
         GuiContainerAccessor accessor = guiScreen.getAccessor();
-        ItemStack itemstack = slotIn.getStack();
+        ItemStack itemstack = slotIn.getItem();
         boolean flag = false;
         boolean flag1 = slotIn == accessor.getClickedSlot() && !accessor.getDraggedStack().isEmpty() && !accessor.getIsRightMouseClick();
         ItemStack itemstack1 = guiScreen.mc.player.inventory.getItemStack();
         int amount = -1;
         String format = null;
 
-        if (slotIn == accessor.getClickedSlot() && !accessor.getDraggedStack().isEmpty() && accessor.getIsRightMouseClick() && !itemstack.isEmpty()) {
+        if (slotIn == accessor.getClickedSlot() && !accessor.getDraggedStack().isEmpty() && accessor.getIsSplittingStack() && !itemstack.isEmpty()) {
             itemstack = itemstack.copy();
             itemstack.setCount(itemstack.getCount() / 2);
         } else if (guiScreen.isDragSplitting() && guiScreen.getDragSlots().contains(slotIn) && !itemstack1.isEmpty()) {
@@ -190,7 +193,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 return;
             }
 
-            if (Container.canAddItemToSlot(slotIn, itemstack1, true) && guiScreen.inventorySlots.canDragIntoSlot(slotIn)) {
+            if (Container.canAddItemToSlot(slotIn, itemstack1, true) && guiScreen.getDragSlots().canDragIntoSlot(slotIn)) {
                 itemstack = itemstack1.copy();
                 flag = true;
                 Container.computeStackSize(guiScreen.getDragSlots(), accessor.getDragSplittingLimit(), itemstack, slotIn.getStack().isEmpty() ? 0 : slotIn.getStack().getCount());

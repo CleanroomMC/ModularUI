@@ -2,8 +2,8 @@ package com.cleanroommc.modularui;
 
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class GuiErrorHandler {
 
     public static final GuiErrorHandler INSTANCE = new GuiErrorHandler();

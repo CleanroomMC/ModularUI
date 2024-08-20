@@ -6,12 +6,11 @@ import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import com.cleanroommc.bogosorter.api.ISortingContextBuilder;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Slot;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.PlayerInvWrapper;
@@ -75,11 +74,11 @@ public class ModularSyncManager {
     }
 
     public ItemStack getCursorItem() {
-        return getPlayer().inventory.getItemStack();
+        return getPlayer().getInventory().getSelected();
     }
 
     public void setCursorItem(ItemStack item) {
-        getPlayer().inventory.setItemStack(item);
+        getPlayer().getInventory().setPickedItem(item);
         this.cursorSlotSyncHandler.sync();
     }
 
@@ -97,11 +96,11 @@ public class ModularSyncManager {
         return this.panelSyncManagerMap.containsKey(panelName);
     }
 
-    public void receiveWidgetUpdate(String panelName, String mapKey, int id, PacketBuffer buf) throws IOException {
+    public void receiveWidgetUpdate(String panelName, String mapKey, int id, FriendlyByteBuf buf) throws IOException {
         getPanelSyncManager(panelName).receiveWidgetUpdate(mapKey, id, buf);
     }
 
-    public EntityPlayer getPlayer() {
+    public Player getPlayer() {
         return this.container.getPlayer();
     }
 
@@ -128,7 +127,7 @@ public class ModularSyncManager {
 
     private static boolean isPlayerSlot(Slot slot) {
         if (slot == null) return false;
-        if (slot.inventory instanceof InventoryPlayer) {
+        if (slot.container instanceof Inventory) {
             return slot.getSlotIndex() >= 0 && slot.getSlotIndex() < 36;
         }
         if (slot instanceof SlotItemHandler slotItemHandler) {

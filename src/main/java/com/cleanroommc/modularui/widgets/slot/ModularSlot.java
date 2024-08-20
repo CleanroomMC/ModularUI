@@ -1,10 +1,11 @@
 package com.cleanroommc.modularui.widgets.slot;
 
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.entity.player.EntityPlayer;
+import com.mojang.datafixers.util.Pair;
+import lombok.Getter;
+
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
@@ -21,12 +22,12 @@ import java.util.function.Predicate;
  */
 public class ModularSlot extends SlotItemHandler {
 
-    private final boolean phantom;
+    @Getter private final boolean phantom;
     private boolean enabled = true;
     private boolean canTake = true, canPut = true;
     private Predicate<ItemStack> filter = stack -> true;
     private IOnSlotChanged changeListener = IOnSlotChanged.DEFAULT;
-    private boolean ignoreMaxStackSize = false;
+    @Getter private boolean ignoreMaxStackSize = false;
     private String slotGroupName = null;
     private SlotGroup slotGroup = null;
 
@@ -47,22 +48,22 @@ public class ModularSlot extends SlotItemHandler {
     }
 
     @Override
-    public boolean isItemValid(@NotNull ItemStack stack) {
-        return this.canPut && !stack.isEmpty() && this.filter.test(stack) && super.isItemValid(stack);
+    public boolean mayPlace(@NotNull ItemStack stack) {
+        return this.canPut && !stack.isEmpty() && this.filter.test(stack) && super.mayPlace(stack);
     }
 
     @Override
-    public boolean canTakeStack(EntityPlayer playerIn) {
-        return this.canTake && super.canTakeStack(playerIn);
+    public boolean mayPickup(Player playerIn) {
+        return this.canTake && super.mayPickup(playerIn);
     }
 
     @Override
-    public int getItemStackLimit(@NotNull ItemStack stack) {
-        return this.ignoreMaxStackSize ? getSlotStackLimit() : super.getItemStackLimit(stack);
+    public int getMaxStackSize(@NotNull ItemStack stack) {
+        return this.ignoreMaxStackSize ? getMaxStackSize() : super.getMaxStackSize(stack);
     }
 
     @Override
-    public void onSlotChanged() {
+    public void setChanged() {
     }
 
     public void onSlotChangedReal(ItemStack itemStack, boolean onlyChangedAmount, boolean client, boolean init) {
@@ -70,15 +71,14 @@ public class ModularSlot extends SlotItemHandler {
     }
 
     @Override
-    public void putStack(@NotNull ItemStack stack) {
-        if (ItemStack.areItemStacksEqual(stack, getStack())) return;
-        super.putStack(stack);
+    public void set(@NotNull ItemStack stack) {
+        if (ItemStack.isSameItem(stack, getItem())) return; // TODO: isSameItemSameTags?
+        super.set(stack);
     }
 
     @Nullable
-    @SideOnly(Side.CLIENT)
     @Override
-    public TextureAtlasSprite getBackgroundSprite() {
+    public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
         return null;
     }
 
@@ -88,16 +88,8 @@ public class ModularSlot extends SlotItemHandler {
     }
 
     @Override
-    public boolean isEnabled() {
+    public boolean isActive() {
         return this.enabled;
-    }
-
-    public boolean isPhantom() {
-        return this.phantom;
-    }
-
-    public boolean isIgnoreMaxStackSize() {
-        return this.ignoreMaxStackSize;
     }
 
     @Nullable

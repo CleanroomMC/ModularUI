@@ -10,10 +10,12 @@ import com.cleanroommc.modularui.utils.fakeworld.ISchema;
 import com.cleanroommc.modularui.utils.fakeworld.SchemaRenderer;
 import com.cleanroommc.modularui.widget.Widget;
 
+import net.minecraft.util.Mth;
 import net.minecraft.util.math.MathHelper;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 import org.lwjgl.util.vector.Vector3f;
 
 public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
@@ -69,20 +71,20 @@ public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
         if (mouseButton == 0 && this.enableRotation) {
             float moveScale = 0.025f;
             yaw = (yaw + dx * moveScale + PI2) % PI2;
-            pitch = MathHelper.clamp(pitch + dy * moveScale, -PI2 / 4 + 0.001f, PI2 / 4 - 0.001f);
+            pitch = Mth.clamp(pitch + dy * moveScale, -PI2 / 4 + 0.001f, PI2 / 4 - 0.001f);
         } else if (mouseButton == 2 && this.enableTranslation) {
             // the idea is to construct a vector which points upwards from the camerae pov (y-axis on screen)
             // this vector determines the amount of z offset from mouse movement in y
             float y = (float) Math.cos(pitch);
             float moveScale = 0.06f;
             // with this the offset can be moved by dy
-            offset.translate(0, dy * y * moveScale, 0);
+            offset.add(0, dy * y * moveScale, 0);
             // to respect dx we need a new vector which is perpendicular on the previous vector (x-axis on screen)
             // y = 0 => mouse movement in x does not move y
             float phi = (yaw + PI / 2) % PI2;
             float x = (float) Math.cos(phi);
             float z = (float) Math.sin(phi);
-            offset.translate(dx * x * moveScale, 0, dx * z * moveScale);
+            offset.add(dx * x * moveScale, 0, dx * z * moveScale);
         }
         this.lastMouseX = mouseX;
         this.lastMouseY = mouseY;

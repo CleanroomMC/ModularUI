@@ -29,6 +29,8 @@ import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 
+import net.minecraftforge.fluids.capability.templates.FluidTank;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
@@ -57,9 +59,9 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
             FluidStack fluid = this.syncHandler.getValue();
             if (this.syncHandler.isPhantom()) {
                 if (fluid != null) {
-                    tooltip.addLine(IKey.str(fluid.getLocalizedName()));
+                    tooltip.addLine(IKey.str(fluid.getTranslationKey()));
                     if (this.syncHandler.controlsAmount()) {
-                        tooltip.addLine(IKey.lang("modularui.fluid.phantom.amount", formatFluidAmount(fluid.amount), getBaseUnit()));
+                        tooltip.addLine(IKey.lang("modularui.fluid.phantom.amount", formatFluidAmount(fluid.getAmount()), getBaseUnit()));
                     }
                 } else {
                     tooltip.addLine(IKey.lang("modularui.fluid.empty"));
@@ -69,8 +71,8 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
                 }
             } else {
                 if (fluid != null) {
-                    tooltip.addLine(IKey.str(fluid.getLocalizedName()));
-                    tooltip.addLine(IKey.lang("modularui.fluid.amount", formatFluidAmount(fluid.amount), formatFluidAmount(fluidTank.getCapacity()), getBaseUnit()));
+                    tooltip.addLine(IKey.str(fluid.getTranslationKey()));
+                    tooltip.addLine(IKey.lang("modularui.fluid.amount", formatFluidAmount(fluid.getAmount()), formatFluidAmount(fluidTank.getCapacity()), getBaseUnit()));
                     addAdditionalFluidInfo(tooltip, fluid);
                 } else {
                     tooltip.addLine(IKey.lang("modularui.fluid.empty"));
@@ -131,7 +133,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
             int y = this.contentOffsetY;
             float height = getArea().height - y * 2;
             if (!this.alwaysShowFull) {
-                float newHeight = height * content.amount * 1f / fluidTank.getCapacity();
+                float newHeight = height * content.getAmount() * 1f / fluidTank.getCapacity();
                 y += (int) (height - newHeight);
                 height = newHeight;
             }
@@ -141,7 +143,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
             this.overlayTexture.drawAtZero(context, getArea(), widgetTheme);
         }
         if (content != null && this.syncHandler.controlsAmount()) {
-            String s = NumberFormat.formatWithMaxDigits(getBaseUnitAmount(content.amount)) + getBaseUnit();
+            String s = NumberFormat.formatWithMaxDigits(getBaseUnitAmount(content.getAmount())) + getBaseUnit();
             this.textRenderer.setAlignment(Alignment.CenterRight, getArea().width - this.contentOffsetX - 1f);
             this.textRenderer.setPos((int) (this.contentOffsetX + 0.5f), (int) (getArea().height - 5.5f));
             this.textRenderer.draw(s);
@@ -164,7 +166,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
         if (!this.syncHandler.canFillSlot() && !this.syncHandler.canDrainSlot()) {
             return Result.IGNORE;
         }
-        ItemStack cursorStack = Minecraft.getMinecraft().player.inventory.getItemStack();
+        ItemStack cursorStack = Minecraft.getInstance().player.getInventory().getSelected();
         if (this.syncHandler.isPhantom() || (!cursorStack.isEmpty() && cursorStack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null))) {
             MouseData mouseData = MouseData.create(mouseButton);
             this.syncHandler.syncToServer(1, mouseData::writeToPacket);

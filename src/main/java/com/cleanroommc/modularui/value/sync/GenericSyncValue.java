@@ -5,7 +5,7 @@ import com.cleanroommc.modularui.utils.serialization.IByteBufDeserializer;
 import com.cleanroommc.modularui.utils.serialization.IByteBufSerializer;
 import com.cleanroommc.modularui.utils.serialization.IEquals;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -76,12 +76,12 @@ public class GenericSyncValue<T> extends ValueSyncHandler<T> {
     }
 
     @Override
-    public void write(PacketBuffer buffer) throws IOException {
+    public void write(FriendlyByteBuf buffer) throws IOException {
         this.serializer.serialize(buffer, this.cache);
     }
 
     @Override
-    public void read(PacketBuffer buffer) throws IOException {
+    public void read(FriendlyByteBuf buffer) throws IOException {
         setValue(this.deserializer.deserialize(buffer), true, false);
     }
 }

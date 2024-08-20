@@ -4,7 +4,7 @@ import com.cleanroommc.modularui.api.value.sync.IIntSyncValue;
 import com.cleanroommc.modularui.api.value.sync.IStringSyncValue;
 import com.cleanroommc.modularui.network.NetworkUtils;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
@@ -75,12 +75,12 @@ public class IntSyncValue extends ValueSyncHandler<Integer> implements IIntSyncV
     }
 
     @Override
-    public void write(PacketBuffer buffer) {
+    public void write(FriendlyByteBuf buffer) {
         buffer.writeVarInt(this.cache);
     }
 
     @Override
-    public void read(PacketBuffer buffer) {
+    public void read(FriendlyByteBuf buffer) {
         setIntValue(buffer.readVarInt(), true, false);
     }
 
