@@ -55,6 +55,38 @@ public interface IKey extends IDrawable {
     }
 
     /**
+     * Creates a translated text with arguments supplier.
+     *
+     * @param key          translation key
+     * @param argsSupplier translation arguments supplier
+     * @return text key
+     */
+    static IKey lang(@NotNull String key, @NotNull Supplier<Object[]> argsSupplier) {
+        return new LangKey(key, argsSupplier);
+    }
+
+    /**
+     * Creates a translated text.
+     *
+     * @param keySupplier translation key supplier
+     * @return text key
+     */
+    static IKey lang(@NotNull Supplier<String> keySupplier) {
+        return new LangKey(keySupplier);
+    }
+
+    /**
+     * Creates a translated text with arguments supplier.
+     *
+     * @param keySupplier  translation key supplier
+     * @param argsSupplier translation arguments supplier
+     * @return text key
+     */
+    static IKey lang(@NotNull Supplier<String> keySupplier, @NotNull Supplier<Object[]> argsSupplier) {
+        return new LangKey(keySupplier, argsSupplier);
+    }
+
+    /**
      * Creates a string literal text.
      *
      * @param key string
