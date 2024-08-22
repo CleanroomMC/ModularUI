@@ -239,8 +239,7 @@ public class DimensionSizer {
             if (this.start != null) {
                 p = calcPoint(this.start, s, relativeTo.getSize(this.axis), true);
             } else if (this.end != null) {
-                p = calcPoint(this.end, s, relativeTo.getSize(this.axis), true);
-                p = relativeTo.getSize(this.axis) - p - s;
+                p = calcPoint(this.end, s, relativeTo.getSize(this.axis), true) - s;
             } else {
                 p = area.getRelativePoint(this.axis) + p0/* + area.getMargin().getStart(this.axis)*/;
                 if (!this.cancelAutoMovement) {
