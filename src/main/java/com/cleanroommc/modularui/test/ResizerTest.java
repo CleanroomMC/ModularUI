@@ -1,14 +1,11 @@
 package com.cleanroommc.modularui.test;
 
-import com.cleanroommc.modularui.api.drawable.IKey;
-import com.cleanroommc.modularui.api.layout.IViewportStack;
-import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.widget.Widget;
-
-import net.minecraft.client.Minecraft;
+import com.cleanroommc.modularui.utils.fakeworld.ArraySchema;
+import com.cleanroommc.modularui.utils.fakeworld.ISchema;
+import com.cleanroommc.modularui.widgets.SchemaWidget;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -24,34 +21,50 @@ public class ResizerTest extends CustomModularScreen {
                         .background(new SpriteDrawable(sprite))
                         .size(20)
                         .align(Alignment.Center));*/
-        return ModularPanel.defaultPanel("main")
+        /*TrackedDummyWorld world = new TrackedDummyWorld();
+        world.addBlock(new BlockPos(0, 0, 0), new BlockInfo(Blocks.DIAMOND_BLOCK.getDefaultState()));
+        world.addBlock(new BlockPos(0, 1, 0), new BlockInfo(Blocks.BEDROCK.getDefaultState()));
+        world.addBlock(new BlockPos(1, 0, 1), new BlockInfo(Blocks.GOLD_BLOCK.getDefaultState()));*/
+/*        return ModularPanel.defaultPanel("main")
                 .size(150)
-                .child(new SpinningWidget()
-                        .size(80, 20)
-                        .center()
-                        .background(GuiTextures.MC_BUTTON)
-                        .overlay(IKey.str("Text"))
-                        .addTooltipLine("Long Tooltip Line"));
-                /*.child(new Column()
-                        .alignX(0.5f)
-                        .heightRel(1f)
-                        .margin(0, 7)
-                        .coverChildrenWidth()
-                        .mainAxisAlignment(Alignment.MainAxis.SPACE_BETWEEN)
-                        .child(new ButtonWidget<>().width(40))
-                        .child(new Row().height(30).widthRel(1f).background(GuiTextures.CHECKBOARD).debugName("row"))
-                        .child(new ButtonWidget<>()));*/
-    }
+                .overlay(new SchemaRenderer(BoxSchema.of(Minecraft.getMinecraft().world, new BlockPos(Minecraft.getMinecraft().player), 5))
+                        .cameraFunc((camera, schema) -> {
+                            double pitch = Math.PI / 4;
+                            double T = 4000D;
+                            double yaw = Minecraft.getSystemTime() % T / T * Math.PI * 2;
+                            camera.setLookAt(new BlockPos(Minecraft.getMinecraft().player), 20, yaw, pitch);
+                        })
+                        .isometric(true)
+                        .asIcon().size(140));*/
 
-    private static class SpinningWidget extends Widget<SpinningWidget> {
 
-        @Override
-        public void transform(IViewportStack stack) {
-            super.transform(stack);
-            stack.translate(getArea().width / 2f, getArea().height / 2f);
-            float p = Minecraft.getSystemTime() % 4000 / 4000f;
-            stack.rotateZ((float) (p * Math.PI * 2));
-            stack.translate(-getArea().width / 2f, -getArea().height / 2f);
-        }
+        /*MapSchema world = new MapSchema.Builder()
+                .add(new BlockPos(0, 0, 0), Blocks.DIAMOND_BLOCK.getDefaultState())
+                .add(new BlockPos(0, 1, 0), Blocks.BEDROCK.getDefaultState())
+                .add(new BlockPos(0, 2, 0), Blocks.WOOL.getDefaultState())
+                .add(new BlockPos(1, 0, 1), Blocks.GOLD_BLOCK.getDefaultState())
+                .add(new BlockPos(0, 3, 0), Blocks.BEACON.getDefaultState())
+                .build();*/
+
+        ISchema schema = ArraySchema.builder()
+                .layer("D   D", "     ", "     ", "     ")
+                .layer(" DDD ", " E E ", "     ", "     ")
+                .layer(" DDD ", "  E  ", "  G  ", "  B  ")
+                .layer(" DDD ", " E E ", "     ", "     ")
+                .layer("D   D", "     ", "     ", "     ")
+                .where('D', "minecraft:gold_block")
+                .where('E', "minecraft:emerald_block")
+                .where('G', "minecraft:diamond_block")
+                .where('B', "minecraft:beacon")
+                .build();
+
+        var panel = ModularPanel.defaultPanel("main").size(170);
+        panel.child(new SchemaWidget(schema)
+                        .full())
+                .child(new SchemaWidget.LayerButton(schema, 0, 3)
+                        .bottom(1)
+                        .left(1)
+                        .size(16));
+        return panel;
     }
 }

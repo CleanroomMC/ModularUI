@@ -37,6 +37,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
 import java.util.Set;
@@ -55,6 +56,7 @@ public class GuiScreenWrapper extends GuiContainer {
         super(container);
         this.screen = screen;
         this.screen.construct(this);
+        container.setScreen(this.screen);
     }
 
     @Override

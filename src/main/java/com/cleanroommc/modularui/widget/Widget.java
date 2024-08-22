@@ -105,14 +105,14 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     public void initialiseSyncHandler(ModularSyncManager syncManager) {
         if (this.syncKey != null) {
             this.syncHandler = syncManager.getSyncHandler(getPanel().getName(), this.syncKey);
-            if (!isValidSyncHandler(this.syncHandler)) {
-                String type = this.syncHandler == null ? null : this.syncHandler.getClass().getName();
-                this.syncHandler = null;
-                throw new IllegalStateException("SyncHandler of type " + type + " is not valid for " + getClass().getName() + ", with key " + this.syncKey);
-            }
-            if (this.syncHandler instanceof ValueSyncHandler<?> valueSyncHandler && valueSyncHandler.getChangeListener() == null) {
-                valueSyncHandler.setChangeListener(this::markTooltipDirty);
-            }
+        }
+        if ((this.syncKey != null || this.syncHandler != null) && !isValidSyncHandler(this.syncHandler)) {
+            String type = this.syncHandler == null ? null : this.syncHandler.getClass().getName();
+            this.syncHandler = null;
+            throw new IllegalStateException("SyncHandler of type " + type + " is not valid for " + getClass().getName() + ", with key " + this.syncKey);
+        }
+        if (this.syncHandler instanceof ValueSyncHandler<?> valueSyncHandler && valueSyncHandler.getChangeListener() == null) {
+            valueSyncHandler.setChangeListener(this::markTooltipDirty);
         }
     }
 

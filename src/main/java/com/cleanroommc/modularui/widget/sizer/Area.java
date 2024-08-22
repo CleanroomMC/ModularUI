@@ -14,6 +14,11 @@ import java.awt.geom.Rectangle2D;
  */
 public class Area extends Rectangle implements IUnResizeable {
 
+    public static boolean isInside(int x, int y, int w, int h, int px, int py) {
+        SHARED.set(x, y, w, h);
+        return SHARED.isInside(px, py);
+    }
+
     public static final Area SHARED = new Area();
 
     /**
@@ -175,6 +180,10 @@ public class Area extends Rectangle implements IUnResizeable {
 
     public int requestedHeight() {
         return this.height + this.margin.vertical();
+    }
+
+    public int requestedSize(GuiAxis axis) {
+        return axis.isHorizontal() ? requestedWidth() : requestedHeight();
     }
 
     public int relativeEndX() {
