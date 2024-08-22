@@ -288,6 +288,9 @@ public class DimensionSizer {
                 val += p.getOffset();
             }
         }
+        if (p == this.end) {
+            val = parentSize - val;
+        }
         this.posCalculated = true;
         return (int) val;
     }
