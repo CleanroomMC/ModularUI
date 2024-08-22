@@ -77,6 +77,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
             this.intValue.setIntValue(state);
         }
         this.lastValue = state;
+        markTooltipDirty();
     }
 
     @Override

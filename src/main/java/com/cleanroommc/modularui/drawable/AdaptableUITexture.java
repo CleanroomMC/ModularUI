@@ -25,7 +25,7 @@ public class AdaptableUITexture extends UITexture {
 
     @Override
     public AdaptableUITexture getSubArea(float uStart, float vStart, float uEnd, float vEnd) {
-        return new AdaptableUITexture(this.location, calcU(uStart), calcV(vStart), calcU(uEnd), calcV(vEnd), this.canApplyTheme, this.imageWidth, this.imageHeight, this.bl, this.bt, this.br, this.bb, this.tiled);
+        return new AdaptableUITexture(this.location, lerpU(uStart), lerpV(vStart), lerpU(uEnd), lerpV(vEnd), this.canApplyTheme, this.imageWidth, this.imageHeight, this.bl, this.bt, this.br, this.bb, this.tiled);
     }
 
     @Override

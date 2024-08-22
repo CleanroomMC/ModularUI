@@ -30,24 +30,30 @@ public class ToggleButton extends AbstractCycleButtonWidget<ToggleButton> {
     }
 
     public ToggleButton selectedBackground(IDrawable... selectedBackground) {
-        this.background = addToArray(this.background, selectedBackground, 1);
-        return this;
+        return background(true, selectedBackground);
     }
 
     public ToggleButton selectedHoverBackground(IDrawable... selectedHoverBackground) {
-        this.hoverBackground = addToArray(this.hoverBackground, selectedHoverBackground, 1);
-        return this;
+        return hoverBackground(true, selectedHoverBackground);
     }
 
     @Override
-    public ToggleButton background(IDrawable... background) {
-        this.background = addToArray(this.background, background, 0);
-        return this;
+    public ToggleButton background(IDrawable... selectedBackground) {
+        return background(false, selectedBackground);
     }
 
     @Override
-    public ToggleButton hoverBackground(IDrawable... background) {
-        this.hoverBackground = addToArray(this.hoverBackground, background, 0);
+    public ToggleButton hoverBackground(IDrawable... selectedHoverBackground) {
+        return hoverBackground(false, selectedHoverBackground);
+    }
+
+    public ToggleButton background(boolean selected, IDrawable... background) {
+        this.background = addToArray(this.background, background, selected ? 1 : 0);
+        return this;
+    }
+
+    public ToggleButton hoverBackground(boolean selected, IDrawable... background) {
+        this.hoverBackground = addToArray(this.hoverBackground, background, selected ? 1 : 0);
         return this;
     }
 

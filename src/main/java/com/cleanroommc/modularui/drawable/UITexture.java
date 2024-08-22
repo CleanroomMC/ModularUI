@@ -1,11 +1,11 @@
 package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
@@ -111,19 +111,19 @@ public class UITexture implements IDrawable {
      * @return relative sub area
      */
     public UITexture getSubArea(float uStart, float vStart, float uEnd, float vEnd) {
-        return new UITexture(this.location, calcU(uStart), calcV(vStart), calcU(uEnd), calcV(vEnd), this.canApplyTheme);
+        return new UITexture(this.location, lerpU(uStart), lerpV(vStart), lerpU(uEnd), lerpV(vEnd), this.canApplyTheme);
     }
 
     public ResourceLocation getLocation() {
         return this.location;
     }
 
-    protected final float calcU(float uNew) {
-        return (this.u1 - this.u0) * uNew + this.u0;
+    protected final float lerpU(float u) {
+        return Interpolations.lerp(this.u0, this.u1, u);
     }
 
-    protected final float calcV(float vNew) {
-        return (this.v1 - this.v0) * vNew + this.v0;
+    protected final float lerpV(float v) {
+        return Interpolations.lerp(this.v0, this.v1, v);
     }
 
     @SideOnly(Side.CLIENT)
@@ -142,7 +142,7 @@ public class UITexture implements IDrawable {
     }
 
     public void drawSubArea(float x, float y, float width, float height, float uStart, float vStart, float uEnd, float vEnd) {
-        GuiDraw.drawTexture(this.location, x, y, x + width, y + height, calcU(uStart), calcV(vStart), calcU(uEnd), calcV(vEnd));
+        GuiDraw.drawTexture(this.location, x, y, x + width, y + height, lerpU(uStart), lerpV(vStart), lerpU(uEnd), lerpV(vEnd));
     }
 
     @Override
