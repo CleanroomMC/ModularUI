@@ -182,6 +182,10 @@ public class Area extends Rectangle implements IUnResizeable {
         return this.height + this.margin.vertical();
     }
 
+    public int requestedSize(GuiAxis axis) {
+        return axis.isHorizontal() ? requestedWidth() : requestedHeight();
+    }
+
     public int relativeEndX() {
         return this.rx + this.width;
     }

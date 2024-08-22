@@ -19,7 +19,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.Optional;
+import net.minecraftforge.fml.common.Optional.Interface;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-@Optional.Interface(modid = ModularUI.BOGO_SORT, iface = "com.cleanroommc.bogosorter.api.ISortableContainer")
+@Interface(modid = ModularUI.BOGO_SORT, iface = "com.cleanroommc.bogosorter.api.ISortableContainer")
 public class ModularContainer extends Container implements ISortableContainer {
 
     public static ModularContainer getCurrent(EntityPlayer player) {
@@ -46,6 +46,8 @@ public class ModularContainer extends Container implements ISortableContainer {
     private final List<ModularSlot> slots = new ArrayList<>();
     private final List<ModularSlot> shiftClickSlots = new ArrayList<>();
     private ContainerCustomizer containerCustomizer;
+
+    private Optional<?> optionalScreen = Optional.empty();
 
     public ModularContainer(EntityPlayer player, PanelSyncManager panelSyncManager, String mainPanelName) {
         this.player = player;
@@ -65,6 +67,17 @@ public class ModularContainer extends Container implements ISortableContainer {
         this.syncManager = null;
         this.containerCustomizer = containerCustomizer != null ? containerCustomizer : new ContainerCustomizer();
         this.containerCustomizer.initialize(this);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void setScreen(ModularScreen screen) {
+        this.optionalScreen = Optional.ofNullable(screen);
+    }
+
+    @Nullable
+    @SideOnly(Side.CLIENT)
+    public ModularScreen getScreen() {
+        return (ModularScreen) optionalScreen.orElse(null);
     }
 
     public ContainerAccessor acc() {

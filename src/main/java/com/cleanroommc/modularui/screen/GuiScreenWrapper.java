@@ -17,6 +17,7 @@ public class GuiScreenWrapper extends GuiContainer implements IMuiScreen {
         super(container);
         this.screen = screen;
         this.screen.construct(this);
+        container.setScreen(this.screen);
     }
 
     @Override

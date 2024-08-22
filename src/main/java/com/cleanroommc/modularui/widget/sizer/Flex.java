@@ -267,12 +267,24 @@ public class Flex implements IResizeable, IPositioned<Flex> {
         return this.x.hasSize();
     }
 
+    public boolean hasPos(GuiAxis axis) {
+        return axis.isHorizontal() ? hasXPos() : hasYPos();
+    }
+
+    public boolean hasSize(GuiAxis axis) {
+        return axis.isHorizontal() ? hasWidth() : hasHeight();
+    }
+
     public boolean xAxisDependsOnChildren() {
         return this.x.dependsOnChildren();
     }
 
     public boolean yAxisDependsOnChildren() {
         return this.y.dependsOnChildren();
+    }
+
+    public boolean dependsOnChildren(GuiAxis axis) {
+        return axis.isHorizontal() ? xAxisDependsOnChildren() : yAxisDependsOnChildren();
     }
 
     public boolean hasFixedSize() {

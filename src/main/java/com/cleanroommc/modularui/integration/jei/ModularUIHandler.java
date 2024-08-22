@@ -60,7 +60,7 @@ public class ModularUIHandler implements IAdvancedGuiHandler<GuiScreenWrapper>, 
     @Nullable
     @Override
     public IRecipeTransferError transferRecipe(@NotNull ModularContainer container, @NotNull IRecipeLayout recipeLayout, @NotNull EntityPlayer player, boolean maxTransfer, boolean doTransfer) {
-        ModularScreen screen = ModularScreen.getCurrent();
+        ModularScreen screen = container.getScreen();
         if (screen instanceof JeiRecipeTransferHandler recipeTransferHandler) {
             return recipeTransferHandler.transferRecipe(recipeLayout, maxTransfer, !doTransfer);
         }
