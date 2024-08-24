@@ -15,10 +15,8 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
@@ -170,9 +168,7 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
     }
 
     public Grid row(IWidget... row) {
-        List<IWidget> list = new ArrayList<>();
-        Collections.addAll(list, row);
-        return row(list);
+        return row(Arrays.asList(row));
     }
 
     @Override
@@ -205,6 +201,32 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
 
     public <T, I extends IWidget> Grid mapTo(int rowLength, List<T> collection, IndexedElementMapper<T, I> widgetCreator) {
         return matrix(mapToMatrix(rowLength, collection, widgetCreator));
+    }
+
+    public <I extends IWidget> Grid mapTo(int rowLength, int size, Function<Integer, I> widgetCreator) {
+        this.matrix.clear();
+        for (int i = 0; i < size; i++) {
+            int r = i / rowLength;
+
+            if (r == this.matrix.size())
+                this.matrix.add(new ArrayList<>());
+
+            this.matrix.get(r).add(widgetCreator.apply(i));
+        }
+        return this;
+    }
+
+    public <T extends IWidget> Grid mapTo(int rowLength, List<T> widgets) {
+        this.matrix.clear();
+        for (int i = 0; i < widgets.size(); i++) {
+            int r = i / rowLength;
+
+            if (r == this.matrix.size())
+                this.matrix.add(new ArrayList<>());
+
+            this.matrix.get(r).add(widgets.get(i));
+        }
+        return this;
     }
 
     public Grid minColWidth(int minColWidth) {
