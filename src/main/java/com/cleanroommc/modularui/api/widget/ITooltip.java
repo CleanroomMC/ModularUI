@@ -148,6 +148,41 @@ public interface ITooltip<W extends IWidget> {
     }
 
     /**
+     * Sets whether the tooltip should automatically update on every render tick. In most of the cases you don't need this,
+     * as ValueSyncHandler handles tooltip update for you when value is updated. However, if you don't handle differently,
+     * you either need to manually set change listener for the sync value, or set auto update to true.
+     *
+     * @param update true if the tooltip should automatically update
+     * @return this
+     */
+    default W tooltipAutoUpdate(boolean update) {
+        tooltip().setAutoUpdate(update);
+        return getThis();
+    }
+
+    /**
+     * Sets whether the tooltip has a title margin, which is 2px space between first and second line inserted by default.
+     *
+     * @param hasTitleMargin true if the tooltip should have a title margin
+     * @return this
+     */
+    default W tooltipHasTitleMargin(boolean hasTitleMargin) {
+        tooltip().setHasTitleMargin(hasTitleMargin);
+        return getThis();
+    }
+
+    /**
+     * Sets the line padding for the tooltip. 1px by default, and you can disable it by passing 0.
+     *
+     * @param linePadding line padding in px
+     * @return this
+     */
+    default W tooltipLinePadding(int linePadding) {
+        tooltip().setLinePadding(linePadding);
+        return getThis();
+    }
+
+    /**
      * Adds any drawable as a new line. Inlining elements is currently not possible.
      *
      * @param drawable drawable element.
@@ -166,5 +201,27 @@ public interface ITooltip<W extends IWidget> {
      */
     default W addTooltipLine(String line) {
         return addTooltipLine(IKey.str(line));
+    }
+
+    /**
+     * Helper method to add multiple drawable lines.
+     *
+     * @param lines collection of drawable elements
+     * @return this
+     */
+    default W addTooltipDrawableLines(Iterable<IDrawable> lines) {
+        tooltip().addDrawableLines(lines);
+        return getThis();
+    }
+
+    /**
+     * Helper method to add multiple text lines.
+     *
+     * @param lines lines of text
+     * @return this
+     */
+    default W addTooltipStringLines(Iterable<String> lines) {
+        tooltip().addStringLines(lines);
+        return getThis();
     }
 }
