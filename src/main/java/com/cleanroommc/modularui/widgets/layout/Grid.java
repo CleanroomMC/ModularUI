@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.widgets.layout;
 
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.ScrollWidget;
 import com.cleanroommc.modularui.widget.scroll.HorizontalScrollData;
 import com.cleanroommc.modularui.widget.scroll.ScrollData;
@@ -25,6 +26,7 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
     private final List<List<IWidget>> matrix = new ArrayList<>();
     private final Box minElementMargin = new Box();
     private int minRowHeight = 5, minColWidth = 5;
+    private Alignment alignment = Alignment.Center;
     private boolean dirty = false;
 
     public Grid() {
@@ -83,8 +85,8 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
                 int width = colSizes.get(c);
                 IWidget child = this.matrix.get(r).get(c);
                 if (child != null) {
-                    child.getArea().rx = (int) (x + width * 0.5 - child.getArea().width * 0.5);
-                    child.getArea().ry = (int) (y + height * 0.5 - child.getArea().height * 0.5);
+                    child.getArea().rx = (int) (x + (width - child.getArea().width) * alignment.x);
+                    child.getArea().ry = (int) (y + (height - child.getArea().height) * alignment.y);
                     child.resizer().setPosResized(true, true);
                 }
                 x += width;
@@ -212,6 +214,11 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
 
     public Grid minRowHeight(int minRowHeight) {
         this.minRowHeight = minRowHeight;
+        return this;
+    }
+
+    public Grid alignment(Alignment alignment) {
+        this.alignment = alignment;
         return this;
     }
 
