@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.core.mixin;
 
-import com.cleanroommc.modularui.screen.GuiScreenWrapper;
+import com.cleanroommc.modularui.screen.GuiContainerWrapper;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
@@ -24,7 +24,7 @@ public class GuiContainerMixin {
      */
     @Inject(method = "getSlotAtPosition", at = @At("HEAD"), cancellable = true)
     public void getSlot(int x, int y, CallbackInfoReturnable<Slot> cir) {
-        if (((Object) this).getClass() == GuiScreenWrapper.class) {
+        if (((Object) this).getClass() == GuiContainerWrapper.class) {
             cir.setReturnValue(this.hoveredSlot);
         }
     }

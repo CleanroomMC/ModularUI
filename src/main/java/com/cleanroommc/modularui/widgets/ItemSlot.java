@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.widgets;
 
-import com.cleanroommc.modularui.ClientScreenHandler;
+import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
@@ -167,7 +167,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     protected List<String> getItemTooltip(ItemStack stack) {
         // todo: JEI seems to be getting tooltip from IngredientRenderer#getTooltip
-        return getScreen().getScreenWrapper().getItemToolTip(stack);
+        return getScreen().getScreenWrapper().getGuiScreen().getItemToolTip(stack);
     }
 
 
@@ -183,7 +183,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @SideOnly(Side.CLIENT)
     private void drawSlot(Slot slotIn) {
-        GuiScreen guiScreen = getScreen().getScreenWrapper();
+        GuiScreen guiScreen = getScreen().getScreenWrapper().getGuiScreen();
         if (!(guiScreen instanceof GuiContainer))
             throw new IllegalStateException("The gui must be an instance of GuiContainer if it contains slots!");
         GuiContainerAccessor acc = (GuiContainerAccessor) guiScreen;

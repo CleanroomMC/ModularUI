@@ -1,14 +1,16 @@
-package com.cleanroommc.modularui;
+package com.cleanroommc.modularui.overlay;
 
 import com.cleanroommc.modularui.screen.ModularScreen;
 
 import net.minecraft.client.gui.GuiScreen;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+@ApiStatus.Experimental
 public class OverlayHandler implements Comparable<OverlayHandler> {
 
     private final Predicate<GuiScreen> test;

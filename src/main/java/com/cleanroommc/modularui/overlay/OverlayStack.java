@@ -1,15 +1,19 @@
-package com.cleanroommc.modularui;
+package com.cleanroommc.modularui.overlay;
 
+import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.ModularScreen;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+@ApiStatus.Experimental
 public class OverlayStack {
 
     private static final List<ModularScreen> overlay = new ArrayList<>();
@@ -44,6 +48,8 @@ public class OverlayStack {
     }
 
     public static void draw(int mouseX, int mouseY, float partialTicks) {
+        ModularScreen hovered = null;
+        ModularScreen fallback = null;
         for (ModularScreen screen : overlay) {
             GlStateManager.disableDepth();
             GlStateManager.disableLighting();
@@ -52,7 +58,10 @@ public class OverlayStack {
             screen.drawScreen(mouseX, mouseY, partialTicks);
             GlStateManager.color(1f, 1f, 1f, 1f);
             screen.drawForeground(partialTicks);
+            if (screen.getContext().getHovered() != null) hovered = screen;
+            fallback = screen;
         }
+        ClientScreenHandler.drawDebugScreen(hovered, fallback);
         GlStateManager.enableLighting();
         GlStateManager.enableDepth();
         GlStateManager.enableRescaleNormal();

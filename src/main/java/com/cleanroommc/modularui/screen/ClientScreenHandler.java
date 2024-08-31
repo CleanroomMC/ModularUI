@@ -1,5 +1,8 @@
-package com.cleanroommc.modularui;
+package com.cleanroommc.modularui.screen;
 
+import com.cleanroommc.modularui.GuiErrorHandler;
+import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
@@ -8,9 +11,10 @@ import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
 import com.cleanroommc.modularui.core.mixin.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.Stencil;
-import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.overlay.OverlayStack;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
+import com.cleanroommc.modularui.utils.Animator;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.FpsCounter;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -53,7 +57,7 @@ public class ClientScreenHandler {
 
     private static ModularScreen currentScreen = null;
     private static Character lastChar = null;
-    private static FpsCounter fpsCounter = new FpsCounter();
+    private static final FpsCounter fpsCounter = new FpsCounter();
 
     @SubscribeEvent
     public static void onGuiOpen(GuiOpenEvent event) {
@@ -115,7 +119,7 @@ public class ClientScreenHandler {
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void onGuiDraw(GuiScreenEvent.DrawScreenEvent.Pre event) {
         if (checkGui(event.getGui())) {
-            drawScreen(currentScreen, currentScreen.getScreenWrapper(), event.getMouseX(), event.getMouseY(), event.getRenderPartialTicks());
+            drawScreen(currentScreen, currentScreen.getScreenWrapper().getGuiScreen(), event.getMouseX(), event.getMouseY(), event.getRenderPartialTicks());
             event.setCanceled(true);
         }
     }
@@ -133,6 +137,12 @@ public class ClientScreenHandler {
                 currentScreen.onUpdate();
             }
         }
+    }
+
+    public static void onFrameUpdate() {
+        OverlayStack.foreach(ModularScreen::onFrameUpdate, true);
+        if (currentScreen != null) currentScreen.onFrameUpdate();
+        Animator.advance();
     }
 
     private static boolean doAction(@Nullable ModularScreen muiScreen, Predicate<ModularScreen> action) {
@@ -275,13 +285,6 @@ public class ClientScreenHandler {
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
         RenderHelper.disableStandardItemLighting();
         muiScreen.drawForeground(partialTicks);
-        if (ModularUIConfig.guiDebugMode) {
-            GlStateManager.disableDepth();
-            GlStateManager.disableLighting();
-            GlStateManager.enableBlend();
-            drawDebugScreen(muiScreen);
-            GlStateManager.color(1f, 1f, 1f, 1f);
-        }
         GuiErrorHandler.INSTANCE.drawErrors(0, 0);
         GlStateManager.enableLighting();
         GlStateManager.enableDepth();
@@ -369,14 +372,6 @@ public class ClientScreenHandler {
         }
 
         GlStateManager.popMatrix();
-
-        if (ModularUIConfig.guiDebugMode) {
-            GlStateManager.disableDepth();
-            GlStateManager.disableLighting();
-            GlStateManager.enableBlend();
-            drawDebugScreen(muiScreen);
-            GlStateManager.color(1f, 1f, 1f, 1f);
-        }
         GuiErrorHandler.INSTANCE.drawErrors(0, 0);
 
         GlStateManager.enableLighting();
@@ -410,7 +405,20 @@ public class ClientScreenHandler {
         }
     }
 
-    public static void drawDebugScreen(ModularScreen muiScreen) {
+    public static void drawDebugScreen(@Nullable ModularScreen muiScreen, @Nullable ModularScreen fallback) {
+        if (!ModularUIConfig.guiDebugMode) return;
+        if (muiScreen == null) {
+            if (checkGui()) {
+                muiScreen = currentScreen;
+            } else {
+                if (fallback == null) return;
+                muiScreen = fallback;
+            }
+        }
+        GlStateManager.disableDepth();
+        GlStateManager.disableLighting();
+        GlStateManager.enableBlend();
+
         GuiContext context = muiScreen.getContext();
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
         int screenH = muiScreen.getScreenArea().height;
@@ -468,6 +476,7 @@ public class ClientScreenHandler {
         }
         // dot at mouse pos
         GuiDraw.drawRect(mouseX, mouseY, 1, 1, Color.withAlpha(Color.GREEN.main, 0.8f));
+        GlStateManager.color(1f, 1f, 1f, 1f);
     }
 
     private static void drawSegmentLine(int y, int color) {

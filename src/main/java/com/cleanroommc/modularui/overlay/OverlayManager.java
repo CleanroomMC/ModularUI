@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui;
+package com.cleanroommc.modularui.overlay;
 
 import com.cleanroommc.modularui.screen.ModularScreen;
 
@@ -7,10 +7,13 @@ import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@ApiStatus.Experimental
 public class OverlayManager {
 
     public static final List<OverlayHandler> overlays = new ArrayList<>();

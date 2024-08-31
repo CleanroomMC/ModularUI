@@ -1,10 +1,11 @@
 package com.cleanroommc.modularui;
 
 import com.cleanroommc.modularui.drawable.DrawableSerialization;
-import com.cleanroommc.modularui.factory.GuiManager;
 import com.cleanroommc.modularui.holoui.HoloScreenEntity;
 import com.cleanroommc.modularui.holoui.ScreenEntityRender;
 import com.cleanroommc.modularui.keybind.KeyBindHandler;
+import com.cleanroommc.modularui.overlay.OverlayManager;
+import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.test.EventHandler;
 import com.cleanroommc.modularui.theme.ThemeManager;
 import com.cleanroommc.modularui.theme.ThemeReloadCommand;
