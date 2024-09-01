@@ -1,10 +1,10 @@
 package com.cleanroommc.modularui.api.layout;
 
 import com.cleanroommc.modularui.screen.viewport.TransformationMatrix;
+import com.cleanroommc.modularui.utils.Vector3f;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.util.vector.Vector3f;
 
 /**
  * This handles all viewports in a GUI. Also keeps track of a matrix stack used for rendering and
