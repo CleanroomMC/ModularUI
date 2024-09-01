@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.factory;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.JeiSettings;
 import com.cleanroommc.modularui.api.MCHelper;
@@ -11,9 +10,9 @@ import com.cleanroommc.modularui.screen.*;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widget.WidgetTree;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
@@ -95,10 +94,15 @@ public class GuiManager {
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularScreen screen = factory.createScreen(guiData, panel);
         screen.getContext().setJeiSettings(jeiSettings);
-        GuiContainerWrapper guiContainerWrapper = new GuiContainerWrapper(new ModularContainer(player, syncManager, panel.getName()), screen);
-        guiContainerWrapper.inventorySlots.windowId = windowId;
-        Minecraft.getMinecraft().displayGuiScreen(guiContainerWrapper);
-        player.openContainer = guiContainerWrapper.inventorySlots;
+        ModularContainer container = new ModularContainer(player, syncManager, panel.getName());
+        IMuiScreen wrapper = factory.createScreenWrapper(container, screen);
+        if (!(wrapper.getGuiScreen() instanceof GuiContainer guiContainer)) {
+            throw new IllegalStateException("The wrapping screen must be a GuiContainer for synced GUIs!");
+        }
+        if (guiContainer.inventorySlots != container) throw new IllegalStateException("Custom Containers are not yet allowed!");
+        guiContainer.inventorySlots.windowId = windowId;
+        MCHelper.displayScreen(wrapper.getGuiScreen());
+        player.openContainer = guiContainer.inventorySlots;
     }
 
     @SideOnly(Side.CLIENT)

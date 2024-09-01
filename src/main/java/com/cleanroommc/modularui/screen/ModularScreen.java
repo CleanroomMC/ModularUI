@@ -132,7 +132,6 @@ public class ModularScreen {
     public void construct(IMuiScreen wrapper) {
         if (this.screenWrapper != null) throw new IllegalStateException("ModularScreen is already constructed!");
         if (wrapper == null) throw new NullPointerException("GuiScreenWrapper must not be null!");
-        //if (!(wrapper instanceof IMuiScreen)) throw new IllegalArgumentException("GuiScreen must be an instance of IMuiScreen!");
         this.screenWrapper = wrapper;
         this.screenWrapper.updateGuiArea(this.panelManager.getMainPanel().getArea());
         this.overlay = false;
