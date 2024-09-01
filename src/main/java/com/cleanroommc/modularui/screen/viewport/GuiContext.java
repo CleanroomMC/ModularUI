@@ -1,13 +1,14 @@
 package com.cleanroommc.modularui.screen.viewport;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.widget.*;
-import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
 import com.cleanroommc.modularui.screen.*;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.entity.EntityPlayerSP;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -26,10 +27,8 @@ import java.util.function.Consumer;
  */
 public class GuiContext extends GuiViewportStack {
 
-    public final Minecraft mc;
-    public final FontRenderer font;
-
     /* GUI elements */
+    @Deprecated
     public final ModularScreen screen;
     private LocatedWidget focusedWidget = LocatedWidget.EMPTY;
     @Nullable
@@ -62,9 +61,11 @@ public class GuiContext extends GuiViewportStack {
 
     public GuiContext(ModularScreen screen) {
         this.screen = screen;
-        this.hoveredWidgets = new HoveredIterable(this.screen.getPanelManager());
-        this.mc = Minecraft.getMinecraft();
-        this.font = this.mc.fontRenderer;
+        this.hoveredWidgets = new HoveredIterable(this.screen.getPanelManager());;
+    }
+
+    public ModularScreen getScreen() {
+        return screen;
     }
 
     /**
@@ -255,7 +256,8 @@ public class GuiContext extends GuiViewportStack {
     }
 
     public boolean isMouseItemEmpty() {
-        return this.mc.player.inventory.getItemStack().isEmpty();
+        EntityPlayerSP player = MCHelper.getPlayer();
+        return player == null || player.inventory.getItemStack().isEmpty();
     }
 
     @ApiStatus.Internal
@@ -364,9 +366,9 @@ public class GuiContext extends GuiViewportStack {
             if (this.hovered != null) {
                 this.hovered.onMouseStartHover();
                 if (this.hovered instanceof IVanillaSlot vanillaSlot) {
-                    ((GuiContainerAccessor) this.screen.getScreenWrapper()).setHoveredSlot(vanillaSlot.getVanillaSlot());
+                    this.screen.getScreenWrapper().setHoveredSlot(vanillaSlot.getVanillaSlot());
                 } else {
-                    ((GuiContainerAccessor) this.screen.getScreenWrapper()).setHoveredSlot(null);
+                    this.screen.getScreenWrapper().setHoveredSlot(null);
                 }
             }
         } else {
@@ -449,6 +451,9 @@ public class GuiContext extends GuiViewportStack {
     }
 
     public JeiSettingsImpl getJeiSettings() {
+        if (this.screen.isOverlay()) {
+            throw new IllegalStateException("Overlays don't have JEI settings!");
+        }
         if (this.jeiSettings == null) {
             throw new IllegalStateException("The screen is not yet initialised!");
         }

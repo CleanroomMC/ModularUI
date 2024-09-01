@@ -1,14 +1,16 @@
 package com.cleanroommc.modularui.widgets;
 
+import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
+import com.cleanroommc.modularui.core.mixin.GuiAccessor;
 import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
+import com.cleanroommc.modularui.core.mixin.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.TextRenderer;
 import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
 import com.cleanroommc.modularui.integration.jei.JeiIngredientProvider;
-import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -23,15 +25,17 @@ import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 import org.jetbrains.annotations.NotNull;
@@ -58,6 +62,9 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @Override
     public void onInit() {
+        if (getScreen().isOverlay()) {
+            throw new IllegalStateException("Overlays can't have slots!");
+        }
         size(SIZE, SIZE);
         getContext().getJeiSettings().addJeiGhostIngredientSlot(this);
     }
@@ -110,7 +117,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             MouseData mouseData = MouseData.create(mouseButton);
             this.syncHandler.syncToServer(2, mouseData::writeToPacket);
         } else {
-            getScreen().getScreenWrapper().clickSlot();
+            ClientScreenHandler.clickSlot();
+            //getScreen().getScreenWrapper().clickSlot();
         }
         return Result.SUCCESS;
     }
@@ -118,7 +126,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     @Override
     public boolean onMouseRelease(int mouseButton) {
         if (!this.syncHandler.isPhantom()) {
-            getScreen().getScreenWrapper().releaseSlot();
+            ClientScreenHandler.releaseSlot();
+            //getScreen().getScreenWrapper().releaseSlot();
         }
         return true;
     }
@@ -135,7 +144,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @Override
     public void onMouseDrag(int mouseButton, long timeSinceClick) {
-        getScreen().getScreenWrapper().dragSlot(timeSinceClick);
+        //getScreen().getScreenWrapper().dragSlot(timeSinceClick);
+        ClientScreenHandler.dragSlot(timeSinceClick);
     }
 
     public ModularSlot getSlot() {
@@ -157,7 +167,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     protected List<String> getItemTooltip(ItemStack stack) {
         // todo: JEI seems to be getting tooltip from IngredientRenderer#getTooltip
-        return getScreen().getScreenWrapper().getItemToolTip(stack);
+        return getScreen().getScreenWrapper().getGuiScreen().getItemToolTip(stack);
     }
 
 
@@ -173,27 +183,30 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @SideOnly(Side.CLIENT)
     private void drawSlot(Slot slotIn) {
-        GuiScreenWrapper guiScreen = getScreen().getScreenWrapper();
-        GuiContainerAccessor accessor = guiScreen.getAccessor();
+        GuiScreen guiScreen = getScreen().getScreenWrapper().getGuiScreen();
+        if (!(guiScreen instanceof GuiContainer))
+            throw new IllegalStateException("The gui must be an instance of GuiContainer if it contains slots!");
+        GuiContainerAccessor acc = (GuiContainerAccessor) guiScreen;
+        RenderItem renderItem = ((GuiScreenAccessor) guiScreen).getItemRender();
         ItemStack itemstack = slotIn.getStack();
         boolean flag = false;
-        boolean flag1 = slotIn == accessor.getClickedSlot() && !accessor.getDraggedStack().isEmpty() && !accessor.getIsRightMouseClick();
+        boolean flag1 = slotIn == acc.getClickedSlot() && !acc.getDraggedStack().isEmpty() && !acc.getIsRightMouseClick();
         ItemStack itemstack1 = guiScreen.mc.player.inventory.getItemStack();
         int amount = -1;
         String format = null;
 
-        if (slotIn == accessor.getClickedSlot() && !accessor.getDraggedStack().isEmpty() && accessor.getIsRightMouseClick() && !itemstack.isEmpty()) {
+        if (slotIn == acc.getClickedSlot() && !acc.getDraggedStack().isEmpty() && acc.getIsRightMouseClick() && !itemstack.isEmpty()) {
             itemstack = itemstack.copy();
             itemstack.setCount(itemstack.getCount() / 2);
-        } else if (guiScreen.isDragSplitting() && guiScreen.getDragSlots().contains(slotIn) && !itemstack1.isEmpty()) {
-            if (guiScreen.getDragSlots().size() == 1) {
+        } else if (acc.getDragSplitting() && acc.getDragSplittingSlots().contains(slotIn) && !itemstack1.isEmpty()) {
+            if (acc.getDragSplittingSlots().size() == 1) {
                 return;
             }
 
-            if (Container.canAddItemToSlot(slotIn, itemstack1, true) && guiScreen.inventorySlots.canDragIntoSlot(slotIn)) {
+            if (Container.canAddItemToSlot(slotIn, itemstack1, true) && getScreen().getContainer().canDragIntoSlot(slotIn)) {
                 itemstack = itemstack1.copy();
                 flag = true;
-                Container.computeStackSize(guiScreen.getDragSlots(), accessor.getDragSplittingLimit(), itemstack, slotIn.getStack().isEmpty() ? 0 : slotIn.getStack().getCount());
+                Container.computeStackSize(acc.getDragSplittingSlots(), acc.getDragSplittingLimit(), itemstack, slotIn.getStack().isEmpty() ? 0 : slotIn.getStack().getCount());
                 int k = Math.min(itemstack.getMaxStackSize(), slotIn.getItemStackLimit(itemstack));
 
                 if (itemstack.getCount() > k) {
@@ -202,13 +215,13 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                     itemstack.setCount(k);
                 }
             } else {
-                guiScreen.getDragSlots().remove(slotIn);
-                accessor.invokeUpdateDragSplitting();
+                acc.getDragSplittingSlots().remove(slotIn);
+                acc.invokeUpdateDragSplitting();
             }
         }
 
-        guiScreen.setZ(100f);
-        guiScreen.getItemRenderer().zLevel = 100.0F;
+        ((GuiAccessor) guiScreen).setZLevel(100f);
+        renderItem.zLevel = 100.0F;
 
         if (!flag1) {
             if (flag) {
@@ -218,7 +231,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             if (!itemstack.isEmpty()) {
                 GlStateManager.enableDepth();
                 // render the item itself
-                guiScreen.getItemRenderer().renderItemAndEffectIntoGUI(guiScreen.mc.player, itemstack, 1, 1);
+                renderItem.renderItemAndEffectIntoGUI(guiScreen.mc.player, itemstack, 1, 1);
                 if (amount < 0) {
                     amount = itemstack.getCount();
                 }
@@ -253,14 +266,14 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 int cachedCount = itemstack.getCount();
                 itemstack.setCount(1); // required to not render the amount overlay
                 // render other overlays like durability bar
-                guiScreen.getItemRenderer().renderItemOverlayIntoGUI(guiScreen.getFontRenderer(), itemstack, 1, 1, null);
+                renderItem.renderItemOverlayIntoGUI(((GuiScreenAccessor) guiScreen).getFontRenderer(), itemstack, 1, 1, null);
                 itemstack.setCount(cachedCount);
                 GlStateManager.disableDepth();
             }
         }
 
-        guiScreen.getItemRenderer().zLevel = 0.0F;
-        guiScreen.setZ(0f);
+        ((GuiAccessor) guiScreen).setZLevel(0f);
+        renderItem.zLevel = 0f;
     }
 
     @Override

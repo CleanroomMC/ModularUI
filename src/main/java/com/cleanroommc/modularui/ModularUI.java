@@ -50,10 +50,6 @@ public class ModularUI {
     }
 
     @Mod.EventHandler
-    public void onLoadComplete(FMLLoadCompleteEvent event) {
-    }
-
-    @Mod.EventHandler
     public void onServerLoad(FMLServerStartingEvent event) {
         proxy.onServerLoad(event);
     }

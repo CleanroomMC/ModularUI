@@ -3,13 +3,12 @@ package com.cleanroommc.modularui.screen.viewport;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.utils.GuiUtils;
+import com.cleanroommc.modularui.utils.Matrix4f;
+import com.cleanroommc.modularui.utils.Vector3f;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.util.vector.Matrix4f;
-import org.lwjgl.util.vector.Vector2f;
-import org.lwjgl.util.vector.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -133,7 +132,7 @@ public class GuiViewportStack implements IViewportStack {
 
     public void translate(float x, float y) {
         checkViewport();
-        this.top.getMatrix().translate(new Vector2f(x, y));
+        this.top.getMatrix().translate(x, y);
         this.top.markDirty();
     }
 

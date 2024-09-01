@@ -2,10 +2,11 @@ package com.cleanroommc.modularui.holoui;
 
 import com.cleanroommc.modularui.utils.GuiUtils;
 
+import com.cleanroommc.modularui.utils.Matrix4f;
+
 import net.minecraft.client.renderer.GlStateManager;
 
 import org.jetbrains.annotations.ApiStatus;
-import org.lwjgl.util.vector.Matrix4f;
 
 /**
  * Highly experimental

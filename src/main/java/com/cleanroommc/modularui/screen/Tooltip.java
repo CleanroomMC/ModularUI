@@ -81,7 +81,7 @@ public class Tooltip {
             this.maxWidth = Integer.MAX_VALUE;
         }
         if (stack == null) stack = ItemStack.EMPTY;
-        Area screen = context.screen.getScreenArea();
+        Area screen = context.getScreen().getScreenArea();
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
         IconRenderer renderer = IconRenderer.SHARED;
         List<String> textLines = lines.stream().filter(drawable -> drawable instanceof IKey).map(key -> ((IKey) key).get()).collect(Collectors.toList());
@@ -133,7 +133,7 @@ public class Tooltip {
         int height = (int) renderer.getLastHeight();
 
         if (!this.customPos) {
-            this.pos = context.screen.getCurrentTheme().getTooltipPosOverride();
+            this.pos = context.getScreen().getCurrentTheme().getTooltipPosOverride();
         }
 
         if (this.pos == null) {
@@ -211,7 +211,7 @@ public class Tooltip {
             if (this.pos == Pos.HORIZONTAL) {
                 if (area.x > screenWidth - area.ex()) {
                     pos = Pos.LEFT;
-                    x = 0;
+                    // x = 0;
                 } else {
                     pos = Pos.RIGHT;
                     x = screenWidth - area.ex() + padding;

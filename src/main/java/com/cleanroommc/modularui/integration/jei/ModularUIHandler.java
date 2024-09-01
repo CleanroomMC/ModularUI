@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.integration.jei;
 
 import com.cleanroommc.modularui.api.widget.IGuiElement;
-import com.cleanroommc.modularui.screen.GuiScreenWrapper;
+import com.cleanroommc.modularui.screen.GuiContainerWrapper;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.screen.ModularScreen;
 
@@ -17,28 +17,28 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 import java.util.List;
 
-public class ModularUIHandler implements IAdvancedGuiHandler<GuiScreenWrapper>, IGhostIngredientHandler<GuiScreenWrapper>, IGuiScreenHandler<GuiScreenWrapper>, IRecipeTransferHandler<ModularContainer> {
+public class ModularUIHandler implements IAdvancedGuiHandler<GuiContainerWrapper>, IGhostIngredientHandler<GuiContainerWrapper>, IGuiScreenHandler<GuiContainerWrapper>, IRecipeTransferHandler<ModularContainer> {
 
     @Override
-    public @NotNull Class<GuiScreenWrapper> getGuiContainerClass() {
-        return GuiScreenWrapper.class;
+    public @NotNull Class<GuiContainerWrapper> getGuiContainerClass() {
+        return GuiContainerWrapper.class;
     }
 
     @Nullable
     @Override
-    public List<Rectangle> getGuiExtraAreas(@NotNull GuiScreenWrapper guiContainer) {
+    public List<Rectangle> getGuiExtraAreas(@NotNull GuiContainerWrapper guiContainer) {
         return guiContainer.getScreen().getContext().getJeiSettings().getAllJeiExclusionAreas();
     }
 
     @Nullable
     @Override
-    public Object getIngredientUnderMouse(@NotNull GuiScreenWrapper guiContainer, int mouseX, int mouseY) {
+    public Object getIngredientUnderMouse(@NotNull GuiContainerWrapper guiContainer, int mouseX, int mouseY) {
         IGuiElement hovered = guiContainer.getScreen().getContext().getHovered();
         return hovered instanceof JeiIngredientProvider jip ? jip.getIngredient() : null;
     }
 
     @Override
-    public <I> @NotNull List<Target<I>> getTargets(GuiScreenWrapper gui, @NotNull I ingredient, boolean doStart) {
+    public <I> @NotNull List<Target<I>> getTargets(GuiContainerWrapper gui, @NotNull I ingredient, boolean doStart) {
         return gui.getScreen().getContext().getJeiSettings().getAllGhostIngredientTargets(ingredient);
     }
 
@@ -48,7 +48,7 @@ public class ModularUIHandler implements IAdvancedGuiHandler<GuiScreenWrapper>, 
 
     @Nullable
     @Override
-    public IGuiProperties apply(@NotNull GuiScreenWrapper guiScreen) {
+    public IGuiProperties apply(@NotNull GuiContainerWrapper guiScreen) {
         return guiScreen.getScreen().getContext().getJeiSettings().isJeiEnabled(guiScreen.getScreen()) ? GuiProperties.create(guiScreen) : null;
     }
 

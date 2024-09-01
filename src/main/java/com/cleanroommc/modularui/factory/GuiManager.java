@@ -1,6 +1,8 @@
 package com.cleanroommc.modularui.factory;
 
+import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.JeiSettings;
+import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.UIFactory;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.packets.OpenGuiPacket;
@@ -8,8 +10,9 @@ import com.cleanroommc.modularui.screen.*;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widget.WidgetTree;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
@@ -36,7 +39,7 @@ public class GuiManager {
 
     private static final Object2ObjectMap<String, UIFactory<?>> FACTORIES = new Object2ObjectOpenHashMap<>(16);
 
-    private static GuiScreenWrapper lastMui;
+    private static IMuiScreen lastMui;
     private static final List<EntityPlayer> openedContainers = new ArrayList<>(4);
 
     public static void registerFactory(UIFactory<?> factory) {
@@ -55,6 +58,10 @@ public class GuiManager {
         UIFactory<?> factory = FACTORIES.get(name);
         if (factory == null) throw new NoSuchElementException();
         return factory;
+    }
+
+    public static boolean hasFactory(String name) {
+        return FACTORIES.containsKey(name);
     }
 
     public static <T extends GuiData> void open(@NotNull UIFactory<T> factory, @NotNull T guiData, EntityPlayerMP player) {
@@ -91,17 +98,27 @@ public class GuiManager {
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularScreen screen = factory.createScreen(guiData, panel);
         screen.getContext().setJeiSettings(jeiSettings);
-        GuiScreenWrapper guiScreenWrapper = new GuiScreenWrapper(new ModularContainer(player, syncManager, panel.getName()), screen);
-        guiScreenWrapper.inventorySlots.windowId = windowId;
-        Minecraft.getMinecraft().displayGuiScreen(guiScreenWrapper);
-        player.openContainer = guiScreenWrapper.inventorySlots;
+        ModularContainer container = new ModularContainer(player, syncManager, panel.getName());
+        IMuiScreen wrapper = factory.createScreenWrapper(container, screen);
+        if (!(wrapper.getGuiScreen() instanceof GuiContainer guiContainer)) {
+            throw new IllegalStateException("The wrapping screen must be a GuiContainer for synced GUIs!");
+        }
+        if (guiContainer.inventorySlots != container) throw new IllegalStateException("Custom Containers are not yet allowed!");
+        guiContainer.inventorySlots.windowId = windowId;
+        MCHelper.displayScreen(wrapper.getGuiScreen());
+        player.openContainer = guiContainer.inventorySlots;
     }
 
     @SideOnly(Side.CLIENT)
     static void openScreen(ModularScreen screen, JeiSettingsImpl jeiSettings, ContainerCustomizer containerCustomizer) {
         screen.getContext().setJeiSettings(jeiSettings);
-        GuiScreenWrapper screenWrapper = new GuiScreenWrapper(new ModularContainer(containerCustomizer), screen);
-        Minecraft.getMinecraft().displayGuiScreen(screenWrapper);
+        GuiScreen guiScreen;
+        if (containerCustomizer == null) {
+            guiScreen = new GuiScreenWrapper(screen);
+        } else {
+            guiScreen = new GuiContainerWrapper(new ModularContainer(containerCustomizer), screen);
+        }
+        MCHelper.displayScreen(guiScreen);
     }
 
     @SubscribeEvent
@@ -120,7 +137,7 @@ public class GuiManager {
             }
             lastMui.getScreen().getPanelManager().dispose();
             lastMui = null;
-        } else if (event.getGui() instanceof GuiScreenWrapper screenWrapper) {
+        } else if (event.getGui() instanceof IMuiScreen screenWrapper) {
             if (lastMui == null) {
                 lastMui = screenWrapper;
             } else if (lastMui == event.getGui()) {

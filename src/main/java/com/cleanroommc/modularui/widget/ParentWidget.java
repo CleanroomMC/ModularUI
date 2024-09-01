@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.widget;
 
+import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
-
 import com.cleanroommc.modularui.theme.WidgetTheme;
 
 import org.jetbrains.annotations.NotNull;
@@ -24,16 +24,13 @@ public class ParentWidget<W extends ParentWidget<W>> extends Widget<W> {
 
     @Override
     public boolean canHover() {
-        return getBackground() != null ||
-                getHoverBackground() != null ||
-                getHoverOverlay() != null ||
-                getTooltip() != null ||
-                hasThemeBackground();
-    }
-
-    protected boolean hasThemeBackground() {
+        if (IDrawable.isVisible(getBackground()) ||
+                IDrawable.isVisible(getHoverBackground()) ||
+                IDrawable.isVisible(getHoverOverlay()) ||
+                getTooltip() != null) return true;
         WidgetTheme widgetTheme = getWidgetTheme(getContext().getTheme());
-        return widgetTheme.getBackground() != null || widgetTheme.getHoverBackground() != null;
+        if (getBackground() == null && IDrawable.isVisible(widgetTheme.getBackground())) return true;
+        return getHoverBackground() == null && IDrawable.isVisible(widgetTheme.getHoverBackground());
     }
 
     public boolean addChild(IWidget child, int index) {

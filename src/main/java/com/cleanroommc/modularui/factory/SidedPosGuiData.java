@@ -3,6 +3,9 @@ package com.cleanroommc.modularui.factory;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 
+/**
+ * See {@link GuiData} for an explanation for what this is for.
+ */
 public class SidedPosGuiData extends PosGuiData {
 
     private final EnumFacing side;

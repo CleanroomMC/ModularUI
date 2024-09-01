@@ -4,6 +4,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 
+/**
+ * See {@link GuiData} for an explanation for what this is for.
+ */
 public class HandGuiData extends GuiData {
 
     private final EnumHand hand;

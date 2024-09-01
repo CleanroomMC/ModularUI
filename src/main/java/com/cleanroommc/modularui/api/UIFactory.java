@@ -1,9 +1,10 @@
 package com.cleanroommc.modularui.api;
 
 import com.cleanroommc.modularui.factory.GuiData;
+import com.cleanroommc.modularui.screen.GuiContainerWrapper;
+import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
-
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -50,6 +51,22 @@ public interface UIFactory<D extends GuiData> {
     @SideOnly(Side.CLIENT)
     @ApiStatus.OverrideOnly
     ModularScreen createScreen(D guiData, ModularPanel mainPanel);
+
+    /**
+     * Creates the screen wrapper for the GUI. Is only called on client side.
+     *
+     * @param container container for the gui
+     * @param screen    the screen which was created in {@link #createScreen(GuiData, ModularPanel)}
+     * @return new screen wrapper
+     * @throws IllegalStateException if the wrapping screen is not a {@link net.minecraft.client.gui.inventory.GuiContainer GuiContainer} or if the
+     *                               container inside is not the same as the one passed to this method. This method is not the thrower, but the
+     *                               caller of this method.
+     */
+    @SideOnly(Side.CLIENT)
+    @ApiStatus.OverrideOnly
+    default IMuiScreen createScreenWrapper(ModularContainer container, ModularScreen screen) {
+        return new GuiContainerWrapper(container, screen);
+    }
 
     /**
      * Writes the gui data to a buffer.

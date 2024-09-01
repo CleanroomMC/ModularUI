@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.api.IGuiHolder;
+import com.cleanroommc.modularui.factory.GuiFactories;
 import com.cleanroommc.modularui.factory.HandGuiData;
 import com.cleanroommc.modularui.factory.ItemGuiFactory;
 import com.cleanroommc.modularui.screen.ModularPanel;
@@ -62,7 +63,7 @@ public class TestItem extends Item implements IGuiHolder<HandGuiData> {
     @Nonnull
     public ActionResult<ItemStack> onItemRightClick(World world, @NotNull EntityPlayer player, @Nonnull EnumHand hand) {
         if (!world.isRemote) {
-            ItemGuiFactory.open((EntityPlayerMP) player, hand);
+            GuiFactories.item().open(player, hand);
         }
         return new ActionResult<>(EnumActionResult.SUCCESS, player.getHeldItem(hand));
     }

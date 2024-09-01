@@ -1,11 +1,13 @@
 package com.cleanroommc.modularui;
 
 import com.cleanroommc.modularui.drawable.DrawableSerialization;
-import com.cleanroommc.modularui.factory.GuiManager;
 import com.cleanroommc.modularui.holoui.HoloScreenEntity;
 import com.cleanroommc.modularui.holoui.ScreenEntityRender;
 import com.cleanroommc.modularui.keybind.KeyBindHandler;
+import com.cleanroommc.modularui.overlay.OverlayManager;
+import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.test.EventHandler;
+import com.cleanroommc.modularui.test.OverlayTest;
 import com.cleanroommc.modularui.theme.ThemeManager;
 import com.cleanroommc.modularui.theme.ThemeReloadCommand;
 
@@ -31,10 +33,13 @@ public class ClientProxy extends CommonProxy {
         super.preInit(event);
 
         MinecraftForge.EVENT_BUS.register(ClientEventHandler.class);
+        MinecraftForge.EVENT_BUS.register(ClientScreenHandler.class);
+        MinecraftForge.EVENT_BUS.register(OverlayManager.class);
         MinecraftForge.EVENT_BUS.register(KeyBindHandler.class);
 
         if (ModularUIConfig.enabledTestGuis) {
             MinecraftForge.EVENT_BUS.register(EventHandler.class);
+            OverlayTest.init();
         }
 
         DrawableSerialization.init();

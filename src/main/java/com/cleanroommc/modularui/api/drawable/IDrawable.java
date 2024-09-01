@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.api.drawable;
 
+import com.cleanroommc.modularui.drawable.DrawableArray;
 import com.cleanroommc.modularui.drawable.Icon;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -10,6 +11,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.google.gson.JsonObject;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * An object which can be drawn. This is mainly used for backgrounds and overlays in
@@ -137,6 +139,14 @@ public interface IDrawable {
      * An empty drawable used to mark hover textures as "should not be used"!
      */
     IDrawable NONE = (context, x, y, width, height, widgetTheme) -> {};
+
+    static boolean isVisible(@Nullable IDrawable drawable) {
+        if (drawable == null || drawable == EMPTY || drawable == NONE) return false;
+        if (drawable instanceof DrawableArray array) {
+            return array.getDrawables().length > 0;
+        }
+        return true;
+    }
 
     /**
      * A widget wrapping a drawable. The drawable is drawn between the background and the overlay.

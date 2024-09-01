@@ -73,7 +73,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
             getArea().z(parent.getArea().z() + 1);
             if (this.guiActionListeners != null) {
                 for (IGuiAction action : this.guiActionListeners) {
-                    this.context.screen.registerGuiActionListener(action);
+                    this.context.getScreen().registerGuiActionListener(action);
                 }
             }
         }
@@ -120,7 +120,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         if (isValid()) {
             if (this.guiActionListeners != null) {
                 for (IGuiAction action : this.guiActionListeners) {
-                    this.context.screen.removeGuiActionListener(action);
+                    this.context.getScreen().removeGuiActionListener(action);
                 }
             }
 
@@ -297,7 +297,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         }
         this.guiActionListeners.add(action);
         if (isValid()) {
-            this.context.screen.registerGuiActionListener(action);
+            this.context.getScreen().registerGuiActionListener(action);
         }
         return getThis();
     }

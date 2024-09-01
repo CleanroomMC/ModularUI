@@ -17,7 +17,7 @@ public class SidedTileEntityGuiFactory extends AbstractUIFactory<SidedPosGuiData
 
     public static final SidedTileEntityGuiFactory INSTANCE = new SidedTileEntityGuiFactory();
 
-    public static <T extends TileEntity & IGuiHolder<SidedPosGuiData>> void open(EntityPlayer player, T tile, EnumFacing facing) {
+    public <T extends TileEntity & IGuiHolder<SidedPosGuiData>> void open(EntityPlayer player, T tile, EnumFacing facing) {
         Objects.requireNonNull(player);
         Objects.requireNonNull(tile);
         Objects.requireNonNull(facing);
@@ -29,15 +29,15 @@ public class SidedTileEntityGuiFactory extends AbstractUIFactory<SidedPosGuiData
         }
         BlockPos pos = tile.getPos();
         SidedPosGuiData data = new SidedPosGuiData(player, pos.getX(), pos.getY(), pos.getZ(), facing);
-        GuiManager.open(INSTANCE, data, (EntityPlayerMP) player);
+        GuiManager.open(this, data, (EntityPlayerMP) player);
     }
 
-    public static void open(EntityPlayer player, BlockPos pos, EnumFacing facing) {
+    public void open(EntityPlayer player, BlockPos pos, EnumFacing facing) {
         Objects.requireNonNull(player);
         Objects.requireNonNull(pos);
         Objects.requireNonNull(facing);
         SidedPosGuiData data = new SidedPosGuiData(player, pos.getX(), pos.getY(), pos.getZ(), facing);
-        GuiManager.open(INSTANCE, data, (EntityPlayerMP) player);
+        GuiManager.open(this, data, (EntityPlayerMP) player);
     }
 
     private SidedTileEntityGuiFactory() {

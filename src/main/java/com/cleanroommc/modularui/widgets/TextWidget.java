@@ -29,7 +29,7 @@ public class TextWidget extends Widget<TextWidget> {
     public void draw(GuiContext context, WidgetTheme widgetTheme) {
         TextRenderer renderer = TextRenderer.SHARED;
         renderer.setColor(this.colorChanged ? this.color : widgetTheme.getTextColor());
-        renderer.setAlignment(this.alignment, getArea().w() + 1, getArea().h());
+        renderer.setAlignment(this.alignment, getArea().w() + this.scale, getArea().h());
         renderer.setShadow(this.shadowChanged ? this.shadow : widgetTheme.getTextShadow());
         renderer.setPos(getArea().getPadding().left, getArea().getPadding().top);
         renderer.setScale(this.scale);
@@ -55,11 +55,13 @@ public class TextWidget extends Widget<TextWidget> {
 
     @Override
     public int getDefaultHeight() {
-        float maxWidth = getScreen().getScreenArea().width;
+        float maxWidth;
         if (resizer() != null && resizer().isWidthCalculated()) {
-            maxWidth = getArea().width + 1;
+            maxWidth = getArea().width + this.scale;
         } else if (getParent().resizer() != null && getParent().resizer().isWidthCalculated()) {
-            maxWidth = getParent().getArea().width + 1;
+            maxWidth = getParent().getArea().width + this.scale;
+        } else {
+            maxWidth = getScreen().getScreenArea().width;
         }
         TextRenderer renderer = simulate(maxWidth);
         Box padding = getArea().getPadding();
