@@ -10,6 +10,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 
+/**
+ * Wraps the current gui screen and uses it for overlays.
+ */
 @ApiStatus.Experimental
 public class ScreenWrapper implements IMuiScreen {
 

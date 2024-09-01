@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.overlay;
 
+import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.ModularScreen;
 
@@ -7,6 +8,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,5 +94,20 @@ public class OverlayStack {
 
     public static void onTick() {
         foreach(ModularScreen::onUpdate, true);
+    }
+
+    @Nullable
+    public static IGuiElement getHoveredElement() {
+        for (int i = overlay.size() - 1; i >= 0; i--) {
+            ModularScreen screen = overlay.get(i);
+            IGuiElement hovered = screen.getContext().getHovered();
+            if (hovered == null) continue;
+            return hovered;
+        }
+        return null;
+    }
+
+    public static boolean isHoveringOverlay() {
+        return getHoveredElement() != null;
     }
 }

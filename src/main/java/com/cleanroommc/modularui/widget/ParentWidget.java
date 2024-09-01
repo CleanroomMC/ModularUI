@@ -24,16 +24,13 @@ public class ParentWidget<W extends ParentWidget<W>> extends Widget<W> {
 
     @Override
     public boolean canHover() {
-        return IDrawable.isVisible(getBackground()) ||
+        if (IDrawable.isVisible(getBackground()) ||
                 IDrawable.isVisible(getHoverBackground()) ||
                 IDrawable.isVisible(getHoverOverlay()) ||
-                getTooltip() != null ||
-                hasThemeBackground();
-    }
-
-    protected boolean hasThemeBackground() {
+                getTooltip() != null) return true;
         WidgetTheme widgetTheme = getWidgetTheme(getContext().getTheme());
-        return IDrawable.isVisible(widgetTheme.getBackground()) || IDrawable.isVisible(widgetTheme.getHoverBackground());
+        if (getBackground() == null && IDrawable.isVisible(widgetTheme.getBackground())) return true;
+        return getHoverBackground() == null && IDrawable.isVisible(widgetTheme.getHoverBackground());
     }
 
     public boolean addChild(IWidget child, int index) {
