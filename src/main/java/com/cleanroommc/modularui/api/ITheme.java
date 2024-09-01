@@ -4,7 +4,7 @@ import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.theme.WidgetSlotTheme;
 import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.theme.WidgetToggleButtonTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeSelectable;
 
 /**
  * A theme is parsed from json and contains style information like color or background texture.
@@ -48,9 +48,17 @@ public interface ITheme {
 
     WidgetTextFieldTheme getTextFieldTheme();
 
-    WidgetToggleButtonTheme getToggleButtonTheme();
+    WidgetThemeSelectable getToggleButtonTheme();
 
     WidgetTheme getWidgetTheme(String id);
+
+    default <T extends WidgetTheme> T getWidgetTheme(Class<T> clazz, String id) {
+        WidgetTheme theme = getWidgetTheme(id);
+        if (clazz.isInstance(theme)) {
+            return (T) theme;
+        }
+        return null;
+    }
 
     int getOpenCloseAnimationOverride();
 

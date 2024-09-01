@@ -1,205 +1,96 @@
 package com.cleanroommc.modularui.widgets;
 
-import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
-import com.cleanroommc.modularui.api.drawable.IKey;
-import com.cleanroommc.modularui.api.value.IBoolValue;
-import com.cleanroommc.modularui.api.value.IEnumValue;
 import com.cleanroommc.modularui.api.value.IIntValue;
-import com.cleanroommc.modularui.api.widget.Interactable;
-import com.cleanroommc.modularui.drawable.UITexture;
 import com.cleanroommc.modularui.screen.Tooltip;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.value.IntValue;
-import com.cleanroommc.modularui.value.sync.SyncHandler;
-import com.cleanroommc.modularui.widget.Widget;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.IntFunction;
 
-public class CycleButtonWidget extends Widget<CycleButtonWidget> implements Interactable {
-
-    private int length = 1;
-    private IIntValue<?> intValue;
-    private int lastValue = -1;
-    private IntFunction<IDrawable> textureGetter;
-    private IDrawable texture = IDrawable.EMPTY;
-    private final List<Tooltip> stateTooltip = new ArrayList<>();
+public class CycleButtonWidget extends AbstractCycleButtonWidget<CycleButtonWidget> {
 
     @Override
-    public void onInit() {
-        if (this.intValue == null) {
-            this.intValue = new IntValue(0);
-        }
-        if (this.textureGetter == null) {
-            ModularUI.LOGGER.warn("Texture Getter of {} was not set!", this);
-            this.textureGetter = val -> IDrawable.EMPTY;
-        }
-        this.texture = this.textureGetter.apply(getState());
-    }
-
-    @Override
-    public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        this.intValue = castIfTypeElseNull(syncHandler, IIntValue.class);
-        return this.intValue != null;
-    }
-
-    private int getState() {
-        int val = this.intValue.getIntValue();
-        if (val != this.lastValue) {
-            setState(val, false);
-        }
-        return val;
-    }
-
-    public void next() {
-        int state = getState();
-        if (++state == this.length) {
-            state = 0;
-        }
-        setState(state, true);
-    }
-
-    public void prev() {
-        int state = getState();
-        if (--state == -1) {
-            state = this.length - 1;
-        }
-        setState(state, true);
-    }
-
-    public void setState(int state, boolean setSource) {
-        if (state < 0 || state >= this.length) {
-            throw new IndexOutOfBoundsException("CycleButton state out of bounds");
-        }
-        if (setSource) {
-            this.intValue.setIntValue(state);
-        }
-        this.texture = this.textureGetter.apply(state);
-        this.lastValue = state;
-        markTooltipDirty();
-    }
-
-    @Override
-    public @NotNull Result onMousePressed(int mouseButton) {
-        switch (mouseButton) {
-            case 0:
-                next();
-                Interactable.playButtonClickSound();
-                return Result.SUCCESS;
-            case 1:
-                prev();
-                Interactable.playButtonClickSound();
-                return Result.SUCCESS;
-        }
-        return Result.IGNORE;
-    }
-
-    @Override
-    public WidgetTheme getWidgetTheme(ITheme theme) {
-        return theme.getButtonTheme();
-    }
-
-    @Override
-    public void draw(GuiContext context, WidgetTheme widgetTheme) {
-        super.draw(context, widgetTheme);
-        // make sure texture is up-to-date
-        getState();
-        // draw state texture after background, but before overlay
-        this.texture.draw(context, 0, 0, getArea().w(), getArea().h(), widgetTheme);
-    }
-
-    @Override
-    public boolean hasTooltip() {
-        int state = getState();
-        return super.hasTooltip() || (this.stateTooltip.size() > state && !this.stateTooltip.get(state).isEmpty());
-    }
-
-    @Override
-    public void markTooltipDirty() {
-        super.markTooltipDirty();
-        for (Tooltip tooltip : this.stateTooltip) {
-            tooltip.markDirty();
-        }
-        this.texture = this.textureGetter.apply(getState());
-    }
-
-    @Override
-    public @Nullable Tooltip getTooltip() {
-        Tooltip tooltip = super.getTooltip();
-        if (tooltip == null || tooltip.isEmpty()) {
-            return this.stateTooltip.get(getState());
-        }
-        return tooltip;
-    }
-
     public CycleButtonWidget value(IIntValue<?> value) {
-        this.intValue = value;
-        setValue(value);
-        if (value instanceof IEnumValue<?> enumValue) {
-            length(enumValue.getEnumClass().getEnumConstants().length);
-        } else if (value instanceof IBoolValue) {
-            length(2);
-        }
-        return this;
+        return super.value(value);
     }
 
-    public CycleButtonWidget textureGetter(IntFunction<IDrawable> textureGetter) {
-        this.textureGetter = textureGetter;
-        return this;
+    public CycleButtonWidget stateBackground(int state, IDrawable drawable) {
+        this.background = addToArray(this.background, drawable, state);
+        return getThis();
     }
 
-    public CycleButtonWidget texture(UITexture texture) {
-        return textureGetter(val -> {
-            float a = 1f / this.length;
-            return texture.getSubArea(0, val * a, 1, val * a + a);
-        });
+    public CycleButtonWidget stateHoverBackground(int state, IDrawable drawable) {
+        this.hoverBackground = addToArray(this.hoverBackground, drawable, state);
+        return getThis();
     }
 
-    /**
-     * Adds a line to the tooltip
-     */
-    public CycleButtonWidget addTooltip(int state, IDrawable tooltip) {
-        if (state >= this.stateTooltip.size() || state < 0) {
-            throw new IndexOutOfBoundsException();
-        }
-        this.stateTooltip.get(state).addLine(tooltip);
-        return this;
+    public CycleButtonWidget stateOverlay(int state, IDrawable drawable) {
+        this.overlay = addToArray(this.overlay, drawable, state);
+        return getThis();
     }
 
-    /**
-     * Adds a line to the tooltip
-     */
+    public CycleButtonWidget stateHoverOverlay(int state, IDrawable drawable) {
+        this.hoverOverlay = addToArray(this.hoverOverlay, drawable, state);
+        return getThis();
+    }
+
+    public CycleButtonWidget stateBackground(boolean state, IDrawable drawable) {
+        return stateBackground(state ? 1 : 0, drawable);
+    }
+
+    public CycleButtonWidget stateHoverBackground(boolean state, IDrawable drawable) {
+        return stateHoverBackground(state ? 1 : 0, drawable);
+    }
+
+    public CycleButtonWidget stateOverlay(boolean state, IDrawable drawable) {
+        return stateOverlay(state ? 1 : 0, drawable);
+    }
+
+    public CycleButtonWidget stateHoverOverlay(boolean state, IDrawable drawable) {
+        return stateHoverOverlay(state ? 1 : 0, drawable);
+    }
+
+    public <T extends Enum<T>> CycleButtonWidget stateBackground(T state, IDrawable drawable) {
+        return stateBackground(state.ordinal(), drawable);
+    }
+
+    public <T extends Enum<T>> CycleButtonWidget stateHoverBackground(T state, IDrawable drawable) {
+        return stateHoverBackground(state.ordinal(), drawable);
+    }
+
+    public <T extends Enum<T>> CycleButtonWidget stateOverlay(T state, IDrawable drawable) {
+        return stateOverlay(state.ordinal(), drawable);
+    }
+
+    public <T extends Enum<T>> CycleButtonWidget stateHoverOverlay(T state, IDrawable drawable) {
+        return stateHoverOverlay(state.ordinal(), drawable);
+    }
+
+    @Override
     public CycleButtonWidget addTooltip(int state, String tooltip) {
-        return addTooltip(state, IKey.str(tooltip));
+        return super.addTooltip(state, tooltip);
+    }
+
+    @Override
+    public CycleButtonWidget addTooltip(int state, IDrawable tooltip) {
+        return super.addTooltip(state, tooltip);
     }
 
     public CycleButtonWidget length(int length) {
-        this.length = length;
-        // adjust tooltip buffer size
-        while (this.stateTooltip.size() < this.length) {
-            this.stateTooltip.add(new Tooltip(this));
-        }
-        while (this.stateTooltip.size() > this.length) {
-            this.stateTooltip.remove(this.stateTooltip.size() - 1);
-        }
-        return this;
+        return stateCount(length);
     }
 
+    @Override
+    public CycleButtonWidget stateCount(int stateCount) {
+        return super.stateCount(stateCount);
+    }
+
+    @Override
     public CycleButtonWidget tooltip(int index, Consumer<Tooltip> builder) {
-        builder.accept(this.stateTooltip.get(index));
-        return this;
+        return super.tooltip(index, builder);
     }
 
+    @Override
     public CycleButtonWidget tooltipBuilder(int index, Consumer<Tooltip> builder) {
-        this.stateTooltip.get(index).tooltipBuilder(builder);
-        return this;
+        return super.tooltipBuilder(index, builder);
     }
 }

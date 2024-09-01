@@ -23,7 +23,7 @@ public class ThemeAPI implements IThemeApi {
     public static final String DEFAULT = "DEFAULT";
     public static final ITheme DEFAULT_DEFAULT = new DefaultTheme();
 
-    private final Object2ObjectMap<String, ITheme> THEMES = new Object2ObjectOpenHashMap<>();
+    private final Object2ObjectMap<String, ITheme> themes = new Object2ObjectOpenHashMap<>();
     protected final Object2ObjectMap<String, List<JsonBuilder>> defaultThemes = new Object2ObjectOpenHashMap<>();
     protected final Object2ObjectMap<String, WidgetTheme> defaultWidgetThemes = new Object2ObjectOpenHashMap<>();
     protected final Object2ObjectMap<String, WidgetThemeParser> widgetThemeFunctions = new Object2ObjectOpenHashMap<>();
@@ -36,8 +36,8 @@ public class ThemeAPI implements IThemeApi {
         registerWidgetTheme(Theme.ITEM_SLOT, new WidgetSlotTheme(GuiTextures.SLOT_ITEM, Color.withAlpha(Color.WHITE.main, 0x60)), WidgetSlotTheme::new);
         registerWidgetTheme(Theme.FLUID_SLOT, new WidgetSlotTheme(GuiTextures.SLOT_FLUID, Color.withAlpha(Color.WHITE.main, 0x60)), WidgetSlotTheme::new);
         registerWidgetTheme(Theme.TEXT_FIELD, new WidgetTextFieldTheme(0xFF2F72A8), (parent, json, fallback) -> new WidgetTextFieldTheme(parent, fallback, json));
-        registerWidgetTheme(Theme.TOGGLE_BUTTON, new WidgetToggleButtonTheme(GuiTextures.MC_BUTTON, GuiTextures.MC_BUTTON_HOVERED, Color.WHITE.main, Color.WHITE.main, true,
-                GuiTextures.MC_BUTTON_DISABLED, IDrawable.NONE, Color.WHITE.main, Color.WHITE.main, true), WidgetToggleButtonTheme::new);
+        registerWidgetTheme(Theme.TOGGLE_BUTTON, new WidgetThemeSelectable(GuiTextures.MC_BUTTON, GuiTextures.MC_BUTTON_HOVERED, Color.WHITE.main, Color.WHITE.main, true,
+                GuiTextures.MC_BUTTON_DISABLED, IDrawable.NONE, Color.WHITE.main, Color.WHITE.main, true), WidgetThemeSelectable::new);
     }
 
     @Override
@@ -47,12 +47,17 @@ public class ThemeAPI implements IThemeApi {
 
     @Override
     public @NotNull ITheme getTheme(String id) {
-        return this.THEMES.getOrDefault(id, getDefaultTheme());
+        return this.themes.getOrDefault(id, getDefaultTheme());
     }
 
     @Override
     public boolean hasTheme(String id) {
-        return this.THEMES.containsKey(id);
+        return this.themes.containsKey(id);
+    }
+
+    @Override
+    public boolean hasWidgetTheme(String id) {
+        return this.widgetThemeFunctions.containsKey(id);
     }
 
     @Override
@@ -105,14 +110,14 @@ public class ThemeAPI implements IThemeApi {
     // Internals
 
     void registerTheme(ITheme theme) {
-        if (this.THEMES.containsKey(theme.getId())) {
+        if (this.themes.containsKey(theme.getId())) {
             throw new IllegalArgumentException("Theme with id " + theme.getId() + " already exists!");
         }
-        this.THEMES.put(theme.getId(), theme);
+        this.themes.put(theme.getId(), theme);
     }
 
     void onReload() {
-        this.THEMES.clear();
+        this.themes.clear();
         this.jsonScreenThemes.clear();
         registerTheme(DEFAULT_DEFAULT);
     }

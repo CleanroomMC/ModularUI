@@ -52,18 +52,40 @@ public interface ITooltip<W extends IWidget> {
      * @return this
      */
     default W tooltip(Consumer<Tooltip> tooltipConsumer) {
+        return tooltipStatic(tooltipConsumer);
+    }
+
+    /**
+     * Helper method to call tooltip setters within a widget tree initialisation.
+     * Only called once.
+     *
+     * @param tooltipConsumer tooltip function
+     * @return this
+     */
+    default W tooltipStatic(Consumer<Tooltip> tooltipConsumer) {
         tooltipConsumer.accept(tooltip());
         return getThis();
     }
 
     /**
      * Sets a tooltip builder. The builder will be called every time the tooltip is marked dirty.
-     * Should be used for dynamic tooltips
+     * Should be used for dynamic tooltips.
      *
      * @param tooltipBuilder tooltip function
      * @return this
      */
     default W tooltipBuilder(Consumer<Tooltip> tooltipBuilder) {
+        return tooltipDynamic(tooltipBuilder);
+    }
+
+    /**
+     * Sets a tooltip builder. The builder will be called every time the tooltip is marked dirty.
+     * Should be used for dynamic tooltips.
+     *
+     * @param tooltipBuilder tooltip function
+     * @return this
+     */
+    default W tooltipDynamic(Consumer<Tooltip> tooltipBuilder) {
         tooltip().tooltipBuilder(tooltipBuilder);
         return getThis();
     }

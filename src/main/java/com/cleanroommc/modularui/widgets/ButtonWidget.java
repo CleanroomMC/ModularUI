@@ -44,7 +44,7 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
     }
 
     @Override
-    public WidgetTheme getWidgetTheme(ITheme theme) {
+    public WidgetTheme getWidgetThemeInternal(ITheme theme) {
         return theme.getButtonTheme();
     }
 

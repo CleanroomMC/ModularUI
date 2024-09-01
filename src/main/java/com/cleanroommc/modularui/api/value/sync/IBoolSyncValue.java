@@ -7,7 +7,7 @@ import com.cleanroommc.modularui.api.value.IBoolValue;
  *
  * @param <T> value type
  */
-public interface IBoolSyncValue<T> extends IValueSyncHandler<T>, IBoolValue<T> {
+public interface IBoolSyncValue<T> extends IValueSyncHandler<T>, IBoolValue<T>, IIntSyncValue<T> {
 
     @Override
     default void setBoolValue(boolean val) {
@@ -19,4 +19,19 @@ public interface IBoolSyncValue<T> extends IValueSyncHandler<T>, IBoolValue<T> {
     }
 
     void setBoolValue(boolean value, boolean setSource, boolean sync);
+
+    @Override
+    default void setIntValue(int value, boolean setSource, boolean sync) {
+        setBoolValue(value == 1, setSource, sync);
+    }
+
+    @Override
+    default int getIntValue() {
+        return IBoolValue.super.getIntValue();
+    }
+
+    @Override
+    default void setIntValue(int val) {
+        IBoolValue.super.setIntValue(val);
+    }
 }

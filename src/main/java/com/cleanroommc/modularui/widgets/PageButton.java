@@ -6,7 +6,7 @@ import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.DrawableArray;
 import com.cleanroommc.modularui.drawable.TabTexture;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.theme.WidgetToggleButtonTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeSelectable;
 import com.cleanroommc.modularui.widget.Widget;
 
 import org.jetbrains.annotations.NotNull;
@@ -24,8 +24,8 @@ public class PageButton extends Widget<PageButton> implements Interactable {
     }
 
     @Override
-    public WidgetTheme getWidgetTheme(ITheme theme) {
-        WidgetToggleButtonTheme widgetTheme = theme.getToggleButtonTheme();
+    public WidgetTheme getWidgetThemeInternal(ITheme theme) {
+        WidgetThemeSelectable widgetTheme = theme.getToggleButtonTheme();
         return isActive() ? widgetTheme : widgetTheme.getSelected();
     }
 

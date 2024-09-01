@@ -19,6 +19,16 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface IDrawable {
 
+    static IDrawable of(IDrawable... drawables) {
+        if (drawables == null || drawables.length == 0) {
+            return null;
+        } else if (drawables.length == 1) {
+            return drawables[0];
+        } else {
+            return new DrawableArray(drawables);
+        }
+    }
+
     /**
      * Draws this drawable at the given position with the given size.
      *

@@ -129,7 +129,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     @Override
-    public WidgetTheme getWidgetTheme(ITheme theme) {
+    public WidgetTheme getWidgetThemeInternal(ITheme theme) {
         return theme.getPanelTheme();
     }
 

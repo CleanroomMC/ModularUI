@@ -3,69 +3,73 @@ package com.cleanroommc.modularui.widgets;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.value.IBoolValue;
-import com.cleanroommc.modularui.api.widget.Interactable;
+import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.theme.WidgetToggleButtonTheme;
-import com.cleanroommc.modularui.widget.Widget;
+import com.cleanroommc.modularui.theme.WidgetThemeSelectable;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import java.util.function.Consumer;
 
-public class ToggleButton extends Widget<ToggleButton> implements Interactable {
+public class ToggleButton extends AbstractCycleButtonWidget<ToggleButton> {
 
-    private IBoolValue<?> boolValue;
-    private IDrawable selectedBackground;
-    private IDrawable selectedHoverBackground;
-
-    @Override
-    public @NotNull Result onMousePressed(int mouseButton) {
-        if (mouseButton == 0 || mouseButton == 1) {
-            this.boolValue.setBoolValue(!this.boolValue.getBoolValue());
-            Interactable.playButtonClickSound();
-            return Result.SUCCESS;
-        }
-        return Result.ACCEPT;
+    public ToggleButton() {
+        stateCount(2);
     }
 
     @Override
-    public WidgetTheme getWidgetTheme(ITheme theme) {
-        WidgetToggleButtonTheme widgetTheme = theme.getToggleButtonTheme();
+    public WidgetTheme getWidgetThemeInternal(ITheme theme) {
+        WidgetThemeSelectable widgetTheme = theme.getToggleButtonTheme();
         return isValueSelected() ? widgetTheme.getSelected() : widgetTheme;
     }
 
-    @Override
-    public @Nullable IDrawable getBackground() {
-        if (isValueSelected()) {
-            return this.selectedBackground;
-        }
-        return super.getBackground();
-    }
-
-    @Override
-    public @Nullable IDrawable getHoverBackground() {
-        if (isValueSelected()) {
-            return this.selectedHoverBackground;
-        }
-        return super.getHoverBackground();
-    }
-
     public boolean isValueSelected() {
-        return this.boolValue.getBoolValue();
+        return getState() == 1;
     }
 
     public ToggleButton value(IBoolValue<?> boolValue) {
-        this.boolValue = boolValue;
-        setValue(boolValue);
+        return super.value(boolValue);
+    }
+
+    public ToggleButton selectedBackground(IDrawable... selectedBackground) {
+        return background(true, selectedBackground);
+    }
+
+    public ToggleButton selectedHoverBackground(IDrawable... selectedHoverBackground) {
+        return hoverBackground(true, selectedHoverBackground);
+    }
+
+    @Override
+    public ToggleButton background(IDrawable... selectedBackground) {
+        return background(false, selectedBackground);
+    }
+
+    @Override
+    public ToggleButton hoverBackground(IDrawable... selectedHoverBackground) {
+        return hoverBackground(false, selectedHoverBackground);
+    }
+
+    public ToggleButton background(boolean selected, IDrawable... background) {
+        this.background = addToArray(this.background, background, selected ? 1 : 0);
         return this;
     }
 
-    public ToggleButton selectedBackground(IDrawable selectedBackground) {
-        this.selectedBackground = selectedBackground;
+    public ToggleButton hoverBackground(boolean selected, IDrawable... background) {
+        this.hoverBackground = addToArray(this.hoverBackground, background, selected ? 1 : 0);
         return this;
     }
 
-    public ToggleButton selectedHoverBackground(IDrawable selectedHoverBackground) {
-        this.selectedHoverBackground = selectedHoverBackground;
-        return this;
+    public ToggleButton addTooltip(boolean selected, String tooltip) {
+        return super.addTooltip(selected ? 1 : 0, tooltip);
+    }
+
+    public ToggleButton addTooltip(boolean selected, IDrawable tooltip) {
+        return super.addTooltip(selected ? 1 : 0, tooltip);
+    }
+
+    public ToggleButton tooltip(boolean selected, Consumer<Tooltip> builder) {
+        return super.tooltip(selected ? 1 : 0, builder);
+    }
+
+    public ToggleButton tooltipBuilder(boolean selected, Consumer<Tooltip> builder) {
+        return super.tooltipBuilder(selected ? 1 : 0, builder);
     }
 }

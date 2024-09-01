@@ -11,7 +11,7 @@ public abstract class AbstractDefaultTheme implements ITheme {
     private WidgetSlotTheme itemSlot;
     private WidgetSlotTheme fluidSlot;
     private WidgetTextFieldTheme textField;
-    private WidgetToggleButtonTheme toggleButtonTheme;
+    private WidgetThemeSelectable toggleButtonTheme;
 
     @Override
     public ITheme getParentTheme() {
@@ -59,9 +59,9 @@ public abstract class AbstractDefaultTheme implements ITheme {
     }
 
     @Override
-    public WidgetToggleButtonTheme getToggleButtonTheme() {
+    public WidgetThemeSelectable getToggleButtonTheme() {
         if (this.toggleButtonTheme == null) {
-            this.toggleButtonTheme = (WidgetToggleButtonTheme) getWidgetTheme(Theme.TOGGLE_BUTTON);
+            this.toggleButtonTheme = (WidgetThemeSelectable) getWidgetTheme(Theme.TOGGLE_BUTTON);
         }
         return this.toggleButtonTheme;
     }

@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.api.value.sync.IBoolSyncValue;
-import com.cleanroommc.modularui.api.value.sync.IIntSyncValue;
 import com.cleanroommc.modularui.api.value.sync.IStringSyncValue;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.utils.BooleanConsumer;
@@ -14,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BooleanSupplier;
 
-public class BooleanSyncValue extends ValueSyncHandler<Boolean> implements IBoolSyncValue<Boolean>, IIntSyncValue<Boolean>, IStringSyncValue<Boolean> {
+public class BooleanSyncValue extends ValueSyncHandler<Boolean> implements IBoolSyncValue<Boolean>, IStringSyncValue<Boolean> {
 
     private final BooleanSupplier getter;
     private final BooleanConsumer setter;
@@ -85,16 +84,6 @@ public class BooleanSyncValue extends ValueSyncHandler<Boolean> implements IBool
     @Override
     public void read(PacketBuffer buffer) {
         setBoolValue(buffer.readBoolean(), true, false);
-    }
-
-    @Override
-    public void setIntValue(int value, boolean setSource, boolean sync) {
-        setBoolValue(value == 1, setSource, sync);
-    }
-
-    @Override
-    public int getIntValue() {
-        return this.cache ? 1 : 0;
     }
 
     @Override

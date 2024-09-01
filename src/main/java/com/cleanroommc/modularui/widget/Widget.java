@@ -1,11 +1,11 @@
 package com.cleanroommc.modularui.widget;
 
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.api.value.IValue;
 import com.cleanroommc.modularui.api.widget.*;
-import com.cleanroommc.modularui.drawable.DrawableArray;
 import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
@@ -54,6 +54,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @Nullable private IDrawable hoverBackground = null;
     @Nullable private IDrawable hoverOverlay = null;
     @Nullable private Tooltip tooltip;
+    @Nullable private String widgetThemeOverride = null;
     // listener
     @Nullable private List<IGuiAction> guiActionListeners;
     @Nullable private Consumer<W> onUpdateListener;
@@ -222,47 +223,37 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         }
     }
 
-    public W background(IDrawable... background) {
-        if (background == null || background.length == 0) {
-            this.background = null;
-        } else if (background.length == 1) {
-            this.background = background[0];
-        } else {
-            this.background = new DrawableArray(background);
+    @ApiStatus.OverrideOnly
+    protected WidgetTheme getWidgetThemeInternal(ITheme theme) {
+        return theme.getFallback();
+    }
+
+    @ApiStatus.NonExtendable
+    @Override
+    public final WidgetTheme getWidgetTheme(ITheme theme) {
+        if (this.widgetThemeOverride != null) {
+            return theme.getWidgetTheme(this.widgetThemeOverride);
         }
+        return getWidgetThemeInternal(theme);
+    }
+
+    public W background(IDrawable... background) {
+        this.background = IDrawable.of(background);
         return getThis();
     }
 
     public W overlay(IDrawable... overlay) {
-        if (overlay == null || overlay.length == 0) {
-            this.overlay = null;
-        } else if (overlay.length == 1) {
-            this.overlay = overlay[0];
-        } else {
-            this.overlay = new DrawableArray(overlay);
-        }
+        this.overlay = IDrawable.of(overlay);
         return getThis();
     }
 
     public W hoverBackground(IDrawable... background) {
-        if (background == null || background.length == 0) {
-            this.hoverBackground = null;
-        } else if (background.length == 1) {
-            this.hoverBackground = background[0];
-        } else {
-            this.hoverBackground = new DrawableArray(background);
-        }
+        this.hoverBackground = IDrawable.of(background);
         return getThis();
     }
 
     public W hoverOverlay(IDrawable... overlay) {
-        if (overlay == null || overlay.length == 0) {
-            this.hoverOverlay = null;
-        } else if (overlay.length == 1) {
-            this.hoverOverlay = overlay[0];
-        } else {
-            this.hoverOverlay = new DrawableArray(overlay);
-        }
+        this.hoverOverlay = IDrawable.of(overlay);
         return getThis();
     }
 
@@ -272,6 +263,14 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
 
     public W disableHoverOverlay() {
         return hoverOverlay(IDrawable.NONE);
+    }
+
+    public W widgetTheme(String s) {
+        if (!IThemeApi.get().hasWidgetTheme(s)) {
+            throw new IllegalArgumentException("No widget theme for id '" + s + "' exists.");
+        }
+        this.widgetThemeOverride = s;
+        return getThis();
     }
 
     // --------------
