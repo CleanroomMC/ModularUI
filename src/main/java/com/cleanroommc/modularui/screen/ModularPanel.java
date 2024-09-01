@@ -573,7 +573,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     final void setPanelGuiContext(@NotNull GuiContext context) {
         setContext(context);
-        if (!context.screen.isOverlay()) {
+        if (!context.getScreen().isOverlay()) {
             context.getJeiSettings().addJeiExclusionArea(this);
         }
     }
