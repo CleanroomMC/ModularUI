@@ -162,10 +162,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
      * @return this
      */
     public W stateBackground(UITexture texture) {
-        for (int i = 0; i < this.stateCount; i++) {
-            float a = 1f / this.stateCount;
-            this.background[i] = texture.getSubArea(0, i * a, 1, i * a + a);
-        }
+        splitTexture(texture, this.background);
         return getThis();
     }
 
@@ -177,10 +174,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
      * @return this
      */
     public W stateOverlay(UITexture texture) {
-        for (int i = 0; i < this.stateCount; i++) {
-            float a = 1f / this.stateCount;
-            this.overlay[i] = texture.getSubArea(0, i * a, 1, i * a + a);
-        }
+        splitTexture(texture, this.overlay);
         return getThis();
     }
 
@@ -192,10 +186,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
      * @return this
      */
     public W stateHoverBackground(UITexture texture) {
-        for (int i = 0; i < this.stateCount; i++) {
-            float a = 1f / this.stateCount;
-            this.hoverBackground[i] = texture.getSubArea(0, i * a, 1, i * a + a);
-        }
+        splitTexture(texture, this.hoverBackground);
         return getThis();
     }
 
@@ -207,10 +198,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
      * @return this
      */
     public W stateHoverOverlay(UITexture texture) {
-        for (int i = 0; i < this.stateCount; i++) {
-            float a = 1f / this.stateCount;
-            this.hoverOverlay[i] = texture.getSubArea(0, i * a, 1, i * a + a);
-        }
+        splitTexture(texture, this.hoverOverlay);
         return getThis();
     }
 
@@ -268,6 +256,13 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
         }
         array[index] = drawable;
         return array;
+    }
+
+    protected static void splitTexture(UITexture texture, IDrawable[] dest) {
+        for (int i = 0; i < dest.length; i++) {
+            float a = 1f / dest.length;
+            dest[i] = texture.getSubArea(0, i * a, 1, i * a + a);
+        }
     }
 
     protected W tooltip(int index, Consumer<Tooltip> builder) {

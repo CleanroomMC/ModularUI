@@ -14,6 +14,7 @@ import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.*;
 import com.cleanroommc.modularui.value.sync.PanelSyncHandler;
+import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
@@ -82,6 +83,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @Override
     public void onInit() {
         getScreen().registerFrameUpdateListener(this, this::findHoveredWidgets, false);
+    }
+
+    @Override
+    public boolean isValidSyncHandler(SyncHandler syncHandler) {
+        return syncHandler instanceof IPanelHandler;
     }
 
     /**

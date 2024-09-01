@@ -2,9 +2,12 @@ package com.cleanroommc.modularui.widgets.textfield;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IMathValue;
+import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.value.IStringValue;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
+import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.math.Constant;
 import com.cleanroommc.modularui.utils.math.MathBuilder;
 import com.cleanroommc.modularui.value.StringValue;
@@ -50,8 +53,16 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             tooltipBuilder(tooltip -> tooltip.addLine(IKey.str(getText())));
         }
         if (!this.changedMarkedColor) {
-            this.renderer.setMarkedColor(getWidgetTheme(getContext().getTheme()).getMarkedColor());
+            this.renderer.setMarkedColor(getMarkedColor());
         }
+    }
+
+    public int getMarkedColor() {
+        WidgetTheme theme = getWidgetTheme(getContext().getTheme());
+        if (theme instanceof WidgetTextFieldTheme textFieldTheme) {
+            return textFieldTheme.getMarkedColor();
+        }
+        return ITheme.getDefault().getTextFieldTheme().getMarkedColor();
     }
 
     @Override

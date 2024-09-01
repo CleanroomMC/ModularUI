@@ -93,7 +93,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         GlStateManager.disableLighting();
         if (isHovering()) {
             GlStateManager.colorMask(true, true, true, false);
-            GuiDraw.drawRect(1, 1, 16, 16, getWidgetTheme(context.getTheme()).getSlotHoverColor());
+            GuiDraw.drawRect(1, 1, 16, 16, getSlotHoverColor());
             GlStateManager.colorMask(true, true, true, true);
         }
     }
@@ -109,6 +109,14 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     @Override
     public WidgetSlotTheme getWidgetThemeInternal(ITheme theme) {
         return theme.getItemSlotTheme();
+    }
+
+    public int getSlotHoverColor() {
+        WidgetTheme theme = getWidgetTheme(getContext().getTheme());
+        if (theme instanceof WidgetSlotTheme slotTheme) {
+            return slotTheme.getSlotHoverColor();
+        }
+        return ITheme.getDefault().getItemSlotTheme().getSlotHoverColor();
     }
 
     @Override
