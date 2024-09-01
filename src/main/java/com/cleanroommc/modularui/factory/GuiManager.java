@@ -60,6 +60,10 @@ public class GuiManager {
         return factory;
     }
 
+    public static boolean hasFactory(String name) {
+        return FACTORIES.containsKey(name);
+    }
+
     public static <T extends GuiData> void open(@NotNull UIFactory<T> factory, @NotNull T guiData, EntityPlayerMP player) {
         if (player instanceof FakePlayer || openedContainers.contains(player)) return;
         openedContainers.add(player);

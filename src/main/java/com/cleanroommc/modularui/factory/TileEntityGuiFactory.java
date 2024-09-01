@@ -17,10 +17,10 @@ public class TileEntityGuiFactory extends AbstractUIFactory<PosGuiData> {
     public static final TileEntityGuiFactory INSTANCE = new TileEntityGuiFactory();
 
     private TileEntityGuiFactory() {
-        super("mui:tile");
+        super("mui:tile_entity");
     }
 
-    public static <T extends TileEntity & IGuiHolder<PosGuiData>> void open(EntityPlayer player, T tile) {
+    public <T extends TileEntity & IGuiHolder<PosGuiData>> void open(EntityPlayer player, T tile) {
         Objects.requireNonNull(player);
         Objects.requireNonNull(tile);
         if (tile.isInvalid()) {
@@ -31,14 +31,14 @@ public class TileEntityGuiFactory extends AbstractUIFactory<PosGuiData> {
         }
         BlockPos pos = tile.getPos();
         PosGuiData data = new PosGuiData(player, pos.getX(), pos.getY(), pos.getZ());
-        GuiManager.open(INSTANCE, data, (EntityPlayerMP) player);
+        GuiManager.open(this, data, (EntityPlayerMP) player);
     }
 
-    public static void open(EntityPlayer player, BlockPos pos) {
+    public void open(EntityPlayer player, BlockPos pos) {
         Objects.requireNonNull(player);
         Objects.requireNonNull(pos);
         PosGuiData data = new PosGuiData(player, pos.getX(), pos.getY(), pos.getZ());
-        GuiManager.open(INSTANCE, data, (EntityPlayerMP) player);
+        GuiManager.open(this, data, (EntityPlayerMP) player);
     }
 
     @Override

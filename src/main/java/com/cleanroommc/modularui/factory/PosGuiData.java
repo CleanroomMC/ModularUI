@@ -5,6 +5,9 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+/**
+ * See {@link GuiData} for an explanation for what this is for.
+ */
 public class PosGuiData extends GuiData {
 
     private static final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
