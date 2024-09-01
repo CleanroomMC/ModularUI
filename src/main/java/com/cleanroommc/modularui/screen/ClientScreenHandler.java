@@ -194,9 +194,14 @@ public class ClientScreenHandler {
         boolean state = Keyboard.getEventKeyState();
 
         if (state) {
+            // pressing a key
             lastChar = c0;
             return doAction(muiScreen, ms -> ms.onKeyPressed(c0, key)) || keyTyped(mcScreen, c0, key);
         } else {
+            // releasing a key
+            // for some reason when you press E after joining a world the button will not trigger the press event,
+            // but ony the release event, causing this to be null
+            if (lastChar == null) return false;
             // when the key is released, the event char is empty
             if (doAction(muiScreen, ms -> ms.onKeyRelease(lastChar, key))) return true;
             if (key == 0 && c0 >= ' ') {

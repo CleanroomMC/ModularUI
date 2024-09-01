@@ -332,6 +332,13 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         SlotGroup slotGroup = new SlotGroup("small_inv", 2);
         syncManager.registerSlotGroup(slotGroup);
         panel.child(ButtonWidget.panelCloseButton())
+                .child(new ButtonWidget<>()
+                        .size(10).top(14).right(4)
+                        .overlay(IKey.str("3"))
+                        .onMousePressed(mouseButton -> {
+                            panelSyncHandler.openPanel();
+                            return true;
+                        }))
                 .child(IKey.str("2nd Panel")
                         .asWidget()
                         .pos(5, 5))
