@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.screen;
 
-import com.cleanroommc.modularui.GuiErrorHandler;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.IMuiScreen;
@@ -285,7 +284,6 @@ public class ClientScreenHandler {
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
         RenderHelper.disableStandardItemLighting();
         muiScreen.drawForeground(partialTicks);
-        GuiErrorHandler.INSTANCE.drawErrors(0, 0);
         GlStateManager.enableLighting();
         GlStateManager.enableDepth();
         GlStateManager.enableRescaleNormal();
@@ -370,15 +368,11 @@ public class ClientScreenHandler {
             int i2 = acc.getTouchUpY() + (int) ((float) i3 * f);
             drawItemStack(mcScreen, acc.getReturningStack(), l1, i2, null);
         }
-
         GlStateManager.popMatrix();
-        GuiErrorHandler.INSTANCE.drawErrors(0, 0);
-
         GlStateManager.enableLighting();
         GlStateManager.enableDepth();
         GlStateManager.enableRescaleNormal();
         RenderHelper.enableStandardItemLighting();
-
         Stencil.remove();
     }
 
