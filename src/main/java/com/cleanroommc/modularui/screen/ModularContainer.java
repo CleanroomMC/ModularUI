@@ -70,14 +70,13 @@ public class ModularContainer extends Container implements ISortableContainer {
     }
 
     @SideOnly(Side.CLIENT)
-    public void setScreen(ModularScreen screen) {
-        this.optionalScreen = Optional.ofNullable(screen);
+    void construct(ModularScreen screen) {
+        this.optionalScreen = Optional.of(screen);
     }
 
-    @Nullable
     @SideOnly(Side.CLIENT)
     public ModularScreen getScreen() {
-        return (ModularScreen) optionalScreen.orElse(null);
+        return (ModularScreen) optionalScreen.orElseThrow(() -> new NoSuchElementException("ModularScreen must not be null!"));
     }
 
     public ContainerAccessor acc() {

@@ -133,6 +133,9 @@ public class ModularScreen {
         if (this.screenWrapper != null) throw new IllegalStateException("ModularScreen is already constructed!");
         if (wrapper == null) throw new NullPointerException("GuiScreenWrapper must not be null!");
         this.screenWrapper = wrapper;
+        if (this.screenWrapper.getGuiScreen() instanceof GuiContainer container) {
+            ((ModularContainer) container.inventorySlots).construct(this);
+        }
         this.screenWrapper.updateGuiArea(this.panelManager.getMainPanel().getArea());
         this.overlay = false;
     }

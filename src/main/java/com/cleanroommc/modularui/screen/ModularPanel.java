@@ -14,6 +14,7 @@ import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.*;
 import com.cleanroommc.modularui.value.sync.PanelSyncHandler;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -26,6 +27,8 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
@@ -34,9 +37,8 @@ import java.util.function.Supplier;
 
 /**
  * This class is like a window in windows. It can hold any amount of widgets. It may also be draggable.
- * To open another panel on top of the main panel you must use {@link IPanelHandler#simple(ModularPanel, SecondaryPanel.IPanelBuilder)}
- * or {@link com.cleanroommc.modularui.value.sync.PanelSyncManager#panel(String, ModularPanel, PanelSyncHandler.IPanelBuilder) PanelSyncManager#panel(String, ModularPanel, PanelSyncHandler.IPanelBuilder)}
- * if the panel should be synced.
+ * To open another panel on top of the main panel you must use {@link IPanelHandler#simple(ModularPanel, SecondaryPanel.IPanelBuilder, boolean)}
+ * or {@link PanelSyncManager#panel(String, PanelSyncHandler.IPanelBuilder, boolean)} if the panel should be synced.
  */
 public class ModularPanel extends ParentWidget<ModularPanel> implements IViewport {
 
@@ -60,6 +62,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     private final Input keyboard = new Input();
     private final Input mouse = new Input();
 
+    private final List<IPanelHandler> clientSubPanels = new ArrayList<>();
     private boolean invisible = false;
     private Animator animator;
     private float scale = 1f;
@@ -104,6 +107,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
      * @param animate true if the closing animation should play first.
      */
     public void closeIfOpen(boolean animate) {
+        closeSubPanels();
         if (!animate || !shouldAnimate()) {
             this.screen.getPanelManager().closePanel(this);
             return;
@@ -118,6 +122,12 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 }
             }
             getAnimator().setEndCallback(val -> this.screen.getPanelManager().closePanel(this)).backward();
+        }
+    }
+
+    protected void closeSubPanels() {
+        if (this.panelHandler != null) {
+            this.panelHandler.closeSubPanels();
         }
     }
 
@@ -625,6 +635,20 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     public boolean shouldAnimate() {
         return !getScreen().isOverlay() && getScreen().getCurrentTheme().getOpenCloseAnimationOverride() > 0;
+    }
+
+    void registerSubPanel(IPanelHandler handler) {
+        if (!this.clientSubPanels.contains(handler)) {
+            this.clientSubPanels.add(handler);
+        }
+    }
+
+    void closeClientSubPanels() {
+        for (IPanelHandler handler : this.clientSubPanels) {
+            if (handler.isSubPanel()) {
+                handler.closePanel();
+            }
+        }
     }
 
     public ModularPanel bindPlayerInventory() {

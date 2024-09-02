@@ -80,12 +80,12 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
 
         Rectangle colorPickerBackground = new Rectangle().setColor(Color.RED.main);
         ModularPanel panel = new ModularPanel("test_tile");
-        PanelSyncHandler panelSyncHandler = guiSyncManager.panel("other_panel", panel, this::openSecondWindow);
+        IPanelHandler panelSyncHandler = guiSyncManager.panel("other_panel", this::openSecondWindow, true);
         IPanelHandler colorPicker = IPanelHandler.simple(panel, (mainPanel, player) -> new ColorPickerDialog(colorPickerBackground::setColor, colorPickerBackground.getColor(), true)
                 .setDraggable(true)
                 .relative(panel)
                 .top(0)
-                .rightRel(1f));
+                .rightRel(1f), true);
         PagedWidget.Controller tabController = new PagedWidget.Controller();
         panel.flex()                        // returns object which is responsible for sizing
                 .size(176, 220)       // set a static size for the main panel
@@ -327,10 +327,10 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         ModularPanel panel = new Dialog<>("second_window", null)
                 .setDisablePanelsBelow(false)
                 .setCloseOnOutOfBoundsClick(false)
-                .size(100, 100)
-                .background(GuiTextures.MC_BACKGROUND);
+                .size(100, 100);
         SlotGroup slotGroup = new SlotGroup("small_inv", 2);
         syncManager.registerSlotGroup(slotGroup);
+        IPanelHandler panelSyncHandler = syncManager.panel("other_panel_2", this::openThirdWindow, true);
         panel.child(ButtonWidget.panelCloseButton())
                 .child(new ButtonWidget<>()
                         .size(10).top(14).right(4)
@@ -348,6 +348,18 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                         .key('I', i -> new ItemSlot().slot(new ModularSlot(smallInv, i).slotGroup(slotGroup)))
                         .build()
                         .center());
+        return panel;
+    }
+
+    public ModularPanel openThirdWindow(PanelSyncManager syncManager, PanelSyncHandler syncHandler) {
+        ModularPanel panel = new Dialog<>("third_window", null)
+                .setDisablePanelsBelow(false)
+                .setCloseOnOutOfBoundsClick(false)
+                .size(50, 50);
+        panel.child(ButtonWidget.panelCloseButton())
+                .child(IKey.str("3rd Panel")
+                        .asWidget()
+                        .pos(5, 5));
         return panel;
     }
 

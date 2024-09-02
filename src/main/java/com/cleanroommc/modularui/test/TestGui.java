@@ -109,7 +109,7 @@ public class TestGui extends CustomModularScreen {
                             .matrix(availableMatrix)
                             .scrollable()
                             .pos(7, 7).right(14).bottom(7).debugName("available list"));
-        });
+        }, true);
         panel.child(new ButtonWidget<>()
                 .bottom(7).size(12, 12).leftRel(0.5f)
                 .overlay(GuiTextures.ADD)

@@ -11,22 +11,32 @@ import java.util.Objects;
 
 public class SecondaryPanel implements IPanelHandler {
 
-    private final ModularPanel mainPanel;
+    private final ModularPanel parent;
     private final IPanelBuilder provider;
+    private final boolean subPanel;
     private ModularScreen screen;
     private ModularPanel panel;
     private boolean open = false;
     private boolean queueDelete = false;
 
-    public SecondaryPanel(ModularPanel mainPanel, IPanelBuilder provider) {
-        this.mainPanel = mainPanel;
+    public SecondaryPanel(ModularPanel parent, IPanelBuilder provider, boolean subPanel) {
+        this.parent = parent;
         this.provider = provider;
+        this.subPanel = subPanel;
+        parent.registerSubPanel(this);
     }
 
     @Override
     public void closePanel() {
         if (!this.open) return;
         this.panel.animateClose();
+    }
+
+    @Override
+    public void closeSubPanels() {
+        if (this.panel != null) {
+            this.panel.closeClientSubPanels();
+        }
     }
 
     @ApiStatus.Internal
@@ -49,10 +59,15 @@ public class SecondaryPanel implements IPanelHandler {
     }
 
     @Override
+    public boolean isSubPanel() {
+        return subPanel;
+    }
+
+    @Override
     public void openPanel() {
         if (this.open) return;
-        if (this.screen != this.mainPanel.getScreen()) {
-            this.screen = this.mainPanel.getScreen();
+        if (this.screen != this.parent.getScreen()) {
+            this.screen = this.parent.getScreen();
         }
         if (this.panel == null) {
             this.panel = Objects.requireNonNull(this.provider.build(this.screen.getMainPanel(), this.screen.getContainer().getPlayer()));
@@ -70,6 +85,6 @@ public class SecondaryPanel implements IPanelHandler {
 
     public interface IPanelBuilder {
 
-        ModularPanel build(ModularPanel mainPanel, EntityPlayer player);
+        ModularPanel build(ModularPanel parentPanel, EntityPlayer player);
     }
 }

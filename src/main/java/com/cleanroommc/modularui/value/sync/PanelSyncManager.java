@@ -1,21 +1,20 @@
 package com.cleanroommc.modularui.value.sync;
 
+import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.IPanelSyncManager;
 import com.cleanroommc.modularui.screen.ContainerCustomizer;
 import com.cleanroommc.modularui.screen.ModularContainer;
-import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
-
-import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,6 +27,7 @@ public class PanelSyncManager implements IPanelSyncManager {
     private final Map<String, SyncHandler> syncHandlers = new Object2ObjectLinkedOpenHashMap<>();
     private final Map<String, SlotGroup> slotGroups = new Object2ObjectOpenHashMap<>();
     private final Map<SyncHandler, String> reverseSyncHandlers = new Object2ObjectOpenHashMap<>();
+    private final Map<String, SyncHandler> subPanels = new Object2ObjectArrayMap<>();
     private ModularSyncManager modularSyncManager;
     private String panelName;
     private boolean init = true;
@@ -44,6 +44,30 @@ public class PanelSyncManager implements IPanelSyncManager {
         this.panelName = panelName;
         this.syncHandlers.forEach((mapKey, syncHandler) -> syncHandler.init(mapKey, this));
         this.init = true;
+        this.subPanels.forEach((s, syncHandler) -> msm.getMainPSM().registerPanelSyncHandler(s, syncHandler));
+    }
+
+    private void registerPanelSyncHandler(String name, SyncHandler syncHandler) {
+        // only called on main psm
+        SyncHandler currentSh = this.syncHandlers.get(name);
+        if (currentSh != null && currentSh != syncHandler) throw new IllegalStateException();
+        String currentName = this.reverseSyncHandlers.get(syncHandler);
+        if (currentName != null && !name.equals(currentName)) throw new IllegalStateException();
+        this.syncHandlers.put(name, syncHandler);
+        this.reverseSyncHandlers.put(syncHandler, name);
+        syncHandler.init(name, this);
+    }
+
+    void closeSubPanels() {
+        this.subPanels.values().forEach(syncHandler -> {
+            if (syncHandler instanceof IPanelHandler panelHandler) {
+                if (panelHandler.isSubPanel()) {
+                    panelHandler.closePanel();
+                }
+            } else {
+                throw new IllegalStateException();
+            }
+        });
     }
 
     @ApiStatus.Internal
@@ -54,6 +78,10 @@ public class PanelSyncManager implements IPanelSyncManager {
     @ApiStatus.Internal
     public void onClose() {
         this.closeListener.forEach(listener -> listener.accept(getPlayer()));
+        for (String name : this.subPanels.keySet()) {
+            SyncHandler sh = this.modularSyncManager.getMainPSM().syncHandlers.remove(name);
+            this.modularSyncManager.getMainPSM().reverseSyncHandlers.remove(sh);
+        }
     }
 
     public boolean isInitialised() {
@@ -147,9 +175,28 @@ public class PanelSyncManager implements IPanelSyncManager {
         return itemSlot("_", id, slot);
     }
 
-    public PanelSyncHandler panel(String key, ModularPanel mainPanel, PanelSyncHandler.IPanelBuilder panelBuilder) {
-        PanelSyncHandler syncHandler = new PanelSyncHandler(mainPanel, panelBuilder);
-        syncValue(key, syncHandler);
+    /**
+     * Creates a synced panel handler. This can be used to automatically handle syncing for synced panels.
+     * Synced panels do not need to be synced themselves, but contain at least one widget which is synced.
+     * <p>NOTE</p>
+     * A panel sync handler is only created once. If one was already registered, that one will be returned.
+     * (This is only relevant for nested sub panels.)
+     *
+     * @param key          the key used for syncing
+     * @param panelBuilder the panel builder, that will create the new panel. It must not return null or any existing panels.
+     * @param subPanel     true if this panel should close when its parent closes (the parent is defined by <i>this</i> {@link PanelSyncManager})
+     * @return a synced panel handler.
+     * @throws NullPointerException     if the build panel of the builder is null
+     * @throws IllegalArgumentException if the build panel of the builder is the main panel
+     */
+    public IPanelHandler panel(String key, PanelSyncHandler.IPanelBuilder panelBuilder, boolean subPanel) {
+        SyncHandler sh = this.subPanels.get(key);
+        if (sh != null) return (IPanelHandler) sh;
+        PanelSyncHandler syncHandler = new PanelSyncHandler(panelBuilder, subPanel);
+        this.subPanels.put(key, syncHandler);
+        if (isInitialised()) {
+            this.modularSyncManager.getMainPSM().registerPanelSyncHandler(key, syncHandler);
+        }
         return syncHandler;
     }
 

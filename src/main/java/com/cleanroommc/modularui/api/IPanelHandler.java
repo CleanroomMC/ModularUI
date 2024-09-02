@@ -3,43 +3,35 @@ package com.cleanroommc.modularui.api;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.SecondaryPanel;
 import com.cleanroommc.modularui.value.sync.PanelSyncHandler;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 
 import org.jetbrains.annotations.ApiStatus;
 
 /**
- * This class can handle opening and closing of a {@link ModularPanel}. It makes sure, that the same panel is not created multiple times and instead reused.
- * Using {@link #openPanel()} is the only way to open multiple panels.
- * Panels can be closed with {@link #closePanel()}, but also with {@link ModularPanel#closeIfOpen(boolean)} and {@link ModularPanel#animateClose()}.
- * They are the same. Synced panels must be registered in the main {@link com.cleanroommc.modularui.value.sync.PanelSyncManager PanelSyncManager}.
- * It is recommended to use {@link com.cleanroommc.modularui.value.sync.PanelSyncManager#panel(String, ModularPanel, PanelSyncHandler.IPanelBuilder) PanelSyncManager#panel(String, ModularPanel, PanelSyncHandler.IPanelBuilder)}.
+ * This class can handle opening and closing of a {@link ModularPanel}. It makes sure, that the same panel is not created multiple
+ * times and instead reused.
+ * <p>Using {@link #openPanel()} is the only way to open multiple panels. </p>
+ * <p>Panels can be closed with {@link #closePanel()}, but also with {@link ModularPanel#closeIfOpen(boolean)} and
+ * {@link ModularPanel#animateClose()}. With the difference, that the method from this interface also works on server side. </p>
+ * Synced panels must be created with {@link PanelSyncManager#panel(String, PanelSyncHandler.IPanelBuilder, boolean)}.
+ * If the panel does not contain any synced widgets, a simple panel handler using {@link #simple(ModularPanel, SecondaryPanel.IPanelBuilder, boolean)}
+ * is likely what you need.
  */
 public interface IPanelHandler {
 
     /**
-     * Creates a synced panel handler. It MUST be registered in a {@link com.cleanroommc.modularui.value.sync.PanelSyncManager PanelSyncManager} on
-     * both sides to work.
-     *
-     * @param mainPanel    the main panel of the GUI
-     * @param panelBuilder the panel builder, that will create the new panel. It must not return null or the main panel.
-     * @return a synced panel handler.
-     * @throws NullPointerException     if the build panel of the builder is null
-     * @throws IllegalArgumentException if the build panel of the builder is the main panel
-     */
-    static IPanelHandler synced(ModularPanel mainPanel, PanelSyncHandler.IPanelBuilder panelBuilder) {
-        return new PanelSyncHandler(mainPanel, panelBuilder);
-    }
-
-    /**
      * Creates a non synced panel handler. Trying to use synced values anyway will result in a crash.
+     * It only works on client side. Doing anything with it on server side might result in a crash.
      *
-     * @param mainPanel the main panel of the GUI
-     * @param provider  the panel builder, that will create the new panel. It must not return null or the main panel.
+     * @param parent   an existing parent panel of the gui
+     * @param provider the panel builder, that will create the new panel. It must not return null or the main panel.
+     * @param subPanel true if this panel should close when its parent closes (the parent is defined by the first parameter)
      * @return a simple panel handler.
      * @throws NullPointerException     if the build panel of the builder is null
      * @throws IllegalArgumentException if the build panel of the builder is the main panel or there are synced values in the panel
      */
-    static IPanelHandler simple(ModularPanel mainPanel, SecondaryPanel.IPanelBuilder provider) {
-        return new SecondaryPanel(mainPanel, provider);
+    static IPanelHandler simple(ModularPanel parent, SecondaryPanel.IPanelBuilder provider, boolean subPanel) {
+        return new SecondaryPanel(parent, provider, subPanel);
     }
 
     /**
@@ -55,6 +47,12 @@ public interface IPanelHandler {
     void closePanel();
 
     /**
+     * Initiates the closing animation of all sub panels.
+     * Usually for internal use.
+     */
+    void closeSubPanels();
+
+    /**
      * Called internally after the panel is closed.
      */
     @ApiStatus.OverrideOnly
@@ -67,4 +65,11 @@ public interface IPanelHandler {
      * @throws UnsupportedOperationException if this handler is synced
      */
     void deleteCachedPanel();
+
+    /**
+     * If this is a sub panel of another panel. A sub panel will be closed when its parent is closed.
+     *
+     * @return true if this is a sub panel
+     */
+    boolean isSubPanel();
 }

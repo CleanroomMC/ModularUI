@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.widget.WidgetTree;
 
 import net.minecraft.network.PacketBuffer;
@@ -19,8 +20,8 @@ import java.util.Objects;
  */
 public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
 
-    private final ModularPanel mainPanel;
     private final IPanelBuilder panelBuilder;
+    private final boolean subPanel;
     private String panelName;
     private ModularPanel openedPanel;
     private PanelSyncManager syncManager;
@@ -29,12 +30,11 @@ public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
     /**
      * Creates a PanelSyncHandler
      *
-     * @param mainPanel    the main panel of the current GUI
      * @param panelBuilder a panel builder function
      */
-    public PanelSyncHandler(ModularPanel mainPanel, IPanelBuilder panelBuilder) {
-        this.mainPanel = mainPanel;
+    PanelSyncHandler(IPanelBuilder panelBuilder, boolean subPanel) {
         this.panelBuilder = panelBuilder;
+        this.subPanel = subPanel;
     }
 
     public ModularPanel createUI(PanelSyncManager syncManager) {
@@ -57,9 +57,6 @@ public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
         } else if (this.syncManager == null) {
             this.syncManager = new PanelSyncManager();
             this.openedPanel = Objects.requireNonNull(createUI(this.syncManager));
-            if (this.openedPanel == this.mainPanel) {
-                throw new IllegalArgumentException("New panel must not be the main panel!");
-            }
             this.panelName = this.openedPanel.getName();
             this.openedPanel.setSyncHandler(this);
             WidgetTree.collectSyncValues(getSyncManager(), this.openedPanel);
@@ -67,8 +64,16 @@ public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
                 this.openedPanel = null;
             }
         }
-        if (client && !this.mainPanel.getScreen().isPanelOpen(this.openedPanel.getName())) {
-            this.mainPanel.getScreen().getPanelManager().openPanel(this.openedPanel, this);
+        if (client) {
+            ModularScreen screen = getSyncManager().getContainer().getScreen();
+            if (!screen.isPanelOpen(this.openedPanel.getName())) {
+                screen.getPanelManager().openPanel(this.openedPanel, this);
+            } else {
+                // this was not supposed to happen
+                // make sure server side also closes the panel
+                closePanelInternal();
+                return;
+            }
         }
         getSyncManager().getModularSyncManager().open(this.panelName, this.syncManager);
         this.open = true;
@@ -83,6 +88,11 @@ public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
         } else {
             syncToClient(2);
         }
+    }
+
+    @Override
+    public void closeSubPanels() {
+        this.syncManager.closeSubPanels();
     }
 
     @ApiStatus.Internal
@@ -100,6 +110,11 @@ public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
         // This is because we can't guarantee that the sync handlers of the new panel are the same.
         // Dynamic sync handler changing is very error-prone.
         throw new UnsupportedOperationException("Can't delete cached panel in synced panel handlers!");
+    }
+
+    @Override
+    public boolean isSubPanel() {
+        return subPanel;
     }
 
     public boolean isPanelOpen() {
@@ -123,10 +138,6 @@ public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
         } else if (i == 2) {
             closePanelInternal();
         }
-    }
-
-    public ModularPanel getMainPanel() {
-        return mainPanel;
     }
 
     /**
