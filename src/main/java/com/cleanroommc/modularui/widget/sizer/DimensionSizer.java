@@ -156,8 +156,7 @@ public class DimensionSizer {
             if (this.start != null) {
                 p = calcPoint(this.start, s, parentSize, calcParent);
             } else if (this.end != null) {
-                p = calcPoint(this.end, s, parentSize, calcParent);
-                p = parentSize - p - s;
+                p = calcPoint(this.end, s, parentSize, calcParent) - s;
             } else {
                 throw new IllegalStateException();
             }
@@ -187,8 +186,8 @@ public class DimensionSizer {
                         p = calcPoint(this.start, -1, parentSize, calcParent);
                         boolean b = this.posCalculated;
                         this.posCalculated = false;
-                        int x2 = calcPoint(this.end, -1, parentSize, calcParent);
-                        s = Math.abs(parentSize - x2 - p);
+                        int p2 = calcPoint(this.end, -1, parentSize, calcParent);
+                        s = Math.abs(p2 - p);
                         this.posCalculated &= b;
                         this.sizeCalculated |= this.posCalculated;
                     } else {
@@ -209,8 +208,7 @@ public class DimensionSizer {
                     this.posCalculated &= (this.sizeCalculated || !needsSize(this.start));
                 } else {
                     s = calcSize(this.size, parentSize, calcParent);
-                    p = calcPoint(this.end, s, parentSize, calcParent);
-                    p = parentSize - p - s;
+                    p = calcPoint(this.end, s, parentSize, calcParent) - s;
                     this.posCalculated &= this.sizeCalculated;
                 }
             }
