@@ -47,7 +47,8 @@ public class ModularContainer extends Container implements ISortableContainer {
     private final List<ModularSlot> shiftClickSlots = new ArrayList<>();
     private ContainerCustomizer containerCustomizer;
 
-    private Optional<?> optionalScreen = Optional.empty();
+    @SideOnly(Side.CLIENT)
+    private ModularScreen optionalScreen = null;
 
     public ModularContainer(EntityPlayer player, PanelSyncManager panelSyncManager, String mainPanelName) {
         this.player = player;
@@ -71,12 +72,13 @@ public class ModularContainer extends Container implements ISortableContainer {
 
     @SideOnly(Side.CLIENT)
     void construct(ModularScreen screen) {
-        this.optionalScreen = Optional.of(screen);
+        this.optionalScreen = screen;
     }
 
     @SideOnly(Side.CLIENT)
     public ModularScreen getScreen() {
-        return (ModularScreen) optionalScreen.orElseThrow(() -> new NoSuchElementException("ModularScreen must not be null!"));
+        if (this.optionalScreen == null) throw new NullPointerException("ModularScreen is not yet initialised!");
+        return optionalScreen;
     }
 
     public ContainerAccessor acc() {
