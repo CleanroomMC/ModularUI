@@ -42,6 +42,8 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
@@ -52,6 +54,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+@SideOnly(Side.CLIENT)
 public class ClientScreenHandler {
 
     private static ModularScreen currentScreen = null;

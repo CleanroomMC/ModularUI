@@ -44,7 +44,7 @@ import java.util.function.Function;
 public class ModularScreen {
 
     public static boolean isScreen(@Nullable GuiScreen guiScreen, String owner, String name) {
-        if (guiScreen instanceof GuiContainerWrapper screenWrapper) {
+        if (guiScreen instanceof IMuiScreen screenWrapper) {
             ModularScreen screen = screenWrapper.getScreen();
             return screen.getOwner().equals(owner) && screen.getName().equals(name);
         }
@@ -57,7 +57,7 @@ public class ModularScreen {
 
     @Nullable
     public static ModularScreen getCurrent() {
-        if (MCHelper.getCurrentScreen() instanceof GuiContainerWrapper screenWrapper) {
+        if (MCHelper.getCurrentScreen() instanceof IMuiScreen screenWrapper) {
             return screenWrapper.getScreen();
         }
         return null;
@@ -70,6 +70,7 @@ public class ModularScreen {
     private final Area screenArea = new Area();
     private final Map<Class<?>, List<IGuiAction>> guiActionListeners = new Object2ObjectOpenHashMap<>();
     private final Object2ObjectArrayMap<IWidget, Runnable> frameUpdates = new Object2ObjectArrayMap<>();
+    private boolean pausesGame = false;
 
     private ITheme currentTheme;
     private IMuiScreen screenWrapper;
@@ -454,6 +455,10 @@ public class ModularScreen {
         throw new IllegalStateException("Screen does not extend GuiContainer!");
     }
 
+    public boolean doesPauseGame() {
+        return pausesGame;
+    }
+
     @SuppressWarnings("unchecked")
     private <T extends IGuiAction> List<T> getGuiActionListeners(Class<T> clazz) {
         return (List<T>) this.guiActionListeners.getOrDefault(clazz, Collections.emptyList());
@@ -540,6 +545,11 @@ public class ModularScreen {
 
     public ModularScreen useTheme(String theme) {
         this.currentTheme = IThemeApi.get().getThemeForScreen(this, theme);
+        return this;
+    }
+
+    public ModularScreen pausesGame(boolean pausesGame) {
+        this.pausesGame = pausesGame;
         return this;
     }
 
