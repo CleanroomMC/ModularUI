@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.drawable;
+package com.cleanroommc.modularui.drawable.text;
 
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;

@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
-import com.cleanroommc.modularui.drawable.TextRenderer;
+import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.utils.Color;
 
 import net.minecraft.client.renderer.BufferBuilder;
@@ -117,11 +117,11 @@ public class TextFieldRenderer extends TextRenderer {
 
     public Point2D.Float getPosOf(List<Line> measuredLines, Point cursorPos) {
         if (measuredLines.isEmpty()) {
-            return new Point2D.Float(getStartX(0), getStartY(1));
+            return new Point2D.Float(getStartX(0), getStartYOfLines(1));
         }
         Line line = measuredLines.get(cursorPos.y);
         String sub = line.getText().substring(0, Math.min(line.getText().length(), cursorPos.x));
-        return new Point2D.Float(getStartX(line.getWidth()) + getFontRenderer().getStringWidth(sub) * this.scale, getStartY(measuredLines.size()) + cursorPos.y * getFontHeight());
+        return new Point2D.Float(getStartX(line.getWidth()) + getFontRenderer().getStringWidth(sub) * this.scale, getStartYOfLines(measuredLines.size()) + cursorPos.y * getFontHeight());
     }
 
     @SideOnly(Side.CLIENT)

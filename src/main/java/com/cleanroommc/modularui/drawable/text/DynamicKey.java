@@ -1,10 +1,8 @@
-package com.cleanroommc.modularui.drawable.keys;
-
-import com.cleanroommc.modularui.api.drawable.IKey;
+package com.cleanroommc.modularui.drawable.text;
 
 import java.util.function.Supplier;
 
-public class DynamicKey implements IKey {
+public class DynamicKey extends BaseKey {
 
     private final Supplier<String> supplier;
 

@@ -1,11 +1,17 @@
 package com.cleanroommc.modularui.test;
 
+import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.drawable.text.RichText;
+import com.cleanroommc.modularui.drawable.ItemDrawable;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.utils.fakeworld.ArraySchema;
-import com.cleanroommc.modularui.utils.fakeworld.ISchema;
-import com.cleanroommc.modularui.widgets.SchemaWidget;
+
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+
+import net.minecraft.util.text.TextFormatting;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -46,7 +52,7 @@ public class ResizerTest extends CustomModularScreen {
                 .add(new BlockPos(0, 3, 0), Blocks.BEACON.getDefaultState())
                 .build();*/
 
-        ISchema schema = ArraySchema.builder()
+        /*ISchema schema = ArraySchema.builder()
                 .layer("D   D", "     ", "     ", "     ")
                 .layer(" DDD ", " E E ", "     ", "     ")
                 .layer(" DDD ", "  E  ", "  G  ", "  B  ")
@@ -64,7 +70,22 @@ public class ResizerTest extends CustomModularScreen {
                 .child(new SchemaWidget.LayerButton(schema, 0, 3)
                         .bottom(1)
                         .left(1)
-                        .size(16));
-        return panel;
+                        .size(16));*/
+
+        RichText text = new RichText()
+                .add("Hello ")
+                .add(new ItemDrawable(new ItemStack(Blocks.GRASS)))
+                .add(", nice to ")
+                .add(new ItemDrawable(new ItemStack(Items.PORKCHOP)))
+                .add(" you. ")
+                .add(IKey.str("This is a long text of strings...").format(TextFormatting.GOLD))
+                .add(" More Text")
+                .shadow(true);
+
+        //text.add("Lorem ipsum dolor sit amet, consetetur sadip\nscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.");
+
+        return new ModularPanel("main")
+                .size(176, 166)
+                .overlay(text.asIcon().margin(7));
     }
 }

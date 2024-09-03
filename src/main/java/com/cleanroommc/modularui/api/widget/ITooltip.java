@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.drawable.text.StyledText;
 import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.utils.Alignment;
 
@@ -126,7 +127,7 @@ public interface ITooltip<W extends IWidget> {
 
     /**
      * Sets if the tooltip text should have shadow enabled by default.
-     * Can be overridden with {@link com.cleanroommc.modularui.drawable.StyledText} lines.
+     * Can be overridden with {@link StyledText} lines.
      *
      * @param textShadow true if text should have a shadow
      * @return this

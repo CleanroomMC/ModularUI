@@ -70,7 +70,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     public ModularPanel(@NotNull String name) {
         this.name = Objects.requireNonNull(name, "A panels name must not be null and should be unique!");
-        align(Alignment.Center);
+        center();
     }
 
     @Override

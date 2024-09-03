@@ -1,7 +1,6 @@
-package com.cleanroommc.modularui.drawable.keys;
+package com.cleanroommc.modularui.drawable.text;
 
 import com.cleanroommc.modularui.ClientEventHandler;
-import com.cleanroommc.modularui.api.drawable.IKey;
 
 import net.minecraft.client.resources.I18n;
 
@@ -11,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-public class LangKey implements IKey {
+public class LangKey extends BaseKey {
 
     private final Supplier<String> keySupplier;
     private final Supplier<Object[]> argsSupplier;
@@ -55,19 +54,5 @@ public class LangKey implements IKey {
         this.time = ClientEventHandler.getTicks();
         this.string = I18n.format(Objects.requireNonNull(this.keySupplier.get()), this.argsSupplier.get());
         return string;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj instanceof LangKey langKey) {
-            return this.get().equals(langKey.get());
-        }
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        return this.get();
     }
 }

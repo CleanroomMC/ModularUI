@@ -1,9 +1,9 @@
-package com.cleanroommc.modularui.drawable.keys;
+package com.cleanroommc.modularui.drawable.text;
 
 import com.cleanroommc.modularui.ClientEventHandler;
 import com.cleanroommc.modularui.api.drawable.IKey;
 
-public class CompoundKey implements IKey {
+public class CompoundKey extends BaseKey {
 
     private static final IKey[] EMPTY = new IKey[0];
 
@@ -30,19 +30,5 @@ public class CompoundKey implements IKey {
 
     public IKey[] getKeys() {
         return this.keys;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj instanceof CompoundKey compoundKey) {
-            return this.get().equals(compoundKey.get());
-        }
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        return this.get();
     }
 }

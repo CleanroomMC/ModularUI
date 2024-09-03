@@ -300,7 +300,6 @@ public class ClientScreenHandler {
     }
 
     public static void drawContainer(ModularScreen muiScreen, GuiContainer mcScreen, int mouseX, int mouseY, float partialTicks) {
-        fpsCounter.onDraw();
         GuiContainerAccessor acc = (GuiContainerAccessor) mcScreen;
 
         Stencil.reset();
@@ -408,6 +407,7 @@ public class ClientScreenHandler {
     }
 
     public static void drawDebugScreen(@Nullable ModularScreen muiScreen, @Nullable ModularScreen fallback) {
+        fpsCounter.onDraw();
         if (!ModularUIConfig.guiDebugMode) return;
         if (muiScreen == null) {
             if (checkGui()) {
