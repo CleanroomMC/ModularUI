@@ -63,7 +63,7 @@ public class KeyBindHandler {
     }
 
     public static KeyBindingMap getKeyBindingMap() {
-        return ((KeyBindAccess) Minecraft.getMinecraft().gameSettings.keyBindPickBlock).getHASH();
+        return KeyBindAccess.getHASH();
     }
 
     public static void incrementPressTime(KeyBinding keyBinding) {
