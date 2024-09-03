@@ -116,7 +116,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
         if (isHovering() && this.hoverOverlay != null && this.hoverOverlay[state] != null) {
             return this.hoverOverlay[state];
         }
-        return this.overlay != null && this.overlay[state] != null ? this.overlay[state] : super.getCurrentBackground(theme, widgetTheme);
+        return this.overlay != null && this.overlay[state] != null ? this.overlay[state] : super.getCurrentOverlay(theme, widgetTheme);
     }
 
     @Override
