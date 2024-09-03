@@ -28,6 +28,7 @@ public class TextRenderer {
     protected int color = 0;//Theme.INSTANCE.getText();
     protected boolean simulate;
     protected float lastWidth = 0, lastHeight = 0;
+    protected float lastX = 0, lastY = 0;
     protected boolean scrollOnOverflow = false;
 
     public void setAlignment(Alignment alignment, float maxWidth) {
@@ -125,6 +126,7 @@ public class TextRenderer {
             GlStateManager.scale(this.scale, this.scale, 1f);
         }
         int y0 = getStartY(height * this.scale);
+        this.lastY = y0;
         for (ITextLine line : lines) {
             int x0 = getStartX(line.getWidth() * this.scale);
             if (!simulate) line.draw(context, getFontRenderer(), x0, y0, this.color, this.shadow);

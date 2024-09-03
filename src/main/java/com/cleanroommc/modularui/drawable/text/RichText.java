@@ -1,11 +1,14 @@
 package com.cleanroommc.modularui.drawable.text;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.drawable.ITextLine;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
+
+import net.minecraft.client.gui.FontRenderer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,5 +81,22 @@ public class RichText implements IDrawable {
         renderer.setColor(this.color != null ? this.color : widgetTheme.getTextColor());
         renderer.setAlignment(this.alignment, width, height);
         this.cachedText = renderer.compileAndDraw(context, this.elements);
+
+        /*int mx = context.unTransformX(context.getAbsMouseX(), context.getAbsMouseY());
+        int my = context.unTransformY(context.getAbsMouseX(), context.getAbsMouseY());
+        Object hovering = getHoveringElement(TextRenderer.getFontRenderer(), mx, my);
+        if (hovering != null) ModularUI.LOGGER.info(hovering);*/
+    }
+
+    public Object getHoveringElement(FontRenderer fr, int x, int y) {
+        if (this.cachedText == null) return null;
+
+        for (ITextLine line : this.cachedText) {
+            Object o = line.getHoveringElement(fr, x, y);
+            if (o == null) continue;
+            if (o == Boolean.FALSE) return null;
+            return o;
+        }
+        return null;
     }
 }

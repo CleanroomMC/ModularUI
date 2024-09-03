@@ -80,9 +80,7 @@ public class ResizerTest extends CustomModularScreen {
                 .add(" you. ")
                 .add(IKey.str("This is a long text of strings...").format(TextFormatting.GOLD))
                 .add(" More Text")
-                .shadow(true);
-
-        //text.add("Lorem ipsum dolor sit amet, consetetur sadip\nscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.");
+                .shadow(false);
 
         return new ModularPanel("main")
                 .size(176, 166)
