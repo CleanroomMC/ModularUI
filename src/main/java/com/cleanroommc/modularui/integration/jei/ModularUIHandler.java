@@ -1,12 +1,14 @@
 package com.cleanroommc.modularui.integration.jei;
 
+import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
-import com.cleanroommc.modularui.screen.GuiContainerWrapper;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.screen.ModularScreen;
 
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 
+import mezz.jei.api.IModRegistry;
 import mezz.jei.api.gui.*;
 import mezz.jei.api.recipe.transfer.IRecipeTransferError;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
@@ -17,38 +19,54 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 import java.util.List;
 
-public class ModularUIHandler implements IAdvancedGuiHandler<GuiContainerWrapper>, IGhostIngredientHandler<GuiContainerWrapper>, IGuiScreenHandler<GuiContainerWrapper>, IRecipeTransferHandler<ModularContainer> {
+public class ModularUIHandler<T extends GuiContainer & IMuiScreen> implements IAdvancedGuiHandler<T>, IGhostIngredientHandler<T>, IGuiScreenHandler<T>, IRecipeTransferHandler<ModularContainer> {
+
+    private static boolean registeredRecipeHandler = false;
+
+    private final Class<T> clazz;
+
+    public ModularUIHandler(Class<T> clazz) {
+        this.clazz = clazz;
+    }
+
+    public void register(IModRegistry registry) {
+        registry.addAdvancedGuiHandlers(this);
+        registry.addGhostIngredientHandler(this.clazz, this);
+        registry.addGuiScreenHandler(this.clazz, this);
+        if (registeredRecipeHandler) return;
+        registry.getRecipeTransferRegistry().addUniversalRecipeTransferHandler(this);
+        registeredRecipeHandler = true;
+    }
 
     @Override
-    public @NotNull Class<GuiContainerWrapper> getGuiContainerClass() {
-        return GuiContainerWrapper.class;
+    public @NotNull Class<T> getGuiContainerClass() {
+        return clazz;
     }
 
     @Nullable
     @Override
-    public List<Rectangle> getGuiExtraAreas(@NotNull GuiContainerWrapper guiContainer) {
+    public List<Rectangle> getGuiExtraAreas(@NotNull T guiContainer) {
         return guiContainer.getScreen().getContext().getJeiSettings().getAllJeiExclusionAreas();
     }
 
     @Nullable
     @Override
-    public Object getIngredientUnderMouse(@NotNull GuiContainerWrapper guiContainer, int mouseX, int mouseY) {
+    public Object getIngredientUnderMouse(@NotNull T guiContainer, int mouseX, int mouseY) {
         IGuiElement hovered = guiContainer.getScreen().getContext().getHovered();
         return hovered instanceof JeiIngredientProvider jip ? jip.getIngredient() : null;
     }
 
     @Override
-    public <I> @NotNull List<Target<I>> getTargets(GuiContainerWrapper gui, @NotNull I ingredient, boolean doStart) {
+    public <I> @NotNull List<Target<I>> getTargets(T gui, @NotNull I ingredient, boolean doStart) {
         return gui.getScreen().getContext().getJeiSettings().getAllGhostIngredientTargets(ingredient);
     }
 
     @Override
-    public void onComplete() {
-    }
+    public void onComplete() {}
 
     @Nullable
     @Override
-    public IGuiProperties apply(@NotNull GuiContainerWrapper guiScreen) {
+    public IGuiProperties apply(@NotNull T guiScreen) {
         return guiScreen.getScreen().getContext().getJeiSettings().isJeiEnabled(guiScreen.getScreen()) ? GuiProperties.create(guiScreen) : null;
     }
 

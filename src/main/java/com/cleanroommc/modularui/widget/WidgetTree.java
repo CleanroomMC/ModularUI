@@ -344,6 +344,7 @@ public class WidgetTree {
         return type.isAssignableFrom(parent.getClass()) ? (T) parent : null;
     }
 
+    @ApiStatus.Internal
     public static void collectSyncValues(PanelSyncManager syncManager, ModularPanel panel) {
         AtomicInteger id = new AtomicInteger(0);
         String syncKey = ModularSyncManager.AUTO_SYNC_PREFIX + panel.getName();
