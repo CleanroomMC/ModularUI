@@ -25,8 +25,7 @@ public class GuiContainerWrapper extends GuiContainer implements IMuiScreen {
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-    }
+    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {}
 
     @Override
     public @NotNull ModularScreen getScreen() {

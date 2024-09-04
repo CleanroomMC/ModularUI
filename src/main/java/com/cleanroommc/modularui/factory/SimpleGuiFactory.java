@@ -44,17 +44,14 @@ public class SimpleGuiFactory extends AbstractUIFactory<GuiData> {
         GuiManager.registerFactory(this);
     }
 
-    public void init() {
-    }
+    public void init() {}
 
     public void open(EntityPlayerMP player) {
         GuiManager.open(this, new GuiData(player), player);
     }
 
-
     @Override
-    public void writeGuiData(GuiData guiData, PacketBuffer buffer) {
-    }
+    public void writeGuiData(GuiData guiData, PacketBuffer buffer) {}
 
     @Override
     public @NotNull GuiData readGuiData(EntityPlayer player, PacketBuffer buffer) {
