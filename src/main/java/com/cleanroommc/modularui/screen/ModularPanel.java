@@ -437,12 +437,9 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                             break loop;
                         }
                     }
+                    widget.unapplyMatrix(getContext());
                 }
-                widget.unapplyMatrix(getContext());
-                if (widget.getElement().canHover()) {
-                    result = true;
-                    break;
-                }
+                if (widget.getElement().canHover()) break;
             }
             if (!this.keyboard.held) {
                 this.keyboard.lastPressed = pressed;
