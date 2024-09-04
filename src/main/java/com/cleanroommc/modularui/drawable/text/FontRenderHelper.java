@@ -1,5 +1,8 @@
 package com.cleanroommc.modularui.drawable.text;
 
+import com.cleanroommc.modularui.api.MCHelper;
+
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.text.TextFormatting;
 
 import org.apache.commons.lang3.StringUtils;
@@ -75,5 +78,10 @@ public class FontRenderHelper {
 
     public static boolean isReset(TextFormatting[] state) {
         return state[6] != null;
+    }
+
+    public static int getDefaultTextHeight() {
+        FontRenderer fr = MCHelper.getFontRenderer();
+        return fr != null ? fr.FONT_HEIGHT : 9;
     }
 }

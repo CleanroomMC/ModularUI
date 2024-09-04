@@ -5,8 +5,8 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.drawable.ITextLine;
-
 import com.cleanroommc.modularui.core.mixin.FontRendererAccessor;
+import com.cleanroommc.modularui.drawable.Icon;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -53,8 +53,8 @@ public class RichTextCompiler {
                 return;
             } else {
                 o = FontRenderHelper.getFormatting(this.formatting) + s2; // add formatting from previous string
-                FontRenderHelper.parseFormattingState(this.formatting, s2); // parse formatting from current string
             }
+            FontRenderHelper.parseFormattingState(this.formatting, s2); // parse formatting from current string
         }
         this.currentLine.add(o);
     }
@@ -111,6 +111,10 @@ public class RichTextCompiler {
                 o = ((IDrawable) o).asIcon();//.size(fr.FONT_HEIGHT);
             }
             IIcon icon = (IIcon) o;
+            if (icon instanceof Icon icon1) {
+                if (icon1.getWidth() <= 0) icon1.width(fr.FONT_HEIGHT);
+                if (icon1.getHeight() <= 0) icon1.height(fr.FONT_HEIGHT);
+            }
             if (icon.getWidth() > maxWidth) {
                 ModularUI.LOGGER.warn("Icon is wider than max width");
             }

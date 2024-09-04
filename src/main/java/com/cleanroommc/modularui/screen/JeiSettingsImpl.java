@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Keeps track of everything related to JEI in a Modular GUI.
@@ -160,10 +159,16 @@ public class JeiSettingsImpl implements JeiSettings {
     public List<Rectangle> getAllJeiExclusionAreas() {
         this.jeiExclusionWidgets.removeIf(widget -> !widget.isValid());
         List<Rectangle> areas = new ArrayList<>(this.jeiExclusionAreas);
-        areas.addAll(this.jeiExclusionWidgets.stream()
-                .filter(IWidget::isEnabled)
-                .map(IWidget::getArea)
-                .collect(Collectors.toList()));
+        for (Iterator<IWidget> iterator = this.jeiExclusionWidgets.iterator(); iterator.hasNext(); ) {
+            IWidget widget = iterator.next();
+            if (!widget.isValid()) {
+                iterator.remove();
+                continue;
+            }
+            if (widget.isEnabled()) {
+                areas.add(widget.getArea());
+            }
+        }
         return areas;
     }
 

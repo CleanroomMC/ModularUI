@@ -2,8 +2,9 @@ package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.drawable.ITextLine;
 import com.cleanroommc.modularui.drawable.text.StyledText;
-import com.cleanroommc.modularui.screen.Tooltip;
+import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.utils.Alignment;
 
 import org.jetbrains.annotations.NotNull;
@@ -22,13 +23,13 @@ public interface ITooltip<W extends IWidget> {
      * @return the current tooltip of this widget. Null if there is none
      */
     @Nullable
-    Tooltip getTooltip();
+    RichTooltip getTooltip();
 
     /**
      * @return the current tooltip of this widget. Creates a new one if there is none
      */
     @NotNull
-    Tooltip tooltip();
+    RichTooltip tooltip();
 
     /**
      * @return true if this widget has a tooltip
@@ -52,7 +53,7 @@ public interface ITooltip<W extends IWidget> {
      * @param tooltipConsumer tooltip function
      * @return this
      */
-    default W tooltip(Consumer<Tooltip> tooltipConsumer) {
+    default W tooltip(Consumer<RichTooltip> tooltipConsumer) {
         return tooltipStatic(tooltipConsumer);
     }
 
@@ -63,7 +64,7 @@ public interface ITooltip<W extends IWidget> {
      * @param tooltipConsumer tooltip function
      * @return this
      */
-    default W tooltipStatic(Consumer<Tooltip> tooltipConsumer) {
+    default W tooltipStatic(Consumer<RichTooltip> tooltipConsumer) {
         tooltipConsumer.accept(tooltip());
         return getThis();
     }
@@ -75,7 +76,7 @@ public interface ITooltip<W extends IWidget> {
      * @param tooltipBuilder tooltip function
      * @return this
      */
-    default W tooltipBuilder(Consumer<Tooltip> tooltipBuilder) {
+    default W tooltipBuilder(Consumer<RichTooltip> tooltipBuilder) {
         return tooltipDynamic(tooltipBuilder);
     }
 
@@ -86,7 +87,7 @@ public interface ITooltip<W extends IWidget> {
      * @param tooltipBuilder tooltip function
      * @return this
      */
-    default W tooltipDynamic(Consumer<Tooltip> tooltipBuilder) {
+    default W tooltipDynamic(Consumer<RichTooltip> tooltipBuilder) {
         tooltip().tooltipBuilder(tooltipBuilder);
         return getThis();
     }
@@ -97,7 +98,7 @@ public interface ITooltip<W extends IWidget> {
      * @param pos tooltip pos
      * @return this
      */
-    default W tooltipPos(Tooltip.Pos pos) {
+    default W tooltipPos(RichTooltip.Pos pos) {
         tooltip().pos(pos);
         return getThis();
     }
@@ -190,7 +191,7 @@ public interface ITooltip<W extends IWidget> {
      * @return this
      */
     default W tooltipHasTitleMargin(boolean hasTitleMargin) {
-        tooltip().setHasTitleMargin(hasTitleMargin);
+        //tooltip().setHasTitleMargin(hasTitleMargin);
         return getThis();
     }
 
@@ -201,7 +202,22 @@ public interface ITooltip<W extends IWidget> {
      * @return this
      */
     default W tooltipLinePadding(int linePadding) {
-        tooltip().setLinePadding(linePadding);
+        //tooltip().setLinePadding(linePadding);
+        return getThis();
+    }
+
+    default W addTooltipElement(String s) {
+        tooltip().add(s);
+        return getThis();
+    }
+
+    default W addTooltipElement(IDrawable drawable) {
+        tooltip().add(drawable);
+        return getThis();
+    }
+
+    default W addTooltipLine(ITextLine line) {
+        tooltip().addLine(line);
         return getThis();
     }
 
@@ -212,7 +228,7 @@ public interface ITooltip<W extends IWidget> {
      * @return this
      */
     default W addTooltipLine(IDrawable drawable) {
-        tooltip().addLine(drawable);
+        tooltip().add(drawable).newLine();
         return getThis();
     }
 

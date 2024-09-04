@@ -80,7 +80,7 @@ public class ResizerTest extends CustomModularScreen {
                 .add(" you. ")
                 .add(IKey.str("This is a long text of strings...").format(TextFormatting.GOLD))
                 .add(" More Text")
-                .shadow(false);
+                .textShadow(false);
 
         return new ModularPanel("main")
                 .size(176, 166)

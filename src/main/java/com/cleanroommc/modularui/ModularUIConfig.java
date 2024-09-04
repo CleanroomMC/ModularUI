@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui;
 
-import com.cleanroommc.modularui.screen.Tooltip;
+import com.cleanroommc.modularui.screen.RichTooltip;
 
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
@@ -20,7 +20,7 @@ public class ModularUIConfig {
 
     // Default direction
     @Config.Comment("Default tooltip position around the widget or its panel.")
-    public static Tooltip.Pos tooltipPos = Tooltip.Pos.VERTICAL;
+    public static RichTooltip.Pos tooltipPos = RichTooltip.Pos.VERTICAL;
 
     @Config.Comment("If true, widget outlines and widget information will be drawn.")
     public static boolean guiDebugMode = FMLLaunchHandler.isDeobfuscatedEnvironment();

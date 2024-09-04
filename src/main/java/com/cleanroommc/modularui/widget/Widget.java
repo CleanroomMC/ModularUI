@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -53,7 +54,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @Nullable private IDrawable overlay = null;
     @Nullable private IDrawable hoverBackground = null;
     @Nullable private IDrawable hoverOverlay = null;
-    @Nullable private Tooltip tooltip;
+    @Nullable private RichTooltip tooltip;
     @Nullable private String widgetThemeOverride = null;
     // listener
     @Nullable private List<IGuiAction> guiActionListeners;
@@ -165,7 +166,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
 
     @Override
     public void drawForeground(GuiContext context) {
-        Tooltip tooltip = getTooltip();
+        RichTooltip tooltip = getTooltip();
         if (tooltip != null && isHoveringFor(tooltip.getShowUpTimer())) {
             tooltip.draw(getContext());
         }
@@ -204,14 +205,14 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
 
     @Nullable
     @Override
-    public Tooltip getTooltip() {
+    public RichTooltip getTooltip() {
         return this.tooltip;
     }
 
     @Override
-    public @NotNull Tooltip tooltip() {
+    public @NotNull RichTooltip tooltip() {
         if (this.tooltip == null) {
-            this.tooltip = new Tooltip(this);
+            this.tooltip = new RichTooltip(this);
         }
         return this.tooltip;
     }

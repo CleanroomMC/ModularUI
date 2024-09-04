@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.widgets;
 
-import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
@@ -11,8 +10,9 @@ import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
 import com.cleanroommc.modularui.integration.jei.JeiIngredientProvider;
+import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.screen.Tooltip;
+import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetSlotTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -41,8 +41,6 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
 public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable, JeiGhostIngredientSlot<ItemStack>, JeiIngredientProvider {
 
     public static final int SIZE = 18;
@@ -51,12 +49,12 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     private ItemSlotSH syncHandler;
 
     public ItemSlot() {
-        tooltip().setAutoUpdate(true).setHasTitleMargin(true);
+        tooltip().setAutoUpdate(true);//.setHasTitleMargin(true);
         tooltipBuilder(tooltip -> {
             if (!isSynced()) return;
             ItemStack stack = getSlot().getStack();
             if (stack.isEmpty()) return;
-            tooltip.addStringLines(getItemTooltip(stack));
+            tooltip.addFromItem(stack);
         });
     }
 
@@ -65,7 +63,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         if (getScreen().isOverlay()) {
             throw new IllegalStateException("Overlays can't have slots!");
         }
-        size(SIZE, SIZE);
+        size(SIZE);
         getContext().getJeiSettings().addJeiGhostIngredientSlot(this);
     }
 
@@ -100,7 +98,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @Override
     public void drawForeground(GuiContext context) {
-        Tooltip tooltip = getTooltip();
+        RichTooltip tooltip = getTooltip();
         if (tooltip != null && isHoveringFor(tooltip.getShowUpTimer())) {
             tooltip.draw(getContext(), getSlot().getStack());
         }
@@ -172,12 +170,6 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         }
         return this.syncHandler;
     }
-
-    protected List<String> getItemTooltip(ItemStack stack) {
-        // todo: JEI seems to be getting tooltip from IngredientRenderer#getTooltip
-        return getScreen().getScreenWrapper().getGuiScreen().getItemToolTip(stack);
-    }
-
 
     public ItemSlot slot(ModularSlot slot) {
         this.syncHandler = new ItemSlotSH(slot);

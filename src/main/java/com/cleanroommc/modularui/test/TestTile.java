@@ -3,11 +3,14 @@ package com.cleanroommc.modularui.test;
 import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.drawable.IKey;
-import com.cleanroommc.modularui.drawable.*;
+import com.cleanroommc.modularui.drawable.Circle;
+import com.cleanroommc.modularui.drawable.GuiTextures;
+import com.cleanroommc.modularui.drawable.ItemDrawable;
+import com.cleanroommc.modularui.drawable.Rectangle;
 import com.cleanroommc.modularui.drawable.text.AnimatedText;
 import com.cleanroommc.modularui.factory.PosGuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.Tooltip;
+import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
@@ -141,7 +144,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                             .asIcon()
                                                                             .size(20))
                                                                     .addLine(new ItemDrawable(new ItemStack(Items.DIAMOND)).asIcon())
-                                                                    .pos(Tooltip.Pos.LEFT);
+                                                                    .pos(RichTooltip.Pos.LEFT);
                                                         })
                                                         .onMousePressed(mouseButton -> {
                                                             //panel.getScreen().close(true);

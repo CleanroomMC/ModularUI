@@ -30,7 +30,7 @@ public class ComposedLine implements ITextLine {
 
     @Override
     public int getHeight(FontRenderer fr) {
-        return height;
+        return height == fr.FONT_HEIGHT ? height : height + 1;
     }
 
     @Override

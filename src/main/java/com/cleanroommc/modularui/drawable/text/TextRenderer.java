@@ -109,8 +109,12 @@ public class TextRenderer {
         return measuredLines;
     }
 
+    public List<ITextLine> compile(List<Object> rawText) {
+        return RichTextCompiler.INSTANCE.compileLines(getFontRenderer(), rawText, (int) this.maxWidth, this.scale);
+    }
+
     public List<ITextLine> compileAndDraw(GuiContext context, List<Object> raw) {
-        List<ITextLine> lines = RichTextCompiler.INSTANCE.compileLines(getFontRenderer(), raw, (int) this.maxWidth, this.scale);
+        List<ITextLine> lines = compile(raw);
         drawCompiled(context, lines);
         return lines;
     }

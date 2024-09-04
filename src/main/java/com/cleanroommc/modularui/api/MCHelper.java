@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.api;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 
 public class MCHelper {
@@ -44,5 +45,10 @@ public class MCHelper {
     public static GuiScreen getCurrentScreen() {
         Minecraft mc = getMc();
         return mc != null ? mc.currentScreen : null;
+    }
+
+    public static FontRenderer getFontRenderer() {
+        if(hasMc()) return getMc().fontRenderer;
+        return null;
     }
 }

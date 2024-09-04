@@ -3,7 +3,7 @@ package com.cleanroommc.modularui.widgets;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.value.IBoolValue;
-import com.cleanroommc.modularui.screen.Tooltip;
+import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.theme.WidgetThemeSelectable;
 
@@ -65,11 +65,11 @@ public class ToggleButton extends AbstractCycleButtonWidget<ToggleButton> {
         return super.addTooltip(selected ? 1 : 0, tooltip);
     }
 
-    public ToggleButton tooltip(boolean selected, Consumer<Tooltip> builder) {
+    public ToggleButton tooltip(boolean selected, Consumer<RichTooltip> builder) {
         return super.tooltip(selected ? 1 : 0, builder);
     }
 
-    public ToggleButton tooltipBuilder(boolean selected, Consumer<Tooltip> builder) {
+    public ToggleButton tooltipBuilder(boolean selected, Consumer<RichTooltip> builder) {
         return super.tooltipBuilder(selected ? 1 : 0, builder);
     }
 }
