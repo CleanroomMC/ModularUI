@@ -225,6 +225,9 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @MustBeInvokedByOverriders
     public void onClose() {
+        if (!getScreen().isOverlay()) {
+            getContext().getJeiSettings().removeJeiExclusionArea(this);
+        }
         this.state = State.CLOSED;
         if (this.panelHandler != null) {
             this.panelHandler.closePanelInternal();
@@ -242,7 +245,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             this.state = State.WAIT_DISPOSING;
             return;
         }
-        getContext().getJeiSettings().removeJeiExclusionArea(this);
         super.dispose();
         this.screen = null;
         this.state = State.DISPOSED;
