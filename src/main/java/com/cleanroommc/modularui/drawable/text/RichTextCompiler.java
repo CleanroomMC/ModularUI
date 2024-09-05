@@ -50,11 +50,19 @@ public class RichTextCompiler {
     public void addLineElement(Object o) {
         if (o instanceof String s2) {
             if (this.currentLine.size() == 1 && this.currentLine.get(0) instanceof String s1) {
+                // if there is already one string in the line, merge them
                 this.currentLine.set(0, s1 + s2);
                 return;
-            } else {
-                o = FontRenderHelper.getFormatting(this.formatting) + s2; // add formatting from previous string
             }
+            if (this.currentLine.isEmpty()) {
+                // if there is currently no string, remove all whitespace from the start,
+                // but don't remove any formatting before
+                int l = FontRenderHelper.getFormatLength(s2, 0);
+                if (l + 1 < s2.length()) {
+                    o = trimAt(s2, l);
+                }
+            }
+            o = FontRenderHelper.getFormatting(this.formatting) + o; // add formatting from previous string
             FontRenderHelper.parseFormattingState(this.formatting, s2); // parse formatting from current string
         }
         this.currentLine.add(o);
@@ -191,5 +199,19 @@ public class RichTextCompiler {
         }
         if (i < s.length() - 1) s = s.substring(0, i);
         return s;
+    }
+
+    public static String trimAt(String s, int start) {
+        int l = 0;
+        for (int i = Math.max(0, start), n = s.length(); i < n; i++) {
+            if (Character.isWhitespace(s.charAt(i))) {
+                l++;
+            } else {
+                break;
+            }
+        }
+        if (l == 0) return s;
+        if (start <= 0) return s.substring(l);
+        return s.substring(0, start) + s.substring(start + l);
     }
 }

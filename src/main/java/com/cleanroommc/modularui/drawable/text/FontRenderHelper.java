@@ -26,6 +26,12 @@ public class FontRenderHelper {
         }
     }
 
+    /**
+     * Returns the formatting for a character with a fast array lookup.
+     *
+     * @param c formatting character
+     * @return formatting for character or null
+     */
     @Nullable
     public static TextFormatting getForCharacter(char c) {
         if (c < min || c > max) return null;
@@ -83,5 +89,29 @@ public class FontRenderHelper {
     public static int getDefaultTextHeight() {
         FontRenderer fr = MCHelper.getFontRenderer();
         return fr != null ? fr.FONT_HEIGHT : 9;
+    }
+
+    /**
+     * Calculates how many formatting characters there are at the given position of the string.
+     *
+     * @param s     string
+     * @param start starting index
+     * @return amount of formatting characters at index
+     */
+    public static int getFormatLength(String s, int start) {
+        int i = Math.max(0, start);
+        int l = 0;
+        for (; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == 167) {
+                if (i + 1 >= s.length()) return l;
+                if (getForCharacter(c) == null) return l;
+                l += 2;
+                i++;
+            } else {
+                return l;
+            }
+        }
+        return l;
     }
 }
