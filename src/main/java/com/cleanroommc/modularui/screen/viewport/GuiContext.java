@@ -75,11 +75,11 @@ public class GuiContext extends GuiViewportStack {
     /* Viewport */
 
     public int getMouseX() {
-        return transformX(this.mouseX, this.mouseY);
+        return unTransformX(this.mouseX, this.mouseY);
     }
 
     public int getMouseY() {
-        return transformY(this.mouseX, this.mouseY);
+        return unTransformY(this.mouseX, this.mouseY);
     }
 
     public int getMouse(GuiAxis axis) {
