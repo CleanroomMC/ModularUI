@@ -1,9 +1,13 @@
 package com.cleanroommc.modularui.screen.viewport;
 
 import com.cleanroommc.modularui.api.GuiAxis;
+import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.widget.sizer.Area;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.lwjgl.input.Keyboard;
@@ -58,6 +62,14 @@ public class GuiContext extends GuiViewportStack {
         this.screenArea.set(0, 0, w, h);
         this.screenArea.rx = 0;
         this.screenArea.ry = 0;
+    }
+
+    public Minecraft getMC() {
+        return Minecraft.getMinecraft();
+    }
+
+    public FontRenderer getFontRenderer() {
+        return MCHelper.getFontRenderer();
     }
 
     public void tick() {

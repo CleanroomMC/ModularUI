@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.drawable.ITextLine;
 import com.cleanroommc.modularui.core.mixin.FontRendererAccessor;
+import com.cleanroommc.modularui.drawable.DelegateIcon;
 import com.cleanroommc.modularui.drawable.Icon;
 
 import net.minecraft.client.Minecraft;
@@ -111,7 +112,11 @@ public class RichTextCompiler {
                 o = ((IDrawable) o).asIcon();//.size(fr.FONT_HEIGHT);
             }
             IIcon icon = (IIcon) o;
-            if (icon instanceof Icon icon1) {
+            IIcon delegate = icon;
+            if (icon instanceof DelegateIcon di) {
+                delegate = di.findRootDelegate();
+            }
+            if (delegate instanceof Icon icon1) {
                 if (icon1.getWidth() <= 0) icon1.width(fr.FONT_HEIGHT);
                 if (icon1.getHeight() <= 0) icon1.height(fr.FONT_HEIGHT);
             }

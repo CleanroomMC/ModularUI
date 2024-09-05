@@ -158,4 +158,9 @@ public class Icon implements IIcon {
     public static Icon ofJson(JsonObject json) {
         return JsonHelper.deserialize(json, IDrawable.class, IDrawable.EMPTY, "drawable", "icon").asIcon();
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" + this.drawable.getClass().getSimpleName() + ")";
+    }
 }

@@ -167,7 +167,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     public void drawForeground(ModularGuiContext context) {
         RichTooltip tooltip = getTooltip();
         if (tooltip != null && isHoveringFor(tooltip.getShowUpTimer())) {
-            tooltip.draw(getContext());
+            tooltip.draw(context);
         }
     }
 
@@ -214,6 +214,12 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
             this.tooltip = new RichTooltip(this);
         }
         return this.tooltip;
+    }
+
+    @Override
+    public W tooltip(RichTooltip tooltip) {
+        this.tooltip = tooltip;
+        return getThis();
     }
 
     @Override

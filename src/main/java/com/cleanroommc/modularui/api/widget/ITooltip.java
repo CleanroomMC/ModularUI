@@ -17,7 +17,7 @@ import java.util.function.Consumer;
  *
  * @param <W> widget type
  */
-public interface ITooltip<W extends IWidget> {
+public interface ITooltip<W extends ITooltip<W>> {
 
     /**
      * @return the current tooltip of this widget. Null if there is none
@@ -30,6 +30,14 @@ public interface ITooltip<W extends IWidget> {
      */
     @NotNull
     RichTooltip tooltip();
+
+    /**
+     * Overwrites the current tooltip with the given one
+     *
+     * @param tooltip new tooltip
+     * @return this
+     */
+    W tooltip(RichTooltip tooltip);
 
     /**
      * @return true if this widget has a tooltip

@@ -4,6 +4,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.TextFormatting;
+
+import java.util.Collections;
+import java.util.List;
 
 public class MCHelper {
 
@@ -48,7 +54,21 @@ public class MCHelper {
     }
 
     public static FontRenderer getFontRenderer() {
-        if(hasMc()) return getMc().fontRenderer;
+        if (hasMc()) return getMc().fontRenderer;
         return null;
+    }
+
+    public static List<String> getItemToolTip(ItemStack item) {
+        if (!hasMc()) return Collections.emptyList();
+        if (getMc().currentScreen != null) return getMc().currentScreen.getItemToolTip(item);
+        List<String> list = item.getTooltip(getPlayer(), getMc().gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL);
+        for (int i = 0; i < list.size(); ++i) {
+            if (i == 0) {
+                list.set(i, item.getItem().getForgeRarity(item).getColor() + list.get(i));
+            } else {
+                list.set(i, TextFormatting.GRAY + list.get(i));
+            }
+        }
+        return list;
     }
 }

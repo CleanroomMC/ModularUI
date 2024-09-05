@@ -1,16 +1,16 @@
 package com.cleanroommc.modularui.test;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.IKey;
-import com.cleanroommc.modularui.drawable.text.RichText;
 import com.cleanroommc.modularui.drawable.ItemDrawable;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
+import com.cleanroommc.modularui.widgets.RichTextWidget;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-
 import net.minecraft.util.text.TextFormatting;
 
 import org.jetbrains.annotations.NotNull;
@@ -72,18 +72,26 @@ public class ResizerTest extends CustomModularScreen {
                         .left(1)
                         .size(16));*/
 
-        RichText text = new RichText()
-                .add("Hello ")
-                .add(new ItemDrawable(new ItemStack(Blocks.GRASS)))
-                .add(", nice to ")
-                .add(new ItemDrawable(new ItemStack(Items.PORKCHOP)))
-                .add(" you. ")
-                .add(IKey.str("This is a long text of strings...").format(TextFormatting.GOLD))
-                .add(" More Text")
-                .textShadow(false);
-
         return new ModularPanel("main")
                 .size(176, 166)
-                .overlay(text.asIcon().margin(7));
+                .child(new RichTextWidget()
+                        .sizeRel(1f).margin(7)
+                        .add("Hello ")
+                        .add(new ItemDrawable(new ItemStack(Blocks.GRASS))
+                                .asIcon()
+                                .asHoverable()
+                                .tooltip(richTooltip -> richTooltip.addFromItem(new ItemStack(Blocks.GRASS))))
+                        .add(", nice to ")
+                        .add(new ItemDrawable(new ItemStack(Items.PORKCHOP))
+                                .asIcon()
+                                .asInteractable()
+                                .onMousePressed(button -> {
+                                    ModularUI.LOGGER.info("Pressed Pork");
+                                    return true;
+                                }))
+                        .add(" you. ")
+                        .add(IKey.str("This is a long text of strings...").format(TextFormatting.GOLD))
+                        .add(" More Text")
+                        .textShadow(false));
     }
 }

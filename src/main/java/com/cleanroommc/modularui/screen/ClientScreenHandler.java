@@ -20,6 +20,7 @@ import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.FpsCounter;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.ItemSlot;
+import com.cleanroommc.modularui.widgets.RichTextWidget;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 
@@ -433,7 +434,7 @@ public class ClientScreenHandler {
         ModularGuiContext context = muiScreen.getContext();
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
         int screenH = muiScreen.getScreenArea().height;
-        int color = Color.rgb(180, 40, 115);
+        int color = Color.argb(180, 40, 115, 220);
         int lineY = screenH - 13;
         Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Mouse Pos: " + mouseX + ", " + mouseY, 5, lineY, color);
         lineY -= 11;
@@ -483,6 +484,11 @@ public class ClientScreenHandler {
                     boolean allowShiftTransfer = slotGroup != null && slotGroup.allowShiftTransfer();
                     GuiDraw.drawText("Shift-Click Priority: " + (allowShiftTransfer ? slotGroup.getShiftClickPriority() : "DISABLED"), 5, lineY, 1, color, false);
                 }
+            } else if(hovered instanceof RichTextWidget richTextWidget) {
+                drawSegmentLine(lineY -= 4, color);
+                lineY -= 10;
+                Object hoveredElement = richTextWidget.getHoveredElement();
+                GuiDraw.drawText("Hovered: " + hoveredElement, 5, lineY, 1, color, false);
             }
         }
         // dot at mouse pos
@@ -523,6 +529,7 @@ public class ClientScreenHandler {
     private static boolean checkGui(GuiScreen screen) {
         if (!MCHelper.hasMc() || currentScreen == null || !(screen instanceof IMuiScreen muiScreen)) return false;
         if (screen != Minecraft.getMinecraft().currentScreen || muiScreen.getScreen() != currentScreen) {
+            defaultContext.reset();
             currentScreen = null;
             lastChar = null;
             return false;

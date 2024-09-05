@@ -172,6 +172,10 @@ public class RichText implements IDrawable, IRichTextBuilder<RichText> {
         return this.cachedText;
     }
 
+    public Object getHoveringElement(GuiContext context) {
+        return getHoveringElement(context.getFontRenderer(), context.getMouseX(), context.getMouseY());
+    }
+
     public Object getHoveringElement(FontRenderer fr, int x, int y) {
         if (this.cachedText == null) return null;
 
