@@ -35,12 +35,14 @@ public class OverlayStack {
     public static boolean interact(Predicate<ModularScreen> function, boolean topToBottom) {
         if (topToBottom) {
             for (int i = overlay.size() - 1; i >= 0; i--) {
+                overlay.get(i).getContext().updateEventState();
                 if (function.test(overlay.get(i))) {
                     return true;
                 }
             }
         } else {
             for (ModularScreen screen : overlay) {
+                screen.getContext().updateEventState();
                 if (function.test(screen)) {
                     return true;
                 }
@@ -53,8 +55,7 @@ public class OverlayStack {
         ModularScreen hovered = null;
         ModularScreen fallback = null;
         for (ModularScreen screen : overlay) {
-            GlStateManager.disableDepth();
-            GlStateManager.disableLighting();
+            screen.getContext().updateState(mouseX, mouseY, partialTicks);
             GlStateManager.enableBlend();
             GlStateManager.color(1f, 1f, 1f, 1f);
             screen.drawScreen(mouseX, mouseY, partialTicks);

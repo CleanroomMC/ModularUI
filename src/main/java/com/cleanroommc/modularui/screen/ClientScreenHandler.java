@@ -67,6 +67,7 @@ public class ClientScreenHandler {
 
     @SubscribeEvent
     public static void onGuiOpen(GuiOpenEvent event) {
+        defaultContext.reset();
         if (event.getGui() instanceof IMuiScreen muiScreen) {
             Objects.requireNonNull(muiScreen.getScreen(), "ModularScreen must not be null!");
             if (currentScreen != muiScreen.getScreen()) {
@@ -89,7 +90,6 @@ public class ClientScreenHandler {
     public static void onGuiInit(GuiScreenEvent.InitGuiEvent.Post event) {
         defaultContext.updateScreenArea(event.getGui().width, event.getGui().height);
         if (checkGui(event.getGui())) {
-            currentScreen.getContext().updateScreenArea(event.getGui().width, event.getGui().height);
             currentScreen.onResize(event.getGui().width, event.getGui().height);
         }
         OverlayStack.foreach(ms -> ms.onResize(event.getGui().width, event.getGui().height), false);
@@ -123,10 +123,13 @@ public class ClientScreenHandler {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void onGuiDraw(GuiScreenEvent.DrawScreenEvent.Pre event) {
-        defaultContext.updateState(event.getMouseX(), event.getMouseY(), event.getRenderPartialTicks());
+        int mx = event.getMouseX(), my = event.getMouseY();
+        float pt = event.getRenderPartialTicks();
+        defaultContext.updateState(mx, my, pt);
+        defaultContext.reset();
         if (checkGui(event.getGui())) {
-            currentScreen.getContext().updateState(event.getMouseX(), event.getMouseY(), event.getRenderPartialTicks());
-            drawScreen(currentScreen, currentScreen.getScreenWrapper().getGuiScreen(), event.getMouseX(), event.getMouseY(), event.getRenderPartialTicks());
+            currentScreen.getContext().updateState(mx, my, pt);
+            drawScreen(currentScreen, currentScreen.getScreenWrapper().getGuiScreen(), mx, my, pt);
             event.setCanceled(true);
         }
     }
