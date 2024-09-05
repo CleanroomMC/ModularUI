@@ -2,7 +2,7 @@ package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.value.IDoubleValue;
 import com.cleanroommc.modularui.drawable.UITexture;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.value.DoubleValue;
@@ -54,7 +54,7 @@ public class ProgressWidget extends Widget<ProgressWidget> {
     }
 
     @Override
-    public void draw(GuiContext context, WidgetTheme widgetTheme) {
+    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
         if (this.emptyTexture != null) {
             this.emptyTexture.draw(context, 0, 0, getArea().w(), getArea().h(), widgetTheme);
             Color.setGlColorOpaque(Color.WHITE.main);

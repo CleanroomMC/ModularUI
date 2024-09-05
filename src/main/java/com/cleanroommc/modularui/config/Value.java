@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.config;
 
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 
 import net.minecraft.network.PacketBuffer;
 
@@ -22,7 +22,7 @@ public abstract class Value {
     }
 
     @Nullable
-    public IWidget buildGuiConfig(GuiContext context) {
+    public IWidget buildGuiConfig(ModularGuiContext context) {
         return null;
     }
 

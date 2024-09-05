@@ -9,7 +9,7 @@ import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.ISynced;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
@@ -116,11 +116,11 @@ public class WidgetTree {
         return !includeSelf || consumer.test(parent);
     }
 
-    public static void drawTree(IWidget parent, GuiContext context) {
+    public static void drawTree(IWidget parent, ModularGuiContext context) {
         drawTree(parent, context, false);
     }
 
-    public static void drawTree(IWidget parent, GuiContext context, boolean ignoreEnabled) {
+    public static void drawTree(IWidget parent, ModularGuiContext context, boolean ignoreEnabled) {
         if (!parent.isEnabled() && !ignoreEnabled) return;
 
         float alpha = parent.getPanel().getAlpha();
@@ -201,7 +201,7 @@ public class WidgetTree {
         context.popMatrix();
     }
 
-    public static void drawTreeForeground(IWidget parent, GuiContext context) {
+    public static void drawTreeForeground(IWidget parent, ModularGuiContext context) {
         IViewport viewport = parent instanceof IViewport viewport1 ? viewport1 : null;
         context.pushMatrix();
         parent.transform(context);

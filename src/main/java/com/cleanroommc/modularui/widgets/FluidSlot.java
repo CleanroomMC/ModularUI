@@ -10,7 +10,7 @@ import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
 import com.cleanroommc.modularui.integration.jei.JeiIngredientProvider;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.RichTooltip;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetSlotTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
@@ -123,7 +123,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
     }
 
     @Override
-    public void draw(GuiContext context, WidgetTheme widgetTheme) {
+    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
         IFluidTank fluidTank = getFluidTank();
         FluidStack content = this.syncHandler.getValue();
         if (content != null) {

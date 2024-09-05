@@ -9,7 +9,7 @@ import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.overlay.ScreenWrapper;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.widget.WidgetTree;
@@ -66,8 +66,7 @@ public class ModularScreen {
     private final String owner;
     private final String name;
     private final PanelManager panelManager;
-    private final GuiContext context = new GuiContext(this);
-    private final Area screenArea = new Area();
+    private final ModularGuiContext context = new ModularGuiContext(this);
     private final Map<Class<?>, List<IGuiAction>> guiActionListeners = new Object2ObjectOpenHashMap<>();
     private final Object2ObjectArrayMap<IWidget, Runnable> frameUpdates = new Object2ObjectArrayMap<>();
     private boolean pausesGame = false;
@@ -101,11 +100,11 @@ public class ModularScreen {
      * @param owner            owner of this screen (usually a mod id)
      * @param mainPanelCreator function which creates the main panel of this screen
      */
-    public ModularScreen(@NotNull String owner, @NotNull Function<GuiContext, ModularPanel> mainPanelCreator) {
+    public ModularScreen(@NotNull String owner, @NotNull Function<ModularGuiContext, ModularPanel> mainPanelCreator) {
         this(owner, Objects.requireNonNull(mainPanelCreator, "The main panel function must not be null!"), false);
     }
 
-    private ModularScreen(@NotNull String owner, @Nullable Function<GuiContext, ModularPanel> mainPanelCreator, boolean ignored) {
+    private ModularScreen(@NotNull String owner, @Nullable Function<ModularGuiContext, ModularPanel> mainPanelCreator, boolean ignored) {
         Objects.requireNonNull(owner, "The owner must not be null!");
         this.owner = owner;
         ModularPanel mainPanel = mainPanelCreator != null ? mainPanelCreator.apply(this.context) : buildUI(this.context);
@@ -125,7 +124,7 @@ public class ModularScreen {
     /**
      * Intended for use in {@link CustomModularScreen}
      */
-    ModularPanel buildUI(GuiContext context) {
+    ModularPanel buildUI(ModularGuiContext context) {
         throw new UnsupportedOperationException();
     }
 
@@ -155,10 +154,8 @@ public class ModularScreen {
         if (this.panelManager.tryInit()) {
             onOpen();
         }
-        this.screenArea.set(0, 0, width, height);
-        this.screenArea.z(0);
 
-        this.context.pushViewport(null, this.screenArea);
+        this.context.pushViewport(null, this.context.getScreenArea());
         for (ModularPanel panel : this.panelManager.getReverseOpenPanels()) {
             WidgetTree.resize(panel);
         }
@@ -219,7 +216,6 @@ public class ModularScreen {
 
     @MustBeInvokedByOverriders
     public void onUpdate() {
-        this.context.tick();
         for (ModularPanel panel : this.panelManager.getOpenPanels()) {
             WidgetTree.onUpdate(panel);
         }
@@ -240,8 +236,6 @@ public class ModularScreen {
     }
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        this.context.updateState(mouseX, mouseY, partialTicks);
-
         GlStateManager.disableRescaleNormal();
         RenderHelper.disableStandardItemLighting();
         GlStateManager.disableLighting();
@@ -249,10 +243,10 @@ public class ModularScreen {
         GlStateManager.disableAlpha();
 
         this.context.reset();
-        this.context.pushViewport(null, this.screenArea);
+        this.context.pushViewport(null, this.context.getScreenArea());
         for (ModularPanel panel : this.panelManager.getReverseOpenPanels()) {
             if (panel.disablePanelsBelow()) {
-                GuiDraw.drawRect(0, 0, this.screenArea.w(), this.screenArea.h(), Color.argb(16, 16, 16, (int) (125 * panel.getAlpha())));
+                GuiDraw.drawRect(0, 0, this.context.getScreenArea().w(), this.context.getScreenArea().h(), Color.argb(16, 16, 16, (int) (125 * panel.getAlpha())));
             }
             WidgetTree.drawTree(panel, this.context);
         }
@@ -273,7 +267,7 @@ public class ModularScreen {
         GlStateManager.disableAlpha();
 
         this.context.reset();
-        this.context.pushViewport(null, this.screenArea);
+        this.context.pushViewport(null, this.context.getScreenArea());
         for (ModularPanel panel : this.panelManager.getReverseOpenPanels()) {
             if (panel.isEnabled()) {
                 WidgetTree.drawTreeForeground(panel, this.context);
@@ -289,7 +283,6 @@ public class ModularScreen {
     }
 
     public boolean onMousePressed(int mouseButton) {
-        this.context.updateEventState();
         for (IGuiAction.MousePressed action : getGuiActionListeners(IGuiAction.MousePressed.class)) {
             action.press(mouseButton);
         }
@@ -308,7 +301,6 @@ public class ModularScreen {
     }
 
     public boolean onMouseRelease(int mouseButton) {
-        this.context.updateEventState();
         for (IGuiAction.MouseReleased action : getGuiActionListeners(IGuiAction.MouseReleased.class)) {
             action.release(mouseButton);
         }
@@ -327,7 +319,6 @@ public class ModularScreen {
     }
 
     public boolean onKeyPressed(char typedChar, int keyCode) {
-        this.context.updateEventState();
         for (IGuiAction.KeyPressed action : getGuiActionListeners(IGuiAction.KeyPressed.class)) {
             action.press(typedChar, keyCode);
         }
@@ -343,7 +334,6 @@ public class ModularScreen {
     }
 
     public boolean onKeyRelease(char typedChar, int keyCode) {
-        this.context.updateEventState();
         for (IGuiAction.KeyReleased action : getGuiActionListeners(IGuiAction.KeyReleased.class)) {
             action.release(typedChar, keyCode);
         }
@@ -359,7 +349,6 @@ public class ModularScreen {
     }
 
     public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
-        this.context.updateEventState();
         for (IGuiAction.MouseScroll action : getGuiActionListeners(IGuiAction.MouseScroll.class)) {
             action.scroll(scrollDirection, amount);
         }
@@ -375,7 +364,6 @@ public class ModularScreen {
     }
 
     public boolean onMouseDrag(int mouseButton, long timeSinceClick) {
-        this.context.updateEventState();
         for (IGuiAction.MouseDrag action : getGuiActionListeners(IGuiAction.MouseDrag.class)) {
             action.drag(mouseButton, timeSinceClick);
         }
@@ -417,7 +405,7 @@ public class ModularScreen {
         return overlay;
     }
 
-    public GuiContext getContext() {
+    public ModularGuiContext getContext() {
         return this.context;
     }
 
@@ -438,7 +426,7 @@ public class ModularScreen {
     }
 
     public Area getScreenArea() {
-        return this.screenArea;
+        return this.context.getScreenArea();
     }
 
     public boolean isClientOnly() {

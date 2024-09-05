@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -39,5 +39,5 @@ public abstract class CustomModularScreen extends ModularScreen {
      */
     @NotNull
     @ApiStatus.OverrideOnly
-    public abstract ModularPanel buildUI(GuiContext context);
+    public abstract ModularPanel buildUI(ModularGuiContext context);
 }

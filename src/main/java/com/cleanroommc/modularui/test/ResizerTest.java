@@ -5,7 +5,7 @@ import com.cleanroommc.modularui.drawable.text.RichText;
 import com.cleanroommc.modularui.drawable.ItemDrawable;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
 import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 public class ResizerTest extends CustomModularScreen {
 
     @Override
-    public @NotNull ModularPanel buildUI(GuiContext context) {
+    public @NotNull ModularPanel buildUI(ModularGuiContext context) {
         /*TextureAtlasSprite sprite = SpriteHelper.getSpriteOfBlockState(GameObjectHelper.getBlockState("minecraft", "command_block"), EnumFacing.UP);
         //SpriteHelper.getSpriteOfItem(new ItemStack(Items.DIAMOND));
         return ModularPanel.defaultPanel("main")

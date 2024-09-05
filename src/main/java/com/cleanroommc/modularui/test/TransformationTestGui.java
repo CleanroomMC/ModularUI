@@ -4,7 +4,7 @@ import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
 import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Interpolation;
 import com.cleanroommc.modularui.widget.Widget;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 public class TransformationTestGui extends CustomModularScreen {
 
     @Override
-    public @NotNull ModularPanel buildUI(GuiContext context) {
+    public @NotNull ModularPanel buildUI(ModularGuiContext context) {
         return new TestPanel("test")
                 .child(new Widget<>()
                         .align(Alignment.Center)

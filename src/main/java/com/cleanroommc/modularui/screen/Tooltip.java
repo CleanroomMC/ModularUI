@@ -1,11 +1,12 @@
 package com.cleanroommc.modularui.screen;
 
-import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.drawable.*;
+import com.cleanroommc.modularui.drawable.GuiDraw;
+import com.cleanroommc.modularui.drawable.Icon;
+import com.cleanroommc.modularui.drawable.IconRenderer;
 import com.cleanroommc.modularui.drawable.text.TextIcon;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -22,7 +23,7 @@ import net.minecraftforge.common.MinecraftForge;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.Rectangle;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -33,7 +34,7 @@ public class Tooltip {
     private final IWidget parent;
     private final List<IDrawable> lines = new ArrayList<>();
     private List<IDrawable> additionalLines = new ArrayList<>();
-    private Pos pos = ModularUIConfig.tooltipPos;
+    private Pos pos = Pos.NEXT_TO_MOUSE;//ModularUIConfig.tooltipPos;
     private boolean customPos = false;
     private Consumer<Tooltip> tooltipBuilder;
     private int showUpTimer = 0;
@@ -83,7 +84,7 @@ public class Tooltip {
             this.maxWidth = Integer.MAX_VALUE;
         }
         if (stack == null) stack = ItemStack.EMPTY;
-        Area screen = context.getScreen().getScreenArea();
+        Area screen = context.getScreenArea();
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
         IconRenderer renderer = IconRenderer.SHARED;
         List<String> textLines = lines.stream().filter(drawable -> drawable instanceof IKey).map(key -> ((IKey) key).get()).collect(Collectors.toList());
@@ -135,7 +136,7 @@ public class Tooltip {
         int height = (int) renderer.getLastHeight();
 
         if (!this.customPos) {
-            this.pos = context.getScreen().getCurrentTheme().getTooltipPosOverride();
+            this.pos = Pos.NEXT_TO_MOUSE;
         }
 
         if (this.pos == null) {

@@ -10,8 +10,7 @@ import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.RichTooltip;
-import com.cleanroommc.modularui.screen.Tooltip;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
@@ -40,7 +39,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     private boolean valid = false;
     private IWidget parent = null;
     private ModularPanel panel = null;
-    private GuiContext context = null;
+    private ModularGuiContext context = null;
     // sizing
     private final Area area = new Area();
     private final Flex flex = new Flex(this);
@@ -145,7 +144,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     // -----------------
 
     @Override
-    public void drawBackground(GuiContext context, WidgetTheme widgetTheme) {
+    public void drawBackground(ModularGuiContext context, WidgetTheme widgetTheme) {
         IDrawable bg = getCurrentBackground(context.getTheme(), widgetTheme);
         if (bg != null) {
             bg.drawAtZero(context, getArea(), widgetTheme);
@@ -153,10 +152,10 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     @Override
-    public void draw(GuiContext context, WidgetTheme widgetTheme) {}
+    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {}
 
     @Override
-    public void drawOverlay(GuiContext context, WidgetTheme widgetTheme) {
+    public void drawOverlay(ModularGuiContext context, WidgetTheme widgetTheme) {
         IDrawable bg = getCurrentOverlay(context.getTheme(), widgetTheme);
         if (bg != null) {
             Box padding = getArea().getPadding();
@@ -165,7 +164,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     @Override
-    public void drawForeground(GuiContext context) {
+    public void drawForeground(ModularGuiContext context) {
         RichTooltip tooltip = getTooltip();
         if (tooltip != null && isHoveringFor(tooltip.getShowUpTimer())) {
             tooltip.draw(getContext());
@@ -384,7 +383,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     @Override
-    public GuiContext getContext() {
+    public ModularGuiContext getContext() {
         if (!isValid()) {
             throw new IllegalStateException(getClass().getSimpleName() + " is not in a valid state!");
         }
@@ -392,7 +391,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     @ApiStatus.Internal
-    protected final void setContext(GuiContext context) {
+    protected final void setContext(ModularGuiContext context) {
         this.context = context;
     }
 

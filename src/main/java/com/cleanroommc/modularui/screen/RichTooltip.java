@@ -1,17 +1,14 @@
 package com.cleanroommc.modularui.screen;
 
+import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.MCHelper;
-import com.cleanroommc.modularui.api.drawable.*;
+import com.cleanroommc.modularui.api.drawable.IRichTextBuilder;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.GuiDraw;
-import com.cleanroommc.modularui.drawable.Icon;
-import com.cleanroommc.modularui.drawable.IconRenderer;
 import com.cleanroommc.modularui.drawable.text.RichText;
-import com.cleanroommc.modularui.drawable.text.TextIcon;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
@@ -76,7 +73,7 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
             this.maxWidth = Integer.MAX_VALUE;
         }
         if (stack == null) stack = ItemStack.EMPTY;
-        Area screen = context.getScreen().getScreenArea();
+        Area screen = context.getScreenArea();
         this.maxWidth = Math.min(this.maxWidth, screen.width);
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
         TextRenderer renderer = TextRenderer.SHARED;
@@ -120,8 +117,8 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
 
         Pos pos = this.pos;
         if (pos == null) {
-            pos = context.getScreen().getCurrentTheme().getTooltipPosOverride();
-            if(pos == null) pos = Pos.NEXT_TO_MOUSE;
+            pos = context.isMuiContext() ? context.getMuiContext().getScreen().getCurrentTheme().getTooltipPosOverride() : null;
+            if (pos == null) pos = ModularUIConfig.tooltipPos;
         }
         if (pos == Pos.FIXED) {
             return new Rectangle(this.x, this.y, width, height);

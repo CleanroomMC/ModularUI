@@ -8,7 +8,7 @@ import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IFocusedWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.screen.viewport.GuiViewportStack;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -595,7 +595,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return 176;
     }
 
-    final void setPanelGuiContext(@NotNull GuiContext context) {
+    final void setPanelGuiContext(@NotNull ModularGuiContext context) {
         setContext(context);
         if (!context.getScreen().isOverlay()) {
             context.getJeiSettings().addJeiExclusionArea(this);

@@ -2,7 +2,7 @@ package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IDraggable;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
@@ -21,7 +21,7 @@ public class DraggablePanelWrapper implements IDraggable {
     }
 
     @Override
-    public void drawMovingState(GuiContext context, float partialTicks) {
+    public void drawMovingState(ModularGuiContext context, float partialTicks) {
         context.pushMatrix();
         transform(context);
         WidgetTree.drawTree(this.panel, context, true);
@@ -31,7 +31,7 @@ public class DraggablePanelWrapper implements IDraggable {
     @Override
     public boolean onDragStart(int button) {
         if (button == 0) {
-            GuiContext context = this.panel.getContext();
+            ModularGuiContext context = this.panel.getContext();
             this.movingArea.x = context.transformX(0, 0);
             this.movingArea.y = context.transformY(0, 0);
             this.relativeClickX = context.getAbsMouseX() - this.movingArea.x;

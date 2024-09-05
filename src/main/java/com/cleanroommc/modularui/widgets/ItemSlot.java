@@ -13,7 +13,7 @@ import com.cleanroommc.modularui.integration.jei.JeiIngredientProvider;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.RichTooltip;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetSlotTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
@@ -83,7 +83,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     @Override
-    public void draw(GuiContext context, WidgetTheme widgetTheme) {
+    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
         if (this.syncHandler == null) return;
         RenderHelper.enableGUIStandardItemLighting();
         drawSlot(getSlot());
@@ -97,7 +97,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     @Override
-    public void drawForeground(GuiContext context) {
+    public void drawForeground(ModularGuiContext context) {
         RichTooltip tooltip = getTooltip();
         if (tooltip != null && isHoveringFor(tooltip.getShowUpTimer())) {
             tooltip.draw(getContext(), getSlot().getStack());

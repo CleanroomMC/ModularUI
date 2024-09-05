@@ -5,7 +5,7 @@ import com.cleanroommc.modularui.api.widget.IFocusedWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.Stencil;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.ScrollWidget;
@@ -83,7 +83,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     }
 
     @Override
-    public void preDraw(GuiContext context, boolean transformed) {
+    public void preDraw(ModularGuiContext context, boolean transformed) {
         if (transformed) {
             drawText(context);
         } else {
@@ -91,7 +91,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
         }
     }
 
-    public void drawText(GuiContext context) {
+    public void drawText(ModularGuiContext context) {
         this.renderer.setSimulate(false);
         this.renderer.setScale(this.scale);
         this.renderer.setAlignment(this.textAlignment, -2, getArea().height);
@@ -110,13 +110,13 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     }
 
     @Override
-    public void onFocus(GuiContext context) {
+    public void onFocus(ModularGuiContext context) {
         this.cursorTimer = 0;
         this.renderer.setCursor(true);
     }
 
     @Override
-    public void onRemoveFocus(GuiContext context) {
+    public void onRemoveFocus(ModularGuiContext context) {
         this.renderer.setCursor(false);
         this.cursorTimer = 0;
         this.scrollOffset = 0;

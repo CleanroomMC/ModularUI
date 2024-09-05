@@ -2,7 +2,7 @@ package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.HoveredWidgetList;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
@@ -19,11 +19,11 @@ public interface IDraggable extends IViewport {
     /**
      * Gets called every frame after everything else is rendered.
      * Is only called when {@link #isMoving()} is true.
-     * Translate to the mouse pos and draw with {@link com.cleanroommc.modularui.widget.WidgetTree#drawTree(IWidget, GuiContext, boolean)}.
+     * Translate to the mouse pos and draw with {@link com.cleanroommc.modularui.widget.WidgetTree#drawTree(IWidget, ModularGuiContext, boolean)}.
      *
      * @param partialTicks difference from last from
      */
-    void drawMovingState(GuiContext context, float partialTicks);
+    void drawMovingState(ModularGuiContext context, float partialTicks);
 
     /**
      * @param button the mouse button that's holding down
