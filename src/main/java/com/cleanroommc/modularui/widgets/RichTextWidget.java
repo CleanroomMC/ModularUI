@@ -13,13 +13,28 @@ import com.cleanroommc.modularui.widget.Widget;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Consumer;
+
 public class RichTextWidget extends Widget<RichTextWidget> implements IRichTextBuilder<RichTextWidget>, Interactable {
 
     private final RichText text = new RichText();
+    private Consumer<RichText> builder;
+    private boolean dirty = false;
+    private boolean autoUpdate = false;
+
+    public void markDirty() {
+        this.dirty = true;
+    }
 
     @Override
     public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
         super.draw(context, widgetTheme);
+        if (this.autoUpdate || this.dirty) {
+            this.text.clearText();
+            if (this.builder != null) {
+                this.builder.accept(this.text);
+            }
+        }
         this.text.drawAtZero(context, getArea(), widgetTheme);
     }
 
@@ -121,5 +136,29 @@ public class RichTextWidget extends Widget<RichTextWidget> implements IRichTextB
     @Override
     public IRichTextBuilder<?> getRichText() {
         return text;
+    }
+
+    /**
+     * Sets the auto update property. If auto update is true the text will be deleted each time it is drawn.
+     * If {@link #builder} is not null, it will then be called.
+     *
+     * @param autoUpdate auto update
+     * @return this
+     */
+    public RichTextWidget autoUpdate(boolean autoUpdate) {
+        this.autoUpdate = autoUpdate;
+        return this;
+    }
+
+    /**
+     * A builder which is called every time before drawing when {@link #dirty} is true.
+     *
+     * @param builder text builder
+     * @return this
+     */
+    public RichTextWidget textBuilder(Consumer<RichText> builder) {
+        this.builder = builder;
+        markDirty();
+        return this;
     }
 }

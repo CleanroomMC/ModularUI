@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.screen.viewport;
 
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.MCHelper;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -13,6 +14,12 @@ import org.jetbrains.annotations.ApiStatus;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
+/**
+ * A gui context contains various properties like screen size, mouse position, last clicked button etc.
+ * It also is a matrix/pose stack.
+ * A default instance can be obtained using {@link #getDefault()}, which can be used in {@link IDrawable IDrawables} for example.
+ * That instance is automatically updated at all times (except when no UI is currently open).
+ */
 public class GuiContext extends GuiViewportStack {
 
     public static GuiContext getDefault() {
@@ -33,13 +40,24 @@ public class GuiContext extends GuiViewportStack {
 
     /* Render states */
     private float partialTicks;
-    private long tick;
+    private long tick = 0;
+
+    public boolean isAbove(IGuiElement widget) {
+        return isMouseAbove(widget.getArea());
+    }
 
     /**
      * @return true the mouse is anywhere above the widget
      */
-    public boolean isAbove(IGuiElement widget) {
-        return widget.getArea().isInside(this.mouseX, this.mouseY);
+    public boolean isMouseAbove(IGuiElement widget) {
+        return isMouseAbove(widget.getArea());
+    }
+
+    /**
+     * @return true the mouse is anywhere above the area
+     */
+    public boolean isMouseAbove(Area area) {
+        return area.isInside(this.mouseX, this.mouseY);
     }
 
     @ApiStatus.Internal
@@ -116,14 +134,6 @@ public class GuiContext extends GuiViewportStack {
 
     public int getAbsMouse(GuiAxis axis) {
         return axis.isHorizontal() ? getAbsMouseX() : getAbsMouseY();
-    }
-
-    public int unTransformMouseX() {
-        return unTransformX(getAbsMouseX(), getAbsMouseY());
-    }
-
-    public int unTransformMouseY() {
-        return unTransformY(getAbsMouseX(), getAbsMouseY());
     }
 
     public int getMouseButton() {

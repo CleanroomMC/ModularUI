@@ -143,14 +143,15 @@ public class RichTextCompiler {
                 // how many chars fit
                 int i = ((FontRendererAccessor) fr).invokeSizeStringToWidth(subText, maxWidth - this.x);
                 if (i == 0) {
-                    // doesn't fit at the end of the line
+                    // doesn't fit at the end of the line, try new line
                     if (this.x > 0) i = ((FontRendererAccessor) fr).invokeSizeStringToWidth(subText, maxWidth);
                     if (i == 0) throw new IllegalStateException("No space for string '" + subText + "'");
                     newLine();
                 } else if (i < subText.length()) {
+                    // the whole string doesn't fit
                     char c = subText.charAt(i);
                     if (c != ' ' && this.x > 0) {
-                        // line was split in the middle of a word
+                        // line was split in the middle of a word, try new line
                         int j = ((FontRendererAccessor) fr).invokeSizeStringToWidth(subText, maxWidth);
                         if (j < subText.length()) {
                             c = subText.charAt(j);

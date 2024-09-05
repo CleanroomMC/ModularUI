@@ -76,22 +76,31 @@ public class ResizerTest extends CustomModularScreen {
                 .size(176, 166)
                 .child(new RichTextWidget()
                         .sizeRel(1f).margin(7)
-                        .add("Hello ")
-                        .add(new ItemDrawable(new ItemStack(Blocks.GRASS))
-                                .asIcon()
-                                .asHoverable()
-                                .tooltip(richTooltip -> richTooltip.addFromItem(new ItemStack(Blocks.GRASS))))
-                        .add(", nice to ")
-                        .add(new ItemDrawable(new ItemStack(Items.PORKCHOP))
-                                .asIcon()
-                                .asInteractable()
-                                .onMousePressed(button -> {
-                                    ModularUI.LOGGER.info("Pressed Pork");
-                                    return true;
-                                }))
-                        .add(" you. ")
-                        .add(IKey.str("This is a long text of strings...").format(TextFormatting.GOLD))
-                        .add(" More Text")
-                        .textShadow(false));
+                        .autoUpdate(true)
+                        .textBuilder(text -> text.add("Hello ")
+                                .add(new ItemDrawable(new ItemStack(Blocks.GRASS))
+                                        .asIcon()
+                                        .asHoverable()
+                                        .tooltip(richTooltip -> richTooltip.addFromItem(new ItemStack(Blocks.GRASS))))
+                                .add(", nice to ")
+                                .add(new ItemDrawable(new ItemStack(Items.PORKCHOP))
+                                        .asIcon()
+                                        .asInteractable()
+                                        .onMousePressed(button -> {
+                                            ModularUI.LOGGER.info("Pressed Pork");
+                                            return true;
+                                        }))
+                                .add(" you. ")
+                                .add(TextFormatting.GREEN + "This is a long ")
+                                .add(IKey.str("string").format(TextFormatting.DARK_PURPLE)
+                                        .asTextIcon()
+                                        .asHoverable()
+                                        .addTooltipLine("Text Tooltip"))
+                                .add(" of characters" + TextFormatting.RESET)
+                                .add(" and not numbers as some might think...")
+                                .newLine()
+                                .add("")
+                                .textShadow(false)
+                        ));
     }
 }

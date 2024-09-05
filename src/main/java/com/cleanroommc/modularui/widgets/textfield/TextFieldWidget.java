@@ -37,6 +37,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         try {
             return MathBuilder.INSTANCE.parse(num);
         } catch (Exception e) {
+            ModularUI.LOGGER.error("Failed to parse {} in TextFieldWidget", num);
             ModularUI.LOGGER.catching(e);
         }
         return new Constant(0);

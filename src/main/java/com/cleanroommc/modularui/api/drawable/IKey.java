@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.api.drawable;
 
+import com.cleanroommc.modularui.drawable.Icon;
 import com.cleanroommc.modularui.drawable.text.*;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -190,6 +191,15 @@ public interface IKey extends IDrawable {
 
     default StyledText shadow(boolean shadow) {
         return withStyle().shadow(shadow);
+    }
+
+    @Override
+    default Icon asIcon() {
+        return new Icon(this);
+    }
+
+    default KeyIcon asTextIcon() {
+        return new KeyIcon(this);
     }
 
     @Override

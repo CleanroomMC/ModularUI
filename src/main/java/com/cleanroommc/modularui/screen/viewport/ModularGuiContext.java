@@ -18,10 +18,11 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * This class keeps track of the gui state like hovered widget, focused widget, pressed buttons, draggables, mouse pos
- * jei settings and themes.
+ * This class contains all the info from {@link GuiContext} and additional MUI specific info like the current {@link ModularScreen},
+ * current hovered widget, current dragged widget, current focused widget and JEI settings.
+ * An instance can only be obtained from {@link ModularScreen#getContext()}. One instance is created every time a {@link ModularScreen}
+ * is created.
  */
-// ModularGuiContext
 public class ModularGuiContext extends GuiContext {
 
     /* GUI elements */

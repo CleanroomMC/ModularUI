@@ -23,7 +23,7 @@ public abstract class BaseKey implements IKey {
         if (this.formatting == null) {
             this.formatting = FontRenderHelper.createFormattingState();
         }
-        FontRenderHelper.add(this.formatting, formatting);
+        FontRenderHelper.addAfter(this.formatting, formatting);
         return this;
     }
 

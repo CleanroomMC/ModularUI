@@ -38,7 +38,7 @@ public class FontRenderHelper {
         return new TextFormatting[7];
     }
 
-    public static void add(TextFormatting[] state, TextFormatting formatting) {
+    public static void addAfter(TextFormatting[] state, TextFormatting formatting) {
         if (formatting == TextFormatting.RESET) {
             Arrays.fill(state, null);
             state[6] = formatting;
@@ -58,7 +58,7 @@ public class FontRenderHelper {
         int i = -2;
         while ((i = text.indexOf(167, i + 2)) >= 0 && i < text.length() - 1) {
             TextFormatting formatting = getForCharacter(text.charAt(i + 1));
-            if (formatting != null) add(state, formatting);
+            if (formatting != null) addAfter(state, formatting);
         }
     }
 

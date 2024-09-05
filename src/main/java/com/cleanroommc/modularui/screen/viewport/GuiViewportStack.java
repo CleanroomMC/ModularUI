@@ -15,10 +15,9 @@ import java.util.List;
 import java.util.ListIterator;
 
 /**
- * Viewport stack
- * <p>
- * This class is responsible for calculating and keeping track of
- * embedded (into each other) scrolling areas
+ * This class is a matrix stack aka pose stack. It keeps track of widget transformations (including position)
+ * and can apply these transformations to OpenGL for rendering.
+ * This is mainly used, but not limited to properly displacing widgets in a scroll area.
  */
 public class GuiViewportStack implements IViewportStack {
 

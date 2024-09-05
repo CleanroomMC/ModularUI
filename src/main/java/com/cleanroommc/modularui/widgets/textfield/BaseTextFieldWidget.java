@@ -132,8 +132,8 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
         if (!isHovering()) {
             return Result.IGNORE;
         }
-        int x = getContext().unTransformMouseX() + getScrollX();
-        int y = getContext().unTransformMouseY() + getScrollY();
+        int x = getContext().getMouseX() + getScrollX();
+        int y = getContext().getMouseY() + getScrollY();
         this.handler.setCursor(this.renderer.getCursorPos(this.handler.getText(), x, y), true);
         return Result.SUCCESS;
     }
@@ -141,8 +141,8 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     @Override
     public void onMouseDrag(int mouseButton, long timeSinceClick) {
         if (isFocused()) {
-            int x = getContext().unTransformMouseX() + getScrollX();
-            int y = getContext().unTransformMouseY() + getScrollY();
+            int x = getContext().getMouseX() + getScrollX();
+            int y = getContext().getMouseY() + getScrollY();
             this.handler.setMainCursor(this.renderer.getCursorPos(this.handler.getText(), x, y), true);
         }
     }
