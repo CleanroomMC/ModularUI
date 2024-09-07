@@ -500,7 +500,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                     if (result) return true;
                 }
             }
-            return true;
+            return false;
         });
     }
 
