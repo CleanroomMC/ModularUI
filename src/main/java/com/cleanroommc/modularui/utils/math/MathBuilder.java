@@ -24,6 +24,7 @@ import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Math builder
@@ -40,6 +41,8 @@ import java.util.Map;
  * TODO: maybe pre-compute constant expressions?
  */
 public class MathBuilder {
+
+    public static final Pattern DECIMAL_PATTERN = Pattern.compile("-?\\d+(\\.\\d+)?([eE]-?\\d+)?");
 
     public static final MathBuilder INSTANCE = new MathBuilder();
 
@@ -565,6 +568,6 @@ public class MathBuilder {
      * number)
      */
     protected boolean isDecimal(String s) {
-        return s.matches("^-?\\d+(\\.\\d+)?$");
+        return DECIMAL_PATTERN.matcher(s).matches();
     }
 }

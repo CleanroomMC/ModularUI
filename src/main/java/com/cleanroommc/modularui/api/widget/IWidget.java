@@ -5,7 +5,7 @@ import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Flex;
@@ -48,30 +48,30 @@ public interface IWidget extends IGuiElement {
      * @param context     gui context
      * @param widgetTheme widget theme of this widget
      */
-    void drawBackground(GuiContext context, WidgetTheme widgetTheme);
+    void drawBackground(ModularGuiContext context, WidgetTheme widgetTheme);
 
     /**
      * Draws additional stuff in this widget.
      * x = 0 and y = 0 is now in the top left corner of this widget.
-     * Do NOT override this method, it is never called. Use {@link #draw(GuiContext, WidgetTheme)} instead.
+     * Do NOT override this method, it is never called. Use {@link #draw(ModularGuiContext, WidgetTheme)} instead.
      *
      * @param context gui context
      */
     @ApiStatus.NonExtendable
     @Deprecated
     @Override
-    default void draw(GuiContext context) {
+    default void draw(ModularGuiContext context) {
         draw(context, getWidgetTheme(context.getTheme()));
     }
 
     /**
-     * Draws extra elements of this widget. Called after {@link #drawBackground(GuiContext, WidgetTheme)} and before
-     * {@link #drawOverlay(GuiContext, WidgetTheme)}
+     * Draws extra elements of this widget. Called after {@link #drawBackground(ModularGuiContext, WidgetTheme)} and before
+     * {@link #drawOverlay(ModularGuiContext, WidgetTheme)}
      *
      * @param context     gui context
      * @param widgetTheme widget theme
      */
-    void draw(GuiContext context, WidgetTheme widgetTheme);
+    void draw(ModularGuiContext context, WidgetTheme widgetTheme);
 
     /**
      * Draws the overlay of this theme.
@@ -79,7 +79,7 @@ public interface IWidget extends IGuiElement {
      * @param context     gui context
      * @param widgetTheme widget theme
      */
-    void drawOverlay(GuiContext context, WidgetTheme widgetTheme);
+    void drawOverlay(ModularGuiContext context, WidgetTheme widgetTheme);
 
     /**
      * Draws foreground elements of this widget. For example tooltips.
@@ -87,7 +87,7 @@ public interface IWidget extends IGuiElement {
      *
      * @param context gui context
      */
-    void drawForeground(GuiContext context);
+    void drawForeground(ModularGuiContext context);
 
     default void transform(IViewportStack stack) {
         stack.translate(getArea().rx, getArea().ry);
@@ -190,7 +190,7 @@ public interface IWidget extends IGuiElement {
     /**
      * @return the context the current screen
      */
-    GuiContext getContext();
+    ModularGuiContext getContext();
 
     /**
      * @return flex of this widget. Creates a new one if it doesn't already have one.

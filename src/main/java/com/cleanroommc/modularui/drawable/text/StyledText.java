@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.drawable;
+package com.cleanroommc.modularui.drawable.text;
 
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -6,18 +6,17 @@ import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widgets.TextWidget;
 
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class StyledText implements IKey {
+public class StyledText extends BaseKey {
 
     private final IKey key;
     private Alignment alignment = Alignment.Center;
-    private int color = 0x404040;
-    private boolean shadow = false;
+    private Integer color = null;
+    private Boolean shadow = null;
     private float scale = 1f;
-
-    protected boolean colorChanged = false, shadowChanged = false;
 
     public StyledText(IKey key) {
         this.key = key;
@@ -28,15 +27,20 @@ public class StyledText implements IKey {
         return this.key.get();
     }
 
+    @Override
+    public String getFormatted() {
+        return this.key.getFormatted();
+    }
+
     @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
         renderer.setAlignment(this.alignment, width, height);
-        renderer.setColor(this.colorChanged ? this.color : widgetTheme.getColor());
+        renderer.setColor(this.color != null ? this.color : widgetTheme.getColor());
         renderer.setScale(this.scale);
         renderer.setPos(x, y);
-        renderer.setShadow(this.shadowChanged ? this.shadow : widgetTheme.getTextShadow());
-        renderer.draw(get());
+        renderer.setShadow(this.shadow != null ? this.shadow : widgetTheme.getTextShadow());
+        renderer.draw(getFormatted());
     }
 
     public Alignment getAlignment() {
@@ -56,6 +60,12 @@ public class StyledText implements IKey {
     }
 
     @Override
+    public BaseKey format(TextFormatting formatting) {
+        this.key.format(formatting);
+        return this;
+    }
+
+    @Override
     public StyledText alignment(Alignment alignment) {
         this.alignment = alignment;
         return this;
@@ -64,7 +74,6 @@ public class StyledText implements IKey {
     @Override
     public StyledText color(int color) {
         this.color = color;
-        this.colorChanged = true;
         return this;
     }
 
@@ -77,31 +86,24 @@ public class StyledText implements IKey {
     @Override
     public StyledText shadow(boolean shadow) {
         this.shadow = shadow;
-        this.shadowChanged = true;
         return this;
     }
 
     @Override
     public TextWidget asWidget() {
-        TextWidget textWidget = new TextWidget(this.key)
+        return new TextWidget(this.key)
                 .alignment(this.alignment)
                 .color(this.color)
                 .scale(this.scale)
                 .shadow(this.shadow);
-        textWidget.colorChanged = this.colorChanged;
-        textWidget.shadowChanged = this.shadowChanged;
-        return textWidget;
     }
 
     @Override
     public AnimatedText withAnimation() {
-        AnimatedText animatedText = new AnimatedText(this)
+        return new AnimatedText(this.key)
                 .alignment(this.alignment)
                 .color(this.color)
                 .scale(this.scale)
                 .shadow(this.shadow);
-        animatedText.colorChanged = this.colorChanged;
-        animatedText.shadowChanged = this.shadowChanged;
-        return animatedText;
     }
 }

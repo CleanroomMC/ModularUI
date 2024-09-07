@@ -5,7 +5,7 @@ import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Flex;
@@ -40,19 +40,19 @@ public class EmptyWidget implements IWidget {
     }
 
     @Override
-    public void drawBackground(GuiContext context, WidgetTheme widgetTheme) {
+    public void drawBackground(ModularGuiContext context, WidgetTheme widgetTheme) {
     }
 
     @Override
-    public void draw(GuiContext context, WidgetTheme widgetTheme) {
+    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
     }
 
     @Override
-    public void drawOverlay(GuiContext context, WidgetTheme widgetTheme) {
+    public void drawOverlay(ModularGuiContext context, WidgetTheme widgetTheme) {
     }
 
     @Override
-    public void drawForeground(GuiContext context) {
+    public void drawForeground(ModularGuiContext context) {
     }
 
     @Override
@@ -93,7 +93,7 @@ public class EmptyWidget implements IWidget {
     }
 
     @Override
-    public GuiContext getContext() {
+    public ModularGuiContext getContext() {
         return this.parent.getContext();
     }
 

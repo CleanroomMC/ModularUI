@@ -1,5 +1,7 @@
-package com.cleanroommc.modularui.drawable;
+package com.cleanroommc.modularui.drawable.text;
 
+import com.cleanroommc.modularui.api.drawable.ITextLine;
+import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -26,6 +28,7 @@ public class TextRenderer {
     protected int color = 0;//Theme.INSTANCE.getText();
     protected boolean simulate;
     protected float lastWidth = 0, lastHeight = 0;
+    protected float lastX = 0, lastY = 0;
     protected boolean scrollOnOverflow = false;
 
     public void setAlignment(Alignment alignment, float maxWidth) {
@@ -73,7 +76,7 @@ public class TextRenderer {
 
     protected void drawMeasuredLines(List<Line> measuredLines) {
         float maxW = 0;
-        int y0 = getStartY(measuredLines.size());
+        int y0 = getStartYOfLines(measuredLines.size());
         for (Line measuredLine : measuredLines) {
             int x0 = getStartX(measuredLine.width);
             maxW = Math.max(maxW, measuredLine.width);
@@ -88,7 +91,7 @@ public class TextRenderer {
 
     public void drawSimple(String text) {
         float w = getFontRenderer().getStringWidth(text) * this.scale;
-        int y = getStartY(1), x = getStartX(w);
+        int y = getStartYOfLines(1), x = getStartX(w);
         draw(text, x, y);
         this.lastWidth = w;
         this.lastHeight = getFontHeight();
@@ -104,6 +107,40 @@ public class TextRenderer {
             }
         }
         return measuredLines;
+    }
+
+    public List<ITextLine> compile(List<Object> rawText) {
+        return RichTextCompiler.INSTANCE.compileLines(getFontRenderer(), rawText, (int) this.maxWidth, this.scale);
+    }
+
+    public List<ITextLine> compileAndDraw(GuiContext context, List<Object> raw) {
+        List<ITextLine> lines = compile(raw);
+        drawCompiled(context, lines);
+        return lines;
+    }
+
+    public void drawCompiled(GuiContext context, List<ITextLine> lines) {
+        int height = 0, width = 0;
+        for (ITextLine line : lines) {
+            height += line.getHeight(getFontRenderer());
+            width = Math.max(width, line.getWidth());
+        }
+        if (!this.simulate) {
+            GlStateManager.pushMatrix();
+            GlStateManager.scale(this.scale, this.scale, 1f);
+        }
+        int y0 = getStartY(height * this.scale);
+        this.lastY = y0;
+        for (ITextLine line : lines) {
+            int x0 = getStartX(line.getWidth() * this.scale);
+            if (!simulate) line.draw(context, getFontRenderer(), x0, y0, this.color, this.shadow);
+            y0 += line.getHeight(getFontRenderer());
+        }
+        if (!this.simulate) GlStateManager.popMatrix();
+        this.lastWidth = this.maxWidth > 0 ? Math.min(width * this.scale, this.maxWidth) : width * this.scale;
+        this.lastHeight = height * this.scale;
+        this.lastWidth = Math.max(0, this.lastWidth - this.scale);
+        this.lastHeight = Math.max(0, this.lastHeight - this.scale);
     }
 
     public void drawCut(String text) {
@@ -167,9 +204,12 @@ public class TextRenderer {
         return (int) Math.ceil(w);
     }
 
-    protected int getStartY(int lines) {
+    protected int getStartYOfLines(int lines) {
+        return getStartY(lines * getFontHeight() - this.scale);
+    }
+
+    protected int getStartY(float height) {
         if (this.alignment.y > 0 && this.maxHeight > 0) {
-            float height = lines * getFontHeight() - this.scale;
             return (int) (this.y + (this.maxHeight * this.alignment.y) - height * this.alignment.y);
         }
         return this.y;
@@ -182,17 +222,14 @@ public class TextRenderer {
         return this.x;
     }
 
-    protected float draw(String text, float x, float y) {
-        if (this.simulate) {
-            return getFontRenderer().getStringWidth(text);
-        }
+    protected void draw(String text, float x, float y) {
+        if (this.simulate) return;
         GlStateManager.disableBlend();
         GlStateManager.pushMatrix();
         GlStateManager.scale(this.scale, this.scale, 0f);
-        int width = getFontRenderer().drawString(text, x / this.scale, y / this.scale, this.color, this.shadow);
+        getFontRenderer().drawString(text, x / this.scale, y / this.scale, this.color, this.shadow);
         GlStateManager.popMatrix();
         GlStateManager.enableBlend();
-        return width * this.scale;
     }
 
     public float getFontHeight() {

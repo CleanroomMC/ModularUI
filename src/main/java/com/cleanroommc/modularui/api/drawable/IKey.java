@@ -1,18 +1,14 @@
 package com.cleanroommc.modularui.api.drawable;
 
-import com.cleanroommc.modularui.drawable.AnimatedText;
-import com.cleanroommc.modularui.drawable.StyledText;
-import com.cleanroommc.modularui.drawable.TextRenderer;
-import com.cleanroommc.modularui.drawable.keys.CompoundKey;
-import com.cleanroommc.modularui.drawable.keys.DynamicKey;
-import com.cleanroommc.modularui.drawable.keys.LangKey;
-import com.cleanroommc.modularui.drawable.keys.StringKey;
+import com.cleanroommc.modularui.drawable.Icon;
+import com.cleanroommc.modularui.drawable.text.*;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widgets.TextWidget;
 
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -31,7 +27,9 @@ public interface IKey extends IDrawable {
 
     TextRenderer renderer = new TextRenderer();
 
-    IKey EMPTY = new StringKey("");
+    IKey EMPTY = str("");
+    IKey LINE_FEED = str("\n");
+    IKey SPACE = str(" ");
 
     /**
      * Creates a translated text.
@@ -104,8 +102,16 @@ public interface IKey extends IDrawable {
      * @param args arguments
      * @return text key
      */
-    static IKey format(@NotNull String key, @Nullable Object... args) {
+    static IKey str(@NotNull String key, @Nullable Object... args) {
         return new StringKey(key, args);
+    }
+
+    /**
+     * @deprecated renamed to str()
+     */
+    @Deprecated
+    static IKey format(@NotNull String key, @Nullable Object... args) {
+        return str(key, args);
     }
 
     /**
@@ -129,9 +135,16 @@ public interface IKey extends IDrawable {
     }
 
     /**
-     * @return the current formatted string
+     * @return the current unformatted string
      */
     String get();
+
+    /**
+     * @return the current formatted string
+     */
+    default String getFormatted() {
+        return get();
+    }
 
     @SideOnly(Side.CLIENT)
     @Override
@@ -141,7 +154,7 @@ public interface IKey extends IDrawable {
         renderer.setAlignment(Alignment.Center, width, height);
         renderer.setScale(1f);
         renderer.setPos(x, y);
-        renderer.draw(get());
+        renderer.draw(getFormatted());
     }
 
     @Override
@@ -155,6 +168,13 @@ public interface IKey extends IDrawable {
 
     default AnimatedText withAnimation() {
         return new AnimatedText(this);
+    }
+
+    IKey format(TextFormatting formatting);
+
+    default IKey format(TextFormatting... formatting) {
+        for (TextFormatting tf : formatting) format(tf);
+        return this;
     }
 
     default StyledText alignment(Alignment alignment) {
@@ -171,6 +191,15 @@ public interface IKey extends IDrawable {
 
     default StyledText shadow(boolean shadow) {
         return withStyle().shadow(shadow);
+    }
+
+    @Override
+    default Icon asIcon() {
+        return new Icon(this);
+    }
+
+    default KeyIcon asTextIcon() {
+        return new KeyIcon(this);
     }
 
     @Override

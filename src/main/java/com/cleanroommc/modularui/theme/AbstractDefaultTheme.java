@@ -2,7 +2,7 @@ package com.cleanroommc.modularui.theme;
 
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.ITheme;
-import com.cleanroommc.modularui.screen.Tooltip;
+import com.cleanroommc.modularui.screen.RichTooltip;
 
 public abstract class AbstractDefaultTheme implements ITheme {
 
@@ -77,7 +77,7 @@ public abstract class AbstractDefaultTheme implements ITheme {
     }
 
     @Override
-    public Tooltip.Pos getTooltipPosOverride() {
+    public RichTooltip.Pos getTooltipPosOverride() {
         return ModularUIConfig.tooltipPos;
     }
 }

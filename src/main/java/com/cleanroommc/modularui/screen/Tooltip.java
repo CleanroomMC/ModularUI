@@ -5,7 +5,11 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.drawable.*;
+import com.cleanroommc.modularui.drawable.GuiDraw;
+import com.cleanroommc.modularui.drawable.Icon;
+import com.cleanroommc.modularui.drawable.IconRenderer;
+import com.cleanroommc.modularui.drawable.text.TextIcon;
+import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
@@ -20,19 +24,19 @@ import net.minecraftforge.common.MinecraftForge;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.Rectangle;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+@Deprecated
 public class Tooltip {
 
     private final IWidget parent;
     private final List<IDrawable> lines = new ArrayList<>();
     private List<IDrawable> additionalLines = new ArrayList<>();
-    private Pos pos = ModularUIConfig.tooltipPos;
-    private boolean customPos = false;
+    private RichTooltip.Pos pos = null;
     private Consumer<Tooltip> tooltipBuilder;
     private int showUpTimer = 0;
 
@@ -81,7 +85,7 @@ public class Tooltip {
             this.maxWidth = Integer.MAX_VALUE;
         }
         if (stack == null) stack = ItemStack.EMPTY;
-        Area screen = context.getScreen().getScreenArea();
+        Area screen = context.getScreenArea();
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
         IconRenderer renderer = IconRenderer.SHARED;
         List<String> textLines = lines.stream().filter(drawable -> drawable instanceof IKey).map(key -> ((IKey) key).get()).collect(Collectors.toList());
@@ -132,15 +136,16 @@ public class Tooltip {
         int width = (int) renderer.getLastWidth();
         int height = (int) renderer.getLastHeight();
 
-        if (!this.customPos) {
-            this.pos = context.getScreen().getCurrentTheme().getTooltipPosOverride();
+        RichTooltip.Pos pos = this.pos;
+        if (pos == null) {
+            pos = context.isMuiContext() ? context.getMuiContext().getScreen().getCurrentTheme().getTooltipPosOverride() : null;
+            if (pos == null) pos = ModularUIConfig.tooltipPos;
         }
-
-        if (this.pos == null) {
+        if (pos == RichTooltip.Pos.FIXED) {
             return new Rectangle(this.x, this.y, width, height);
         }
 
-        if (this.pos == Pos.NEXT_TO_MOUSE) {
+        if (pos == RichTooltip.Pos.NEXT_TO_MOUSE) {
             final int padding = 8;
             // magic number to place tooltip nicer. Look at GuiScreen#L237
             final int mouseOffset = 12;
@@ -178,7 +183,7 @@ public class Tooltip {
         area.setPos(0, 0); // context is transformed to this widget
         area.transformAndRectanglerize(context);
         int x = 0, y = 0;
-        if (this.pos.vertical) {
+        if (pos.axis.isVertical()) {
             if (width < area.width) {
                 x = area.x + shiftAmount;
             } else {
@@ -194,26 +199,26 @@ public class Tooltip {
                 }
             }
 
-            Pos pos = this.pos;
-            if (this.pos == Pos.VERTICAL) {
+            RichTooltip.Pos pos1 = pos;
+            if (pos == RichTooltip.Pos.VERTICAL) {
                 int bottomSpace = screenHeight - area.ey();
-                pos = bottomSpace < height + padding && bottomSpace < area.y ? Pos.ABOVE : Pos.BELOW;
+                pos1 = bottomSpace < height + padding && bottomSpace < area.y ? RichTooltip.Pos.ABOVE : RichTooltip.Pos.BELOW;
             }
 
-            if (pos == Pos.BELOW) {
+            if (pos1 == RichTooltip.Pos.BELOW) {
                 y = area.ey() + padding;
-            } else if (pos == Pos.ABOVE) {
+            } else if (pos1 == RichTooltip.Pos.ABOVE) {
                 y = area.y - height - padding;
             }
-        } else if (this.pos.horizontal) {
+        } else if (pos.axis.isHorizontal()) {
             boolean usedMoreSpaceSide = false;
-            Pos pos = this.pos;
-            if (this.pos == Pos.HORIZONTAL) {
+            RichTooltip.Pos pos1 = pos;
+            if (pos == RichTooltip.Pos.HORIZONTAL) {
                 if (area.x > screenWidth - area.ex()) {
-                    pos = Pos.LEFT;
+                    pos1 = RichTooltip.Pos.LEFT;
                     // x = 0;
                 } else {
-                    pos = Pos.RIGHT;
+                    pos1 = RichTooltip.Pos.RIGHT;
                     x = screenWidth - area.ex() + padding;
                 }
             }
@@ -229,7 +234,7 @@ public class Tooltip {
 
             if (x + width > screenWidth - padding) {
                 int maxWidth;
-                if (pos == Pos.LEFT) {
+                if (pos1 == RichTooltip.Pos.LEFT) {
                     maxWidth = Math.max(minWidth, area.x - padding * 2);
                 } else {
                     maxWidth = Math.max(minWidth, screenWidth - area.ex() - padding * 2);
@@ -241,14 +246,14 @@ public class Tooltip {
                 height = (int) renderer.getLastHeight();
             }
 
-            if (this.pos == Pos.HORIZONTAL && !usedMoreSpaceSide) {
+            if (pos == RichTooltip.Pos.HORIZONTAL && !usedMoreSpaceSide) {
                 int rightSpace = screenWidth - area.ex();
-                pos = rightSpace < width + padding && rightSpace < area.x ? Pos.LEFT : Pos.RIGHT;
+                pos1 = rightSpace < width + padding && rightSpace < area.x ? RichTooltip.Pos.LEFT : RichTooltip.Pos.RIGHT;
             }
 
-            if (pos == Pos.RIGHT) {
+            if (pos1 == RichTooltip.Pos.RIGHT) {
                 x = area.ex() + padding;
-            } else if (pos == Pos.LEFT) {
+            } else if (pos1 == RichTooltip.Pos.LEFT) {
                 x = area.x - width - padding;
             }
         }
@@ -283,15 +288,13 @@ public class Tooltip {
         return this.hasTitleMargin;
     }
 
-    public Tooltip pos(Pos pos) {
-        this.customPos = true;
+    public Tooltip pos(RichTooltip.Pos pos) {
         this.pos = pos;
         return this;
     }
 
     public Tooltip pos(int x, int y) {
-        this.customPos = true;
-        this.pos = null;
+        this.pos = RichTooltip.Pos.FIXED;
         this.x = x;
         this.y = y;
         return this;
@@ -374,23 +377,5 @@ public class Tooltip {
             addLine(IKey.str(line));
         }
         return this;
-    }
-
-    public enum Pos {
-
-        ABOVE(false, true),
-        BELOW(false, true),
-        LEFT(true, false),
-        RIGHT(true, false),
-        VERTICAL(false, true),
-        HORIZONTAL(true, false),
-        NEXT_TO_MOUSE(false, false);
-
-        public final boolean horizontal, vertical;
-
-        Pos(boolean horizontal, boolean vertical) {
-            this.horizontal = horizontal;
-            this.vertical = vertical;
-        }
     }
 }

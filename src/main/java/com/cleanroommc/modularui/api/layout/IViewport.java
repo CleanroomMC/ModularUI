@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.api.layout;
 
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.HoveredWidgetList;
 
 import java.util.function.Predicate;
@@ -45,7 +45,7 @@ public interface IViewport {
      * @param context     gui context
      * @param transformed if transformation from this viewport is active
      */
-    default void preDraw(GuiContext context, boolean transformed) {}
+    default void preDraw(ModularGuiContext context, boolean transformed) {}
 
     /**
      * Called during drawing twice (after children are drawn). Once with transformation of this viewport and once without
@@ -53,7 +53,7 @@ public interface IViewport {
      * @param context     gui context
      * @param transformed if transformation from this viewport is active
      */
-    default void postDraw(GuiContext context, boolean transformed) {}
+    default void postDraw(ModularGuiContext context, boolean transformed) {}
 
     static void getChildrenAt(IWidget parent, IViewportStack stack, HoveredWidgetList widgetList, int x, int y) {
         for (IWidget child : parent.getChildren()) {

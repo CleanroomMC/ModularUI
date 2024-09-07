@@ -5,7 +5,7 @@ import com.cleanroommc.modularui.api.IMathValue;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.value.IStringValue;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.math.Constant;
@@ -37,6 +37,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         try {
             return MathBuilder.INSTANCE.parse(num);
         } catch (Exception e) {
+            ModularUI.LOGGER.error("Failed to parse {} in TextFieldWidget", num);
             ModularUI.LOGGER.catching(e);
         }
         return new Constant(0);
@@ -90,7 +91,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     @Override
-    public void drawText(GuiContext context) {
+    public void drawText(ModularGuiContext context) {
         this.renderer.setSimulate(false);
         this.renderer.setPos(getArea().getPadding().left, 0);
         this.renderer.setScale(this.scale);
@@ -100,7 +101,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     @Override
-    public void drawForeground(GuiContext context) {
+    public void drawForeground(ModularGuiContext context) {
         if (hasTooltip() && getScrollData().isScrollBarActive(getScrollArea()) && isHoveringFor(getTooltip().getShowUpTimer())) {
             getTooltip().draw(getContext());
         }
@@ -126,7 +127,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     @Override
-    public void onFocus(GuiContext context) {
+    public void onFocus(ModularGuiContext context) {
         super.onFocus(context);
         Point main = this.handler.getMainCursor();
         if (main.x == 0) {
@@ -135,7 +136,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     @Override
-    public void onRemoveFocus(GuiContext context) {
+    public void onRemoveFocus(ModularGuiContext context) {
         super.onRemoveFocus(context);
         if (this.handler.getText().isEmpty()) {
             this.handler.getText().add(this.validator.apply(""));

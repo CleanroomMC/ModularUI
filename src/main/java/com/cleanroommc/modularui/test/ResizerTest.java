@@ -1,18 +1,24 @@
 package com.cleanroommc.modularui.test;
 
+import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.drawable.ItemDrawable;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
 import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.utils.fakeworld.ArraySchema;
-import com.cleanroommc.modularui.utils.fakeworld.ISchema;
-import com.cleanroommc.modularui.widgets.SchemaWidget;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
+import com.cleanroommc.modularui.widgets.RichTextWidget;
+
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.TextFormatting;
 
 import org.jetbrains.annotations.NotNull;
 
 public class ResizerTest extends CustomModularScreen {
 
     @Override
-    public @NotNull ModularPanel buildUI(GuiContext context) {
+    public @NotNull ModularPanel buildUI(ModularGuiContext context) {
         /*TextureAtlasSprite sprite = SpriteHelper.getSpriteOfBlockState(GameObjectHelper.getBlockState("minecraft", "command_block"), EnumFacing.UP);
         //SpriteHelper.getSpriteOfItem(new ItemStack(Items.DIAMOND));
         return ModularPanel.defaultPanel("main")
@@ -46,7 +52,7 @@ public class ResizerTest extends CustomModularScreen {
                 .add(new BlockPos(0, 3, 0), Blocks.BEACON.getDefaultState())
                 .build();*/
 
-        ISchema schema = ArraySchema.builder()
+        /*ISchema schema = ArraySchema.builder()
                 .layer("D   D", "     ", "     ", "     ")
                 .layer(" DDD ", " E E ", "     ", "     ")
                 .layer(" DDD ", "  E  ", "  G  ", "  B  ")
@@ -64,7 +70,37 @@ public class ResizerTest extends CustomModularScreen {
                 .child(new SchemaWidget.LayerButton(schema, 0, 3)
                         .bottom(1)
                         .left(1)
-                        .size(16));
-        return panel;
+                        .size(16));*/
+
+        return new ModularPanel("main")
+                .size(176, 166)
+                .child(new RichTextWidget()
+                        .sizeRel(1f).margin(7)
+                        .autoUpdate(true)
+                        .textBuilder(text -> text.add("Hello ")
+                                .add(new ItemDrawable(new ItemStack(Blocks.GRASS))
+                                        .asIcon()
+                                        .asHoverable()
+                                        .tooltip(richTooltip -> richTooltip.addFromItem(new ItemStack(Blocks.GRASS))))
+                                .add(", nice to ")
+                                .add(new ItemDrawable(new ItemStack(Items.PORKCHOP))
+                                        .asIcon()
+                                        .asInteractable()
+                                        .onMousePressed(button -> {
+                                            ModularUI.LOGGER.info("Pressed Pork");
+                                            return true;
+                                        }))
+                                .add(" you. ")
+                                .add(TextFormatting.GREEN + "This is a long ")
+                                .add(IKey.str("string").format(TextFormatting.DARK_PURPLE)
+                                        .asTextIcon()
+                                        .asHoverable()
+                                        .addTooltipLine("Text Tooltip"))
+                                .add(" of characters" + TextFormatting.RESET)
+                                .add(" and not numbers as some might think...")
+                                .newLine()
+                                .add("")
+                                .textShadow(false)
+                        ));
     }
 }

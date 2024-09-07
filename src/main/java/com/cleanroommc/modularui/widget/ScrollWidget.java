@@ -6,7 +6,7 @@ import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.HoveredWidgetList;
 import com.cleanroommc.modularui.widget.scroll.HorizontalScrollData;
 import com.cleanroommc.modularui.widget.scroll.ScrollArea;
@@ -87,7 +87,7 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
 
     @Override
     public @NotNull Result onMousePressed(int mouseButton) {
-        GuiContext context = getContext();
+        ModularGuiContext context = getContext();
         if (this.scroll.mouseClicked(context)) {
             return Result.STOP;
         }
@@ -112,14 +112,14 @@ public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> imp
     }
 
     @Override
-    public void preDraw(GuiContext context, boolean transformed) {
+    public void preDraw(ModularGuiContext context, boolean transformed) {
         if (!transformed) {
             Stencil.applyAtZero(this.scroll, context);
         }
     }
 
     @Override
-    public void postDraw(GuiContext context, boolean transformed) {
+    public void postDraw(ModularGuiContext context, boolean transformed) {
         if (!transformed) {
             Stencil.remove();
             this.scroll.drawScrollbar();

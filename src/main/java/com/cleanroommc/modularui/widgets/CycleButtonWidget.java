@@ -2,7 +2,7 @@ package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.value.IIntValue;
-import com.cleanroommc.modularui.screen.Tooltip;
+import com.cleanroommc.modularui.screen.RichTooltip;
 
 import java.util.function.Consumer;
 
@@ -85,12 +85,12 @@ public class CycleButtonWidget extends AbstractCycleButtonWidget<CycleButtonWidg
     }
 
     @Override
-    public CycleButtonWidget tooltip(int index, Consumer<Tooltip> builder) {
+    public CycleButtonWidget tooltip(int index, Consumer<RichTooltip> builder) {
         return super.tooltip(index, builder);
     }
 
     @Override
-    public CycleButtonWidget tooltipBuilder(int index, Consumer<Tooltip> builder) {
+    public CycleButtonWidget tooltipBuilder(int index, Consumer<RichTooltip> builder) {
         return super.tooltipBuilder(index, builder);
     }
 }

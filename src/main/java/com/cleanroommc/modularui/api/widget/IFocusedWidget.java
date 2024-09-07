@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.api.widget;
 
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 
 /**
  * An interface for {@link IWidget}'s, that makes them focusable.
@@ -17,12 +17,12 @@ public interface IFocusedWidget {
      *
      * @param context gui context
      */
-    void onFocus(GuiContext context);
+    void onFocus(ModularGuiContext context);
 
     /**
      * Called when the focus is removed from this widget
      *
      * @param context gui context
      */
-    void onRemoveFocus(GuiContext context);
+    void onRemoveFocus(ModularGuiContext context);
 }

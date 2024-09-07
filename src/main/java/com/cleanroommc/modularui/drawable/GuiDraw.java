@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.utils.Color;
 
 import net.minecraft.client.Minecraft;
@@ -341,10 +342,11 @@ public class GuiDraw {
         GlStateManager.pushMatrix();
         RenderHelper.enableGUIStandardItemLighting();
         GlStateManager.enableDepth();
+        GlStateManager.translate(x, y, 0);
         GlStateManager.scale(width / 16f, height / 16f, 1);
         RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
         renderItem.zLevel = 200;
-        renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().player, item, x, y);
+        renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().player, item, 0, 0);
         renderItem.zLevel = 0;
         GlStateManager.disableDepth();
         RenderHelper.enableStandardItemLighting();

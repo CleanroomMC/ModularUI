@@ -5,12 +5,12 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiDraw;
-import com.cleanroommc.modularui.drawable.TextRenderer;
+import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
 import com.cleanroommc.modularui.integration.jei.JeiIngredientProvider;
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.screen.Tooltip;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.RichTooltip;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetSlotTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
@@ -51,7 +51,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
 
     public FluidSlot() {
         size(DEFAULT_SIZE);
-        tooltip().setAutoUpdate(true).setHasTitleMargin(true);
+        tooltip().setAutoUpdate(true);//.setHasTitleMargin(true);
         tooltipBuilder(tooltip -> {
             IFluidTank fluidTank = getFluidTank();
             FluidStack fluid = this.syncHandler.getValue();
@@ -93,8 +93,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
         });
     }
 
-    public void addAdditionalFluidInfo(Tooltip tooltip, FluidStack fluidStack) {
-    }
+    public void addAdditionalFluidInfo(RichTooltip tooltip, FluidStack fluidStack) {}
 
     public String formatFluidAmount(double amount) {
         NumberFormat.FORMAT.setMaximumFractionDigits(3);
@@ -124,7 +123,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
     }
 
     @Override
-    public void draw(GuiContext context, WidgetTheme widgetTheme) {
+    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
         IFluidTank fluidTank = getFluidTank();
         FluidStack content = this.syncHandler.getValue();
         if (content != null) {

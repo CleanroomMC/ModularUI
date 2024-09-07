@@ -6,7 +6,7 @@ import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.DraggablePanelWrapper;
 import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.HoveredWidgetList;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
@@ -32,7 +32,7 @@ public class DragHandle extends Widget<DragHandle> implements IDraggable {
     }
 
     @Override
-    public void drawMovingState(GuiContext context, float partialTicks) {
+    public void drawMovingState(ModularGuiContext context, float partialTicks) {
         if (this.parentDraggable != null) {
             this.parentDraggable.drawMovingState(context, partialTicks);
         }

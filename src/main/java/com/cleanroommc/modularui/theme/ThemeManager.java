@@ -2,7 +2,8 @@ package com.cleanroommc.modularui.theme;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
-import com.cleanroommc.modularui.screen.Tooltip;
+import com.cleanroommc.modularui.screen.RichTooltip;
+import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.utils.*;
 
 import net.minecraft.client.resources.IResource;
@@ -18,11 +19,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectIterator;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import it.unimi.dsi.fastutil.objects.*;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -303,7 +300,7 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
             }
             if (jsonBuilder.getJson().has("tooltipPos")) {
                 String posName = jsonBuilder.getJson().get("tooltipPos").getAsString();
-                theme.setTooltipPosOverride(Tooltip.Pos.valueOf(posName));
+                theme.setTooltipPosOverride(RichTooltip.Pos.valueOf(posName));
             }
             return theme;
         }

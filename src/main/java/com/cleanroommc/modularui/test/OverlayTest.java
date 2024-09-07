@@ -8,7 +8,7 @@ import com.cleanroommc.modularui.overlay.OverlayManager;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.TextWidget;
@@ -52,7 +52,7 @@ public class OverlayTest {
             return new CustomModularScreen() {
 
                 @Override
-                public @NotNull ModularPanel buildUI(GuiContext context) {
+                public @NotNull ModularPanel buildUI(ModularGuiContext context) {
                     return ModularPanel.defaultPanel("watermark_overlay", gui.getXSize(), gui.getYSize())
                             .pos(gui.getGuiLeft(), gui.getGuiTop())
                             .background(IDrawable.EMPTY)

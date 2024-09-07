@@ -7,7 +7,7 @@ import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
 import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.SortableListWidget;
@@ -39,7 +39,7 @@ public class TestGui extends CustomModularScreen {
     }
 
     @Override
-    public @NotNull ModularPanel buildUI(GuiContext context) {
+    public @NotNull ModularPanel buildUI(ModularGuiContext context) {
         if (this.lines == null) {
             this.lines = IntStream.range(0, 20).mapToObj(i -> "Option " + (i + 1)).collect(Collectors.toList());
             this.configuredOptions = this.lines;

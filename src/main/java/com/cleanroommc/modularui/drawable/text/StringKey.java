@@ -1,12 +1,10 @@
-package com.cleanroommc.modularui.drawable.keys;
-
-import com.cleanroommc.modularui.api.drawable.IKey;
+package com.cleanroommc.modularui.drawable.text;
 
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public class StringKey implements IKey {
+public class StringKey extends BaseKey {
 
     private final String string;
     private final Object[] args;
@@ -23,19 +21,5 @@ public class StringKey implements IKey {
     @Override
     public String get() {
         return this.args == null ? this.string : String.format(this.string, this.args);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj instanceof StringKey stringKey) {
-            return this.string.equals(stringKey.string);
-        }
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        return this.string;
     }
 }

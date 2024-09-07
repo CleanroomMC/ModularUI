@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.api.drawable;
 import com.cleanroommc.modularui.drawable.DrawableArray;
 import com.cleanroommc.modularui.drawable.Icon;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -171,7 +172,7 @@ public interface IDrawable {
 
         @SideOnly(Side.CLIENT)
         @Override
-        public void draw(GuiContext context, WidgetTheme widgetTheme) {
+        public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
             this.drawable.drawAtZero(context, getArea(), widgetTheme);
         }
     }

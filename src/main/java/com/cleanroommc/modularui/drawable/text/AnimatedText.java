@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.drawable;
+package com.cleanroommc.modularui.drawable.text;
 
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -97,6 +98,11 @@ public class AnimatedText extends StyledText {
     public AnimatedText forward(boolean forward) {
         this.forward = forward;
         return this;
+    }
+
+    @Override
+    public AnimatedText format(TextFormatting formatting) {
+        return (AnimatedText) super.format(formatting);
     }
 
     @Override
