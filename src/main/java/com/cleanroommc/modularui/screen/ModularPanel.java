@@ -107,12 +107,13 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
      * @param animate true if the closing animation should play first.
      */
     public void closeIfOpen(boolean animate) {
+        if (!isOpen()) return;
         closeSubPanels();
         if (!animate || !shouldAnimate()) {
             this.screen.getPanelManager().closePanel(this);
             return;
         }
-        if (isOpen() && !isOpening() && !isClosing()) {
+        if (!isOpening() && !isClosing()) {
             if (isMainPanel()) {
                 // if this is the main panel, start closing animation for all panels
                 for (ModularPanel panel : getScreen().getPanelManager().getOpenPanels()) {
