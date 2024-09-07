@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui;
 
+import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.drawable.Stencil;
-import com.cleanroommc.modularui.screen.GuiContainerWrapper;
 
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -65,6 +65,6 @@ public class ClientEventHandler {
     }
 
     private static boolean hasDraggable(GuiScreenEvent event) {
-        return event.getGui() instanceof GuiContainerWrapper screenWrapper && screenWrapper.getScreen().getContext().hasDraggable();
+        return event.getGui() instanceof IMuiScreen screenWrapper && screenWrapper.getScreen().getContext().hasDraggable();
     }
 }
