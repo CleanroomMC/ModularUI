@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 public class FontRenderHelper {
 
-    private static final int min = 48, max = 114;
+    private static final int min = '0', max = 'r'; // min = 48, max = 114
     // array to access text formatting by character fast
     private static final TextFormatting[] formattingMap = new TextFormatting[max - min + 1];
 

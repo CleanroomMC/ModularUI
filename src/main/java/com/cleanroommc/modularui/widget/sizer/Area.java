@@ -228,61 +228,136 @@ public class Area extends Rectangle implements IUnResizeable {
     }
 
     /**
-     * Expand the area either inwards or outwards on each side
+     * Increases or decreases the size of this area. The position will change so that the center of the new
+     * area is in the same place.
+     * The size will change with double of the given value. The position will change with the negative of the given value.
+     * <br>
+     * In short, it will push or pull all four edges by the given amount.
+     *
+     * @param expand amount to expand area by (no restrictions)
      */
-    public void expand(int offset) {
-        this.expandX(offset);
-        this.expandY(offset);
+    public void expand(int expand) {
+        this.expandX(expand);
+        this.expandY(expand);
     }
 
     /**
-     * Expand the area either inwards or outwards (horizontally)
+     * Increases or decreases the size of this area. The position will change so that the center of the new
+     * area is in the same place.
+     * The size will change with double of the given value. The position will change with the negative of the given value.
+     * <br>
+     * In short, it will push or pull all four edges by the given amount.
+     *
+     * @param expandX amount to expand x-axis by (no restrictions)
+     * @param expandY amount to expand y-axis by (no restrictions)
      */
-    public void expandX(int offset) {
-        offsetX(-offset);
-        growW(offset * 2);
+    public void expand(int expandX, int expandY) {
+        this.expandX(expandX);
+        this.expandY(expandY);
     }
 
     /**
-     * Expand the area either inwards or outwards (horizontally)
+     * Increases or decreases the width of this area. The x position will change so that the center of the new
+     * area is in the same place.
+     * The width will change with double of the given value. The x position will change with the negative of the given value.
+     * <br>
+     * In short, it will push or pull the left and right edges by the given amount.
+     *
+     * @param expand amount to expand x-axis by (no restrictions)
      */
-    public void expandY(int offset) {
-        offsetY(-offset);
-        growH(offset * 2);
+    public void expandX(int expand) {
+        offsetX(-expand);
+        growW(expand * 2);
     }
 
+    /**
+     * Increases or decreases the height of this area. The y position will change so that the center of the new
+     * area is in the same place.
+     * The height will change with double of the given value. The y position will change with the negative of the given value.
+     * <br>
+     * In short, it will push or pull the top and bottom edges by the given amount.
+     *
+     * @param expand amount to expand y-axis by (no restrictions)
+     */
+    public void expandY(int expand) {
+        offsetY(-expand);
+        growH(expand * 2);
+    }
+
+    /**
+     * Increases or decreases the position of the area by the given amount, but doesn't change its size.
+     *
+     * @param offset amount to change position by (no restrictions)
+     */
     public void offset(int offset) {
         offsetX(offset);
         offsetY(offset);
     }
 
+    /**
+     * Increases or decreases the position of the area by the given amount, but doesn't change its size.
+     *
+     * @param offsetX amount to change x position by (no restrictions)
+     * @param offsetY amount to change y position by (no restrictions)
+     */
     public void offset(int offsetX, int offsetY) {
         offsetX(offsetX);
         offsetY(offsetY);
     }
 
+    /**
+     * Increases or decreases the x position of the area by the given amount, but doesn't change its size.
+     *
+     * @param offset amount to change x position by (no restrictions)
+     */
     public void offsetX(int offset) {
         this.x += offset;
     }
 
+    /**
+     * Increases or decreases the y position of the area by the given amount, but doesn't change its size.
+     *
+     * @param offset amount to change y position by (no restrictions)
+     */
     public void offsetY(int offset) {
         this.y += offset;
     }
 
+    /**
+     * Increases or decreases the size of the area by the given amount, but doesn't change its position.
+     *
+     * @param grow amount to change size by (no restrictions)
+     */
     public void grow(int grow) {
         growW(grow);
         growH(grow);
     }
 
+    /**
+     * Increases or decreases the size of the area by the given amount, but doesn't change its position.
+     *
+     * @param growW amount to change width by (no restrictions)
+     * @param growH amount to change height by (no restrictions)
+     */
     public void grow(int growW, int growH) {
         growW(growW);
         growH(growH);
     }
 
+    /**
+     * Increases or decreases the width of the area by the given amount, but doesn't change its position.
+     *
+     * @param grow amount to change width by (no restrictions)
+     */
     public void growW(int grow) {
         this.width += grow;
     }
 
+    /**
+     * Increases or decreases the height of the area by the given amount, but doesn't change its position.
+     *
+     * @param grow amount to change height by (no restrictions)
+     */
     public void growH(int grow) {
         this.height += grow;
     }
@@ -311,6 +386,22 @@ public class Area extends Rectangle implements IUnResizeable {
         this.height = h;
     }
 
+    public void setPos(Rectangle rectangle) {
+        setPos(rectangle.x, rectangle.y);
+    }
+
+    public void setSize(Rectangle rectangle) {
+        setSize(rectangle.width, rectangle.height);
+    }
+
+    /**
+     * Sets position and size by specifying top left and bottom right corner position.
+     *
+     * @param sx x position of top left corner
+     * @param sy y position of top left corner
+     * @param ex x position of bottom right corner
+     * @param ey y position of bottom right corner
+     */
     public void setPos(int sx, int sy, int ex, int ey) {
         int x0 = Math.min(sx, ex);
         int y0 = Math.min(sy, ey);
@@ -331,7 +422,12 @@ public class Area extends Rectangle implements IUnResizeable {
         setBounds(area.x, area.y, area.width, area.height);
     }
 
-    // transforms each corner vertex and then puts a min fit rectangle around all vertices
+    /**
+     * Transforms the four corners of this rectangle with the given pose stack. The new rectangle can be rotated.
+     * Then a min fit rectangle, which is not rotated and aligned with the screen, is put around the corner.
+     *
+     * @param stack pose stack
+     */
     public void transformAndRectanglerize(IViewportStack stack) {
         int xTL = stack.transformX(this.x, this.y), xTR = stack.transformX(ex(), this.y), xBL = stack.transformX(this.x, ey()), xBR = stack.transformX(ex(), ey());
         int yTL = stack.transformY(this.x, this.y), yTR = stack.transformY(ex(), this.y), yBL = stack.transformY(this.x, ey()), yBR = stack.transformY(ex(), ey());
@@ -361,6 +457,11 @@ public class Area extends Rectangle implements IUnResizeable {
         return this;
     }
 
+    /**
+     * This creates a copy, but it only copies position and size.
+     *
+     * @return copy
+     */
     public Area createCopy() {
         return new Area(this);
     }

@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.api.drawable;
 
-import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.HoverableIcon;
 import com.cleanroommc.modularui.drawable.InteractableIcon;
 import com.cleanroommc.modularui.widget.sizer.Box;

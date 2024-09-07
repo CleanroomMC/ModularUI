@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.drawable.text;
 
 import com.cleanroommc.modularui.api.IThemeApi;
+import com.cleanroommc.modularui.api.drawable.IHoverable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.drawable.ITextLine;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -45,6 +46,9 @@ public class ComposedLine implements ITextLine {
             } else if (o instanceof IIcon icon) {
                 float drawY = getHeight(fr) / 2f - icon.getHeight() / 2f;
                 icon.draw(context, (int) x, (int) (y + drawY), icon.getWidth(), icon.getHeight(), IThemeApi.get().getDefaultTheme().getFallback());
+                if (icon instanceof IHoverable hoverable) {
+                    hoverable.setRenderedAt((int) x, (int) (y + drawY));
+                }
                 x += icon.getWidth();
             }
         }

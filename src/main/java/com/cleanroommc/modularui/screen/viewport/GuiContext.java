@@ -10,6 +10,9 @@ import com.cleanroommc.modularui.widget.sizer.Area;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
 import org.jetbrains.annotations.ApiStatus;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -82,10 +85,12 @@ public class GuiContext extends GuiViewportStack {
         this.screenArea.ry = 0;
     }
 
+    @SideOnly(Side.CLIENT)
     public Minecraft getMC() {
         return Minecraft.getMinecraft();
     }
 
+    @SideOnly(Side.CLIENT)
     public FontRenderer getFontRenderer() {
         return MCHelper.getFontRenderer();
     }

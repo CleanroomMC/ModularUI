@@ -9,6 +9,8 @@ import com.cleanroommc.modularui.core.mixin.FontRendererAccessor;
 import com.cleanroommc.modularui.drawable.DelegateIcon;
 import com.cleanroommc.modularui.drawable.Icon;
 
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.text.TextFormatting;
@@ -17,6 +19,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * This class compiles a list of objects into renderable text. The objects can be strings or any drawable.
+ * The compiler will try to inline the drawables into the text according to the given maximum width.
+ * Recommended usage is via {@link TextRenderer#compileAndDraw(GuiContext, List)}.
+ */
 public class RichTextCompiler {
 
     public static final RichTextCompiler INSTANCE = new RichTextCompiler();
@@ -27,51 +34,12 @@ public class RichTextCompiler {
     private List<ITextLine> lines;
     private List<Object> currentLine;
     private int x, h;
-    private TextFormatting[] formatting = FontRenderHelper.createFormattingState();
+    private final TextFormatting[] formatting = FontRenderHelper.createFormattingState();
 
-    public void newLine() {
-        int i = currentLine.size() - 1;
-        if (!currentLine.isEmpty() && currentLine.get(i) instanceof String s) {
-            if (s.equals(" ")) {currentLine.remove(i);} else currentLine.set(i, trimRight(s));
-        }
-        if (currentLine.isEmpty()) {
-            //lines.add(null);
-        } else if (currentLine.size() == 1 && currentLine.get(0) instanceof String) {
-            lines.add(new TextLine((String) currentLine.get(0), x));
-            currentLine.clear();
-        } else {
-            lines.add(new ComposedLine(currentLine, x, h));
-            currentLine = new ArrayList<>();
-        }
-        x = 0;
-        h = 0;
-    }
-
-    public void addLineElement(Object o) {
-        if (o instanceof String s2) {
-            if (this.currentLine.size() == 1 && this.currentLine.get(0) instanceof String s1) {
-                // if there is already one string in the line, merge them
-                this.currentLine.set(0, s1 + s2);
-                return;
-            }
-            if (this.currentLine.isEmpty()) {
-                // if there is currently no string, remove all whitespace from the start,
-                // but don't remove any formatting before
-                int l = FontRenderHelper.getFormatLength(s2, 0);
-                if (l + 1 < s2.length()) {
-                    o = trimAt(s2, l);
-                }
-            }
-            o = FontRenderHelper.getFormatting(this.formatting) + o; // add formatting from previous string
-            FontRenderHelper.parseFormattingState(this.formatting, s2); // parse formatting from current string
-        }
-        this.currentLine.add(o);
-    }
-
-    public void checkNewLine(int width) {
-        if (x > 0 && x + width > maxWidth) {
-            newLine();
-        }
+    public List<ITextLine> compileLines(FontRenderer fr, List<Object> raw, int maxWidth, float scale) {
+        reset(fr, (int) (maxWidth / scale));
+        compile(raw);
+        return lines;
     }
 
     public void reset(FontRenderer fr, int maxWidth) {
@@ -82,12 +50,6 @@ public class RichTextCompiler {
         this.x = 0;
         this.h = 0;
         Arrays.fill(this.formatting, null);
-    }
-
-    public List<ITextLine> compileLines(FontRenderer fr, List<Object> raw, int maxWidth, float scale) {
-        reset(fr, (int) (maxWidth / scale));
-        compile(raw);
-        return lines;
     }
 
     private void compile(List<Object> raw) {
@@ -190,6 +152,51 @@ public class RichTextCompiler {
                 newLine();
             }
         } while ((l = text.indexOf('\n', k)) >= 0 || k < text.length()); // if no line feed found, check if we are at the end of the text
+    }
+
+    private void newLine() {
+        int i = currentLine.size() - 1;
+        if (!currentLine.isEmpty() && currentLine.get(i) instanceof String s) {
+            if (s.equals(" ")) {currentLine.remove(i);} else currentLine.set(i, trimRight(s));
+        }
+        if (currentLine.isEmpty()) {
+            //lines.add(null);
+        } else if (currentLine.size() == 1 && currentLine.get(0) instanceof String) {
+            lines.add(new TextLine((String) currentLine.get(0), x));
+            currentLine.clear();
+        } else {
+            lines.add(new ComposedLine(currentLine, x, h));
+            currentLine = new ArrayList<>();
+        }
+        x = 0;
+        h = 0;
+    }
+
+    private void addLineElement(Object o) {
+        if (o instanceof String s2) {
+            if (this.currentLine.size() == 1 && this.currentLine.get(0) instanceof String s1) {
+                // if there is already one string in the line, merge them
+                this.currentLine.set(0, s1 + s2);
+                return;
+            }
+            if (this.currentLine.isEmpty()) {
+                // if there is currently no string, remove all whitespace from the start,
+                // but don't remove any formatting before
+                int l = FontRenderHelper.getFormatLength(s2, 0);
+                if (l + 1 < s2.length()) {
+                    o = trimAt(s2, l);
+                }
+            }
+            o = FontRenderHelper.getFormatting(this.formatting) + o; // add formatting from previous string
+            FontRenderHelper.parseFormattingState(this.formatting, s2); // parse formatting from current string
+        }
+        this.currentLine.add(o);
+    }
+
+    private void checkNewLine(int width) {
+        if (x > 0 && x + width > maxWidth) {
+            newLine();
+        }
     }
 
     public static String trimRight(String s) {
