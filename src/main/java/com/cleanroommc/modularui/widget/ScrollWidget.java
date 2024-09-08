@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.widget;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.ModularScreen;
@@ -16,7 +17,13 @@ import com.cleanroommc.modularui.widget.sizer.Area;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ScrollWidget<W extends ScrollWidget<W>> extends ParentWidget<W> implements IViewport, Interactable {
+/**
+ * A scrollable parent widget. Children can be added
+ *
+ * @param <I> type of children (in most cases just {@link IWidget})
+ * @param <W> type of this widget
+ */
+public class ScrollWidget<I extends IWidget, W extends ScrollWidget<I, W>> extends ParentWidget<I, W> implements IViewport, Interactable {
 
     private final ScrollArea scroll = new ScrollArea();
 

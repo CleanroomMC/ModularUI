@@ -38,32 +38,6 @@ public class ClientEventHandler {
         Stencil.reset();
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public static void onGuiInput(GuiScreenEvent.MouseInputEvent.Pre event) {
-        if (hasDraggable(event)) {
-            // cancel interactions with other mods
-            try {
-                event.getGui().handleMouseInput();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            event.setCanceled(true);
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public static void onGuiInput(GuiScreenEvent.KeyboardInputEvent.Pre event) {
-        if (hasDraggable(event)) {
-            // cancel interactions with other mods
-            try {
-                event.getGui().handleKeyboardInput();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            event.setCanceled(true);
-        }
-    }
-
     private static boolean hasDraggable(GuiScreenEvent event) {
         return event.getGui() instanceof IMuiScreen screenWrapper && screenWrapper.getScreen().getContext().hasDraggable();
     }

@@ -12,6 +12,7 @@ import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.SortableListWidget;
 import com.cleanroommc.modularui.widgets.layout.Grid;
+import com.cleanroommc.modularui.widgets.layout.Row;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -21,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -45,14 +45,29 @@ public class TestGui extends CustomModularScreen {
             this.configuredOptions = this.lines;
             this.availableElements = new Object2ObjectOpenHashMap<>();
         }
-        AtomicReference<SortableListWidget<String, SortableListWidget.Item<String>>> ref = new AtomicReference<>(null);
+        final Map<String, SortableListWidget.Item<String>> items = new Object2ObjectOpenHashMap<>();
+        for (String line : this.lines) {
+            items.put(line, new SortableListWidget.Item<>(line).child(item -> new Row()
+                    .child(new Widget<>()
+                            .addTooltipLine(line)
+                            .background(GuiTextures.BUTTON_CLEAN)
+                            .overlay(IKey.str(line))
+                            .expanded().heightRel(1f))
+                    .child(new ButtonWidget<>()
+                            .onMousePressed(button -> item.removeSelfFromList())
+                            .overlay(GuiTextures.CROSS)
+                            .width(10).heightRel(1f))));
+        }
+        SortableListWidget<String> sortableListWidget = new SortableListWidget<String>()
+                .children(configuredOptions, items::get)
+                .debugName("sortable list");
         List<List<AvailableElement>> availableMatrix = Grid.mapToMatrix(2, this.lines, (index, value) -> {
             AvailableElement availableElement = new AvailableElement().overlay(IKey.str(value))
                     .size(60, 14)
                     .addTooltipLine(value)
                     .onMousePressed(mouseButton1 -> {
                         if (this.availableElements.get(value).available) {
-                            ref.get().add(value, -1);
+                            sortableListWidget.child(items.get(value));
                             this.availableElements.get(value).available = false;
                         }
                         return true;
@@ -83,14 +98,7 @@ public class TestGui extends CustomModularScreen {
                 .matrix(matrix)
                 .scrollable()
                 .pos(10, 10).right(10).bottom(10))*/
-        SortableListWidget<String, SortableListWidget.Item<String>> sortableListWidget = SortableListWidget.sortableBuilder(this.lines, this.configuredOptions,
-                s -> new SortableListWidget.Item<>(s, new Widget<>()
-                        .addTooltipLine(s)
-                        .background(GuiTextures.BUTTON_CLEAN)
-                        .overlay(IKey.str(s))
-                        .left(0).right(10))
-                        .removeable()).debugName("sortable list");
-        ref.set(sortableListWidget);
+
         panel.child(sortableListWidget
                 .onRemove(stringItem -> this.availableElements.get(stringItem.getWidgetValue()).available = true)
                 /*.onChange(list -> {

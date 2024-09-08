@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
+public class Grid extends ScrollWidget<IWidget, Grid> implements ILayoutWidget {
 
     private final List<List<IWidget>> matrix = new ArrayList<>();
     private final Box minElementMargin = new Box();

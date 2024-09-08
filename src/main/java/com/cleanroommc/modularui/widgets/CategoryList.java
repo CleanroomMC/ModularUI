@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CategoryList extends ParentWidget<CategoryList> implements Interactable, ILayoutWidget {
+public class CategoryList extends ParentWidget<IWidget, CategoryList> implements Interactable, ILayoutWidget {
 
     private final List<CategoryList> subCategories = new ArrayList<>();
     private boolean expanded = false;
@@ -120,7 +120,7 @@ public class CategoryList extends ParentWidget<CategoryList> implements Interact
         return this;
     }
 
-    public static class Root extends ListWidget<Void, IWidget, Root> {
+    public static class Root extends ListWidget<IWidget, Root> {
 
         private final List<CategoryList> categories = new ArrayList<>();
 

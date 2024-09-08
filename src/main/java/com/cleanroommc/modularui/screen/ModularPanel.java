@@ -40,7 +40,7 @@ import java.util.function.Supplier;
  * To open another panel on top of the main panel you must use {@link IPanelHandler#simple(ModularPanel, SecondaryPanel.IPanelBuilder, boolean)}
  * or {@link PanelSyncManager#panel(String, PanelSyncHandler.IPanelBuilder, boolean)} if the panel should be synced.
  */
-public class ModularPanel extends ParentWidget<ModularPanel> implements IViewport {
+public class ModularPanel extends ParentWidget<IWidget, ModularPanel> implements IViewport {
 
     public static ModularPanel defaultPanel(@NotNull String name) {
         return defaultPanel(name, 176, 166);
@@ -334,7 +334,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                         break;
                     }
                     widget.unapplyMatrix(getContext());
-                    if (widget.getElement().canHover()) {
+                    if (!widget.getElement().canClickThrough()) {
                         result = true;
                         break;
                     }
@@ -440,7 +440,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                     }
                     widget.unapplyMatrix(getContext());
                 }
-                if (widget.getElement().canHover()) break;
+                if (!widget.getElement().canClickThrough()) break;
             }
             if (!this.keyboard.held) {
                 this.keyboard.lastPressed = pressed;

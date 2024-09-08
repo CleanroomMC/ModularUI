@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.widgets.VoidWidget;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -12,14 +13,24 @@ import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-public class ParentWidget<W extends ParentWidget<W>> extends Widget<W> {
+/**
+ * A widget which can hold any amount of children.
+ *
+ * @param <I> type of children (in most cases just {@link IWidget}). Use {@link VoidWidget} if no children should be added.
+ * @param <W> type of this widget
+ */
+public class ParentWidget<I extends IWidget, W extends ParentWidget<I, W>> extends Widget<W> {
 
-    private final List<IWidget> children = new ArrayList<>();
+    private final List<I> children = new ArrayList<>();
 
     @NotNull
     @Override
     public List<IWidget> getChildren() {
-        return this.children;
+        return (List<IWidget>) this.children;
+    }
+
+    public List<I> getTypeChildren() {
+        return children;
     }
 
     @Override
@@ -33,15 +44,23 @@ public class ParentWidget<W extends ParentWidget<W>> extends Widget<W> {
         return getHoverBackground() == null && IDrawable.isVisible(widgetTheme.getHoverBackground());
     }
 
-    public boolean addChild(IWidget child, int index) {
+    @Override
+    public boolean canClickThrough() {
+        return !canHover();
+    }
+
+    public boolean addChild(I child, int index) {
         if (child == null || child == this || getChildren().contains(child)) {
             return false;
         }
         if (child instanceof ModularPanel) {
-            throw new IllegalStateException("ModularPanel should not be added as child widget; Use ModularScreen#openPanel instead");
+            throw new IllegalArgumentException("ModularPanel should not be added as child widget; Use ModularScreen#openPanel instead");
+        }
+        if (!isChildValid(child)) {
+            throw new IllegalArgumentException("Child '" + child + "' is not valid for parent '" + this + "'!");
         }
         if (index < 0) {
-            index = getChildren().size() + index + 1;
+            index += getChildren().size() + 1;
         }
         this.children.add(index, child);
         if (isValid()) {
@@ -51,7 +70,7 @@ public class ParentWidget<W extends ParentWidget<W>> extends Widget<W> {
         return true;
     }
 
-    public boolean remove(IWidget child) {
+    public boolean remove(I child) {
         if (this.children.remove(child)) {
             child.dispose();
             onChildRemove(child);
@@ -64,41 +83,50 @@ public class ParentWidget<W extends ParentWidget<W>> extends Widget<W> {
         if (index < 0) {
             index = getChildren().size() + index + 1;
         }
-        IWidget child = this.children.remove(index);
+        I child = this.children.remove(index);
         child.dispose();
         onChildRemove(child);
         return true;
     }
 
-    public void onChildAdd(IWidget child) {
+    public boolean isChildValid(I child) {
+        return true;
     }
 
-    public void onChildRemove(IWidget child) {
+    public void onChildAdd(I child) {}
+
+    public void onChildRemove(I child) {}
+
+    public W child(int index, I child) {
+        if (!addChild(child, index)) {
+            throw new IllegalStateException("Failed to add child");
+        }
+        return getThis();
     }
 
-    public W child(IWidget child) {
+    public W child(I child) {
         if (!addChild(child, -1)) {
             throw new IllegalStateException("Failed to add child");
         }
         return getThis();
     }
 
-    public W childIf(boolean condition, IWidget child) {
+    public W childIf(boolean condition, I child) {
         if (condition) return child(child);
         return getThis();
     }
 
-    public W childIf(BooleanSupplier condition, IWidget child) {
+    public W childIf(BooleanSupplier condition, I child) {
         if (condition.getAsBoolean()) return child(child);
         return getThis();
     }
 
-    public W childIf(boolean condition, Supplier<IWidget> child) {
+    public W childIf(boolean condition, Supplier<I> child) {
         if (condition) return child(child.get());
         return getThis();
     }
 
-    public W childIf(BooleanSupplier condition, Supplier<IWidget> child) {
+    public W childIf(BooleanSupplier condition, Supplier<I> child) {
         if (condition.getAsBoolean()) return child(child.get());
         return getThis();
     }
