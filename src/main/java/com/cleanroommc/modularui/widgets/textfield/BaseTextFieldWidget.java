@@ -43,6 +43,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     protected Alignment textAlignment = Alignment.CenterLeft;
     protected int scrollOffset = 0;
     protected float scale = 1f;
+    protected boolean focusOnGuiOpen;
     private int cursorTimer;
 
     protected boolean changedTextColor = false;
@@ -70,6 +71,15 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
         this.handler.setGuiContext(getContext());
         if (!this.changedTextColor) {
             this.renderer.setColor(getWidgetTheme(getContext().getTheme()).getTextColor());
+        }
+    }
+
+    @Override
+    public void afterInit() {
+        super.afterInit();
+        if (this.focusOnGuiOpen) {
+            getContext().focus(this);
+            this.handler.markAll();
         }
     }
 
@@ -254,6 +264,11 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     public W setTextColor(int color) {
         this.renderer.setColor(color);
         this.changedTextColor = true;
+        return getThis();
+    }
+
+    public W setFocusOnGuiOpen(boolean focusOnGuiOpen) {
+        this.focusOnGuiOpen = focusOnGuiOpen;
         return getThis();
     }
 
