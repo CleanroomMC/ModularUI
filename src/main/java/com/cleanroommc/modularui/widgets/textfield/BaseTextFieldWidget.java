@@ -210,7 +210,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
                 this.handler.delete();
             }
             // paste copied text in marked text
-            this.handler.insert(GuiScreen.getClipboardString());
+            this.handler.insert(GuiScreen.getClipboardString().replace("§", ""));
             return Result.SUCCESS;
         } else if (GuiScreen.isKeyComboCtrlX(keyCode) && this.handler.hasTextMarked()) {
             // copy and delete copied text
