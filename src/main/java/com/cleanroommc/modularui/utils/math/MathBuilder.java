@@ -305,6 +305,8 @@ public class MathBuilder {
             if ((this.isVariable(first) || first.equals("-")) && second instanceof List<?> list) {
                 return this.createFunction((String) first, list);
             }
+            // This can happen with e.g. [15, %] and we cannot process this any further
+            throw new ParseException(String.format("Couldn't parse symbols: '%s%s'", first, second));
         }
 
         /* Any other math expression */
