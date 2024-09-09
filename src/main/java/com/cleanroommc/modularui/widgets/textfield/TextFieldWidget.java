@@ -30,6 +30,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     private Function<String, String> validator = val -> val;
     private boolean numbers = false;
     private String mathFailMessage = null;
+    private double defaultNumber = 0;
 
     protected boolean changedMarkedColor = false;
 
@@ -41,7 +42,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         } catch (MathBuilder.ParseException e) {
             this.mathFailMessage = e.getMessage();
         }
-        return new Constant(0);
+        return new Constant(this.defaultNumber);
     }
 
     public IStringValue<?> createMathFailMessageValue() {
@@ -187,12 +188,11 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     public TextFieldWidget setNumbersLong(Function<Long, Long> validator) {
-        //setPattern(WHOLE_NUMS);
         this.numbers = true;
         setValidator(val -> {
             long num;
             if (val.isEmpty()) {
-                num = 0;
+                num = (long) this.defaultNumber;
             } else {
                 num = (long) parse(val).doubleValue();
             }
@@ -202,12 +202,11 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     public TextFieldWidget setNumbers(Function<Integer, Integer> validator) {
-        //setPattern(WHOLE_NUMS);
         this.numbers = true;
         return setValidator(val -> {
             int num;
             if (val.isEmpty()) {
-                num = 0;
+                num = (int) this.defaultNumber;
             } else {
                 num = (int) parse(val).doubleValue();
             }
@@ -216,12 +215,11 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     public TextFieldWidget setNumbersDouble(Function<Double, Double> validator) {
-        //setPattern(DECIMALS);
         this.numbers = true;
         return setValidator(val -> {
             double num;
             if (val.isEmpty()) {
-                num = 0;
+                num = this.defaultNumber;
             } else {
                 num = parse(val).doubleValue();
             }
@@ -243,6 +241,11 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
     public TextFieldWidget setNumbers() {
         return setNumbers(Integer.MIN_VALUE, Integer.MAX_VALUE);
+    }
+
+    public TextFieldWidget setDefaultNumber(double defaultNumber) {
+        this.defaultNumber = defaultNumber;
+        return this;
     }
 
     public TextFieldWidget value(IStringValue<?> stringValue) {
