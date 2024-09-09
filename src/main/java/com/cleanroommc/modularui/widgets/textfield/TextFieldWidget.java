@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IMathValue;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IKey;
@@ -30,17 +29,23 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     private IStringValue<?> stringValue;
     private Function<String, String> validator = val -> val;
     private boolean numbers = false;
+    private String mathFailMessage = null;
 
     protected boolean changedMarkedColor = false;
 
-    public static IMathValue parse(String num) {
+    public IMathValue parse(String num) {
         try {
-            return MathBuilder.INSTANCE.parse(num);
-        } catch (Exception e) {
-            ModularUI.LOGGER.error("Failed to parse {} in TextFieldWidget", num);
-            ModularUI.LOGGER.catching(e);
+            IMathValue ret = MathBuilder.INSTANCE.parse(num);
+            this.mathFailMessage = null;
+            return ret;
+        } catch (MathBuilder.ParseException e) {
+            this.mathFailMessage = e.getMessage();
         }
         return new Constant(0);
+    }
+
+    public IStringValue<?> createMathFailMessageValue() {
+        return new StringValue.Dynamic(() -> this.mathFailMessage, val -> this.mathFailMessage = val);
     }
 
     @Override

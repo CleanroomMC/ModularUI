@@ -126,17 +126,17 @@ public class MathBuilder {
      * Parse given math expression into a {@link IMathValue} which can be
      * used to execute math.
      */
-    public IMathValue parse(String expression) throws Exception {
+    public IMathValue parse(String expression) throws ParseException {
         return this.parseSymbols(this.breakdownChars(this.breakdown(expression)));
     }
 
     /**
      * Breakdown an expression
      */
-    public String[] breakdown(String expression) throws Exception {
+    public String[] breakdown(String expression) throws ParseException {
         /* If given string have illegal characters, then it can't be parsed */
         if (this.strict && !expression.matches("^[\\w\\s_+-/*%^&|<>=!?:.,()\"'@~\\[\\]]+$")) {
-            throw new Exception("Given expression '" + expression + "' contains illegal characters!");
+            throw new ParseException("Given expression '" + expression + "' contains illegal characters!");
         }
 
         String[] chars = expression.split("(?!^)");
@@ -155,7 +155,7 @@ public class MathBuilder {
         /* Amount of left and right brackets should be the same */
         if (left != right) {
             // TODO: auto pre- or append ( or )
-            throw new Exception("Given expression '" + expression + "' has more uneven amount of parenthesis, there are " + left + " open and " + right + " closed!");
+            throw new ParseException("Given expression '" + expression + "' has more uneven amount of parenthesis, there are " + left + " open and " + right + " closed!");
         }
 
         return chars;
@@ -283,7 +283,7 @@ public class MathBuilder {
      * However, beside parsing operations, it's also can return one or
      * two item sized symbol lists.
      */
-    public IMathValue parseSymbols(List<?> symbols) throws Exception {
+    public IMathValue parseSymbols(List<?> symbols) throws ParseException {
         IMathValue ternary = this.tryTernary(symbols);
 
         if (ternary != null) {
@@ -384,7 +384,7 @@ public class MathBuilder {
      * and some elements from beginning till ?, in between ? and :, and also some
      * remaining elements after :.
      */
-    protected IMathValue tryTernary(List<?> symbols) throws Exception {
+    protected IMathValue tryTernary(List<?> symbols) throws ParseException {
         int question = -1;
         int questions = 0;
         int colon = -1;
@@ -433,7 +433,7 @@ public class MathBuilder {
      * mixed with operators, groups, values and commas. And then plug it
      * in to a class constructor with given name.
      */
-    protected IMathValue createFunction(String first, List<?> args) throws Exception {
+    protected IMathValue createFunction(String first, List<?> args) throws ParseException {
         /* Handle special cases with negation */
         if (first.equals("!")) {
             return new Negate(this.parseSymbols(args));
@@ -453,7 +453,7 @@ public class MathBuilder {
         }
 
         if (!this.functions.containsKey(first)) {
-            throw new Exception("Function '" + first + "' couldn't be found!");
+            throw new ParseException("Function '" + first + "' couldn't be found!");
         }
 
         List<IMathValue> values = new ArrayList<>();
@@ -473,8 +473,17 @@ public class MathBuilder {
         }
 
         Class<? extends Function> function = this.functions.get(first);
-        Constructor<? extends Function> ctor = function.getConstructor(IMathValue[].class, String.class);
-        return ctor.newInstance(values.toArray(new IMathValue[0]), first);
+        Constructor<? extends Function> ctor;
+        try {
+            ctor = function.getConstructor(IMathValue[].class, String.class);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            return ctor.newInstance(values.toArray(new IMathValue[0]), first);
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -485,7 +494,7 @@ public class MathBuilder {
      * groups.
      */
     @SuppressWarnings("unchecked")
-    public IMathValue valueFromObject(Object object) throws Exception {
+    public IMathValue valueFromObject(Object object) throws ParseException {
         if (object instanceof String symbol) {
 
             /* Variable and constant negation */
@@ -524,7 +533,7 @@ public class MathBuilder {
             return new Group(this.parseSymbols(list));
         }
 
-        throw new Exception("Given object couldn't be converted to value! " + object);
+        throw new ParseException("Given object couldn't be converted to value! " + object);
     }
 
     protected String trimThousandSeparator(String symbol) {
@@ -533,7 +542,7 @@ public class MathBuilder {
                 .replace("_", "");
     }
 
-    protected Double tryParseNumber(String symbol) throws Exception {
+    protected Double tryParseNumber(String symbol) throws ParseException {
         final StringBuilder buffer = new StringBuilder();
         final char[] characters = symbol.toCharArray();
         Double leftNumber = null;
@@ -553,7 +562,7 @@ public class MathBuilder {
                 // Not a suffix nor E notation
                 if (leftNumber != null) {
                     // Something like 2k5 cannot be parsed
-                    throw new Exception(String.format("Symbol %s cannot be parsed!", symbol));
+                    throw new ParseException(String.format("Symbol %s cannot be parsed!", symbol));
                 }
                 buffer.append(c);
             } else {
@@ -574,7 +583,7 @@ public class MathBuilder {
                         rightNumber = Double.parseDouble(rightString);
                     } catch (NumberFormatException ignored) {
                         // Left number is guaranteed to be nonnull here, and we don't have variable like 4ER
-                        throw new Exception(String.format("Symbol %s cannot be parsed!", symbol));
+                        throw new ParseException(String.format("Symbol %s cannot be parsed!", symbol));
                     }
                     return leftNumber * Math.pow(10, rightNumber);
                 } else {
@@ -589,7 +598,7 @@ public class MathBuilder {
         try {
             return Double.parseDouble(symbol);
         } catch (NumberFormatException ignored) {
-            throw new Exception(String.format("Symbol %s cannot be parsed!", symbol));
+            throw new ParseException(String.format("Symbol %s cannot be parsed!", symbol));
         }
     }
 
@@ -604,14 +613,14 @@ public class MathBuilder {
     /**
      * Get operation for given operator strings
      */
-    protected Operation operationForOperator(String op) throws Exception {
+    protected Operation operationForOperator(String op) throws ParseException {
         for (Operation operation : Operation.values()) {
             if (operation.sign.equals(op)) {
                 return operation;
             }
         }
 
-        throw new Exception("There is no such operator '" + op + "'!");
+        throw new ParseException("There is no such operator '" + op + "'!");
     }
 
     /**
@@ -638,5 +647,12 @@ public class MathBuilder {
      */
     protected boolean isDecimal(String s) {
         return DECIMAL_PATTERN.matcher(s).matches();
+    }
+    
+    public static class ParseException extends Exception {
+
+        public ParseException(String message) {
+            super(message);
+        }
     }
 }
