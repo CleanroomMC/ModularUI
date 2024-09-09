@@ -15,12 +15,11 @@ import com.cleanroommc.modularui.utils.math.functions.string.StringEndsWith;
 import com.cleanroommc.modularui.utils.math.functions.string.StringStartsWith;
 import com.cleanroommc.modularui.utils.math.functions.trig.*;
 import com.cleanroommc.modularui.utils.math.functions.utility.*;
-import com.cleanroommc.modularui.widgets.textfield.BaseTextFieldWidget;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
-import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +65,7 @@ public class MathBuilder {
     public MathBuilder() {
         /* Some default values */
         this.register(new Variable("PI", Math.PI));
-        this.register(new Variable("E", Math.E));
+        this.register(new Variable("NAPIER", Math.E));
 
         /* Rounding functions */
         this.functions.put("floor", Floor.class);
@@ -499,9 +498,10 @@ public class MathBuilder {
             }
 
             symbol = trimThousandSeparator(symbol);
+            Double triedNumber = tryParseNumber(symbol);
 
-            if (this.isDecimal(symbol)) {
-                return new Constant(BaseTextFieldWidget.format.parse(symbol, new ParsePosition(0)).doubleValue());
+            if (triedNumber != null) {
+                return new Constant(triedNumber);
             } else if (this.isVariable(symbol)) {
                 /* Need to account for a negative value variable */
                 if (symbol.startsWith("-")) {
@@ -533,9 +533,70 @@ public class MathBuilder {
                 .replace("_", "");
     }
 
+    protected Double tryParseNumber(String symbol) throws Exception {
+        final StringBuilder buffer = new StringBuilder();
+        final char[] characters = symbol.toCharArray();
+        Double leftNumber = null;
+        for (int i = 0; i < characters.length; i++) {
+            char c = characters[i];
+            double multiplier = switch (c) {
+                case 'k', 'K' -> 1_000;
+                case 'm', 'M' -> 1_000_000;
+                case 'g', 'G', 'b', 'B' -> 1_000_000_000;
+                case 't', 'T' -> 1_000_000_000_000L;
+                case 's', 'S' -> 64;
+                case 'i', 'I' -> 144;
+                default -> 0;
+            };
+            final boolean isENotation = c == 'e' || c == 'E';
+            if (multiplier == 0 && !isENotation) {
+                // Not a suffix nor E notation
+                if (leftNumber != null) {
+                    // Something like 2k5 cannot be parsed
+                    throw new Exception(String.format("Symbol %s cannot be parsed!", symbol));
+                }
+                buffer.append(c);
+            } else {
+                if (leftNumber == null) {
+                    // We haven't seen number so far, so try parse it
+                    final String buffered = buffer.toString();
+                    try {
+                        leftNumber = Double.parseDouble(buffered);
+                    } catch (NumberFormatException ignored) {
+                        // Don't throw error here, as it could be variable name
+                        return null;
+                    }
+                }
+                if (isENotation) {
+                    final String rightString = symbol.substring(i + 1);
+                    final double rightNumber;
+                    try {
+                        rightNumber = Double.parseDouble(rightString);
+                    } catch (NumberFormatException ignored) {
+                        // Left number is guaranteed to be nonnull here, and we don't have variable like 4ER
+                        throw new Exception(String.format("Symbol %s cannot be parsed!", symbol));
+                    }
+                    return leftNumber * Math.pow(10, rightNumber);
+                } else {
+                    // Continue parsing to allow 2kk == 2000k for example
+                    leftNumber *= multiplier;
+                }
+            }
+        }
+        if (leftNumber != null) {
+            return leftNumber;
+        }
+        try {
+            return Double.parseDouble(symbol);
+        } catch (NumberFormatException ignored) {
+            throw new Exception(String.format("Symbol %s cannot be parsed!", symbol));
+        }
+    }
+
     /**
      * Get variable
      */
+    @Nullable
     protected Variable getVariable(String name) {
         return this.variables.get(name);
     }
