@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
+import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.widget.IFocusedWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -43,6 +45,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     protected TextFieldHandler handler = new TextFieldHandler(this);
     protected TextFieldRenderer renderer = new TextFieldRenderer(this.handler);
     protected Alignment textAlignment = Alignment.CenterLeft;
+    protected List<String> lastText;
     protected int scrollOffset = 0;
     protected float scale = 1f;
     protected boolean focusOnGuiOpen;
@@ -125,6 +128,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     public void onFocus(ModularGuiContext context) {
         this.cursorTimer = 0;
         this.renderer.setCursor(true);
+        this.lastText = new ArrayList<>(this.handler.getText());
     }
 
     @Override
@@ -145,8 +149,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
             return Result.IGNORE;
         }
         if (mouseButton == 1) {
-            this.handler.markAll();
-            this.handler.delete();
+            this.handler.clear();
         } else {
             int x = getContext().getMouseX() + getScrollX();
             int y = getContext().getMouseY() + getScrollY();
@@ -178,6 +181,10 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
                 }
                 return Result.SUCCESS;
             case Keyboard.KEY_ESCAPE:
+                if (ModularUIConfig.escRestoreLastText) {
+                    this.handler.clear();
+                    this.handler.insert(this.lastText);
+                }
                 getContext().removeFocus();
                 return Result.SUCCESS;
             case Keyboard.KEY_LEFT: {
@@ -245,6 +252,10 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
 
     public ScrollData getScrollData() {
         return getScrollArea().getScrollX();
+    }
+
+    public List<String> getLastText() {
+        return lastText;
     }
 
     public W setTextAlignment(Alignment textAlignment) {
