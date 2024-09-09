@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IMathValue;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IKey;
@@ -41,6 +42,8 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             return ret;
         } catch (MathBuilder.ParseException e) {
             this.mathFailMessage = e.getMessage();
+        } catch (Exception e) {
+            ModularUI.LOGGER.catching(e);
         }
         return new Constant(this.defaultNumber);
     }
