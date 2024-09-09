@@ -144,9 +144,14 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
         if (!isHovering()) {
             return Result.IGNORE;
         }
-        int x = getContext().getMouseX() + getScrollX();
-        int y = getContext().getMouseY() + getScrollY();
-        this.handler.setCursor(this.renderer.getCursorPos(this.handler.getText(), x, y), true);
+        if (mouseButton == 1) {
+            this.handler.markAll();
+            this.handler.delete();
+        } else {
+            int x = getContext().getMouseX() + getScrollX();
+            int y = getContext().getMouseY() + getScrollY();
+            this.handler.setCursor(this.renderer.getCursorPos(this.handler.getText(), x, y), true);
+        }
         return Result.SUCCESS;
     }
 
