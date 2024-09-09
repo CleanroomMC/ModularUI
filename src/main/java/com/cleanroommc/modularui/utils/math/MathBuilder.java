@@ -498,6 +498,8 @@ public class MathBuilder {
                 return new Constant(symbol.substring(1, symbol.length() - 1));
             }
 
+            symbol = trimThousandSeparator(symbol);
+
             if (this.isDecimal(symbol)) {
                 return new Constant(BaseTextFieldWidget.format.parse(symbol, new ParsePosition(0)).doubleValue());
             } else if (this.isVariable(symbol)) {
@@ -523,6 +525,12 @@ public class MathBuilder {
         }
 
         throw new Exception("Given object couldn't be converted to value! " + object);
+    }
+
+    protected String trimThousandSeparator(String symbol) {
+        return symbol.replace(" ", "")
+                .replace("\u202F", "") // French locale
+                .replace("_", "");
     }
 
     /**
