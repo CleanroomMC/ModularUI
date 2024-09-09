@@ -38,6 +38,8 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     public static final Pattern ANY = Pattern.compile(".*");
     private static final Pattern BASE_PATTERN = Pattern.compile("[^§]");
 
+    private static final int CURSOR_BLINK_RATE = 10;
+
     protected TextFieldHandler handler = new TextFieldHandler(this);
     protected TextFieldRenderer renderer = new TextFieldRenderer(this.handler);
     protected Alignment textAlignment = Alignment.CenterLeft;
@@ -86,7 +88,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     @Override
     public void onUpdate() {
         super.onUpdate();
-        if (isFocused() && ++this.cursorTimer == 30) {
+        if (isFocused() && ++this.cursorTimer == CURSOR_BLINK_RATE) {
             this.renderer.toggleCursor();
             this.cursorTimer = 0;
         }
