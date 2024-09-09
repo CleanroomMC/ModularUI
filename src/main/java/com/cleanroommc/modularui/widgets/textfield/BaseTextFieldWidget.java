@@ -206,6 +206,9 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
             GuiScreen.setClipboardString(this.handler.getSelectedText());
             return Result.SUCCESS;
         } else if (GuiScreen.isKeyComboCtrlV(keyCode)) {
+            if (this.handler.hasTextMarked()) {
+                this.handler.delete();
+            }
             // paste copied text in marked text
             this.handler.insert(GuiScreen.getClipboardString());
             return Result.SUCCESS;
@@ -218,7 +221,10 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
             // mark whole text
             this.handler.markAll();
             return Result.SUCCESS;
-        } else if (BASE_PATTERN.matcher(String.valueOf(character)).matches()) {
+        } else if (BASE_PATTERN.matcher(String.valueOf(character)).matches() && handler.test(String.valueOf(character))) {
+            if (this.handler.hasTextMarked()) {
+                this.handler.delete();
+            }
             // insert typed char
             this.handler.insert(String.valueOf(character));
             return Result.SUCCESS;
