@@ -26,4 +26,11 @@ public interface IMathValue {
     boolean booleanValue();
 
     String stringValue();
+
+    class EvaluateException extends RuntimeException {
+
+        public EvaluateException(String message) {
+            super(message);
+        }
+    }
 }

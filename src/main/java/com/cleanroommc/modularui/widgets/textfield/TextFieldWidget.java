@@ -194,7 +194,12 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             if (val.isEmpty()) {
                 num = (long) this.defaultNumber;
             } else {
-                num = (long) parse(val).doubleValue();
+                try {
+                    num = (long) parse(val).doubleValue();
+                } catch (IMathValue.EvaluateException e) {
+                    this.mathFailMessage = e.getMessage();
+                    num = (long) this.defaultNumber;
+                }
             }
             return format.format(validator.apply(num));
         });
@@ -208,7 +213,12 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             if (val.isEmpty()) {
                 num = (int) this.defaultNumber;
             } else {
-                num = (int) parse(val).doubleValue();
+                try {
+                    num = (int) parse(val).doubleValue();
+                } catch (IMathValue.EvaluateException e) {
+                    this.mathFailMessage = e.getMessage();
+                    num = (int) this.defaultNumber;
+                }
             }
             return format.format(validator.apply(num));
         });
@@ -221,7 +231,12 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             if (val.isEmpty()) {
                 num = this.defaultNumber;
             } else {
-                num = parse(val).doubleValue();
+                try {
+                    num = parse(val).doubleValue();
+                } catch (IMathValue.EvaluateException e) {
+                    this.mathFailMessage = e.getMessage();
+                    num = this.defaultNumber;
+                }
             }
             return format.format(validator.apply(num));
         });
