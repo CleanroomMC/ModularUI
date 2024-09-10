@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
 
-public abstract class NumericFieldWidget<W extends NumericFieldWidget<W>> extends TextFieldWidget<W> {
+public abstract class NumericFieldWidget<W extends NumericFieldWidget<W>> extends OneLineTextField<W> {
 
     protected final DecimalFormat format = new DecimalFormat();
     private String mathFailMessage = null;

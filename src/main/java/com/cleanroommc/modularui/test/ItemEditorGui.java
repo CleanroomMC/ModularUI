@@ -14,7 +14,7 @@ import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Row;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.textfield.IntFieldWidget;
-import com.cleanroommc.modularui.widgets.textfield.StringTextFieldWidget;
+import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -87,7 +87,7 @@ public class ItemEditorGui implements IGuiHolder<GuiData> {
                                                 getStack().setCount(value);
                                         }))
                                         .setRange(1, 127)))
-                        .child(new StringTextFieldWidget()
+                        .child(new TextFieldWidget()
                                 .height(20)
                                 .widthRel(1f)
                                 .value(new StringSyncValue(() -> getStack().hasTagCompound() ? getStack().getTagCompound().toString() : "", val -> {
