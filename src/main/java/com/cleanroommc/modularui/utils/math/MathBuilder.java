@@ -42,6 +42,7 @@ import java.util.regex.Pattern;
 public class MathBuilder {
 
     public static final Pattern DECIMAL_PATTERN = Pattern.compile("-?\\d+(\\.\\d+)?([eE]-?\\d+)?");
+    private static final Pattern BRACKETS = Pattern.compile("[()]");
 
     public static final MathBuilder INSTANCE = new MathBuilder();
 
@@ -127,6 +128,11 @@ public class MathBuilder {
      * used to execute math.
      */
     public IMathValue parse(String expression) throws ParseException {
+        if (!BRACKETS.matcher(expression).find()) {
+            // Absense of bracket implies it's simple decimal expression maybe with operators,
+            // so comma is supposed to be representing a thousand separator instead of an argument separator
+            expression = expression.replace(",", "");
+        }
         return this.parseSymbols(this.breakdownChars(this.breakdown(expression)));
     }
 
