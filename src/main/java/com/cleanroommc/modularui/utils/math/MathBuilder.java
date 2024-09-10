@@ -554,8 +554,7 @@ public class MathBuilder {
         final StringBuilder buffer = new StringBuilder();
         final char[] characters = symbol.toCharArray();
         Double leftNumber = null;
-        for (int i = 0; i < characters.length; i++) {
-            char c = characters[i];
+        for (char c : characters) {
             double multiplier = switch (c) {
                 case 'k', 'K' -> 1_000;
                 case 'm', 'M' -> 1_000_000;
@@ -565,9 +564,8 @@ public class MathBuilder {
                 case 'i', 'I' -> 144;
                 default -> 0;
             };
-            final boolean isENotation = c == 'e' || c == 'E';
-            if (multiplier == 0 && !isENotation) {
-                // Not a suffix nor E notation
+            if (multiplier == 0) {
+                // Not a suffix
                 if (leftNumber != null) {
                     // Something like 2k5 cannot be parsed
                     throw new ParseException(String.format("Symbol %s cannot be parsed!", symbol));
@@ -584,20 +582,8 @@ public class MathBuilder {
                         return null;
                     }
                 }
-                if (isENotation) {
-                    final String rightString = symbol.substring(i + 1);
-                    final double rightNumber;
-                    try {
-                        rightNumber = Double.parseDouble(rightString);
-                    } catch (NumberFormatException ignored) {
-                        // Left number is guaranteed to be nonnull here, and we don't have variable like 4ER
-                        throw new ParseException(String.format("Symbol %s cannot be parsed!", symbol));
-                    }
-                    return leftNumber * Math.pow(10, rightNumber);
-                } else {
-                    // Continue parsing to allow 2kk == 2000k for example
-                    leftNumber *= multiplier;
-                }
+                // Continue parsing to allow 2kk == 2000k for example
+                leftNumber *= multiplier;
             }
         }
         if (leftNumber != null) {

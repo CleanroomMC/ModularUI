@@ -56,6 +56,18 @@ public enum Operation {
             return Math.pow(a, b);
         }
     },
+    E_NOTATION_LOWERCASE("e", 4) {
+        @Override
+        public double calculate(double a, double b) {
+            return a * Math.pow(10, b);
+        }
+    },
+    E_NOTATION_UPPERCASE("E", 4) {
+        @Override
+        public double calculate(double a, double b) {
+            return a * Math.pow(10, b);
+        }
+    },
     AND("&&", -3) {
         @Override
         public double calculate(double a, double b) {
