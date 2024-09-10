@@ -13,7 +13,8 @@ import com.cleanroommc.modularui.widgets.ItemSlot;
 import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Row;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
-import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
+import com.cleanroommc.modularui.widgets.textfield.IntFieldWidget;
+import com.cleanroommc.modularui.widgets.textfield.StringTextFieldWidget;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -71,22 +72,22 @@ public class ItemEditorGui implements IGuiHolder<GuiData> {
                                 .height(16)
                                 .margin(0, 4)
                                 .child(IKey.str("Meta: ").asWidget())
-                                .child(new TextFieldWidget()
+                                .child(new IntFieldWidget()
                                         .size(50, 16)
                                         .value(new IntSyncValue(() -> getStack().getMetadata(), val -> {
                                             if (!syncManager.isClient())
                                                 getStack().setItemDamage(val);
                                         }))
-                                        .setNumbers(0, Short.MAX_VALUE - 1))
+                                        .setRange(0, Short.MAX_VALUE - 1))
                                 .child(IKey.str("  Amount: ").asWidget())
-                                .child(new TextFieldWidget()
+                                .child(new IntFieldWidget()
                                         .size(30, 16)
                                         .value(new IntSyncValue(() -> getStack().getCount(), value -> {
                                             if (!syncManager.isClient())
                                                 getStack().setCount(value);
                                         }))
-                                        .setNumbers(1, 127)))
-                        .child(new TextFieldWidget()
+                                        .setRange(1, 127)))
+                        .child(new StringTextFieldWidget()
                                 .height(20)
                                 .widthRel(1f)
                                 .value(new StringSyncValue(() -> getStack().hasTagCompound() ? getStack().getTagCompound().toString() : "", val -> {
