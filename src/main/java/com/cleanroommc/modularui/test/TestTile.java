@@ -30,7 +30,7 @@ import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import com.cleanroommc.modularui.widgets.textfield.IntFieldWidget;
 import com.cleanroommc.modularui.widgets.textfield.LongFieldWidget;
-import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
+import com.cleanroommc.modularui.widgets.textfield.StringTextFieldWidget;
 
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -44,6 +44,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITickable {
 
@@ -157,7 +158,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                         })
                                                         //.flex(flex -> flex.left(3)) // ?
                                                         .overlay(IKey.str("Button 2")))
-                                                .child(new TextFieldWidget()
+                                                .child(new StringTextFieldWidget()
                                                         .size(60, 20)
                                                         .value(SyncHandlers.string(() -> this.value, val -> this.value = val))
                                                         .margin(0, 3))
@@ -372,7 +373,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
     public void buildDialog(Dialog<String> dialog) {
         AtomicReference<String> value = new AtomicReference<>("");
         dialog.setDraggable(true);
-        dialog.child(new TextFieldWidget()
+        dialog.child(new StringTextFieldWidget()
                         .flex(flex -> flex.size(100, 20).align(Alignment.Center))
                         .value(new StringValue.Dynamic(value::get, value::set)))
                 .child(new ButtonWidget<>()

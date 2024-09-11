@@ -13,7 +13,7 @@ import com.cleanroommc.modularui.value.DoubleValue;
 import com.cleanroommc.modularui.value.StringValue;
 import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Row;
-import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
+import com.cleanroommc.modularui.widgets.textfield.StringTextFieldWidget;
 
 import java.util.function.Consumer;
 
@@ -67,7 +67,7 @@ public class ColorPickerDialog extends Dialog<Integer> {
                                 .overlay(IKey.str("HSV"))))
                 .child(new Row().widthRel(1f).height(12).marginTop(4)
                         .child(IKey.str("Hex: ").asWidget().heightRel(1f))
-                        .child(new TextFieldWidget()
+                        .child(new StringTextFieldWidget()
                                 .height(12)
                                 .expanded()
                                 .setValidator(this::validateRawColor)
