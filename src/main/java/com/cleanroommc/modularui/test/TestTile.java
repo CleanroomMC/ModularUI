@@ -28,9 +28,7 @@ import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Row;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
-import com.cleanroommc.modularui.widgets.textfield.IntFieldWidget;
-import com.cleanroommc.modularui.widgets.textfield.LongFieldWidget;
-import com.cleanroommc.modularui.widgets.textfield.StringTextFieldWidget;
+import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -54,7 +52,6 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
     private int val, val2 = 0;
     private String value = "";
     private double doubleValue = 1;
-    private long longValue = 25;
     private final int duration = 80;
     private int progress = 0;
     private int cycleState = 0;
@@ -158,14 +155,14 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                         })
                                                         //.flex(flex -> flex.left(3)) // ?
                                                         .overlay(IKey.str("Button 2")))
-                                                .child(new StringTextFieldWidget()
+                                                .child(new TextFieldWidget()
                                                         .size(60, 20)
                                                         .value(SyncHandlers.string(() -> this.value, val -> this.value = val))
                                                         .margin(0, 3))
-                                                .child(new LongFieldWidget()
-                                                        .size(100, 20)
-                                                        .value(SyncHandlers.longNumber(() -> this.longValue, val -> this.longValue = val))
-                                                        .setRange(-10L, 1234567890123456789L))
+                                                .child(new TextFieldWidget()
+                                                        .size(60, 20)
+                                                        .value(SyncHandlers.doubleNumber(() -> this.doubleValue, val -> this.doubleValue = val))
+                                                        .setNumbersDouble(Function.identity()))
                                                 .child(IKey.str("Test string").asWidget().padding(2).debugName("test string")))
                                         .child(new Column()
                                                 .debugName("button and slots test 2")
@@ -291,9 +288,9 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                 .debugName("bogo test config 2")
                                                 .widthRel(1f).height(14)
                                                 .childPadding(2)
-                                                .child(new IntFieldWidget()
+                                                .child(new TextFieldWidget()
                                                         .value(new IntValue.Dynamic(() -> this.num, val -> this.num = val))
-                                                        .setRange(1, Short.MAX_VALUE)
+                                                        .setNumbers(1, Short.MAX_VALUE)
                                                         .setTextAlignment(Alignment.Center)
                                                         .background(new Rectangle().setColor(0xFFb1b1b1))
                                                         .setTextColor(IKey.TEXT_COLOR)
@@ -373,7 +370,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
     public void buildDialog(Dialog<String> dialog) {
         AtomicReference<String> value = new AtomicReference<>("");
         dialog.setDraggable(true);
-        dialog.child(new StringTextFieldWidget()
+        dialog.child(new TextFieldWidget()
                         .flex(flex -> flex.size(100, 20).align(Alignment.Center))
                         .value(new StringValue.Dynamic(value::get, value::set)))
                 .child(new ButtonWidget<>()

@@ -1,54 +1,64 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
+import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.IMathValue;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.value.IStringValue;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.utils.math.Constant;
+import com.cleanroommc.modularui.utils.math.MathBuilder;
+import com.cleanroommc.modularui.value.StringValue;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.text.ParsePosition;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 /**
  * Text input widget with one line only. Can be synced between client and server. Can handle text validation.
- * <p>
- * Child classes are expected to have Value bound to it. It's capable of doing anything to displayed text
- * while keeping value consistent.
  */
-public abstract class TextFieldWidget< W extends TextFieldWidget<W>> extends BaseTextFieldWidget<W> {
+public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
+
+    private IStringValue<?> stringValue;
+    private Function<String, String> validator = val -> val;
+    private boolean numbers = false;
+    private String mathFailMessage = null;
+    private double defaultNumber = 0;
 
     protected boolean changedMarkedColor = false;
 
-    /**
-     * Called on widget init. Set default value if it's not set by user, so that it can be called anytime.
-     */
-    protected abstract void setupValueIfNull();
+    public IMathValue parse(String num) {
+        try {
+            IMathValue ret = MathBuilder.INSTANCE.parse(num);
+            this.mathFailMessage = null;
+            return ret;
+        } catch (MathBuilder.ParseException e) {
+            this.mathFailMessage = e.getMessage();
+        } catch (Exception e) {
+            ModularUI.LOGGER.catching(e);
+        }
+        return new Constant(this.defaultNumber);
+    }
 
-    /**
-     * Called when initializing sync handlers. If supplied sync handler can satisfy the requirement, save it and return true.
-     */
-    protected abstract boolean checkAndSetSyncHandler(SyncHandler syncHandler);
-
-    /**
-     * Return text to display derived from value.
-     */
-    @NotNull
-    protected abstract String getDisplayTextFromValue();
-
-    /**
-     * Parse supplied display text and store to the value.
-     */
-    protected abstract void parseDisplayText(String text);
+    public IStringValue<?> createMathFailMessageValue() {
+        return new StringValue.Dynamic(() -> this.mathFailMessage, val -> this.mathFailMessage = val);
+    }
 
     @Override
     public void onInit() {
         super.onInit();
-        setupValueIfNull();
-        setText(getDisplayTextFromValue());
+        if (this.stringValue == null) {
+            this.stringValue = new StringValue("");
+        }
+        setText(this.stringValue.getStringValue());
         if (!hasTooltip()) {
             tooltipBuilder(tooltip -> tooltip.addLine(IKey.str(getText())));
         }
@@ -66,11 +76,12 @@ public abstract class TextFieldWidget< W extends TextFieldWidget<W>> extends Bas
     }
 
     @Override
-    public final boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof ValueSyncHandler<?> valueSyncHandler && checkAndSetSyncHandler(syncHandler)) {
+    public boolean isValidSyncHandler(SyncHandler syncHandler) {
+        if (syncHandler instanceof IStringValue<?> iStringValue && syncHandler instanceof ValueSyncHandler<?> valueSyncHandler) {
+            this.stringValue = iStringValue;
             valueSyncHandler.setChangeListener(() -> {
                 markTooltipDirty();
-                setText(getDisplayTextFromValue());
+                setText(this.stringValue.getValue().toString());
             });
             return true;
         }
@@ -81,7 +92,7 @@ public abstract class TextFieldWidget< W extends TextFieldWidget<W>> extends Bas
     public void onUpdate() {
         super.onUpdate();
         if (!isFocused()) {
-            String s = getDisplayTextFromValue();
+            String s = this.stringValue.getStringValue();
             if (!getText().equals(s)) {
                 setText(s);
             }
@@ -137,15 +148,14 @@ public abstract class TextFieldWidget< W extends TextFieldWidget<W>> extends Bas
     public void onRemoveFocus(ModularGuiContext context) {
         super.onRemoveFocus(context);
         if (this.handler.getText().isEmpty()) {
-            parseDisplayText("");
-            this.handler.getText().add(getDisplayTextFromValue());
+            this.handler.getText().add(this.validator.apply(""));
         } else if (this.handler.getText().size() == 1) {
-            parseDisplayText(this.handler.getText().get(0));
-            this.handler.getText().set(0, getDisplayTextFromValue());
+            this.handler.getText().set(0, this.validator.apply(this.handler.getText().get(0)));
             markTooltipDirty();
         } else {
             throw new IllegalStateException("TextFieldWidget can only have one line!");
         }
+        this.stringValue.setStringValue(this.numbers ? format.parse(getText(), new ParsePosition(0)).toString() : getText());
     }
 
     @Override
@@ -153,25 +163,112 @@ public abstract class TextFieldWidget< W extends TextFieldWidget<W>> extends Bas
         return true;
     }
 
-    public W setMaxLength(int maxLength) {
+    public TextFieldWidget setMaxLength(int maxLength) {
         this.handler.setMaxCharacters(maxLength);
-        return getThis();
+        return this;
     }
 
-    public W setPattern(Pattern pattern) {
+    public TextFieldWidget setPattern(Pattern pattern) {
         this.handler.setPattern(pattern);
-        return getThis();
+        return this;
     }
 
-    public W setTextColor(int textColor) {
+    public TextFieldWidget setTextColor(int textColor) {
         this.renderer.setColor(textColor);
         this.changedTextColor = true;
-        return getThis();
+        return this;
     }
 
-    public W setMarkedColor(int color) {
+    public TextFieldWidget setMarkedColor(int color) {
         this.renderer.setMarkedColor(color);
         this.changedMarkedColor = true;
-        return getThis();
+        return this;
+    }
+
+    public TextFieldWidget setValidator(Function<String, String> validator) {
+        this.validator = validator;
+        return this;
+    }
+
+    public TextFieldWidget setNumbersLong(Function<Long, Long> validator) {
+        this.numbers = true;
+        setValidator(val -> {
+            long num;
+            if (val.isEmpty()) {
+                num = (long) this.defaultNumber;
+            } else {
+                try {
+                    num = (long) parse(val).doubleValue();
+                } catch (IMathValue.EvaluateException e) {
+                    this.mathFailMessage = e.getMessage();
+                    num = (long) this.defaultNumber;
+                }
+            }
+            return format.format(validator.apply(num));
+        });
+        return this;
+    }
+
+    public TextFieldWidget setNumbers(Function<Integer, Integer> validator) {
+        this.numbers = true;
+        return setValidator(val -> {
+            int num;
+            if (val.isEmpty()) {
+                num = (int) this.defaultNumber;
+            } else {
+                try {
+                    num = (int) parse(val).doubleValue();
+                } catch (IMathValue.EvaluateException e) {
+                    this.mathFailMessage = e.getMessage();
+                    num = (int) this.defaultNumber;
+                }
+            }
+            return format.format(validator.apply(num));
+        });
+    }
+
+    public TextFieldWidget setNumbersDouble(Function<Double, Double> validator) {
+        this.numbers = true;
+        return setValidator(val -> {
+            double num;
+            if (val.isEmpty()) {
+                num = this.defaultNumber;
+            } else {
+                try {
+                    num = parse(val).doubleValue();
+                } catch (IMathValue.EvaluateException e) {
+                    this.mathFailMessage = e.getMessage();
+                    num = this.defaultNumber;
+                }
+            }
+            return format.format(validator.apply(num));
+        });
+    }
+
+    public TextFieldWidget setNumbers(Supplier<Integer> min, Supplier<Integer> max) {
+        return setNumbers(val -> Math.min(max.get(), Math.max(min.get(), val)));
+    }
+
+    public TextFieldWidget setNumbersLong(Supplier<Long> min, Supplier<Long> max) {
+        return setNumbersLong(val -> Math.min(max.get(), Math.max(min.get(), val)));
+    }
+
+    public TextFieldWidget setNumbers(int min, int max) {
+        return setNumbers(val -> Math.min(max, Math.max(min, val)));
+    }
+
+    public TextFieldWidget setNumbers() {
+        return setNumbers(Integer.MIN_VALUE, Integer.MAX_VALUE);
+    }
+
+    public TextFieldWidget setDefaultNumber(double defaultNumber) {
+        this.defaultNumber = defaultNumber;
+        return this;
+    }
+
+    public TextFieldWidget value(IStringValue<?> stringValue) {
+        this.stringValue = stringValue;
+        setValue(stringValue);
+        return this;
     }
 }
