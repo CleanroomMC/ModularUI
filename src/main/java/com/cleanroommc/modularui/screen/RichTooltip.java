@@ -307,6 +307,7 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
         } else {
             this.tooltipBuilder = tooltipBuilder;
         }
+        markDirty();
         return this;
     }
 
