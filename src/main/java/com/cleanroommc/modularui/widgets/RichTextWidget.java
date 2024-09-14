@@ -30,8 +30,8 @@ public class RichTextWidget extends Widget<RichTextWidget> implements IRichTextB
     public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
         super.draw(context, widgetTheme);
         if (this.autoUpdate || this.dirty) {
-            this.text.clearText();
             if (this.builder != null) {
+                this.text.clearText();
                 this.builder.accept(this.text);
             }
         }
