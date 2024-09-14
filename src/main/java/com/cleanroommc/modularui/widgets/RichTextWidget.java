@@ -34,6 +34,7 @@ public class RichTextWidget extends Widget<RichTextWidget> implements IRichTextB
                 this.text.clearText();
                 this.builder.accept(this.text);
             }
+            this.dirty = false;
         }
         this.text.drawAtZero(context, getArea(), widgetTheme);
     }
