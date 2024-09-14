@@ -52,8 +52,18 @@ public class ToggleButton extends AbstractCycleButtonWidget<ToggleButton> {
         return this;
     }
 
+    public ToggleButton overlay(boolean selected, IDrawable... overlay) {
+        this.overlay = addToArray(this.overlay, overlay, selected ? 1 : 0);
+        return this;
+    }
+
     public ToggleButton hoverBackground(boolean selected, IDrawable... background) {
         this.hoverBackground = addToArray(this.hoverBackground, background, selected ? 1 : 0);
+        return this;
+    }
+
+    public ToggleButton hoverOverlay(boolean selected, IDrawable... overlay) {
+        this.hoverOverlay = addToArray(this.hoverOverlay, overlay, selected ? 1 : 0);
         return this;
     }
 
