@@ -63,8 +63,8 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
 
     public void buildTooltip() {
         this.dirty = false;
-        this.text.clearText();
         if (this.tooltipBuilder != null) {
+            this.text.clearText();
             this.tooltipBuilder.accept(this);
         }
     }
@@ -307,6 +307,7 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
         } else {
             this.tooltipBuilder = tooltipBuilder;
         }
+        markDirty();
         return this;
     }
 
