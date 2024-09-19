@@ -8,8 +8,8 @@ import java.util.function.Supplier;
 
 public class EnumValue<T extends Enum<T>> implements IEnumValue<T>, IIntValue<T> {
 
-    private final Class<T> enumClass;
-    private T value;
+    protected final Class<T> enumClass;
+    protected T value;
 
     public EnumValue(Class<T> enumClass, T value) {
         this.enumClass = enumClass;
@@ -33,7 +33,7 @@ public class EnumValue<T extends Enum<T>> implements IEnumValue<T>, IIntValue<T>
 
     @Override
     public void setIntValue(int val) {
-        setValue(this.enumClass.getEnumConstants()[0]);
+        setValue(this.enumClass.getEnumConstants()[val]);
     }
 
     @Override
@@ -43,9 +43,9 @@ public class EnumValue<T extends Enum<T>> implements IEnumValue<T>, IIntValue<T>
 
     public static class Dynamic<T extends Enum<T>> implements IEnumValue<T>, IIntValue<T> {
 
-        private final Class<T> enumClass;
-        private final Supplier<T> getter;
-        private final Consumer<T> setter;
+        protected final Class<T> enumClass;
+        protected final Supplier<T> getter;
+        protected final Consumer<T> setter;
 
         public Dynamic(Class<T> enumClass, Supplier<T> getter, Consumer<T> setter) {
             this.enumClass = enumClass;
