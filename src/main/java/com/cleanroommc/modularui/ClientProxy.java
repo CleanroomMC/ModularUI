@@ -37,8 +37,10 @@ public class ClientProxy extends CommonProxy {
         MinecraftForge.EVENT_BUS.register(OverlayManager.class);
         MinecraftForge.EVENT_BUS.register(KeyBindHandler.class);
 
-        if (ModularUIConfig.enabledTestGuis) {
+        if (ModularUIConfig.enableTestGuis) {
             MinecraftForge.EVENT_BUS.register(EventHandler.class);
+        }
+        if (ModularUIConfig.enableTestOverlays) {
             OverlayTest.init();
         }
 
