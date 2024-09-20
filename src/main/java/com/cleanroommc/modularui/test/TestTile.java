@@ -327,7 +327,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         return panel;
     }
 
-    public ModularPanel openSecondWindow(PanelSyncManager syncManager, PanelSyncHandler syncHandler) {
+    public ModularPanel openSecondWindow(PanelSyncManager syncManager, IPanelHandler syncHandler) {
         ModularPanel panel = new Dialog<>("second_window", null)
                 .setDisablePanelsBelow(false)
                 .setCloseOnOutOfBoundsClick(false)
@@ -355,7 +355,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         return panel;
     }
 
-    public ModularPanel openThirdWindow(PanelSyncManager syncManager, PanelSyncHandler syncHandler) {
+    public ModularPanel openThirdWindow(PanelSyncManager syncManager, IPanelHandler syncHandler) {
         ModularPanel panel = new Dialog<>("third_window", null)
                 .setDisablePanelsBelow(false)
                 .setCloseOnOutOfBoundsClick(false)
