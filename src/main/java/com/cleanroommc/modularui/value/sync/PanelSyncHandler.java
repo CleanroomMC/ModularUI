@@ -18,7 +18,7 @@ import java.util.Objects;
  * Register it in any {@link PanelSyncManager} (preferably the main one).
  * Then you can call {@link #openPanel()} and {@link #closePanel()} from any side.
  */
-public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
+public final class PanelSyncHandler extends SyncHandler implements IPanelHandler {
 
     private final IPanelBuilder panelBuilder;
     private final boolean subPanel;
@@ -117,6 +117,7 @@ public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
         return subPanel;
     }
 
+    @Override
     public boolean isPanelOpen() {
         return this.open;
     }
@@ -153,6 +154,6 @@ public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
          * @return the created panel
          */
         @NotNull
-        ModularPanel buildUI(@NotNull PanelSyncManager syncManager, @NotNull PanelSyncHandler syncHandler);
+        ModularPanel buildUI(@NotNull PanelSyncManager syncManager, @NotNull IPanelHandler syncHandler);
     }
 }

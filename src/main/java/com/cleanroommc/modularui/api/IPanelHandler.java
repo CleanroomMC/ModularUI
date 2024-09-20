@@ -34,6 +34,8 @@ public interface IPanelHandler {
         return new SecondaryPanel(parent, provider, subPanel);
     }
 
+    boolean isPanelOpen();
+
     /**
      * Opens the panel. If there is no cached panel, one will be created.
      * Can be called on both sides if this handler is synced.
