@@ -624,9 +624,13 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     @ApiStatus.Internal
-    public void setSyncHandler(@Nullable PanelSyncHandler syncHandler) {
+    @Override
+    public void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        if (!isValidSyncHandler(syncHandler))
+            throw new IllegalStateException("Panel SyncHandler's must implement IPanelHandler!");
+
         super.setSyncHandler(syncHandler);
-        setPanelHandler(syncHandler);
+        setPanelHandler((IPanelHandler) syncHandler);
     }
 
     @NotNull
