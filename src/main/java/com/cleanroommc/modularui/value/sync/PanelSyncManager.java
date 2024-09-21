@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.value.sync;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.IPanelSyncManager;
 import com.cleanroommc.modularui.screen.ContainerCustomizer;
@@ -98,6 +99,10 @@ public class PanelSyncManager implements IPanelSyncManager {
     }
 
     public void receiveWidgetUpdate(String mapKey, int id, PacketBuffer buf) throws IOException {
+        if (!this.syncHandlers.containsKey(mapKey)) {
+            ModularUI.LOGGER.warn("SyncHandler \"{}\" does not exist for panel \"{}\"! ID was {}.", mapKey, panelName, id);
+            return;
+        }
         SyncHandler syncHandler = this.syncHandlers.get(mapKey);
         if (isClient()) {
             syncHandler.readOnClient(id, buf);

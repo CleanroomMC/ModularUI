@@ -29,7 +29,7 @@ public class ModularSyncManager {
     protected static final String PLAYER_INVENTORY = "player_inventory";
     private static final String CURSOR_KEY = makeSyncKey("cursor_slot", 255255);
 
-    private final Map<String, PanelSyncManager> panelSyncManagerMap = new Object2ObjectOpenHashMap<>();
+    private final Map<String, IPanelSyncManager> panelSyncManagerMap = new Object2ObjectOpenHashMap<>();
     private PanelSyncManager mainPSM;
     private final ModularContainer container;
     private final CursorSlotSyncHandler cursorSlotSyncHandler = new CursorSlotSyncHandler();
@@ -65,8 +65,8 @@ public class ModularSyncManager {
         this.panelSyncManagerMap.values().forEach(IPanelSyncManager::onOpen);
     }
 
-    public PanelSyncManager getPanelSyncManager(String panelName) {
-        PanelSyncManager psm = this.panelSyncManagerMap.get(panelName);
+    public IPanelSyncManager getPanelSyncManager(String panelName) {
+        IPanelSyncManager psm = this.panelSyncManagerMap.get(panelName);
         if (psm != null) return psm;
         throw new NullPointerException("No PanelSyncManager found for name '" + panelName + "'!");
     }
@@ -88,13 +88,13 @@ public class ModularSyncManager {
         this.cursorSlotSyncHandler.sync();
     }
 
-    public void open(String name, PanelSyncManager syncManager) {
+    public void open(String name, IPanelSyncManager syncManager) {
         this.panelSyncManagerMap.put(name, syncManager);
         syncManager.initialize(name, this);
     }
 
     public void close(String name) {
-        PanelSyncManager psm = this.panelSyncManagerMap.remove(name);
+        IPanelSyncManager psm = this.panelSyncManagerMap.remove(name);
         if (psm != null) psm.onClose();
     }
 
@@ -120,8 +120,8 @@ public class ModularSyncManager {
 
     @Optional.Method(modid = ModularUI.BOGO_SORT)
     public void buildSortingContext(ISortingContextBuilder builder) {
-        for (PanelSyncManager psm : this.panelSyncManagerMap.values()) {
-            for (SlotGroup slotGroup : psm.getSlotGroups()) {
+        for (IPanelSyncManager ipsm : this.panelSyncManagerMap.values()) {
+            for (SlotGroup slotGroup : ipsm.getSlotGroups()) {
                 if (slotGroup.isAllowSorting() && !isPlayerSlot(slotGroup.getSlots().get(0))) {
                     builder.addSlotGroupOf(slotGroup.getSlots(), slotGroup.getRowSize())
                             .buttonPosSetter(null)
