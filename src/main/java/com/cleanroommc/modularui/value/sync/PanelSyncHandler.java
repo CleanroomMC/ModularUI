@@ -47,6 +47,7 @@ public final class PanelSyncHandler extends SyncHandler implements IPanelHandler
     }
 
     private void openPanel(boolean syncToServer) {
+        if (isPanelOpen()) return;
         boolean client = getSyncManager().isClient();
         if (syncToServer && client) {
             syncToServer(0);
@@ -59,7 +60,7 @@ public final class PanelSyncHandler extends SyncHandler implements IPanelHandler
             this.openedPanel = Objects.requireNonNull(createUI(this.syncManager));
             this.panelName = this.openedPanel.getName();
             this.openedPanel.setSyncHandler(this);
-            WidgetTree.collectSyncValues(getSyncManager(), this.openedPanel);
+            WidgetTree.collectSyncValues(this.syncManager, this.openedPanel, false);
             if (!client) {
                 this.openedPanel = null;
             }

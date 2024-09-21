@@ -45,7 +45,7 @@ public class PanelSyncManager implements IPanelSyncManager {
         this.panelName = panelName;
         this.syncHandlers.forEach((mapKey, syncHandler) -> syncHandler.init(mapKey, this));
         this.init = true;
-        this.subPanels.forEach((s, syncHandler) -> msm.getMainPSM().registerPanelSyncHandler(s, syncHandler));
+        this.subPanels.forEach(this::registerPanelSyncHandler);
     }
 
     private void registerPanelSyncHandler(String name, SyncHandler syncHandler) {
