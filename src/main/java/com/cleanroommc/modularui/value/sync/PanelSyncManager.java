@@ -83,8 +83,8 @@ public class PanelSyncManager implements IPanelSyncManager {
     public void onClose() {
         this.closeListener.forEach(listener -> listener.accept(getPlayer()));
         for (String name : this.subPanels.keySet()) {
-            SyncHandler sh = this.modularSyncManager.getMainPSM().syncHandlers.remove(name);
-            this.modularSyncManager.getMainPSM().reverseSyncHandlers.remove(sh);
+            SyncHandler sh = this.subPanels.get(name).getSyncManager().syncHandlers.remove(name);
+            this.subPanels.get(name).getSyncManager().reverseSyncHandlers.remove(sh);
         }
     }
 
@@ -202,9 +202,6 @@ public class PanelSyncManager implements IPanelSyncManager {
         if (sh != null) return (IPanelHandler) sh;
         PanelSyncHandler syncHandler = new PanelSyncHandler(panelBuilder, subPanel);
         this.subPanels.put(key, syncHandler);
-        if (isInitialised()) {
-            this.modularSyncManager.getMainPSM().registerPanelSyncHandler(key, syncHandler);
-        }
         return syncHandler;
     }
 
