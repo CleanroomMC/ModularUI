@@ -30,7 +30,7 @@ public class ModularSyncManager {
     private static final String CURSOR_KEY = makeSyncKey("cursor_slot", 255255);
 
     private final Map<String, IPanelSyncManager> panelSyncManagerMap = new Object2ObjectOpenHashMap<>();
-    private PanelSyncManager mainPSM;
+    private PanelSyncManager rootManager;
     private final ModularContainer container;
     private final CursorSlotSyncHandler cursorSlotSyncHandler = new CursorSlotSyncHandler();
 
@@ -39,18 +39,18 @@ public class ModularSyncManager {
     }
 
     @ApiStatus.Internal
-    public void construct(String mainPanelName, PanelSyncManager mainPSM) {
-        this.mainPSM = mainPSM;
-        if (this.mainPSM.getSlotGroup(PLAYER_INVENTORY) == null) {
-            this.mainPSM.bindPlayerInventory(getPlayer());
+    public void construct(String mainPanelName, PanelSyncManager rootManager) {
+        this.rootManager = rootManager;
+        if (this.rootManager.getSlotGroup(PLAYER_INVENTORY) == null) {
+            this.rootManager.bindPlayerInventory(getPlayer());
         }
-        open(mainPanelName, mainPSM);
-        mainPSM.syncValue(CURSOR_KEY, this.cursorSlotSyncHandler);
+        open(mainPanelName, rootManager);
+        rootManager.syncValue(CURSOR_KEY, this.cursorSlotSyncHandler);
     }
 
     // not sure why there was no getter before, need to check if this can be public
-    PanelSyncManager getMainPSM() {
-        return mainPSM;
+    PanelSyncManager getRootManager() {
+        return rootManager;
     }
 
     public void detectAndSendChanges(boolean init) {
