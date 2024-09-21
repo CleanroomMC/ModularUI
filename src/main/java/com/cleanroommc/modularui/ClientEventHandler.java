@@ -3,6 +3,8 @@ package com.cleanroommc.modularui;
 import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.drawable.Stencil;
 
+import com.cleanroommc.modularui.screen.ClientScreenHandler;
+
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -43,7 +45,7 @@ public class ClientEventHandler {
         if (hasDraggable(event)) {
             // cancel interactions with other mods
             try {
-                event.getGui().handleMouseInput();
+                ClientScreenHandler.onGuiInputLow(event);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -56,7 +58,7 @@ public class ClientEventHandler {
         if (hasDraggable(event)) {
             // cancel interactions with other mods
             try {
-                event.getGui().handleKeyboardInput();
+                ClientScreenHandler.onGuiInputLow(event);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

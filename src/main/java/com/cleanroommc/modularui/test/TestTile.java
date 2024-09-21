@@ -359,11 +359,12 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         ModularPanel panel = new Dialog<>("third_window", null)
                 .setDisablePanelsBelow(false)
                 .setCloseOnOutOfBoundsClick(false)
+                .setDraggable(true)
                 .size(50, 50);
         panel.child(ButtonWidget.panelCloseButton())
                 .child(IKey.str("3rd Panel")
                         .asWidget()
-                        .pos(5, 5));
+                        .pos(5, 17));
         return panel;
     }
 
