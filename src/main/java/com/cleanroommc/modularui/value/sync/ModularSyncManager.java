@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.IPanelSyncManager;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import com.cleanroommc.bogosorter.api.ISortingContextBuilder;
@@ -29,7 +28,7 @@ public class ModularSyncManager {
     protected static final String PLAYER_INVENTORY = "player_inventory";
     private static final String CURSOR_KEY = makeSyncKey("cursor_slot", 255255);
 
-    private final Map<String, IPanelSyncManager> panelSyncManagerMap = new Object2ObjectOpenHashMap<>();
+    private final Map<String, PanelSyncManager> panelSyncManagerMap = new Object2ObjectOpenHashMap<>();
     private PanelSyncManager rootManager;
     private final ModularContainer container;
     private final CursorSlotSyncHandler cursorSlotSyncHandler = new CursorSlotSyncHandler();
@@ -58,15 +57,15 @@ public class ModularSyncManager {
     }
 
     public void onClose() {
-        this.panelSyncManagerMap.values().forEach(IPanelSyncManager::onClose);
+        this.panelSyncManagerMap.values().forEach(PanelSyncManager::onClose);
     }
 
     public void onOpen() {
-        this.panelSyncManagerMap.values().forEach(IPanelSyncManager::onOpen);
+        this.panelSyncManagerMap.values().forEach(PanelSyncManager::onOpen);
     }
 
-    public IPanelSyncManager getPanelSyncManager(String panelName) {
-        IPanelSyncManager psm = this.panelSyncManagerMap.get(panelName);
+    public PanelSyncManager getPanelSyncManager(String panelName) {
+        PanelSyncManager psm = this.panelSyncManagerMap.get(panelName);
         if (psm != null) return psm;
         throw new NullPointerException("No PanelSyncManager found for name '" + panelName + "'!");
     }
@@ -88,13 +87,13 @@ public class ModularSyncManager {
         this.cursorSlotSyncHandler.sync();
     }
 
-    public void open(String name, IPanelSyncManager syncManager) {
+    public void open(String name, PanelSyncManager syncManager) {
         this.panelSyncManagerMap.put(name, syncManager);
         syncManager.initialize(name, this);
     }
 
     public void close(String name) {
-        IPanelSyncManager psm = this.panelSyncManagerMap.remove(name);
+        PanelSyncManager psm = this.panelSyncManagerMap.remove(name);
         if (psm != null) psm.onClose();
     }
 
@@ -120,8 +119,8 @@ public class ModularSyncManager {
 
     @Optional.Method(modid = ModularUI.BOGO_SORT)
     public void buildSortingContext(ISortingContextBuilder builder) {
-        for (IPanelSyncManager ipsm : this.panelSyncManagerMap.values()) {
-            for (SlotGroup slotGroup : ipsm.getSlotGroups()) {
+        for (PanelSyncManager psm : this.panelSyncManagerMap.values()) {
+            for (SlotGroup slotGroup : psm.getSlotGroups()) {
                 if (slotGroup.isAllowSorting() && !isPlayerSlot(slotGroup.getSlots().get(0))) {
                     builder.addSlotGroupOf(slotGroup.getSlots(), slotGroup.getRowSize())
                             .buttonPosSetter(null)

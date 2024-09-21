@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IPanelHandler;
-import com.cleanroommc.modularui.api.IPanelSyncManager;
 import com.cleanroommc.modularui.screen.ContainerCustomizer;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
@@ -23,7 +22,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class PanelSyncManager implements IPanelSyncManager {
+public class PanelSyncManager {
 
     private final Map<String, SyncHandler> syncHandlers = new Object2ObjectLinkedOpenHashMap<>();
     private final Map<String, SlotGroup> slotGroups = new Object2ObjectOpenHashMap<>();
