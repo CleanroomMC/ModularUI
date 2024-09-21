@@ -363,6 +363,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                 .size(50, 50);
         panel.child(ButtonWidget.panelCloseButton())
                 .child(IKey.str("3rd Panel")
+                        .shadow(true)
                         .asWidget()
                         .pos(5, 17));
         return panel;
