@@ -48,7 +48,7 @@ public class ModularContainer extends Container implements ISortableContainer {
     private ContainerCustomizer containerCustomizer;
 
     @SideOnly(Side.CLIENT)
-    private ModularScreen optionalScreen = null;
+    private ModularScreen optionalScreen;
 
     public ModularContainer(EntityPlayer player, PanelSyncManager panelSyncManager, String mainPanelName) {
         this.player = player;
