@@ -53,7 +53,7 @@ import java.io.IOException;
 import java.util.Set;
 
 @OnlyIn(Dist.CLIENT)
-public abstract class GuiScreenWrapper extends AbstractContainerScreen {
+public class GuiScreenWrapper extends AbstractContainerScreen {
 
     private final ModularScreen screen;
     private boolean init = true;
@@ -62,8 +62,8 @@ public abstract class GuiScreenWrapper extends AbstractContainerScreen {
     private int fps, frameCount = 0;
     private long timer = Minecraft.getSystemTime();
 
-    public GuiScreenWrapper(ModularContainer container, ModularScreen screen, Inventory playerInv, Component title) {
-        super(container, playerInv, title);
+    public GuiScreenWrapper(ModularContainer container, ModularScreen screen, Inventory playerInv) {
+        super(container, playerInv, Component.literal(""));
         this.screen = screen;
         this.screen.construct(this);
         container.setScreen(this.screen);
@@ -192,6 +192,11 @@ public abstract class GuiScreenWrapper extends AbstractContainerScreen {
         RenderHelper.enableStandardItemLighting();
 
         Stencil.remove();
+    }
+
+    @Override
+    protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
+
     }
 
     @Override

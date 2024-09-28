@@ -6,6 +6,8 @@ import com.cleanroommc.modularui.integration.jei.GhostIngredientTarget;
 import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
 import com.cleanroommc.modularui.integration.jei.JeiState;
 
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -27,7 +29,7 @@ import java.util.stream.Collectors;
  * By default, JEI is disabled in client only GUIs.
  * This class can be safely interacted with even when JEI/HEI is not installed.
  */
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class JeiSettingsImpl implements JeiSettings {
 
     private JeiState jeiState = JeiState.DEFAULT;

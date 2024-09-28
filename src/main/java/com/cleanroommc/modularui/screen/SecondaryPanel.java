@@ -3,7 +3,7 @@ package com.cleanroommc.modularui.screen;
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.widget.WidgetTree;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.entity.player.Player;
 
 import org.jetbrains.annotations.ApiStatus;
 
@@ -70,6 +70,6 @@ public class SecondaryPanel implements IPanelHandler {
 
     public interface IPanelBuilder {
 
-        ModularPanel build(ModularPanel mainPanel, EntityPlayer player);
+        ModularPanel build(ModularPanel mainPanel, Player player);
     }
 }

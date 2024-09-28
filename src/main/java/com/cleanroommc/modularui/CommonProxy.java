@@ -13,7 +13,6 @@ import com.cleanroommc.modularui.test.TestBlock;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 
 import net.minecraft.client.Timer;
-import net.minecraft.util.Timer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -21,6 +20,7 @@ import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.PlayerContainerEvent;
+import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
@@ -31,8 +31,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class CommonProxy {
@@ -57,8 +55,8 @@ public class CommonProxy {
     }
 
     @SubscribeEvent
-    void onServerLoad(FMLServerStartingEvent event) {
-        event.registerServerCommand(new ItemEditorGui.Command());
+    void onServerLoad(ServerStartingEvent event) {
+        //event.registerServerCommand(new ItemEditorGui.Command());
     }
 
     @OnlyIn(Dist.CLIENT)

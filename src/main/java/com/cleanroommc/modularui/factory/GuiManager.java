@@ -16,10 +16,15 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerContainerEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -77,15 +82,15 @@ public class GuiManager {
         factory.writeGuiData(guiData, buffer);
         NetworkHandler.sendToPlayer(new OpenGuiPacket<>(windowId, factory, buffer), player);
         // open container // this mimics forge behaviour
-        player.openContainer = container;
-        player.openContainer.windowId = windowId;
-        player.openContainer.addListener(player);
+        player.containerMenu = container;
+        player.containerMenu.containerId = windowId;
+        player.containerMenu.addSlotListener(player.containerListener);
         // finally invoke event
         MinecraftForge.EVENT_BUS.post(new PlayerContainerEvent.Open(player, container));
     }
 
-    @SideOnly(Side.CLIENT)
-    public static <T extends GuiData> void open(int windowId, @NotNull UIFactory<T> factory, @NotNull PacketBuffer data, @NotNull EntityPlayerSP player) {
+    @OnlyIn(Dist.CLIENT)
+    public static <T extends GuiData> void open(int windowId, @NotNull UIFactory<T> factory, @NotNull FriendlyByteBuf data, @NotNull Player player) {
         T guiData = factory.readGuiData(player, data);
         JeiSettingsImpl jeiSettings = new JeiSettingsImpl();
         guiData.setJeiSettings(jeiSettings);
@@ -94,17 +99,17 @@ public class GuiManager {
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularScreen screen = factory.createScreen(guiData, panel);
         screen.getContext().setJeiSettings(jeiSettings);
-        GuiScreenWrapper guiScreenWrapper = new GuiScreenWrapper(new ModularContainer(player, syncManager, panel.getName()), screen);
-        guiScreenWrapper.inventorySlots.windowId = windowId;
-        Minecraft.getMinecraft().displayGuiScreen(guiScreenWrapper);
-        player.openContainer = guiScreenWrapper.inventorySlots;
+        GuiScreenWrapper guiScreenWrapper = new GuiScreenWrapper(new ModularContainer(player, syncManager, panel.getName()), screen, player.getInventory(), );
+        guiScreenWrapper.getMenu().containerId = windowId;
+        Minecraft.getInstance().setScreen(guiScreenWrapper);
+        player.containerMenu = guiScreenWrapper.getMenu();
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     static void openScreen(ModularScreen screen, JeiSettingsImpl jeiSettings, ContainerCustomizer containerCustomizer) {
         screen.getContext().setJeiSettings(jeiSettings);
-        GuiScreenWrapper screenWrapper = new GuiScreenWrapper(new ModularContainer(containerCustomizer), screen);
-        Minecraft.getMinecraft().displayGuiScreen(screenWrapper);
+        GuiScreenWrapper screenWrapper = new GuiScreenWrapper(new ModularContainer(containerCustomizer), screen, null);
+        Minecraft.getInstance().setScreen(screenWrapper);
     }
 
     @SubscribeEvent
@@ -116,17 +121,17 @@ public class GuiManager {
 
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
-    public static void onGuiOpen(GuiOpenEvent event) {
-        if (lastMui != null && event.getGui() == null) {
+    public static void onGuiOpen(ScreenEvent event) {
+        if (lastMui != null && event.getScreen() == null) {
             if (lastMui.getScreen().getPanelManager().isOpen()) {
                 lastMui.getScreen().getPanelManager().closeAll();
             }
             lastMui.getScreen().getPanelManager().dispose();
             lastMui = null;
-        } else if (event.getGui() instanceof GuiScreenWrapper screenWrapper) {
+        } else if (event.getScreen() instanceof GuiScreenWrapper screenWrapper) {
             if (lastMui == null) {
                 lastMui = screenWrapper;
-            } else if (lastMui == event.getGui()) {
+            } else if (lastMui == event.getScreen()) {
                 lastMui.getScreen().getPanelManager().reopen();
             } else {
                 if (lastMui.getScreen().getPanelManager().isOpen()) {

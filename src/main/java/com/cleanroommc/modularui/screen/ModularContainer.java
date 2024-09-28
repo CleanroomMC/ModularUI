@@ -17,11 +17,13 @@ import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.common.Optional.Interface;
@@ -48,7 +50,7 @@ public class ModularContainer extends AbstractContainerMenu { //  implements ISo
     private final Player player;
     private final ModularSyncManager syncManager;
     private boolean init = true;
-    private final List<ModularSlot> slots = new ArrayList<>();
+    private final List<ModularSlot> modularSlots = new ArrayList<>();
     private final List<ModularSlot> shiftClickSlots = new ArrayList<>();
     private ContainerCustomizer containerCustomizer;
 
@@ -112,26 +114,29 @@ public class ModularContainer extends AbstractContainerMenu { //  implements ISo
     }
 
     @Override
-    public void setAll(@NotNull List<ItemStack> items) {
-        if (this.inventorySlots.size() != items.size()) {
-            ModularUI.LOGGER.error("Here are {} slots, but expected {}", this.inventorySlots.size(), items.size());
+    public void initializeContents(int stateId, @NotNull List<ItemStack> items, ItemStack carried) {
+        if (this.modularSlots.size() != items.size()) {
+            ModularUI.LOGGER.error("Here are {} slots, but expected {}", this.modularSlots.size(), items.size());
         }
-        for (int i = 0; i < Math.min(this.inventorySlots.size(), items.size()); ++i) {
-            this.getSlot(i).putStack(items.get(i));
+        for (int i = 0; i < Math.min(this.modularSlots.size(), items.size()); ++i) {
+            this.getSlot(i).set(items.get(i));
         }
+
+        setCarried(carried);
+        this.stateId = stateId;
     }
 
     @ApiStatus.Internal
     public void registerSlot(String panelName, ModularSlot slot) {
-        if (this.inventorySlots.contains(slot)) {
+        if (this.modularSlots.contains(slot)) {
             throw new IllegalArgumentException("Tried to register slot which already exists!");
         }
-        addSlotToContainer(slot);
-        this.slots.add(slot);
+        addSlot(slot);
+        this.modularSlots.add(slot);
         if (slot.getSlotGroupName() != null) {
             SlotGroup slotGroup = getSyncManager().getSlotGroup(panelName, slot.getSlotGroupName());
             if (slotGroup == null) {
-                ModularUI.LOGGER.throwing(new IllegalArgumentException("SlotGroup '" + slot.getSlotGroupName() + "' is not registered!"));
+                //ModularUI.LOGGER.(new IllegalArgumentException("SlotGroup '" + slot.getSlotGroupName() + "' is not registered!"));
                 return;
             }
             slot.slotGroup(slotGroup);
@@ -187,7 +192,7 @@ public class ModularContainer extends AbstractContainerMenu { //  implements ISo
     }
 
     public ModularSlot getModularSlot(int index) {
-        return this.slots.get(index);
+        return this.modularSlots.get(index);
     }
 
     public List<ModularSlot> getShiftClickSlots() {
@@ -195,56 +200,56 @@ public class ModularContainer extends AbstractContainerMenu { //  implements ISo
     }
 
     @Override
-    public boolean canInteractWith(@NotNull Player playerIn) {
+    public boolean stillValid(@NotNull Player playerIn) {
         return true;
     }
 
     @Override
-    public @NotNull ItemStack slotClick(int slotId, int mouseButton, @NotNull ClickType clickTypeIn, @NotNull EntityPlayer player) {
-        return this.containerCustomizer.slotClick(slotId, mouseButton, clickTypeIn, player);
+    public void clicked(int slotId, int mouseButton, @NotNull ClickType clickTypeIn, @NotNull Player player) {
+        this.containerCustomizer.slotClick(slotId, mouseButton, clickTypeIn, player);
     }
 
-    public @NotNull ItemStack superSlotClick(int slotId, int mouseButton, @NotNull ClickType clickTypeIn, @NotNull EntityPlayer player) {
-        return super.slotClick(slotId, mouseButton, clickTypeIn, player);
-    }
-
-    @Override
-    public @NotNull ItemStack transferStackInSlot(@NotNull EntityPlayer playerIn, int index) {
-        return this.containerCustomizer.transferStackInSlot(playerIn, index);
-    }
-
-    public @NotNull ItemStack superTransferStackInSlot(@NotNull EntityPlayer playerIn, int index) {
-        return this.containerCustomizer.transferStackInSlot(playerIn, index);
+    public @NotNull void superSlotClick(int slotId, int mouseButton, @NotNull ClickType clickTypeIn, @NotNull Player player) {
+        super.clicked(slotId, mouseButton, clickTypeIn, player);
     }
 
     @Override
-    public boolean canMergeSlot(@NotNull ItemStack stack, @NotNull Slot slotIn) {
+    public @NotNull ItemStack quickMoveStack(@NotNull Player playerIn, int index) {
+        return this.containerCustomizer.transferStackInSlot(playerIn, index);
+    }
+
+    public @NotNull ItemStack superTransferStackInSlot(@NotNull Player playerIn, int index) {
+        return this.containerCustomizer.transferStackInSlot(playerIn, index);
+    }
+
+    @Override
+    public boolean canTakeItemForPickAll(@NotNull ItemStack stack, @NotNull Slot slotIn) {
         return this.containerCustomizer.canMergeSlot(stack, slotIn);
     }
 
     public boolean superCanMergeSlot(@NotNull ItemStack stack, @NotNull Slot slotIn) {
-        return super.canMergeSlot(stack, slotIn);
+        return super.canTakeItemForPickAll(stack, slotIn);
     }
 
     @Override
-    protected boolean mergeItemStack(@NotNull ItemStack stack, int startIndex, int endIndex, boolean reverseDirection) {
+    protected boolean moveItemStackTo(@NotNull ItemStack stack, int startIndex, int endIndex, boolean reverseDirection) {
         return this.containerCustomizer.mergeItemStack(stack, startIndex, endIndex, reverseDirection);
     }
 
     public boolean superMergeItemStack(@NotNull ItemStack stack, int startIndex, int endIndex, boolean reverseDirection) {
-        return super.mergeItemStack(stack, startIndex, endIndex, reverseDirection);
+        return super.moveItemStackTo(stack, startIndex, endIndex, reverseDirection);
     }
 
     @Override
-    protected void clearContainer(@NotNull EntityPlayer playerIn, @NotNull World worldIn, @NotNull IInventory inventoryIn) {
-        this.containerCustomizer.clearContainer(playerIn, worldIn, inventoryIn);
+    protected void clearContainer(@NotNull Player playerIn, @NotNull Container inventoryIn) {
+        this.containerCustomizer.clearContainer(playerIn, inventoryIn);
     }
 
-    public void superClearContainer(@NotNull EntityPlayer playerIn, @NotNull World worldIn, @NotNull IInventory inventoryIn) {
-        super.clearContainer(playerIn, worldIn, inventoryIn);
+    public void superClearContainer(@NotNull Player playerIn, @NotNull Container inventoryIn) {
+        super.clearContainer(playerIn, inventoryIn);
     }
 
-    @Override
+    /*@Override
     public void buildSortingContext(ISortingContextBuilder builder) {
         if (this.syncManager != null) {
             this.syncManager.buildSortingContext(builder);
@@ -254,5 +259,5 @@ public class ModularContainer extends AbstractContainerMenu { //  implements ISo
     @Override
     public IPosSetter getPlayerButtonPosSetter() {
         return null;
-    }
+    }*/
 }

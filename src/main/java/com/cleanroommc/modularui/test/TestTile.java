@@ -31,7 +31,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 
@@ -40,10 +42,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
-public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITickable {
+public class TestTile extends BlockEntity implements IGuiHolder<PosGuiData>,  {
 
-    private final FluidTank fluidTank = new FluidTank(10000);
-    private final FluidTank fluidTankPhantom = new FluidTank(Integer.MAX_VALUE);
+    private final IFluidTank fluidTank = new FluidTank(10000);
+    private final IFluidTank fluidTankPhantom = new FluidTank(Integer.MAX_VALUE);
     private long time = 0;
     private int val, val2 = 0;
     private String value = "";
@@ -62,8 +64,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
 
     private final ItemStackHandler mixerItems = new ItemStackHandler(4);
     private final ItemStackHandler smallInv = new ItemStackHandler(4);
-    private final FluidTank mixerFluids1 = new FluidTank(16000);
-    private final FluidTank mixerFluids2 = new FluidTank(16000);
+    private final IFluidTank mixerFluids1 = new FluidTank(16000);
+    private final IFluidTank mixerFluids2 = new FluidTank(16000);
 
     private int num = 2;
 
