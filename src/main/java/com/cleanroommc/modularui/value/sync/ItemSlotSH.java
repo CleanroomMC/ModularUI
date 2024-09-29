@@ -83,13 +83,15 @@ public class ItemSlotSH extends SyncHandler {
             setEnabled(buf.readBoolean(), false);
         } else if (id == 5) {
             if (!isPhantom()) return;
-            ItemStack stack = buf.readItemStack();
-            this.slot.putStack(stack);
+            phantomClick(MouseData.create(0), buf.readItemStack());
         }
     }
 
     protected void phantomClick(MouseData mouseData) {
-        ItemStack cursorStack = getSyncManager().getCursorItem();
+        phantomClick(mouseData, getSyncManager().getCursorItem());
+    }
+
+    protected void phantomClick(MouseData mouseData, ItemStack cursorStack) {
         ItemStack slotStack = getSlot().getStack();
         ItemStack stackToPut;
         if (!cursorStack.isEmpty() && !slotStack.isEmpty() && !ItemHandlerHelper.canItemStacksStack(cursorStack, slotStack)) {
@@ -97,6 +99,7 @@ public class ItemSlotSH extends SyncHandler {
             if (mouseData.mouseButton == 1) {
                 stackToPut.setCount(1);
             }
+            stackToPut.setCount(Math.min(stackToPut.getCount(), slot.getItemStackLimit(stackToPut)));
             getSlot().putStack(stackToPut);
             this.lastStoredPhantomItem = stackToPut.copy();
         } else if (slotStack.isEmpty()) {
@@ -112,6 +115,7 @@ public class ItemSlotSH extends SyncHandler {
             if (mouseData.mouseButton == 1) {
                 stackToPut.setCount(1);
             }
+            stackToPut.setCount(Math.min(stackToPut.getCount(), slot.getItemStackLimit(stackToPut)));
             getSlot().putStack(stackToPut);
             this.lastStoredPhantomItem = stackToPut.copy();
         } else {
