@@ -2,12 +2,14 @@ package com.cleanroommc.modularui.holoui;
 
 import com.cleanroommc.modularui.utils.GuiUtils;
 
+import com.cleanroommc.modularui.utils.Matrix4f;
+
+import com.cleanroommc.modularui.utils.Vector3f;
+
 import net.minecraft.client.renderer.GlStateManager;
 
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.ApiStatus;
-import org.lwjgl.util.vector.Matrix4f;
-import org.lwjgl.util.vector.Vector3f;
 
 /**
  * Highly experimental
