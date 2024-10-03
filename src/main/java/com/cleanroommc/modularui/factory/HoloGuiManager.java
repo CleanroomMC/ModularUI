@@ -88,7 +88,7 @@ public class HoloGuiManager extends GuiManager {
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularScreen screen = factory.createScreen(guiData, panel);
         screen.getContext().setJeiSettings(jeiSettings);
-        GuiScreenWrapper guiScreenWrapper = new GuiScreenWrapper(new ModularContainer(player, syncManager, panel.getName()), screen);
+        GuiContainerWrapper guiScreenWrapper = new GuiContainerWrapper(new ModularContainer(player, syncManager, panel.getName()), screen);
         guiScreenWrapper.inventorySlots.windowId = windowId;
         HoloUI.builder()
 //                .screenScale(0.25f)

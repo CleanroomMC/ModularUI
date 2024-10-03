@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.holoui;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.screen.GuiContainerWrapper;
 import com.cleanroommc.modularui.utils.Animator;
 
@@ -57,8 +56,8 @@ public class ScreenEntityRender extends Render<HoloScreenEntity> {
             plane3D.transform();
         }
         var mouse = calculateMousePos(player.getPositionVector().add(0, player.getEyeHeight(), 0), entity, player.getLookVec());
-        screenWrapper.drawScreen(mouse.getX(), mouse.getY(), partialTicks);
-//        screen.drawScreen(mouse.getX(), mouse.getY(), partialTicks);
+//        screenWrapper.drawScreen(mouse.getX(), mouse.getY(), partialTicks);
+        screen.drawScreen(mouse.getX(), mouse.getY(), partialTicks);
         screen.onFrameUpdate();
 
         UUID id = player.getUniqueID();

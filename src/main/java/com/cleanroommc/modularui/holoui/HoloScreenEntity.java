@@ -1,9 +1,6 @@
 package com.cleanroommc.modularui.holoui;
 
-import com.cleanroommc.modularui.screen.GuiScreenWrapper;
-import com.cleanroommc.modularui.screen.ModularContainer;
-import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.*;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;

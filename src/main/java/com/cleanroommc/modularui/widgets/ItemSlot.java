@@ -221,8 +221,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         }
 
         float z = 100f;
-        // todo fix
-        ((GuiAccessor) guiScreen).setZLevel(z);
+        float zStart = ((GuiAccessor) guiScreen).getZLevel();
+        ((GuiAccessor) guiScreen).setZLevel(zStart + z);
         renderItem.zLevel += z;
 
         if (!flag1) {
@@ -235,7 +235,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 // render the item itself
 //                renderItem.renderItemAndEffectIntoGUI(guiScreen.mc.player, itemstack, 1, 1);
 //                guiScreen.getItemRenderer().renderItemAndEffectIntoGUI(guiScreen.mc.player, itemstack, 1, 1);
-                guiScreen.drawItem(itemstack, 1, 1);
+                renderItem.renderItemIntoGUI(itemstack, 1, 1);
                 if (amount < 0) {
                     amount = itemstack.getCount();
                 }
@@ -276,8 +276,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             }
         }
 
-        // todo fix
-        ((GuiAccessor) guiScreen).setZLevel(0f);
+        ((GuiAccessor) guiScreen).setZLevel(zStart);
         renderItem.zLevel -= z;
     }
 
