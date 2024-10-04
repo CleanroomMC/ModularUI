@@ -52,7 +52,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
     @Override
     public void setValue(@Nullable FluidStack value, boolean setSource, boolean sync) {
         this.cache = copyFluid(value);
-        if (setSource && !NetworkUtils.isClient()) {
+        if (setSource) {
             this.fluidTank.drain(Integer.MAX_VALUE, true);
             if (!isFluidEmpty(value)) {
                 this.fluidTank.fill(value.copy(), true);
