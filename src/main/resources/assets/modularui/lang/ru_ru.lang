@@ -1,0 +1,15 @@
+
+
+modularui.test=Лорен Ипсум\n2. Строка
+modularui.tooltip.shift=§bЗажмите Shift
+modularui.decrement.tooltip=§7Нажмите для уменьшения на §by §6%d§7\nC зажатым Shift [§6%d§7], ctrl[§6%d§7] или shift+ctrl[§6%d§7]
+modularui.amount=§9Кол-во: %,d
+modularui.fluid.empty=Пусто
+modularui.fluid.amount=§9Кол-во: %s/%s %s
+modularui.fluid.phantom.amount=§9Кол-во: %s %s
+modularui.increment.tooltip=§7Нажмите для увеличения на §by §6%d§7\nC зажатым Shift [§6%d§7], ctrl[§6%d§7] или shift+ctrl[§6%d§7]
+modularui.item.phantom.control=§7Колесо прокрутки вверх увеличивает количество, вниз уменьшает.\n§7Shift[§6x4§7],Ctrl[§ex16§7],Alt[§ax64§7]\n§7ПКМ увеличивает кол-во, левый уменьшает.\n§7Shift + ЛКМ для очистки.
+modularui.fluid.click_to_fill=§bЛКМ§7 с Емкостью для Жидкости для §bзаполнения §7хранилища (Shift-ЛКМ для полного комплекта).
+modularui.fluid.click_combined=§bПКМ§7 или §bЛКМ§7 с Емкостью содержащей жидкость для §bопустошения§7 или §bзаполнения§7 емкости (Shift-ЛКМ для полного комплекта).
+modularui.fluid.click_to_empty=§bПКМ§7 с Емкостью содержащей жидкость для §bопустошения§7 емкости (Shift-ЛКМ для полного комплекта).
+modularui.fluid.phantom.control=§7Колесо прокрутки вверх увеличивает количество, вниз уменьшает.\n§7Shift[§6x10§r],Ctrl[§ex100§r],Shift+Ctrl[§ax1000§r]\n§7ПКМ увеличивает кол-во, левый уменьшает.\n§7Shift + ЛКМ для очистки.
