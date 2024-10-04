@@ -324,6 +324,11 @@ public class TextFieldHandler {
         setCursor(this.cursor.y + 1, 0, false);
     }
 
+    public void clear() {
+        markAll();
+        delete();
+    }
+
     public void delete() {
         delete(false);
     }

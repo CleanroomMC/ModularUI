@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
+import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.widget.IFocusedWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -38,11 +40,15 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     public static final Pattern ANY = Pattern.compile(".*");
     private static final Pattern BASE_PATTERN = Pattern.compile("[^§]");
 
+    private static final int CURSOR_BLINK_RATE = 10;
+
     protected TextFieldHandler handler = new TextFieldHandler(this);
     protected TextFieldRenderer renderer = new TextFieldRenderer(this.handler);
     protected Alignment textAlignment = Alignment.CenterLeft;
+    protected List<String> lastText;
     protected int scrollOffset = 0;
     protected float scale = 1f;
+    protected boolean focusOnGuiOpen;
     private int cursorTimer;
 
     protected boolean changedTextColor = false;
@@ -74,9 +80,18 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     }
 
     @Override
+    public void afterInit() {
+        super.afterInit();
+        if (this.focusOnGuiOpen) {
+            getContext().focus(this);
+            this.handler.markAll();
+        }
+    }
+
+    @Override
     public void onUpdate() {
         super.onUpdate();
-        if (isFocused() && ++this.cursorTimer == 30) {
+        if (isFocused() && ++this.cursorTimer == CURSOR_BLINK_RATE) {
             this.renderer.toggleCursor();
             this.cursorTimer = 0;
         }
@@ -113,6 +128,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     public void onFocus(ModularGuiContext context) {
         this.cursorTimer = 0;
         this.renderer.setCursor(true);
+        this.lastText = new ArrayList<>(this.handler.getText());
     }
 
     @Override
@@ -132,9 +148,13 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
         if (!isHovering()) {
             return Result.IGNORE;
         }
-        int x = getContext().getMouseX() + getScrollX();
-        int y = getContext().getMouseY() + getScrollY();
-        this.handler.setCursor(this.renderer.getCursorPos(this.handler.getText(), x, y), true);
+        if (mouseButton == 1) {
+            this.handler.clear();
+        } else {
+            int x = getContext().getMouseX() + getScrollX();
+            int y = getContext().getMouseY() + getScrollY();
+            this.handler.setCursor(this.renderer.getCursorPos(this.handler.getText(), x, y), true);
+        }
         return Result.SUCCESS;
     }
 
@@ -161,6 +181,10 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
                 }
                 return Result.SUCCESS;
             case Keyboard.KEY_ESCAPE:
+                if (ModularUIConfig.escRestoreLastText) {
+                    this.handler.clear();
+                    this.handler.insert(this.lastText);
+                }
                 getContext().removeFocus();
                 return Result.SUCCESS;
             case Keyboard.KEY_LEFT: {
@@ -196,8 +220,11 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
             GuiScreen.setClipboardString(this.handler.getSelectedText());
             return Result.SUCCESS;
         } else if (GuiScreen.isKeyComboCtrlV(keyCode)) {
+            if (this.handler.hasTextMarked()) {
+                this.handler.delete();
+            }
             // paste copied text in marked text
-            this.handler.insert(GuiScreen.getClipboardString());
+            this.handler.insert(GuiScreen.getClipboardString().replace("§", ""));
             return Result.SUCCESS;
         } else if (GuiScreen.isKeyComboCtrlX(keyCode) && this.handler.hasTextMarked()) {
             // copy and delete copied text
@@ -208,7 +235,10 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
             // mark whole text
             this.handler.markAll();
             return Result.SUCCESS;
-        } else if (BASE_PATTERN.matcher(String.valueOf(character)).matches()) {
+        } else if (BASE_PATTERN.matcher(String.valueOf(character)).matches() && handler.test(String.valueOf(character))) {
+            if (this.handler.hasTextMarked()) {
+                this.handler.delete();
+            }
             // insert typed char
             this.handler.insert(String.valueOf(character));
             return Result.SUCCESS;
@@ -222,6 +252,10 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
 
     public ScrollData getScrollData() {
         return getScrollArea().getScrollX();
+    }
+
+    public List<String> getLastText() {
+        return lastText;
     }
 
     public W setTextAlignment(Alignment textAlignment) {
@@ -254,6 +288,11 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     public W setTextColor(int color) {
         this.renderer.setColor(color);
         this.changedTextColor = true;
+        return getThis();
+    }
+
+    public W setFocusOnGuiOpen(boolean focusOnGuiOpen) {
+        this.focusOnGuiOpen = focusOnGuiOpen;
         return getThis();
     }
 

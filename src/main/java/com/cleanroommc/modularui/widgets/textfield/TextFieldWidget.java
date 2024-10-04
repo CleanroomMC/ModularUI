@@ -30,17 +30,26 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     private IStringValue<?> stringValue;
     private Function<String, String> validator = val -> val;
     private boolean numbers = false;
+    private String mathFailMessage = null;
+    private double defaultNumber = 0;
 
     protected boolean changedMarkedColor = false;
 
-    public static IMathValue parse(String num) {
+    public IMathValue parse(String num) {
         try {
-            return MathBuilder.INSTANCE.parse(num);
+            IMathValue ret = MathBuilder.INSTANCE.parse(num);
+            this.mathFailMessage = null;
+            return ret;
+        } catch (MathBuilder.ParseException e) {
+            this.mathFailMessage = e.getMessage();
         } catch (Exception e) {
-            ModularUI.LOGGER.error("Failed to parse {} in TextFieldWidget", num);
             ModularUI.LOGGER.catching(e);
         }
-        return new Constant(0);
+        return new Constant(this.defaultNumber);
+    }
+
+    public IStringValue<?> createMathFailMessageValue() {
+        return new StringValue.Dynamic(() -> this.mathFailMessage, val -> this.mathFailMessage = val);
     }
 
     @Override
@@ -182,14 +191,18 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     public TextFieldWidget setNumbersLong(Function<Long, Long> validator) {
-        //setPattern(WHOLE_NUMS);
         this.numbers = true;
         setValidator(val -> {
             long num;
             if (val.isEmpty()) {
-                num = 0;
+                num = (long) this.defaultNumber;
             } else {
-                num = (long) parse(val).doubleValue();
+                try {
+                    num = (long) parse(val).doubleValue();
+                } catch (IMathValue.EvaluateException e) {
+                    this.mathFailMessage = e.getMessage();
+                    num = (long) this.defaultNumber;
+                }
             }
             return format.format(validator.apply(num));
         });
@@ -197,28 +210,36 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     public TextFieldWidget setNumbers(Function<Integer, Integer> validator) {
-        //setPattern(WHOLE_NUMS);
         this.numbers = true;
         return setValidator(val -> {
             int num;
             if (val.isEmpty()) {
-                num = 0;
+                num = (int) this.defaultNumber;
             } else {
-                num = (int) parse(val).doubleValue();
+                try {
+                    num = (int) parse(val).doubleValue();
+                } catch (IMathValue.EvaluateException e) {
+                    this.mathFailMessage = e.getMessage();
+                    num = (int) this.defaultNumber;
+                }
             }
             return format.format(validator.apply(num));
         });
     }
 
     public TextFieldWidget setNumbersDouble(Function<Double, Double> validator) {
-        //setPattern(DECIMALS);
         this.numbers = true;
         return setValidator(val -> {
             double num;
             if (val.isEmpty()) {
-                num = 0;
+                num = this.defaultNumber;
             } else {
-                num = parse(val).doubleValue();
+                try {
+                    num = parse(val).doubleValue();
+                } catch (IMathValue.EvaluateException e) {
+                    this.mathFailMessage = e.getMessage();
+                    num = this.defaultNumber;
+                }
             }
             return format.format(validator.apply(num));
         });
@@ -238,6 +259,11 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
     public TextFieldWidget setNumbers() {
         return setNumbers(Integer.MIN_VALUE, Integer.MAX_VALUE);
+    }
+
+    public TextFieldWidget setDefaultNumber(double defaultNumber) {
+        this.defaultNumber = defaultNumber;
+        return this;
     }
 
     public TextFieldWidget value(IStringValue<?> stringValue) {

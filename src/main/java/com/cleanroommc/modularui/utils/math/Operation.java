@@ -1,5 +1,7 @@
 package com.cleanroommc.modularui.utils.math;
 
+import com.cleanroommc.modularui.api.IMathValue;
+
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 import java.util.Set;
@@ -36,8 +38,10 @@ public enum Operation {
     DIV("/", 2) {
         @Override
         public double calculate(double a, double b) {
-            /* To avoid any exceptions */
-            return a / (b == 0 ? 1 : b);
+            if (b == 0) {
+                throw new IMathValue.EvaluateException(String.format("Division by zero: %s / %s", a, b));
+            }
+            return a / b;
         }
     },
     MOD("%", 2) {
@@ -50,6 +54,18 @@ public enum Operation {
         @Override
         public double calculate(double a, double b) {
             return Math.pow(a, b);
+        }
+    },
+    E_NOTATION_LOWERCASE("e", 4) {
+        @Override
+        public double calculate(double a, double b) {
+            return a * Math.pow(10, b);
+        }
+    },
+    E_NOTATION_UPPERCASE("E", 4) {
+        @Override
+        public double calculate(double a, double b) {
+            return a * Math.pow(10, b);
         }
     },
     AND("&&", -3) {
