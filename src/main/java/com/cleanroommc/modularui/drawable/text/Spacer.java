@@ -22,6 +22,10 @@ public class Spacer implements ITextLine {
         this.space = space;
     }
 
+    public int getSpace() {
+        return space;
+    }
+
     @Override
     public int getWidth() {
         return 1;
