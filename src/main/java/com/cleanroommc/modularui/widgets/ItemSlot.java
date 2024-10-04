@@ -224,8 +224,10 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             }
         }
 
-        ((GuiAccessor) guiScreen).setZLevel(100f);
-        renderItem.zLevel = 100.0F;
+        float z = 100f;
+        float zStart = ((GuiAccessor) guiScreen).getZLevel();
+        ((GuiAccessor) guiScreen).setZLevel(zStart + z);
+        renderItem.zLevel += z;
 
         if (!flag1) {
             if (flag) {
@@ -235,7 +237,9 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             if (!itemstack.isEmpty()) {
                 GlStateManager.enableDepth();
                 // render the item itself
-                renderItem.renderItemAndEffectIntoGUI(guiScreen.mc.player, itemstack, 1, 1);
+//                renderItem.renderItemAndEffectIntoGUI(guiScreen.mc.player, itemstack, 1, 1);
+//                guiScreen.getItemRenderer().renderItemAndEffectIntoGUI(guiScreen.mc.player, itemstack, 1, 1);
+                renderItem.renderItemIntoGUI(itemstack, 1, 1);
                 if (amount < 0) {
                     amount = itemstack.getCount();
                 }
@@ -276,8 +280,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             }
         }
 
-        ((GuiAccessor) guiScreen).setZLevel(0f);
-        renderItem.zLevel = 0f;
+        ((GuiAccessor) guiScreen).setZLevel(zStart);
+        renderItem.zLevel -= z;
     }
 
     @Override

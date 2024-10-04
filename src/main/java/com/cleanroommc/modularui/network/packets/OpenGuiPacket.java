@@ -3,6 +3,8 @@ package com.cleanroommc.modularui.network.packets;
 import com.cleanroommc.modularui.api.UIFactory;
 import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.factory.GuiManager;
+import com.cleanroommc.modularui.factory.HoloGuiFactory;
+import com.cleanroommc.modularui.factory.HoloGuiManager;
 import com.cleanroommc.modularui.network.IPacket;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.NetworkUtils;
@@ -49,7 +51,11 @@ public class OpenGuiPacket<T extends GuiData> implements IPacket {
     @SideOnly(Side.CLIENT)
     @Override
     public @Nullable IPacket executeClient(NetHandlerPlayClient handler) {
-        GuiManager.open(this.windowId, this.factory, this.data, Minecraft.getMinecraft().player);
+        if (this.factory instanceof HoloGuiFactory) {
+            HoloGuiManager.open(this.windowId, this.factory, this.data, Minecraft.getMinecraft().player);
+        } else {
+            GuiManager.open(this.windowId, this.factory, this.data, Minecraft.getMinecraft().player);
+        }
         return null;
     }
 }
