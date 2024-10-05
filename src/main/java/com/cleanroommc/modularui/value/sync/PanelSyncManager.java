@@ -42,9 +42,13 @@ public class PanelSyncManager {
     public void initialize(String panelName, ModularSyncManager msm) {
         this.modularSyncManager = msm;
         this.panelName = panelName;
-        this.syncHandlers.forEach((mapKey, syncHandler) -> syncHandler.init(mapKey, this));
+        this.syncHandlers.forEach((mapKey, syncHandler) -> {
+            if (!syncHandler.isValid() || !(syncHandler instanceof ItemSlotSH))
+                syncHandler.init(mapKey, this);
+        });
         this.init = true;
-        this.subPanels.forEach(this::registerPanelSyncHandler);
+        this.subPanels.forEach((s, syncHandler) ->
+                msm.getRootManager().registerPanelSyncHandler(s, syncHandler));
     }
 
     private void registerPanelSyncHandler(String name, SyncHandler syncHandler) {
@@ -79,8 +83,8 @@ public class PanelSyncManager {
     public void onClose() {
         this.closeListener.forEach(listener -> listener.accept(getPlayer()));
         for (String name : this.subPanels.keySet()) {
-            SyncHandler sh = this.subPanels.get(name).getSyncManager().syncHandlers.remove(name);
-            this.subPanels.get(name).getSyncManager().reverseSyncHandlers.remove(sh);
+            SyncHandler sh = this.getModularSyncManager().getRootManager().syncHandlers.remove(name);
+            this.getModularSyncManager().getRootManager().reverseSyncHandlers.remove(sh);
         }
     }
 
