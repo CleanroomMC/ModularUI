@@ -181,7 +181,7 @@ public interface IKey extends IDrawable {
         return withStyle().alignment(alignment);
     }
 
-    default StyledText color(int color) {
+    default StyledText color(@Nullable Integer color) {
         return withStyle().color(color);
     }
 
@@ -189,7 +189,7 @@ public interface IKey extends IDrawable {
         return withStyle().scale(scale);
     }
 
-    default StyledText shadow(boolean shadow) {
+    default StyledText shadow(@Nullable Boolean shadow) {
         return withStyle().shadow(shadow);
     }
 

@@ -10,6 +10,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import org.jetbrains.annotations.Nullable;
+
 public class AnimatedText extends StyledText {
 
     private String fullString;
@@ -111,7 +113,7 @@ public class AnimatedText extends StyledText {
     }
 
     @Override
-    public AnimatedText color(int color) {
+    public AnimatedText color(@Nullable Integer color) {
         return (AnimatedText) super.color(color);
     }
 
@@ -121,7 +123,7 @@ public class AnimatedText extends StyledText {
     }
 
     @Override
-    public AnimatedText shadow(boolean shadow) {
+    public AnimatedText shadow(@Nullable Boolean shadow) {
         return (AnimatedText) super.shadow(shadow);
     }
 

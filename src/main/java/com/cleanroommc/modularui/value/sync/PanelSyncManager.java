@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.value.sync;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IPanelHandler;
-import com.cleanroommc.modularui.api.IPanelSyncManager;
 import com.cleanroommc.modularui.screen.ContainerCustomizer;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class PanelSyncManager implements IPanelSyncManager {
+public class PanelSyncManager {
 
     private final Map<String, SyncHandler> syncHandlers = new Object2ObjectLinkedOpenHashMap<>();
     private final Map<String, SlotGroup> slotGroups = new Object2ObjectOpenHashMap<>();
@@ -79,8 +79,8 @@ public class PanelSyncManager implements IPanelSyncManager {
     public void onClose() {
         this.closeListener.forEach(listener -> listener.accept(getPlayer()));
         for (String name : this.subPanels.keySet()) {
-            SyncHandler sh = this.modularSyncManager.getMainPSM().syncHandlers.remove(name);
-            this.modularSyncManager.getMainPSM().reverseSyncHandlers.remove(sh);
+            SyncHandler sh = this.getModularSyncManager().getMainPSM().syncHandlers.remove(name);
+            this.getModularSyncManager().getMainPSM().reverseSyncHandlers.remove(sh);
         }
     }
 
@@ -98,6 +98,10 @@ public class PanelSyncManager implements IPanelSyncManager {
     }
 
     public void receiveWidgetUpdate(String mapKey, int id, PacketBuffer buf) throws IOException {
+        if (!this.syncHandlers.containsKey(mapKey)) {
+            ModularUI.LOGGER.warn("SyncHandler \"{}\" does not exist for panel \"{}\"! ID was {}.", mapKey, panelName, id);
+            return;
+        }
         SyncHandler syncHandler = this.syncHandlers.get(mapKey);
         if (isClient()) {
             syncHandler.readOnClient(id, buf);
@@ -194,9 +198,6 @@ public class PanelSyncManager implements IPanelSyncManager {
         if (sh != null) return (IPanelHandler) sh;
         PanelSyncHandler syncHandler = new PanelSyncHandler(panelBuilder, subPanel);
         this.subPanels.put(key, syncHandler);
-        if (isInitialised()) {
-            this.modularSyncManager.getMainPSM().registerPanelSyncHandler(key, syncHandler);
-        }
         return syncHandler;
     }
 

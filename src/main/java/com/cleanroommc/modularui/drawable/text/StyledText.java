@@ -10,6 +10,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import org.jetbrains.annotations.Nullable;
+
 public class StyledText extends BaseKey {
 
     private final IKey key;
@@ -72,7 +74,7 @@ public class StyledText extends BaseKey {
     }
 
     @Override
-    public StyledText color(int color) {
+    public StyledText color(@Nullable Integer color) {
         this.color = color;
         return this;
     }
@@ -84,7 +86,7 @@ public class StyledText extends BaseKey {
     }
 
     @Override
-    public StyledText shadow(boolean shadow) {
+    public StyledText shadow(@Nullable Boolean shadow) {
         this.shadow = shadow;
         return this;
     }

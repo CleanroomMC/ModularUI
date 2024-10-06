@@ -64,6 +64,11 @@ public class SecondaryPanel implements IPanelHandler {
     }
 
     @Override
+    public boolean isPanelOpen() {
+        return this.open;
+    }
+
+    @Override
     public void openPanel() {
         if (this.open) return;
         if (this.screen != this.parent.getScreen()) {
