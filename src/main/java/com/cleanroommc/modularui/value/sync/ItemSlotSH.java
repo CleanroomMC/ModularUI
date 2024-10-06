@@ -22,6 +22,7 @@ public class ItemSlotSH extends SyncHandler {
     private final ModularSlot slot;
     private ItemStack lastStoredItem;
     private ItemStack lastStoredPhantomItem = ItemStack.EMPTY;
+    private boolean registered = false;
 
     @ApiStatus.Internal
     public ItemSlotSH(ModularSlot slot) {
@@ -31,7 +32,10 @@ public class ItemSlotSH extends SyncHandler {
     @Override
     public void init(String key, PanelSyncManager syncHandler) {
         super.init(key, syncHandler);
-        syncHandler.getContainer().registerSlot(syncHandler.getPanelName(), this.slot);
+        if (!registered) {
+            getSyncManager().getContainer().registerSlot(getSyncManager().getPanelName(), this.slot);
+            this.registered = true;
+        }
         this.lastStoredItem = getSlot().getStack().copy();
         if (isPhantom() && !getSlot().getStack().isEmpty()) {
             this.lastStoredPhantomItem = getSlot().getStack().copy();
