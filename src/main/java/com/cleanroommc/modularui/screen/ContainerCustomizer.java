@@ -176,7 +176,7 @@ public class ContainerCustomizer {
             container.detectAndSendChanges();
             return returnable;
         } else if (clickTypeIn == ClickType.SWAP && mouseButton >= 0 && mouseButton < 9) {
-            final ModularSlot phantom = container.getModularSlot(slotId);
+            ModularSlot phantom = container.getModularSlot(slotId);
             ItemStack hotbarStack = inventoryplayer.getStackInSlot(mouseButton).copy();
             if (phantom.isPhantom()) {
                 phantom.putStack(hotbarStack);
