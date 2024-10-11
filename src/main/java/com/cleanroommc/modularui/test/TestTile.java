@@ -61,6 +61,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
             return slot == 0 ? Integer.MAX_VALUE : 64;
         }
     };
+    private final IItemHandlerModifiable phantomInventory = new ItemStackHandler(1);
 
     private final ItemStackHandler bigInventory = new ItemStackHandler(9);
 
@@ -128,9 +129,15 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                 .child(new ButtonWidget<>()
                                                         .size(60, 18)
                                                         .overlay(IKey.dynamic(() -> "Button " + this.val)))
-                                                .child(new FluidSlot()
-                                                        .margin(2)
-                                                        .syncHandler(SyncHandlers.fluidSlot(this.fluidTank)))
+                                                .child(new Row().widthRel(1f).coverChildrenHeight()
+                                                        .debugName("fluid slot and phantom slot")
+                                                        .child(new FluidSlot()
+                                                                .align(Alignment.CenterLeft)
+                                                                .syncHandler(SyncHandlers.fluidSlot(this.fluidTank)))
+                                                        .child(new ItemSlot()
+                                                                .align(Alignment.CenterRight)
+                                                                .slot(SyncHandlers.phantomItemSlot(phantomInventory, 0)))
+                                                        .margin(2))
                                                 .child(new ButtonWidget<>()
                                                         .size(60, 18)
                                                         .tooltip(tooltip -> {
