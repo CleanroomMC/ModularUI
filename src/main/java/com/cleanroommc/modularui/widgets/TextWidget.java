@@ -59,7 +59,7 @@ public class TextWidget extends Widget<TextWidget> {
         }
         TextRenderer renderer = simulate(maxWidth);
         Box padding = getArea().getPadding();
-        return (int) (renderer.getLastHeight() + padding.vertical() + 0.5f);
+        return Math.max(1, (int) (renderer.getLastHeight() + padding.vertical() + 0.5f));
     }
 
     @Override
@@ -70,7 +70,7 @@ public class TextWidget extends Widget<TextWidget> {
         }
         TextRenderer renderer = simulate(maxWidth);
         Box padding = getArea().getPadding();
-        return (int) (renderer.getLastWidth() + padding.horizontal() + 0.5f);
+        return Math.max(1, (int) (renderer.getLastWidth() + padding.horizontal() + 0.5f));
     }
 
     public IKey getKey() {

@@ -130,7 +130,7 @@ public interface IKey extends IDrawable {
      * @param getter string supplier
      * @return dynamic text key
      */
-    static IKey dynamic(@NotNull Supplier<String> getter) {
+    static IKey dynamic(@NotNull Supplier<@NotNull String> getter) {
         return new DynamicKey(getter);
     }
 
