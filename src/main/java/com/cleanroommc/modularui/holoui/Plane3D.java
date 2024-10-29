@@ -22,6 +22,8 @@ public class Plane3D {
     private float aX = 0.5f, aY = 0.5f;
     private Vec3d normal = Direction.NORTH.asVec3d();
     private Vec3d rotation = this.normal;
+    private Vec3d from = Vec3d.ZERO;
+    private Vec3d to = new Vec3d(1, 1, 0);
 
 
     public void transform() {
@@ -59,6 +61,11 @@ public class Plane3D {
         GuiUtils.applyTransformationMatrix(mPitch);
         // un-translate for scale and rotation
         GlStateManager.translate(-(this.w / 2f), -(this.h / 2f), 0);
+    }
+
+    public void setBounds(Vec3d from, Vec3d to) {
+        this.from = from;
+        this.to = to;
     }
 
     public void setSize(float w, float h) {

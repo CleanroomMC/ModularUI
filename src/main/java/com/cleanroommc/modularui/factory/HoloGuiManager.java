@@ -59,7 +59,6 @@ public class HoloGuiManager extends GuiManager {
                 .screenScale(0.5f)
                 .inFrontOf(player, 5, true)
                 .open(screen -> {
-                    screen.setContainer(container);
                     screen.setPanel(panel);
                     //HoloUI.registerSyncedHoloUI(panel, screen);
                 }, player.getEntityWorld());
@@ -97,7 +96,6 @@ public class HoloGuiManager extends GuiManager {
                 .open(screen1 -> {
                     screen1.setPanel(panel);
                     screen1.setWrapper(guiScreenWrapper);
-                    //HoloUI.registerSyncedHoloUI(panel, screen1);
                 }, player.getEntityWorld());
     }
 

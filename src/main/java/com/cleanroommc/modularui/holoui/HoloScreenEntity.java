@@ -1,5 +1,7 @@
 package com.cleanroommc.modularui.holoui;
 
+import com.cleanroommc.modularui.api.IMuiScreen;
+import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.screen.*;
 
 import net.minecraft.block.Block;
@@ -24,8 +26,7 @@ import org.jetbrains.annotations.NotNull;
 @ApiStatus.Experimental
 public class HoloScreenEntity extends Entity {
 
-    private GuiContainerWrapper wrapper;
-    private ModularContainer container;
+    private IMuiScreen wrapper;
     private ModularPanel panel;
     private final Plane3D plane3D;
     private static final DataParameter<Byte> ORIENTATION = EntityDataManager.createKey(HoloScreenEntity.class, DataSerializers.BYTE);
@@ -39,16 +40,11 @@ public class HoloScreenEntity extends Entity {
         this(world, new Plane3D());
     }
 
-    public void setWrapper(GuiContainerWrapper wrapper) {
+    public void setWrapper(IMuiScreen wrapper) {
         this.wrapper = wrapper;
-        this.wrapper.setWorldAndResolution(Minecraft.getMinecraft(), (int) this.plane3D.getWidth(), (int) this.plane3D.getHeight());
-        this.getScreen().getContext().holoScreen = this;
-        this.getScreen().getContext().isHoloScreen = true;
-        setContainer(wrapper.getScreen().getContainer());
-    }
-
-    public void setContainer(ModularContainer container) {
-        this.container = container;
+        this.wrapper.getGuiScreen().setWorldAndResolution(Minecraft.getMinecraft(), (int) this.plane3D.getWidth(), (int) this.plane3D.getHeight());
+        this.wrapper.getScreen().getContext().holoScreen = this;
+        this.wrapper.getScreen().getContext().isHoloScreen = true;
     }
 
     public void setPanel(ModularPanel panel) {
@@ -59,7 +55,7 @@ public class HoloScreenEntity extends Entity {
         return this.getWrapper().getScreen();
     }
 
-    public GuiContainerWrapper getWrapper() {
+    public IMuiScreen getWrapper() {
         return this.wrapper;
     }
 
@@ -110,8 +106,9 @@ public class HoloScreenEntity extends Entity {
                 this.getEntityWorld().removeEntity(this);
                 return;
             }
-            if (w != this.wrapper.width || h != this.wrapper.height) {
-                this.wrapper.onResize(Minecraft.getMinecraft(), w, h);
+            var wrapper = this.wrapper.getGuiScreen();
+            if (w != wrapper.width || h != wrapper.height) {
+                wrapper.onResize(Minecraft.getMinecraft(), w, h);
             }
             this.wrapper.getScreen().onUpdate();
         }

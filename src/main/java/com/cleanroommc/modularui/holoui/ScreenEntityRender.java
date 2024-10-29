@@ -1,9 +1,11 @@
 package com.cleanroommc.modularui.holoui;
 
+import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.screen.GuiContainerWrapper;
 import com.cleanroommc.modularui.utils.Animator;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.entity.Render;
@@ -28,7 +30,7 @@ import java.util.UUID;
  */
 @ApiStatus.Experimental
 public class ScreenEntityRender extends Render<HoloScreenEntity> {
-    private static final Map<UUID, GuiContainerWrapper> lookingPlayers = new Object2ObjectOpenHashMap<>();
+    private static final Map<UUID, IMuiScreen> lookingPlayers = new Object2ObjectOpenHashMap<>();
 
     public ScreenEntityRender(RenderManager renderManager) {
         super(renderManager);
@@ -42,7 +44,7 @@ public class ScreenEntityRender extends Render<HoloScreenEntity> {
 
     @Override
     public void doRender(@NotNull HoloScreenEntity entity, double x, double y, double z, float entityYaw, float partialTicks) {
-        GuiContainerWrapper screenWrapper = entity.getWrapper();
+        var screenWrapper = entity.getWrapper();
         if (screenWrapper == null) return;
         var screen = screenWrapper.getScreen();
 
@@ -73,7 +75,7 @@ public class ScreenEntityRender extends Render<HoloScreenEntity> {
     public static void clickScreen(EntityPlayer player) {
         if (lookingPlayers.containsKey(player.getUniqueID())) {
             try {
-                lookingPlayers.get(player.getUniqueID()).handleMouseInput();
+                lookingPlayers.get(player.getUniqueID()).getGuiScreen().handleMouseInput();
             } catch (Throwable throwable1) {
                 CrashReport c = CrashReport.makeCrashReport(throwable1, "Updating screen events");
                 c.makeCategory("Affected screen")

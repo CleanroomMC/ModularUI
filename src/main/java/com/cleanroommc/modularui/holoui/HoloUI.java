@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.holoui;
 
+import net.minecraft.client.renderer.Vector3d;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -23,21 +24,25 @@ public class HoloUI {
     public static class Builder {
 
         private double x, y, z;
+        private Vec3d from, to;
         private Plane3D plane3D = new Plane3D();
         private ScreenOrientation orientation = ScreenOrientation.FIXED;
+
+        private Builder() {
+            from = to = Vec3d.ZERO;
+        }
 
         public Builder at(double x, double y, double z) {
             this.x = x;
             this.y = y;
             this.z = z;
+            this.from = new Vec3d(this.x - 0.5D, this.y - 0.5D, this.z - 0.5D);
+            this.to = new Vec3d(this.x + 0.5D, this.y + 0.5D, this.z + 0.5D);
             return this;
         }
 
         public Builder at(BlockPos pos) {
-            this.x = pos.getX() + 0.5D;
-            this.y = pos.getY() + 0.5D;
-            this.z = pos.getZ() + 0.5D;
-            return this;
+            return at(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D);
         }
 
         public Builder inFrontOf(EntityPlayer player, double distance, boolean fixed) {
@@ -79,20 +84,12 @@ public class HoloUI {
         }
 
         public void open(Consumer<HoloScreenEntity> entityConsumer, World world) {
-//            JeiSettingsImpl jeiSettings = new JeiSettingsImpl();
-//            jeiSettings.disableJei();
-//            screen.getContext().setJeiSettings(jeiSettings);
-
-//            wrapper.getScreen().getContext().isHoloScreen = true;
+            this.plane3D.setBounds(this.from, this.to);
             HoloScreenEntity screen = new HoloScreenEntity(world, this.plane3D);
             screen.setPosition(this.x, this.y, this.z);
             screen.setOrientation(this.orientation);
             entityConsumer.accept(screen);
             screen.spawnInWorld();
-//            holoScreenEntity.setPosition(this.x, this.y, this.z);
-//            holoScreenEntity.setWrapper(wrapper);
-//            holoScreenEntity.spawnInWorld();
-//            holoScreenEntity.setOrientation(this.orientation);
         }
 
         public void reposition(EntityPlayer player, Collection<HoloScreenEntity> screens) {
