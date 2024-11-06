@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
 public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
@@ -200,10 +200,24 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
     }
 
     public <T, I extends IWidget> Grid mapTo(int rowLength, List<T> collection, IndexedElementMapper<T, I> widgetCreator) {
-        return matrix(mapToMatrix(rowLength, collection, widgetCreator));
+        this.matrix.clear();
+        for (int i = 0; i < collection.size(); i++) {
+            int r = i / rowLength;
+
+            if (r == this.matrix.size())
+                this.matrix.add(new ArrayList<>());
+
+            this.matrix.get(r).add(widgetCreator.apply(i, collection.get(i)));
+        }
+        this.dirty = true;
+        return this;
     }
 
-    public <I extends IWidget> Grid mapTo(int rowLength, int size, Function<Integer, I> widgetCreator) {
+    public <I extends IWidget> Grid mapTo(int rowLength, List<I> collection) {
+        return mapTo(rowLength, collection, (index, value) -> value);
+    }
+
+    public <I extends IWidget> Grid mapTo(int rowLength, int size, @NotNull IntFunction<I> widgetCreator) {
         this.matrix.clear();
         for (int i = 0; i < size; i++) {
             int r = i / rowLength;
@@ -213,19 +227,7 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
 
             this.matrix.get(r).add(widgetCreator.apply(i));
         }
-        return this;
-    }
-
-    public <T extends IWidget> Grid mapTo(int rowLength, List<T> widgets) {
-        this.matrix.clear();
-        for (int i = 0; i < widgets.size(); i++) {
-            int r = i / rowLength;
-
-            if (r == this.matrix.size())
-                this.matrix.add(new ArrayList<>());
-
-            this.matrix.get(r).add(widgets.get(i));
-        }
+        this.dirty = true;
         return this;
     }
 
