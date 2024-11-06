@@ -200,7 +200,7 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
     public <T, I extends IWidget> Grid mapTo(int rowLength, @NotNull List<T> list, @NotNull IndexedElementMapper<T, I> widgetCreator) {
         Objects.requireNonNull(widgetCreator);
         Objects.requireNonNull(list);
-        return mapTo(rowLength, list.size(), i -> widgetCreator.apply(i, list.get(i)));
+        return matrix(mapToMatrix(rowLength, list, widgetCreator));
     }
 
     public <I extends IWidget> Grid mapTo(int rowLength, @NotNull List<I> list) {
@@ -210,17 +210,7 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
 
     public <I extends IWidget> Grid mapTo(int rowLength, int size, @NotNull IntFunction<I> widgetCreator) {
         Objects.requireNonNull(widgetCreator);
-        this.matrix.clear();
-        for (int i = 0; i < size; i++) {
-            int r = i / rowLength;
-
-            if (r == this.matrix.size())
-                this.matrix.add(new ArrayList<>());
-
-            this.matrix.get(r).add(widgetCreator.apply(i));
-        }
-        this.dirty = true;
-        return this;
+        return matrix(mapToMatrix(rowLength, size, widgetCreator));
     }
 
     public Grid minColWidth(int minColWidth) {
@@ -289,14 +279,18 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
     }
 
     public static <T, I extends IWidget> List<List<I>> mapToMatrix(int rowLength, List<T> list, IndexedElementMapper<T, I> widgetCreator) {
+        return mapToMatrix(rowLength, list.size(), i -> widgetCreator.apply(i, list.get(i)));
+    }
+
+    public static <I extends IWidget> List<List<I>> mapToMatrix(int rowLength, int size, IntFunction<I> widgetCreator) {
         List<List<I>> matrix = new ArrayList<>();
-        for (int i = 0; i < list.size(); i++) {
+        for (int i = 0; i < size; i++) {
             int r = i / rowLength;
 
             if (r == matrix.size())
                 matrix.add(new ArrayList<>());
 
-            matrix.get(r).add(widgetCreator.apply(i, list.get(i)));
+            matrix.get(r).add(widgetCreator.apply(i));
         }
         return matrix;
     }
