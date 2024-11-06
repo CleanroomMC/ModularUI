@@ -27,9 +27,7 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
     private Alignment alignment = Alignment.Center;
     private boolean dirty = false;
 
-    public Grid() {
-        this.minElementMargin.all(2);
-    }
+    public Grid() {}
 
     @Override
     public void onInit() {
@@ -265,7 +263,7 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
         return getThis();
     }
 
-    public Grid margin(int all) {
+    public Grid minElementMargin(int all) {
         this.minElementMargin.all(all);
         return getThis();
     }
