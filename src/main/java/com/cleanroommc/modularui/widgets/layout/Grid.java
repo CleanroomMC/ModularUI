@@ -165,7 +165,8 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
         return this;
     }
 
-    public Grid row(IWidget... row) {
+    public Grid row(@NotNull IWidget... row) {
+        Objects.requireNonNull(row);
         return row(Arrays.asList(row));
     }
 
