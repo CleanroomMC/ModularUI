@@ -199,15 +199,19 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
         return this;
     }
 
-    public <T, I extends IWidget> Grid mapTo(int rowLength, List<T> collection, IndexedElementMapper<T, I> widgetCreator) {
-        return mapTo(rowLength, collection.size(), i -> widgetCreator.apply(i, collection.get(i)));
+    public <T, I extends IWidget> Grid mapTo(int rowLength, @NotNull List<T> list, @NotNull IndexedElementMapper<T, I> widgetCreator) {
+        Objects.requireNonNull(widgetCreator);
+        Objects.requireNonNull(list);
+        return mapTo(rowLength, list.size(), i -> widgetCreator.apply(i, list.get(i)));
     }
 
-    public <I extends IWidget> Grid mapTo(int rowLength, List<I> collection) {
-        return mapTo(rowLength, collection.size(), collection::get);
+    public <I extends IWidget> Grid mapTo(int rowLength, @NotNull List<I> list) {
+        Objects.requireNonNull(list);
+        return mapTo(rowLength, list.size(), list::get);
     }
 
     public <I extends IWidget> Grid mapTo(int rowLength, int size, @NotNull IntFunction<I> widgetCreator) {
+        Objects.requireNonNull(widgetCreator);
         this.matrix.clear();
         for (int i = 0; i < size; i++) {
             int r = i / rowLength;
@@ -286,18 +290,15 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
         return getThis();
     }
 
-    public static <T, I extends IWidget> List<List<I>> mapToMatrix(int rowLength, List<T> collection, IndexedElementMapper<T, I> widgetCreator) {
+    public static <T, I extends IWidget> List<List<I>> mapToMatrix(int rowLength, List<T> list, IndexedElementMapper<T, I> widgetCreator) {
         List<List<I>> matrix = new ArrayList<>();
-        for (int i = 0; i < collection.size(); i++) {
+        for (int i = 0; i < list.size(); i++) {
             int r = i / rowLength;
-            List<I> row;
-            if (matrix.size() <= r) {
-                row = new ArrayList<>();
-                matrix.add(row);
-            } else {
-                row = matrix.get(r);
-            }
-            row.add(widgetCreator.apply(i, collection.get(i)));
+
+            if (r == matrix.size())
+                matrix.add(new ArrayList<>());
+
+            matrix.get(r).add(widgetCreator.apply(i, list.get(i)));
         }
         return matrix;
     }
