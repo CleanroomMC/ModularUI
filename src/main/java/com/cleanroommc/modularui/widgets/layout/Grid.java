@@ -200,21 +200,11 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
     }
 
     public <T, I extends IWidget> Grid mapTo(int rowLength, List<T> collection, IndexedElementMapper<T, I> widgetCreator) {
-        this.matrix.clear();
-        for (int i = 0; i < collection.size(); i++) {
-            int r = i / rowLength;
-
-            if (r == this.matrix.size())
-                this.matrix.add(new ArrayList<>());
-
-            this.matrix.get(r).add(widgetCreator.apply(i, collection.get(i)));
-        }
-        this.dirty = true;
-        return this;
+        return mapTo(rowLength, collection.size(), i -> widgetCreator.apply(i, collection.get(i)));
     }
 
     public <I extends IWidget> Grid mapTo(int rowLength, List<I> collection) {
-        return mapTo(rowLength, collection, (index, value) -> value);
+        return mapTo(rowLength, collection.size(), collection::get);
     }
 
     public <I extends IWidget> Grid mapTo(int rowLength, int size, @NotNull IntFunction<I> widgetCreator) {
