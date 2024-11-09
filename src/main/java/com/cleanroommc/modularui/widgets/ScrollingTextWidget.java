@@ -6,6 +6,8 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 
+import org.jetbrains.annotations.Nullable;
+
 public class ScrollingTextWidget extends TextWidget {
 
     private static final int pauseTime = 60;
@@ -86,7 +88,7 @@ public class ScrollingTextWidget extends TextWidget {
     }
 
     @Override
-    public ScrollingTextWidget color(int color) {
+    public ScrollingTextWidget color(@Nullable Integer color) {
         return (ScrollingTextWidget) super.color(color);
     }
 
@@ -96,7 +98,7 @@ public class ScrollingTextWidget extends TextWidget {
     }
 
     @Override
-    public ScrollingTextWidget shadow(boolean shadow) {
+    public ScrollingTextWidget shadow(@Nullable Boolean shadow) {
         return (ScrollingTextWidget) super.shadow(shadow);
     }
 

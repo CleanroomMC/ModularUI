@@ -130,7 +130,7 @@ public interface IKey extends IDrawable {
      * @param getter string supplier
      * @return dynamic text key
      */
-    static IKey dynamic(@NotNull Supplier<String> getter) {
+    static IKey dynamic(@NotNull Supplier<@NotNull String> getter) {
         return new DynamicKey(getter);
     }
 
@@ -181,7 +181,7 @@ public interface IKey extends IDrawable {
         return withStyle().alignment(alignment);
     }
 
-    default StyledText color(int color) {
+    default StyledText color(@Nullable Integer color) {
         return withStyle().color(color);
     }
 
@@ -189,7 +189,7 @@ public interface IKey extends IDrawable {
         return withStyle().scale(scale);
     }
 
-    default StyledText shadow(boolean shadow) {
+    default StyledText shadow(@Nullable Boolean shadow) {
         return withStyle().shadow(shadow);
     }
 

@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.api;
 
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.SecondaryPanel;
+import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 import com.cleanroommc.modularui.value.sync.PanelSyncHandler;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 
@@ -34,6 +35,8 @@ public interface IPanelHandler {
         return new SecondaryPanel(parent, provider, subPanel);
     }
 
+    boolean isPanelOpen();
+
     /**
      * Opens the panel. If there is no cached panel, one will be created.
      * Can be called on both sides if this handler is synced.
@@ -60,9 +63,9 @@ public interface IPanelHandler {
 
     /**
      * Deletes the current cached panel. Should not be used frequently.
-     * This only works on non synced panels. Otherwise, it crashes.
+     * This only works on panels which don't have {@link ItemSlotSH} sync handlers.
      *
-     * @throws UnsupportedOperationException if this handler is synced
+     * @throws UnsupportedOperationException if this handler has ItemSlot sync handlers
      */
     void deleteCachedPanel();
 
