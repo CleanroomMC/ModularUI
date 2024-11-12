@@ -25,6 +25,7 @@ public class NetworkHandler {
         registerC2S(PacketSyncHandler.class);
         registerC2S(SyncConfig.class);
         registerS2C(OpenGuiPacket.class);
+        registerS2C(SyncHoloPacket.class);
         //registerC2S(OpenGuiHandshake.class);
     }
 
