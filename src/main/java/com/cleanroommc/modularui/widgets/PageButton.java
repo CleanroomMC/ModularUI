@@ -16,6 +16,7 @@ public class PageButton extends Widget<PageButton> implements Interactable {
     private final int index;
     private final PagedWidget.Controller controller;
     private IDrawable inactiveTexture = null;
+    private boolean invert = false;
 
     public PageButton(int index, PagedWidget.Controller controller) {
         this.index = index;
@@ -26,7 +27,7 @@ public class PageButton extends Widget<PageButton> implements Interactable {
     @Override
     public WidgetTheme getWidgetThemeInternal(ITheme theme) {
         WidgetThemeSelectable widgetTheme = theme.getToggleButtonTheme();
-        return isActive() ? widgetTheme : widgetTheme.getSelected();
+        return isActive() ^ invertSelected() ? widgetTheme : widgetTheme.getSelected();
     }
 
     @Override
@@ -63,9 +64,18 @@ public class PageButton extends Widget<PageButton> implements Interactable {
     }
 
     public PageButton tab(TabTexture texture, int location) {
-        return background(false, texture.get(location, false))
-                .background(true, texture.get(location, true))
+        return background(invertSelected(), texture.get(location, invertSelected()))
+                .background(!invertSelected(), texture.get(location, !invertSelected()))
                 .disableHoverBackground()
                 .size(texture.getWidth(), texture.getHeight());
+    }
+
+    public PageButton invertSelected(boolean invert) {
+        this.invert = invert;
+        return getThis();
+    }
+
+    public boolean invertSelected() {
+        return this.invert;
     }
 }

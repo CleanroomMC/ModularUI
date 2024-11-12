@@ -11,6 +11,8 @@ import java.util.function.Consumer;
 
 public class ToggleButton extends AbstractCycleButtonWidget<ToggleButton> {
 
+    private boolean invert = false;
+
     public ToggleButton() {
         stateCount(2);
     }
@@ -18,7 +20,7 @@ public class ToggleButton extends AbstractCycleButtonWidget<ToggleButton> {
     @Override
     public WidgetTheme getWidgetThemeInternal(ITheme theme) {
         WidgetThemeSelectable widgetTheme = theme.getToggleButtonTheme();
-        return isValueSelected() ? widgetTheme.getSelected() : widgetTheme;
+        return isValueSelected() ^ invertSelected() ? widgetTheme.getSelected() : widgetTheme;
     }
 
     public boolean isValueSelected() {
@@ -81,5 +83,14 @@ public class ToggleButton extends AbstractCycleButtonWidget<ToggleButton> {
 
     public ToggleButton tooltipBuilder(boolean selected, Consumer<RichTooltip> builder) {
         return super.tooltipBuilder(selected ? 1 : 0, builder);
+    }
+
+    public ToggleButton invertSelected(boolean invert) {
+        this.invert = invert;
+        return getThis();
+    }
+
+    public boolean invertSelected() {
+        return this.invert;
     }
 }
