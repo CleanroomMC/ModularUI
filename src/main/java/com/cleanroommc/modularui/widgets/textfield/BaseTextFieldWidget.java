@@ -175,6 +175,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
             return Result.IGNORE;
         }
         switch (keyCode) {
+            case Keyboard.KEY_NUMPADENTER:
             case Keyboard.KEY_RETURN:
                 if (getMaxLines() > 1) {
                     this.handler.newLine();
