@@ -25,6 +25,16 @@ public class BooleanSyncValue extends ValueSyncHandler<Boolean> implements IBool
         this.cache = getter.getAsBoolean();
     }
 
+    public BooleanSyncValue(@NotNull BooleanSupplier getter) {
+        this(getter, (BooleanConsumer) null);
+    }
+
+    @Contract("null, null -> fail")
+    public BooleanSyncValue(@Nullable BooleanSupplier clientGetter,
+                            @Nullable BooleanSupplier serverGetter) {
+        this(clientGetter, null, serverGetter, null);
+    }
+
     @Contract("null, _, null, _ -> fail")
     public BooleanSyncValue(@Nullable BooleanSupplier clientGetter, @Nullable BooleanConsumer clientSetter,
                             @Nullable BooleanSupplier serverGetter, @Nullable BooleanConsumer serverSetter) {

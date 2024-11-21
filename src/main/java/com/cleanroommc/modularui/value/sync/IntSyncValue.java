@@ -7,6 +7,7 @@ import com.cleanroommc.modularui.network.NetworkUtils;
 import net.minecraft.network.PacketBuffer;
 
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.IntConsumer;
@@ -18,9 +19,19 @@ public class IntSyncValue extends ValueSyncHandler<Integer> implements IIntSyncV
     private final IntSupplier getter;
     private final IntConsumer setter;
 
-    public IntSyncValue(IntSupplier getter, IntConsumer setter) {
+    public IntSyncValue(@NotNull IntSupplier getter, @Nullable IntConsumer setter) {
         this.getter = getter;
         this.setter = setter;
+    }
+
+    public IntSyncValue(@NotNull IntSupplier getter) {
+        this(getter, (IntConsumer) null);
+    }
+
+    @Contract("null, null -> fail")
+    public IntSyncValue(@Nullable IntSupplier clientGetter,
+                        @Nullable IntSupplier serverGetter) {
+        this(clientGetter, null, serverGetter, null);
     }
 
     @Contract("null, _, null, _ -> fail")
