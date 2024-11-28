@@ -22,6 +22,7 @@ public class IntSyncValue extends ValueSyncHandler<Integer> implements IIntSyncV
     public IntSyncValue(@NotNull IntSupplier getter, @Nullable IntConsumer setter) {
         this.getter = getter;
         this.setter = setter;
+        this.cache = getter.getAsInt();
     }
 
     public IntSyncValue(@NotNull IntSupplier getter) {
