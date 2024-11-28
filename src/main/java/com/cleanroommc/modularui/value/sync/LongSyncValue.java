@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.function.LongConsumer;
 import java.util.function.LongSupplier;
 
@@ -21,7 +22,7 @@ public class LongSyncValue extends ValueSyncHandler<Long> implements ILongSyncVa
     private long cache;
 
     public LongSyncValue(@NotNull LongSupplier getter, @Nullable LongConsumer setter) {
-        this.getter = getter;
+        this.getter = Objects.requireNonNull(getter);
         this.setter = setter;
         this.cache = getter.getAsLong();
     }

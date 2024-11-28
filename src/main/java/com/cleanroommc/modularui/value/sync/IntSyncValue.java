@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 
@@ -20,7 +21,7 @@ public class IntSyncValue extends ValueSyncHandler<Integer> implements IIntSyncV
     private final IntConsumer setter;
 
     public IntSyncValue(@NotNull IntSupplier getter, @Nullable IntConsumer setter) {
-        this.getter = getter;
+        this.getter = Objects.requireNonNull(getter);
         this.setter = setter;
         this.cache = getter.getAsInt();
     }
@@ -79,7 +80,7 @@ public class IntSyncValue extends ValueSyncHandler<Integer> implements IIntSyncV
 
     @Override
     public boolean updateCacheFromSource(boolean isFirstSync) {
-        if (this.getter != null && (isFirstSync || this.getter.getAsInt() != this.cache)) {
+        if (isFirstSync || this.getter.getAsInt() != this.cache) {
             setIntValue(this.getter.getAsInt(), false, false);
             return true;
         }

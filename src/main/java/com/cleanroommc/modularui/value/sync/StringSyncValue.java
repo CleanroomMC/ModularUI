@@ -20,7 +20,7 @@ public class StringSyncValue extends ValueSyncHandler<String> implements IString
     private String cache;
 
     public StringSyncValue(@NotNull Supplier<String> getter, @Nullable Consumer<String> setter) {
-        this.getter = getter;
+        this.getter = Objects.requireNonNull(getter);
         this.setter = setter;
         this.cache = getter.get();
     }

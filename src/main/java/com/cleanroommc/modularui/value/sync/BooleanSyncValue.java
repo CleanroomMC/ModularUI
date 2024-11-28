@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.function.BooleanSupplier;
 
 public class BooleanSyncValue extends ValueSyncHandler<Boolean> implements IBoolSyncValue<Boolean>, IStringSyncValue<Boolean> {
@@ -20,7 +21,7 @@ public class BooleanSyncValue extends ValueSyncHandler<Boolean> implements IBool
     private boolean cache;
 
     public BooleanSyncValue(@NotNull BooleanSupplier getter, @Nullable BooleanConsumer setter) {
-        this.getter = getter;
+        this.getter = Objects.requireNonNull(getter);
         this.setter = setter;
         this.cache = getter.getAsBoolean();
     }
