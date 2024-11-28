@@ -4,6 +4,8 @@ import com.cleanroommc.modularui.api.value.sync.IByteSyncValue;
 
 import com.cleanroommc.modularui.network.NetworkUtils;
 
+import com.cleanroommc.modularui.value.ByteValue;
+
 import net.minecraft.network.PacketBuffer;
 
 import org.jetbrains.annotations.Contract;
@@ -15,22 +17,22 @@ import java.io.IOException;
 public class ByteSyncValue extends ValueSyncHandler<Byte> implements IByteSyncValue<Byte> {
 
     private byte cache;
-    private final ByteSupplier getter;
-    private final ByteConsumer setter;
+    private final ByteValue.Supplier getter;
+    private final ByteValue.Consumer setter;
 
-    public ByteSyncValue(@NotNull ByteSupplier getter) {
-        this(getter, (ByteConsumer) null);
+    public ByteSyncValue(@NotNull ByteValue.Supplier getter) {
+        this(getter, (ByteValue.Consumer) null);
     }
 
-    public ByteSyncValue(@NotNull ByteSupplier getter, @Nullable ByteConsumer setter) {
+    public ByteSyncValue(@NotNull ByteValue.Supplier getter, @Nullable ByteValue.Consumer setter) {
         this.getter = getter;
         this.setter = setter;
         this.cache = getter.getByte();
     }
 
     @Contract("null, _, null, _ -> fail")
-    public ByteSyncValue(@Nullable ByteSupplier clientGetter, @Nullable ByteConsumer clientSetter,
-                        @Nullable ByteSupplier serverGetter, @Nullable ByteConsumer serverSetter) {
+    public ByteSyncValue(@Nullable ByteValue.Supplier clientGetter, @Nullable ByteValue.Consumer clientSetter,
+                         @Nullable ByteValue.Supplier serverGetter, @Nullable ByteValue.Consumer serverSetter) {
         if (clientGetter == null && serverGetter == null) {
             throw new NullPointerException("Client or server getter must not be null!");
         }
@@ -44,8 +46,8 @@ public class ByteSyncValue extends ValueSyncHandler<Byte> implements IByteSyncVa
         this.cache = this.getter.getByte();
     }
 
-    public ByteSyncValue(@Nullable ByteSupplier clientGetter,
-                         @Nullable ByteSupplier serverGetter) {
+    public ByteSyncValue(@Nullable ByteValue.Supplier clientGetter,
+                         @Nullable ByteValue.Supplier serverGetter) {
         this(clientGetter, null, serverGetter, null);
     }
 
@@ -88,12 +90,5 @@ public class ByteSyncValue extends ValueSyncHandler<Byte> implements IByteSyncVa
     @Override
     public byte getByteValue() {
         return this.cache;
-    }
-
-    public interface ByteSupplier {
-        byte getByte();
-    }
-    public interface ByteConsumer {
-        void setByte(byte b);
     }
 }
