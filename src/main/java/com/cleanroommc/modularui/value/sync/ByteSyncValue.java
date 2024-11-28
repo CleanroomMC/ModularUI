@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class ByteSyncValue extends ValueSyncHandler<Byte> implements IByteSyncValue<Byte> {
 
@@ -25,7 +26,7 @@ public class ByteSyncValue extends ValueSyncHandler<Byte> implements IByteSyncVa
     }
 
     public ByteSyncValue(@NotNull ByteValue.Supplier getter, @Nullable ByteValue.Consumer setter) {
-        this.getter = getter;
+        this.getter = Objects.requireNonNull(getter);
         this.setter = setter;
         this.cache = getter.getByte();
     }
@@ -58,6 +59,10 @@ public class ByteSyncValue extends ValueSyncHandler<Byte> implements IByteSyncVa
 
     @Override
     public boolean updateCacheFromSource(boolean isFirstSync) {
+        if (isFirstSync || this.getter.getByte() != this.cache) {
+            setByteValue(this.getter.getByte(), false, false);
+            return true;
+        }
         return false;
     }
 
