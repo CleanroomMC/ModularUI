@@ -54,6 +54,7 @@ public class GenericSyncValue<T> extends ValueSyncHandler<T> {
                             @NotNull IByteBufSerializer<T> serializer,
                             @Nullable IEquals<T> equals) {
         this.getter = Objects.requireNonNull(getter);
+        this.cache = getter.get();
         this.setter = setter;
         this.deserializer = Objects.requireNonNull(deserializer);
         this.serializer = Objects.requireNonNull(serializer);
