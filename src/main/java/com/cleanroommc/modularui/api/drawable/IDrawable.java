@@ -38,6 +38,7 @@ public interface IDrawable {
      * @param y       y position
      * @param width   draw width
      * @param height  draw height
+     * @param widgetTheme current theme
      */
     @SideOnly(Side.CLIENT)
     void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme);
@@ -66,7 +67,7 @@ public interface IDrawable {
      * @param context     gui context
      * @param width       draw width
      * @param height      draw height
-     * @param widgetTheme
+     * @param widgetTheme current theme
      */
     @SideOnly(Side.CLIENT)
     default void drawAtZero(GuiContext context, int width, int height, WidgetTheme widgetTheme) {
@@ -79,7 +80,7 @@ public interface IDrawable {
     @SideOnly(Side.CLIENT)
     @Deprecated
     default void draw(GuiContext context, Area area) {
-        draw(context, area.x, area.y, area.width, area.height, WidgetTheme.getDefault());
+        draw(context, area, WidgetTheme.getDefault());
     }
 
     /**
@@ -87,10 +88,11 @@ public interface IDrawable {
      *
      * @param context current context to draw with
      * @param area    draw area
+     * @param widgetTheme current theme
      */
     @SideOnly(Side.CLIENT)
     default void draw(GuiContext context, Area area, WidgetTheme widgetTheme) {
-        draw(context, area.x, area.y, area.width, area.height, widgetTheme);
+        draw(context, area.x + area.getPadding().left, area.y + area.getPadding().top, area.paddedWidth(), area.paddedHeight(), widgetTheme);
     }
 
     /**
@@ -99,7 +101,7 @@ public interface IDrawable {
     @Deprecated
     @SideOnly(Side.CLIENT)
     default void drawAtZero(GuiContext context, Area area) {
-        draw(context, 0, 0, area.width, area.height, WidgetTheme.getDefault());
+        drawAtZero(context, area, WidgetTheme.getDefault());
     }
 
     /**
@@ -107,10 +109,11 @@ public interface IDrawable {
      *
      * @param context gui context
      * @param area    draw area
+     * @param widgetTheme current theme
      */
     @SideOnly(Side.CLIENT)
     default void drawAtZero(GuiContext context, Area area, WidgetTheme widgetTheme) {
-        draw(context, 0, 0, area.width, area.height, widgetTheme);
+        draw(context, 0, 0, area.paddedWidth(), area.paddedHeight(), widgetTheme);
     }
 
     /**
@@ -174,6 +177,16 @@ public interface IDrawable {
         @Override
         public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
             this.drawable.drawAtZero(context, getArea(), widgetTheme);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof IDrawable drawable)
+                return this.drawable == drawable;
+            else if (obj instanceof DrawableWidget drawableWidget)
+                return this.drawable == drawableWidget.drawable;
+
+            return false;
         }
     }
 }
