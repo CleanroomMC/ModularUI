@@ -7,8 +7,10 @@ import com.cleanroommc.modularui.network.NetworkUtils;
 import net.minecraft.network.PacketBuffer;
 
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 
@@ -18,9 +20,20 @@ public class IntSyncValue extends ValueSyncHandler<Integer> implements IIntSyncV
     private final IntSupplier getter;
     private final IntConsumer setter;
 
-    public IntSyncValue(IntSupplier getter, IntConsumer setter) {
-        this.getter = getter;
+    public IntSyncValue(@NotNull IntSupplier getter, @Nullable IntConsumer setter) {
+        this.getter = Objects.requireNonNull(getter);
         this.setter = setter;
+        this.cache = getter.getAsInt();
+    }
+
+    public IntSyncValue(@NotNull IntSupplier getter) {
+        this(getter, (IntConsumer) null);
+    }
+
+    @Contract("null, null -> fail")
+    public IntSyncValue(@Nullable IntSupplier clientGetter,
+                        @Nullable IntSupplier serverGetter) {
+        this(clientGetter, null, serverGetter, null);
     }
 
     @Contract("null, _, null, _ -> fail")
@@ -67,7 +80,7 @@ public class IntSyncValue extends ValueSyncHandler<Integer> implements IIntSyncV
 
     @Override
     public boolean updateCacheFromSource(boolean isFirstSync) {
-        if (this.getter != null && (isFirstSync || this.getter.getAsInt() != this.cache)) {
+        if (isFirstSync || this.getter.getAsInt() != this.cache) {
             setIntValue(this.getter.getAsInt(), false, false);
             return true;
         }

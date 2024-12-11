@@ -7,8 +7,10 @@ import com.cleanroommc.modularui.network.NetworkUtils;
 import net.minecraft.network.PacketBuffer;
 
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -19,11 +21,22 @@ public class EnumSyncValue<T extends Enum<T>> extends ValueSyncHandler<T> implem
     private final Consumer<T> setter;
     protected T cache;
 
-    public EnumSyncValue(Class<T> enumClass, Supplier<T> getter, Consumer<T> setter) {
-        this.enumClass = enumClass;
-        this.getter = getter;
+    public EnumSyncValue(@NotNull Class<T> enumClass, @NotNull Supplier<T> getter, @Nullable Consumer<T> setter) {
+        this.enumClass = Objects.requireNonNull(enumClass);
+        this.getter = Objects.requireNonNull(getter);
         this.setter = setter;
         this.cache = getter.get();
+    }
+
+    public EnumSyncValue(@NotNull Class<T> enumClass, @NotNull Supplier<T> getter) {
+        this(enumClass, getter, (Consumer<T>) null);
+    }
+
+    @Contract("_, null, null -> fail")
+    public EnumSyncValue(Class<T> enumClass,
+                         @Nullable Supplier<T> clientGetter,
+                         @Nullable Supplier<T> serverGetter) {
+        this(enumClass, clientGetter, null, serverGetter, null);
     }
 
     @Contract("_, null, _, null, _ -> fail")
