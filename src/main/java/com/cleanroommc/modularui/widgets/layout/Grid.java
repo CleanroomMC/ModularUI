@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.widgets.layout;
 
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
+import com.cleanroommc.modularui.api.widget.IParentWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.ScrollWidget;
@@ -21,7 +22,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class Grid extends ScrollWidget<IWidget, Grid> implements ILayoutWidget {
+public class Grid extends ScrollWidget<IWidget, Grid> implements ILayoutWidget, IParentWidget<IWidget, Grid> {
 
     private final List<List<IWidget>> matrix = new ArrayList<>();
     private final Box minElementMargin = new Box();

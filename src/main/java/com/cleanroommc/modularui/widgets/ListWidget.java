@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.widgets;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
+import com.cleanroommc.modularui.api.widget.IParentWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -21,7 +22,7 @@ import java.util.function.IntFunction;
  * @param <I> type of children (in most cases just {@link IWidget})
  * @param <W> type of this widget
  */
-public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends ScrollWidget<I, W> implements ILayoutWidget {
+public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends ScrollWidget<I, W> implements ILayoutWidget, IParentWidget<I, W> {
 
     private ScrollData scrollData;
     private IIcon childSeparator;
@@ -91,6 +92,11 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends S
             p += separatorSize;
         }
         getScrollData().setScrollSize(p + getArea().getPadding().getEnd(axis));
+    }
+
+    @Override
+    public boolean addChild(I child, int index) {
+        return super.addChild(child, index);
     }
 
     @Override

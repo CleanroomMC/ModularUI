@@ -1,133 +1,27 @@
 package com.cleanroommc.modularui.widget;
 
-import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.widget.IParentWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.widgets.VoidWidget;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 
 /**
  * A widget which can hold any amount of children.
  *
- * @param <I> type of children (in most cases just {@link IWidget}). Use {@link VoidWidget} if no children should be added.
  * @param <W> type of this widget
  */
-public class ParentWidget<I extends IWidget, W extends ParentWidget<I, W>> extends Widget<W> {
+public class ParentWidget<W extends ParentWidget<W>> extends AbstractParentWidget<IWidget, W> implements IParentWidget<IWidget, W> {
 
-    private final List<I> children = new ArrayList<>();
-
-    @NotNull
-    @Override
-    public List<IWidget> getChildren() {
-        return (List<IWidget>) this.children;
-    }
-
-    public List<I> getTypeChildren() {
-        return children;
+    public boolean addChild(IWidget child, int index) {
+        return super.addChild(child, index);
     }
 
     @Override
-    public boolean canHover() {
-        if (IDrawable.isVisible(getBackground()) ||
-                IDrawable.isVisible(getHoverBackground()) ||
-                IDrawable.isVisible(getHoverOverlay()) ||
-                getTooltip() != null) return true;
-        WidgetTheme widgetTheme = getWidgetTheme(getContext().getTheme());
-        if (getBackground() == null && IDrawable.isVisible(widgetTheme.getBackground())) return true;
-        return getHoverBackground() == null && IDrawable.isVisible(widgetTheme.getHoverBackground());
+    public boolean remove(IWidget child) {
+        return super.remove(child);
     }
 
     @Override
-    public boolean canClickThrough() {
-        return !canHover();
-    }
-
-    public boolean addChild(I child, int index) {
-        if (child == null || child == this || getChildren().contains(child)) {
-            return false;
-        }
-        if (child instanceof ModularPanel) {
-            throw new IllegalArgumentException("ModularPanel should not be added as child widget; Use ModularScreen#openPanel instead");
-        }
-        if (!isChildValid(child)) {
-            throw new IllegalArgumentException("Child '" + child + "' is not valid for parent '" + this + "'!");
-        }
-        if (index < 0) {
-            index += getChildren().size() + 1;
-        }
-        this.children.add(index, child);
-        if (isValid()) {
-            child.initialise(this);
-        }
-        onChildAdd(child);
-        return true;
-    }
-
-    public boolean remove(I child) {
-        if (this.children.remove(child)) {
-            child.dispose();
-            onChildRemove(child);
-            return true;
-        }
-        return false;
-    }
-
     public boolean remove(int index) {
-        if (index < 0) {
-            index = getChildren().size() + index + 1;
-        }
-        I child = this.children.remove(index);
-        child.dispose();
-        onChildRemove(child);
-        return true;
+        return super.remove(index);
     }
 
-    public boolean isChildValid(I child) {
-        return true;
-    }
-
-    public void onChildAdd(I child) {}
-
-    public void onChildRemove(I child) {}
-
-    public W child(int index, I child) {
-        if (!addChild(child, index)) {
-            throw new IllegalStateException("Failed to add child");
-        }
-        return getThis();
-    }
-
-    public W child(I child) {
-        if (!addChild(child, -1)) {
-            throw new IllegalStateException("Failed to add child");
-        }
-        return getThis();
-    }
-
-    public W childIf(boolean condition, I child) {
-        if (condition) return child(child);
-        return getThis();
-    }
-
-    public W childIf(BooleanSupplier condition, I child) {
-        if (condition.getAsBoolean()) return child(child);
-        return getThis();
-    }
-
-    public W childIf(boolean condition, Supplier<I> child) {
-        if (condition) return child(child.get());
-        return getThis();
-    }
-
-    public W childIf(BooleanSupplier condition, Supplier<I> child) {
-        if (condition.getAsBoolean()) return child(child.get());
-        return getThis();
-    }
 }

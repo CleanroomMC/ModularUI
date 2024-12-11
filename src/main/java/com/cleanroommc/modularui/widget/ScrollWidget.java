@@ -23,7 +23,11 @@ import org.jetbrains.annotations.Nullable;
  * @param <I> type of children (in most cases just {@link IWidget})
  * @param <W> type of this widget
  */
-public class ScrollWidget<I extends IWidget, W extends ScrollWidget<I, W>> extends ParentWidget<I, W> implements IViewport, Interactable {
+public class ScrollWidget<I extends IWidget, W extends ScrollWidget<I, W>> extends AbstractParentWidget<I, W> implements IViewport, Interactable {
+
+    public static <W extends ScrollWidget<IWidget, W>> ScrollWidget<IWidget, W> simple() {
+        return new ScrollWidget<>();
+    }
 
     private final ScrollArea scroll = new ScrollArea();
 

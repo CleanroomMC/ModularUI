@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.IntFunction;
 
-public class SlotGroupWidget extends ParentWidget<IWidget, SlotGroupWidget> {
+public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
 
     public static SlotGroupWidget playerInventory() {
         return playerInventory(7);

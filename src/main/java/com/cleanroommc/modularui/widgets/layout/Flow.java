@@ -4,10 +4,11 @@ import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.widget.AbstractParentWidget;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.sizer.Box;
 
-public class Flow extends ParentWidget<IWidget, Flow> implements ILayoutWidget, IExpander {
+public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander {
 
     public static Flow row() {
         return new Flow(GuiAxis.X);
