@@ -1,20 +1,19 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.IMathValue;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.value.IStringValue;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.utils.math.Constant;
-import com.cleanroommc.modularui.utils.math.MathBuilder;
 import com.cleanroommc.modularui.value.StringValue;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
 
 import org.jetbrains.annotations.NotNull;
+import org.mariuszgromada.math.mxparser.Constant;
+import org.mariuszgromada.math.mxparser.Expression;
 
 import java.awt.*;
 import java.text.ParsePosition;
@@ -27,6 +26,23 @@ import java.util.regex.Pattern;
  */
 public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
+    public static final Constant k = new Constant("k", 1e3);
+    public static final Constant M = new Constant("M", 1e6);
+    public static final Constant G = new Constant("G", 1e9);
+    public static final Constant T = new Constant("T", 1e12);
+    public static final Constant P = new Constant("P", 1e15);
+    public static final Constant E = new Constant("E", 1e18);
+    public static final Constant Z = new Constant("Z", 1e21);
+    public static final Constant Y = new Constant("Y", 1e24);
+    public static final Constant m = new Constant("m", 1e-3);
+    public static final Constant u = new Constant("u", 1e-6);
+    public static final Constant n = new Constant("n", 1e-9);
+    public static final Constant p = new Constant("p", 1e-12);
+    public static final Constant f = new Constant("f", 1e-15);
+    public static final Constant a = new Constant("a", 1e-18);
+    public static final Constant z = new Constant("z", 1e-21);
+    public static final Constant y = new Constant("y", 1e-24);
+
     private IStringValue<?> stringValue;
     private Function<String, String> validator = val -> val;
     private boolean numbers = false;
@@ -35,17 +51,16 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
     protected boolean changedMarkedColor = false;
 
-    public IMathValue parse(String num) {
-        try {
-            IMathValue ret = MathBuilder.INSTANCE.parse(num);
-            this.mathFailMessage = null;
-            return ret;
-        } catch (MathBuilder.ParseException e) {
-            this.mathFailMessage = e.getMessage();
-        } catch (Exception e) {
-            ModularUI.LOGGER.catching(e);
+    public double parse(String num) {
+        if (num == null || num.isEmpty()) return 0;
+        Expression e = new Expression(num);
+        e.addConstants(k, M, G, T, P, E, Z, Y, m, u, n, p, f, a, z, y);
+        double result = e.calculate();
+        if (Double.isNaN(result)) {
+            this.mathFailMessage = e.getErrorMessage();
+            result = this.defaultNumber;
         }
-        return new Constant(this.defaultNumber);
+        return result;
     }
 
     public IStringValue<?> createMathFailMessageValue() {
@@ -197,12 +212,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             if (val.isEmpty()) {
                 num = (long) this.defaultNumber;
             } else {
-                try {
-                    num = (long) parse(val).doubleValue();
-                } catch (IMathValue.EvaluateException e) {
-                    this.mathFailMessage = e.getMessage();
-                    num = (long) this.defaultNumber;
-                }
+                num = (long) parse(val);
             }
             return format.format(validator.apply(num));
         });
@@ -216,12 +226,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             if (val.isEmpty()) {
                 num = (int) this.defaultNumber;
             } else {
-                try {
-                    num = (int) parse(val).doubleValue();
-                } catch (IMathValue.EvaluateException e) {
-                    this.mathFailMessage = e.getMessage();
-                    num = (int) this.defaultNumber;
-                }
+                num = (int) parse(val);
             }
             return format.format(validator.apply(num));
         });
@@ -234,12 +239,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             if (val.isEmpty()) {
                 num = this.defaultNumber;
             } else {
-                try {
-                    num = parse(val).doubleValue();
-                } catch (IMathValue.EvaluateException e) {
-                    this.mathFailMessage = e.getMessage();
-                    num = this.defaultNumber;
-                }
+                num = parse(val);
             }
             return format.format(validator.apply(num));
         });
