@@ -1,20 +1,18 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.IMathValue;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.value.IStringValue;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.utils.math.Constant;
-import com.cleanroommc.modularui.utils.math.MathBuilder;
 import com.cleanroommc.modularui.value.StringValue;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
 
 import org.jetbrains.annotations.NotNull;
+import org.mariuszgromada.math.mxparser.Expression;
 
 import java.awt.*;
 import java.text.ParsePosition;
@@ -33,14 +31,15 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
     protected boolean changedMarkedColor = false;
 
-    public static IMathValue parse(String num) {
-        try {
-            return MathBuilder.INSTANCE.parse(num);
-        } catch (Exception e) {
-            ModularUI.LOGGER.error("Failed to parse {} in TextFieldWidget", num);
-            ModularUI.LOGGER.catching(e);
+    public static double parse(String num) {
+        if (num == null || num.isEmpty()) return 0;
+        Expression e = new Expression(num);
+        double result = e.calculate();
+        if (Double.isNaN(result)) {
+            ModularUI.LOGGER.error(e.getErrorMessage());
+            result = 0.0;
         }
-        return new Constant(0);
+        return result;
     }
 
     @Override
@@ -189,7 +188,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             if (val.isEmpty()) {
                 num = 0;
             } else {
-                num = (long) parse(val).doubleValue();
+                num = (long) parse(val);
             }
             return format.format(validator.apply(num));
         });
@@ -204,7 +203,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             if (val.isEmpty()) {
                 num = 0;
             } else {
-                num = (int) parse(val).doubleValue();
+                num = (int) parse(val);
             }
             return format.format(validator.apply(num));
         });
@@ -218,7 +217,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             if (val.isEmpty()) {
                 num = 0;
             } else {
-                num = parse(val).doubleValue();
+                num = parse(val);
             }
             return format.format(validator.apply(num));
         });
