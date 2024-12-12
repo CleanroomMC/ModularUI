@@ -22,6 +22,9 @@ public class ModularUIConfig {
     @Config.Comment("Default tooltip position around the widget or its panel.")
     public static RichTooltip.Pos tooltipPos = RichTooltip.Pos.VERTICAL;
 
+    @Config.Comment("If true, pressing ESC key in the text field will restore the last text instead of confirming current one.")
+    public static boolean escRestoreLastText = false;
+
     @Config.Comment("If true, widget outlines and widget information will be drawn.")
     public static boolean guiDebugMode = FMLLaunchHandler.isDeobfuscatedEnvironment();
 
