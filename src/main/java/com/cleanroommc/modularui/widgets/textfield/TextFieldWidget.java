@@ -51,7 +51,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
     protected boolean changedMarkedColor = false;
 
-    public static double parse(String num) {
+    public double parse(String num) {
         if (num == null || num.isEmpty()) return 0;
         Expression e = new Expression(num);
         e.addConstants(k, M, G, T, P, E, Z, Y, m, u, n, p, f, a, z, y);
