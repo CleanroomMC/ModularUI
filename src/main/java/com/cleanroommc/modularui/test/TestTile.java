@@ -234,7 +234,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                 .row("FII")
                                                 .row("FII")
                                                 .key('F', index -> new FluidSlot().syncHandler("mixer_fluids", index))
-                                                .key('I', index -> new ItemSlot().slot(SyncHandlers.itemSlot(this.mixerItems, index).slotGroup("mixer_items")))
+                                                .key('I', index -> new ItemSlot().slot(new ModularSlot(this.mixerItems, index, index >= 2).slotGroup("mixer_items")))
                                                 .build())
                                         .child(new Row()
                                                 .coverChildrenHeight()

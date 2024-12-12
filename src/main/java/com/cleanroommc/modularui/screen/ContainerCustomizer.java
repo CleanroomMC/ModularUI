@@ -175,6 +175,15 @@ public class ContainerCustomizer {
 
             container.detectAndSendChanges();
             return returnable;
+        } else if (clickTypeIn == ClickType.SWAP && mouseButton >= 0 && mouseButton < 9) {
+            ModularSlot phantom = container.getModularSlot(slotId);
+            ItemStack hotbarStack = inventoryplayer.getStackInSlot(mouseButton);
+            if (phantom.isPhantom()) {
+                // insert stack from hotbar slot into phantom slot
+                phantom.putStack(hotbarStack.isEmpty() ? ItemStack.EMPTY : hotbarStack.copy());
+                container.detectAndSendChanges();
+                return returnable;
+            }
         }
 
         return container.superSlotClick(slotId, mouseButton, clickTypeIn, player);
