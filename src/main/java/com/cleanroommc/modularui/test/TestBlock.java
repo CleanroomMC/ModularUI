@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.factory.GuiFactories;
-import com.cleanroommc.modularui.factory.TileEntityGuiFactory;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
@@ -28,17 +27,24 @@ import net.minecraftforge.registries.IForgeRegistry;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.util.function.Supplier;
 
 public class TestBlock extends Block implements ITileEntityProvider {
 
-    public static final Block testBlock = new TestBlock();
+    public static final Block testBlock = new TestBlock(TestTile::new);
+    public static final Block testBlock2 = new TestBlock(TestTile2::new);
     public static final ItemBlock testItemBlock = new ItemBlock(testBlock);
+    public static final ItemBlock testItemBlock2 = new ItemBlock(testBlock2);
 
     public static void preInit() {
         ResourceLocation rl = new ResourceLocation(ModularUI.ID, "test_block");
         testBlock.setRegistryName(rl);
         testItemBlock.setRegistryName(rl);
         GameRegistry.registerTileEntity(TestTile.class, rl);
+        rl = new ResourceLocation(ModularUI.ID, "test_block_2");
+        testBlock2.setRegistryName(rl);
+        testItemBlock2.setRegistryName(rl);
+        GameRegistry.registerTileEntity(TestTile2.class, rl);
         TestItem.testItem.setRegistryName(ModularUI.ID, "test_item");
     }
 
@@ -46,12 +52,14 @@ public class TestBlock extends Block implements ITileEntityProvider {
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
         IForgeRegistry<Block> registry = event.getRegistry();
         registry.register(testBlock);
+        registry.register(testBlock2);
     }
 
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
         IForgeRegistry<Item> registry = event.getRegistry();
         registry.register(testItemBlock);
+        registry.register(testItemBlock2);
         registry.register(TestItem.testItem);
     }
 
@@ -61,14 +69,17 @@ public class TestBlock extends Block implements ITileEntityProvider {
         ModelLoader.setCustomModelResourceLocation(TestItem.testItem, 0, mrl);
     }
 
-    public TestBlock() {
+    private final Supplier<TileEntity> tileEntitySupplier;
+
+    public TestBlock(Supplier<TileEntity> tileEntitySupplier) {
         super(Material.ROCK);
+        this.tileEntitySupplier = tileEntitySupplier;
     }
 
     @Nullable
     @Override
     public TileEntity createNewTileEntity(@NotNull World worldIn, int meta) {
-        return new TestTile();
+        return this.tileEntitySupplier.get();
     }
 
     @Override

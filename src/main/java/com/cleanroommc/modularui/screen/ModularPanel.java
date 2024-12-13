@@ -334,7 +334,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                         break;
                     }
                     widget.unapplyMatrix(getContext());
-                    if (widget.getElement().canHover()) {
+                    if (!widget.getElement().canClickThrough()) {
                         result = true;
                         break;
                     }
@@ -440,7 +440,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                     }
                     widget.unapplyMatrix(getContext());
                 }
-                if (widget.getElement().canHover()) break;
+                if (!widget.getElement().canClickThrough()) break;
             }
             if (!this.keyboard.held) {
                 this.keyboard.lastPressed = pressed;

@@ -5,7 +5,7 @@ package com.cleanroommc.modularui.api.widget;
  *
  * @param <T>
  */
-public interface IValueWidget<T> {
+public interface IValueWidget<T> extends IWidget {
 
     /**
      * @return stored value

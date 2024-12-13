@@ -171,6 +171,10 @@ public interface IWidget extends IGuiElement {
         return true;
     }
 
+    default boolean canClickThrough() {
+        return true;
+    }
+
     /**
      * Marks tooltip for this widget as dirty.
      */
