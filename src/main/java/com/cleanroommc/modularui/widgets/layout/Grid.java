@@ -4,7 +4,7 @@ import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.widget.IParentWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.utils.Alignment;
-import com.cleanroommc.modularui.widget.ScrollWidget;
+import com.cleanroommc.modularui.widget.AbstractScrollWidget;
 import com.cleanroommc.modularui.widget.scroll.HorizontalScrollData;
 import com.cleanroommc.modularui.widget.scroll.ScrollData;
 import com.cleanroommc.modularui.widget.scroll.VerticalScrollData;
@@ -20,7 +20,7 @@ import java.util.*;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
-public class Grid extends ScrollWidget<IWidget, Grid> implements ILayoutWidget, IParentWidget<IWidget, Grid> {
+public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayoutWidget, IParentWidget<IWidget, Grid> {
 
     private final List<List<IWidget>> matrix = new ArrayList<>();
     private final Box minElementMargin = new Box();
@@ -28,7 +28,9 @@ public class Grid extends ScrollWidget<IWidget, Grid> implements ILayoutWidget, 
     private Alignment alignment = Alignment.Center;
     private boolean dirty = false;
 
-    public Grid() {}
+    public Grid() {
+        super(null, null);
+    }
 
     @Override
     public void onInit() {

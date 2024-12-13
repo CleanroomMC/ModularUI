@@ -7,12 +7,14 @@ import com.cleanroommc.modularui.api.widget.IParentWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.widget.ScrollWidget;
+import com.cleanroommc.modularui.widget.AbstractScrollWidget;
+import com.cleanroommc.modularui.widget.scroll.HorizontalScrollData;
 import com.cleanroommc.modularui.widget.scroll.ScrollData;
 import com.cleanroommc.modularui.widget.scroll.VerticalScrollData;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.IntFunction;
 
@@ -22,12 +24,16 @@ import java.util.function.IntFunction;
  * @param <I> type of children (in most cases just {@link IWidget})
  * @param <W> type of this widget
  */
-public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends ScrollWidget<I, W> implements ILayoutWidget, IParentWidget<I, W> {
+public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends AbstractScrollWidget<I, W> implements ILayoutWidget, IParentWidget<I, W> {
 
     private ScrollData scrollData;
     private IIcon childSeparator;
     private final IntList separatorPositions = new IntArrayList();
     private boolean keepScrollBarInArea = false;
+
+    public ListWidget() {
+        super(null, null);
+    }
 
     @Override
     public void onInit() {

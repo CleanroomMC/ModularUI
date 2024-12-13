@@ -9,7 +9,7 @@ import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
 import com.cleanroommc.modularui.utils.Alignment;
-import com.cleanroommc.modularui.widget.ScrollWidget;
+import com.cleanroommc.modularui.widget.AbstractScrollWidget;
 import com.cleanroommc.modularui.widget.scroll.HorizontalScrollData;
 import com.cleanroommc.modularui.widget.scroll.ScrollData;
 
@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 /**
  * The base of a text input widget. Handles mouse/keyboard input and rendering.
  */
-public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends ScrollWidget<VoidWidget, W> implements IFocusedWidget {
+public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends AbstractScrollWidget<VoidWidget, W> implements IFocusedWidget {
 
     public static final DecimalFormat format = new DecimalFormat("###.###");
 
@@ -56,7 +56,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     protected boolean changedTextColor = false;
 
     public BaseTextFieldWidget() {
-        super(new HorizontalScrollData());
+        super(new HorizontalScrollData(), null);
         this.handler.setRenderer(this.renderer);
         this.handler.setScrollArea(getScrollArea());
         padding(4, 0);
