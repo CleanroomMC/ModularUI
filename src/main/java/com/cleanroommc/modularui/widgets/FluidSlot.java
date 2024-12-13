@@ -55,9 +55,11 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
         tooltipBuilder(tooltip -> {
             IFluidTank fluidTank = getFluidTank();
             FluidStack fluid = this.syncHandler.getValue();
+            if (fluid != null) {
+                tooltip.addLine(IKey.str(fluid.getLocalizedName())).spaceLine(2);
+            }
             if (this.syncHandler.isPhantom()) {
                 if (fluid != null) {
-                    tooltip.addLine(IKey.str(fluid.getLocalizedName()));
                     if (this.syncHandler.controlsAmount()) {
                         tooltip.addLine(IKey.lang("modularui.fluid.phantom.amount", formatFluidAmount(fluid.amount), getBaseUnit()));
                     }
@@ -69,7 +71,6 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
                 }
             } else {
                 if (fluid != null) {
-                    tooltip.addLine(IKey.str(fluid.getLocalizedName()));
                     tooltip.addLine(IKey.lang("modularui.fluid.amount", formatFluidAmount(fluid.amount), formatFluidAmount(fluidTank.getCapacity()), getBaseUnit()));
                     addAdditionalFluidInfo(tooltip, fluid);
                 } else {

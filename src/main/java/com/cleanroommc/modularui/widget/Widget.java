@@ -147,7 +147,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     public void drawBackground(ModularGuiContext context, WidgetTheme widgetTheme) {
         IDrawable bg = getCurrentBackground(context.getTheme(), widgetTheme);
         if (bg != null) {
-            bg.drawAtZero(context, getArea(), widgetTheme);
+            bg.drawAtZero(context, getArea().width, getArea().height, widgetTheme);
         }
     }
 
@@ -158,8 +158,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     public void drawOverlay(ModularGuiContext context, WidgetTheme widgetTheme) {
         IDrawable bg = getCurrentOverlay(context.getTheme(), widgetTheme);
         if (bg != null) {
-            Box padding = getArea().getPadding();
-            bg.draw(context, padding.left, padding.top, getArea().width - padding.horizontal(), getArea().height - padding.vertical(), widgetTheme);
+            bg.drawAtZero(context, getArea(), widgetTheme);
         }
     }
 

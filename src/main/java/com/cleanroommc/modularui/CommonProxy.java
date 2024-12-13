@@ -32,7 +32,7 @@ public class CommonProxy {
         MinecraftForge.EVENT_BUS.register(CommonProxy.class);
         MinecraftForge.EVENT_BUS.register(GuiManager.class);
 
-        if (ModularUIConfig.enabledTestGuis) {
+        if (ModularUIConfig.enableTestGuis) {
             MinecraftForge.EVENT_BUS.register(TestBlock.class);
             TestBlock.preInit();
         }

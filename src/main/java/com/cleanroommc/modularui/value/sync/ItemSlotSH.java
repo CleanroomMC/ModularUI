@@ -22,6 +22,7 @@ public class ItemSlotSH extends SyncHandler {
     private final ModularSlot slot;
     private ItemStack lastStoredItem;
     private ItemStack lastStoredPhantomItem = ItemStack.EMPTY;
+    private boolean registered = false;
 
     @ApiStatus.Internal
     public ItemSlotSH(ModularSlot slot) {
@@ -31,7 +32,10 @@ public class ItemSlotSH extends SyncHandler {
     @Override
     public void init(String key, PanelSyncManager syncHandler) {
         super.init(key, syncHandler);
-        syncHandler.getContainer().registerSlot(syncHandler.getPanelName(), this.slot);
+        if (!registered) {
+            getSyncManager().getContainer().registerSlot(getSyncManager().getPanelName(), this.slot);
+            this.registered = true;
+        }
         this.lastStoredItem = getSlot().getStack().copy();
         if (isPhantom() && !getSlot().getStack().isEmpty()) {
             this.lastStoredPhantomItem = getSlot().getStack().copy();
@@ -83,13 +87,15 @@ public class ItemSlotSH extends SyncHandler {
             setEnabled(buf.readBoolean(), false);
         } else if (id == 5) {
             if (!isPhantom()) return;
-            ItemStack stack = buf.readItemStack();
-            this.slot.putStack(stack);
+            phantomClick(MouseData.create(0), buf.readItemStack());
         }
     }
 
     protected void phantomClick(MouseData mouseData) {
-        ItemStack cursorStack = getSyncManager().getCursorItem();
+        phantomClick(mouseData, getSyncManager().getCursorItem());
+    }
+
+    protected void phantomClick(MouseData mouseData, ItemStack cursorStack) {
         ItemStack slotStack = getSlot().getStack();
         ItemStack stackToPut;
         if (!cursorStack.isEmpty() && !slotStack.isEmpty() && !ItemHandlerHelper.canItemStacksStack(cursorStack, slotStack)) {
@@ -97,6 +103,7 @@ public class ItemSlotSH extends SyncHandler {
             if (mouseData.mouseButton == 1) {
                 stackToPut.setCount(1);
             }
+            stackToPut.setCount(Math.min(stackToPut.getCount(), slot.getItemStackLimit(stackToPut)));
             getSlot().putStack(stackToPut);
             this.lastStoredPhantomItem = stackToPut.copy();
         } else if (slotStack.isEmpty()) {
@@ -112,6 +119,7 @@ public class ItemSlotSH extends SyncHandler {
             if (mouseData.mouseButton == 1) {
                 stackToPut.setCount(1);
             }
+            stackToPut.setCount(Math.min(stackToPut.getCount(), slot.getItemStackLimit(stackToPut)));
             getSlot().putStack(stackToPut);
             this.lastStoredPhantomItem = stackToPut.copy();
         } else {

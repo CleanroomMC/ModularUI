@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.drawable.text;
 
-import com.cleanroommc.modularui.ClientEventHandler;
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.screen.ClientScreenHandler;
 
 public class CompoundKey extends BaseKey {
 
@@ -17,8 +17,8 @@ public class CompoundKey extends BaseKey {
 
     @Override
     public String get() {
-        if (ClientEventHandler.getTicks() != this.time) {
-            this.time = ClientEventHandler.getTicks();
+        if (ClientScreenHandler.getTicks() != this.time) {
+            this.time = ClientScreenHandler.getTicks();
             StringBuilder builder = new StringBuilder();
             for (IKey key : this.keys) {
                 builder.append(key.get());

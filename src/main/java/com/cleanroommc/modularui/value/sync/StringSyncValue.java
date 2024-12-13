@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.network.NetworkUtils;
 import net.minecraft.network.PacketBuffer;
 
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -18,10 +19,20 @@ public class StringSyncValue extends ValueSyncHandler<String> implements IString
     private final Consumer<String> setter;
     private String cache;
 
-    public StringSyncValue(Supplier<String> getter, Consumer<String> setter) {
-        this.getter = getter;
+    public StringSyncValue(@NotNull Supplier<String> getter, @Nullable Consumer<String> setter) {
+        this.getter = Objects.requireNonNull(getter);
         this.setter = setter;
         this.cache = getter.get();
+    }
+
+    public StringSyncValue(@NotNull Supplier<String> getter) {
+        this(getter, (Consumer<String>) null);
+    }
+
+    @Contract("null, null -> fail")
+    public StringSyncValue(@Nullable Supplier<String> clientGetter,
+                           @Nullable Supplier<String> serverGetter) {
+        this(clientGetter, null, serverGetter, null);
     }
 
     @Contract("null, _, null, _ -> fail")

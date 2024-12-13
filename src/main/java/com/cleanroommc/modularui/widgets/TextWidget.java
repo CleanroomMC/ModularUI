@@ -10,6 +10,8 @@ import com.cleanroommc.modularui.widget.sizer.Box;
 
 import net.minecraft.util.text.TextFormatting;
 
+import org.jetbrains.annotations.Nullable;
+
 public class TextWidget extends Widget<TextWidget> {
 
     private final IKey key;
@@ -57,7 +59,7 @@ public class TextWidget extends Widget<TextWidget> {
         }
         TextRenderer renderer = simulate(maxWidth);
         Box padding = getArea().getPadding();
-        return (int) (renderer.getLastHeight() + padding.vertical() + 0.5f);
+        return Math.max(1, (int) (renderer.getLastHeight() + padding.vertical() + 0.5f));
     }
 
     @Override
@@ -68,7 +70,7 @@ public class TextWidget extends Widget<TextWidget> {
         }
         TextRenderer renderer = simulate(maxWidth);
         Box padding = getArea().getPadding();
-        return (int) (renderer.getLastWidth() + padding.horizontal() + 0.5f);
+        return Math.max(1, (int) (renderer.getLastWidth() + padding.horizontal() + 0.5f));
     }
 
     public IKey getKey() {
@@ -96,7 +98,7 @@ public class TextWidget extends Widget<TextWidget> {
         return this;
     }
 
-    public TextWidget color(int color) {
+    public TextWidget color(@Nullable Integer color) {
         this.color = color;
         return this;
     }
@@ -106,7 +108,7 @@ public class TextWidget extends Widget<TextWidget> {
         return this;
     }
 
-    public TextWidget shadow(boolean shadow) {
+    public TextWidget shadow(@Nullable Boolean shadow) {
         this.shadow = shadow;
         return this;
     }

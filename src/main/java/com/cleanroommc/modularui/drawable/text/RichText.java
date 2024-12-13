@@ -142,13 +142,27 @@ public class RichText implements IDrawable, IRichTextBuilder<RichText> {
         return this;
     }
 
+    public RichText insertTitleMargin(int margin) {
+        List<Object> objects = this.elements;
+        for (int i = 0; i < objects.size(); i++) {
+            Object o = objects.get(i);
+            if (o == IKey.LINE_FEED) {
+                if (i == objects.size() - 1) return this;
+                if (objects.get(i + 1) instanceof Spacer spacer) {
+                    if (spacer.getSpace() == margin) return this;
+                    objects.set(i + 1, Spacer.of(margin));
+                } else {
+                    objects.add(i + 1, Spacer.of(margin));
+                }
+                return this;
+            }
+        }
+        return this;
+    }
+
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
         draw(context, x, y, width, height, widgetTheme.getTextColor(), widgetTheme.getTextShadow());
-        /*int mx = context.unTransformX(context.getAbsMouseX(), context.getAbsMouseY());
-        int my = context.unTransformY(context.getAbsMouseX(), context.getAbsMouseY());
-        Object hovering = getHoveringElement(TextRenderer.getFontRenderer(), mx, my);
-        if (hovering != null) ModularUI.LOGGER.info(hovering);*/
     }
 
     public void draw(GuiContext context, int x, int y, int width, int height, int color, boolean shadow) {

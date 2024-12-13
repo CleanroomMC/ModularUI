@@ -32,13 +32,14 @@ public class ClientProxy extends CommonProxy {
     void preInit(FMLPreInitializationEvent event) {
         super.preInit(event);
 
-        MinecraftForge.EVENT_BUS.register(ClientEventHandler.class);
         MinecraftForge.EVENT_BUS.register(ClientScreenHandler.class);
         MinecraftForge.EVENT_BUS.register(OverlayManager.class);
         MinecraftForge.EVENT_BUS.register(KeyBindHandler.class);
 
-        if (ModularUIConfig.enabledTestGuis) {
+        if (ModularUIConfig.enableTestGuis) {
             MinecraftForge.EVENT_BUS.register(EventHandler.class);
+        }
+        if (ModularUIConfig.enableTestOverlays) {
             OverlayTest.init();
         }
 

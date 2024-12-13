@@ -346,6 +346,11 @@ public class WidgetTree {
 
     @ApiStatus.Internal
     public static void collectSyncValues(PanelSyncManager syncManager, ModularPanel panel) {
+        collectSyncValues(syncManager, panel, true);
+    }
+
+    @ApiStatus.Internal
+    public static void collectSyncValues(PanelSyncManager syncManager, ModularPanel panel, boolean includePanel) {
         AtomicInteger id = new AtomicInteger(0);
         String syncKey = ModularSyncManager.AUTO_SYNC_PREFIX + panel.getName();
         foreachChildBFS(panel, widget -> {
@@ -355,7 +360,7 @@ public class WidgetTree {
                 }
             }
             return true;
-        }, true);
+        }, includePanel);
     }
 
     public static boolean hasSyncedValues(ModularPanel panel) {

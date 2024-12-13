@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
@@ -19,10 +20,20 @@ public class DoubleSyncValue extends ValueSyncHandler<Double> implements IDouble
     private final DoubleConsumer setter;
     private double cache;
 
-    public DoubleSyncValue(DoubleSupplier getter, DoubleConsumer setter) {
-        this.getter = getter;
+    public DoubleSyncValue(@NotNull DoubleSupplier getter, @Nullable DoubleConsumer setter) {
+        this.getter = Objects.requireNonNull(getter);
         this.setter = setter;
         this.cache = getter.getAsDouble();
+    }
+
+    public DoubleSyncValue(@NotNull DoubleSupplier getter) {
+        this(getter, (DoubleConsumer) null);
+    }
+
+    @Contract("null, null -> fail")
+    public DoubleSyncValue(@Nullable DoubleSupplier clientGetter,
+                           @Nullable DoubleSupplier serverGetter) {
+        this(clientGetter, null, serverGetter, null);
     }
 
     @Contract("null, _, null, _ -> fail")

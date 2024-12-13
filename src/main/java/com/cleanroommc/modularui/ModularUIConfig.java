@@ -22,6 +22,9 @@ public class ModularUIConfig {
     @Config.Comment("Default tooltip position around the widget or its panel.")
     public static RichTooltip.Pos tooltipPos = RichTooltip.Pos.VERTICAL;
 
+    @Config.Comment("If true, pressing ESC key in the text field will restore the last text instead of confirming current one.")
+    public static boolean escRestoreLastText = false;
+
     @Config.Comment("If true, widget outlines and widget information will be drawn.")
     public static boolean guiDebugMode = FMLLaunchHandler.isDeobfuscatedEnvironment();
 
@@ -30,5 +33,9 @@ public class ModularUIConfig {
 
     @Config.RequiresMcRestart
     @Config.Comment("Enables a test block, test item with a test gui and opening a gui by right clicking a diamond.")
-    public static boolean enabledTestGuis = FMLLaunchHandler.isDeobfuscatedEnvironment();
+    public static boolean enableTestGuis = FMLLaunchHandler.isDeobfuscatedEnvironment();
+
+    @Config.RequiresMcRestart
+    @Config.Comment("Enables a test overlay shown on title screen and watermark shown on every GuiContainer.")
+    public static boolean enableTestOverlays = false;
 }

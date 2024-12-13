@@ -8,8 +8,10 @@ import com.cleanroommc.modularui.network.NetworkUtils;
 import net.minecraft.network.PacketBuffer;
 
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.function.LongConsumer;
 import java.util.function.LongSupplier;
 
@@ -19,10 +21,20 @@ public class LongSyncValue extends ValueSyncHandler<Long> implements ILongSyncVa
     private final LongConsumer setter;
     private long cache;
 
-    public LongSyncValue(LongSupplier getter, LongConsumer setter) {
-        this.getter = getter;
+    public LongSyncValue(@NotNull LongSupplier getter, @Nullable LongConsumer setter) {
+        this.getter = Objects.requireNonNull(getter);
         this.setter = setter;
         this.cache = getter.getAsLong();
+    }
+
+    public LongSyncValue(@NotNull LongSupplier getter) {
+        this(getter, (LongConsumer) null);
+    }
+
+    @Contract("null, null -> fail")
+    public LongSyncValue(@Nullable LongSupplier clientGetter,
+                         @Nullable LongSupplier serverGetter) {
+        this(clientGetter, null, serverGetter, null);
     }
 
     @Contract("null, _, null, _ -> fail")

@@ -38,11 +38,23 @@ public class GenericSyncValue<T> extends ValueSyncHandler<T> {
     }
 
     public GenericSyncValue(@NotNull Supplier<T> getter,
+                            @NotNull IByteBufAdapter<T> adapter) {
+        this(getter, null, adapter, adapter, adapter);
+    }
+
+    public GenericSyncValue(@NotNull Supplier<T> getter,
+                            @NotNull IByteBufDeserializer<T> deserializer,
+                            @NotNull IByteBufSerializer<T> serializer) {
+        this(getter, null, deserializer, serializer, null);
+    }
+
+    public GenericSyncValue(@NotNull Supplier<T> getter,
                             @Nullable Consumer<T> setter,
                             @NotNull IByteBufDeserializer<T> deserializer,
                             @NotNull IByteBufSerializer<T> serializer,
                             @Nullable IEquals<T> equals) {
         this.getter = Objects.requireNonNull(getter);
+        this.cache = getter.get();
         this.setter = setter;
         this.deserializer = Objects.requireNonNull(deserializer);
         this.serializer = Objects.requireNonNull(serializer);

@@ -41,6 +41,14 @@ public interface IRichTextBuilder<T extends IRichTextBuilder<T>> {
         return addLine(Spacer.of(pixelSpace));
     }
 
+    default T spaceLine() {
+        return addLine(Spacer.SPACER_2PX);
+    }
+
+    default T emptyLine() {
+        return addLine(Spacer.LINE_SPACER);
+    }
+
     default T addElements(Iterable<IDrawable> drawables) {
         for (IDrawable drawable : drawables) {
             getRichText().add(drawable);
