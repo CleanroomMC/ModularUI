@@ -1,6 +1,8 @@
 package com.cleanroommc.modularui.holoui;
 
 import com.cleanroommc.modularui.api.IMuiScreen;
+import com.cleanroommc.modularui.api.MCHelper;
+import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.GuiContainerWrapper;
 import com.cleanroommc.modularui.utils.Animator;
 
@@ -58,7 +60,7 @@ public class ScreenEntityRender extends Render<HoloScreenEntity> {
             plane3D.transform();
         }
         var mouse = calculateMousePos(player.getPositionVector().add(0, player.getEyeHeight(), 0), entity, player.getLookVec());
-//        screenWrapper.drawScreen(mouse.getX(), mouse.getY(), partialTicks);
+//        ClientScreenHandler.drawScreen(screen, screenWrapper.getGuiScreen(), mouse.getX(), mouse.getY(), partialTicks);
         screen.drawScreen(mouse.getX(), mouse.getY(), partialTicks);
         screen.onFrameUpdate();
 
@@ -89,7 +91,7 @@ public class ScreenEntityRender extends Render<HoloScreenEntity> {
     public boolean shouldRender(HoloScreenEntity screen, ICamera camera, double camX, double camY, double camZ) {
         boolean render = super.shouldRender(screen, camera, camX, camY, camZ);
         if (!render) {
-            lookingPlayers.remove(Minecraft.getMinecraft().player.getUniqueID());
+            lookingPlayers.remove(MCHelper.getMc().player.getUniqueID());
         }
         return render;
     }

@@ -61,6 +61,13 @@ public class HoloScreenEntity extends Entity {
 
     public void spawnInWorld() {
         getEntityWorld().spawnEntity(this);
+        if (world.isRemote)
+            onResize();
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void onResize() {
+        getScreen().onResize((int) plane3D.getWidth(), (int) plane3D.getHeight());
     }
 
     public void setOrientation(ScreenOrientation orientation) {

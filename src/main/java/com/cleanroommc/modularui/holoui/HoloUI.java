@@ -99,6 +99,7 @@ public class HoloUI {
                 if (player.world.isRemote) {
                     var vec = screen.getPositionVector().subtract(player.getPositionVector());
                     screen.getPlane3D().setNormal((float) -vec.x, 0, (float) -vec.z);
+                    screen.onResize();
                 }
             }
         }
