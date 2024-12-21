@@ -41,6 +41,8 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+
 public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable, JeiGhostIngredientSlot<ItemStack>, JeiIngredientProvider {
 
     public static final int SIZE = 18;
@@ -126,6 +128,13 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         if (this.syncHandler.isPhantom()) {
             MouseData mouseData = MouseData.create(mouseButton);
             this.syncHandler.syncToServer(2, mouseData::writeToPacket);
+        } else if (getContext().isHoloScreen) {
+            var holo = getContext().holoScreen.getScreen();
+            if (holo.getScreenWrapper().getGuiScreen() instanceof GuiScreenAccessor acc) {
+                try {
+                    acc.invokeMouseClicked(getContext().getMouseX(), getContext().getMouseY(), getContext().getMouseButton());
+                } catch (IOException ignored) {}
+            }
         } else {
             ClientScreenHandler.clickSlot();
             //getScreen().getScreenWrapper().clickSlot();

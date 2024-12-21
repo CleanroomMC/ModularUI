@@ -60,7 +60,9 @@ public class ScreenEntityRender extends Render<HoloScreenEntity> {
             plane3D.transform();
         }
         var mouse = calculateMousePos(player.getPositionVector().add(0, player.getEyeHeight(), 0), entity, player.getLookVec());
-        screen.drawScreen(mouse.getX(), mouse.getY(), partialTicks);
+        screen.getContext().updateState(mouse.getX(), mouse.getY(), partialTicks);
+        ClientScreenHandler.drawScreenInternal(screen, screenWrapper.getGuiScreen(), mouse.getX(), mouse.getY(), partialTicks);
+//        screen.drawScreen(mouse.getX(), mouse.getY(), partialTicks);
         screen.onFrameUpdate();
 
         UUID id = player.getUniqueID();
