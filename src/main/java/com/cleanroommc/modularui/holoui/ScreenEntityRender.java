@@ -3,11 +3,9 @@ package com.cleanroommc.modularui.holoui;
 import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
-import com.cleanroommc.modularui.screen.GuiContainerWrapper;
 import com.cleanroommc.modularui.utils.Animator;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.entity.Render;
@@ -48,7 +46,6 @@ public class ScreenEntityRender extends Render<HoloScreenEntity> {
     public void doRender(@NotNull HoloScreenEntity entity, double x, double y, double z, float entityYaw, float partialTicks) {
         var screenWrapper = entity.getWrapper();
         if (screenWrapper == null) return;
-        var screen = screenWrapper.getScreen();
 
         Plane3D plane3D = entity.getPlane3D();
         GlStateManager.pushMatrix();
@@ -59,20 +56,28 @@ public class ScreenEntityRender extends Render<HoloScreenEntity> {
         } else {
             plane3D.transform();
         }
+
         var mouse = calculateMousePos(player.getPositionVector().add(0, player.getEyeHeight(), 0), entity, player.getLookVec());
-        screen.getContext().updateState(mouse.getX(), mouse.getY(), partialTicks);
-        ClientScreenHandler.drawScreenInternal(screen, screenWrapper.getGuiScreen(), mouse.getX(), mouse.getY(), partialTicks);
-//        screen.drawScreen(mouse.getX(), mouse.getY(), partialTicks);
-        screen.onFrameUpdate();
+        drawScreen(entity, mouse, partialTicks);
 
         UUID id = player.getUniqueID();
-        Animator.advance();
         if (withinScreen(mouse, entity.getPlane3D()) && !lookingPlayers.containsKey(id)) {
             lookingPlayers.put(id, screenWrapper);
         } else if (!withinScreen(mouse, entity.getPlane3D())) {
             lookingPlayers.remove(id);
         }
         GlStateManager.popMatrix();
+    }
+
+    private static void drawScreen(HoloScreenEntity entity, Vec3i mouse, float partialTicks) {
+        var screen = entity.getScreen();
+        var mcScreen = screen.getScreenWrapper().getGuiScreen();
+
+        screen.getContext().updateState(mouse.getX(), mouse.getY(), partialTicks);
+        ClientScreenHandler.drawDebugScreen(screen, null);
+        ClientScreenHandler.drawScreenInternal(screen, mcScreen, mouse.getX(), mouse.getY(), partialTicks);
+        screen.onFrameUpdate();
+        Animator.advance();
     }
 
     public static void clickScreen(EntityPlayer player) {
