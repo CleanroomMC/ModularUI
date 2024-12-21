@@ -224,7 +224,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             }
         }
 
-        float z = 100f;
+        float z = getContext().isHoloScreen ? -100f : 100f;
         float zStart = ((GuiAccessor) guiScreen).getZLevel();
         ((GuiAccessor) guiScreen).setZLevel(zStart + z);
         renderItem.zLevel += z;
