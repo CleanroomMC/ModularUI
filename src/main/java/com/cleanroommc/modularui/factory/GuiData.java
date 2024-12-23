@@ -21,10 +21,12 @@ import java.util.Objects;
 public class GuiData {
 
     private final EntityPlayer player;
+    private final int openedDimension;
     private JeiSettings jeiSettings;
 
     public GuiData(EntityPlayer player) {
         this.player = Objects.requireNonNull(player);
+        this.openedDimension = player.dimension;
     }
 
     public EntityPlayer getPlayer() {
@@ -56,5 +58,9 @@ public class GuiData {
 
     final void setJeiSettings(JeiSettings jeiSettings) {
         this.jeiSettings = Objects.requireNonNull(jeiSettings);
+    }
+
+    public boolean canInteractWith(EntityPlayer playerIn){
+        return playerIn == player && playerIn.dimension == openedDimension;
     }
 }

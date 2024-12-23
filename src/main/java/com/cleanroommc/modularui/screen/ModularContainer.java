@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.core.mixin.ContainerAccessor;
+import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
@@ -42,6 +43,7 @@ public class ModularContainer extends Container implements ISortableContainer {
 
     private final EntityPlayer player;
     private final ModularSyncManager syncManager;
+    private final GuiData guiData;
     private boolean init = true;
     private final List<ModularSlot> slots = new ArrayList<>();
     private final List<ModularSlot> shiftClickSlots = new ArrayList<>();
@@ -50,7 +52,7 @@ public class ModularContainer extends Container implements ISortableContainer {
     @SideOnly(Side.CLIENT)
     private ModularScreen optionalScreen;
 
-    public ModularContainer(EntityPlayer player, PanelSyncManager panelSyncManager, String mainPanelName) {
+    public ModularContainer(EntityPlayer player, PanelSyncManager panelSyncManager, String mainPanelName, GuiData guiData) {
         this.player = player;
         this.syncManager = new ModularSyncManager(this);
         this.syncManager.construct(mainPanelName, panelSyncManager);
@@ -60,6 +62,7 @@ public class ModularContainer extends Container implements ISortableContainer {
         }
         this.containerCustomizer.initialize(this);
         sortShiftClickSlots();
+        this.guiData = guiData;
     }
 
     @SideOnly(Side.CLIENT)
@@ -68,6 +71,7 @@ public class ModularContainer extends Container implements ISortableContainer {
         this.syncManager = null;
         this.containerCustomizer = containerCustomizer != null ? containerCustomizer : new ContainerCustomizer();
         this.containerCustomizer.initialize(this);
+        this.guiData = null;
     }
 
     @SideOnly(Side.CLIENT)
@@ -170,6 +174,13 @@ public class ModularContainer extends Container implements ISortableContainer {
         return this.syncManager;
     }
 
+    public GuiData getGuiData() {
+        if (this.guiData == null) {
+            throw new IllegalStateException("GuiData is not available for client only GUI's.");
+        }
+        return this.guiData;
+    }
+
     public boolean isClient() {
         return this.syncManager == null || NetworkUtils.isClient(this.player);
     }
@@ -192,7 +203,7 @@ public class ModularContainer extends Container implements ISortableContainer {
 
     @Override
     public boolean canInteractWith(@NotNull EntityPlayer playerIn) {
-        return true;
+        return guiData.canInteractWith(playerIn);
     }
 
     @Override

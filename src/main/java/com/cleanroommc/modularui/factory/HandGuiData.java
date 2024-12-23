@@ -10,10 +10,12 @@ import net.minecraft.util.EnumHand;
 public class HandGuiData extends GuiData {
 
     private final EnumHand hand;
+    private final ItemStack openedStack;
 
     public HandGuiData(EntityPlayer player, EnumHand hand) {
         super(player);
         this.hand = hand;
+        openedStack = getUsedItemStack();
     }
 
     public EnumHand getHand() {
@@ -36,4 +38,8 @@ public class HandGuiData extends GuiData {
         getPlayer().setHeldItem(this.hand, item);
     }
 
+    @Override
+    public boolean canInteractWith(EntityPlayer playerIn) {
+        return super.canInteractWith(playerIn) && openedStack == getUsedItemStack();
+    }
 }

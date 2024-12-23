@@ -72,7 +72,7 @@ public class GuiManager {
         PanelSyncManager syncManager = new PanelSyncManager();
         ModularPanel panel = factory.createPanel(guiData, syncManager);
         WidgetTree.collectSyncValues(syncManager, panel);
-        ModularContainer container = new ModularContainer(player, syncManager, panel.getName());
+        ModularContainer container = new ModularContainer(player, syncManager, panel.getName(), guiData);
         // sync to client
         player.getNextWindowId();
         player.closeContainer();
@@ -98,7 +98,7 @@ public class GuiManager {
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularScreen screen = factory.createScreen(guiData, panel);
         screen.getContext().setJeiSettings(jeiSettings);
-        ModularContainer container = new ModularContainer(player, syncManager, panel.getName());
+        ModularContainer container = new ModularContainer(player, syncManager, panel.getName(), guiData);
         IMuiScreen wrapper = factory.createScreenWrapper(container, screen);
         if (!(wrapper.getGuiScreen() instanceof GuiContainer guiContainer)) {
             throw new IllegalStateException("The wrapping screen must be a GuiContainer for synced GUIs!");

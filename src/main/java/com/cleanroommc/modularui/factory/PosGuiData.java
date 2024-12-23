@@ -1,5 +1,7 @@
 package com.cleanroommc.modularui.factory;
 
+import com.cleanroommc.modularui.api.IDistantTile;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -10,15 +12,16 @@ import net.minecraft.world.World;
  */
 public class PosGuiData extends GuiData {
 
-    private static final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
-
-    private final int x, y, z;
+    private final BlockPos pos;
+    private final TileEntity openedTile;
+    private final double interactDistanceSq;
 
     public PosGuiData(EntityPlayer player, int x, int y, int z) {
         super(player);
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.pos = new BlockPos(x, y, z);
+        openedTile = getTileEntity();
+        double interactDistance = openedTile instanceof IDistantTile ? ((IDistantTile) openedTile).getInteractionDistance(): 8;
+        this.interactDistanceSq = interactDistance * interactDistance;
     }
 
     public World getWorld() {
@@ -26,23 +29,26 @@ public class PosGuiData extends GuiData {
     }
 
     public int getX() {
-        return this.x;
+        return this.pos.getX();
     }
 
     public int getY() {
-        return this.y;
+        return this.pos.getY();
     }
 
     public int getZ() {
-        return this.z;
+        return this.pos.getZ();
     }
 
     public BlockPos getBlockPos() {
-        return new BlockPos(this.x, this.y, this.z);
+        return pos;
     }
 
     public TileEntity getTileEntity() {
-        pos.setPos(this.x, this.y, this.z);
         return getWorld().getTileEntity(pos);
+    }
+    @Override
+    public boolean canInteractWith(EntityPlayer playerIn) {
+        return super.canInteractWith(playerIn) && playerIn.getDistanceSqToCenter(pos) < interactDistanceSq && getTileEntity() == openedTile;
     }
 }
