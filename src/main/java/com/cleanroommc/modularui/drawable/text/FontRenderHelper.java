@@ -121,7 +121,7 @@ public class FontRenderHelper {
     }
 
     public static boolean isReset(TextFormatting[] state) {
-        return state[6] != null;
+        return state[6] == TextFormatting.RESET;
     }
 
     public static int getDefaultTextHeight() {
