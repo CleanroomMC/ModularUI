@@ -68,7 +68,7 @@ public class StyledText extends BaseKey {
     }
 
     @Override
-    public BaseKey tailFormat(TextFormatting formatting) {
+    public BaseKey tailFormat(TextFormatting[] formatting) {
         this.key.tailFormat(formatting);
         return this;
     }

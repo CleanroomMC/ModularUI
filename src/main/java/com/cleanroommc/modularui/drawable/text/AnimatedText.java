@@ -107,8 +107,9 @@ public class AnimatedText extends StyledText {
         return (AnimatedText) super.format(formatting);
     }
 
+
     @Override
-    public AnimatedText tailFormat(TextFormatting formatting) {
+    public AnimatedText tailFormat(TextFormatting[] formatting) {
         return (AnimatedText) super.tailFormat(formatting);
     }
 

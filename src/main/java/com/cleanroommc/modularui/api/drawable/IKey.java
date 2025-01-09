@@ -204,7 +204,7 @@ public interface IKey extends IDrawable {
 
     IKey format(TextFormatting formatting);
 
-    IKey tailFormat(TextFormatting formatting);
+    IKey tailFormat(TextFormatting[] formatting);
 
     default IKey format(TextFormatting... formatting) {
         for (TextFormatting tf : formatting) format(tf);

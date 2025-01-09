@@ -152,4 +152,15 @@ public class FontRenderHelper {
         }
         return l;
     }
+
+    public static String fixString(String s, TextFormatting[] formatting) {
+        int codes = getFormatLength(s, 0);
+        if (codes == 0) return s;
+        return s + getFormatting(formatting);
+    }
+
+    public static Object[] fixArgs(Object[] args, TextFormatting[] formatting) {
+        Arrays.setAll(args, i -> fixString(args[i].toString(), formatting));
+        return args;
+    }
 }

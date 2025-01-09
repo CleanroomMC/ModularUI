@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.drawable.text;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -20,6 +21,7 @@ public class StringKey extends BaseKey {
 
     @Override
     public String get() {
-        return this.args == null ? this.string : String.format(this.string, this.args);
+        if (ArrayUtils.isEmpty(this.args)) return this.string;
+        return String.format(this.string, FontRenderHelper.fixArgs(this.args, getFormatting()));
     }
 }

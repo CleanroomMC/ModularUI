@@ -52,7 +52,9 @@ public class LangKey extends BaseKey {
             return this.string;
         }
         this.time = ClientScreenHandler.getTicks();
-        this.string = I18n.format(Objects.requireNonNull(this.keySupplier.get()), this.argsSupplier.get()).replaceAll("\\\\n", "\n");
+        String key = Objects.requireNonNull(this.keySupplier.get());
+        Object[] args = FontRenderHelper.fixArgs(this.argsSupplier.get(), getFormatting());
+        this.string = I18n.format(key, args).replaceAll("\\\\n", "\n");
         return string;
     }
 }

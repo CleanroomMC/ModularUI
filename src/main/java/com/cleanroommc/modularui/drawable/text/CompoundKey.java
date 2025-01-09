@@ -33,6 +33,7 @@ public class CompoundKey extends BaseKey {
 
     private String toString(boolean formatted, TextFormatting @Nullable [] parentFormatting) {
         if (ClientScreenHandler.getTicks() != this.time) {
+            this.time = ClientScreenHandler.getTicks();
             StringBuilder builder = new StringBuilder();
             for (IKey key : this.keys) {
                 if (formatted) {
