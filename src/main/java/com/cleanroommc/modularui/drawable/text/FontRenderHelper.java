@@ -160,7 +160,7 @@ public class FontRenderHelper {
     }
 
     public static Object[] fixArgs(Object[] args, TextFormatting[] formatting) {
-        Arrays.setAll(args, i -> fixString(args[i].toString(), formatting));
+        Arrays.setAll(args, i -> fixString(String.valueOf(args[i]), formatting));
         return args;
     }
 }
