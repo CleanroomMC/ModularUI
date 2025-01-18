@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -141,7 +142,17 @@ public class UITexture implements IDrawable {
         GuiDraw.drawTexture(this.location, x, y, x + width, y + height, this.u0, this.v0, this.u1, this.v1);
     }
 
+    @Deprecated
     public void drawSubArea(float x, float y, float width, float height, float uStart, float vStart, float uEnd, float vEnd) {
+        drawSubArea(x, y, width, height, uStart, vStart, uEnd, vEnd, WidgetTheme.getDefault());
+    }
+
+    public void drawSubArea(float x, float y, float width, float height, float uStart, float vStart, float uEnd, float vEnd, WidgetTheme widgetTheme) {
+        if (canApplyTheme()) {
+            Color.setGlColor(widgetTheme.getColor());
+        } else {
+            Color.setGlColorOpaque(Color.WHITE.main);
+        }
         GuiDraw.drawTexture(this.location, x, y, x + width, y + height, lerpU(uStart), lerpV(vStart), lerpU(uEnd), lerpV(vEnd));
     }
 
