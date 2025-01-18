@@ -62,14 +62,14 @@ public class StyledText extends BaseKey {
     }
 
     @Override
-    public BaseKey format(TextFormatting formatting) {
+    public StyledText format(TextFormatting formatting) {
         this.key.format(formatting);
         return this;
     }
 
     @Override
-    public BaseKey tailFormat(TextFormatting[] formatting) {
-        this.key.tailFormat(formatting);
+    public StyledText parentFormat(TextFormatting[] formatting) {
+        this.key.parentFormat(formatting);
         return this;
     }
 

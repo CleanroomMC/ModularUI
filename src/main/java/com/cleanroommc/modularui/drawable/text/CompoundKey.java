@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.screen.ClientScreenHandler;
 
 import net.minecraft.util.text.TextFormatting;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
 
 public class CompoundKey extends BaseKey {
@@ -17,7 +18,7 @@ public class CompoundKey extends BaseKey {
     private long time = 0;
 
     public CompoundKey(IKey... keys) {
-        this.keys = keys == null || keys.length == 0 ? EMPTY : keys;
+        this.keys = ArrayUtils.isEmpty(keys) ? EMPTY : keys;
     }
 
     @Override

@@ -104,33 +104,39 @@ public class AnimatedText extends StyledText {
 
     @Override
     public AnimatedText format(TextFormatting formatting) {
-        return (AnimatedText) super.format(formatting);
+        super.format(formatting);
+        return this;
     }
 
 
     @Override
-    public AnimatedText tailFormat(TextFormatting[] formatting) {
-        return (AnimatedText) super.tailFormat(formatting);
+    public AnimatedText parentFormat(TextFormatting[] formatting) {
+        super.parentFormat(formatting);
+        return this;
     }
 
     @Override
     public AnimatedText alignment(Alignment alignment) {
-        return (AnimatedText) super.alignment(alignment);
+        super.alignment(alignment);
+        return this;
     }
 
     @Override
     public AnimatedText color(@Nullable Integer color) {
-        return (AnimatedText) super.color(color);
+        super.color(color);
+        return this;
     }
 
     @Override
     public AnimatedText scale(float scale) {
-        return (AnimatedText) super.scale(scale);
+        super.scale(scale);
+        return this;
     }
 
     @Override
     public AnimatedText shadow(@Nullable Boolean shadow) {
-        return (AnimatedText) super.shadow(shadow);
+        super.shadow(shadow);
+        return this;
     }
 
     /**
