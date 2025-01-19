@@ -10,6 +10,7 @@ import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
+import com.cleanroommc.modularui.widgets.Dialog;
 import com.cleanroommc.modularui.widgets.SortableListWidget;
 import com.cleanroommc.modularui.widgets.layout.Grid;
 import com.cleanroommc.modularui.widgets.layout.Row;
@@ -55,7 +56,7 @@ public class TestGui extends CustomModularScreen {
                             .expanded().heightRel(1f))
                     .child(new ButtonWidget<>()
                             .onMousePressed(button -> item.removeSelfFromList())
-                            .overlay(GuiTextures.CROSS)
+                            .overlay(GuiTextures.CROSS_TINY.asIcon().size(10))
                             .width(10).heightRel(1f))));
         }
         SortableListWidget<String> sortableListWidget = new SortableListWidget<String>()
@@ -87,7 +88,7 @@ public class TestGui extends CustomModularScreen {
                 .bottom(23)
                 .width(100));
         IPanelHandler otherPanel = IPanelHandler.simple(panel, (mainPanel, player) -> {
-            ModularPanel panel1 = ModularPanel.defaultPanel("Option Selection", 150, 120);
+            ModularPanel panel1 = new Dialog<>("Option Selection").setDisablePanelsBelow(false).setDraggable(false).size(150, 120);
             return panel1.child(ButtonWidget.panelCloseButton())
                     .child(new Grid()
                             .matrix(availableMatrix)

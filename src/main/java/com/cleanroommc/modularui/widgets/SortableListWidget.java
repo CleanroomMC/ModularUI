@@ -24,6 +24,7 @@ public class SortableListWidget<T> extends ListValueWidget<T, SortableListWidget
     private int timeSinceLastMove = 0;
 
     public SortableListWidget() {
+        super(Item::getWidgetValue);
         heightRel(1f);
     }
 

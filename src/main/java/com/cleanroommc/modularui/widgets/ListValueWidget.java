@@ -1,17 +1,23 @@
 package com.cleanroommc.modularui.widgets;
 
-import com.cleanroommc.modularui.api.widget.IValueWidget;
+import com.cleanroommc.modularui.api.widget.IWidget;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-public class ListValueWidget<T, I extends IValueWidget<T>, W extends ListValueWidget<T, I, W>> extends ListWidget<I, W> {
+public class ListValueWidget<T, I extends IWidget, W extends ListValueWidget<T, I, W>> extends ListWidget<I, W> {
+
+    private final Function<I, T> widgetToValue;
+
+    public ListValueWidget(Function<I, T> widgetToValue) {
+        this.widgetToValue = widgetToValue;
+    }
 
     public List<T> getValues() {
         List<T> list = new ArrayList<>();
         for (I widget : getTypeChildren()) {
-            list.add(widget.getWidgetValue());
+            list.add(this.widgetToValue.apply(widget));
         }
         return list;
     }
