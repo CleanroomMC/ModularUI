@@ -153,17 +153,12 @@ public class FontRenderHelper {
         return l;
     }
 
-    public static String fixString(Object obj, TextFormatting[] formatting) {
-        if (obj == null) return null;
-        String s = obj.toString();
-        int codes = getFormatLength(s, 0);
-        if (codes == 0) return s;
-        return s + getFormatting(formatting);
-    }
-
-    public static Object[] fixArgs(Object[] args, TextFormatting[] formatting) {
+    public static Object[] fixArgs(Object[] args, TextFormatting[] formatting, TextFormatting[] parentFormatting) {
         if (args == null) return null;
-        Arrays.setAll(args, i -> fixString(args[i], formatting));
+        Arrays.setAll(args, i -> {
+            if (args[i] == null) return null;
+            return format(formatting, parentFormatting, String.valueOf(args[i]));
+        });
         return args;
     }
 }

@@ -1,8 +1,11 @@
 package com.cleanroommc.modularui.drawable.text;
 
+import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 
 import net.minecraft.client.resources.I18n;
+
+import net.minecraft.util.text.TextFormatting;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
@@ -61,12 +64,21 @@ public class LangKey extends BaseKey {
 
     @Override
     public String get() {
+        return toString(false, null);
+    }
+
+    @Override
+    public String getFormatted(@Nullable TextFormatting[] parentFormatting) {
+        return toString(true, parentFormatting);
+    }
+
+    private String toString(boolean formatted, TextFormatting @Nullable [] parentFormatting) {
         if (this.time != ClientScreenHandler.getTicks()) {
             this.time = ClientScreenHandler.getTicks();
             this.lastLang = this.keySupplier.get();
-            this.lastArgs = FontRenderHelper.fixArgs(this.argsSupplier.get(), getFormatting());
+            this.lastArgs = FontRenderHelper.fixArgs(this.argsSupplier.get(), getFormatting(), parentFormatting);
             this.string = I18n.format(this.lastLang, this.lastArgs).replaceAll("\\\\n", "\n");
         }
-        return this.string;
+        return formatted ? FontRenderHelper.format(getFormatting(), parentFormatting, this.string) : this.string;
     }
 }
