@@ -1,21 +1,27 @@
 package com.cleanroommc.modularui.core.mixin;
 
 import com.cleanroommc.modularui.api.IMuiScreen;
+import com.cleanroommc.modularui.screen.IClickableGuiContainer;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GuiContainer.class)
-public class GuiContainerMixin {
+public class GuiContainerMixin implements IClickableGuiContainer {
 
     @Shadow
     private Slot hoveredSlot;
+
+    @Shadow private Slot clickedSlot;
+    @Unique
+    private Slot modularUI$clickedSlot;
 
     /**
      * Mixin into ModularUI screen wrapper to return the true hovered slot.
@@ -24,8 +30,20 @@ public class GuiContainerMixin {
      */
     @Inject(method = "getSlotAtPosition", at = @At("HEAD"), cancellable = true)
     public void getSlot(int x, int y, CallbackInfoReturnable<Slot> cir) {
-        if (IMuiScreen.class.isAssignableFrom(this.getClass())) {
+        if (this.clickedSlot != null) {
+            cir.setReturnValue(this.clickedSlot);
+        } else if (IMuiScreen.class.isAssignableFrom(this.getClass())) {
             cir.setReturnValue(this.hoveredSlot);
         }
+    }
+
+    @Override
+    public void modularUI$setClickedSlot(Slot slot) {
+        this.modularUI$clickedSlot = slot;
+    }
+
+    @Override
+    public Slot modularUI$getClickedSlot() {
+        return modularUI$clickedSlot;
     }
 }

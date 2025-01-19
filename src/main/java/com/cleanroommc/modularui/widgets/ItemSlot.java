@@ -127,7 +127,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             MouseData mouseData = MouseData.create(mouseButton);
             this.syncHandler.syncToServer(2, mouseData::writeToPacket);
         } else {
-            ClientScreenHandler.clickSlot();
+            ClientScreenHandler.clickSlot(getScreen(), getSlot());
             //getScreen().getScreenWrapper().clickSlot();
         }
         return Result.SUCCESS;
