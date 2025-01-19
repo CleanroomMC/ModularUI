@@ -5,16 +5,37 @@ import com.cleanroommc.modularui.drawable.GuiDraw;
 
 public class HorizontalScrollData extends ScrollData {
 
+    /**
+     * Creates horizontal scroll data which handles scrolling and scroll bar.
+     * Scrollbar is 4 pixel high and is placed at the bottom.
+     */
     public HorizontalScrollData() {
-        this(false);
+        this(false, DEFAULT_THICKNESS);
     }
 
+    /**
+     * Creates horizontal scroll data which handles scrolling and scroll bar.
+     * Scrollbar is 4 pixel high.
+     *
+     * @param topAlignment if the scroll bar should be placed at the top
+     */
     public HorizontalScrollData(boolean topAlignment) {
-        this(topAlignment, 4);
+        this(topAlignment, DEFAULT_THICKNESS);
     }
 
+    /**
+     * Creates horizontal scroll data which handles scrolling and scroll bar.
+     *
+     * @param topAlignment if the scroll bar should be placed at the top
+     * @param thickness    height of the scroll bar in pixel
+     */
     public HorizontalScrollData(boolean topAlignment, int thickness) {
         super(GuiAxis.X, topAlignment, thickness);
+    }
+
+    public HorizontalScrollData cancelScrollEdge(boolean cancelScrollEdge) {
+        setCancelScrollEdge(cancelScrollEdge);
+        return this;
     }
 
     @Override

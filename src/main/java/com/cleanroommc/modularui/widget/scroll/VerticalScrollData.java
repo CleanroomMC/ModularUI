@@ -5,16 +5,37 @@ import com.cleanroommc.modularui.drawable.GuiDraw;
 
 public class VerticalScrollData extends ScrollData {
 
+    /**
+     * Creates vertical scroll data which handles scrolling and scroll bar.
+     * Scrollbar is 4 pixel wide and is placed on the right.
+     */
     public VerticalScrollData() {
-        this(false);
+        this(false, DEFAULT_THICKNESS);
     }
 
+    /**
+     * Creates vertical scroll data which handles scrolling and scroll bar.
+     * Scrollbar is 4 pixel wide.
+     *
+     * @param leftAlignment if the scroll bar should be placed on the left
+     */
     public VerticalScrollData(boolean leftAlignment) {
-        this(leftAlignment, 4);
+        this(leftAlignment, DEFAULT_THICKNESS);
     }
 
+    /**
+     * Creates vertical scroll data which handles scrolling and scroll bar.
+     *
+     * @param leftAlignment if the scroll bar should be placed on the left
+     * @param thickness     width of the scroll bar in pixel
+     */
     public VerticalScrollData(boolean leftAlignment, int thickness) {
         super(GuiAxis.Y, leftAlignment, thickness);
+    }
+
+    public VerticalScrollData cancelScrollEdge(boolean cancelScrollEdge) {
+        setCancelScrollEdge(cancelScrollEdge);
+        return this;
     }
 
     @Override

@@ -13,10 +13,48 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class ScrollData {
 
+    /**
+     * Creates scroll data which handles scrolling and scroll bar. Scrollbar is 4 pixel thick
+     * and will be at the end of the cross axis (bottom/right).
+     *
+     * @param axis      axis on which to scroll
+     * @return new scroll data
+     */
+    public static ScrollData of(GuiAxis axis) {
+        return of(axis, false, DEFAULT_THICKNESS);
+    }
+
+    /**
+     * Creates scroll data which handles scrolling and scroll bar. Scrollbar is 4 pixel thick.
+     *
+     * @param axis      axis on which to scroll
+     * @param axisStart if the scroll bar should be at the start of the cross axis (left/top)
+     * @return new scroll data
+     */
+    public static ScrollData of(GuiAxis axis, boolean axisStart) {
+        return of(axis, axisStart, DEFAULT_THICKNESS);
+    }
+
+    /**
+     * Creates scroll data which handles scrolling and scroll bar.
+     *
+     * @param axis      axis on which to scroll
+     * @param axisStart if the scroll bar should be at the start of the cross axis (left/top)
+     * @param thickness cross axis thickness of the scroll bar in pixel
+     * @return new scroll data
+     */
+    public static ScrollData of(GuiAxis axis, boolean axisStart, int thickness) {
+        if (axis.isHorizontal()) return new HorizontalScrollData(axisStart, thickness);
+        return new VerticalScrollData(axisStart, thickness);
+    }
+
+    public static final int DEFAULT_THICKNESS = 4;
+
     private final GuiAxis axis;
     private final boolean axisStart;
     private final int thickness;
     private int scrollSpeed = 30;
+    private boolean cancelScrollEdge = true;
 
     private int scrollSize;
     private int scroll;
@@ -73,6 +111,21 @@ public abstract class ScrollData {
 
     public boolean isHorizontal() {
         return this.axis.isHorizontal();
+    }
+
+    /**
+     * Determines if scrolling of widgets below should still be canceled if this scroll view
+     * has hit the end and is currently not scrolling.
+     * Most of the time this should be true
+     *
+     * @return true if scrolling should be canceled even when this view hit an edge
+     */
+    public boolean isCancelScrollEdge() {
+        return cancelScrollEdge;
+    }
+
+    public void setCancelScrollEdge(boolean cancelScrollEdge) {
+        this.cancelScrollEdge = cancelScrollEdge;
     }
 
     protected final int getRawVisibleSize(ScrollArea area) {

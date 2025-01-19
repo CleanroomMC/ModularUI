@@ -62,7 +62,7 @@ public class ProgressWidget extends Widget<ProgressWidget> {
         float progress = getCurrentProgress();
         if (this.fullTexture[0] != null && progress > 0) {
             if (this.direction == Direction.CIRCULAR_CW) {
-                drawCircular(progress);
+                drawCircular(progress, widgetTheme);
                 return;
             }
             if (progress >= 1) {
@@ -91,7 +91,7 @@ public class ProgressWidget extends Widget<ProgressWidget> {
                         y = getArea().height - height;
                         break;
                 }
-                this.fullTexture[0].drawSubArea(x, y, width, height, u0, v0, u1, v1);
+                this.fullTexture[0].drawSubArea(x, y, width, height, u0, v0, u1, v1, widgetTheme);
             }
         }
     }
@@ -103,7 +103,7 @@ public class ProgressWidget extends Widget<ProgressWidget> {
         return (float) (Math.floor(uv * this.imageSize) / this.imageSize);
     }
 
-    private void drawCircular(float progress) {
+    private void drawCircular(float progress, WidgetTheme widgetTheme) {
         float[] subAreas = {
                 getProgressUV(MathHelper.clamp(progress / 0.25f, 0, 1)),
                 getProgressUV(MathHelper.clamp((progress - 0.25f) / 0.25f, 0, 1)),
@@ -118,7 +118,7 @@ public class ProgressWidget extends Widget<ProgressWidget> {
                 0, getArea().height - progressScaled,
                 halfWidth, progressScaled,
                 0.0f, 1.0f - progressScaled / halfHeight,
-                1.0f, 1.0f
+                1.0f, 1.0f, widgetTheme
         ); // BL, draw UP
 
         progressScaled = subAreas[1] * halfWidth;
@@ -126,7 +126,8 @@ public class ProgressWidget extends Widget<ProgressWidget> {
                 0, 0,
                 progressScaled, halfHeight,
                 0.0f, 0.0f,
-                progressScaled / (halfWidth), 1.0f
+                progressScaled / (halfWidth), 1.0f,
+                widgetTheme
         ); // TL, draw RIGHT
 
         progressScaled = subAreas[2] * halfHeight;
@@ -134,7 +135,8 @@ public class ProgressWidget extends Widget<ProgressWidget> {
                 halfWidth, 0,
                 halfWidth, progressScaled,
                 0.0f, 0.0f,
-                1.0f, progressScaled / halfHeight
+                1.0f, progressScaled / halfHeight,
+                widgetTheme
         ); // TR, draw DOWN
 
         progressScaled = subAreas[3] * halfWidth;
@@ -142,7 +144,7 @@ public class ProgressWidget extends Widget<ProgressWidget> {
                 getArea().width - progressScaled, halfHeight,
                 progressScaled, halfHeight,
                 1.0f - progressScaled / halfWidth, 0.0f,
-                1.0f, 1.0f
+                1.0f, 1.0f, widgetTheme
         ); // BR, draw LEFT
     }
 

@@ -45,6 +45,9 @@ public interface GuiScreenAccessor {
     List<GuiButton> getButtonList();
 
     @Accessor
+    void setButtonList(List<GuiButton> buttonList);
+
+    @Accessor
     List<GuiLabel> getLabelList();
 
     @Invoker

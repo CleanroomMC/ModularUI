@@ -30,7 +30,7 @@ public class ModularGuiContext extends GuiContext {
     public final ModularScreen screen;
     private LocatedWidget focusedWidget = LocatedWidget.EMPTY;
     @Nullable
-    private IGuiElement hovered;
+    private IWidget hovered;
     private int timeHovered = 0;
     private final HoveredIterable hoveredWidgets;
 
@@ -81,7 +81,7 @@ public class ModularGuiContext extends GuiContext {
      * @return the hovered widget (widget directly below the mouse)
      */
     @Nullable
-    public IGuiElement getHovered() {
+    public IWidget getHovered() {
         return this.hovered;
     }
 
@@ -310,7 +310,7 @@ public class ModularGuiContext extends GuiContext {
 
     @ApiStatus.Internal
     public void onFrameUpdate() {
-        IGuiElement hovered = this.screen.getPanelManager().getTopWidget();
+        IWidget hovered = this.screen.getPanelManager().getTopWidget();
         if (hasDraggable() && (this.lastDragX != getAbsMouseX() || this.lastDragY != getAbsMouseY())) {
             this.lastDragX = getAbsMouseX();
             this.lastDragY = getAbsMouseY();

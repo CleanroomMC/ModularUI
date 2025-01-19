@@ -3,13 +3,13 @@ package com.cleanroommc.modularui;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mariuszgromada.math.mxparser.License;
 
 @Mod(modid = ModularUI.ID,
         name = ModularUI.NAME,
@@ -36,6 +36,11 @@ public class ModularUI {
 
     private static boolean blurLoaded = false;
     private static boolean sorterLoaded = false;
+
+    static {
+        // confirm mXparser license
+        License.iConfirmNonCommercialUse("CleanroomMC");
+    }
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {

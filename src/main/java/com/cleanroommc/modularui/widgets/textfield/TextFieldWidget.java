@@ -1,15 +1,14 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.IMathValue;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.value.IStringValue;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.utils.math.Constant;
-import com.cleanroommc.modularui.utils.math.MathBuilder;
+import com.cleanroommc.modularui.utils.MathUtils;
+import com.cleanroommc.modularui.utils.ParseResult;
 import com.cleanroommc.modularui.value.StringValue;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
@@ -35,17 +34,14 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
     protected boolean changedMarkedColor = false;
 
-    public IMathValue parse(String num) {
-        try {
-            IMathValue ret = MathBuilder.INSTANCE.parse(num);
-            this.mathFailMessage = null;
-            return ret;
-        } catch (MathBuilder.ParseException e) {
-            this.mathFailMessage = e.getMessage();
-        } catch (Exception e) {
-            ModularUI.LOGGER.catching(e);
+    public double parse(String num) {
+        ParseResult result = MathUtils.parseExpression(num, this.defaultNumber, true);
+        double value = result.getResult();
+        if (result.isFailure()) {
+            this.mathFailMessage = result.getError();
+            ModularUI.LOGGER.error("Math expression error in {}: {}", this, this.mathFailMessage);
         }
-        return new Constant(this.defaultNumber);
+        return value;
     }
 
     public IStringValue<?> createMathFailMessageValue() {
@@ -163,6 +159,10 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         return true;
     }
 
+    public String getMathFailMessage() {
+        return mathFailMessage;
+    }
+
     public TextFieldWidget setMaxLength(int maxLength) {
         this.handler.setMaxCharacters(maxLength);
         return this;
@@ -197,12 +197,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             if (val.isEmpty()) {
                 num = (long) this.defaultNumber;
             } else {
-                try {
-                    num = (long) parse(val).doubleValue();
-                } catch (IMathValue.EvaluateException e) {
-                    this.mathFailMessage = e.getMessage();
-                    num = (long) this.defaultNumber;
-                }
+                num = (long) parse(val);
             }
             return format.format(validator.apply(num));
         });
@@ -216,12 +211,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             if (val.isEmpty()) {
                 num = (int) this.defaultNumber;
             } else {
-                try {
-                    num = (int) parse(val).doubleValue();
-                } catch (IMathValue.EvaluateException e) {
-                    this.mathFailMessage = e.getMessage();
-                    num = (int) this.defaultNumber;
-                }
+                num = (int) parse(val);
             }
             return format.format(validator.apply(num));
         });
@@ -234,12 +224,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             if (val.isEmpty()) {
                 num = this.defaultNumber;
             } else {
-                try {
-                    num = parse(val).doubleValue();
-                } catch (IMathValue.EvaluateException e) {
-                    this.mathFailMessage = e.getMessage();
-                    num = this.defaultNumber;
-                }
+                num = parse(val);
             }
             return format.format(validator.apply(num));
         });
