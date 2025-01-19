@@ -19,7 +19,6 @@ public class GuiContainerMixin implements IClickableGuiContainer {
     @Shadow
     private Slot hoveredSlot;
 
-    @Shadow private Slot clickedSlot;
     @Unique
     private Slot modularUI$clickedSlot;
 
@@ -30,8 +29,8 @@ public class GuiContainerMixin implements IClickableGuiContainer {
      */
     @Inject(method = "getSlotAtPosition", at = @At("HEAD"), cancellable = true)
     public void getSlot(int x, int y, CallbackInfoReturnable<Slot> cir) {
-        if (this.clickedSlot != null) {
-            cir.setReturnValue(this.clickedSlot);
+        if (this.modularUI$clickedSlot != null) {
+            cir.setReturnValue(this.modularUI$clickedSlot);
         } else if (IMuiScreen.class.isAssignableFrom(this.getClass())) {
             cir.setReturnValue(this.hoveredSlot);
         }
