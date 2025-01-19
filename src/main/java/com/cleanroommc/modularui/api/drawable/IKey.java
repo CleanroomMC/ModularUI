@@ -31,6 +31,30 @@ public interface IKey extends IDrawable {
     IKey LINE_FEED = str("\n");
     IKey SPACE = str(" ");
 
+    // Formatting for convenience
+    TextFormatting BLACK = TextFormatting.BLACK;
+    TextFormatting DARK_BLUE = TextFormatting.DARK_BLUE;
+    TextFormatting DARK_GREEN = TextFormatting.DARK_GREEN;
+    TextFormatting DARK_AQUA = TextFormatting.DARK_AQUA;
+    TextFormatting DARK_RED = TextFormatting.DARK_RED;
+    TextFormatting DARK_PURPLE = TextFormatting.DARK_PURPLE;
+    TextFormatting GOLD = TextFormatting.GOLD;
+    TextFormatting GRAY = TextFormatting.GRAY;
+    TextFormatting DARK_GRAY = TextFormatting.DARK_GRAY;
+    TextFormatting BLUE = TextFormatting.BLUE;
+    TextFormatting GREEN = TextFormatting.GREEN;
+    TextFormatting AQUA = TextFormatting.AQUA;
+    TextFormatting RED = TextFormatting.RED;
+    TextFormatting LIGHT_PURPLE = TextFormatting.LIGHT_PURPLE;
+    TextFormatting YELLOW = TextFormatting.YELLOW;
+    TextFormatting WHITE = TextFormatting.WHITE;
+    TextFormatting OBFUSCATED = TextFormatting.OBFUSCATED;
+    TextFormatting BOLD = TextFormatting.BOLD;
+    TextFormatting STRIKETHROUGH = TextFormatting.STRIKETHROUGH;
+    TextFormatting UNDERLINE = TextFormatting.UNDERLINE;
+    TextFormatting ITALIC = TextFormatting.ITALIC;
+    TextFormatting RESET = TextFormatting.RESET;
+
     /**
      * Creates a translated text.
      *
@@ -140,10 +164,18 @@ public interface IKey extends IDrawable {
     String get();
 
     /**
+     * @param parentFormatting formatting of the parent in case of composite keys
+     * @return the current formatted string
+     */
+    default String getFormatted(@Nullable TextFormatting[] parentFormatting) {
+        return get();
+    }
+
+    /**
      * @return the current formatted string
      */
     default String getFormatted() {
-        return get();
+        return getFormatted(null);
     }
 
     @SideOnly(Side.CLIENT)
