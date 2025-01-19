@@ -33,6 +33,11 @@ public class VerticalScrollData extends ScrollData {
         super(GuiAxis.Y, leftAlignment, thickness);
     }
 
+    public VerticalScrollData cancelScrollEdge(boolean cancelScrollEdge) {
+        setCancelScrollEdge(cancelScrollEdge);
+        return this;
+    }
+
     @Override
     public float getProgress(ScrollArea area, int x, int y) {
         return (y - area.y) / (float) getFullVisibleSize(area);

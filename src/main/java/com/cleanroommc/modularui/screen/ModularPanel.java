@@ -290,6 +290,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             boolean result = false;
 
             if (this.hovering.isEmpty()) {
+                // no element is hovered -> try close panel
                 if (closeOnOutOfBoundsClick()) {
                     animateClose();
                     result = true;
@@ -298,6 +299,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 loop:
                 for (LocatedWidget widget : this.hovering) {
                     widget.applyMatrix(getContext());
+                    // click widget and see how it reacts
                     if (widget.getElement() instanceof Interactable interactable) {
                         switch (interactable.onMousePressed(mouseButton)) {
                             case IGNORE:
@@ -327,6 +329,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                             }
                         }
                     }
+                    // see if widget can be dragged
                     if (getContext().onHoveredClick(mouseButton, widget)) {
                         pressed = LocatedWidget.EMPTY;
                         result = true;
@@ -334,6 +337,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                         break;
                     }
                     widget.unapplyMatrix(getContext());
+                    // see if widgets below this can be interacted with
                     if (!widget.getElement().canClickThrough()) {
                         result = true;
                         break;

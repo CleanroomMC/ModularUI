@@ -54,6 +54,7 @@ public abstract class ScrollData {
     private final boolean axisStart;
     private final int thickness;
     private int scrollSpeed = 30;
+    private boolean cancelScrollEdge = true;
 
     private int scrollSize;
     private int scroll;
@@ -110,6 +111,21 @@ public abstract class ScrollData {
 
     public boolean isHorizontal() {
         return this.axis.isHorizontal();
+    }
+
+    /**
+     * Determines if scrolling of widgets below should still be canceled if this scroll view
+     * has hit the end and is currently not scrolling.
+     * Most of the time this should be true
+     *
+     * @return true if scrolling should be canceled even when this view hit an edge
+     */
+    public boolean isCancelScrollEdge() {
+        return cancelScrollEdge;
+    }
+
+    public void setCancelScrollEdge(boolean cancelScrollEdge) {
+        this.cancelScrollEdge = cancelScrollEdge;
     }
 
     protected final int getRawVisibleSize(ScrollArea area) {
