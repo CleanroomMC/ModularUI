@@ -157,7 +157,7 @@ public class FontRenderHelper {
         if (args == null) return null;
         Arrays.setAll(args, i -> {
             if (args[i] == null) return null;
-            return format(formatting, parentFormatting, String.valueOf(args[i]));
+            return format(formatting, parentFormatting, args[i].toString());
         });
         return args;
     }
