@@ -11,6 +11,10 @@ public class Dialog<T> extends ModularPanel {
     private boolean disablePanelsBelow = true;
     private boolean closeOnOutOfBoundsClick = false;
 
+    public Dialog(String name) {
+        this(name, null);
+    }
+
     public Dialog(String name, Consumer<T> resultConsumer) {
         super(name);
         this.resultConsumer = resultConsumer;

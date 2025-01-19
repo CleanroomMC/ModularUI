@@ -1,65 +1,45 @@
 package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.GuiAxis;
+import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
-import com.cleanroommc.modularui.api.widget.IValueWidget;
+import com.cleanroommc.modularui.api.widget.IParentWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.widget.ScrollWidget;
-import com.cleanroommc.modularui.widget.WidgetTree;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
+import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.widget.AbstractScrollWidget;
+import com.cleanroommc.modularui.widget.scroll.HorizontalScrollData;
 import com.cleanroommc.modularui.widget.scroll.ScrollData;
 import com.cleanroommc.modularui.widget.scroll.VerticalScrollData;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.function.IntFunction;
 
-public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> extends ScrollWidget<W> implements ILayoutWidget {
-
-    protected final Function<T, I> valueToWidgetMapper;
-    protected final Function<I, T> widgetToValueMapper;
+/**
+ * A widget which can hold any amount of children.
+ *
+ * @param <I> type of children (in most cases just {@link IWidget})
+ * @param <W> type of this widget
+ */
+public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends AbstractScrollWidget<I, W> implements ILayoutWidget, IParentWidget<I, W> {
 
     private ScrollData scrollData;
+    private IIcon childSeparator;
+    private final IntList separatorPositions = new IntArrayList();
     private boolean keepScrollBarInArea = false;
 
     public ListWidget() {
-        this(v -> null, w -> null);
+        super(null, null);
     }
 
-    public ListWidget(Collection<IWidget> widgets) {
-        this();
-        for (IWidget widget : widgets) {
-            child(widget);
+    @Override
+    public void onInit() {
+        if (this.scrollData == null) {
+            scrollDirection(new VerticalScrollData());
         }
-    }
-
-    public ListWidget(Function<T, I> valueToWidgetMapper, Function<I, T> widgetToValueMapper) {
-        super(new VerticalScrollData());
-        this.valueToWidgetMapper = Objects.requireNonNull(valueToWidgetMapper);
-        this.widgetToValueMapper = Objects.requireNonNull(widgetToValueMapper);
-        this.scrollData = getScrollArea().getScrollY();
-    }
-
-    public static <T, V extends IValueWidget<T> & IWidget, W extends ListWidget<T, V, W>> ListWidget<T, V, W> of(Function<T, V> valueToWidgetMapper) {
-        return new ListWidget<>(valueToWidgetMapper, IValueWidget::getWidgetValue);
-    }
-
-    public static <T, I extends IWidget, W extends ListWidget<T, I, W>> ListWidget<T, I, W> builder(Iterable<T> iterable, Function<T, I> creator) {
-        Map<T, I> map = new Object2ObjectOpenHashMap<>();
-        Map<I, T> map_reverse = new Object2ObjectOpenHashMap<>();
-        ListWidget<T, I, W> listWidget = new ListWidget<>(map::get, map_reverse::get);
-        for (T t : iterable) {
-            I widget = creator.apply(t);
-            map.put(t, widget);
-            map_reverse.put(widget, t);
-            listWidget.child(widget);
-        }
-        return listWidget;
     }
 
     @Override
@@ -72,38 +52,33 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
         }
     }
 
-    public boolean add(T value, int index) {
-        if (addChild(this.valueToWidgetMapper.apply(value), index)) {
-            if (isValid()) {
-                WidgetTree.resize(this);
+    @Override
+    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
+        if (this.childSeparator == null || this.separatorPositions.isEmpty()) return;
+        GuiAxis axis = this.scrollData.getAxis();
+        int x = getArea().getPadding().left, y = getArea().getPadding().top, w, h;
+        if (axis.isHorizontal()) {
+            w = this.childSeparator.getWidth();
+            h = getArea().h() - getArea().getPadding().vertical();
+        } else {
+            w = getArea().w() - getArea().getPadding().horizontal();
+            h = this.childSeparator.getHeight();
+        }
+        for (int p : this.separatorPositions) {
+            if (axis.isHorizontal()) {
+                x = p;
+            } else {
+                y = p;
             }
-            return true;
+            this.childSeparator.draw(context, x, y, w, h, widgetTheme);
         }
-        return false;
-    }
-
-    public boolean add(T value) {
-        return add(value, getChildren().size());
-    }
-
-    @Nullable
-    public IWidget remove(T value) {
-        IWidget widget = this.valueToWidgetMapper.apply(value);
-        if (remove(widget)) {
-            return widget;
-        }
-        return null;
-    }
-
-    public List<T> getValues() {
-        return getChildren().stream()
-                .map(widget -> this.widgetToValueMapper.apply((I) widget))
-                .collect(Collectors.toList());
     }
 
     @Override
     public void layoutWidgets() {
+        this.separatorPositions.clear();
         GuiAxis axis = this.scrollData.getAxis();
+        int separatorSize = getSeparatorSize();
         int p = getArea().getPadding().getStart(axis);
         for (IWidget widget : getChildren()) {
             if (axis.isVertical() ?
@@ -119,25 +94,74 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
             } else {
                 widget.resizer().setYResized(true);
             }
+            this.separatorPositions.add(p);
+            p += separatorSize;
         }
         getScrollData().setScrollSize(p + getArea().getPadding().getEnd(axis));
+    }
+
+    @Override
+    public boolean addChild(I child, int index) {
+        return super.addChild(child, index);
+    }
+
+    @Override
+    public void onChildAdd(I child) {
+        super.onChildAdd(child);
+        if (isValid()) {
+            this.scrollData.clamp(getScrollArea());
+        }
+    }
+
+    @Override
+    public void onChildRemove(I child) {
+        super.onChildRemove(child);
+        if (isValid()) {
+            this.scrollData.clamp(getScrollArea());
+        }
+    }
+
+    public int getSeparatorSize() {
+        if (this.childSeparator == null) return 0;
+        return this.scrollData.getAxis().isHorizontal() ? this.childSeparator.getWidth() : this.childSeparator.getHeight();
     }
 
     public ScrollData getScrollData() {
         return this.scrollData;
     }
 
+    public W scrollDirection(GuiAxis axis) {
+        return scrollDirection(ScrollData.of(axis));
+    }
+
     public W scrollDirection(ScrollData data) {
-        if (this.scrollData.getAxis() != data.getAxis()) {
-            this.scrollData = data;
-            getScrollArea().removeScrollData();
-            getScrollArea().setScrollData(this.scrollData);
-        }
+        this.scrollData = data;
+        getScrollArea().removeScrollData();
+        getScrollArea().setScrollData(this.scrollData);
         return getThis();
     }
 
     public W keepScrollBarInArea() {
         this.keepScrollBarInArea = true;
+        return getThis();
+    }
+
+    public W childSeparator(IIcon separator) {
+        this.childSeparator = separator;
+        return getThis();
+    }
+
+    public W children(Iterable<I> widgets) {
+        for (I widget : widgets) {
+            child(widget);
+        }
+        return getThis();
+    }
+
+    public W children(int amount, IntFunction<I> widgetCreator) {
+        for (int i = 0; i < amount; i++) {
+            child(widgetCreator.apply(i));
+        }
         return getThis();
     }
 }

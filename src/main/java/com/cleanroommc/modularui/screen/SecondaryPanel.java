@@ -1,9 +1,9 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.api.IPanelHandler;
+import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.widget.WidgetTree;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 
 import net.minecraftforge.fml.relauncher.Side;
@@ -80,7 +80,7 @@ public class SecondaryPanel implements IPanelHandler {
             this.screen = this.parent.getScreen();
         }
         if (this.panel == null) {
-            this.panel = Objects.requireNonNull(this.provider.build(this.screen.getMainPanel(), Minecraft.getMinecraft().player));
+            this.panel = Objects.requireNonNull(this.provider.build(this.screen.getMainPanel(), MCHelper.getPlayer()));
             if (this.panel == this.screen.getMainPanel()) {
                 throw new IllegalArgumentException("Must not return main panel!");
             }

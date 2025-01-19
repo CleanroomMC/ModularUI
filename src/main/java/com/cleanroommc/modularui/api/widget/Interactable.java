@@ -90,11 +90,13 @@ public interface Interactable {
     }
 
     /**
-     * Called when this widget is focused or when the mouse is above this widget
+     * Called when this widget is focused or when the mouse is above this widget.
+     * This method should return true if it can scroll at all and not if it scrolled right now.
+     * If this scroll view scrolled to the end and this returns false, the scroll will get passed through another scroll view below this.
      *
      * @param scrollDirection up or down
-     * @param amount          usually irrelevant
-     * @return if other widgets should get called too
+     * @param amount          amount scrolled by (usually irrelevant)
+     * @return true if this widget can be scrolled at all
      */
     default boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
         return false;

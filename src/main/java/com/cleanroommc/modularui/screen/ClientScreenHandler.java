@@ -194,6 +194,7 @@ public class ClientScreenHandler {
             }
             acc.setEventButton(button);
             acc.setLastMouseEvent(Minecraft.getSystemTime());
+            if (muiScreen != null && muiScreen.handleDraggableInput(button, true)) return true;
             return doAction(muiScreen, ms -> ms.onMousePressed(button));
         }
         if (button != -1) {
@@ -207,6 +208,7 @@ public class ClientScreenHandler {
                 }
             }
             acc.setEventButton(-1);
+            if (muiScreen != null && muiScreen.handleDraggableInput(button, false)) return true;
             return doAction(muiScreen, ms -> ms.onMouseRelease(button));
         }
         if (acc.getEventButton() != -1 && acc.getLastMouseEvent() > 0L) {
@@ -512,7 +514,7 @@ public class ClientScreenHandler {
                     boolean allowShiftTransfer = slotGroup != null && slotGroup.allowShiftTransfer();
                     GuiDraw.drawText("Shift-Click Priority: " + (allowShiftTransfer ? slotGroup.getShiftClickPriority() : "DISABLED"), 5, lineY, 1, color, false);
                 }
-            } else if(hovered instanceof RichTextWidget richTextWidget) {
+            } else if (hovered instanceof RichTextWidget richTextWidget) {
                 drawSegmentLine(lineY -= 4, color);
                 lineY -= 10;
                 Object hoveredElement = richTextWidget.getHoveredElement();
