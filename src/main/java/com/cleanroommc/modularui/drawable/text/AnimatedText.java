@@ -110,12 +110,6 @@ public class AnimatedText extends StyledText {
 
 
     @Override
-    public AnimatedText parentFormat(TextFormatting[] formatting) {
-        super.parentFormat(formatting);
-        return this;
-    }
-
-    @Override
     public AnimatedText alignment(Alignment alignment) {
         super.alignment(alignment);
         return this;

@@ -68,12 +68,6 @@ public class StyledText extends BaseKey {
     }
 
     @Override
-    public StyledText parentFormat(TextFormatting[] formatting) {
-        this.key.parentFormat(formatting);
-        return this;
-    }
-
-    @Override
     public StyledText alignment(Alignment alignment) {
         this.alignment = alignment;
         return this;
