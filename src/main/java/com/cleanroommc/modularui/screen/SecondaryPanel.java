@@ -5,7 +5,6 @@ import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.widget.WidgetTree;
 
 import net.minecraft.entity.player.EntityPlayer;
-
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -72,7 +71,6 @@ public class SecondaryPanel implements IPanelHandler {
         return this.open;
     }
 
-    @SideOnly(Side.CLIENT)
     @Override
     public void openPanel() {
         if (this.open) return;
@@ -80,7 +78,7 @@ public class SecondaryPanel implements IPanelHandler {
             this.screen = this.parent.getScreen();
         }
         if (this.panel == null) {
-            this.panel = Objects.requireNonNull(this.provider.build(this.screen.getMainPanel(), MCHelper.getPlayer()));
+            this.panel = buildPanel();
             if (this.panel == this.screen.getMainPanel()) {
                 throw new IllegalArgumentException("Must not return main panel!");
             }
@@ -91,6 +89,11 @@ public class SecondaryPanel implements IPanelHandler {
         }
         this.screen.getPanelManager().openPanel(this.panel, this);
         this.open = true;
+    }
+
+    @SideOnly(Side.CLIENT)
+    private ModularPanel buildPanel() {
+        return Objects.requireNonNull(this.provider.build(this.screen.getMainPanel(), MCHelper.getPlayer()));
     }
 
     public interface IPanelBuilder {
