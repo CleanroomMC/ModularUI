@@ -55,4 +55,13 @@ public class LangKey extends BaseKey {
         this.string = I18n.format(Objects.requireNonNull(this.keySupplier.get()), this.argsSupplier.get()).replaceAll("\\\\n", "\n");
         return string;
     }
+
+    @Override
+    public String getFormatted(@Nullable FormattingState parentFormatting) {
+        Object[] args = this.argsSupplier.get();
+        if (args == null || args.length == 0) return super.getFormatted(parentFormatting);
+        String text = I18n.format(Objects.requireNonNull(this.keySupplier.get()));
+        text = FontRenderHelper.formatArgs(args, FormattingState.merge(parentFormatting, getFormatting()), text);
+        return FontRenderHelper.format(getFormatting(), parentFormatting, text);
+    }
 }

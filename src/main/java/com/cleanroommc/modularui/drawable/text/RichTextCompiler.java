@@ -34,7 +34,7 @@ public class RichTextCompiler {
     private List<ITextLine> lines;
     private List<Object> currentLine;
     private int x, h;
-    private final TextFormatting[] formatting = FontRenderHelper.createFormattingState();
+    private final FormattingState formatting = new FormattingState();
 
     public List<ITextLine> compileLines(FontRenderer fr, List<Object> raw, int maxWidth, float scale) {
         reset(fr, (int) (maxWidth / scale));
@@ -49,7 +49,7 @@ public class RichTextCompiler {
         this.currentLine = new ArrayList<>();
         this.x = 0;
         this.h = 0;
-        Arrays.fill(this.formatting, null);
+        this.formatting.reset();
     }
 
     private void compile(List<Object> raw) {
@@ -187,8 +187,8 @@ public class RichTextCompiler {
                     o = trimAt(s2, l);
                 }
             }
-            o = FontRenderHelper.getFormatting(this.formatting) + o; // add formatting from previous string
-            FontRenderHelper.parseFormattingState(this.formatting, s2); // parse formatting from current string
+            o = this.formatting.getFormatting() + o;
+            this.formatting.parseFrom(s2); // parse formatting from current string
         }
         this.currentLine.add(o);
     }

@@ -22,17 +22,17 @@ public class CompoundKey extends BaseKey {
     }
 
     @Override
-    public String getFormatted(TextFormatting @Nullable [] parentFormatting) {
+    public String getFormatted(@Nullable FormattingState parentFormatting) {
         // formatting is prepended to each key
         return toString(true, parentFormatting);
     }
 
-    private String toString(boolean formatted, TextFormatting @Nullable [] parentFormatting) {
+    private String toString(boolean formatted, @Nullable FormattingState parentFormatting) {
         StringBuilder builder = new StringBuilder();
         for (IKey key : this.keys) {
             if (formatted) {
                 // merge parent formatting and this formatting to no lose info
-                builder.append(key.getFormatted(FontRenderHelper.mergeState(parentFormatting, getFormatting())));
+                builder.append(key.getFormatted(FormattingState.merge(parentFormatting, getFormatting())));
             } else {
                 builder.append(key.get());
             }

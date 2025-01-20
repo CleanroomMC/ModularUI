@@ -79,7 +79,7 @@ public class TestGuis extends CustomModularScreen {
                                         }))
                                 .add(" you. ")
                                 .add(IKey.GREEN + "This is a long ")
-                                .add(IKey.str("string").format(IKey.DARK_PURPLE)
+                                .add(IKey.str("string").style(IKey.DARK_PURPLE)
                                         .asTextIcon()
                                         .asHoverable()
                                         .addTooltipLine("Text Tooltip"))
@@ -91,12 +91,16 @@ public class TestGuis extends CustomModularScreen {
                                                 IKey.str("Underline all: "),
                                                 IKey.comp(
                                                                 IKey.str("Green Text, "),
-                                                                IKey.str("this is red").format(IKey.RED),
+                                                                IKey.str("this is red").style(IKey.RED),
                                                                 IKey.str(" and this should be green again"))
-                                                        .format(IKey.GREEN),
+                                                        .style(IKey.GREEN),
                                                 IKey.str(". Still underlined, "))
-                                        .format(IKey.UNDERLINE), IKey.str("but not anymore.")))
+                                        .style(IKey.UNDERLINE), IKey.str("but not anymore.")))
                                 .newLine()
+                                .add(IKey.str("Green, %s, %s and green again",
+                                        IKey.str("red").style(IKey.RED),
+                                        IKey.str("underline").style(null, IKey.UNDERLINE)
+                                ).style(IKey.GREEN))
                                 .textShadow(false)
                         ));
     }

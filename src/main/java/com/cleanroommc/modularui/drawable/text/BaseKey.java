@@ -9,24 +9,33 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class BaseKey implements IKey {
 
-    private TextFormatting[] formatting;
+    private FormattingState formatting;
 
     @Override
-    public String getFormatted(@Nullable TextFormatting[] parentFormatting) {
+    public String getFormatted(@Nullable FormattingState parentFormatting) {
         return FontRenderHelper.format(this.formatting, parentFormatting, get());
     }
 
     @Override
-    public BaseKey format(TextFormatting formatting) {
+    public BaseKey style(@Nullable TextFormatting formatting) {
         if (this.formatting == null) {
-            this.formatting = FontRenderHelper.createFormattingState();
+            this.formatting = new FormattingState();
         }
-        FontRenderHelper.addAfter(this.formatting, formatting);
+        if (formatting == null) this.formatting.forceDefaultColor();
+        else this.formatting.add(formatting, false);
         return this;
     }
 
-    @Nullable
-    public TextFormatting[] getFormatting() {
+    @Override
+    public IKey removeStyle() {
+        if (this.formatting != null) {
+            this.formatting.reset();
+        }
+        return this;
+    }
+
+    @Override
+    public @Nullable FormattingState getFormatting() {
         return formatting;
     }
 

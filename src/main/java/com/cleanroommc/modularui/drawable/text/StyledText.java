@@ -62,8 +62,8 @@ public class StyledText extends BaseKey {
     }
 
     @Override
-    public BaseKey format(TextFormatting formatting) {
-        this.key.format(formatting);
+    public BaseKey style(TextFormatting formatting) {
+        this.key.style(formatting);
         return this;
     }
 

@@ -113,8 +113,8 @@ public class TextWidget extends Widget<TextWidget> {
         return this;
     }
 
-    public TextWidget format(TextFormatting formatting) {
-        this.key.format(formatting);
+    public TextWidget style(TextFormatting formatting) {
+        this.key.style(formatting);
         return this;
     }
 }

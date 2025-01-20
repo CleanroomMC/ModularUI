@@ -22,4 +22,11 @@ public class StringKey extends BaseKey {
     public String get() {
         return this.args == null ? this.string : String.format(this.string, this.args);
     }
+
+    @Override
+    public String getFormatted(@Nullable FormattingState parentFormatting) {
+        if (this.args == null || this.args.length == 0) return super.getFormatted(parentFormatting);
+        String text = FontRenderHelper.formatArgs(this.args, FormattingState.merge(parentFormatting, getFormatting()), this.string);
+        return FontRenderHelper.format(getFormatting(), parentFormatting, text);
+    }
 }

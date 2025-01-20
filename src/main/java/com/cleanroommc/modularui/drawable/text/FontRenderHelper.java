@@ -1,12 +1,11 @@
 package com.cleanroommc.modularui.drawable.text;
 
 import com.cleanroommc.modularui.api.MCHelper;
+import com.cleanroommc.modularui.api.drawable.IKey;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.text.TextFormatting;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -39,20 +38,14 @@ public class FontRenderHelper {
         return formattingMap[c - min];
     }
 
-    // a formatting state keeps track of a color format and each of the fancy style options
-    // 0: color, 1 - 5: fancy style (random, bolt, italic, underline, strikethrough), 6: reset
-    public static TextFormatting[] createFormattingState() {
-        return new TextFormatting[7];
-    }
-
-    public static void addAfter(TextFormatting[] state, TextFormatting formatting) {
+    public static void addAfter(TextFormatting[] state, TextFormatting formatting, boolean removeAllOnReset) {
         if (formatting == TextFormatting.RESET) {
-            Arrays.fill(state, null);
-            state[6] = formatting;
+            if (removeAllOnReset) Arrays.fill(state, null);
+            state[0] = formatting;
             return;
         }
         // remove reset
-        state[6] = null;
+        if (removeAllOnReset) state[6] = null;
         if (formatting.isFancyStyling()) {
             state[formatting.ordinal() - 15] = formatting;
             return;
@@ -61,67 +54,27 @@ public class FontRenderHelper {
         state[0] = formatting;
     }
 
-    public static void parseFormattingState(TextFormatting[] state, String text) {
-        int i = -2;
-        while ((i = text.indexOf(167, i + 2)) >= 0 && i < text.length() - 1) {
-            TextFormatting formatting = getForCharacter(text.charAt(i + 1));
-            if (formatting != null) addAfter(state, formatting);
-        }
-    }
-
-    public static String getFormatting(TextFormatting[] state) {
-        if (isReset(state)) return TextFormatting.RESET.toString();
-        StringBuilder builder = appendFormatting(state, new StringBuilder());
-        return builder.length() == 0 ? StringUtils.EMPTY : builder.toString();
-    }
-
-    public static StringBuilder appendFormatting(TextFormatting[] state, StringBuilder builder) {
-        return appendFormatting(state, null, builder);
-    }
-
-    public static StringBuilder appendFormatting(TextFormatting[] state, TextFormatting @Nullable [] fallback, StringBuilder builder) {
-        for (int i = 0, n = 6; i < n; i++) {
-            if (state[i] != null) {
-                builder.append(state[i]);
-            } else if (fallback != null && fallback[i] != null) {
-                builder.append(fallback[i]);
-            }
-        }
-        return builder;
-    }
-
-    public static String format(@Nullable TextFormatting[] state, @Nullable TextFormatting[] parentState, String text) {
+    public static String format(@Nullable FormattingState state, @Nullable FormattingState parentState, String text) {
         if (state == null) {
             if (parentState == null) return text;
-            return appendFormatting(parentState, new StringBuilder().append(TextFormatting.RESET)).append(text).toString();
+            return parentState.prependText(new StringBuilder().append(TextFormatting.RESET)).append(text).toString();
         }
-        StringBuilder s = appendFormatting(state, parentState, new StringBuilder().append(TextFormatting.RESET))
+        StringBuilder s = state.prependText(new StringBuilder().append(TextFormatting.RESET), parentState)
                 .append(text);
         return s.toString();
     }
 
-    public static TextFormatting @NotNull [] mergeState(TextFormatting @Nullable [] state1, TextFormatting @Nullable [] state2) {
-        return mergeState(state1, state2, null);
-    }
-
-    public static TextFormatting @NotNull [] mergeState(TextFormatting @Nullable [] state1, TextFormatting @Nullable [] state2, TextFormatting @Nullable [] result) {
-        if (state1 == null) {
-            if (state2 == null) return createFormattingState();
-            return state2;
-        } else if (state2 == null) {
-            return state1;
+    public static String formatArgs(Object[] args, @Nullable FormattingState parentState, String text) {
+        if (args == null || args.length == 0) return text;
+        args = Arrays.copyOf(args, args.length);
+        for (int i = 0; i < args.length; i++) {
+            if (args[i] instanceof IKey key) {
+                // parent format + key format + key text + parent format
+                args[i] = FormattingState.appendFormat(new StringBuilder(key.getFormatted(parentState))
+                        .append(TextFormatting.RESET), parentState).toString();
+            }
         }
-        if (isReset(state2)) return state2; // state2 has higher priority
-        if (result == null) result = Arrays.copyOf(state1, state1.length);
-        for (int i = 0, n = 6; i < n; i++) {
-            TextFormatting formatting = state2[i];
-            if (formatting != null) addAfter(result, formatting);
-        }
-        return result;
-    }
-
-    public static boolean isReset(TextFormatting[] state) {
-        return state[6] != null;
+        return String.format(text, args);
     }
 
     public static int getDefaultTextHeight() {

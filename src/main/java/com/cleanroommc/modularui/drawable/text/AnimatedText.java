@@ -103,8 +103,8 @@ public class AnimatedText extends StyledText {
     }
 
     @Override
-    public AnimatedText format(TextFormatting formatting) {
-        return (AnimatedText) super.format(formatting);
+    public AnimatedText style(TextFormatting formatting) {
+        return (AnimatedText) super.style(formatting);
     }
 
     @Override
