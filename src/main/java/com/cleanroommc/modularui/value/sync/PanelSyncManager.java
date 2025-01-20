@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IPanelHandler;
+import com.cleanroommc.modularui.factory.PosGuiData;
 import com.cleanroommc.modularui.screen.ContainerCustomizer;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
@@ -10,6 +11,7 @@ import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
@@ -21,8 +23,11 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class PanelSyncManager {
+
+    private static final double DEFAULT_INTERACT_RANGE = 8.0;
 
     private final Map<String, SyncHandler> syncHandlers = new Object2ObjectLinkedOpenHashMap<>();
     private final Map<String, SlotGroup> slotGroups = new Object2ObjectOpenHashMap<>();
@@ -127,6 +132,11 @@ public class PanelSyncManager {
     }
 
     public void setContainerCustomizer(ContainerCustomizer containerCustomizer) {
+        if (this.containerCustomizer != null &&
+                this.containerCustomizer.getCanInteractWith() != null &&
+                containerCustomizer.getCanInteractWith() == null) {
+            containerCustomizer.setCanInteractWith(this.containerCustomizer.getCanInteractWith());
+        }
         this.containerCustomizer = containerCustomizer;
     }
 
@@ -252,6 +262,36 @@ public class PanelSyncManager {
     public PanelSyncManager addCloseListener(Consumer<EntityPlayer> listener) {
         this.closeListener.add(listener);
         return this;
+    }
+
+    public PanelSyncManager canInteractWith(Predicate<EntityPlayer> canInteractWith) {
+        if (this.containerCustomizer == null) this.containerCustomizer = new ContainerCustomizer();
+        this.containerCustomizer.setCanInteractWith(canInteractWith);
+        return this;
+    }
+
+    public PanelSyncManager canInteractWithinRange(double x, double y, double z, double range) {
+        return canInteractWith(player -> player.getDistanceSq(x, y, z) <= range * range);
+    }
+
+    public PanelSyncManager canInteractWithinRange(BlockPos pos, double range) {
+        return canInteractWith(player -> player.getDistanceSqToCenter(pos) <= range * range);
+    }
+
+    public PanelSyncManager canInteractWithinRange(PosGuiData guiData, double range) {
+        return canInteractWithinRange(guiData.getX() + 0.5, guiData.getY() + 0.5, guiData.getZ() + 0.5, range);
+    }
+
+    public PanelSyncManager canInteractWithinDefaultRange(double x, double y, double z) {
+        return canInteractWithinRange(x, y, z, DEFAULT_INTERACT_RANGE);
+    }
+
+    public PanelSyncManager canInteractWithinDefaultRange(BlockPos pos) {
+        return canInteractWithinRange(pos, DEFAULT_INTERACT_RANGE);
+    }
+
+    public PanelSyncManager canInteractWithinDefaultRange(PosGuiData guiData) {
+        return canInteractWithinRange(guiData, DEFAULT_INTERACT_RANGE);
     }
 
     public SlotGroup getSlotGroup(String name) {

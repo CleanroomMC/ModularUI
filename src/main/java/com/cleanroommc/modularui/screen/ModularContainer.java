@@ -2,6 +2,8 @@ package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.core.mixin.ContainerAccessor;
+import com.cleanroommc.modularui.factory.GuiData;
+import com.cleanroommc.modularui.factory.PosGuiData;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
@@ -29,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 @Interface(modid = ModularUI.BOGO_SORT, iface = "com.cleanroommc.bogosorter.api.ISortableContainer")
 public class ModularContainer extends Container implements ISortableContainer {
@@ -46,19 +49,34 @@ public class ModularContainer extends Container implements ISortableContainer {
     private final List<ModularSlot> slots = new ArrayList<>();
     private final List<ModularSlot> shiftClickSlots = new ArrayList<>();
     private ContainerCustomizer containerCustomizer;
+    private Predicate<EntityPlayer> canInteractWith;
 
     @SideOnly(Side.CLIENT)
     private ModularScreen optionalScreen;
 
-    public ModularContainer(EntityPlayer player, PanelSyncManager panelSyncManager, String mainPanelName) {
+    public ModularContainer(EntityPlayer player, PanelSyncManager panelSyncManager, String mainPanelName, GuiData guiData) {
         this.player = player;
         this.syncManager = new ModularSyncManager(this);
         this.syncManager.construct(mainPanelName, panelSyncManager);
         this.containerCustomizer = panelSyncManager.getContainerCustomizer();
         if (this.containerCustomizer == null) {
             this.containerCustomizer = new ContainerCustomizer();
+            panelSyncManager.setContainerCustomizer(this.containerCustomizer);
         }
         this.containerCustomizer.initialize(this);
+        if (this.containerCustomizer.getCanInteractWith() == null) {
+            if (guiData instanceof PosGuiData posGuiData) {
+                panelSyncManager.canInteractWithinDefaultRange(posGuiData);
+            } else {
+                // store current pos of player
+                // gui will close when the player somehow moves away while the gui is open
+                double x = guiData.getPlayer().posX;
+                double y = guiData.getPlayer().posY;
+                double z = guiData.getPlayer().posZ;
+                panelSyncManager.canInteractWithinDefaultRange(x, y, z);
+            }
+        }
+        this.canInteractWith = this.containerCustomizer.getCanInteractWith();
         sortShiftClickSlots();
     }
 
@@ -190,9 +208,13 @@ public class ModularContainer extends Container implements ISortableContainer {
         return Collections.unmodifiableList(this.shiftClickSlots);
     }
 
+    public void setCanInteractWith(Predicate<EntityPlayer> canInteractWith) {
+        this.canInteractWith = canInteractWith;
+    }
+
     @Override
     public boolean canInteractWith(@NotNull EntityPlayer playerIn) {
-        return true;
+        return this.canInteractWith.test(playerIn);
     }
 
     @Override

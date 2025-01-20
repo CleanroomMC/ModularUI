@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.function.Predicate;
 
 /**
  * Sometimes you need special behaviour. This class allows you to override common methods from {@link net.minecraft.inventory.Container Container}.
@@ -30,6 +31,7 @@ public class ContainerCustomizer {
     private static final int RIGHT_MOUSE = 1;
 
     private ModularContainer container;
+    private Predicate<EntityPlayer> canInteractWith;
 
     void initialize(ModularContainer container) {
         this.container = container;
@@ -40,6 +42,14 @@ public class ContainerCustomizer {
             throw new NullPointerException("ContainerCustomizer is not registered!");
         }
         return container;
+    }
+
+    public Predicate<EntityPlayer> getCanInteractWith() {
+        return canInteractWith;
+    }
+
+    public void setCanInteractWith(Predicate<EntityPlayer> canInteractWith) {
+        this.canInteractWith = canInteractWith;
     }
 
     public void onContainerClosed() {}
