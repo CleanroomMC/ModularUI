@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widgets;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
@@ -10,6 +11,7 @@ import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
 import com.cleanroommc.modularui.integration.jei.JeiIngredientProvider;
+import com.cleanroommc.modularui.integration.jei.ModularUIJeiPlugin;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.RichTooltip;
@@ -88,7 +90,11 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         drawSlot(getSlot());
         RenderHelper.enableStandardItemLighting();
         GlStateManager.disableLighting();
-        if (isHovering()) {
+        if (this.syncHandler.isPhantom() && ModularUI.isJeiLoaded() && ModularUIJeiPlugin.hasDraggingGhostIngredient()) {
+            GlStateManager.colorMask(true, true, true, false);
+            drawHighlight(getArea(), isHovering());
+            GlStateManager.colorMask(true, true, true, true);
+        } else if (isHovering()) {
             GlStateManager.colorMask(true, true, true, false);
             GuiDraw.drawRect(1, 1, 16, 16, getSlotHoverColor());
             GlStateManager.colorMask(true, true, true, true);
@@ -289,7 +295,10 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @Override
     public @Nullable ItemStack castGhostIngredientIfValid(@NotNull Object ingredient) {
-        return this.syncHandler.isPhantom() && ingredient instanceof ItemStack itemStack ? itemStack : null;
+        return areAncestorsEnabled() &&
+                this.syncHandler.isPhantom() &&
+                ingredient instanceof ItemStack itemStack &&
+                this.syncHandler.isItemValid(itemStack) ? itemStack : null;
     }
 
     @Override

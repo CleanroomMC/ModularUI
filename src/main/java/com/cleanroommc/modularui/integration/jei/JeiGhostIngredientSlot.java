@@ -1,10 +1,16 @@
 package com.cleanroommc.modularui.integration.jei;
 
 import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.drawable.GuiDraw;
+import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.Widget;
+
+import mezz.jei.gui.ghost.GhostIngredientDrag;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.awt.*;
 
 /**
  * An interface for compat with JEI's ghost slots.
@@ -34,4 +40,18 @@ public interface JeiGhostIngredientSlot<I> {
      */
     @Nullable
     I castGhostIngredientIfValid(@NotNull Object ingredient);
+
+    default void drawHighlight(Rectangle area, boolean hovering) {
+        int color = hovering ? Color.argb(76, 201, 25, 128) : Color.argb(19, 201, 10, 64);
+        GuiDraw.drawRect(0, 0, area.width, area.height, color);
+    }
+
+    static <T> boolean insertGhostIngredient(GhostIngredientDrag<?> drag, JeiGhostIngredientSlot<T> slot) {
+        T t = slot.castGhostIngredientIfValid(drag.getIngredient());
+        if (t != null) {
+            slot.setGhostIngredient(t);
+            return true;
+        }
+        return false;
+    }
 }

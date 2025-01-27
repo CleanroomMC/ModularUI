@@ -1,0 +1,14 @@
+{
+  "package": "com.cleanroommc.modularui.core.mixin.jei",
+  "refmap": "mixins.modularui.refmap.json",
+  "target": "@env(DEFAULT)",
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_8",
+  "client": [
+  ],
+  "mixins": [
+    "GhostIngredientDragManagerAccessor",
+    "IngredientGridMixin",
+    "IngredientListOverlayAccessor"
+  ]
+}

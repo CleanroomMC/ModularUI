@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.screen;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
@@ -8,6 +9,8 @@ import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IFocusedWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
+import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
+import com.cleanroommc.modularui.integration.jei.ModularUIJeiPlugin;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.screen.viewport.GuiViewportStack;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
@@ -19,6 +22,8 @@ import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
+
+import mezz.jei.gui.ghost.GhostIngredientDrag;
 
 import net.minecraft.client.Minecraft;
 
@@ -299,6 +304,17 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 loop:
                 for (LocatedWidget widget : this.hovering) {
                     widget.applyMatrix(getContext());
+                    // try inserting ghost ingredient
+                    if (widget.getElement() instanceof JeiGhostIngredientSlot<?> ghostSlot && ModularUI.isJeiLoaded()) {
+                        GhostIngredientDrag<?> drag = ModularUIJeiPlugin.getGhostDrag();
+                        if (drag != null && JeiGhostIngredientSlot.insertGhostIngredient(drag, ghostSlot)) {
+                            ModularUIJeiPlugin.getGhostDragManager().stopDrag();
+                            pressed = LocatedWidget.EMPTY;
+                            result = true;
+                            widget.unapplyMatrix(getContext());
+                            break;
+                        }
+                    }
                     // click widget and see how it reacts
                     if (widget.getElement() instanceof Interactable interactable) {
                         switch (interactable.onMousePressed(mouseButton)) {

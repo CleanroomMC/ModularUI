@@ -36,6 +36,7 @@ public class ModularUI {
 
     private static boolean blurLoaded = false;
     private static boolean sorterLoaded = false;
+    private static boolean jeiLoaded = false;
 
     static {
         // confirm mXparser license
@@ -46,6 +47,7 @@ public class ModularUI {
     public void preInit(FMLPreInitializationEvent event) {
         blurLoaded = Loader.isModLoaded("blur");
         sorterLoaded = Loader.isModLoaded(BOGO_SORT);
+        jeiLoaded = Loader.isModLoaded("jei");
         proxy.preInit(event);
     }
 
@@ -65,5 +67,9 @@ public class ModularUI {
 
     public static boolean isSortModLoaded() {
         return sorterLoaded;
+    }
+
+    public static boolean isJeiLoaded() {
+        return jeiLoaded;
     }
 }

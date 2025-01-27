@@ -24,7 +24,8 @@ public abstract class IngredientGridMixin {
             at = @At(value = "INVOKE",
                     target = "Lmezz/jei/gui/overlay/IngredientGrid;drawTooltips(Lnet/minecraft/client/Minecraft;II)V"))
     private void considerExclusions(IngredientGrid instance, Minecraft minecraft, int mouseX, int mouseY, Operation<Void> original) {
-        if (!guiScreenHelper.isInGuiExclusionArea(mouseX, mouseY))
+        if (!guiScreenHelper.isInGuiExclusionArea(mouseX, mouseY)) {
             original.call(instance, minecraft, mouseX, mouseY);
+        }
     }
 }

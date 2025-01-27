@@ -64,6 +64,11 @@ public class ModularUIHandler<T extends GuiContainer & IMuiScreen> implements IA
     @Override
     public void onComplete() {}
 
+    @Override
+    public boolean shouldHighlightTargets() {
+        return false;
+    }
+
     @Nullable
     @Override
     public IGuiProperties apply(@NotNull T guiScreen) {
