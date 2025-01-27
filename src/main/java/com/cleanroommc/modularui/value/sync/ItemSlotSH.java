@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import org.jetbrains.annotations.ApiStatus;
@@ -87,7 +88,7 @@ public class ItemSlotSH extends SyncHandler {
             setEnabled(buf.readBoolean(), false);
         } else if (id == 5) {
             if (!isPhantom()) return;
-            phantomClick(MouseData.create(0), buf.readItemStack());
+            phantomClick(new MouseData(Side.SERVER, 0, false, false, false), buf.readItemStack());
         }
     }
 
@@ -99,6 +100,7 @@ public class ItemSlotSH extends SyncHandler {
         ItemStack slotStack = getSlot().getStack();
         ItemStack stackToPut;
         if (!cursorStack.isEmpty() && !slotStack.isEmpty() && !ItemHandlerHelper.canItemStacksStack(cursorStack, slotStack)) {
+            if (!isItemValid(cursorStack)) return;
             stackToPut = cursorStack.copy();
             if (mouseData.mouseButton == 1) {
                 stackToPut.setCount(1);
@@ -114,6 +116,7 @@ public class ItemSlotSH extends SyncHandler {
                     return;
                 }
             } else {
+                if (!isItemValid(cursorStack)) return;
                 stackToPut = cursorStack.copy();
             }
             if (mouseData.mouseButton == 1) {
