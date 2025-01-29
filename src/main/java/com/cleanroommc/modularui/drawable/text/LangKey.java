@@ -60,8 +60,8 @@ public class LangKey extends BaseKey {
     public String getFormatted(@Nullable FormattingState parentFormatting) {
         Object[] args = this.argsSupplier.get();
         if (args == null || args.length == 0) return super.getFormatted(parentFormatting);
-        String text = I18n.format(Objects.requireNonNull(this.keySupplier.get()));
-        text = FontRenderHelper.formatArgs(args, FormattingState.merge(parentFormatting, getFormatting()), text);
+        String text = Objects.requireNonNull(this.keySupplier.get());
+        text = FontRenderHelper.formatArgs(args, FormattingState.merge(parentFormatting, getFormatting()), text, true);
         return FontRenderHelper.format(getFormatting(), parentFormatting, text);
     }
 }

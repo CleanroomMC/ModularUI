@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.drawable.IKey;
 
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.TextFormatting;
 
 import org.jetbrains.annotations.Nullable;
@@ -64,8 +65,8 @@ public class FontRenderHelper {
         return s.toString();
     }
 
-    public static String formatArgs(Object[] args, @Nullable FormattingState parentState, String text) {
-        if (args == null || args.length == 0) return text;
+    public static String formatArgs(Object[] args, @Nullable FormattingState parentState, String text, boolean translate) {
+        if (args == null || args.length == 0) return translate ? I18n.format(text) : text;
         args = Arrays.copyOf(args, args.length);
         for (int i = 0; i < args.length; i++) {
             if (args[i] instanceof IKey key) {
@@ -74,7 +75,7 @@ public class FontRenderHelper {
                         .append(TextFormatting.RESET), parentState).toString();
             }
         }
-        return String.format(text, args);
+        return translate ? I18n.format(text, args) : String.format(text, args);
     }
 
     public static int getDefaultTextHeight() {
