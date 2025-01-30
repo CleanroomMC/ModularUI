@@ -46,6 +46,7 @@ public class TestBlock extends Block implements ITileEntityProvider {
         testItemBlock2.setRegistryName(rl);
         GameRegistry.registerTileEntity(TestTile2.class, rl);
         TestItem.testItem.setRegistryName(ModularUI.ID, "test_item");
+        TestHoloItem.testHoloItem.setRegistryName(ModularUI.ID, "test_holo_item");
     }
 
     @SubscribeEvent
@@ -61,12 +62,14 @@ public class TestBlock extends Block implements ITileEntityProvider {
         registry.register(testItemBlock);
         registry.register(testItemBlock2);
         registry.register(TestItem.testItem);
+        registry.register(TestHoloItem.testHoloItem);
     }
 
     @SubscribeEvent
     public static void registerModel(ModelRegistryEvent event) {
         ModelResourceLocation mrl = new ModelResourceLocation(new ResourceLocation("diamond"), "inventory");
         ModelLoader.setCustomModelResourceLocation(TestItem.testItem, 0, mrl);
+        ModelLoader.setCustomModelResourceLocation(TestHoloItem.testHoloItem, 0, mrl);
     }
 
     private final Supplier<TileEntity> tileEntitySupplier;
