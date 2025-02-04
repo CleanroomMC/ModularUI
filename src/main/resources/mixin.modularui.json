@@ -15,7 +15,6 @@
   ],
   "mixins": [
     "ContainerAccessor",
-    "FontRendererAccessor",
-    "jei.IngredientGridMixin"
+    "FontRendererAccessor"
   ]
 }
