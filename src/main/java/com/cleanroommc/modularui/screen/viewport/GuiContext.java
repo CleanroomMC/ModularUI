@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
+import com.cleanroommc.modularui.holoui.HoloScreenEntity;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
 import net.minecraft.client.Minecraft;
@@ -44,6 +45,8 @@ public class GuiContext extends GuiViewportStack {
     /* Render states */
     private float partialTicks;
     private long tick = 0;
+    public boolean isHoloScreen = false;
+    public HoloScreenEntity holoScreen = null;
 
     public boolean isAbove(IGuiElement widget) {
         return isMouseAbove(widget.getArea());
