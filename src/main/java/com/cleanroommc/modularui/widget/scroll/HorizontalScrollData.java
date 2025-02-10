@@ -39,11 +39,6 @@ public class HorizontalScrollData extends ScrollData {
     }
 
     @Override
-    public float getProgress(ScrollArea area, int x, int y) {
-        return (x - area.x) / (float) getFullVisibleSize(area);
-    }
-
-    @Override
     public VerticalScrollData getOtherScrollData(ScrollArea area) {
         return area.getScrollY();
     }
@@ -74,7 +69,7 @@ public class HorizontalScrollData extends ScrollData {
         int h = getThickness();
         GuiDraw.drawRect(x, y, w, h, area.getScrollBarBackgroundColor());
 
-        x = ((getFullVisibleSize(area, isOtherActive) - l) * getScroll()) / (getScrollSize() - getVisibleSize(area, isOtherActive));
+        x = getScrollBarStart(area, l, isOtherActive);
         ScrollData data2 = getOtherScrollData(area);
         if (data2 != null && isOtherActive && data2.isOnAxisStart()) {
             x += data2.getThickness();
@@ -82,14 +77,5 @@ public class HorizontalScrollData extends ScrollData {
 
         w = l;
         drawScrollBar(x, y, w, h);
-    }
-
-    @Override
-    public boolean onMouseClicked(ScrollArea area, int x, int y, int button) {
-        if (isOnAxisStart() ? y <= area.y + getThickness() : y >= area.ey() - getThickness()) {
-            this.dragging = true;
-            return true;
-        }
-        return false;
     }
 }
