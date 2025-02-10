@@ -7,6 +7,7 @@ import org.jetbrains.annotations.ApiStatus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.DoubleConsumer;
+import java.util.function.DoublePredicate;
 
 public class Animator {
 
@@ -23,7 +24,7 @@ public class Animator {
     private float min = 0, max = 1;
     private float value;
     private final IInterpolation interpolation;
-    private DoubleConsumer callback;
+    private DoublePredicate callback;
     private DoubleConsumer endCallback;
 
     public Animator(int duration, IInterpolation interpolation) {
@@ -32,6 +33,14 @@ public class Animator {
     }
 
     public Animator setCallback(DoubleConsumer callback) {
+        this.callback = val -> {
+            callback.accept(val);
+            return false;
+        };
+        return this;
+    }
+
+    public Animator setCallback(DoublePredicate callback) {
         this.callback = callback;
         return this;
     }
@@ -100,7 +109,9 @@ public class Animator {
     private boolean tick() {
         this.progress += this.dir;
         updateValue();
-        if (this.callback != null) this.callback.accept(this.value);
+        if (this.callback != null && this.callback.test(this.value)) {
+            this.dir = 0; // stop animation
+        }
         if (!isRunning()) {
             if (this.endCallback != null) this.endCallback.accept(this.value);
             return true;

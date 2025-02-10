@@ -173,31 +173,35 @@ public abstract class ScrollData {
     /**
      * Clamp scroll to the bounds of the scroll size;
      */
-    public void clamp(ScrollArea area) {
+    public boolean clamp(ScrollArea area) {
         int size = getVisibleSize(area);
 
+        int old = this.scroll;
         if (this.scrollSize <= size) {
             this.scroll = 0;
         } else {
             this.scroll = MathHelper.clamp(this.scroll, 0, this.scrollSize - size);
         }
+        return old != this.scroll; // returns true if the area was clamped
     }
 
-    public void scrollBy(ScrollArea area, int x) {
+    public boolean scrollBy(ScrollArea area, int x) {
         this.scroll += x;
-        this.clamp(area);
+        return clamp(area);
     }
 
     /**
      * Scroll to the position in the scroll area
      */
-    public void scrollTo(ScrollArea area, int x) {
+    public boolean scrollTo(ScrollArea area, int x) {
         this.scroll = x;
-        this.clamp(area);
+        return clamp(area);
     }
 
     public void animateTo(ScrollArea area, int x) {
-        this.scrollAnimator.setCallback(value -> scrollTo(area, (int) value));
+        this.scrollAnimator.setCallback(value -> {
+            return scrollTo(area, (int) value); // stop animation once an edge is hit
+        });
         this.scrollAnimator.setValueBounds(this.scroll, x);
         this.scrollAnimator.forward();
         this.animatingTo = x;
@@ -233,6 +237,11 @@ public abstract class ScrollData {
 
     public boolean isAnimating() {
         return this.scrollAnimator.isRunning();
+    }
+
+    public int getAnimationDirection() {
+        if (!isAnimating()) return 0;
+        return this.scrollAnimator.getMax() >= this.scrollAnimator.getMin() ? 1 : -1;
     }
 
     public int getAnimatingTo() {
