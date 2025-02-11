@@ -29,7 +29,6 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
     private ScrollData scrollData;
     private IIcon childSeparator;
     private final IntList separatorPositions = new IntArrayList();
-    private boolean keepScrollBarInArea = false;
 
     public ListWidget() {
         super(null, null);
@@ -39,16 +38,6 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
     public void onInit() {
         if (this.scrollData == null) {
             scrollDirection(new VerticalScrollData());
-        }
-    }
-
-    @Override
-    public void onResized() {
-        if (this.keepScrollBarInArea) return;
-        if (this.scrollData.isVertical()) {
-            getArea().width += this.scrollData.getThickness();
-        } else {
-            getArea().height += this.scrollData.getThickness();
         }
     }
 
@@ -138,11 +127,6 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
         this.scrollData = data;
         getScrollArea().removeScrollData();
         getScrollArea().setScrollData(this.scrollData);
-        return getThis();
-    }
-
-    public W keepScrollBarInArea() {
-        this.keepScrollBarInArea = true;
         return getThis();
     }
 

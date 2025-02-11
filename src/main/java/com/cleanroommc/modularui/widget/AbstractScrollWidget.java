@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 public abstract class AbstractScrollWidget<I extends IWidget, W extends AbstractScrollWidget<I, W>> extends AbstractParentWidget<I, W> implements IViewport, Interactable {
 
     private final ScrollArea scroll = new ScrollArea();
+    private boolean keepScrollBarInArea = false;
 
     public AbstractScrollWidget(@Nullable HorizontalScrollData x, @Nullable VerticalScrollData y) {
         super();
@@ -69,9 +70,15 @@ public abstract class AbstractScrollWidget<I extends IWidget, W extends Abstract
     public void onResized() {
         if (this.scroll.getScrollX() != null) {
             this.scroll.getScrollX().clamp(this.scroll);
+            if (!this.keepScrollBarInArea) {
+                getArea().width += this.scroll.getScrollY().getThickness();
+            }
         }
         if (this.scroll.getScrollY() != null) {
             this.scroll.getScrollY().clamp(this.scroll);
+            if (!this.keepScrollBarInArea) {
+                getArea().height += this.scroll.getScrollX().getThickness();
+            }
         }
     }
 
@@ -127,5 +134,22 @@ public abstract class AbstractScrollWidget<I extends IWidget, W extends Abstract
 
     public int getScrollY() {
         return this.scroll.getScrollY() != null ? this.scroll.getScrollY().getScroll() : 0;
+    }
+
+    /**
+     * Sets whether the scroll bar should be kept inside the area of this widget, which might cause it to overlap with the content of this widget.
+     * By setting the value to false, the size of this widget is expanded by the thickness of the scrollbars after the tree is resized.
+     * Default: false
+     *
+     * @param value if the scroll bar should be kept inside the widgets area
+     * @return this
+     */
+    public W keepScrollBarInArea(boolean value) {
+        this.keepScrollBarInArea = value;
+        return getThis();
+    }
+
+    public W keepScrollBarInArea() {
+        return keepScrollBarInArea(true);
     }
 }
