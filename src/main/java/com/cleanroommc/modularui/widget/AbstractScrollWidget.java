@@ -71,13 +71,13 @@ public abstract class AbstractScrollWidget<I extends IWidget, W extends Abstract
         if (this.scroll.getScrollX() != null) {
             this.scroll.getScrollX().clamp(this.scroll);
             if (!this.keepScrollBarInArea) {
-                getArea().width += this.scroll.getScrollY().getThickness();
+                getArea().height += this.scroll.getScrollX().getThickness();
             }
         }
         if (this.scroll.getScrollY() != null) {
             this.scroll.getScrollY().clamp(this.scroll);
             if (!this.keepScrollBarInArea) {
-                getArea().height += this.scroll.getScrollX().getThickness();
+                getArea().width += this.scroll.getScrollY().getThickness();
             }
         }
     }
