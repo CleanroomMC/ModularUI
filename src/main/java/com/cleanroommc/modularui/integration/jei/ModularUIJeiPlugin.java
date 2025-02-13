@@ -36,8 +36,18 @@ public class ModularUIJeiPlugin implements IModPlugin {
         return ((IngredientListOverlayAccessor) runtime.getIngredientListOverlay()).getGhostIngredientDragManager();
     }
 
+    public static boolean hoveringOverIngredient(JeiGhostIngredientSlot<?> ingredientSlot) {
+        Object hovered = getHoverdObject();
+        if (hovered == null) return false;
+        return ingredientSlot.castGhostIngredientIfValid(hovered) != null;
+    }
+
     public static GhostIngredientDrag<?> getGhostDrag() {
         return ((GhostIngredientDragManagerAccessor) getGhostDragManager()).getGhostIngredientDrag();
+    }
+
+    public static Object getHoverdObject() {
+        return ((GhostIngredientDragManagerAccessor) getGhostDragManager()).getHoveredIngredient();
     }
 
     public static boolean hasDraggingGhostIngredient() {

@@ -10,4 +10,7 @@ public interface GhostIngredientDragManagerAccessor {
 
     @Accessor
     GhostIngredientDrag<?> getGhostIngredientDrag();
+
+    @Accessor
+    Object getHoveredIngredient();
 }
