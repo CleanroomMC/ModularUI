@@ -39,8 +39,7 @@ public class ModularUIJeiPlugin implements IModPlugin {
     public static boolean hoveringOverIngredient(JeiGhostIngredientSlot<?> ingredientSlot) {
         Object hovered = getHoverdObject();
         if (hovered == null) return false;
-        Object ing = ingredientSlot.castGhostIngredientIfValid(getHoverdObject());
-        return ing != null;
+        return ingredientSlot.castGhostIngredientIfValid(hovered) != null;
     }
 
     public static GhostIngredientDrag<?> getGhostDrag() {
