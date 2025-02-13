@@ -54,6 +54,7 @@ public class RichTextCompiler {
 
     private void compile(List<Object> raw) {
         for (Object o : raw) {
+            this.formatting.reset();
             if (o instanceof ITextLine line) {
                 newLine();
                 lines.add(line);
@@ -157,7 +158,11 @@ public class RichTextCompiler {
     private void newLine() {
         int i = currentLine.size() - 1;
         if (!currentLine.isEmpty() && currentLine.get(i) instanceof String s) {
-            if (s.equals(" ")) {currentLine.remove(i);} else currentLine.set(i, trimRight(s));
+            if (s.equals(" ")) {
+                currentLine.remove(i);
+            } else {
+                currentLine.set(i, trimRight(s));
+            }
         }
         if (currentLine.isEmpty()) {
             //lines.add(null);

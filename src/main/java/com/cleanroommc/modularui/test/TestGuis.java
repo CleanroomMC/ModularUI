@@ -22,6 +22,8 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 
+import net.minecraft.util.text.TextFormatting;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -68,7 +70,8 @@ public class TestGuis extends CustomModularScreen {
                                 .add(new ItemDrawable(new ItemStack(Blocks.GRASS))
                                         .asIcon()
                                         .asHoverable()
-                                        .tooltip(richTooltip -> richTooltip.addFromItem(new ItemStack(Blocks.GRASS))))
+                                        .tooltip(richTooltip -> richTooltip.addFromItem(new ItemStack(Blocks.GRASS))
+                                                .add(TextFormatting.GRAY + "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.")))
                                 .add(", nice to ")
                                 .add(new ItemDrawable(new ItemStack(Items.PORKCHOP))
                                         .asIcon()
@@ -101,6 +104,10 @@ public class TestGuis extends CustomModularScreen {
                                         IKey.str("red").style(IKey.RED),
                                         IKey.str("underline").style(null, IKey.UNDERLINE)
                                 ).style(IKey.GREEN))
+                                .newLine()
+                                .add(TextFormatting.RESET + "" + TextFormatting.UNDERLINE + "Underlined" + TextFormatting.RESET)
+                                .newLine()
+                                .add("A long line which should wrap around")
                                 .textShadow(false)
                         ));
     }
