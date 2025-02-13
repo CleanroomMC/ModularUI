@@ -36,4 +36,9 @@ public class GuiContainerWrapper extends GuiContainer implements IMuiScreen {
     public boolean doesGuiPauseGame() {
         return this.screen != null && this.screen.doesPauseGame();
     }
+
+    @Override
+    protected boolean hasClickedOutside(int mx, int my, int guiLeft, int guiTop) {
+        return this.screen.hasClickedOutside();
+    }
 }

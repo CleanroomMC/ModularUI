@@ -460,6 +460,15 @@ public class ModularScreen {
         return pausesGame;
     }
 
+    public boolean hasClickedOutside() {
+        for (ModularPanel openPanel : getPanelManager().getOpenPanels()) {
+            if (openPanel.getTopHovering() != null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @SuppressWarnings("unchecked")
     private <T extends IGuiAction> List<T> getGuiActionListeners(Class<T> clazz) {
         return (List<T>) this.guiActionListeners.getOrDefault(clazz, Collections.emptyList());
