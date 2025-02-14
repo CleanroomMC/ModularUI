@@ -54,7 +54,6 @@ public class RichTextCompiler {
 
     private void compile(List<Object> raw) {
         for (Object o : raw) {
-            this.formatting.reset();
             if (o instanceof ITextLine line) {
                 newLine();
                 lines.add(line);
@@ -69,6 +68,7 @@ public class RichTextCompiler {
                 }
                 if (key == IKey.LINE_FEED) {
                     newLine();
+                    this.formatting.reset();
                     continue;
                 }
                 text = key.getFormatted();
