@@ -16,9 +16,4 @@ public class DynamicKey extends BaseKey {
     public String get() {
         return this.supplier.get();
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        return this == obj || (obj instanceof DynamicKey dynamicKey && dynamicKey.supplier == this.supplier);
-    }
 }

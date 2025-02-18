@@ -178,15 +178,5 @@ public interface IDrawable {
         public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
             this.drawable.drawAtZero(context, getArea(), widgetTheme);
         }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof IDrawable drawable)
-                return this.drawable == drawable;
-            else if (obj instanceof DrawableWidget drawableWidget)
-                return this.drawable == drawableWidget.drawable;
-
-            return false;
-        }
     }
 }

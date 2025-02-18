@@ -45,13 +45,6 @@ public abstract class BaseKey implements IKey {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof IKey key)) return false;
-        return getFormatted().equals(key.getFormatted());
-    }
-
-    @Override
     public int hashCode() {
         throw new NotImplementedException("Implement hashCode() in subclasses");
     }
