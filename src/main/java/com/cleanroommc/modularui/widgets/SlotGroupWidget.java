@@ -43,7 +43,7 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
         for (int i = 0; i < 9; i++) {
             slotGroupWidget.child(slotConsumer.apply(i, new ItemSlot())
                     .syncHandler(key, i)
-                    .pos(i * 18, 3 * 18 + 5)
+                    .pos(i * 18, 3 * 18 + 4)
                     .debugName("slot_" + i));
         }
         for (int i = 0; i < 27; i++) {
