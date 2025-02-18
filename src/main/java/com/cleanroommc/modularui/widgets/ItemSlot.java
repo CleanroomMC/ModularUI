@@ -90,7 +90,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         drawSlot(getSlot());
         RenderHelper.enableStandardItemLighting();
         GlStateManager.disableLighting();
-        if (this.syncHandler.isPhantom() && ModularUI.isJeiLoaded() && ModularUIJeiPlugin.hasDraggingGhostIngredient()) {
+        if (this.syncHandler.isPhantom() && ModularUI.isJeiLoaded() &&
+                (ModularUIJeiPlugin.hasDraggingGhostIngredient() || ModularUIJeiPlugin.hoveringOverIngredient(this))) {
             GlStateManager.colorMask(true, true, true, false);
             drawHighlight(getArea(), isHovering());
             GlStateManager.colorMask(true, true, true, true);
