@@ -326,7 +326,7 @@ public class ModularGuiContext extends GuiContext {
             this.timeHovered = 0;
             if (this.hovered != null) {
                 this.hovered.onMouseStartHover();
-                if (this.hovered instanceof IVanillaSlot vanillaSlot) {
+                if (this.hovered instanceof IVanillaSlot vanillaSlot && vanillaSlot.handleAsVanillaSlot()) {
                     this.screen.getScreenWrapper().setHoveredSlot(vanillaSlot.getVanillaSlot());
                 } else {
                     this.screen.getScreenWrapper().setHoveredSlot(null);

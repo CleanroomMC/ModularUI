@@ -21,7 +21,6 @@ import java.util.function.Predicate;
  */
 public class ModularSlot extends SlotItemHandler {
 
-    private final boolean phantom;
     private boolean enabled = true;
     private boolean canTake = true, canPut = true;
     private Predicate<ItemStack> filter = stack -> true;
@@ -30,20 +29,14 @@ public class ModularSlot extends SlotItemHandler {
     private String slotGroupName = null;
     private SlotGroup slotGroup = null;
 
-    public ModularSlot(IItemHandler itemHandler, int index) {
-        this(itemHandler, index, false);
-    }
-
     /**
      * Creates a ModularSlot
      *
      * @param itemHandler item handler of the slot
      * @param index       slot index in the item handler
-     * @param phantom     true if the slot should not be a real slot, but only a phantom of the item that would be in the slot
      */
-    public ModularSlot(IItemHandler itemHandler, int index, boolean phantom) {
+    public ModularSlot(IItemHandler itemHandler, int index) {
         super(itemHandler, index, Integer.MIN_VALUE, Integer.MIN_VALUE);
-        this.phantom = phantom;
     }
 
     @Override
@@ -62,8 +55,7 @@ public class ModularSlot extends SlotItemHandler {
     }
 
     @Override
-    public void onSlotChanged() {
-    }
+    public void onSlotChanged() {}
 
     public void onSlotChangedReal(ItemStack itemStack, boolean onlyChangedAmount, boolean client, boolean init) {
         this.changeListener.onChange(itemStack, onlyChangedAmount, client, init);
@@ -92,8 +84,9 @@ public class ModularSlot extends SlotItemHandler {
         return this.enabled;
     }
 
+    @Deprecated
     public boolean isPhantom() {
-        return this.phantom;
+        return false;
     }
 
     public boolean isIgnoreMaxStackSize() {

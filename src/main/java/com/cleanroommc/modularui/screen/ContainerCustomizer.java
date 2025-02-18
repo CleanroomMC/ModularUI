@@ -65,6 +65,7 @@ public class ContainerCustomizer {
         if ((clickTypeIn == ClickType.PICKUP || clickTypeIn == ClickType.QUICK_MOVE) &&
                 (mouseButton == LEFT_MOUSE || mouseButton == RIGHT_MOUSE)) {
             if (slotId == DROP_TO_WORLD) {
+                // no dif
                 if (!inventoryplayer.getItemStack().isEmpty()) {
                     if (mouseButton == LEFT_MOUSE) {
                         player.dropItem(inventoryplayer.getItemStack(), true);
@@ -78,6 +79,7 @@ public class ContainerCustomizer {
                 return inventoryplayer.getItemStack();
             }
 
+            // early return
             if (slotId < 0) return ItemStack.EMPTY;
 
             if (clickTypeIn == ClickType.QUICK_MOVE) {
@@ -86,7 +88,7 @@ public class ContainerCustomizer {
                 if (!fromSlot.canTakeStack(player)) {
                     return ItemStack.EMPTY;
                 }
-
+                // simpler code, but effectivly no difference
                 returnable = transferStackInSlot(player, slotId);
             } else {
                 Slot clickedSlot = container.getSlot(slotId);
@@ -95,6 +97,7 @@ public class ContainerCustomizer {
                 ItemStack heldStack = inventoryplayer.getItemStack();
 
                 if (slotStack.isEmpty()) {
+                    // no dif
                     if (!heldStack.isEmpty() && clickedSlot.isItemValid(heldStack)) {
                         int stackCount = mouseButton == LEFT_MOUSE ? heldStack.getCount() : 1;
 
@@ -106,7 +109,7 @@ public class ContainerCustomizer {
                     }
                 } else if (clickedSlot.canTakeStack(player)) {
                     if (heldStack.isEmpty() && !slotStack.isEmpty()) {
-                        int s = Math.min(slotStack.getCount(), slotStack.getMaxStackSize());
+                        int s = Math.min(slotStack.getCount(), slotStack.getMaxStackSize()); // checking max stack size here, probably for oversized slots
                         int toRemove = mouseButton == LEFT_MOUSE ? s : (s + 1) / 2;
                         inventoryplayer.setItemStack(slotStack.splitStack(toRemove));
                         clickedSlot.putStack(slotStack);

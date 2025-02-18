@@ -9,7 +9,7 @@ import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.value.sync.IntSyncValue;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.StringSyncValue;
-import com.cleanroommc.modularui.widgets.ItemSlot;
+import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Row;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;

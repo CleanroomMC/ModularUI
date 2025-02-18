@@ -10,7 +10,7 @@ import com.cleanroommc.modularui.utils.ItemStackItemHandler;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandlers;
 import com.cleanroommc.modularui.widget.ParentWidget;
-import com.cleanroommc.modularui.widgets.ItemSlot;
+import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import com.cleanroommc.modularui.widgets.layout.Column;
 

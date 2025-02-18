@@ -6,7 +6,7 @@ import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widget.ScrollWidget;
 import com.cleanroommc.modularui.widget.scroll.VerticalScrollData;
-import com.cleanroommc.modularui.widgets.ItemSlot;
+import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 
 import net.minecraft.item.Item;

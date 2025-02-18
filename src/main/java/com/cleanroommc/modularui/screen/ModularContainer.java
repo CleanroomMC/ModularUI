@@ -47,6 +47,7 @@ public class ModularContainer extends Container implements ISortableContainer {
     private final ModularSyncManager syncManager;
     private boolean init = true;
     private final List<ModularSlot> slots = new ArrayList<>();
+    private final List<ModularSlot> phantomSlots = new ArrayList<>();
     private final List<ModularSlot> shiftClickSlots = new ArrayList<>();
     private ContainerCustomizer containerCustomizer;
     private Predicate<EntityPlayer> canInteractWith;
@@ -136,11 +137,15 @@ public class ModularContainer extends Container implements ISortableContainer {
     }
 
     @ApiStatus.Internal
-    public void registerSlot(String panelName, ModularSlot slot) {
+    public void registerSlot(String panelName, ModularSlot slot, boolean phantom) {
         if (this.inventorySlots.contains(slot)) {
             throw new IllegalArgumentException("Tried to register slot which already exists!");
         }
-        addSlotToContainer(slot);
+        if (phantom) {
+            this.phantomSlots.add(slot);
+        } else {
+            addSlotToContainer(slot);
+        }
         this.slots.add(slot);
         if (slot.getSlotGroupName() != null) {
             SlotGroup slotGroup = getSyncManager().getSlotGroup(panelName, slot.getSlotGroupName());
@@ -150,7 +155,7 @@ public class ModularContainer extends Container implements ISortableContainer {
             }
             slot.slotGroup(slotGroup);
         }
-        if (slot.getSlotGroup() != null) {
+        if (slot.getSlotGroup() != null && !phantom) { // TODO
             SlotGroup slotGroup = slot.getSlotGroup();
             if (slotGroup.allowShiftTransfer()) {
                 this.shiftClickSlots.add(slot);

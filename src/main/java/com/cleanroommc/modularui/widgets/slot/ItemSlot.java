@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.widgets;
+package com.cleanroommc.modularui.widgets.slot;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
@@ -23,9 +23,9 @@ import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
+import com.cleanroommc.modularui.value.sync.PhantomItemSlotSH;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
-import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -46,6 +46,10 @@ import org.jetbrains.annotations.Nullable;
 public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable, JeiGhostIngredientSlot<ItemStack>, JeiIngredientProvider {
 
     public static final int SIZE = 18;
+
+    public static ItemSlot create(boolean phantom) {
+        return phantom ? new PhantomItemSlot() : new ItemSlot();
+    }
 
     private static final TextRenderer textRenderer = new TextRenderer();
     private ItemSlotSH syncHandler;
@@ -90,11 +94,11 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         drawSlot(getSlot());
         RenderHelper.enableStandardItemLighting();
         GlStateManager.disableLighting();
-        if (this.syncHandler.isPhantom() && ModularUI.isJeiLoaded() && ModularUIJeiPlugin.hasDraggingGhostIngredient()) {
-            GlStateManager.colorMask(true, true, true, false);
-            drawHighlight(getArea(), isHovering());
-            GlStateManager.colorMask(true, true, true, true);
-        } else if (isHovering()) {
+        drawOverlay();
+    }
+
+    protected void drawOverlay() {
+        if (isHovering()) {
             GlStateManager.colorMask(true, true, true, false);
             GuiDraw.drawRect(1, 1, 16, 16, getSlotHoverColor());
             GlStateManager.colorMask(true, true, true, true);
@@ -129,33 +133,16 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @Override
     public @NotNull Result onMousePressed(int mouseButton) {
-        if (this.syncHandler.isPhantom()) {
-            MouseData mouseData = MouseData.create(mouseButton);
-            this.syncHandler.syncToServer(2, mouseData::writeToPacket);
-        } else {
-            ClientScreenHandler.clickSlot(getScreen(), getSlot());
-            //getScreen().getScreenWrapper().clickSlot();
-        }
+        ClientScreenHandler.clickSlot(getScreen(), getSlot());
+        //getScreen().getScreenWrapper().clickSlot();
         return Result.SUCCESS;
     }
 
     @Override
     public boolean onMouseRelease(int mouseButton) {
-        if (!this.syncHandler.isPhantom()) {
-            ClientScreenHandler.releaseSlot();
-            //getScreen().getScreenWrapper().releaseSlot();
-        }
+        ClientScreenHandler.releaseSlot();
+        //getScreen().getScreenWrapper().releaseSlot();
         return true;
-    }
-
-    @Override
-    public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
-        if (this.syncHandler.isPhantom()) {
-            MouseData mouseData = MouseData.create(scrollDirection.modifier);
-            this.syncHandler.syncToServer(3, mouseData::writeToPacket);
-            return true;
-        }
-        return false;
     }
 
     @Override
@@ -171,6 +158,11 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     @Override
     public Slot getVanillaSlot() {
         return this.syncHandler.getSlot();
+    }
+
+    @Override
+    public boolean handleAsVanillaSlot() {
+        return true;
     }
 
     @Override
@@ -199,34 +191,36 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         GuiContainerAccessor acc = (GuiContainerAccessor) guiScreen;
         RenderItem renderItem = ((GuiScreenAccessor) guiScreen).getItemRender();
         ItemStack itemstack = slotIn.getStack();
-        boolean flag = false;
+        boolean isDragPreview = false;
         boolean flag1 = slotIn == acc.getClickedSlot() && !acc.getDraggedStack().isEmpty() && !acc.getIsRightMouseClick();
         ItemStack itemstack1 = guiScreen.mc.player.inventory.getItemStack();
         int amount = -1;
         String format = null;
 
-        if (slotIn == acc.getClickedSlot() && !acc.getDraggedStack().isEmpty() && acc.getIsRightMouseClick() && !itemstack.isEmpty()) {
-            itemstack = itemstack.copy();
-            itemstack.setCount(itemstack.getCount() / 2);
-        } else if (acc.getDragSplitting() && acc.getDragSplittingSlots().contains(slotIn) && !itemstack1.isEmpty()) {
-            if (acc.getDragSplittingSlots().size() == 1) {
-                return;
-            }
-
-            if (Container.canAddItemToSlot(slotIn, itemstack1, true) && getScreen().getContainer().canDragIntoSlot(slotIn)) {
-                itemstack = itemstack1.copy();
-                flag = true;
-                Container.computeStackSize(acc.getDragSplittingSlots(), acc.getDragSplittingLimit(), itemstack, slotIn.getStack().isEmpty() ? 0 : slotIn.getStack().getCount());
-                int k = Math.min(itemstack.getMaxStackSize(), slotIn.getItemStackLimit(itemstack));
-
-                if (itemstack.getCount() > k) {
-                    amount = k;
-                    format = TextFormatting.YELLOW.toString();
-                    itemstack.setCount(k);
+        if (!getSyncHandler().isPhantom()) {
+            if (slotIn == acc.getClickedSlot() && !acc.getDraggedStack().isEmpty() && acc.getIsRightMouseClick() && !itemstack.isEmpty()) {
+                itemstack = itemstack.copy();
+                itemstack.setCount(itemstack.getCount() / 2);
+            } else if (acc.getDragSplitting() && acc.getDragSplittingSlots().contains(slotIn) && !itemstack1.isEmpty()) {
+                if (acc.getDragSplittingSlots().size() == 1) {
+                    return;
                 }
-            } else {
-                acc.getDragSplittingSlots().remove(slotIn);
-                acc.invokeUpdateDragSplitting();
+
+                if (Container.canAddItemToSlot(slotIn, itemstack1, true) && getScreen().getContainer().canDragIntoSlot(slotIn)) {
+                    itemstack = itemstack1.copy();
+                    isDragPreview = true;
+                    Container.computeStackSize(acc.getDragSplittingSlots(), acc.getDragSplittingLimit(), itemstack, slotIn.getStack().isEmpty() ? 0 : slotIn.getStack().getCount());
+                    int k = Math.min(itemstack.getMaxStackSize(), slotIn.getItemStackLimit(itemstack));
+
+                    if (itemstack.getCount() > k) {
+                        amount = k;
+                        format = TextFormatting.YELLOW.toString();
+                        itemstack.setCount(k);
+                    }
+                } else {
+                    acc.getDragSplittingSlots().remove(slotIn);
+                    acc.invokeUpdateDragSplitting();
+                }
             }
         }
 
@@ -234,7 +228,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         renderItem.zLevel = 100.0F;
 
         if (!flag1) {
-            if (flag) {
+            if (isDragPreview) {
                 GuiDraw.drawRect(1, 1, 16, 16, -2130706433);
             }
 

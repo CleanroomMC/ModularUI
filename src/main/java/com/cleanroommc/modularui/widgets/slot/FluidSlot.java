@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.widgets;
+package com.cleanroommc.modularui.widgets.slot;
 
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
