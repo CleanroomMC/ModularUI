@@ -327,7 +327,7 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
 
     public RichTooltip addFromItem(ItemStack item) {
         List<String> lines = MCHelper.getItemToolTip(item);
-        add(lines.get(0)).spaceLine(2);
+        add(lines.get(0)).spaceLine(3);
         for (int i = 1, n = lines.size(); i < n; i++) {
             add(lines.get(i)).newLine();
         }

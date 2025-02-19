@@ -30,7 +30,16 @@ public interface IRichTextBuilder<T extends IRichTextBuilder<T>> {
     }
 
     default T newLine() {
-        return add(IKey.LINE_FEED);
+        return newLine(1);
+    }
+
+    default T newLine(int space) {
+        if (space > 0) {
+            getRichText().add(IKey.LINE_FEED).addLine(Spacer.of(space));
+        } else {
+            getRichText().add(IKey.LINE_FEED);
+        }
+        return getThis();
     }
 
     default T space() {
