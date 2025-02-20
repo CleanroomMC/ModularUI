@@ -4,6 +4,8 @@ import com.cleanroommc.modularui.api.widget.ISynced;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.widget.ParentWidget;
 
+import com.cleanroommc.modularui.widgets.slot.ItemSlot;
+
 import it.unimi.dsi.fastutil.chars.Char2IntMap;
 import it.unimi.dsi.fastutil.chars.Char2IntOpenHashMap;
 import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
@@ -16,28 +18,29 @@ import java.util.function.IntFunction;
 
 public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
 
-    public static SlotGroupWidget playerInventory() {
-        return playerInventory(7);
+    public static SlotGroupWidget playerInventory(boolean positioned) {
+        return positioned ? playerInventory(7, true) : playerInventory((index, slot) -> slot);
     }
 
-    public static SlotGroupWidget playerInventory(SlotConsumer slotConsumer) {
-        return playerInventory(7, slotConsumer);
+    public static SlotGroupWidget playerInventory(int bottom, boolean horizontalCentered) {
+        return playerInventory(bottom, horizontalCentered, (index, slot) -> slot);
     }
 
-    public static SlotGroupWidget playerInventory(int bottom) {
-        return playerInventory(bottom, (index, slot) -> slot);
+    public static SlotGroupWidget playerInventory(int bottom, boolean horizontalCentered, SlotConsumer slotConsumer) {
+        SlotGroupWidget widget = playerInventory(slotConsumer);
+        if (bottom != 0) widget.bottom(bottom);
+        if (horizontalCentered) widget.leftRel(0.5f);
+        return widget;
     }
 
         /**
          * Automatically creates and places the player inventory.
          *
-         * @param bottom margin to the bottom border of the parent or 0 for no y placement (useful for columns)
          * @return player inventory group
          */
-    public static SlotGroupWidget playerInventory(int bottom, SlotConsumer slotConsumer) {
+    public static SlotGroupWidget playerInventory(SlotConsumer slotConsumer) {
         SlotGroupWidget slotGroupWidget = new SlotGroupWidget();
-        slotGroupWidget.coverChildren().leftRel(0.5f);
-        if (bottom != 0) slotGroupWidget.bottom(bottom);
+        slotGroupWidget.coverChildren();
         slotGroupWidget.debugName("player_inventory");
         String key = "player";
         for (int i = 0; i < 9; i++) {

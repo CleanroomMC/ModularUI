@@ -7,6 +7,8 @@ import com.cleanroommc.modularui.utils.GameObjectHelper;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widget.Widget;
 
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
@@ -17,6 +19,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.NoSuchElementException;
 
@@ -24,11 +27,38 @@ public class ItemDrawable implements IDrawable {
 
     private ItemStack item = ItemStack.EMPTY;
 
-    public ItemDrawable() {
-    }
+    public ItemDrawable() {}
 
     public ItemDrawable(@NotNull ItemStack item) {
-        this.item = item;
+        setItem(item);
+    }
+
+    public ItemDrawable(@NotNull Item item) {
+         setItem(item);
+    }
+
+    public ItemDrawable(@NotNull Item item, int meta) {
+         setItem(item, meta);
+    }
+
+    public ItemDrawable(@NotNull Item item, int meta, int amount) {
+         setItem(item, meta, amount);
+    }
+
+    public ItemDrawable(@NotNull Item item, int meta, int amount, @Nullable NBTTagCompound nbt) {
+        setItem(item, meta, amount, nbt);
+    }
+
+    public ItemDrawable(@NotNull Block item) {
+         setItem(item);
+    }
+
+    public ItemDrawable(@NotNull Block item, int meta) {
+         setItem(item, meta);
+    }
+
+    public ItemDrawable(@NotNull Block item, int meta, int amount) {
+        setItem(new ItemStack(item, amount, meta));
     }
 
     @SideOnly(Side.CLIENT)
@@ -50,6 +80,36 @@ public class ItemDrawable implements IDrawable {
     public ItemDrawable setItem(@NotNull ItemStack item) {
         this.item = item;
         return this;
+    }
+
+    public ItemDrawable setItem(@NotNull Item item) {
+        return setItem(item, 0, 1, null);
+    }
+
+    public ItemDrawable setItem(@NotNull Item item, int meta) {
+        return setItem(item, meta, 1, null);
+    }
+
+    public ItemDrawable setItem(@NotNull Item item, int meta, int amount) {
+        return setItem(item, meta, amount, null);
+    }
+
+    public ItemDrawable setItem(@NotNull Item item, int meta, int amount, @Nullable NBTTagCompound nbt) {
+        ItemStack itemStack = new ItemStack(item, amount, meta);
+        itemStack.setTagCompound(nbt);
+        return setItem(itemStack);
+    }
+
+    public ItemDrawable setItem(@NotNull Block item) {
+        return setItem(item, 0, 1);
+    }
+
+    public ItemDrawable setItem(@NotNull Block item, int meta) {
+        return setItem(item, meta, 1);
+    }
+
+    public ItemDrawable setItem(@NotNull Block item, int meta, int amount) {
+        return setItem(new ItemStack(item, amount, meta));
     }
 
     public static ItemDrawable ofJson(JsonObject json) {

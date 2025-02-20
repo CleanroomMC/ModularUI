@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.UIFactory;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 
+import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 
 import org.jetbrains.annotations.NotNull;
@@ -28,9 +29,9 @@ public abstract class AbstractUIFactory<T extends GuiData> implements UIFactory<
     public abstract IGuiHolder<T> getGuiHolder(T data);
 
     @Override
-    public ModularPanel createPanel(T guiData, PanelSyncManager syncManager) {
+    public ModularPanel createPanel(T guiData, PanelSyncManager syncManager, UISettings settings) {
         IGuiHolder<T> guiHolder = Objects.requireNonNull(getGuiHolder(guiData), "Gui holder must not be null!");
-        return guiHolder.buildUI(guiData, syncManager);
+        return guiHolder.buildUI(guiData, syncManager, settings);
     }
 
     @Override
