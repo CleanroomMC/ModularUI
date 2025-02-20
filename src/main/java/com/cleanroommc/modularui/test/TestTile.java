@@ -11,6 +11,7 @@ import com.cleanroommc.modularui.drawable.text.AnimatedText;
 import com.cleanroommc.modularui.factory.PosGuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.RichTooltip;
+import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
@@ -25,10 +26,10 @@ import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widgets.*;
 import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Row;
-import com.cleanroommc.modularui.widgets.slot.ModularSlot;
-import com.cleanroommc.modularui.widgets.slot.SlotGroup;
+import com.cleanroommc.modularui.widgets.slot.*;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -72,7 +73,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
     private int num = 2;
 
     @Override
-    public ModularPanel buildUI(PosGuiData guiData, PanelSyncManager guiSyncManager) {
+    public ModularPanel buildUI(PosGuiData guiData, PanelSyncManager guiSyncManager, UISettings settings) {
         guiSyncManager.registerSlotGroup("item_inv", 3);
         guiSyncManager.registerSlotGroup("mixer_items", 2);
 
@@ -104,7 +105,10 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                         .child(new PageButton(1, tabController)
                                 .tab(GuiTextures.TAB_TOP, 0))
                         .child(new PageButton(2, tabController)
-                                .tab(GuiTextures.TAB_TOP, 0)))
+                                .tab(GuiTextures.TAB_TOP, 0))
+                        .child(new PageButton(3, tabController)
+                                .tab(GuiTextures.TAB_TOP, 0)
+                                .overlay(new ItemDrawable(Blocks.CRAFTING_TABLE).asIcon())))
                 .child(new PagedWidget<>()
                         .debugName("root parent")
                         .sizeRel(1f)
@@ -318,7 +322,11 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                         .stateOverlay(GuiTextures.CHECK_BOX)
                                                         .size(14, 14))
                                                 .child(IKey.lang("bogosort.gui.enabled").asWidget()
-                                                        .height(14))))))
+                                                        .height(14)))))
+                        .addPage(new ParentWidget<>()
+                                .debugName("page 4 crafting")
+                                .sizeRel(1f)
+                        ))
                 .bindPlayerInventory();
         /*panel.child(new ButtonWidget<>()
                         .flex(flex -> flex.size(60, 20)

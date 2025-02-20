@@ -1,9 +1,10 @@
 package com.cleanroommc.modularui.factory;
 
 import com.cleanroommc.modularui.api.MCHelper;
-import com.cleanroommc.modularui.screen.ContainerCustomizer;
 import com.cleanroommc.modularui.screen.JeiSettingsImpl;
+import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.UISettings;
 
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.relauncher.Side;
@@ -11,6 +12,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Supplier;
 
 /**
  * Helper class to open client only GUIs. This class is safe to use inside a Modular GUI.
@@ -29,7 +32,7 @@ public class ClientGUI {
      * @param screen new modular screen
      */
     public static void open(@NotNull ModularScreen screen) {
-        open(screen, new JeiSettingsImpl(), null);
+        open(screen, new UISettings());
     }
 
     /**
@@ -40,30 +43,45 @@ public class ClientGUI {
      * @param jeiSettings custom jei settings
      */
     public static void open(@NotNull ModularScreen screen, @NotNull JeiSettingsImpl jeiSettings) {
-        GuiManager.openScreen(screen, jeiSettings, null);
+        GuiManager.openScreen(screen, new UISettings(jeiSettings));
     }
 
     /**
      * Opens a modular screen on the next client tick with custom jei settings.
      * It needs to be opened in next tick, because we might break the current GUI if we open it now.
      *
-     * @param screen              new modular screen
-     * @param containerCustomizer container customizer
+     * @param screen    new modular screen
+     * @param container custom container
      */
-    public static void open(@NotNull ModularScreen screen, @NotNull ContainerCustomizer containerCustomizer) {
-        GuiManager.openScreen(screen, new JeiSettingsImpl(), containerCustomizer);
+    public static void open(@NotNull ModularScreen screen, @Nullable Supplier<ModularContainer> container) {
+        UISettings settings = new UISettings();
+        settings.customContainer(container);
+        GuiManager.openScreen(screen, settings);
     }
 
     /**
      * Opens a modular screen on the next client tick with custom jei settings.
      * It needs to be opened in next tick, because we might break the current GUI if we open it now.
      *
-     * @param screen              new modular screen
-     * @param jeiSettings         custom jei settings
-     * @param containerCustomizer container customizer
+     * @param screen      new modular screen
+     * @param jeiSettings custom jei settings
+     * @param container   custom container
      */
-    public static void open(@NotNull ModularScreen screen, @NotNull JeiSettingsImpl jeiSettings, @Nullable ContainerCustomizer containerCustomizer) {
-        GuiManager.openScreen(screen, jeiSettings, containerCustomizer);
+    public static void open(@NotNull ModularScreen screen, @NotNull JeiSettingsImpl jeiSettings, @Nullable Supplier<ModularContainer> container) {
+        UISettings settings = new UISettings(jeiSettings);
+        settings.customContainer(container);
+        GuiManager.openScreen(screen, settings);
+    }
+
+    /**
+     * Opens a modular screen on the next client tick with custom jei settings.
+     * It needs to be opened in next tick, because we might break the current GUI if we open it now.
+     *
+     * @param screen   new modular screen
+     * @param settings ui settings
+     */
+    public static void open(@NotNull ModularScreen screen, @NotNull UISettings settings) {
+        GuiManager.openScreen(screen, settings);
     }
 
     /**

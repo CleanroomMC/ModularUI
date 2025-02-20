@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.factory;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -35,6 +36,25 @@ public class PosGuiData extends GuiData {
 
     public int getZ() {
         return this.z;
+    }
+
+    public double getSquaredDistance(double x, double y, double z) {
+        double dx = this.x + 0.5 - x;
+        double dy = this.y + 0.5 - y;
+        double dz = this.z + 0.5 - z;
+        return dx * dx + dy * dy + dz * dz;
+    }
+
+    public double getDistance(double x, double y, double z) {
+        return Math.sqrt(getSquaredDistance(x, y, z));
+    }
+
+    public double getSquaredDistance(Entity entity) {
+        return getSquaredDistance(entity.posX, entity.posY, entity.posZ);
+    }
+
+    public double getDistance(Entity entity) {
+        return Math.sqrt(getSquaredDistance(entity));
     }
 
     public BlockPos getBlockPos() {
