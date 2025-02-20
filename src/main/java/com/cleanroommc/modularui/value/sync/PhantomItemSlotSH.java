@@ -37,9 +37,13 @@ public class PhantomItemSlotSH extends ItemSlotSH {
     @Override
     protected void onSlotUpdate(ItemStack stack, boolean onlyAmountChanged, boolean client, boolean init) {
         getSlot().putStack(stack);
+        if (!onlyAmountChanged && !stack.isEmpty()) {
+            // store last non-empty stack for later
+            this.lastStoredPhantomItem = stack.copy();
+            this.lastStoredPhantomItem.setCount(1);
+        }
         super.onSlotUpdate(stack, onlyAmountChanged, client, init);
     }
-
 
     @Override
     public void readOnServer(int id, PacketBuffer buf) throws IOException {

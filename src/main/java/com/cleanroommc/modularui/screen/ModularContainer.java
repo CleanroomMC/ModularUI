@@ -22,7 +22,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Optional.Interface;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import org.jetbrains.annotations.*;
@@ -46,7 +45,7 @@ public class ModularContainer extends Container implements ISortableContainer {
     private EntityPlayer player;
     private ModularSyncManager syncManager;
     private boolean init = true;
-    private final List<ModularSlot> slots = new ArrayList<>();
+    // all phantom slots (inventory don't contain phantom slots)
     private final List<ModularSlot> phantomSlots = new ArrayList<>();
     private final List<ModularSlot> shiftClickSlots = new ArrayList<>();
     private UISettings settings;
@@ -126,16 +125,15 @@ public class ModularContainer extends Container implements ISortableContainer {
     }
 
     @ApiStatus.Internal
-    public void registerSlot(String panelName, ModularSlot slot, boolean phantom) {
+    public void registerSlot(String panelName, ModularSlot slot) {
         if (this.inventorySlots.contains(slot)) {
             throw new IllegalArgumentException("Tried to register slot which already exists!");
         }
-        if (phantom) {
+        if (slot.isPhantom()) {
             this.phantomSlots.add(slot);
         } else {
             addSlotToContainer(slot);
         }
-        this.slots.add(slot);
         if (slot.getSlotGroupName() != null) {
             SlotGroup slotGroup = getSyncManager().getSlotGroup(panelName, slot.getSlotGroupName());
             if (slotGroup == null) {
@@ -144,7 +142,7 @@ public class ModularContainer extends Container implements ISortableContainer {
             }
             slot.slotGroup(slotGroup);
         }
-        if (slot.getSlotGroup() != null && !phantom) { // TODO
+        if (slot.getSlotGroup() != null) {
             SlotGroup slotGroup = slot.getSlotGroup();
             if (slotGroup.allowShiftTransfer()) {
                 this.shiftClickSlots.add(slot);
@@ -195,7 +193,11 @@ public class ModularContainer extends Container implements ISortableContainer {
     }
 
     public ModularSlot getModularSlot(int index) {
-        return this.slots.get(index);
+        Slot slot = this.inventorySlots.get(index);
+        if (slot instanceof ModularSlot modularSlot) {
+            return modularSlot;
+        }
+        throw new IllegalStateException("A non-ModularSlot was found, but all slots in a ModularContainer must extend ModularSlot.");
     }
 
     public List<ModularSlot> getShiftClickSlots() {
@@ -384,16 +386,12 @@ public class ModularContainer extends Container implements ISortableContainer {
 
     protected ItemStack transferItem(ModularSlot fromSlot, ItemStack fromStack) {
         @Nullable SlotGroup fromSlotGroup = fromSlot.getSlotGroup();
+        // in first iteration only insert into non-empty, non-phantom slots
         for (ModularSlot toSlot : getShiftClickSlots()) {
             SlotGroup slotGroup = Objects.requireNonNull(toSlot.getSlotGroup());
             if (slotGroup != fromSlotGroup && toSlot.isEnabled() && toSlot.isItemValid(fromStack)) {
                 ItemStack toStack = toSlot.getStack().copy();
-                if (toSlot.isPhantom()) {
-                    if (toStack.isEmpty() || (ItemHandlerHelper.canItemStacksStack(fromStack, toStack) && toStack.getCount() < toSlot.getItemStackLimit(toStack))) {
-                        toSlot.putStack(fromStack.copy());
-                        return fromStack;
-                    }
-                } else if (ItemHandlerHelper.canItemStacksStack(fromStack, toStack)) {
+                if (!fromSlot.isPhantom() && ItemHandlerHelper.canItemStacksStack(fromStack, toStack)) {
                     int j = toStack.getCount() + fromStack.getCount();
                     int maxSize = toSlot.getItemStackLimit(fromStack);//Math.min(toSlot.getSlotStackLimit(), fromStack.getMaxStackSize());
 
@@ -413,18 +411,43 @@ public class ModularContainer extends Container implements ISortableContainer {
                 }
             }
         }
-        for (ModularSlot emptySlot : getShiftClickSlots()) {
-            ItemStack itemstack = emptySlot.getStack();
-            SlotGroup slotGroup = Objects.requireNonNull(emptySlot.getSlotGroup());
-            if (slotGroup != fromSlotGroup && emptySlot.isEnabled() && itemstack.isEmpty() && emptySlot.isItemValid(fromStack)) {
-                if (fromStack.getCount() > emptySlot.getItemStackLimit(fromStack)) {
-                    emptySlot.putStack(fromStack.splitStack(emptySlot.getItemStackLimit(fromStack)));
-                } else {
-                    emptySlot.putStack(fromStack.splitStack(fromStack.getCount()));
+        boolean hasNonEmptyPhantom = false;
+        // now insert into first empty slot (phantom or not) and check if we have any non-empty phantom slots
+        for (ModularSlot toSlot : getShiftClickSlots()) {
+            ItemStack itemstack = toSlot.getStack();
+            SlotGroup slotGroup = Objects.requireNonNull(toSlot.getSlotGroup());
+            if (slotGroup != fromSlotGroup && toSlot.isEnabled() && toSlot.isItemValid(fromStack)) {
+                if (toSlot.isPhantom()) {
+                    if (!itemstack.isEmpty()) {
+                        // skip non-empty phantom for now
+                        hasNonEmptyPhantom = true;
+                    } else {
+                        toSlot.putStack(fromStack.copy());
+                        return fromStack;
+                    }
+                } else if (itemstack.isEmpty()) {
+                    if (fromStack.getCount() > toSlot.getItemStackLimit(fromStack)) {
+                        toSlot.putStack(fromStack.splitStack(toSlot.getItemStackLimit(fromStack)));
+                    } else {
+                        toSlot.putStack(fromStack.splitStack(fromStack.getCount()));
+                    }
+                    if (fromStack.getCount() < 1) {
+                        break;
+                    }
                 }
-                if (fromStack.getCount() < 1) {
-                    break;
-                }
+            }
+        }
+        if (!hasNonEmptyPhantom) return fromStack;
+
+        // now insert into the first phantom slot we can find (will be non-empty)
+        // unfortunately, when all phantom slots are used it will always overwrite the first one
+        for (ModularSlot toSlot : getShiftClickSlots()) {
+            ItemStack itemstack = toSlot.getStack();
+            SlotGroup slotGroup = Objects.requireNonNull(toSlot.getSlotGroup());
+            if (slotGroup != fromSlotGroup && toSlot.isPhantom() && toSlot.isEnabled() && toSlot.isItemValid(fromStack)) {
+                // don't check for stackable, just overwrite
+                toSlot.putStack(fromStack.copy());
+                return fromStack;
             }
         }
         return fromStack;

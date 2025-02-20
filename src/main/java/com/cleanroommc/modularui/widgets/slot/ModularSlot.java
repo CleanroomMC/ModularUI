@@ -28,6 +28,7 @@ public class ModularSlot extends SlotItemHandler {
     private boolean ignoreMaxStackSize = false;
     private String slotGroupName = null;
     private SlotGroup slotGroup = null;
+    private boolean phantom = false;
 
     /**
      * Creates a ModularSlot
@@ -37,6 +38,11 @@ public class ModularSlot extends SlotItemHandler {
      */
     public ModularSlot(IItemHandler itemHandler, int index) {
         super(itemHandler, index, Integer.MIN_VALUE, Integer.MIN_VALUE);
+    }
+
+    // used internally in slot widget
+    void setPhantom(boolean phantom) {
+        this.phantom = phantom;
     }
 
     @Override
@@ -84,9 +90,8 @@ public class ModularSlot extends SlotItemHandler {
         return this.enabled;
     }
 
-    @Deprecated
     public boolean isPhantom() {
-        return false;
+        return this.phantom;
     }
 
     public boolean isIgnoreMaxStackSize() {

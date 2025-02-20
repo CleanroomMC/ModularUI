@@ -1,12 +1,10 @@
 package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.network.NetworkUtils;
-import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import org.jetbrains.annotations.ApiStatus;
@@ -33,7 +31,7 @@ public class ItemSlotSH extends SyncHandler {
     public void init(String key, PanelSyncManager syncHandler) {
         super.init(key, syncHandler);
         if (!registered) {
-            getSyncManager().getContainer().registerSlot(getSyncManager().getPanelName(), this.slot, isPhantom());
+            getSyncManager().getContainer().registerSlot(getSyncManager().getPanelName(), this.slot);
             this.registered = true;
         }
         this.lastStoredItem = getSlot().getStack().copy();

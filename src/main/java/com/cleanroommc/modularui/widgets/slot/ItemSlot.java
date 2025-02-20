@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.widgets.slot;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
@@ -11,19 +10,15 @@ import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
 import com.cleanroommc.modularui.integration.jei.JeiIngredientProvider;
-import com.cleanroommc.modularui.integration.jei.ModularUIJeiPlugin;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
-import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetSlotTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
-import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
-import com.cleanroommc.modularui.value.sync.PhantomItemSlotSH;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 
@@ -173,9 +168,19 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         return this.syncHandler;
     }
 
+    /**
+     * Initializes a slot with phantom/non-phantom. This should be called when a new slot is set.
+     *
+     * @param slot slot to initialize
+     */
+    protected final void initSlot(ModularSlot slot) {
+        slot.setPhantom(getSyncHandler().isPhantom());
+    }
+
     public ItemSlot slot(ModularSlot slot) {
         this.syncHandler = new ItemSlotSH(slot);
         setSyncHandler(this.syncHandler);
+        initSlot(slot);
         return this;
     }
 
