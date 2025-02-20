@@ -48,6 +48,7 @@ public class ModularContainer extends Container implements ISortableContainer {
     // all phantom slots (inventory don't contain phantom slots)
     private final List<ModularSlot> phantomSlots = new ArrayList<>();
     private final List<ModularSlot> shiftClickSlots = new ArrayList<>();
+    private GuiData guiData;
     private UISettings settings;
 
     @SideOnly(Side.CLIENT)
@@ -61,6 +62,7 @@ public class ModularContainer extends Container implements ISortableContainer {
         this.syncManager = new ModularSyncManager(this);
         this.syncManager.construct(mainPanelName, panelSyncManager);
         this.settings = settings;
+        this.guiData = guiData;
         sortShiftClickSlots();
     }
 
@@ -97,7 +99,6 @@ public class ModularContainer extends Container implements ISortableContainer {
         if (this.syncManager != null) {
             this.syncManager.onClose();
         }
-        //this.containerCustomizer.onContainerClosed();
     }
 
     @MustBeInvokedByOverriders
@@ -192,6 +193,10 @@ public class ModularContainer extends Container implements ISortableContainer {
         return player;
     }
 
+    public GuiData getGuiData() {
+        return guiData;
+    }
+
     public ModularSlot getModularSlot(int index) {
         Slot slot = this.inventorySlots.get(index);
         if (slot instanceof ModularSlot modularSlot) {
@@ -203,6 +208,8 @@ public class ModularContainer extends Container implements ISortableContainer {
     public List<ModularSlot> getShiftClickSlots() {
         return Collections.unmodifiableList(this.shiftClickSlots);
     }
+
+    public void onSlotChanged(ModularSlot slot, ItemStack stack, boolean onlyAmountChanged) {}
 
     @Override
     public boolean canInteractWith(@NotNull EntityPlayer playerIn) {
@@ -451,10 +458,6 @@ public class ModularContainer extends Container implements ISortableContainer {
             }
         }
         return fromStack;
-    }
-
-    protected final @NotNull ItemStack superTransferStackInSlot(@NotNull EntityPlayer playerIn, int index) {
-        return super.transferStackInSlot(playerIn, index);
     }
 
     @Override

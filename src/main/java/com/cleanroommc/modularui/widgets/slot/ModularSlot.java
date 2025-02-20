@@ -1,5 +1,7 @@
 package com.cleanroommc.modularui.widgets.slot;
 
+import com.cleanroommc.modularui.value.sync.ItemSlotSH;
+
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -30,6 +32,8 @@ public class ModularSlot extends SlotItemHandler {
     private SlotGroup slotGroup = null;
     private boolean phantom = false;
 
+    private ItemSlotSH syncHandler = null;
+
     /**
      * Creates a ModularSlot
      *
@@ -40,9 +44,20 @@ public class ModularSlot extends SlotItemHandler {
         super(itemHandler, index, Integer.MIN_VALUE, Integer.MIN_VALUE);
     }
 
-    // used internally in slot widget
-    void setPhantom(boolean phantom) {
+    @ApiStatus.Internal
+    public void initialize(ItemSlotSH syncManager, boolean phantom) {
+        this.syncHandler = syncManager;
         this.phantom = phantom;
+    }
+
+    @ApiStatus.Internal
+    public void dispose() {
+        this.syncHandler = null;
+        this.phantom = false;
+    }
+
+    public boolean isInitialized() {
+        return this.syncHandler != null;
     }
 
     @Override
@@ -65,6 +80,7 @@ public class ModularSlot extends SlotItemHandler {
 
     public void onSlotChangedReal(ItemStack itemStack, boolean onlyChangedAmount, boolean client, boolean init) {
         this.changeListener.onChange(itemStack, onlyChangedAmount, client, init);
+        if (!init && isInitialized()) getSyncHandler().getSyncManager().getContainer().onSlotChanged(this, itemStack, onlyChangedAmount);
     }
 
     @Override
@@ -73,10 +89,9 @@ public class ModularSlot extends SlotItemHandler {
         super.putStack(stack);
     }
 
-    @Nullable
     @SideOnly(Side.CLIENT)
     @Override
-    public TextureAtlasSprite getBackgroundSprite() {
+    public @Nullable TextureAtlasSprite getBackgroundSprite() {
         return null;
     }
 
@@ -98,14 +113,23 @@ public class ModularSlot extends SlotItemHandler {
         return this.ignoreMaxStackSize;
     }
 
-    @Nullable
-    public String getSlotGroupName() {
+    public @Nullable String getSlotGroupName() {
         return this.slotGroupName;
     }
 
-    @Nullable
-    public SlotGroup getSlotGroup() {
+    public @Nullable SlotGroup getSlotGroup() {
         return this.slotGroup;
+    }
+
+    public @NotNull ItemSlotSH getSyncHandler() {
+        if (this.syncHandler == null) {
+            throw new IllegalStateException("ModularSlot is not yet initialized");
+        }
+        return this.syncHandler;
+    }
+
+    protected EntityPlayer getPlayer() {
+        return getSyncHandler().getSyncManager().getPlayer();
     }
 
     /**

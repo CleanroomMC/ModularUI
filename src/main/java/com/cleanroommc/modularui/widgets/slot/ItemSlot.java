@@ -167,19 +167,9 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         return this.syncHandler;
     }
 
-    /**
-     * Initializes a slot with phantom/non-phantom. This should be called when a new slot is set.
-     *
-     * @param slot slot to initialize
-     */
-    protected final void initSlot(ModularSlot slot) {
-        slot.setPhantom(getSyncHandler().isPhantom());
-    }
-
     public ItemSlot slot(ModularSlot slot) {
         this.syncHandler = new ItemSlotSH(slot);
         setSyncHandler(this.syncHandler);
-        initSlot(slot);
         return this;
     }
 

@@ -55,7 +55,7 @@ public class TestItem extends Item implements IGuiHolder<HandGuiData> {
                                         .slotGroup("mixer_items")))
                                 .build()
                                 .align(Alignment.Center)))
-                .child(SlotGroupWidget.playerInventory(0)));
+                .child(SlotGroupWidget.playerInventory(false)));
 
         return panel;
     }

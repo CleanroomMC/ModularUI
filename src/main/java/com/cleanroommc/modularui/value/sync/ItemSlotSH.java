@@ -34,10 +34,17 @@ public class ItemSlotSH extends SyncHandler {
     public void init(String key, PanelSyncManager syncHandler) {
         super.init(key, syncHandler);
         if (!registered) {
+            this.slot.initialize(this, isPhantom());
             getSyncManager().getContainer().registerSlot(getSyncManager().getPanelName(), this.slot);
             this.registered = true;
         }
         this.lastStoredItem = getSlot().getStack().copy();
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        this.slot.dispose();
     }
 
     @Override
@@ -59,6 +66,7 @@ public class ItemSlotSH extends SyncHandler {
                 buffer.writeBoolean(finalOnlyAmountChanged);
                 buffer.writeItemStack(itemStack);
                 buffer.writeBoolean(init);
+                buffer.writeBoolean(false);
             });
         }
     }
@@ -69,6 +77,9 @@ public class ItemSlotSH extends SyncHandler {
             boolean onlyAmountChanged = buf.readBoolean();
             this.lastStoredItem = NetworkUtils.readItemStack(buf);
             onSlotUpdate(this.lastStoredItem, onlyAmountChanged, true, buf.readBoolean());
+            if (buf.readBoolean()) {
+                this.slot.putStack(this.lastStoredItem);
+            }
         } else if (id == SYNC_ENABLED) {
             setEnabled(buf.readBoolean(), false);
         }
@@ -90,6 +101,15 @@ public class ItemSlotSH extends SyncHandler {
         if (sync) {
             sync(SYNC_ENABLED, buffer -> buffer.writeBoolean(enabled));
         }
+    }
+
+    public void forceSyncItem() {
+        syncToClient(SYNC_ITEM, buffer -> {
+            buffer.writeBoolean(false);
+            buffer.writeItemStack(this.slot.getStack());
+            buffer.writeBoolean(false);
+            buffer.writeBoolean(true);
+        });
     }
 
     public ModularSlot getSlot() {

@@ -94,7 +94,6 @@ public class PhantomItemSlot extends ItemSlot implements JeiGhostIngredientSlot<
         this.syncHandler = new PhantomItemSlotSH(slot);
         super.isValidSyncHandler(this.syncHandler);
         setSyncHandler(this.syncHandler);
-        initSlot(slot);
         return this;
     }
 
