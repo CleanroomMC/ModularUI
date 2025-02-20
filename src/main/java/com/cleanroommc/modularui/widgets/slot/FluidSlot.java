@@ -175,7 +175,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
         ItemStack cursorStack = Minecraft.getMinecraft().player.inventory.getItemStack();
         if (this.syncHandler.isPhantom() || (!cursorStack.isEmpty() && cursorStack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null))) {
             MouseData mouseData = MouseData.create(mouseButton);
-            this.syncHandler.syncToServer(1, mouseData::writeToPacket);
+            this.syncHandler.syncToServer(FluidSlotSyncHandler.SYNC_CLICK, mouseData::writeToPacket);
         }
         return Result.SUCCESS;
     }
@@ -187,7 +187,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
                 return false;
             }
             MouseData mouseData = MouseData.create(scrollDirection.modifier);
-            this.syncHandler.syncToServer(2, mouseData::writeToPacket);
+            this.syncHandler.syncToServer(FluidSlotSyncHandler.SYNC_SCROLL, mouseData::writeToPacket);
             return true;
         }
         return false;

@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.widgets.slot;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
 import com.cleanroommc.modularui.integration.jei.ModularUIJeiPlugin;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.utils.MouseData;
@@ -9,11 +10,20 @@ import com.cleanroommc.modularui.value.sync.SyncHandler;
 
 import net.minecraft.client.renderer.GlStateManager;
 
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.item.ItemStack;
 
-public class PhantomItemSlot extends ItemSlot {
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+public class PhantomItemSlot extends ItemSlot implements JeiGhostIngredientSlot<ItemStack> {
 
     private PhantomItemSlotSH syncHandler;
+
+    @Override
+    public void onInit() {
+        super.onInit();
+        getContext().getJeiSettings().addJeiGhostIngredientSlot(this);
+    }
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
@@ -35,7 +45,7 @@ public class PhantomItemSlot extends ItemSlot {
     @Override
     public @NotNull Result onMousePressed(int mouseButton) {
         MouseData mouseData = MouseData.create(mouseButton);
-        this.syncHandler.syncToServer(2, mouseData::writeToPacket);
+        this.syncHandler.syncToServer(PhantomItemSlotSH.SYNC_CLICK, mouseData::writeToPacket);
         return Result.SUCCESS;
     }
 
@@ -47,13 +57,26 @@ public class PhantomItemSlot extends ItemSlot {
     @Override
     public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
         MouseData mouseData = MouseData.create(scrollDirection.modifier);
-        this.syncHandler.syncToServer(3, mouseData::writeToPacket);
+        this.syncHandler.syncToServer(PhantomItemSlotSH.SYNC_SCROLL, mouseData::writeToPacket);
         return true;
     }
 
     @Override
     public void onMouseDrag(int mouseButton, long timeSinceClick) {
         // TODO custom drag impl
+    }
+
+    @Override
+    public void setGhostIngredient(@NotNull ItemStack ingredient) {
+        this.syncHandler.updateFromClient(ingredient);
+    }
+
+    @Override
+    public @Nullable ItemStack castGhostIngredientIfValid(@NotNull Object ingredient) {
+        return areAncestorsEnabled() &&
+                this.syncHandler.isPhantom() &&
+                ingredient instanceof ItemStack itemStack &&
+                this.syncHandler.isItemValid(itemStack) ? itemStack : null;
     }
 
     @Override

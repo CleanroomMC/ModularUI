@@ -38,7 +38,7 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable, JeiGhostIngredientSlot<ItemStack>, JeiIngredientProvider {
+public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable, JeiIngredientProvider {
 
     public static final int SIZE = 18;
 
@@ -64,7 +64,6 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             throw new IllegalStateException("Overlays can't have slots!");
         }
         size(SIZE);
-        getContext().getJeiSettings().addJeiGhostIngredientSlot(this);
     }
 
     @Override
@@ -283,21 +282,6 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
         ((GuiAccessor) guiScreen).setZLevel(0f);
         renderItem.zLevel = 0f;
-    }
-
-    @Override
-    public void setGhostIngredient(@NotNull ItemStack ingredient) {
-        if (this.syncHandler.isPhantom()) {
-            this.syncHandler.updateFromClient(ingredient);
-        }
-    }
-
-    @Override
-    public @Nullable ItemStack castGhostIngredientIfValid(@NotNull Object ingredient) {
-        return areAncestorsEnabled() &&
-                this.syncHandler.isPhantom() &&
-                ingredient instanceof ItemStack itemStack &&
-                this.syncHandler.isItemValid(itemStack) ? itemStack : null;
     }
 
     @Override

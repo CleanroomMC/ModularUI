@@ -18,6 +18,10 @@ import java.io.IOException;
  */
 public class PhantomItemSlotSH extends ItemSlotSH {
 
+    public static final int SYNC_CLICK = 100;
+    public static final int SYNC_SCROLL = 101;
+    public static final int SYNC_ITEM_SIMPLE = 102;
+
     private ItemStack lastStoredPhantomItem = ItemStack.EMPTY;
 
     @ApiStatus.Internal
@@ -48,14 +52,18 @@ public class PhantomItemSlotSH extends ItemSlotSH {
     @Override
     public void readOnServer(int id, PacketBuffer buf) throws IOException {
         super.readOnServer(id, buf);
-        if (id == 2) {
+        if (id == SYNC_CLICK) {
             phantomClick(MouseData.readPacket(buf));
-        } else if (id == 3) {
+        } else if (id == SYNC_SCROLL) {
             phantomScroll(MouseData.readPacket(buf));
-        } else if (id == 5) {
+        } else if (id == SYNC_ITEM_SIMPLE) {
             if (!isPhantom()) return;
             phantomClick(new MouseData(Side.SERVER, 0, false, false, false), buf.readItemStack());
         }
+    }
+
+    public void updateFromClient(ItemStack stack) {
+        syncToServer(SYNC_ITEM_SIMPLE, buf -> buf.writeItemStack(stack));
     }
 
     protected void phantomClick(MouseData mouseData) {

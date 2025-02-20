@@ -18,6 +18,9 @@ import java.io.IOException;
  */
 public class ItemSlotSH extends SyncHandler {
 
+    public static final int SYNC_ITEM = 1;
+    public static final int SYNC_ENABLED = 2;
+
     private final ModularSlot slot;
     private ItemStack lastStoredItem;
     private boolean registered = false;
@@ -52,7 +55,7 @@ public class ItemSlotSH extends SyncHandler {
                 this.lastStoredItem = itemStack.isEmpty() ? ItemStack.EMPTY : itemStack.copy();
             }
             final boolean finalOnlyAmountChanged = onlyAmountChanged;
-            syncToClient(1, buffer -> {
+            syncToClient(SYNC_ITEM, buffer -> {
                 buffer.writeBoolean(finalOnlyAmountChanged);
                 buffer.writeItemStack(itemStack);
                 buffer.writeBoolean(init);
@@ -62,18 +65,18 @@ public class ItemSlotSH extends SyncHandler {
 
     @Override
     public void readOnClient(int id, PacketBuffer buf) {
-        if (id == 1) {
+        if (id == SYNC_ITEM) {
             boolean onlyAmountChanged = buf.readBoolean();
             this.lastStoredItem = NetworkUtils.readItemStack(buf);
             onSlotUpdate(this.lastStoredItem, onlyAmountChanged, true, buf.readBoolean());
-        } else if (id == 4) {
+        } else if (id == SYNC_ENABLED) {
             setEnabled(buf.readBoolean(), false);
         }
     }
 
     @Override
     public void readOnServer(int id, PacketBuffer buf) throws IOException {
-        if (id == 4) {
+        if (id == SYNC_ENABLED) {
             setEnabled(buf.readBoolean(), false);
         }
     }
@@ -85,12 +88,8 @@ public class ItemSlotSH extends SyncHandler {
     public void setEnabled(boolean enabled, boolean sync) {
         this.slot.setEnabled(enabled);
         if (sync) {
-            sync(4, buffer -> buffer.writeBoolean(enabled));
+            sync(SYNC_ENABLED, buffer -> buffer.writeBoolean(enabled));
         }
-    }
-
-    public void updateFromClient(ItemStack stack) {
-        syncToServer(5, buf -> buf.writeItemStack(stack));
     }
 
     public ModularSlot getSlot() {
