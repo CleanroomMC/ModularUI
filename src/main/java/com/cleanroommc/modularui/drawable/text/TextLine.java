@@ -24,7 +24,7 @@ public class TextLine implements ITextLine {
 
     @Override
     public int getHeight(FontRenderer fr) {
-        return fr.FONT_HEIGHT;
+        return fr.FONT_HEIGHT + 1;
     }
 
     @Override
