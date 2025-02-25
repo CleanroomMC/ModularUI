@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Box;
 
@@ -86,11 +87,11 @@ public class TextWidget extends Widget<TextWidget> {
     }
 
     public int getColor() {
-        return this.color;
+        return this.color == null ? Color.BLACK.main : this.color;
     }
 
     public boolean isShadow() {
-        return this.shadow;
+        return this.shadow != null && this.shadow;
     }
 
     public TextWidget alignment(Alignment alignment) {
