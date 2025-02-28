@@ -122,11 +122,7 @@ public class RichTextWidget extends Widget<RichTextWidget> implements IRichTextB
     @Nullable
     public Object getHoveredElement(ModularGuiContext context) {
         if (!isHovering()) return null;
-        context.pushMatrix();
-        context.translate(getArea().x, getArea().y);
-        Object o = this.text.getHoveringElement(context);
-        context.popMatrix();
-        return o;
+        return this.text.getHoveringElement(context);
     }
 
     @Override
