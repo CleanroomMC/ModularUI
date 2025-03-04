@@ -67,7 +67,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
                 if (i == 0) {
                     colSizes.add(this.minColWidth);
                 }
-                if (child != null) {
+                if (child != null && child.isEnabled()) {
                     rowSizes.set(i, Math.max(rowSizes.getInt(i), getElementHeight(child.getArea())));
                     colSizes.set(j, Math.max(colSizes.getInt(j), getElementWidth(child.getArea())));
                 }
