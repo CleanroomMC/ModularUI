@@ -5,6 +5,8 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 
+import com.cleanroommc.modularui.widget.sizer.Area;
+
 import net.minecraft.client.gui.FontRenderer;
 
 import java.util.ArrayList;
@@ -166,9 +168,21 @@ public class RichText implements IDrawable, IRichTextBuilder<RichText> {
     }
 
     public void draw(GuiContext context, int x, int y, int width, int height, int color, boolean shadow) {
+        draw(renderer, context, x, y, width, height, color, shadow);
+    }
+
+    public void draw(TextRenderer renderer, GuiContext context, int x, int y, int width, int height, int color, boolean shadow) {
         renderer.setSimulate(false);
         setupRenderer(renderer, x, y, width, height, color, shadow);
         this.cachedText = renderer.compileAndDraw(context, this.elements);
+    }
+
+    public int getLastHeight() {
+        return (int) renderer.getLastHeight();
+    }
+
+    public int getLastWidth() {
+        return (int) renderer.getLastWidth();
     }
 
     public void setupRenderer(TextRenderer renderer, int x, int y, float width, float height, int color, boolean shadow) {
