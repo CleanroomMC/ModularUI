@@ -204,7 +204,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                         .slot(SyncHandlers.itemSlot(this.inventory, 0).ignoreMaxStackSize(true).singletonSlotGroup()))
                                                 .child(new FluidSlot()
                                                         .margin(2)
-                                                        .width(30)
+                                                        .width(18)
                                                         .syncHandler(SyncHandlers.fluidSlot(this.fluidTankPhantom).phantom(true)))
                                         )))
                         .addPage(new Column()
