@@ -62,11 +62,12 @@ public class ItemSlotSH extends SyncHandler {
                 this.lastStoredItem = itemStack.isEmpty() ? ItemStack.EMPTY : itemStack.copy();
             }
             final boolean finalOnlyAmountChanged = onlyAmountChanged;
+            final boolean forceSync = false;
             syncToClient(SYNC_ITEM, buffer -> {
                 buffer.writeBoolean(finalOnlyAmountChanged);
                 buffer.writeItemStack(itemStack);
                 buffer.writeBoolean(init);
-                buffer.writeBoolean(false);
+                buffer.writeBoolean(forceSync);
             });
         }
     }
@@ -78,6 +79,7 @@ public class ItemSlotSH extends SyncHandler {
             this.lastStoredItem = NetworkUtils.readItemStack(buf);
             onSlotUpdate(this.lastStoredItem, onlyAmountChanged, true, buf.readBoolean());
             if (buf.readBoolean()) {
+                // force sync
                 this.slot.putStack(this.lastStoredItem);
             }
         } else if (id == SYNC_ENABLED) {
@@ -104,11 +106,17 @@ public class ItemSlotSH extends SyncHandler {
     }
 
     public void forceSyncItem() {
+        boolean onlyAmountChanged = false;
+        ItemStack stack = slot.getStack();
+        boolean init = false;
+        boolean forceSync = true;
+        onSlotUpdate(stack, onlyAmountChanged, getSyncManager().isClient(), init);
+        this.lastStoredItem = stack.isEmpty() ? ItemStack.EMPTY : stack;
         syncToClient(SYNC_ITEM, buffer -> {
-            buffer.writeBoolean(false);
-            buffer.writeItemStack(this.slot.getStack());
-            buffer.writeBoolean(false);
-            buffer.writeBoolean(true);
+            buffer.writeBoolean(onlyAmountChanged);
+            buffer.writeItemStack(stack);
+            buffer.writeBoolean(init);
+            buffer.writeBoolean(forceSync);
         });
     }
 
