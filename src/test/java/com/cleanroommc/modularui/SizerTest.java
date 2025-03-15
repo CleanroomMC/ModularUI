@@ -1,9 +1,9 @@
 package com.cleanroommc.modularui;
 
 import com.cleanroommc.modularui.overlay.ScreenWrapper;
-import com.cleanroommc.modularui.screen.JeiSettingsImpl;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
 
@@ -37,7 +37,7 @@ public class SizerTest {
 
     ModularScreen testPanel(ModularPanel panel) {
         ModularScreen screen = new ModularScreen(panel);
-        screen.getContext().setJeiSettings(new JeiSettingsImpl());
+        screen.getContext().setSettings(new UISettings());
         ScreenWrapper wrapper = new ScreenWrapper(null, screen);
         screen.construct(wrapper);
         screen.onResize(W, H);
