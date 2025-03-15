@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.holoui;
 
-import com.cleanroommc.modularui.screen.GuiContainerWrapper;
-import com.cleanroommc.modularui.screen.ModularContainer;
-import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.api.IMuiScreen;
+import com.cleanroommc.modularui.api.MCHelper;
+import com.cleanroommc.modularui.screen.*;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -26,8 +26,8 @@ import org.jetbrains.annotations.NotNull;
 @ApiStatus.Experimental
 public class HoloScreenEntity extends Entity {
 
-    private GuiContainerWrapper wrapper;
-    private ModularScreen screen;
+    private IMuiScreen wrapper;
+    private ModularPanel panel;
     private final Plane3D plane3D;
     private static final DataParameter<Byte> ORIENTATION = EntityDataManager.createKey(HoloScreenEntity.class, DataSerializers.BYTE);
 
@@ -40,22 +40,34 @@ public class HoloScreenEntity extends Entity {
         this(world, new Plane3D());
     }
 
-    public void setScreen(ModularScreen screen) {
-        this.screen = screen;
-        this.wrapper = new GuiContainerWrapper(new ModularContainer(null), screen);
-        this.wrapper.setWorldAndResolution(Minecraft.getMinecraft(), (int) this.plane3D.getWidth(), (int) this.plane3D.getHeight());
+    public void setWrapper(IMuiScreen wrapper) {
+        this.wrapper = wrapper;
+        this.wrapper.getGuiScreen().setWorldAndResolution(Minecraft.getMinecraft(), (int) this.plane3D.getWidth(), (int) this.plane3D.getHeight());
+        this.wrapper.getScreen().getContext().holoScreen = this;
+        this.wrapper.getScreen().getContext().isHoloScreen = true;
+    }
+
+    public void setPanel(ModularPanel panel) {
+        this.panel = panel;
     }
 
     public ModularScreen getScreen() {
-        return this.screen;
+        return this.getWrapper().getScreen();
     }
 
-    public GuiContainerWrapper getWrapper() {
+    public IMuiScreen getWrapper() {
         return this.wrapper;
     }
 
     public void spawnInWorld() {
         getEntityWorld().spawnEntity(this);
+        if (world.isRemote)
+            onResize();
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void onResize() {
+        getScreen().onResize((int) plane3D.getWidth(), (int) plane3D.getHeight());
     }
 
     public void setOrientation(ScreenOrientation orientation) {
@@ -64,6 +76,11 @@ public class HoloScreenEntity extends Entity {
 
     public ScreenOrientation getOrientation() {
         return ScreenOrientation.values()[this.dataManager.get(ORIENTATION)];
+    }
+
+    public boolean isName(String name) {
+        if (this.panel == null) return false;
+        return this.panel.getName().equals(name);
     }
 
     public Plane3D getPlane3D() {
@@ -84,18 +101,23 @@ public class HoloScreenEntity extends Entity {
         this.prevPosZ = this.posZ;
         this.prevRotationPitch = this.rotationPitch;
         this.prevRotationYaw = this.rotationYaw;
-        if (this.world.isRemote) {
-            this.extinguish();
-        }
+
         if (this.posY < -64.0D) {
             this.outOfWorld();
         }
 
         if (this.world.isRemote) {
+            this.extinguish();
             int w = (int) this.plane3D.getWidth(), h = (int) this.plane3D.getHeight();
-            if (w != this.wrapper.width || h != this.wrapper.height) {
-                this.wrapper.onResize(Minecraft.getMinecraft(), w, h);
+            if (this.wrapper == null) {
+                this.getEntityWorld().removeEntity(this);
+                return;
             }
+            var wrapper = this.wrapper.getGuiScreen();
+            if (w != wrapper.width || h != wrapper.height) {
+                wrapper.onResize(Minecraft.getMinecraft(), w, h);
+            }
+            this.wrapper.getScreen().onUpdate();
         }
 
         this.firstUpdate = false;

@@ -43,6 +43,8 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+
 public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable, JeiGhostIngredientSlot<ItemStack>, JeiIngredientProvider {
 
     public static final int SIZE = 18;
@@ -133,6 +135,13 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         if (this.syncHandler.isPhantom()) {
             MouseData mouseData = MouseData.create(mouseButton);
             this.syncHandler.syncToServer(2, mouseData::writeToPacket);
+        } else if (getContext().isHoloScreen) {
+            var holo = getContext().holoScreen.getScreen();
+            if (holo.getScreenWrapper().getGuiScreen() instanceof GuiScreenAccessor acc) {
+                try {
+                    acc.invokeMouseClicked(getContext().getMouseX(), getContext().getMouseY(), getContext().getMouseButton());
+                } catch (IOException ignored) {}
+            }
         } else {
             ClientScreenHandler.clickSlot(getScreen(), getSlot());
             //getScreen().getScreenWrapper().clickSlot();
@@ -231,8 +240,10 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             }
         }
 
-        ((GuiAccessor) guiScreen).setZLevel(100f);
-        renderItem.zLevel = 100.0F;
+        float z = getContext().isHoloScreen ? -100f : 100f;
+        float zStart = ((GuiAccessor) guiScreen).getZLevel();
+        ((GuiAccessor) guiScreen).setZLevel(zStart + z);
+        renderItem.zLevel += z;
 
         if (!flag1) {
             if (flag) {
@@ -242,7 +253,9 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             if (!itemstack.isEmpty()) {
                 GlStateManager.enableDepth();
                 // render the item itself
-                renderItem.renderItemAndEffectIntoGUI(guiScreen.mc.player, itemstack, 1, 1);
+//                renderItem.renderItemAndEffectIntoGUI(guiScreen.mc.player, itemstack, 1, 1);
+//                guiScreen.getItemRenderer().renderItemAndEffectIntoGUI(guiScreen.mc.player, itemstack, 1, 1);
+                renderItem.renderItemIntoGUI(itemstack, 1, 1);
                 if (amount < 0) {
                     amount = itemstack.getCount();
                 }
@@ -283,8 +296,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             }
         }
 
-        ((GuiAccessor) guiScreen).setZLevel(0f);
-        renderItem.zLevel = 0f;
+        ((GuiAccessor) guiScreen).setZLevel(zStart);
+        renderItem.zLevel -= z;
     }
 
     @Override

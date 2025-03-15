@@ -37,7 +37,7 @@ import java.util.Objects;
 
 public class GuiManager {
 
-    private static final Object2ObjectMap<String, UIFactory<?>> FACTORIES = new Object2ObjectOpenHashMap<>(16);
+    protected static final Object2ObjectMap<String, UIFactory<?>> FACTORIES = new Object2ObjectOpenHashMap<>(16);
 
     private static IMuiScreen lastMui;
     private static final List<EntityPlayer> openedContainers = new ArrayList<>(4);

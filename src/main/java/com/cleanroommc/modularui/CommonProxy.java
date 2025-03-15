@@ -31,6 +31,7 @@ public class CommonProxy {
     void preInit(FMLPreInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(CommonProxy.class);
         MinecraftForge.EVENT_BUS.register(GuiManager.class);
+        MinecraftForge.EVENT_BUS.register(HoloGuiManager.class);
 
         if (ModularUIConfig.enableTestGuis) {
             MinecraftForge.EVENT_BUS.register(TestBlock.class);
@@ -40,6 +41,7 @@ public class CommonProxy {
         NetworkHandler.init();
 
         GuiFactories.init();
+        GuiManager.registerFactory(HoloGuiFactory.INSTANCE);
     }
 
     void postInit(FMLPostInitializationEvent event) {
@@ -61,6 +63,7 @@ public class CommonProxy {
                 .id("modular_screen", 0)
                 .name("ModularScreen")
                 .entity(HoloScreenEntity.class)
+                .tracker(100, 20, false)
                 .factory(HoloScreenEntity::new)
                 .build());
     }
