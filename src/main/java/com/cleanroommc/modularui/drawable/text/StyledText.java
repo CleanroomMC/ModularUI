@@ -49,7 +49,7 @@ public class StyledText extends BaseKey {
         return this.alignment;
     }
 
-    public int getColor() {
+    public @Nullable Integer getColor() {
         return this.color;
     }
 
@@ -57,7 +57,7 @@ public class StyledText extends BaseKey {
         return this.scale;
     }
 
-    public boolean isShadow() {
+    public @Nullable Boolean isShadow() {
         return this.shadow;
     }
 

@@ -85,11 +85,11 @@ public class TextWidget extends Widget<TextWidget> {
         return this.scale;
     }
 
-    public int getColor() {
+    public @Nullable Integer getColor() {
         return this.color;
     }
 
-    public boolean isShadow() {
+    public @Nullable Boolean isShadow() {
         return this.shadow;
     }
 

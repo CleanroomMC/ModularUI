@@ -59,9 +59,9 @@ public class ScrollingTextWidget extends TextWidget {
     public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
         checkString();
         TextRenderer renderer = TextRenderer.SHARED;
-        renderer.setColor(getColor());
+        renderer.setColor(getColor() != null ? getColor() : widgetTheme.getTextColor());
         renderer.setAlignment(getAlignment(), getArea().w() + 1, getArea().h());
-        renderer.setShadow(isShadow());
+        renderer.setShadow(isShadow() != null ? isShadow() : widgetTheme.getTextShadow());
         renderer.setPos(getArea().getPadding().left, getArea().getPadding().top);
         renderer.setScale(getScale());
         renderer.setSimulate(false);
