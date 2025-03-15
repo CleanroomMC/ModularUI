@@ -37,10 +37,6 @@ public class SyncHandlers {
         return new ModularSlot(inventory, index);
     }
 
-    public static ModularSlot phantomItemSlot(IItemHandlerModifiable inventory, int index) {
-        return new ModularSlot(inventory, index, true);
-    }
-
     public static FluidSlotSyncHandler fluidSlot(IFluidTank fluidTank) {
         return new FluidSlotSyncHandler(fluidTank);
     }

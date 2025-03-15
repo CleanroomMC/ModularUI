@@ -1,8 +1,6 @@
 package com.cleanroommc.modularui.factory;
 
-import com.cleanroommc.modularui.api.JeiSettings;
 import com.cleanroommc.modularui.network.NetworkUtils;
-import com.cleanroommc.modularui.screen.JeiSettingsImpl;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -12,7 +10,6 @@ import java.util.Objects;
 /**
  * This class and subclasses are holding necessary data to find the exact same GUI on client and server.
  * For example, if the GUI was opened by right-clicking a TileEntity, then this data needs a world and a block pos.
- * Additionally, this can be used to configure JEI via {@link #getJeiSettings()}.
  * <p>
  * Also see {@link PosGuiData} (useful for TileEntities), {@link SidedPosGuiData} (useful for covers from GregTech) and
  * {@link HandGuiData} (useful for guis opened by interacting with an item in the players hand) for default implementations.
@@ -21,7 +18,6 @@ import java.util.Objects;
 public class GuiData {
 
     private final EntityPlayer player;
-    private JeiSettings jeiSettings;
 
     public GuiData(EntityPlayer player) {
         this.player = Objects.requireNonNull(player);
@@ -41,20 +37,5 @@ public class GuiData {
 
     public ItemStack getOffHandItem() {
         return this.player.getHeldItemOffhand();
-    }
-
-    public JeiSettings getJeiSettings() {
-        if (this.jeiSettings == null) {
-            throw new IllegalStateException("Not yet initialised!");
-        }
-        return this.jeiSettings;
-    }
-
-    final JeiSettingsImpl getJeiSettingsImpl() {
-        return (JeiSettingsImpl) this.jeiSettings;
-    }
-
-    final void setJeiSettings(JeiSettings jeiSettings) {
-        this.jeiSettings = Objects.requireNonNull(jeiSettings);
     }
 }

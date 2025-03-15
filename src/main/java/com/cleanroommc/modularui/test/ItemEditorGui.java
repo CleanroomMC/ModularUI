@@ -5,11 +5,12 @@ import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.factory.SimpleGuiFactory;
 import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.value.sync.IntSyncValue;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.StringSyncValue;
-import com.cleanroommc.modularui.widgets.ItemSlot;
+import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Row;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
@@ -43,7 +44,7 @@ public class ItemEditorGui implements IGuiHolder<GuiData> {
     }
 
     @Override
-    public ModularPanel buildUI(GuiData data, PanelSyncManager syncManager) {
+    public ModularPanel buildUI(GuiData data, PanelSyncManager syncManager, UISettings settings) {
         ItemStack itemStack = syncManager.getPlayer().getHeldItemMainhand();
         if (!itemStack.isEmpty()) {
             setStack(itemStack.copy());

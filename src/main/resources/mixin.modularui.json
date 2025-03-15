@@ -15,6 +15,7 @@
   ],
   "mixins": [
     "ContainerAccessor",
-    "FontRendererAccessor"
+    "FontRendererAccessor",
+    "InventoryCraftingAccessor"
   ]
 }
