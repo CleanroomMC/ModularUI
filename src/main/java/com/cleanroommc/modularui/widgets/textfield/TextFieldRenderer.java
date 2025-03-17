@@ -95,20 +95,23 @@ public class TextFieldRenderer extends TextRenderer {
             return new Point();
         }
         List<Line> measuredLines = measureLines(lines);
-        y -= getStartY(measuredLines.size()) + this.y;
+        y -= getStartY(measuredLines.size());
         int index = (int) (y / (getFontHeight()));
         if (index < 0) return new Point();
         if (index >= measuredLines.size())
             return new Point(measuredLines.get(measuredLines.size() - 1).getText().length(), measuredLines.size() - 1);
         Line line = measuredLines.get(index);
-        x -= getStartX(line.getWidth()) + this.x;
+        x -= getStartX(line.getWidth());
         if (line.getWidth() <= 0) return new Point(0, index);
         if (line.getWidth() < x) return new Point(line.getText().length(), index);
         float currentX = 0;
         for (int i = 0; i < line.getText().length(); i++) {
             char c = line.getText().charAt(i);
-            currentX += getFontRenderer().getCharWidth(c) * this.scale;
+            float charWidth = getFontRenderer().getCharWidth(c) * this.scale;
+            currentX += charWidth;
             if (currentX >= x) {
+                // dist with current letter < dist without current letter -> next letter pos
+                if (Math.abs(currentX - x) < Math.abs(currentX - charWidth - x)) i++;
                 return new Point(i, index);
             }
         }
