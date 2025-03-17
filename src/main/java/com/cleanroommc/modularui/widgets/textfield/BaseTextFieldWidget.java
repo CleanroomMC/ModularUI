@@ -160,7 +160,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
     public @NotNull Result onMousePressed(int mouseButton) {
         Result result = super.onMousePressed(mouseButton);
         if (result != Result.IGNORE) {
-            return result;
+            return Result.SUCCESS; // keep focused
         }
         if (!isHovering()) {
             return Result.IGNORE;
@@ -178,7 +178,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
 
     @Override
     public void onMouseDrag(int mouseButton, long timeSinceClick) {
-        if (isFocused()) {
+        if (isFocused() && !getScrollArea().isDragging()) {
             int x = getContext().getMouseX() + getScrollX();
             int y = getContext().getMouseY() + getScrollY();
             this.handler.setMainCursor(this.renderer.getCursorPos(this.handler.getText(), x, y), true);
