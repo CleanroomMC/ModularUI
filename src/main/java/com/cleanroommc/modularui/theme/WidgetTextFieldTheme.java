@@ -9,18 +9,25 @@ import com.google.gson.JsonObject;
 public class WidgetTextFieldTheme extends WidgetTheme {
 
     private final int markedColor;
+    private final int hintColor;
 
-    public WidgetTextFieldTheme(int markedColor) {
+    public WidgetTextFieldTheme(int markedColor, int hintColor) {
         super(GuiTextures.DISPLAY_SMALL, null, Color.WHITE.main, Color.WHITE.main, false);
         this.markedColor = markedColor;
+        this.hintColor = hintColor;
     }
 
     public WidgetTextFieldTheme(WidgetTheme parent, JsonObject fallback, JsonObject json) {
         super(parent, json, fallback);
         this.markedColor = JsonHelper.getColorWithFallback(json, fallback, ((WidgetTextFieldTheme) parent).getMarkedColor(), "markedColor");
+        this.hintColor = JsonHelper.getColorWithFallback(json, fallback, ((WidgetTextFieldTheme) parent).getHintColor(), "hintColor");
     }
 
     public int getMarkedColor() {
         return this.markedColor;
+    }
+
+    public int getHintColor() {
+        return hintColor;
     }
 }

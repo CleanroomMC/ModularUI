@@ -12,7 +12,6 @@ import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.AbstractScrollWidget;
 import com.cleanroommc.modularui.widget.scroll.HorizontalScrollData;
 import com.cleanroommc.modularui.widget.scroll.ScrollData;
-
 import com.cleanroommc.modularui.widgets.VoidWidget;
 
 import net.minecraft.client.gui.GuiScreen;
@@ -53,7 +52,10 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
     protected boolean focusOnGuiOpen;
     private int cursorTimer;
 
-    protected boolean changedTextColor = false;
+    protected Integer textColor;
+    protected Integer markedColor;
+    protected String hintText = null;
+    protected Integer hintTextColor;
 
     public BaseTextFieldWidget() {
         super(new HorizontalScrollData(), null);
@@ -76,9 +78,6 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
     public void onInit() {
         super.onInit();
         this.handler.setGuiContext(getContext());
-        if (!this.changedTextColor) {
-            this.renderer.setColor(getWidgetTheme(getContext().getTheme()).getTextColor());
-        }
     }
 
     @Override
@@ -102,17 +101,33 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
     @Override
     public void preDraw(ModularGuiContext context, boolean transformed) {
         if (transformed) {
-            drawText(context);
+            WidgetTextFieldTheme widgetTheme = (WidgetTextFieldTheme) getWidgetTheme(context.getTheme());
+            this.renderer.setColor(this.textColor != null ? this.textColor : widgetTheme.getTextColor());
+            this.renderer.setCursorColor(this.textColor != null ? this.textColor : widgetTheme.getTextColor());
+            this.renderer.setMarkedColor(this.markedColor != null ? this.markedColor : widgetTheme.getMarkedColor());
+            setupDrawText(context, widgetTheme);
+            drawText(context, widgetTheme);
         } else {
             Stencil.apply(1, 1, getArea().w() - 2, getArea().h() - 2, context);
         }
     }
 
-    public void drawText(ModularGuiContext context) {
+    protected void setupDrawText(ModularGuiContext context, WidgetTextFieldTheme widgetTheme) {
         this.renderer.setSimulate(false);
         this.renderer.setScale(this.scale);
         this.renderer.setAlignment(this.textAlignment, -2, getArea().height);
-        this.renderer.draw(this.handler.getText());
+    }
+
+    protected void drawText(ModularGuiContext context, WidgetTextFieldTheme widgetTheme) {
+        if (this.handler.isTextEmpty() && this.hintText != null) {
+            int c = this.renderer.getColor();
+            int hintColor = this.hintTextColor != null ? this.hintTextColor : widgetTheme.getHintColor();
+            this.renderer.setColor(hintColor);
+            this.renderer.draw(Collections.singletonList(this.hintText));
+            this.renderer.setColor(c);
+        } else {
+            this.renderer.draw(this.handler.getText());
+        }
         getScrollArea().getScrollX().setScrollSize(Math.max(0, (int) (this.renderer.getLastWidth() + 0.5f)));
     }
 
@@ -290,13 +305,34 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
     }*/
 
     public W setTextColor(int color) {
-        this.renderer.setColor(color);
-        this.changedTextColor = true;
+        this.textColor = color;
+        return getThis();
+    }
+
+    public W setMarkedColor(int color) {
+        this.markedColor = color;
         return getThis();
     }
 
     public W setFocusOnGuiOpen(boolean focusOnGuiOpen) {
         this.focusOnGuiOpen = focusOnGuiOpen;
+        return getThis();
+    }
+
+    /**
+     * Sets a constant hint text. The hint is displayed in a less noticeable color when the field is empty.
+     * The color is by default obtained from the current them, but can be overriden with {@link #hintColor(int)}.
+     *
+     * @param hint hint text to display
+     * @return this
+     */
+    public W hintText(String hint) {
+        this.hintText = hint;
+        return getThis();
+    }
+
+    public W hintColor(int color) {
+        this.hintTextColor = color;
         return getThis();
     }
 

@@ -232,6 +232,26 @@ public class TextRenderer {
         GlStateManager.enableBlend();
     }
 
+    public int getColor() {
+        return color;
+    }
+
+    public float getScale() {
+        return scale;
+    }
+
+    public Alignment getAlignment() {
+        return alignment;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
     public float getFontHeight() {
         return getFontRenderer().FONT_HEIGHT * this.scale;
     }

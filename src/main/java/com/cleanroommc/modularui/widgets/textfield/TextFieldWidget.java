@@ -32,8 +32,6 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     private String mathFailMessage = null;
     private double defaultNumber = 0;
 
-    protected boolean changedMarkedColor = false;
-
     public double parse(String num) {
         ParseResult result = MathUtils.parseExpression(num, this.defaultNumber, true);
         double value = result.getResult();
@@ -57,9 +55,6 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         setText(this.stringValue.getStringValue());
         if (!hasTooltip()) {
             tooltipBuilder(tooltip -> tooltip.addLine(IKey.str(getText())));
-        }
-        if (!this.changedMarkedColor) {
-            this.renderer.setMarkedColor(getMarkedColor());
         }
     }
 
@@ -96,13 +91,11 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     @Override
-    public void drawText(ModularGuiContext context) {
+    protected void setupDrawText(ModularGuiContext context, WidgetTextFieldTheme widgetTheme) {
         this.renderer.setSimulate(false);
         this.renderer.setPos(getArea().getPadding().left, 0);
         this.renderer.setScale(this.scale);
         this.renderer.setAlignment(this.textAlignment, -1, getArea().height);
-        this.renderer.draw(this.handler.getText());
-        getScrollData().setScrollSize(Math.max(0, (int) this.renderer.getLastWidth()));
     }
 
     @Override
@@ -170,18 +163,6 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
     public TextFieldWidget setPattern(Pattern pattern) {
         this.handler.setPattern(pattern);
-        return this;
-    }
-
-    public TextFieldWidget setTextColor(int textColor) {
-        this.renderer.setColor(textColor);
-        this.changedTextColor = true;
-        return this;
-    }
-
-    public TextFieldWidget setMarkedColor(int color) {
-        this.renderer.setMarkedColor(color);
-        this.changedMarkedColor = true;
         return this;
     }
 
