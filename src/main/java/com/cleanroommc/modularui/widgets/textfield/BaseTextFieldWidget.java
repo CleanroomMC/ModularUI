@@ -153,6 +153,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
         if (mouseButton == 1) {
             this.handler.clear();
         } else {
+            // the current transformation does not include the transformation of the children (the scroll) so we need to manually transform here
             int x = getContext().getMouseX() + getScrollX();
             int y = getContext().getMouseY() + getScrollY();
             this.handler.setCursor(this.renderer.getCursorPos(this.handler.getText(), x, y), true);
