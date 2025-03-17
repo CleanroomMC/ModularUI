@@ -42,8 +42,7 @@ public class CommonProxy {
         GuiFactories.init();
     }
 
-    void postInit(FMLPostInitializationEvent event) {
-    }
+    void postInit(FMLPostInitializationEvent event) {}
 
     void onServerLoad(FMLServerStartingEvent event) {
         event.registerServerCommand(new ItemEditorGui.Command());

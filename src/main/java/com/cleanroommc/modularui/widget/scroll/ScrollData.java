@@ -142,7 +142,7 @@ public abstract class ScrollData {
     }
 
     public final int getFullVisibleSize(ScrollArea area, boolean isOtherActive) {
-        int s = getRawVisibleSize(area);
+        int s = getRawFullVisibleSize(area);
         ScrollData data = getOtherScrollData(area);
         if (data != null && (isOtherActive || data.isScrollBarActive(area, true))) {
             s -= data.getThickness();
