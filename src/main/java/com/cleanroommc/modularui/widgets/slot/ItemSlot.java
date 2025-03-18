@@ -164,13 +164,17 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     public ItemSlot slot(ModularSlot slot) {
-        this.syncHandler = new ItemSlotSH(slot);
-        setSyncHandler(this.syncHandler);
-        return this;
+        return syncHandler(new ItemSlotSH(slot));
     }
 
     public ItemSlot slot(IItemHandlerModifiable itemHandler, int index) {
         return slot(new ModularSlot(itemHandler, index));
+    }
+
+    public ItemSlot syncHandler(ItemSlotSH syncHandler) {
+        this.syncHandler = syncHandler;
+        setSyncHandler(this.syncHandler);
+        return this;
     }
 
     @SideOnly(Side.CLIENT)

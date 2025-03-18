@@ -20,6 +20,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.relauncher.Side;
@@ -79,6 +80,13 @@ public class CommonProxy {
     public static void onConfigChange(ConfigChangedEvent.OnConfigChangedEvent event) {
         if (event.getModID().equals(ModularUI.ID)) {
             ConfigManager.sync(ModularUI.ID, Config.Type.INSTANCE);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onTick(TickEvent.PlayerTickEvent event) {
+        if (event.player.openContainer instanceof ModularContainer container) {
+            container.onTick();
         }
     }
 }

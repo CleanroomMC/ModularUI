@@ -64,6 +64,10 @@ public class ModularSyncManager {
         this.panelSyncManagerMap.values().forEach(PanelSyncManager::onOpen);
     }
 
+    public void onTick() {
+        this.panelSyncManagerMap.values().forEach(PanelSyncManager::onTick);
+    }
+
     public PanelSyncManager getPanelSyncManager(String panelName) {
         PanelSyncManager psm = this.panelSyncManagerMap.get(panelName);
         if (psm != null) return psm;
@@ -101,8 +105,8 @@ public class ModularSyncManager {
         return this.panelSyncManagerMap.containsKey(panelName);
     }
 
-    public void receiveWidgetUpdate(String panelName, String mapKey, int id, PacketBuffer buf) throws IOException {
-        getPanelSyncManager(panelName).receiveWidgetUpdate(mapKey, id, buf);
+    public void receiveWidgetUpdate(String panelName, String mapKey, boolean action, int id, PacketBuffer buf) throws IOException {
+        getPanelSyncManager(panelName).receiveWidgetUpdate(mapKey, action, id, buf);
     }
 
     public EntityPlayer getPlayer() {

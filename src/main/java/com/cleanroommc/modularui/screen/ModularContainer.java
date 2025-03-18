@@ -111,6 +111,10 @@ public class ModularContainer extends Container implements ISortableContainer {
         this.init = false;
     }
 
+    public void onTick() {
+
+    }
+
     private void sortShiftClickSlots() {
         this.shiftClickSlots.sort(Comparator.comparingInt(slot -> Objects.requireNonNull(slot.getSlotGroup()).getShiftClickPriority()));
     }

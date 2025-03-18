@@ -231,7 +231,10 @@ public class WidgetTree {
     }
 
     public static void resize(IWidget parent) {
-        // TODO check if widget has a parent which depends on its children
+        // check if updating this widget's pos and size can potentially update its parents
+        while (!(parent instanceof ModularPanel) && (parent.getParent() instanceof ILayoutWidget || parent.getParent().flex().dependsOnChildren())) {
+            parent = parent.getParent();
+        }
         // resize each widget and calculate their relative pos
         if (!resizeWidget(parent, true) && !resizeWidget(parent, false)) {
             throw new IllegalStateException("Failed to resize widgets");
@@ -345,14 +348,19 @@ public class WidgetTree {
     }
 
     @ApiStatus.Internal
-    public static void collectSyncValues(PanelSyncManager syncManager, ModularPanel panel) {
+    public static void collectSyncValues(PanelSyncManager syncManager, IWidget panel) {
         collectSyncValues(syncManager, panel, true);
     }
 
     @ApiStatus.Internal
     public static void collectSyncValues(PanelSyncManager syncManager, ModularPanel panel, boolean includePanel) {
+        collectSyncValues(syncManager, panel.getName(), panel, includePanel);
+    }
+
+    @ApiStatus.Internal
+    public static void collectSyncValues(PanelSyncManager syncManager, String panelName, IWidget panel, boolean includePanel) {
         AtomicInteger id = new AtomicInteger(0);
-        String syncKey = ModularSyncManager.AUTO_SYNC_PREFIX + panel.getName();
+        String syncKey = ModularSyncManager.AUTO_SYNC_PREFIX + panelName;
         foreachChildBFS(panel, widget -> {
             if (widget instanceof ISynced<?> synced) {
                 if (synced.isSynced() && !syncManager.hasSyncHandler(synced.getSyncHandler())) {

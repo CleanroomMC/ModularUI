@@ -16,6 +16,7 @@
   "mixins": [
     "ContainerAccessor",
     "FontRendererAccessor",
-    "InventoryCraftingAccessor"
+    "InventoryCraftingAccessor",
+    "PacketBufferMixin"
   ]
 }

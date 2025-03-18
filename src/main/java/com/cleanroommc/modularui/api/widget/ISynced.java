@@ -24,8 +24,9 @@ public interface ISynced<W extends IWidget> {
      * Called when this widget gets initialised or when this widget is added to the gui
      *
      * @param syncManager sync manager
+     * @param late
      */
-    void initialiseSyncHandler(ModularSyncManager syncManager);
+    void initialiseSyncHandler(ModularSyncManager syncManager, boolean late);
 
     /**
      * Checks if the received sync handler is valid for this widget.

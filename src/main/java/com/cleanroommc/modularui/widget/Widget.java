@@ -64,7 +64,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
 
     @ApiStatus.Internal
     @Override
-    public void initialise(@NotNull IWidget parent) {
+    public void initialise(@NotNull IWidget parent, boolean late) {
         if (!(this instanceof ModularPanel)) {
             this.parent = parent;
             this.panel = parent.getPanel();
@@ -82,12 +82,12 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         }
         this.valid = true;
         if (!getScreen().isClientOnly()) {
-            initialiseSyncHandler(getScreen().getSyncManager());
+            initialiseSyncHandler(getScreen().getSyncManager(), late);
         }
         onInit();
         if (hasChildren()) {
             for (IWidget child : getChildren()) {
-                child.initialise(this);
+                child.initialise(this, false);
             }
         }
         afterInit();
@@ -101,7 +101,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     public void afterInit() {}
 
     @Override
-    public void initialiseSyncHandler(ModularSyncManager syncManager) {
+    public void initialiseSyncHandler(ModularSyncManager syncManager, boolean late) {
         if (this.syncKey != null) {
             this.syncHandler = syncManager.getSyncHandler(getPanel().getName(), this.syncKey);
         }

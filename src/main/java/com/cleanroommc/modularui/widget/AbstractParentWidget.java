@@ -10,8 +10,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 
 /**
  * A widget which can hold any amount of children.
@@ -64,7 +62,7 @@ public class AbstractParentWidget<I extends IWidget, W extends AbstractParentWid
         }
         this.children.add(index, child);
         if (isValid()) {
-            child.initialise(this);
+            child.initialise(this, true);
         }
         onChildAdd(child);
         return true;

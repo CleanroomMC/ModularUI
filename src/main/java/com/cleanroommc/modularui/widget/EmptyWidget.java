@@ -25,7 +25,7 @@ public class EmptyWidget implements IWidget {
     }
 
     @Override
-    public void initialise(@NotNull IWidget parent) {
+    public void initialise(@NotNull IWidget parent, boolean late) {
         this.parent = parent;
     }
 
@@ -40,24 +40,19 @@ public class EmptyWidget implements IWidget {
     }
 
     @Override
-    public void drawBackground(ModularGuiContext context, WidgetTheme widgetTheme) {
-    }
+    public void drawBackground(ModularGuiContext context, WidgetTheme widgetTheme) {}
 
     @Override
-    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
-    }
+    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {}
 
     @Override
-    public void drawOverlay(ModularGuiContext context, WidgetTheme widgetTheme) {
-    }
+    public void drawOverlay(ModularGuiContext context, WidgetTheme widgetTheme) {}
 
     @Override
-    public void drawForeground(ModularGuiContext context) {
-    }
+    public void drawForeground(ModularGuiContext context) {}
 
     @Override
-    public void onUpdate() {
-    }
+    public void onUpdate() {}
 
     @Override
     public Area getArea() {
@@ -75,8 +70,7 @@ public class EmptyWidget implements IWidget {
     }
 
     @Override
-    public void setEnabled(boolean enabled) {
-    }
+    public void setEnabled(boolean enabled) {}
 
     @Override
     public boolean canBeSeen(IViewportStack stack) {
@@ -84,8 +78,7 @@ public class EmptyWidget implements IWidget {
     }
 
     @Override
-    public void markTooltipDirty() {
-    }
+    public void markTooltipDirty() {}
 
     @Override
     public @NotNull IWidget getParent() {

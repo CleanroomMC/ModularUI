@@ -212,7 +212,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         getArea().z(1);
         this.scale = 1f;
         this.alpha = 1f;
-        initialise(this);
+        initialise(this, false);
         if (shouldAnimate()) {
             this.scale = 0.75f;
             this.alpha = 0f;

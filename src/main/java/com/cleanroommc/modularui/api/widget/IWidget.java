@@ -27,8 +27,9 @@ public interface IWidget extends IGuiElement {
      * This element now becomes valid
      *
      * @param parent the parent this element belongs to
+     * @param late
      */
-    void initialise(@NotNull IWidget parent);
+    void initialise(@NotNull IWidget parent, boolean late);
 
     /**
      * Invalidates this element.
