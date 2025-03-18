@@ -348,7 +348,7 @@ public class WidgetTree {
     }
 
     @ApiStatus.Internal
-    public static void collectSyncValues(PanelSyncManager syncManager, IWidget panel) {
+    public static void collectSyncValues(PanelSyncManager syncManager, ModularPanel panel) {
         collectSyncValues(syncManager, panel, true);
     }
 

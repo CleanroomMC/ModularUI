@@ -43,8 +43,8 @@ public class ModularSyncManager {
         if (this.mainPSM.getSlotGroup(PLAYER_INVENTORY) == null) {
             this.mainPSM.bindPlayerInventory(getPlayer());
         }
-        open(mainPanelName, mainPSM);
         mainPSM.syncValue(CURSOR_KEY, this.cursorSlotSyncHandler);
+        open(mainPanelName, mainPSM);
     }
 
     // not sure why there was no getter before, need to check if this can be public
