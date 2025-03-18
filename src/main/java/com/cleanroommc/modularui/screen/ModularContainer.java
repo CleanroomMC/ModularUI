@@ -111,8 +111,12 @@ public class ModularContainer extends Container implements ISortableContainer {
         this.init = false;
     }
 
-    public void onTick() {
-
+    @ApiStatus.Internal
+    public void onUpdate() {
+        // detectAndSendChanges is potentially called multiple times per tick, while this method is called exactly once per tick
+        if (this.syncManager != null) {
+            this.syncManager.onUpdate();
+        }
     }
 
     private void sortShiftClickSlots() {

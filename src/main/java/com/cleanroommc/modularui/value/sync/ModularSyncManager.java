@@ -64,8 +64,8 @@ public class ModularSyncManager {
         this.panelSyncManagerMap.values().forEach(PanelSyncManager::onOpen);
     }
 
-    public void onTick() {
-        this.panelSyncManagerMap.values().forEach(PanelSyncManager::onTick);
+    public void onUpdate() {
+        this.panelSyncManagerMap.values().forEach(PanelSyncManager::onUpdate);
     }
 
     public PanelSyncManager getPanelSyncManager(String panelName) {

@@ -43,7 +43,7 @@ public class PanelSyncManager {
 
     private final List<Consumer<EntityPlayer>> openListener = new ArrayList<>();
     private final List<Consumer<EntityPlayer>> closeListener = new ArrayList<>();
-    private final List<Runnable> tickerListener = new ArrayList<>();
+    private final List<Runnable> tickListener = new ArrayList<>();
 
     public PanelSyncManager(boolean client) {
         this.client = client;
@@ -109,8 +109,8 @@ public class PanelSyncManager {
         this.init = false;
     }
 
-    void onTick() {
-        this.tickerListener.forEach(Runnable::run);
+    void onUpdate() {
+        this.tickListener.forEach(Runnable::run);
     }
 
     @ApiStatus.Internal
@@ -290,15 +290,20 @@ public class PanelSyncManager {
 
     public PanelSyncManager onClientTick(Runnable runnable) {
         if (this.client) {
-            this.tickerListener.add(runnable);
+            this.tickListener.add(runnable);
         }
         return this;
     }
 
     public PanelSyncManager onServerTick(Runnable runnable) {
         if (!this.client) {
-            this.tickerListener.add(runnable);
+            this.tickListener.add(runnable);
         }
+        return this;
+    }
+
+    public PanelSyncManager onCommonTick(Runnable runnable) {
+        this.tickListener.add(runnable);
         return this;
     }
 

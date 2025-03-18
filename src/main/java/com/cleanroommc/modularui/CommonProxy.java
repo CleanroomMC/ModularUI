@@ -86,7 +86,7 @@ public class CommonProxy {
     @SubscribeEvent
     public static void onTick(TickEvent.PlayerTickEvent event) {
         if (event.player.openContainer instanceof ModularContainer container) {
-            container.onTick();
+            container.onUpdate();
         }
     }
 }
