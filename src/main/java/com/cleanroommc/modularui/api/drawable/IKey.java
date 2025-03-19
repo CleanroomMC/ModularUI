@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.api.drawable;
 
+import com.cleanroommc.modularui.api.IJsonSerializable;
 import com.cleanroommc.modularui.drawable.Icon;
 import com.cleanroommc.modularui.drawable.text.*;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -21,7 +22,7 @@ import java.util.function.Supplier;
 /**
  * This represents a piece of text in a GUI.
  */
-public interface IKey extends IDrawable {
+public interface IKey extends IDrawable, IJsonSerializable {
 
     int TEXT_COLOR = 0xFF404040;
 

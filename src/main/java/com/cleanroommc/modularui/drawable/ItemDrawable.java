@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.api.IJsonSerializable;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -24,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.NoSuchElementException;
 
-public class ItemDrawable implements IDrawable {
+public class ItemDrawable implements IDrawable, IJsonSerializable {
 
     private ItemStack item = ItemStack.EMPTY;
 

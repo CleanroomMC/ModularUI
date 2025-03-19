@@ -138,23 +138,6 @@ public interface IDrawable {
     }
 
     /**
-     * Reads extra json data after this drawable is created.
-     *
-     * @param json json to read from
-     */
-    default void loadFromJson(JsonObject json) {}
-
-    /**
-     * Writes all json data necessary so that deserializing it results in the same drawable.
-     *
-     * @param json json to write to
-     * @return if the drawable was serialized
-     */
-    default boolean saveToJson(JsonObject json) {
-        return false;
-    }
-
-    /**
      * An empty drawable. Does nothing.
      */
     IDrawable EMPTY = (context, x, y, width, height, widgetTheme) -> {};

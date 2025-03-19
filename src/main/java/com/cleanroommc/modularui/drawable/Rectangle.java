@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.api.IJsonSerializable;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -14,7 +15,7 @@ import com.google.gson.JsonObject;
 
 import java.util.function.IntConsumer;
 
-public class Rectangle implements IDrawable {
+public class Rectangle implements IDrawable, IJsonSerializable {
 
     public static final double PI_2 = Math.PI / 2;
 

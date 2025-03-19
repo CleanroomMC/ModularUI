@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.IJsonSerializable;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.utils.JsonHelper;
@@ -37,7 +38,7 @@ public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDes
         return REVERSE_TEXTURES.get(texture);
     }
 
-    public static <T extends IDrawable> void registerDrawableType(String id, Class<T> type, Function<@NotNull JsonObject, @NotNull T> creator) {
+    public static <T extends IDrawable & IJsonSerializable> void registerDrawableType(String id, Class<T> type, Function<@NotNull JsonObject, @NotNull T> creator) {
         if (DRAWABLE_TYPES.containsKey(id)) {
             throw new IllegalArgumentException("Drawable type '" + id + "' already exists!");
         }
@@ -49,14 +50,11 @@ public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDes
 
     @ApiStatus.Internal
     public static void init() {
-        registerDrawableType("empty", IDrawable.class, json -> IDrawable.EMPTY);
-        registerDrawableType("null", null, json -> IDrawable.EMPTY);
-        registerDrawableType("none", null, json -> IDrawable.NONE);
+        // empty, none and text are special cases
         registerDrawableType("texture", UITexture.class, UITexture::parseFromJson);
-        registerDrawableType("color", null, json -> new Rectangle());
+        registerDrawableType("color", Rectangle.class, json -> new Rectangle());
         registerDrawableType("rectangle", Rectangle.class, json -> new Rectangle());
         registerDrawableType("ellipse", Circle.class, json -> new Circle());
-        registerDrawableType("text", IKey.class, DrawableSerialization::parseText);
         registerDrawableType("item", ItemDrawable.class, ItemDrawable::ofJson);
         registerDrawableType("icon", Icon.class, Icon::ofJson);
     }
@@ -107,12 +105,17 @@ public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDes
             return IDrawable.EMPTY;
         }
         String type = JsonHelper.getString(json, "empty", "type");
+        if ("text".equals(type)) {
+            IKey key = parseText(json);
+            key.loadFromJson(json);
+            return key;
+        }
         if (!DRAWABLE_TYPES.containsKey(type)) {
-            ModularUI.LOGGER.throwing(new JsonParseException("Drawable type '" + type + "' is either not specified or invalid!"));
+            ModularUI.LOGGER.throwing(new JsonParseException("Drawable type '" + type + "' is either not json serializable!"));
             return IDrawable.EMPTY;
         }
         IDrawable drawable = DRAWABLE_TYPES.get(type).apply(json);
-        drawable.loadFromJson(json);
+        ((IJsonSerializable) drawable).loadFromJson(json);
         return drawable;
     }
 
@@ -128,8 +131,12 @@ public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDes
             return jsonArray;
         }
         JsonObject json = new JsonObject();
-        if (src instanceof IKey) {
+        if (src instanceof IKey key) {
             json.addProperty("type", "text");
+            // TODO serialize text properly
+            json.addProperty("text", key.getFormatted());
+        } else if (!(src instanceof IJsonSerializable)) {
+            throw new IllegalArgumentException("Can't serialize IDrawable which doesn't implement IJsonSerializable!");
         } else {
             Class<?> type = src.getClass();
             String key = REVERSE_DRAWABLE_TYPES.get(type);
@@ -142,10 +149,9 @@ public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDes
                 return JsonNull.INSTANCE;
             }
             json.addProperty("type", key);
-        }
-
-        if (!src.saveToJson(json)) {
-            ModularUI.LOGGER.error("Serialization of drawable {} failed!", src.getClass().getSimpleName());
+            if (!((IJsonSerializable) src).saveToJson(json)) {
+                ModularUI.LOGGER.error("Serialization of drawable {} failed!", src.getClass().getSimpleName());
+            }
         }
         return json;
     }

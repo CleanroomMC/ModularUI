@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.api.IJsonSerializable;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -16,7 +17,7 @@ import com.google.gson.JsonObject;
 /**
  * A {@link IDrawable} wrapper with a fixed size and an alignment.
  */
-public class Icon implements IIcon {
+public class Icon implements IIcon, IJsonSerializable {
 
     private final IDrawable drawable;
     private int width = 0, height = 0;
