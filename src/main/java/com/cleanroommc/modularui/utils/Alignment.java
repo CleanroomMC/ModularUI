@@ -1,10 +1,7 @@
 package com.cleanroommc.modularui.utils;
 
 import com.google.common.base.CaseFormat;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
+import com.google.gson.*;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.lang.reflect.Type;
@@ -71,7 +68,7 @@ public class Alignment {
         START, CENTER, END
     }
 
-    public static class Json implements JsonDeserializer<Alignment> {
+    public static class Json implements JsonDeserializer<Alignment>, JsonSerializer<Alignment> {
 
         @Override
         public Alignment deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
@@ -85,6 +82,19 @@ public class Alignment {
             float x = JsonHelper.getFloat(json.getAsJsonObject(), 0f, "x");
             float y = JsonHelper.getFloat(json.getAsJsonObject(), 0f, "y");
             return new Alignment(x, y);
+        }
+
+        @Override
+        public JsonElement serialize(Alignment src, Type typeOfSrc, JsonSerializationContext context) {
+            for (Map.Entry<String, Alignment> entry : ALIGNMENT_MAP.entrySet()) {
+                if (entry.getValue() == src) {
+                    return new JsonPrimitive(entry.getKey());
+                }
+            }
+            return JsonHelper.makeJson(json -> {
+                json.addProperty("x", src.x);
+                json.addProperty("y", src.y);
+            });
         }
     }
 }

@@ -33,11 +33,11 @@ public interface IDrawable {
     /**
      * Draws this drawable at the given position with the given size.
      *
-     * @param context current context to draw with
-     * @param x       x position
-     * @param y       y position
-     * @param width   draw width
-     * @param height  draw height
+     * @param context     current context to draw with
+     * @param x           x position
+     * @param y           y position
+     * @param width       draw width
+     * @param height      draw height
      * @param widgetTheme current theme
      */
     @SideOnly(Side.CLIENT)
@@ -86,8 +86,8 @@ public interface IDrawable {
     /**
      * Draws this drawable in a given area.
      *
-     * @param context current context to draw with
-     * @param area    draw area
+     * @param context     current context to draw with
+     * @param area        draw area
      * @param widgetTheme current theme
      */
     @SideOnly(Side.CLIENT)
@@ -107,8 +107,8 @@ public interface IDrawable {
     /**
      * Draws this drawable at the current (0|0) with the given area's size.
      *
-     * @param context gui context
-     * @param area    draw area
+     * @param context     gui context
+     * @param area        draw area
      * @param widgetTheme current theme
      */
     @SideOnly(Side.CLIENT)
@@ -143,6 +143,16 @@ public interface IDrawable {
      * @param json json to read from
      */
     default void loadFromJson(JsonObject json) {}
+
+    /**
+     * Writes all json data necessary so that deserializing it results in the same drawable.
+     *
+     * @param json json to write to
+     * @return if the drawable was serialized
+     */
+    default boolean saveToJson(JsonObject json) {
+        return false;
+    }
 
     /**
      * An empty drawable. Does nothing.

@@ -11,13 +11,13 @@ import java.util.Map;
 
 public class Theme implements ITheme {
 
-    public static final String FALLBACK = "default";
-    public static final String PANEL = "panel";
-    public static final String BUTTON = "button";
-    public static final String ITEM_SLOT = "itemSlot";
-    public static final String FLUID_SLOT = "fluidSlot";
-    public static final String TEXT_FIELD = "textField";
-    public static final String TOGGLE_BUTTON = "toggleButton";
+    public static final String FALLBACK = IThemeApi.FALLBACK;
+    public static final String PANEL = IThemeApi.PANEL;
+    public static final String BUTTON = IThemeApi.BUTTON;
+    public static final String ITEM_SLOT = IThemeApi.ITEM_SLOT;
+    public static final String FLUID_SLOT = IThemeApi.FLUID_SLOT;
+    public static final String TEXT_FIELD = IThemeApi.TEXT_FIELD;
+    public static final String TOGGLE_BUTTON = IThemeApi.TOGGLE_BUTTON;
 
     private final Map<String, WidgetTheme> widgetThemes = new Object2ObjectOpenHashMap<>();
 

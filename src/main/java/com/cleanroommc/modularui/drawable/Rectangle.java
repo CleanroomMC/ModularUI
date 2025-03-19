@@ -119,6 +119,17 @@ public class Rectangle implements IDrawable {
         this.cornerSegments = JsonHelper.getInt(json, 10, "cornerSegments");
     }
 
+    @Override
+    public boolean saveToJson(JsonObject json) {
+        json.addProperty("colorTL", this.colorTL);
+        json.addProperty("colorTR", this.colorTR);
+        json.addProperty("colorBL", this.colorBL);
+        json.addProperty("colorBR", this.colorBR);
+        json.addProperty("cornerRadius", this.cornerRadius);
+        json.addProperty("cornerSegments", this.cornerSegments);
+        return true;
+    }
+
     private void setColor(JsonObject json, IntConsumer color, String... keys) {
         JsonElement element = JsonHelper.getJsonElement(json, keys);
         if (element != null) {

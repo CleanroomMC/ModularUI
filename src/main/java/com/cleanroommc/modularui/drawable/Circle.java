@@ -22,24 +22,44 @@ public class Circle implements IDrawable {
         this.segments = 40;
     }
 
-    @Contract("_ -> this")
     public Circle setColorInner(int colorInner) {
+        return colorInner(colorInner);
+    }
+
+    public Circle setColorOuter(int colorOuter) {
+        return colorOuter(colorOuter);
+    }
+
+    public Circle setColor(int inner, int outer) {
+        return color(inner, outer);
+    }
+
+    public Circle setSegments(int segments) {
+        return segments(segments);
+    }
+
+    @Contract("_ -> this")
+    public Circle colorInner(int colorInner) {
         this.colorInner = colorInner;
         return this;
     }
 
-    public Circle setColorOuter(int colorOuter) {
+    public Circle colorOuter(int colorOuter) {
         this.colorOuter = colorOuter;
         return this;
     }
 
-    public Circle setColor(int inner, int outer) {
+    public Circle color(int inner, int outer) {
         this.colorInner = inner;
         this.colorOuter = outer;
         return this;
     }
 
-    public Circle setSegments(int segments) {
+    public Circle color(int color) {
+        return color(color, color);
+    }
+
+    public Circle segments(int segments) {
         this.segments = segments;
         return this;
     }
@@ -55,5 +75,13 @@ public class Circle implements IDrawable {
         this.colorInner = JsonHelper.getColor(json, Color.WHITE.main, "colorInner", "color");
         this.colorOuter = JsonHelper.getColor(json, Color.WHITE.main, "colorOuter", "color");
         this.segments = JsonHelper.getInt(json, 40, "segments");
+    }
+
+    @Override
+    public boolean saveToJson(JsonObject json) {
+        json.addProperty("colorInner", this.colorInner);
+        json.addProperty("colorOuter", this.colorOuter);
+        json.addProperty("segments", this.segments);
+        return true;
     }
 }

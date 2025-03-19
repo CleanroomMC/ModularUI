@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.theme;
 
+import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.JsonHelper;
@@ -17,7 +18,7 @@ public class WidgetSlotTheme extends WidgetTheme {
 
     public WidgetSlotTheme(WidgetTheme parent, JsonObject json, JsonObject fallback) {
         super(parent, json, fallback);
-        this.slotHoverColor = JsonHelper.getColorWithFallback(json, fallback, ((WidgetSlotTheme) parent).getSlotHoverColor(), "slotHoverColor");
+        this.slotHoverColor = JsonHelper.getColorWithFallback(json, fallback, ((WidgetSlotTheme) parent).getSlotHoverColor(), IThemeApi.SLOT_HOVER_COLOR);
     }
 
     public int getSlotHoverColor() {

@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.theme;
 
+import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.JsonHelper;
@@ -19,8 +20,8 @@ public class WidgetTextFieldTheme extends WidgetTheme {
 
     public WidgetTextFieldTheme(WidgetTheme parent, JsonObject fallback, JsonObject json) {
         super(parent, json, fallback);
-        this.markedColor = JsonHelper.getColorWithFallback(json, fallback, ((WidgetTextFieldTheme) parent).getMarkedColor(), "markedColor");
-        this.hintColor = JsonHelper.getColorWithFallback(json, fallback, ((WidgetTextFieldTheme) parent).getHintColor(), "hintColor");
+        this.markedColor = JsonHelper.getColorWithFallback(json, fallback, ((WidgetTextFieldTheme) parent).getMarkedColor(), IThemeApi.MARKED_COLOR);
+        this.hintColor = JsonHelper.getColorWithFallback(json, fallback, ((WidgetTextFieldTheme) parent).getHintColor(), IThemeApi.HINT_COLOR);
     }
 
     public int getMarkedColor() {

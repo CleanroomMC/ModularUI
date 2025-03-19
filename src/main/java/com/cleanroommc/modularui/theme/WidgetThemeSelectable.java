@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.theme;
 
+import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.utils.JsonHelper;
 
@@ -21,11 +22,11 @@ public class WidgetThemeSelectable extends WidgetTheme {
     public WidgetThemeSelectable(WidgetTheme parent, JsonObject json, JsonObject fallback) {
         super(parent, json, fallback);
         WidgetThemeSelectable parentWTBT = (WidgetThemeSelectable) parent;
-        IDrawable selectedBackground = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, parentWTBT.getSelected().getBackground(), "selectedBackground");
-        IDrawable selectedHoverBackground = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, parentWTBT.getSelected().getHoverBackground(), "selectedHoverBackground");
-        int selectedColor = JsonHelper.getColorWithFallback(json, fallback, parentWTBT.getSelected().getColor(), "selectedColor");
-        int selectedTextColor = JsonHelper.getColorWithFallback(json, fallback, parentWTBT.getSelected().getTextColor(), "selectedTextColor");
-        boolean selectedTextShadow = JsonHelper.getBoolWithFallback(json, fallback, parentWTBT.getSelected().getTextShadow(), "selectedTextShadow");
+        IDrawable selectedBackground = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, parentWTBT.getSelected().getBackground(), IThemeApi.SELECTED_BACKGROUND);
+        IDrawable selectedHoverBackground = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, parentWTBT.getSelected().getHoverBackground(), IThemeApi.SELECTED_HOVER_BACKGROUND);
+        int selectedColor = JsonHelper.getColorWithFallback(json, fallback, parentWTBT.getSelected().getColor(), IThemeApi.SELECTED_COLOR);
+        int selectedTextColor = JsonHelper.getColorWithFallback(json, fallback, parentWTBT.getSelected().getTextColor(), IThemeApi.SELECTED_TEXT_COLOR);
+        boolean selectedTextShadow = JsonHelper.getBoolWithFallback(json, fallback, parentWTBT.getSelected().getTextShadow(), IThemeApi.SELECTED_TEXT_SHADOW);
         this.selected = new WidgetTheme(selectedBackground, selectedHoverBackground, selectedColor, selectedTextColor, selectedTextShadow);
     }
 

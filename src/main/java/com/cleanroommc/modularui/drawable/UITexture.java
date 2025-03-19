@@ -161,7 +161,7 @@ public class UITexture implements IDrawable {
         return this.canApplyTheme;
     }
 
-    public static IDrawable parseFromJson(JsonObject json) {
+    public static UITexture parseFromJson(JsonObject json) {
         String name = JsonHelper.getString(json, null, "name", "id");
         if (name != null) {
             UITexture drawable = DrawableSerialization.getTexture(name);
@@ -186,15 +186,34 @@ public class UITexture implements IDrawable {
                     JsonHelper.getFloat(json, 1, "u1"),
                     JsonHelper.getFloat(json, 1, "v1"));
         }
-        int borderX = JsonHelper.getInt(json, 0, "borderX", "border");
-        int borderY = JsonHelper.getInt(json, 0, "borderY", "border");
-        if (borderX > 0 || borderY > 0) {
-            builder.adaptable(borderX, borderY);
+        int bl = JsonHelper.getInt(json, 0, "bl", "borderLeft", "borderX", "border");
+        int br = JsonHelper.getInt(json, 0, "br", "borderRight", "borderY", "border");
+        int bt = JsonHelper.getInt(json, 0, "bt", "borderTop", "borderBottom", "border");
+        int bb = JsonHelper.getInt(json, 0, "bb", "borderBottom", "borderTop", "border");
+        if (bl > 0 || br > 0 || bt > 0 || bb > 0) {
+            builder.adaptable(bl, bt, br, bb);
         }
         if (JsonHelper.getBoolean(json, false, "tiled")) {
             builder.tiled();
         }
+        builder.canApplyTheme(JsonHelper.getBoolean(json, false, "canApplyTheme"));
         return builder.build();
+    }
+
+    @Override
+    public boolean saveToJson(JsonObject json) {
+        String name = DrawableSerialization.getTextureId(this);
+        if (name != null) {
+            json.addProperty("id", name);
+            return true;
+        }
+        json.addProperty("location", this.location.toString());
+        json.addProperty("u0", this.u0);
+        json.addProperty("v0", this.v0);
+        json.addProperty("u1", this.u1);
+        json.addProperty("v1", this.v1);
+        json.addProperty("canApplyTheme", this.canApplyTheme);
+        return true;
     }
 
     private static int defaultImageWidth = 16, defaultImageHeight = 16;
@@ -415,7 +434,7 @@ public class UITexture implements IDrawable {
             if (this.mode == Mode.RELATIVE) {
                 if (this.u0 < 0 || this.v0 < 0 || this.u1 > 1 || this.v1 > 1)
                     throw new IllegalArgumentException("UV values must be 0 - 1");
-                if (this.bl > 0 || this.bt > 0) {
+                if (this.bl > 0 || this.bt > 0 || this.br > 0|| this.bb > 0) {
                     return new AdaptableUITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.canApplyTheme, this.iw, this.ih, this.bl, this.bt, this.br, this.bb, this.tiled);
                 }
                 if (this.tiled) {

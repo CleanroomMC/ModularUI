@@ -1,26 +1,22 @@
 # ModularUI TODO's
 
-:boom: = Potential breaking changes
-
 ## Widgets
 
-* [ ]  Trackpad 
-* [X]  improve List (column but scrollable) :boom:
-* [X]  improve Sortable List (for bogosorter) :boom:
-* [X]  improve Slot Group (Builder, sorting) :boom:
-* [X]  improve Dialog :boom:
-* [X]  improve Popup menu :boom:
+* [ ]  Context Menu
 * [ ]  Dropdown menu
+* [ ]  Trackpad
 * [ ]  Pie menu
+
+## High Priority
+- [ ]  merge animations with NEA
+- [ ]  check JEI click interactions
 
 ## Medium Priority
 
-- [ ]  texture json registry improvements :boom:
 - [ ]  Entity drawable
-- [ ]  Fake world drawable
-- [ ]  Text editor :boom:
+- [ ]  Text editor
 - [ ]  Json Guis
-- [ ]  Inject to any mc gui :boom:
+- [ ]  Inject to any mc gui
 - [ ]  Error handling with on-screen reports
 
 ## Low Priority
@@ -28,10 +24,10 @@
 - [ ]  Config lib
 - [ ]  Keybind api
 - [ ]  create JEI UIs (?)
-- [ ]  properly add modularui elements to any gui screen
+- [x]  properly add modularui elements to any gui screen (possible with overlays currently)
 - [ ]  a gui to create guis
 - [ ]  sounds ?
 
-## HoloUI :boom:
+## HoloUI
 - [ ] Fix/Remove current rotations
 - [ ] Implement interactions

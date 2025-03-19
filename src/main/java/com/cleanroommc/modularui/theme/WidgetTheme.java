@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.theme;
 
+import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.utils.JsonHelper;
 
@@ -30,11 +31,11 @@ public class WidgetTheme {
     }
 
     public WidgetTheme(WidgetTheme parent, JsonObject json, JsonObject fallback) {
-        this.background = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, parent.getBackground(), "background", "bg");
-        this.hoverBackground = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, parent.getHoverBackground(), "hoverBackground", "hbg");
-        this.color = JsonHelper.getColorWithFallback(json, fallback, parent.getColor(), "color");
-        this.textColor = JsonHelper.getColorWithFallback(json, fallback, parent.getTextColor(), "textColor");
-        this.textShadow = JsonHelper.getBoolWithFallback(json, fallback, parent.getTextShadow(), "textShadow");
+        this.background = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, parent.getBackground(), IThemeApi.BACKGROUND, "bg");
+        this.hoverBackground = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, parent.getHoverBackground(), IThemeApi.HOVER_BACKGROUND, "hbg");
+        this.color = JsonHelper.getColorWithFallback(json, fallback, parent.getColor(), IThemeApi.COLOR);
+        this.textColor = JsonHelper.getColorWithFallback(json, fallback, parent.getTextColor(), IThemeApi.TEXT_COLOR);
+        this.textShadow = JsonHelper.getBoolWithFallback(json, fallback, parent.getTextShadow(), IThemeApi.TEXT_SHADOW);
     }
 
     public @Nullable IDrawable getBackground() {

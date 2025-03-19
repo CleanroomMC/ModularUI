@@ -160,6 +160,19 @@ public class Icon implements IIcon {
     }
 
     @Override
+    public boolean saveToJson(JsonObject json) {
+        json.add("drawable", JsonHelper.serialize(this.drawable));
+        json.addProperty("width", this.width);
+        json.addProperty("height", this.height);
+        json.add("alignment", JsonHelper.serialize(this.alignment));
+        json.addProperty("marginTop", this.margin.top);
+        json.addProperty("marginBottom", this.margin.bottom);
+        json.addProperty("marginLeft", this.margin.left);
+        json.addProperty("marginRight", this.margin.right);
+        return true;
+    }
+
+    @Override
     public String toString() {
         return getClass().getSimpleName() + "(" + this.drawable.getClass().getSimpleName() + ")";
     }

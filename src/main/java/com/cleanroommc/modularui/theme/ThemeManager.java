@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.theme;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.utils.*;
@@ -242,8 +243,8 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
             String p = null;
             for (ListIterator<JsonObject> iterator = jsons.listIterator(jsons.size()); iterator.hasPrevious(); ) {
                 JsonObject json = iterator.previous();
-                if (json.has("parent")) {
-                    p = json.get("parent").getAsString();
+                if (json.has(IThemeApi.PARENT)) {
+                    p = json.get(IThemeApi.PARENT).getAsString();
                     break;
                 }
             }

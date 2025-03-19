@@ -4,6 +4,8 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 
+import com.google.gson.JsonObject;
+
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -37,5 +39,12 @@ public class DrawableArray implements IDrawable {
 
     public IDrawable[] getDrawables() {
         return this.drawables;
+    }
+
+    @Override
+    public boolean saveToJson(JsonObject json) {
+        // serialized as special case
+        // this method should never be called
+        throw new IllegalStateException();
     }
 }
