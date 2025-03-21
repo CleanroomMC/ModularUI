@@ -92,6 +92,10 @@ public class Icon implements IIcon, IJsonSerializable {
         return this;
     }
 
+    public Icon center() {
+        return alignment(Alignment.Center);
+    }
+
     public Icon color(int color) {
         this.color = color;
         return this;
