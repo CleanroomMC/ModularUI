@@ -366,6 +366,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         ModularPanel panel = new Dialog<>("second_window", null)
                 .setDisablePanelsBelow(false)
                 .setCloseOnOutOfBoundsClick(false)
+                .setDraggable(true)
                 .size(100, 100);
         SlotGroup slotGroup = new SlotGroup("small_inv", 2);
         syncManager.registerSlotGroup(slotGroup);

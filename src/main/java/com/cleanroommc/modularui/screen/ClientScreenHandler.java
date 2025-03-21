@@ -11,6 +11,7 @@ import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
 import com.cleanroommc.modularui.core.mixin.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.Stencil;
+import com.cleanroommc.modularui.integration.jei.ModularUIJeiPlugin;
 import com.cleanroommc.modularui.overlay.OverlayStack;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
@@ -19,8 +20,8 @@ import com.cleanroommc.modularui.utils.Animator;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.FpsCounter;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 import com.cleanroommc.modularui.widgets.RichTextWidget;
+import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 
@@ -49,6 +50,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import mezz.jei.gui.overlay.IngredientListOverlay;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -61,6 +64,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+@ApiStatus.Internal
 @SideOnly(Side.CLIENT)
 public class ClientScreenHandler {
 
@@ -101,20 +105,35 @@ public class ClientScreenHandler {
         OverlayStack.foreach(ms -> ms.onResize(event.getGui().width, event.getGui().height), false);
     }
 
+    // before JEI
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public static void onGuiInputLow(GuiScreenEvent.KeyboardInputEvent.Pre event) throws IOException {
+    public static void onGuiInputHigh(GuiScreenEvent.KeyboardInputEvent.Pre event) throws IOException {
         defaultContext.updateEventState();
+        inputEvent(event, InputPhase.EARLY);
+    }
+
+    // after JEI
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public static void onGuiInputLow(GuiScreenEvent.KeyboardInputEvent.Pre event) throws IOException {
+        inputEvent(event, InputPhase.LATE);
+    }
+
+    private static void inputEvent(GuiScreenEvent.KeyboardInputEvent.Pre event, InputPhase phase) throws IOException {
         if (checkGui(event.getGui())) currentScreen.getContext().updateEventState();
-        if (handleKeyboardInput(currentScreen, event.getGui())) {
+        if (handleKeyboardInput(currentScreen, event.getGui(), phase)) {
             event.setCanceled(true);
         }
     }
 
+    // before JEI
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public static void onGuiInputLow(GuiScreenEvent.MouseInputEvent.Pre event) throws IOException {
+    public static void onGuiInputHigh(GuiScreenEvent.MouseInputEvent.Pre event) throws IOException {
         defaultContext.updateEventState();
         if (checkGui(event.getGui())) currentScreen.getContext().updateEventState();
         if (handleMouseInput(Mouse.getEventButton(), currentScreen, event.getGui())) {
+            if (ModularUI.isJeiLoaded()) {
+                ((IngredientListOverlay) ModularUIJeiPlugin.getRuntime().getIngredientListOverlay()).setKeyboardFocus(false);
+            }
             event.setCanceled(true);
             return;
         }
@@ -221,7 +240,7 @@ public class ClientScreenHandler {
     /**
      * This replicates vanilla behavior while also injecting custom behavior for consistency
      */
-    private static boolean handleKeyboardInput(@Nullable ModularScreen muiScreen, GuiScreen mcScreen) throws IOException {
+    private static boolean handleKeyboardInput(@Nullable ModularScreen muiScreen, GuiScreen mcScreen, InputPhase inputPhase) throws IOException {
         char c0 = Keyboard.getEventCharacter();
         int key = Keyboard.getEventKey();
         boolean state = Keyboard.getEventKeyState();
@@ -229,15 +248,17 @@ public class ClientScreenHandler {
         if (state) {
             // pressing a key
             lastChar = c0;
-            return doAction(muiScreen, ms -> ms.onKeyPressed(c0, key)) || keyTyped(mcScreen, c0, key);
+            return inputPhase.isEarly() ? doAction(muiScreen, ms -> ms.onKeyPressed(c0, key)) : keyTyped(mcScreen, c0, key);
         } else {
             // releasing a key
             // for some reason when you press E after joining a world the button will not trigger the press event,
             // but ony the release event, causing this to be null
             if (lastChar == null) return false;
             // when the key is released, the event char is empty
-            if (doAction(muiScreen, ms -> ms.onKeyRelease(lastChar, key))) return true;
-            if (key == 0 && c0 >= ' ') {
+            if (inputPhase.isEarly() && doAction(muiScreen, ms -> ms.onKeyRelease(lastChar, key))) {
+                return true;
+            }
+            if (inputPhase.isLate() && key == 0 && c0 >= ' ') {
                 return keyTyped(mcScreen, c0, key);
             }
         }
@@ -576,5 +597,20 @@ public class ClientScreenHandler {
             return currentScreen.getContext();
         }
         return defaultContext;
+    }
+
+    private enum InputPhase {
+        // for mui interactions
+        EARLY,
+        // for mc interactions (like E and ESC)
+        LATE;
+
+        public boolean isEarly() {
+            return this == EARLY;
+        }
+
+        public boolean isLate() {
+            return this == LATE;
+        }
     }
 }

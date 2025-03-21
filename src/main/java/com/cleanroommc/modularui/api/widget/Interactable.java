@@ -153,21 +153,30 @@ public interface Interactable {
     }
 
     enum Result {
+
         /**
          * Nothing happens.
          */
-        IGNORE,
+        IGNORE(false, false),
         /**
          * Interaction is accepted, but other widgets will get checked.
          */
-        ACCEPT,
+        ACCEPT(true, false),
         /**
          * Interaction is rejected and no other widgets will get checked.
          */
-        STOP,
+        STOP(false, true),
         /**
          * Interaction is accepted and no other widgets will get checked.
          */
-        SUCCESS
+        SUCCESS(true, true);
+
+        public final boolean accepts;
+        public final boolean stops;
+
+        Result(boolean accepts, boolean stops) {
+            this.accepts = accepts;
+            this.stops = stops;
+        }
     }
 }
