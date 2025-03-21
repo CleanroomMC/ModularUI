@@ -264,6 +264,7 @@ public class DimensionSizer {
                 p = area.getRelativePoint(this.axis);
             }
             area.setRelativePoint(this.axis, p);
+            this.posCalculated = true;
         }
     }
 
