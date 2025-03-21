@@ -350,9 +350,13 @@ public class Flex implements IResizeable, IPositioned<Flex> {
     @Override
     public boolean postResize(IGuiElement guiElement) {
         if (!this.x.dependsOnChildren() && !this.y.dependsOnChildren()) return isFullyCalculated();
+        if (!(this.parent instanceof IWidget widget) || !widget.hasChildren()) {
+            coverChildrenForEmpty();
+            return isFullyCalculated();
+        }
         if (this.parent instanceof ILayoutWidget) {
             // layout widgets handle widget layout's themselves, so we only need to fit the right and bottom border
-            coverChildrenForLayout();
+            coverChildrenForLayout(widget);
             return isFullyCalculated();
         }
         // non layout widgets can have their children in any position
@@ -360,102 +364,107 @@ public class Flex implements IResizeable, IPositioned<Flex> {
         // this means for each edge there is at least one widget that touches it (plus padding and margin)
 
         // children are now calculated and now this area can be calculated if it requires childrens area
-        List<IWidget> children = ((IWidget) this.parent).getChildren();
-        if (!children.isEmpty()) {
-            int moveChildrenX = 0, moveChildrenY = 0;
+        List<IWidget> children = widget.getChildren();
+        int moveChildrenX = 0, moveChildrenY = 0;
 
-            Box padding = this.parent.getArea().getPadding();
-            // first calculate the area the children span
-            int x0 = Integer.MAX_VALUE, x1 = Integer.MIN_VALUE, y0 = Integer.MAX_VALUE, y1 = Integer.MIN_VALUE;
-            int w = 0, h = 0;
+        Box padding = this.parent.getArea().getPadding();
+        // first calculate the area the children span
+        int x0 = Integer.MAX_VALUE, x1 = Integer.MIN_VALUE, y0 = Integer.MAX_VALUE, y1 = Integer.MIN_VALUE;
+        int w = 0, h = 0;
+        for (IWidget child : children) {
+            Box margin = child.getArea().getMargin();
+            IResizeable resizeable = child.resizer();
+            Area area = child.getArea();
+            if (this.x.dependsOnChildren() && resizeable.isWidthCalculated()) {
+                // minimum width this widget requests
+                w = Math.max(w, area.requestedWidth() + padding.horizontal());
+                if (resizeable.isXCalculated()) {
+                    // if pos is calculated use that
+                    x0 = Math.min(x0, area.rx - padding.left - margin.left);
+                    x1 = Math.max(x1, area.rx + area.width + padding.right + margin.right);
+                }
+            }
+            if (this.y.dependsOnChildren() && resizeable.isHeightCalculated()) {
+                h = Math.max(h, area.requestedHeight() + padding.vertical());
+                if (resizeable.isYCalculated()) {
+                    y0 = Math.min(y0, area.ry - padding.top - margin.top);
+                    y1 = Math.max(y1, area.ry + area.height + padding.bottom + margin.bottom);
+                }
+            }
+        }
+        if (x1 == Integer.MIN_VALUE) x1 = 0;
+        if (y1 == Integer.MIN_VALUE) y1 = 0;
+        if (x0 == Integer.MAX_VALUE) x0 = 0;
+        if (y0 == Integer.MAX_VALUE) y0 = 0;
+        if (w > x1 - x0)
+            x1 = x0 + w; // we found at least one widget which was wider than what was calculated by start and end pos
+        if (h > y1 - y0) y1 = y0 + h;
+
+        // now calculate new x, y, width and height based on the childrens area
+        Area relativeTo = getRelativeTo().getArea();
+        if (this.x.dependsOnChildren()) {
+            // apply the size to this widget
+            // the return value is the amount of pixels we need to move the children
+            moveChildrenX = this.x.postApply(this.parent.getArea(), relativeTo, x0, x1);
+        }
+        if (this.y.dependsOnChildren()) {
+            moveChildrenY = this.y.postApply(this.parent.getArea(), relativeTo, y0, y1);
+        }
+        // since the edges might have been moved closer to the widgets, the widgets should move back into it's original (absolute) position
+        if (moveChildrenX != 0 || moveChildrenY != 0) {
             for (IWidget child : children) {
-                Box margin = child.getArea().getMargin();
-                IResizeable resizeable = child.resizer();
                 Area area = child.getArea();
-                if (this.x.dependsOnChildren() && resizeable.isWidthCalculated()) {
-                    // minimum width this widget requests
-                    w = Math.max(w, area.requestedWidth() + padding.horizontal());
-                    if (resizeable.isXCalculated()) {
-                        // if pos is calculated use that
-                        x0 = Math.min(x0, area.rx - padding.left - margin.left);
-                        x1 = Math.max(x1, area.rx + area.width + padding.right + margin.right);
-                    }
-                }
-                if (this.y.dependsOnChildren() && resizeable.isHeightCalculated()) {
-                    h = Math.max(h, area.requestedHeight() + padding.vertical());
-                    if (resizeable.isYCalculated()) {
-                        y0 = Math.min(y0, area.ry - padding.top - margin.top);
-                        y1 = Math.max(y1, area.ry + area.height + padding.bottom + margin.bottom);
-                    }
-                }
-            }
-            if (x1 == Integer.MIN_VALUE) x1 = 0;
-            if (y1 == Integer.MIN_VALUE) y1 = 0;
-            if (x0 == Integer.MAX_VALUE) x0 = 0;
-            if (y0 == Integer.MAX_VALUE) y0 = 0;
-            if (w > x1 - x0)
-                x1 = x0 + w; // we found at least one widget which was wider than what was calculated by start and end pos
-            if (h > y1 - y0) y1 = y0 + h;
-
-            // now calculate new x, y, width and height based on the childrens area
-            Area relativeTo = getRelativeTo().getArea();
-            if (this.x.dependsOnChildren()) {
-                // apply the size to this widget
-                // the return value is the amount of pixels we need to move the children
-                moveChildrenX = this.x.postApply(this.parent.getArea(), relativeTo, x0, x1);
-            }
-            if (this.y.dependsOnChildren()) {
-                moveChildrenY = this.y.postApply(this.parent.getArea(), relativeTo, y0, y1);
-            }
-            // since the edges might have been moved closer to the widgets, the widgets should move back into it's original (absolute) position
-            if (moveChildrenX != 0 || moveChildrenY != 0) {
-                for (IWidget widget : children) {
-                    Area area = widget.getArea();
-                    IResizeable resizeable = widget.resizer();
-                    if (resizeable.isXCalculated()) area.rx += moveChildrenX;
-                    if (resizeable.isYCalculated()) area.ry += moveChildrenY;
-                }
+                IResizeable resizeable = child.resizer();
+                if (resizeable.isXCalculated()) area.rx += moveChildrenX;
+                if (resizeable.isYCalculated()) area.ry += moveChildrenY;
             }
         }
         return isFullyCalculated();
     }
 
-    private void coverChildrenForLayout() {
-        List<IWidget> children = ((IWidget) this.parent).getChildren();
-        if (!children.isEmpty()) {
-            Box padding = this.parent.getArea().getPadding();
-            // first calculate the area the children span
-            int x1 = Integer.MIN_VALUE, y1 = Integer.MIN_VALUE;
-            int w = 0, h = 0;
-            for (IWidget child : children) {
-                Box margin = child.getArea().getMargin();
-                IResizeable resizeable = child.resizer();
-                Area area = child.getArea();
-                if (this.x.dependsOnChildren() && resizeable.isWidthCalculated()) {
-                    w = Math.max(w, area.requestedWidth() + padding.horizontal());
-                    if (resizeable.isXCalculated()) {
-                        x1 = Math.max(x1, area.rx + area.width + padding.right + margin.right);
-                    }
-                }
-                if (this.y.dependsOnChildren() && resizeable.isHeightCalculated()) {
-                    h = Math.max(h, area.requestedHeight() + padding.vertical());
-                    if (resizeable.isXCalculated()) {
-                        y1 = Math.max(y1, area.ry + area.height + padding.bottom + margin.bottom);
-                    }
+    private void coverChildrenForLayout(IWidget widget) {
+        List<IWidget> children = widget.getChildren();
+        Box padding = this.parent.getArea().getPadding();
+        // first calculate the area the children span
+        int x1 = Integer.MIN_VALUE, y1 = Integer.MIN_VALUE;
+        int w = 0, h = 0;
+        for (IWidget child : children) {
+            Box margin = child.getArea().getMargin();
+            IResizeable resizeable = child.resizer();
+            Area area = child.getArea();
+            if (this.x.dependsOnChildren() && resizeable.isWidthCalculated()) {
+                w = Math.max(w, area.requestedWidth() + padding.horizontal());
+                if (resizeable.isXCalculated()) {
+                    x1 = Math.max(x1, area.rx + area.width + padding.right + margin.right);
                 }
             }
-            if (x1 == Integer.MIN_VALUE) x1 = 0;
-            if (y1 == Integer.MIN_VALUE) y1 = 0;
-            if (w > x1) x1 = w;
-            if (h > y1) y1 = h;
+            if (this.y.dependsOnChildren() && resizeable.isHeightCalculated()) {
+                h = Math.max(h, area.requestedHeight() + padding.vertical());
+                if (resizeable.isXCalculated()) {
+                    y1 = Math.max(y1, area.ry + area.height + padding.bottom + margin.bottom);
+                }
+            }
+        }
+        if (x1 == Integer.MIN_VALUE) x1 = 0;
+        if (y1 == Integer.MIN_VALUE) y1 = 0;
+        if (w > x1) x1 = w;
+        if (h > y1) y1 = h;
 
-            Area relativeTo = getRelativeTo().getArea();
-            if (this.x.dependsOnChildren()) {
-                this.x.postApply(getArea(), relativeTo, 0, x1);
-            }
-            if (this.y.dependsOnChildren()) {
-                this.y.postApply(getArea(), relativeTo, 0, y1);
-            }
+        Area relativeTo = getRelativeTo().getArea();
+        if (this.x.dependsOnChildren()) {
+            this.x.postApply(getArea(), relativeTo, 0, x1);
+        }
+        if (this.y.dependsOnChildren()) {
+            this.y.postApply(getArea(), relativeTo, 0, y1);
+        }
+    }
+
+    private void coverChildrenForEmpty() {
+        if (this.x.dependsOnChildren()) {
+            this.x.coverChildrenForEmpty(this.parent.getArea(), getRelativeTo().getArea());
+        }
+        if (this.y.dependsOnChildren()) {
+            this.y.coverChildrenForEmpty(this.parent.getArea(), getRelativeTo().getArea());
         }
     }
 

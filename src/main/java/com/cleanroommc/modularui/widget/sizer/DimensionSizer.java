@@ -250,6 +250,23 @@ public class DimensionSizer {
         return moveAmount;
     }
 
+    public void coverChildrenForEmpty(Area area, Area relativeTo) {
+        int s = 0;
+        area.setSize(this.axis, s);
+        this.sizeCalculated = true;
+        if (!isPosCalculated()) {
+            int p;
+            if (this.start != null) {
+                p = calcPoint(this.start, s, relativeTo.getSize(this.axis), true);
+            } else if (this.end != null) {
+                p = calcPoint(this.end, s, relativeTo.getSize(this.axis), true) - s;
+            } else {
+                p = area.getRelativePoint(this.axis);
+            }
+            area.setRelativePoint(this.axis, p);
+        }
+    }
+
     public void applyMarginAndPaddingToPos(Area area, Area relativeTo) {
         // apply self margin and parent padding if not done yet
         if (isMarginPaddingApplied()) return;
