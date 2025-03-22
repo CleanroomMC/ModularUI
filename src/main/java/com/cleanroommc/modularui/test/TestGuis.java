@@ -1,13 +1,17 @@
 package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.animation.Animator;
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.ItemDrawable;
 import com.cleanroommc.modularui.drawable.SpriteDrawable;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.GameObjectHelper;
+import com.cleanroommc.modularui.utils.Interpolation;
 import com.cleanroommc.modularui.utils.SpriteHelper;
 import com.cleanroommc.modularui.utils.fakeworld.ArraySchema;
 import com.cleanroommc.modularui.utils.fakeworld.ISchema;
@@ -15,6 +19,8 @@ import com.cleanroommc.modularui.widget.DraggableWidget;
 import com.cleanroommc.modularui.widgets.RichTextWidget;
 import com.cleanroommc.modularui.widgets.SchemaWidget;
 import com.cleanroommc.modularui.widgets.SortableListWidget;
+
+import com.cleanroommc.modularui.widgets.TransformWidget;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.init.Blocks;
@@ -33,7 +39,31 @@ public class TestGuis extends CustomModularScreen {
 
     @Override
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {
-        return buildRichTextUI(context);
+        return buildAnimationUI(context);
+    }
+
+    public @NotNull ModularPanel buildAnimationUI(ModularGuiContext context) {
+        IWidget widget = GuiTextures.MUI_LOGO.asWidget().size(20).pos(65, 65);
+        Animator animator = new Animator()
+                .bounds(0, 1)
+                .curve(Interpolation.SINE_INOUT)
+                .reverseOnFinish(true)
+                .repeatsOnFinish(-1)
+                .duration(1200);
+                //.onUpdate(val -> {
+                   //widget.getArea().rx = (int) (75 + 55 * Math.cos(val * 2 * Math.PI + Math.PI / 2));
+                   //widget.getArea().ry = (int) (75 + 55 * Math.sin(val * 2 * Math.PI + Math.PI / 2));
+                //});
+        animator.reset(true);
+        animator.animate(true);
+        return ModularPanel.defaultPanel("main").size(150)
+                .child(new TransformWidget()
+                        .child(widget)
+                        .transform(stack -> {
+                            float x = (float) (55 * Math.cos(animator.getValue() * 2 * Math.PI - Math.PI / 2));
+                            float y = (float) (55 * Math.sin(animator.getValue() * 2 * Math.PI - Math.PI / 2));
+                            stack.translate(x, y);
+                        }));
     }
 
     public @NotNull ModularPanel buildSpriteUI(ModularGuiContext context) {

@@ -129,7 +129,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                     }
                 }
             }
-            getAnimator().setEndCallback(val -> this.screen.getPanelManager().closePanel(this)).backward();
+            //getAnimator().setEndCallback(val -> this.screen.getPanelManager().closePanel(this)).backward();
         }
     }
 
@@ -350,7 +350,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     private boolean checkJeiGhostIngredient(int mouseButton) {
-        if (ModularUI.isJeiLoaded() && ModularUIJeiPlugin.getGhostDrag() != null) {
+        if (ModularUI.Mods.JEI.isLoaded() && ModularUIJeiPlugin.getGhostDrag() != null) {
             // try inserting ghost ingredient
             GhostIngredientDrag<?> drag = ModularUIJeiPlugin.getGhostDrag();
             for (LocatedWidget widget : this.hovering) {
@@ -696,7 +696,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     public boolean shouldAnimate() {
-        return !getScreen().isOverlay() && getScreen().getCurrentTheme().getOpenCloseAnimationOverride() > 0;
+        //return !getScreen().isOverlay() && ModularUI.Mods.NEA.isLoaded() && NEAConfig.openingAnimationTime > 0;
+        return false;
     }
 
     void registerSubPanel(IPanelHandler handler) {

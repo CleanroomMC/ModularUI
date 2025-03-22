@@ -25,6 +25,8 @@ import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 
+import com.cleanroommc.neverenoughanimations.animations.OpeningAnimation;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -75,7 +77,8 @@ public class ClientScreenHandler {
     private static final FpsCounter fpsCounter = new FpsCounter();
     private static long ticks = 0L;
 
-    @SubscribeEvent
+    // we need to know the actual gui and not some fake bs some other mod overwrites
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onGuiOpen(GuiOpenEvent event) {
         defaultContext.reset();
         if (event.getGui() instanceof IMuiScreen muiScreen) {
@@ -131,7 +134,7 @@ public class ClientScreenHandler {
         defaultContext.updateEventState();
         if (checkGui(event.getGui())) currentScreen.getContext().updateEventState();
         if (handleMouseInput(Mouse.getEventButton(), currentScreen, event.getGui())) {
-            if (ModularUI.isJeiLoaded()) {
+            if (ModularUI.Mods.JEI.isLoaded()) {
                 ((IngredientListOverlay) ModularUIJeiPlugin.getRuntime().getIngredientListOverlay()).setKeyboardFocus(false);
             }
             event.setCanceled(true);
@@ -319,17 +322,19 @@ public class ClientScreenHandler {
     }
 
     public static boolean shouldDrawWorldBackground() {
-        return ModularUI.isBlurLoaded() || Minecraft.getMinecraft().world == null;
+        return ModularUI.Mods.BLUR.isLoaded() || Minecraft.getMinecraft().world == null;
     }
 
     public static void drawDarkBackground(GuiScreen screen, int tint) {
         if (hasScreen()) {
-            float alpha = currentScreen.getMainPanel().getAlpha();
+            float alpha = ModularUI.Mods.NEA.isLoaded() ? OpeningAnimation.getValue(screen) : 1f;
             // vanilla color values as hex
             int color = 0x101010;
-            int startAlpha = 0xc0;
-            int endAlpha = 0xd0;
-            GuiDraw.drawVerticalGradientRect(0, 0, screen.width, screen.height, Color.withAlpha(color, (int) (startAlpha * alpha)), Color.withAlpha(color, (int) (endAlpha * alpha)));
+            int start = (int) (0xc0 * alpha);
+            int end = (int) (0xd0 * alpha);
+            start = Color.withAlpha(color, start);
+            end = Color.withAlpha(color, end);
+            GuiDraw.drawVerticalGradientRect(0, 0, screen.width, screen.height, start, end);
         }
     }
 
@@ -342,8 +347,10 @@ public class ClientScreenHandler {
     }
 
     public static void drawScreenInternal(ModularScreen muiScreen, GuiScreen mcScreen, int mouseX, int mouseY, float partialTicks) {
+        GlStateManager.pushMatrix(); // needed for open animation currently
         Stencil.reset();
         Stencil.apply(muiScreen.getScreenArea(), null);
+        handleAnimationScale(mcScreen);
         muiScreen.drawScreen(mouseX, mouseY, partialTicks);
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
@@ -358,6 +365,7 @@ public class ClientScreenHandler {
         GlStateManager.enableRescaleNormal();
         RenderHelper.enableStandardItemLighting();
         Stencil.remove();
+        GlStateManager.popMatrix();
     }
 
     public static void drawContainer(ModularScreen muiScreen, GuiContainer mcScreen, int mouseX, int mouseY, float partialTicks) {
@@ -369,6 +377,7 @@ public class ClientScreenHandler {
         int x = mcScreen.getGuiLeft();
         int y = mcScreen.getGuiTop();
 
+        //handleAnimationScale(mcScreen);
         acc.invokeDrawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
         muiScreen.drawScreen(mouseX, mouseY, partialTicks);
 
@@ -611,6 +620,12 @@ public class ClientScreenHandler {
 
         public boolean isLate() {
             return this == LATE;
+        }
+    }
+
+    public static void handleAnimationScale(GuiScreen screen) {
+        if (ModularUI.Mods.NEA.isLoaded()) {
+            OpeningAnimation.handleScale(screen, true);
         }
     }
 }

@@ -1,8 +1,10 @@
 package com.cleanroommc.modularui.widget.sizer;
 
+import com.cleanroommc.modularui.animation.IAnimatable;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
+import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.MathUtils;
 
 import java.awt.*;
@@ -12,7 +14,7 @@ import java.awt.geom.Rectangle2D;
  * A rectangular widget area, composed of a position and a size.
  * Also has fields for a relative position, a layer and margin & padding.
  */
-public class Area extends Rectangle implements IUnResizeable {
+public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> {
 
     public static boolean isInside(int x, int y, int w, int h, int px, int py) {
         SHARED.set(x, y, w, h);
@@ -45,6 +47,16 @@ public class Area extends Rectangle implements IUnResizeable {
 
     public Area(Rectangle rectangle) {
         super(rectangle);
+    }
+
+    public Area(Area area) {
+        super(area);
+        this.rx = area.rx;
+        this.ry = area.ry;
+        this.panelLayer = area.panelLayer;
+        this.z = area.z;
+        this.margin.set(area.margin);
+        this.padding.set(area.padding);
     }
 
     public int x() {
@@ -486,5 +498,23 @@ public class Area extends Rectangle implements IUnResizeable {
                 ", width=" + this.width +
                 ", height=" + this.height +
                 '}';
+    }
+
+    @Override
+    public Area interpolate(Area start, Area end, float t) {
+        this.x = Interpolations.lerp(this.x, end.x, t);
+        this.y = Interpolations.lerp(this.y, end.y, t);
+        this.width = Interpolations.lerp(this.width, end.width, t);
+        this.height = Interpolations.lerp(this.height, end.height, t);
+        this.rx = Interpolations.lerp(this.rx, end.rx, t);
+        this.ry = Interpolations.lerp(this.ry, end.ry, t);
+        this.margin.interpolate(start.margin, end.margin, t);
+        this.padding.interpolate(start.padding, end.padding, t);
+        return this;
+    }
+
+    @Override
+    public Area copyOrImmutable() {
+        return createCopy();
     }
 }
