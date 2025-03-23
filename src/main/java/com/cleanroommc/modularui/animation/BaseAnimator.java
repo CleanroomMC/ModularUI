@@ -1,15 +1,13 @@
 package com.cleanroommc.modularui.animation;
 
-import net.minecraft.client.Minecraft;
-
 import org.jetbrains.annotations.Nullable;
 
 public abstract class BaseAnimator implements IAnimator {
 
     private IAnimator parent;
 
-    private long startTime = 0;
     private byte direction = 0;
+    private boolean paused = false;
 
     void setParent(IAnimator parent) {
         this.parent = parent;
@@ -21,19 +19,25 @@ public abstract class BaseAnimator implements IAnimator {
     }
 
     @Override
-    public void animate(boolean reverse) {
-        restartAnimation(reverse);
-        if (this.parent == null) AnimatorManager.startAnimation(this);
-    }
-
-    protected void restartAnimation(boolean reverse) {
-        this.startTime = Minecraft.getSystemTime();
-        this.direction = (byte) (reverse ? -1 : 1);
+    public void stop(boolean force) {
+        this.direction = 0;
     }
 
     @Override
-    public void stop() {
-        this.direction = 0;
+    public void pause() {
+        this.paused = true;
+    }
+
+    @Override
+    public void resume(boolean reverse) {
+        this.paused = false;
+        this.direction = (byte) (reverse ? -1 : 1);
+        if (this.parent == null) AnimatorManager.startAnimation(this);
+    }
+
+    @Override
+    public boolean isPaused() {
+        return paused;
     }
 
     @Override
@@ -53,9 +57,5 @@ public abstract class BaseAnimator implements IAnimator {
 
     public final byte getDirection() {
         return direction;
-    }
-
-    protected long getStartTime() {
-        return startTime;
     }
 }

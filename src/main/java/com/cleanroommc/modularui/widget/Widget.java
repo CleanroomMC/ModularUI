@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.layout.IResizeable;
+import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.value.IValue;
 import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.factory.GuiData;
@@ -26,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -43,6 +45,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     private final Area area = new Area();
     private final Flex flex = new Flex(this);
     private IResizeable resizer = this.flex;
+    private BiConsumer<W, IViewportStack> transform;
     // syncing
     @Nullable private IValue<?> value;
     @Nullable private String syncKey;
@@ -354,6 +357,19 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @Override
     public void resizer(IResizeable resizer) {
         this.resizer = resizer != null ? resizer : IUnResizeable.INSTANCE;
+    }
+
+    @Override
+    public void transform(IViewportStack stack) {
+        IWidget.super.transform(stack);
+        if (this.transform != null) {
+            this.transform.accept(getThis(), stack);
+        }
+    }
+
+    public W transform(BiConsumer<W, IViewportStack> transform) {
+        this.transform = transform;
+        return getThis();
     }
 
     // -------------------

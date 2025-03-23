@@ -35,6 +35,7 @@ public class AnimatorManager {
         if (lastTime > 0 && !animators.isEmpty()) {
             animators.removeIf(animator -> {
                 if (animator == null) return true;
+                if (animator.isPaused()) return false;
                 animator.advance(elapsedTime);
                 return !animator.isAnimating();
             });
@@ -48,7 +49,7 @@ public class AnimatorManager {
     public void onDraw(GuiOpenEvent event) {
         if (event.getGui() == null) {
             // stop and yeet all animators on gui close
-            animators.forEach(IAnimator::stop);
+            animators.forEach(iAnimator -> iAnimator.stop(false));
             animators.clear();
         }
     }

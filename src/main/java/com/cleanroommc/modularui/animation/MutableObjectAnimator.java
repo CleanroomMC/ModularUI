@@ -22,8 +22,8 @@ public class MutableObjectAnimator<T extends IAnimatable<T>> extends Animator {
     }
 
     @Override
-    protected void onUpdate() {
-        super.onUpdate();
+    protected boolean onUpdate() {
         this.animatable.interpolate(this.from, this.to, getRawValue());
+        return super.onUpdate();
     }
 }

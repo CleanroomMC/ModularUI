@@ -1,6 +1,9 @@
 package com.cleanroommc.modularui.animation;
 
+import com.cleanroommc.modularui.ModularUI;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class SequentialAnimator extends BaseAnimator implements IAnimator {
@@ -10,6 +13,16 @@ public class SequentialAnimator extends BaseAnimator implements IAnimator {
 
     public SequentialAnimator(List<IAnimator> animators) {
         this.animators = new ArrayList<>(animators);
+        this.animators.forEach(animator -> {
+            if (animator instanceof BaseAnimator baseAnimator) {
+                baseAnimator.setParent(this);
+            }
+        });
+    }
+
+    public SequentialAnimator(IAnimator... animators) {
+        this.animators = new ArrayList<>();
+        Collections.addAll(this.animators, animators);
         this.animators.forEach(animator -> {
             if (animator instanceof BaseAnimator baseAnimator) {
                 baseAnimator.setParent(this);
@@ -35,13 +48,14 @@ public class SequentialAnimator extends BaseAnimator implements IAnimator {
     public int advance(int elapsedTime) {
         while (isAnimating() && elapsedTime > 0) {
             IAnimator animator = this.animators.get(currentIndex);
-            elapsedTime -= animator.advance(elapsedTime);
+            elapsedTime = animator.advance(elapsedTime);
             if (!animator.isAnimating()) {
                 // animator has finished
                 this.currentIndex += getDirection();
+                ModularUI.LOGGER.info("Finished {}th animator", this.currentIndex);
                 if (this.currentIndex >= this.animators.size() || this.currentIndex < 0) {
                     // whole sequence has finished
-                    stop();
+                    stop(false);
                 } else {
                     // start next animation
                     animator = this.animators.get(this.currentIndex);

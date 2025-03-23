@@ -2,6 +2,8 @@ package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.animation.Animator;
+import com.cleanroommc.modularui.animation.SequentialAnimator;
+import com.cleanroommc.modularui.animation.Wait;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.GuiTextures;
@@ -10,9 +12,7 @@ import com.cleanroommc.modularui.drawable.SpriteDrawable;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.utils.GameObjectHelper;
-import com.cleanroommc.modularui.utils.Interpolation;
-import com.cleanroommc.modularui.utils.SpriteHelper;
+import com.cleanroommc.modularui.utils.*;
 import com.cleanroommc.modularui.utils.fakeworld.ArraySchema;
 import com.cleanroommc.modularui.utils.fakeworld.ISchema;
 import com.cleanroommc.modularui.widget.DraggableWidget;
@@ -21,6 +21,8 @@ import com.cleanroommc.modularui.widgets.SchemaWidget;
 import com.cleanroommc.modularui.widgets.SortableListWidget;
 
 import com.cleanroommc.modularui.widgets.TransformWidget;
+
+import com.cleanroommc.modularui.widgets.layout.Row;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.init.Blocks;
@@ -34,12 +36,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class TestGuis extends CustomModularScreen {
 
     @Override
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {
-        return buildAnimationUI(context);
+        return buildPostTheLogAnimationUI(context);
     }
 
     public @NotNull ModularPanel buildAnimationUI(ModularGuiContext context) {
@@ -50,10 +53,7 @@ public class TestGuis extends CustomModularScreen {
                 .reverseOnFinish(true)
                 .repeatsOnFinish(-1)
                 .duration(1200);
-                //.onUpdate(val -> {
-                   //widget.getArea().rx = (int) (75 + 55 * Math.cos(val * 2 * Math.PI + Math.PI / 2));
-                   //widget.getArea().ry = (int) (75 + 55 * Math.sin(val * 2 * Math.PI + Math.PI / 2));
-                //});
+
         animator.reset(true);
         animator.animate(true);
         return ModularPanel.defaultPanel("main").size(150)
@@ -64,6 +64,42 @@ public class TestGuis extends CustomModularScreen {
                             float y = (float) (55 * Math.sin(animator.getValue() * 2 * Math.PI - Math.PI / 2));
                             stack.translate(x, y);
                         }));
+    }
+
+    public @NotNull ModularPanel buildPostTheLogAnimationUI(ModularGuiContext context) {
+        int offset = 20;
+        Animator post = new Animator().curve(Interpolation.SINE_IN).duration(300).bounds(-offset, 0);
+        Animator the = new Animator().curve(Interpolation.SINE_IN).duration(300).bounds(offset, 0);
+        Animator fucking = new Animator().curve(Interpolation.SINE_IN).duration(300).bounds(-offset, 0);
+        Animator log = new Animator().curve(Interpolation.SINE_IN).duration(300).bounds(offset, 0);
+        Animator logGrow = new Animator().curve(Interpolation.LINEAR).duration(3000).bounds(0f, 1f);
+        SequentialAnimator seq = new SequentialAnimator(new Wait(300), post, the, fucking, log, logGrow);
+        seq.animate();
+        //post.animate();
+        Random rnd = new Random();
+        return new ModularPanel("main")
+                .coverChildren()
+                .padding(12)
+                .child(new Row()
+                        .coverChildren()
+                        .child(IKey.str("Post ").asWidget()
+                                .transform((widget, stack) -> stack.translate(0, post.getValue())))
+                        .child(IKey.str("the ").asWidget()
+                                .transform((widget, stack) -> stack.translate(0, the.getValue())))
+                        .child(IKey.str("fucking ").asWidget()
+                                .transform((widget, stack) -> stack.translate(0, fucking.getValue())))
+                        .child(IKey.str("LOOOOOGGG!!!! ").asWidget()
+                                .transform((widget, stack) -> {
+                                    float logVal = log.getValue();
+                                    float logGrowVal = logGrow.getValue();
+                                    stack.translate(rnd.nextInt(5) * logGrowVal, logVal + rnd.nextInt(5) * logGrowVal);
+                                    int x0 = widget.getArea().width / 2, y0 = widget.getArea().height / 2;
+                                    float scale = Interpolations.lerp(1f, 4f, logGrowVal);
+                                    stack.translate(x0, y0);
+                                    stack.scale(scale, scale);
+                                    stack.translate(-x0, -y0);
+                                    widget.color(Color.interpolate(0xFF040404, Color.RED.main, logGrowVal));
+                                })));
     }
 
     public @NotNull ModularPanel buildSpriteUI(ModularGuiContext context) {

@@ -1,10 +1,10 @@
 package com.cleanroommc.modularui.animation;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.IInterpolation;
 import com.cleanroommc.modularui.utils.Interpolation;
 
 import java.util.function.DoubleConsumer;
+import java.util.function.DoublePredicate;
 
 public class Animator extends BaseAnimator implements IAnimator {
 
@@ -14,7 +14,7 @@ public class Animator extends BaseAnimator implements IAnimator {
     private IInterpolation curve = Interpolation.LINEAR;
     private boolean reverseOnFinish = false;
     private int repeats = 0;
-    private DoubleConsumer onUpdate;
+    private DoublePredicate onUpdate;
     private Runnable onFinish;
 
     private int progress = 0;
@@ -24,36 +24,29 @@ public class Animator extends BaseAnimator implements IAnimator {
     @Override
     public void reset(boolean atEnd) {
         this.progress = atEnd ? this.duration : 0;
-    }
-
-    @Override
-    public void animate(boolean reverse) {
-        super.animate(reverse);
-        this.startedReverse = reverse;
+        this.startedReverse = atEnd;
         this.repeated = 0;
     }
 
     @Override
-    public void stop() {
-        if (isAnimating()) {
+    public void stop(boolean force) {
+        if (isAnimating() && !force) {
             if (this.reverseOnFinish && this.startedReverse == isAnimatingReverse()) {
                 onAnimationFinished(false, false);
                 // started reverse -> bounce back and animate forward
-                reset(isAnimatingForward());
-                restartAnimation(isAnimatingForward());
+                animate(isAnimatingForward());
                 return;
             }
             if (repeats != 0 && (repeated < repeats || repeats < 0)) {
                 onAnimationFinished(true, false);
                 // started forward -> full cycle finished -> try repeating
                 boolean reverse = !this.reverseOnFinish == isAnimatingReverse();
-                reset(reverse);
-                restartAnimation(reverse);
+                animate(reverse);
                 repeated++;
                 return;
             }
         }
-        super.stop();
+        super.stop(force);
     }
 
     @Override
@@ -64,9 +57,12 @@ public class Animator extends BaseAnimator implements IAnimator {
             int prog = Math.min(max, elapsedTime);
             this.progress += prog * getDirection();
             elapsedTime -= prog;
-            onUpdate();
+            if (onUpdate()) {
+                stop(true);
+                break;
+            }
             if ((isAnimatingForward() && this.progress >= this.duration) || (isAnimatingReverse() && this.progress <= 0)) {
-                stop();
+                stop(false);
                 if (!isAnimating()) {
                     onAnimationFinished(true, true);
                     break;
@@ -76,14 +72,11 @@ public class Animator extends BaseAnimator implements IAnimator {
         return elapsedTime;
     }
 
-    protected void onUpdate() {
-        if (this.onUpdate != null) {
-            this.onUpdate.accept(getRawValue());
-        }
+    protected boolean onUpdate() {
+        return this.onUpdate != null && this.onUpdate.test(this.progress);
     }
 
     protected void onAnimationFinished(boolean finishedOneCycle, boolean finishedAllRepeats) {
-        ModularUI.LOGGER.info("Animation finished after: {}", IAnimator.getTimeDiff(getStartTime()));
         if (this.onFinish != null) {
             this.onFinish.run();
         }
@@ -211,9 +204,23 @@ public class Animator extends BaseAnimator implements IAnimator {
      * @param onUpdate update function
      * @return this
      */
-    public Animator onUpdate(DoubleConsumer onUpdate) {
+    public Animator onUpdate(DoublePredicate onUpdate) {
         this.onUpdate = onUpdate;
         return this;
+    }
+
+    /**
+     * Sets a function which is executed everytime the progress updates, that is on every frame.
+     * The argument of the function is the interpolated value.
+     *
+     * @param onUpdate update function
+     * @return this
+     */
+    public Animator onUpdate(DoubleConsumer onUpdate) {
+        return onUpdate(val -> {
+            onUpdate.accept(val);
+            return false;
+        });
     }
 
     /**

@@ -9,13 +9,20 @@ public interface IAnimator {
 
     @Nullable IAnimator getParent();
 
-    void animate(boolean reverse);
+    default void animate(boolean reverse) {
+        reset(reverse);
+        resume(reverse);
+    }
 
     default void animate() {
         animate(false);
     }
 
-    void stop();
+    void stop(boolean force);
+
+    void pause();
+
+    void resume(boolean reverse);
 
     void reset(boolean atEnd);
 
@@ -31,6 +38,8 @@ public interface IAnimator {
      */
     @ApiStatus.OverrideOnly
     int advance(int elapsedTime);
+
+    boolean isPaused();
 
     boolean isAnimating();
 
