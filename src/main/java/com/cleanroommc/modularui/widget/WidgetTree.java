@@ -177,7 +177,7 @@ public class WidgetTree {
             // draw all backgrounds first if we have more than 1 child
             // the whole reason this exists is because of the hover animation of items with NEA
             // on hover the item scales up slightly, this causes the amount text to overlap nearby slots, but since the whole slot is drawn
-            // at once the backgrounds my draw on top of the text
+            // at once the backgrounds might draw on top of the text
             // for now we'll apply this always without checking for NEA as it might be useful for other things
             // maybe proper layer customization in the future?
             if (backgroundSeparate) children.forEach(widget -> drawBackground(widget, context, ignoreEnabled));
