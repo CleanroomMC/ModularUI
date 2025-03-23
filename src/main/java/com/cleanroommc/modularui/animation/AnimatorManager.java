@@ -44,7 +44,7 @@ public class AnimatorManager {
         queuedAnimators.clear();
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onDraw(GuiOpenEvent event) {
         if (event.getGui() == null) {
             // stop and yeet all animators on gui close

@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.animation.Animator;
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
@@ -15,9 +16,9 @@ import com.cleanroommc.modularui.screen.viewport.GuiViewportStack;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.utils.Animator;
 import com.cleanroommc.modularui.utils.HoveredWidgetList;
 import com.cleanroommc.modularui.utils.Interpolation;
+import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.value.sync.PanelSyncHandler;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
@@ -25,6 +26,8 @@ import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
+
+import com.cleanroommc.neverenoughanimations.NEAConfig;
 
 import net.minecraft.client.Minecraft;
 
@@ -71,9 +74,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     private final List<IPanelHandler> clientSubPanels = new ArrayList<>();
     private boolean invisible = false;
-    private Animator animator;
-    private float scale = 1f;
-    private float alpha = 1f;
+    private Animator animator;;
 
     public ModularPanel(@NotNull String name) {
         this.name = Objects.requireNonNull(name, "A panels name must not be null and should be unique!");
@@ -110,13 +111,16 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     /**
      * If this panel is open it will be closed.
      * If animating is enabled and an animation is already playing this method will do nothing.
-     *
-     * @param animate true if the closing animation should play first.
      */
-    public void closeIfOpen(boolean animate) {
+    public void closeIfOpen() {
         if (!isOpen()) return;
         closeSubPanels();
-        if (!animate || !shouldAnimate()) {
+        if (isMainPanel()) {
+            // close screen and let NEA animation
+            Minecraft.getMinecraft().player.closeScreen();
+            return;
+        }
+        if (!shouldAnimate()) {
             this.screen.getPanelManager().closePanel(this);
             return;
         }
@@ -125,11 +129,13 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 // if this is the main panel, start closing animation for all panels
                 for (ModularPanel panel : getScreen().getPanelManager().getOpenPanels()) {
                     if (!panel.isMainPanel()) {
-                        panel.closeIfOpen(true);
+                        panel.closeIfOpen();
                     }
                 }
             }
-            //getAnimator().setEndCallback(val -> this.screen.getPanelManager().closePanel(this)).backward();
+            getAnimator().onFinish(() -> this.screen.getPanelManager().closePanel(this));
+            getAnimator().reset(true);
+            getAnimator().animate(true);
         }
     }
 
@@ -140,7 +146,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     public void animateClose() {
-        closeIfOpen(true);
+        closeIfOpen();
     }
 
     void setPanelHandler(IPanelHandler panelHandler) {
@@ -212,16 +218,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     public void onOpen(ModularScreen screen) {
         this.screen = screen;
         getArea().z(1);
-        this.scale = 1f;
-        this.alpha = 1f;
         initialise(this);
-        if (shouldAnimate()) {
-            this.scale = 0.75f;
-            this.alpha = 0f;
-            getAnimator().setEndCallback(value -> {
-                this.scale = 1f;
-                this.alpha = 1f;
-            }).forward();
+        if (!isMainPanel() && shouldAnimate()) {
+            getAnimator().onFinish(() -> {});
+            getAnimator().reset();
+            getAnimator().animate();
         }
         this.state = State.OPEN;
     }
@@ -653,19 +654,21 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     public boolean isOpening() {
-        return this.animator != null && this.animator.isRunningForwards();
+        return this.animator != null && this.animator.isAnimatingForward();
     }
 
     public boolean isClosing() {
-        return this.animator != null && this.animator.isRunningBackwards();
+        return this.animator != null && this.animator.isAnimatingReverse();
     }
 
     public float getScale() {
-        return this.scale;
+        if (!ModularUI.Mods.NEA.isLoaded() || NEAConfig.openingAnimationTime == 0) return 1f;
+        return Interpolations.lerp(NEAConfig.openingStartScale, 1f, getAnimator().getValue());
     }
 
     public float getAlpha() {
-        return this.alpha;
+        if (!ModularUI.Mods.NEA.isLoaded() || NEAConfig.openingAnimationTime == 0) return 1f;
+        return getAnimator().getValue();
     }
 
     public final boolean isMainPanel() {
@@ -685,19 +688,23 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @NotNull
     protected Animator getAnimator() {
         if (this.animator == null) {
-            this.animator = new Animator(getScreen().getCurrentTheme().getOpenCloseAnimationOverride(), Interpolation.QUINT_OUT)
-                    .setValueBounds(0.0f, 1.0f)
-                    .setCallback(val -> {
-                        this.alpha = (float) val;
-                        this.scale = (float) val * 0.25f + 0.75f;
-                    });
+            this.animator = new Animator()
+                    .bounds(0f, 1f)
+                    .duration(NEAConfig.openingAnimationTime)
+                    .curve(Interpolation.getForName(NEAConfig.openingAnimationCurve.getName()));
+            this.animator.reset(true);
         }
         return this.animator;
     }
 
+    /**
+     * This method determines if the panel should be animated.
+     * It is strongly discouraged to override this method. Users should have animations when they have NEA installed, and it's enabled in
+     * the config. Only override if the animation looks seriously wrong with your specific panel.
+     */
+    @ApiStatus.Internal
     public boolean shouldAnimate() {
-        //return !getScreen().isOverlay() && ModularUI.Mods.NEA.isLoaded() && NEAConfig.openingAnimationTime > 0;
-        return false;
+        return !getScreen().isOverlay() && ModularUI.Mods.NEA.isLoaded() && NEAConfig.openingAnimationTime > 0;
     }
 
     void registerSubPanel(IPanelHandler handler) {

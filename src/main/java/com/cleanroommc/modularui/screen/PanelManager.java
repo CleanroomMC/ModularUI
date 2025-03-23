@@ -168,8 +168,8 @@ public class PanelManager {
         }
     }
 
-    public void closeTopPanel(boolean animate) {
-        getTopMostPanel().closeIfOpen(animate);
+    public void closeTopPanel() {
+        getTopMostPanel().closeIfOpen();
     }
 
     public boolean closeAll() {

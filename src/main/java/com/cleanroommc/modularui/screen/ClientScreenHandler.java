@@ -12,6 +12,7 @@ import com.cleanroommc.modularui.core.mixin.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.integration.jei.ModularUIJeiPlugin;
+import com.cleanroommc.modularui.overlay.OverlayManager;
 import com.cleanroommc.modularui.overlay.OverlayStack;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
@@ -77,10 +78,32 @@ public class ClientScreenHandler {
     private static final FpsCounter fpsCounter = new FpsCounter();
     private static long ticks = 0L;
 
+    private static IMuiScreen lastMui;
+
     // we need to know the actual gui and not some fake bs some other mod overwrites
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onGuiOpen(GuiOpenEvent event) {
         defaultContext.reset();
+        if (lastMui != null && event.getGui() == null) {
+            if (lastMui.getScreen().getPanelManager().isOpen()) {
+                lastMui.getScreen().getPanelManager().closeAll();
+            }
+            lastMui.getScreen().getPanelManager().dispose();
+            lastMui = null;
+        } else if (event.getGui() instanceof IMuiScreen screenWrapper) {
+            if (lastMui == null) {
+                lastMui = screenWrapper;
+            } else if (lastMui == event.getGui()) {
+                lastMui.getScreen().getPanelManager().reopen();
+            } else {
+                if (lastMui.getScreen().getPanelManager().isOpen()) {
+                    lastMui.getScreen().getPanelManager().closeAll();
+                }
+                lastMui.getScreen().getPanelManager().dispose();
+                lastMui = screenWrapper;
+            }
+        }
+
         if (event.getGui() instanceof IMuiScreen muiScreen) {
             Objects.requireNonNull(muiScreen.getScreen(), "ModularScreen must not be null!");
             if (currentScreen != muiScreen.getScreen()) {
@@ -97,6 +120,8 @@ public class ClientScreenHandler {
             currentScreen = null;
             lastChar = null;
         }
+
+        OverlayManager.onGuiOpen(event);
     }
 
     @SubscribeEvent
@@ -279,7 +304,7 @@ public class ClientScreenHandler {
             if (currentScreen.getContext().hasDraggable()) {
                 currentScreen.getContext().dropDraggable();
             } else {
-                currentScreen.getPanelManager().closeTopPanel(true);
+                currentScreen.getPanelManager().closeTopPanel();
             }
             return true;
         }

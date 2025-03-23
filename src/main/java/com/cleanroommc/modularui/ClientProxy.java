@@ -34,7 +34,6 @@ public class ClientProxy extends CommonProxy {
         super.preInit(event);
 
         MinecraftForge.EVENT_BUS.register(ClientScreenHandler.class);
-        MinecraftForge.EVENT_BUS.register(OverlayManager.class);
         MinecraftForge.EVENT_BUS.register(KeyBindHandler.class);
         AnimatorManager.init();
 

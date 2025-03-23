@@ -37,7 +37,7 @@ public interface IAnimator {
     boolean isAnimatingReverse();
 
     default boolean isAnimatingForward() {
-        return !isAnimatingReverse();
+        return isAnimating() && !isAnimatingReverse();
     }
 
     static int getTimeDiff(long startTime) {

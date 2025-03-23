@@ -46,7 +46,12 @@ public abstract class BaseAnimator implements IAnimator {
         return this.direction < 0;
     }
 
-    public byte getDirection() {
+    @Override
+    public boolean isAnimatingForward() {
+        return this.direction > 0;
+    }
+
+    public final byte getDirection() {
         return direction;
     }
 
