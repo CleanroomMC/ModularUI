@@ -483,8 +483,11 @@ public class Flex implements IResizeable, IPositioned<Flex> {
         if (parent instanceof IVanillaSlot vanillaSlot) {
             // special treatment for minecraft slots
             Slot slot = vanillaSlot.getVanillaSlot();
-            slot.xPos = parent.getArea().x;
-            slot.yPos = parent.getArea().y;
+            Area mainArea = parent.getScreen().getMainPanel().getArea();
+            // in vanilla uis the position is relative to the gui area and size is 16 x 16
+            // since our slots are 18 x 18 we need to offset by 1
+            slot.xPos = parent.getArea().x - mainArea.x + 1;
+            slot.yPos = parent.getArea().y - mainArea.y + 1;
         }
     }
 
