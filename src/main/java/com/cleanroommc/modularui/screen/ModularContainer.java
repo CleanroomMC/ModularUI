@@ -127,12 +127,15 @@ public class ModularContainer extends Container implements ISortableContainer {
 
     @ApiStatus.Internal
     public void registerSlot(String panelName, ModularSlot slot) {
-        if (this.inventorySlots.contains(slot)) {
-            throw new IllegalArgumentException("Tried to register slot which already exists!");
-        }
         if (slot.isPhantom()) {
+            if (this.phantomSlots.contains(slot)) {
+                throw new IllegalArgumentException("Tried to register slot which already exists!");
+            }
             this.phantomSlots.add(slot);
         } else {
+            if (this.inventorySlots.contains(slot)) {
+                throw new IllegalArgumentException("Tried to register slot which already exists!");
+            }
             addSlotToContainer(slot);
         }
         if (slot.getSlotGroupName() != null) {
@@ -228,18 +231,7 @@ public class ModularContainer extends Container implements ISortableContainer {
         if ((clickTypeIn == ClickType.PICKUP || clickTypeIn == ClickType.QUICK_MOVE) &&
                 (mouseButton == LEFT_MOUSE || mouseButton == RIGHT_MOUSE)) {
             if (slotId == DROP_TO_WORLD) {
-                // no dif
-                if (!inventoryplayer.getItemStack().isEmpty()) {
-                    if (mouseButton == LEFT_MOUSE) {
-                        player.dropItem(inventoryplayer.getItemStack(), true);
-                        inventoryplayer.setItemStack(ItemStack.EMPTY);
-                    }
-
-                    if (mouseButton == RIGHT_MOUSE) {
-                        player.dropItem(inventoryplayer.getItemStack().splitStack(1), true);
-                    }
-                }
-                return inventoryplayer.getItemStack();
+                return superSlotClick(slotId, mouseButton, clickTypeIn, player);
             }
 
             // early return
@@ -251,8 +243,12 @@ public class ModularContainer extends Container implements ISortableContainer {
                 if (!fromSlot.canTakeStack(player)) {
                     return ItemStack.EMPTY;
                 }
-                // simpler code, but effectivly no difference
-                returnable = transferStackInSlot(player, slotId);
+                if (NEAAnimationHandler.shouldHandleNEA(this)) {
+                    returnable = NEAAnimationHandler.injectQuickMove(this, slotId, fromSlot);
+                } else {
+                    // simpler code, but effectivly no difference
+                    returnable = transferStackInSlot(player, slotId);
+                }
             } else {
                 Slot clickedSlot = getSlot(slotId);
 
@@ -317,49 +313,6 @@ public class ModularContainer extends Container implements ISortableContainer {
             }
             detectAndSendChanges();
             return returnable;
-        } else if (clickTypeIn == ClickType.PICKUP_ALL && slotId >= 0) {
-            Slot slot = inventorySlots.get(slotId);
-            ItemStack itemstack1 = inventoryplayer.getItemStack();
-
-            if (!itemstack1.isEmpty() && (slot == null || !slot.getHasStack() || !slot.canTakeStack(player))) {
-                int i = mouseButton == 0 ? 0 : inventorySlots.size() - 1;
-                int j = mouseButton == 0 ? 1 : -1;
-
-                for (int k = 0; k < 2; ++k) {
-                    for (int l = i; l >= 0 && l < inventorySlots.size() && itemstack1.getCount() < itemstack1.getMaxStackSize(); l += j) {
-                        Slot slot1 = inventorySlots.get(l);
-                        if (slot1 instanceof ModularSlot modularSlot && modularSlot.isPhantom()) continue;
-
-                        if (slot1.getHasStack() && Container.canAddItemToSlot(slot1, itemstack1, true) && slot1.canTakeStack(player) && canMergeSlot(itemstack1, slot1)) {
-                            ItemStack itemstack2 = slot1.getStack();
-
-                            if (k != 0 || itemstack2.getCount() != itemstack2.getMaxStackSize()) {
-                                int i1 = Math.min(itemstack1.getMaxStackSize() - itemstack1.getCount(), itemstack2.getCount());
-                                ItemStack itemstack3 = slot1.decrStackSize(i1);
-                                itemstack1.grow(i1);
-
-                                if (itemstack3.isEmpty()) {
-                                    slot1.putStack(ItemStack.EMPTY);
-                                }
-
-                                slot1.onTake(player, itemstack3);
-                            }
-                        }
-                    }
-                }
-            }
-
-            detectAndSendChanges();
-            return returnable;
-        } else if (clickTypeIn == ClickType.SWAP && mouseButton >= 0 && mouseButton < 9) {
-            ModularSlot phantom = getModularSlot(slotId);
-            ItemStack hotbarStack = inventoryplayer.getStackInSlot(mouseButton);
-            if (phantom.isPhantom()) {
-                // insert stack from hotbar slot into phantom slot
-                phantom.putStack(hotbarStack.isEmpty() ? ItemStack.EMPTY : hotbarStack.copy());
-                detectAndSendChanges();
-                return returnable;
-            }
         }
 
         return superSlotClick(slotId, mouseButton, clickTypeIn, player);

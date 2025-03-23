@@ -25,7 +25,6 @@ import com.cleanroommc.modularui.widgets.RichTextWidget;
 import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
-
 import com.cleanroommc.neverenoughanimations.animations.OpeningAnimation;
 
 import net.minecraft.client.Minecraft;
@@ -453,7 +452,7 @@ public class ClientScreenHandler {
                 }
             }
 
-            drawItemStack(mcScreen, itemstack, mouseX - x - 8, mouseY - y - k2, s);
+            drawItemStack(mcScreen, NEAAnimationHandler.injectVirtualCursorStack(mcScreen, itemstack), mouseX - x - 8, mouseY - y - k2, s);
         }
 
         if (!acc.getReturningStack().isEmpty()) {
@@ -470,6 +469,8 @@ public class ClientScreenHandler {
             int i2 = acc.getTouchUpY() + (int) ((float) i3 * f);
             drawItemStack(mcScreen, acc.getReturningStack(), l1, i2, null);
         }
+
+        NEAAnimationHandler.drawItemAnimation(mcScreen);
         GlStateManager.popMatrix();
         GlStateManager.enableLighting();
         GlStateManager.enableDepth();
