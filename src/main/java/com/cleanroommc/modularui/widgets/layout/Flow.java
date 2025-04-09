@@ -67,11 +67,11 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         int expandedAmount = 0;
         int amount = 0;
 
-        // calculate total size and maximum width
+        // calculate total size
         for (IWidget widget : getChildren()) {
             // ignore disabled child if configured as such
             if (shouldIgnoreChildSize(widget)) continue;
-            // exclude self positioned (Y) children
+            // exclude children whose position of main axis is fixed
             if (widget.flex().hasPos(this.axis)) continue;
             amount++;
             if (widget.flex().isExpanded()) {
@@ -96,7 +96,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
             for (IWidget widget : getChildren()) {
                 // ignore disabled child if configured as such
                 if (shouldIgnoreChildSize(widget)) continue;
-                // exclude self positioned (Y) children
+                // exclude children whose position of main axis is fixed
                 if (widget.flex().hasPos(this.axis)) continue;
                 if (widget.flex().isExpanded()) {
                     widget.getArea().setSize(this.axis, newSize);
@@ -118,11 +118,11 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         for (IWidget widget : getChildren()) {
             // ignore disabled child if configured as such
             if (shouldIgnoreChildSize(widget)) continue;
-            // exclude self positioned (Y) children
+            // exclude children whose position of main axis is fixed
             if (widget.flex().hasPos(this.axis)) continue;
             Box margin = widget.getArea().getMargin();
 
-            // set calculated relative Y pos and set bottom margin for next widget
+            // set calculated relative main axis pos and set end margin for next widget
             widget.getArea().setRelativePoint(this.axis, lastP + margin.getStart(this.axis));
             widget.resizer().setPosResized(this.axis, true);
             widget.resizer().setMarginPaddingApplied(this.axis, true);
@@ -141,20 +141,20 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         Box padding = getArea().getPadding();
         boolean hasWidth = resizer().isSizeCalculated(other);
         for (IWidget widget : getChildren()) {
-            // exclude self positioned (Y) children
+            // exclude children whose position of main axis is fixed
             if (widget.flex().hasPos(this.axis)) continue;
             Box margin = widget.getArea().getMargin();
-            // don't align auto positioned (X) children in X
+            // don't align auto positioned children in cross axis
             if (!widget.flex().hasPos(other) && widget.resizer().isSizeCalculated(other)) {
-                int x = margin.getStart(other) + padding.getStart(other);
+                int crossAxisPos = margin.getStart(other) + padding.getStart(other);
                 if (hasWidth) {
                     if (this.caa == Alignment.CrossAxis.CENTER) {
-                        x = (int) (width / 2f - widget.getArea().getSize(other) / 2f);
+                        crossAxisPos = (int) (width / 2f - widget.getArea().getSize(other) / 2f);
                     } else if (this.caa == Alignment.CrossAxis.END) {
-                        x = width - widget.getArea().getSize(other) - margin.getEnd(other) - padding.getStart(other);
+                        crossAxisPos = width - widget.getArea().getSize(other) - margin.getEnd(other) - padding.getStart(other);
                     }
                 }
-                widget.getArea().setRelativePoint(other, x);
+                widget.getArea().setRelativePoint(other, crossAxisPos);
                 widget.resizer().setPosResized(other, true);
                 widget.resizer().setMarginPaddingApplied(other, true);
             }
