@@ -47,16 +47,16 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
     @Override
     public void layoutWidgets() {
         if (!hasChildren()) return;
-        boolean hasSize = resizer().isSizeCalculated(this.axis);
-        int size = getArea().getSize(axis);
-        Box padding = getArea().getPadding();
+        final boolean hasSize = resizer().isSizeCalculated(this.axis);
+        final Box padding = getArea().getPadding();
+        final int size = getArea().getSize(axis) - padding.getTotal(this.axis);
         Alignment.MainAxis maa = this.maa;
         if (!hasSize && maa != Alignment.MainAxis.START) {
             maa = Alignment.MainAxis.START;
         }
         int space = this.spaceBetween;
 
-        int totalSize = 0;
+        int childrenSize = 0;
         int expandedAmount = 0;
         int amount = 0;
 
@@ -69,10 +69,10 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
             amount++;
             if (widget.flex().isExpanded()) {
                 expandedAmount++;
-                totalSize += widget.getArea().getMargin().getTotal(this.axis);
+                childrenSize += widget.getArea().getMargin().getTotal(this.axis);
                 continue;
             }
-            totalSize += widget.getArea().requestedSize(this.axis);
+            childrenSize += widget.getArea().requestedSize(this.axis);
         }
 
         if (amount <= 1 && maa == Alignment.MainAxis.SPACE_BETWEEN) {
@@ -87,10 +87,10 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
                 space = 0;
             }
         }
-        totalSize += space * spaceCount;
+        childrenSize += space * spaceCount;
 
         if (expandedAmount > 0 && hasSize) {
-            int newSize = (size - totalSize - padding.getTotal(this.axis)) / expandedAmount;
+            int newSize = (size - childrenSize) / expandedAmount;
             for (IWidget widget : getChildren()) {
                 // ignore disabled child if configured as such
                 if (shouldIgnoreChildSize(widget)) continue;
@@ -107,9 +107,9 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         int lastP = padding.getStart(this.axis);
         if (hasSize) {
             if (maa == Alignment.MainAxis.CENTER) {
-                lastP = (int) (size / 2f - totalSize / 2f);
+                lastP += (int) (size / 2f - childrenSize / 2f);
             } else if (maa == Alignment.MainAxis.END) {
-                lastP = size - totalSize;
+                lastP += size - childrenSize;
             }
         }
 
@@ -127,7 +127,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
 
             lastP += widget.getArea().requestedSize(this.axis) + space;
             if (hasSize && maa == Alignment.MainAxis.SPACE_BETWEEN) {
-                lastP += (size - totalSize) / spaceCount;
+                lastP += (size - childrenSize) / spaceCount;
             }
         }
     }
