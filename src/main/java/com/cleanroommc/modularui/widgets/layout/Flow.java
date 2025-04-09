@@ -52,11 +52,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         Box padding = getArea().getPadding();
         Alignment.MainAxis maa = this.maa;
         if (!hasSize && maa != Alignment.MainAxis.START) {
-            if (flex().dependsOnChildren(axis)) {
-                maa = Alignment.MainAxis.START;
-            } else {
-                throw new IllegalStateException("Alignment.MainAxis other than start need the size to be calculated!");
-            }
+            maa = Alignment.MainAxis.START;
         }
         if (maa == Alignment.MainAxis.SPACE_BETWEEN && getChildren().size() == 1) {
             maa = Alignment.MainAxis.CENTER;
