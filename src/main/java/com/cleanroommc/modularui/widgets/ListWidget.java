@@ -89,6 +89,7 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
         getScrollData().setScrollSize(p + getArea().getPadding().getEnd(axis));
     }
 
+    @Override
     public boolean shouldIgnoreChildSize(IWidget child) {
         return this.collapseDisabledChild && !child.isEnabled();
     }

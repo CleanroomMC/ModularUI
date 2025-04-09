@@ -161,6 +161,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         }
     }
 
+    @Override
     public boolean shouldIgnoreChildSize(IWidget child) {
         return this.collapseDisabledChild && !child.isEnabled();
     }

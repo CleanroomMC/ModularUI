@@ -101,6 +101,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
         }
     }
 
+    @Override
     public boolean shouldIgnoreChildSize(IWidget child) {
         return child == null || (this.collapseDisabledChild && !child.isEnabled());
     }

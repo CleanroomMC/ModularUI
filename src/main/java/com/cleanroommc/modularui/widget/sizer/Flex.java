@@ -422,16 +422,17 @@ public class Flex implements IResizeable, IPositioned<Flex> {
         return isFullyCalculated();
     }
 
-    private void coverChildrenForLayout(IWidget widget) {
-        List<IWidget> children = widget.getChildren();
+     private void coverChildrenForLayout(IWidget widget) {
+         List<IWidget> children = widget.getChildren();
         Box padding = this.parent.getArea().getPadding();
         // first calculate the area the children span
         int x1 = Integer.MIN_VALUE, y1 = Integer.MIN_VALUE;
         int w = 0, h = 0;
         for (IWidget child : children) {
-            Box margin = child.getArea().getMargin();
+            final boolean shouldIgnoreChildSize = ((ILayoutWidget) this.parent).shouldIgnoreChildSize(child);
+            Box margin = shouldIgnoreChildSize ? Box.ZERO : child.getArea().getMargin();
             IResizeable resizeable = child.resizer();
-            Area area = child.getArea();
+            Area area = shouldIgnoreChildSize ? Area.ZERO : child.getArea();
             if (this.x.dependsOnChildren() && resizeable.isWidthCalculated()) {
                 w = Math.max(w, area.requestedWidth() + padding.horizontal());
                 if (resizeable.isXCalculated()) {

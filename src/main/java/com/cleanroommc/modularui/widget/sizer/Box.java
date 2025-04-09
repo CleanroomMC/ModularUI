@@ -10,6 +10,8 @@ public class Box {
 
     public static final Box SHARED = new Box();
 
+    public static final Box ZERO = new Box();
+
     public int left;
     public int top;
     public int right;
@@ -73,5 +75,15 @@ public class Box {
 
     public int getEnd(GuiAxis axis) {
         return axis.isHorizontal() ? this.right : this.bottom;
+    }
+
+    @Override
+    public String toString() {
+        return "Box{" +
+                "left=" + left +
+                ", top=" + top +
+                ", right=" + right +
+                ", bottom=" + bottom +
+                '}';
     }
 }
