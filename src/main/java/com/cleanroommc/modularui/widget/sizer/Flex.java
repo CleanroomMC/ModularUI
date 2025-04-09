@@ -422,8 +422,8 @@ public class Flex implements IResizeable, IPositioned<Flex> {
         return isFullyCalculated();
     }
 
-     private void coverChildrenForLayout(IWidget widget) {
-         List<IWidget> children = widget.getChildren();
+    private void coverChildrenForLayout(IWidget widget) {
+        List<IWidget> children = widget.getChildren();
         Box padding = this.parent.getArea().getPadding();
         // first calculate the area the children span
         int x1 = Integer.MIN_VALUE, y1 = Integer.MIN_VALUE;
