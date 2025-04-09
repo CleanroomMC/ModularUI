@@ -4,7 +4,6 @@ import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.utils.Alignment;
-import com.cleanroommc.modularui.widget.AbstractParentWidget;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.sizer.Box;
 
@@ -35,6 +34,10 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
      * Does not work with {@link Alignment.MainAxis#SPACE_BETWEEN} and {@link Alignment.MainAxis#SPACE_AROUND}.
      */
     private int spaceBetween = 0;
+    /**
+     * Whether disabled child widgets should be collapsed for display.
+     */
+    private boolean collapseDisabledChild = false;
 
     public Flow(GuiAxis axis) {
         this.axis = axis;
@@ -66,6 +69,8 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
 
         // calculate total size and maximum width
         for (IWidget widget : getChildren()) {
+            // ignore disabled child if configured as such
+            if (shouldIgnoreChildSize(widget)) continue;
             // exclude self positioned (Y) children
             if (widget.flex().hasPos(this.axis)) continue;
             amount++;
@@ -89,6 +94,8 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         if (expandedAmount > 0 && hasSize) {
             int newSize = (size - totalSize - padding.getTotal(this.axis)) / expandedAmount;
             for (IWidget widget : getChildren()) {
+                // ignore disabled child if configured as such
+                if (shouldIgnoreChildSize(widget)) continue;
                 // exclude self positioned (Y) children
                 if (widget.flex().hasPos(this.axis)) continue;
                 if (widget.flex().isExpanded()) {
@@ -109,6 +116,8 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         }
 
         for (IWidget widget : getChildren()) {
+            // ignore disabled child if configured as such
+            if (shouldIgnoreChildSize(widget)) continue;
             // exclude self positioned (Y) children
             if (widget.flex().hasPos(this.axis)) continue;
             Box margin = widget.getArea().getMargin();
@@ -152,6 +161,10 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         }
     }
 
+    public boolean shouldIgnoreChildSize(IWidget child) {
+        return this.collapseDisabledChild && !child.isEnabled();
+    }
+
     public Flow crossAxisAlignment(Alignment.CrossAxis caa) {
         this.caa = caa;
         return this;
@@ -164,6 +177,14 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
 
     public Flow childPadding(int spaceBetween) {
         this.spaceBetween = spaceBetween;
+        return this;
+    }
+
+    /**
+     * Configures this widget to collapse disabled child widgets.
+     */
+    public Flow collapseDisabledChild() {
+        this.collapseDisabledChild = true;
         return this;
     }
 

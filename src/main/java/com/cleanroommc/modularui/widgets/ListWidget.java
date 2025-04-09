@@ -8,13 +8,11 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.widget.AbstractScrollWidget;
-import com.cleanroommc.modularui.widget.scroll.HorizontalScrollData;
 import com.cleanroommc.modularui.widget.scroll.ScrollData;
 import com.cleanroommc.modularui.widget.scroll.VerticalScrollData;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.function.IntFunction;
 
@@ -29,6 +27,7 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
     private ScrollData scrollData;
     private IIcon childSeparator;
     private final IntList separatorPositions = new IntArrayList();
+    private boolean collapseDisabledChild = false;
 
     public ListWidget() {
         super(null, null);
@@ -70,6 +69,7 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
         int separatorSize = getSeparatorSize();
         int p = getArea().getPadding().getStart(axis);
         for (IWidget widget : getChildren()) {
+            if (shouldIgnoreChildSize(widget)) continue;
             if (axis.isVertical() ?
                     widget.getFlex().hasYPos() || !widget.resizer().isHeightCalculated() :
                     widget.getFlex().hasXPos() || !widget.resizer().isWidthCalculated()) {
@@ -87,6 +87,10 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
             p += separatorSize;
         }
         getScrollData().setScrollSize(p + getArea().getPadding().getEnd(axis));
+    }
+
+    public boolean shouldIgnoreChildSize(IWidget child) {
+        return this.collapseDisabledChild && !child.isEnabled();
     }
 
     @Override
@@ -146,6 +150,14 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
         for (int i = 0; i < amount; i++) {
             child(widgetCreator.apply(i));
         }
+        return getThis();
+    }
+
+    /**
+     * Configures this widget to collapse disabled child widgets.
+     */
+    public W collapseDisabledChild() {
+        this.collapseDisabledChild = true;
         return getThis();
     }
 }
