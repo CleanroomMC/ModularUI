@@ -54,9 +54,6 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         if (!hasSize && maa != Alignment.MainAxis.START) {
             maa = Alignment.MainAxis.START;
         }
-        if (maa == Alignment.MainAxis.SPACE_BETWEEN && getChildren().size() == 1) {
-            maa = Alignment.MainAxis.CENTER;
-        }
         int space = this.spaceBetween;
 
         int totalSize = 0;
@@ -78,6 +75,9 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
             totalSize += widget.getArea().requestedSize(this.axis);
         }
 
+        if (amount <= 1 && maa == Alignment.MainAxis.SPACE_BETWEEN) {
+            maa = Alignment.MainAxis.CENTER;
+        }
         final int spaceCount = Math.max(amount - 1, 0);
 
         if (maa == Alignment.MainAxis.SPACE_BETWEEN || maa == Alignment.MainAxis.SPACE_AROUND) {
