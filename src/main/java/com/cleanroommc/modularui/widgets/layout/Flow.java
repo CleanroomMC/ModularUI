@@ -4,7 +4,6 @@ import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.utils.Alignment;
-import com.cleanroommc.modularui.widget.AbstractParentWidget;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.sizer.Box;
 
@@ -35,6 +34,10 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
      * Does not work with {@link Alignment.MainAxis#SPACE_BETWEEN} and {@link Alignment.MainAxis#SPACE_AROUND}.
      */
     private int spaceBetween = 0;
+    /**
+     * Whether disabled child widgets should be collapsed for display.
+     */
+    private boolean collapseDisabledChild = false;
 
     public Flow(GuiAxis axis) {
         this.axis = axis;
@@ -44,38 +47,38 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
     @Override
     public void layoutWidgets() {
         if (!hasChildren()) return;
-        boolean hasSize = resizer().isSizeCalculated(this.axis);
-        int size = getArea().getSize(axis);
-        Box padding = getArea().getPadding();
+        final boolean hasSize = resizer().isSizeCalculated(this.axis);
+        final Box padding = getArea().getPadding();
+        final int size = getArea().getSize(axis) - padding.getTotal(this.axis);
         Alignment.MainAxis maa = this.maa;
         if (!hasSize && maa != Alignment.MainAxis.START) {
-            if (flex().dependsOnChildren(axis)) {
-                maa = Alignment.MainAxis.START;
-            } else {
-                throw new IllegalStateException("Alignment.MainAxis other than start need the size to be calculated!");
-            }
-        }
-        if (maa == Alignment.MainAxis.SPACE_BETWEEN && getChildren().size() == 1) {
-            maa = Alignment.MainAxis.CENTER;
+            maa = Alignment.MainAxis.START;
         }
         int space = this.spaceBetween;
 
-        int totalSize = 0;
+        int childrenSize = 0;
         int expandedAmount = 0;
         int amount = 0;
 
-        // calculate total size and maximum width
+        // calculate total size
         for (IWidget widget : getChildren()) {
-            // exclude self positioned (Y) children
+            // ignore disabled child if configured as such
+            if (shouldIgnoreChildSize(widget)) continue;
+            // exclude children whose position of main axis is fixed
             if (widget.flex().hasPos(this.axis)) continue;
             amount++;
             if (widget.flex().isExpanded()) {
                 expandedAmount++;
-                totalSize += widget.getArea().getMargin().getTotal(this.axis);
+                childrenSize += widget.getArea().getMargin().getTotal(this.axis);
                 continue;
             }
-            totalSize += widget.getArea().requestedSize(this.axis);
+            childrenSize += widget.getArea().requestedSize(this.axis);
         }
+
+        if (amount <= 1 && maa == Alignment.MainAxis.SPACE_BETWEEN) {
+            maa = Alignment.MainAxis.CENTER;
+        }
+        final int spaceCount = Math.max(amount - 1, 0);
 
         if (maa == Alignment.MainAxis.SPACE_BETWEEN || maa == Alignment.MainAxis.SPACE_AROUND) {
             if (expandedAmount > 0) {
@@ -84,12 +87,14 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
                 space = 0;
             }
         }
-        totalSize += space * (getChildren().size() - 1);
+        childrenSize += space * spaceCount;
 
         if (expandedAmount > 0 && hasSize) {
-            int newSize = (size - totalSize - padding.getTotal(this.axis)) / expandedAmount;
+            int newSize = (size - childrenSize) / expandedAmount;
             for (IWidget widget : getChildren()) {
-                // exclude self positioned (Y) children
+                // ignore disabled child if configured as such
+                if (shouldIgnoreChildSize(widget)) continue;
+                // exclude children whose position of main axis is fixed
                 if (widget.flex().hasPos(this.axis)) continue;
                 if (widget.flex().isExpanded()) {
                     widget.getArea().setSize(this.axis, newSize);
@@ -102,25 +107,27 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         int lastP = padding.getStart(this.axis);
         if (hasSize) {
             if (maa == Alignment.MainAxis.CENTER) {
-                lastP = (int) (size / 2f - totalSize / 2f);
+                lastP += (int) (size / 2f - childrenSize / 2f);
             } else if (maa == Alignment.MainAxis.END) {
-                lastP = size - totalSize;
+                lastP += size - childrenSize;
             }
         }
 
         for (IWidget widget : getChildren()) {
-            // exclude self positioned (Y) children
+            // ignore disabled child if configured as such
+            if (shouldIgnoreChildSize(widget)) continue;
+            // exclude children whose position of main axis is fixed
             if (widget.flex().hasPos(this.axis)) continue;
             Box margin = widget.getArea().getMargin();
 
-            // set calculated relative Y pos and set bottom margin for next widget
+            // set calculated relative main axis pos and set end margin for next widget
             widget.getArea().setRelativePoint(this.axis, lastP + margin.getStart(this.axis));
             widget.resizer().setPosResized(this.axis, true);
             widget.resizer().setMarginPaddingApplied(this.axis, true);
 
             lastP += widget.getArea().requestedSize(this.axis) + space;
             if (hasSize && maa == Alignment.MainAxis.SPACE_BETWEEN) {
-                lastP += (size - totalSize) / (getChildren().size() - 1);
+                lastP += (size - childrenSize) / spaceCount;
             }
         }
     }
@@ -132,24 +139,29 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         Box padding = getArea().getPadding();
         boolean hasWidth = resizer().isSizeCalculated(other);
         for (IWidget widget : getChildren()) {
-            // exclude self positioned (Y) children
+            // exclude children whose position of main axis is fixed
             if (widget.flex().hasPos(this.axis)) continue;
             Box margin = widget.getArea().getMargin();
-            // don't align auto positioned (X) children in X
+            // don't align auto positioned children in cross axis
             if (!widget.flex().hasPos(other) && widget.resizer().isSizeCalculated(other)) {
-                int x = margin.getStart(other) + padding.getStart(other);
+                int crossAxisPos = margin.getStart(other) + padding.getStart(other);
                 if (hasWidth) {
                     if (this.caa == Alignment.CrossAxis.CENTER) {
-                        x = (int) (width / 2f - widget.getArea().getSize(other) / 2f);
+                        crossAxisPos = (int) (width / 2f - widget.getArea().getSize(other) / 2f);
                     } else if (this.caa == Alignment.CrossAxis.END) {
-                        x = width - widget.getArea().getSize(other) - margin.getEnd(other) - padding.getStart(other);
+                        crossAxisPos = width - widget.getArea().getSize(other) - margin.getEnd(other) - padding.getStart(other);
                     }
                 }
-                widget.getArea().setRelativePoint(other, x);
+                widget.getArea().setRelativePoint(other, crossAxisPos);
                 widget.resizer().setPosResized(other, true);
                 widget.resizer().setMarginPaddingApplied(other, true);
             }
         }
+    }
+
+    @Override
+    public boolean shouldIgnoreChildSize(IWidget child) {
+        return this.collapseDisabledChild && !child.isEnabled();
     }
 
     public Flow crossAxisAlignment(Alignment.CrossAxis caa) {
@@ -164,6 +176,14 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
 
     public Flow childPadding(int spaceBetween) {
         this.spaceBetween = spaceBetween;
+        return this;
+    }
+
+    /**
+     * Configures this widget to collapse disabled child widgets.
+     */
+    public Flow collapseDisabledChild() {
+        this.collapseDisabledChild = true;
         return this;
     }
 
