@@ -441,7 +441,7 @@ public class Flex implements IResizeable, IPositioned<Flex> {
             }
             if (this.y.dependsOnChildren() && resizeable.isHeightCalculated()) {
                 h = Math.max(h, area.requestedHeight() + padding.vertical());
-                if (resizeable.isXCalculated()) {
+                if (resizeable.isYCalculated()) {
                     y1 = Math.max(y1, area.ry + area.height + padding.bottom + margin.bottom);
                 }
             }
