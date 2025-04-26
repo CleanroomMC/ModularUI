@@ -67,13 +67,13 @@ public class ByteSyncValue extends ValueSyncHandler<Byte> implements IByteSyncVa
     }
 
     @Override
-    public void write(PacketBuffer buffer) throws IOException {
+    public void write(PacketBuffer buffer) {
         buffer.writeByte(getByteValue());
     }
 
     @Override
-    public void read(PacketBuffer buffer) throws IOException {
-        setByteValue(buffer.readByte(), false, false);
+    public void read(PacketBuffer buffer) {
+        setByteValue(buffer.readByte(), true, false);
     }
 
     @Override
