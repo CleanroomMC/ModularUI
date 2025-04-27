@@ -47,8 +47,7 @@ public class ModularSyncManager {
         mainPSM.syncValue(CURSOR_KEY, this.cursorSlotSyncHandler);
     }
 
-    // not sure why there was no getter before, need to check if this can be public
-    PanelSyncManager getMainPSM() {
+    public PanelSyncManager getMainPSM() {
         return mainPSM;
     }
 
