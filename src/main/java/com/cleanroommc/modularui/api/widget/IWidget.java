@@ -215,6 +215,8 @@ public interface IWidget extends IGuiElement {
     /**
      * @return resizer of this widget
      */
+    @NotNull
+    @Override
     IResizeable resizer();
 
     /**
