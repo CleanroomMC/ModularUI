@@ -39,7 +39,7 @@ public class ArraySchema implements ISchema {
 
     private final World world;
     private final BlockInfo[][][] blocks;
-    private BiPredicate<BlockPos, BlockInfo> renderFilter;
+    private BiPredicate<BlockPos, BlockInfo> renderFilter = (__,___) -> true;
     private final Vec3d center;
 
     public ArraySchema(BlockInfo[][][] blocks) {
