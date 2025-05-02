@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.utils.fakeworld;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -29,9 +30,22 @@ public class BlockInfo {
         }
         TileEntity tile = null;
         if (blockState.getBlock().hasTileEntity(blockState)) {
-            tile = world.getTileEntity(pos);
+            TileEntity realTile = world.getTileEntity(pos);
+            tile = fixRealTileWorldCorrupting(realTile, blockState);
         }
         return new BlockInfo(blockState, tile);
+    }
+
+    @Nullable
+    private static TileEntity fixRealTileWorldCorrupting(TileEntity realTile, IBlockState blockState) {
+        TileEntity fakeTile = null;
+        if(realTile != null){
+            fakeTile = blockState.getBlock().createTileEntity(null, blockState);
+            if(fakeTile != null){
+                fakeTile.deserializeNBT(realTile.serializeNBT());
+            }
+        }
+        return fakeTile;
     }
 
     private IBlockState blockState;
