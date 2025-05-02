@@ -8,6 +8,7 @@ public class Camera {
 
     private final Vector3f pos;
     private final Vector3f lookAt;
+    private double yaw, pitch;
 
     public Camera(Vector3f pos, Vector3f lookAt) {
         this.pos = pos;
@@ -44,6 +45,8 @@ public class Camera {
         pos.y += (float) (Math.tan(pitch) * pos.length());
         pos.normalise().scale((float) radius);
         this.pos.set(pos.translate(lookAtX, lookAtY, lookAtZ));
+        this.yaw = yaw;
+        this.pitch = pitch;
         return this;
     }
 
@@ -53,5 +56,13 @@ public class Camera {
 
     public Vector3f getLookAt() {
         return lookAt;
+    }
+
+    public double getYaw() {
+        return yaw;
+    }
+
+    public double getPitch() {
+        return pitch;
     }
 }

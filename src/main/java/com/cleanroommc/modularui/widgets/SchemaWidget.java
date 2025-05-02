@@ -10,11 +10,27 @@ import com.cleanroommc.modularui.utils.fakeworld.ISchema;
 import com.cleanroommc.modularui.utils.fakeworld.SchemaRenderer;
 import com.cleanroommc.modularui.widget.Widget;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.MathHelper;
+
+import net.minecraft.util.math.RayTraceResult;
+
+import net.minecraft.util.math.Vec3d;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
+
+import java.util.List;
+import java.util.Map;
 
 public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
 
@@ -136,6 +152,10 @@ public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
     @Override
     public @Nullable IDrawable getOverlay() {
         return schema;
+    }
+
+    public RayTraceResult getBlockUnderMouse() {
+        return schema.getBlockUnderMouse();
     }
 
     public static class LayerButton extends ButtonWidget<LayerButton> {
