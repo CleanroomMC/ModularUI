@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.test;
 import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.Circle;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.ItemDrawable;
@@ -16,6 +17,10 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.fakeworld.ArraySchema;
+import com.cleanroommc.modularui.utils.fakeworld.BlockInfo;
+import com.cleanroommc.modularui.utils.fakeworld.MapSchema;
+import com.cleanroommc.modularui.utils.fakeworld.SchemaRenderer;
 import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.value.IntValue;
 import com.cleanroommc.modularui.value.StringValue;
@@ -30,18 +35,31 @@ import com.cleanroommc.modularui.widgets.layout.Row;
 import com.cleanroommc.modularui.widgets.slot.*;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.opengl.GL11;
 
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -112,7 +130,10 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                 .tab(GuiTextures.TAB_TOP, 0))
                         .child(new PageButton(3, tabController)
                                 .tab(GuiTextures.TAB_TOP, 0)
-                                .overlay(new ItemDrawable(Blocks.CRAFTING_TABLE).asIcon())))
+                                .overlay(new ItemDrawable(Blocks.CRAFTING_TABLE).asIcon()))
+                        .child(new PageButton(4, tabController)
+                                .tab(GuiTextures.TAB_TOP, 0)
+                                .overlay(new ItemDrawable(Items.ENDER_EYE).asIcon())))
                 .child(Flow.column()
                         .sizeRel(1f)
                         .paddingBottom(7)
@@ -346,7 +367,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                         .key('O', new ItemSlot().slot(new ModularCraftingSlot(this.craftingInventory, 9)))
                                                         .build()
                                                         .center())
-                                        )))
+                                        )
+                                        .addPage(createSchemaPage())))
                         .child(SlotGroupWidget.playerInventory(false))
                 );
         /*panel.child(new ButtonWidget<>()
@@ -360,6 +382,57 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                 .left(0.5f))
                         .setSynced("fluid_slot"));*/
         return panel;
+    }
+
+    private IWidget createSchemaPage() {
+        ParentWidget page = new ParentWidget<>();
+        page.debugName("page 5 schema");
+        page.sizeRel(1f);
+        page.child(IKey.str("schema").asWidget());
+        if (world.isRemote)
+            page.child(new SchemaWidget(new SchemaRenderer(new ArraySchema(collectBlocksAround())).rayTracing(true).afterRender((__, schema) -> {
+                RayTraceResult trace = schema.getBlockUnderMouse();
+                if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK) {
+                    GlStateManager.disableTexture2D();
+                    BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+                    buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+                    for (Vec3d v : sideVertices.get(trace.sideHit)) {
+                        buffer.pos(
+                                        trace.getBlockPos().getX() + v.x,
+                                        trace.getBlockPos().getY() + v.y,
+                                        trace.getBlockPos().getZ() + v.z
+                                )
+                                .color(128, 255, 128, 100)
+                                .endVertex();
+                    }
+                    Tessellator.getInstance().draw();
+                }
+            })).pos(20,20).size(100,100));
+        return page;
+    }
+
+
+    double one = 1.001;
+    double zero = -0.001;
+    Map<EnumFacing, List<Vec3d>> sideVertices = ImmutableMap.<EnumFacing, List<Vec3d>>builder()
+            .put(EnumFacing.DOWN, ImmutableList.of(new Vec3d(one, zero, zero), new Vec3d(one, zero, one), new Vec3d(zero, zero, one), new Vec3d(zero, zero, zero)))
+            .put(EnumFacing.UP, ImmutableList.of(new Vec3d(zero, one, zero), new Vec3d(zero, one, one), new Vec3d(one, one, one), new Vec3d(one, one, zero)))
+            .put(EnumFacing.SOUTH, ImmutableList.of(new Vec3d(zero, zero, one), new Vec3d(one, zero, one), new Vec3d(one, one, one), new Vec3d(zero, one, one)))
+            .put(EnumFacing.NORTH, ImmutableList.of(new Vec3d(zero, one, zero), new Vec3d(one, one, zero), new Vec3d(one, zero, zero), new Vec3d(zero, zero, zero)))
+            .put(EnumFacing.EAST, ImmutableList.of(new Vec3d(one, one, zero), new Vec3d(one, one, one), new Vec3d(one, zero, one), new Vec3d(one, zero, zero)))
+            .put(EnumFacing.WEST, ImmutableList.of(new Vec3d(zero, zero, zero), new Vec3d(zero, zero, one), new Vec3d(zero, one, one), new Vec3d(zero, one, zero)))
+            .build();
+
+    public BlockInfo[][][] collectBlocksAround(){
+        BlockInfo[][][] blocks = new BlockInfo[11][11][11];
+        for (int x = -5; x <= 5; x++) {
+            for (int y = -5; y <= 5; y++) {
+                for (int z = -5; z <= 5; z++) {
+                    blocks[x+5][y+5][z+5]=BlockInfo.of(world,pos.add(x,y,z));
+                }
+            }
+        }
+        return blocks;
     }
 
     public ModularPanel openSecondWindow(PanelSyncManager syncManager, IPanelHandler syncHandler) {
