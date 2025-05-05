@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.ISynced;
 import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -269,6 +270,7 @@ public class WidgetTree {
     }
 
     public static void resize(IWidget parent) {
+        if (!NetworkUtils.isClient()) return;
         // TODO check if widget has a parent which depends on its children
         // resize each widget and calculate their relative pos
         if (!resizeWidget(parent, true) && !resizeWidget(parent, false)) {
@@ -283,23 +285,17 @@ public class WidgetTree {
     }
 
     private static boolean resizeWidget(IWidget widget, boolean init) {
-        boolean result = false, alreadyCalculated = false;
+        boolean alreadyCalculated = false;
         // first try to resize this widget
         IResizeable resizer = widget.resizer();
-        if (resizer != null) {
-            if (init) {
-                widget.beforeResize();
-                resizer.initResizing();
-            } else {
-                // if this is not the first time check if this widget is already resized
-                alreadyCalculated = resizer.isFullyCalculated();
-            }
-            result = alreadyCalculated || resizer.resize(widget);
-        } else if (!init) {
-            // weird case that is not supposed to happen
-            result = true;
-            alreadyCalculated = true;
+        if (init) {
+            widget.beforeResize();
+            resizer.initResizing();
+        } else {
+            // if this is not the first time check if this widget is already resized
+            alreadyCalculated = resizer.isFullyCalculated();
         }
+        boolean result = alreadyCalculated || resizer.resize(widget);
 
         GuiAxis expandAxis = widget instanceof IExpander expander ? expander.getExpandAxis() : null;
         // now resize all children and collect children which could not be fully calculated
@@ -320,7 +316,7 @@ public class WidgetTree {
             }
 
             // post resize this widget if possible
-            if (resizer != null && !result) {
+            if (!result) {
                 result = resizer.postResize(widget);
             }
 
@@ -341,10 +337,7 @@ public class WidgetTree {
 
     public static void applyPos(IWidget parent) {
         WidgetTree.foreachChildBFS(parent, child -> {
-            IResizeable resizer = child.resizer();
-            if (resizer != null) {
-                resizer.applyPos(child);
-            }
+            child.resizer().applyPos(child);
             return true;
         }, true);
     }

@@ -14,6 +14,8 @@ public class Box implements IAnimatable<Box> {
 
     public static final Box SHARED = new Box();
 
+    public static final Box ZERO = new Box();
+
     public int left;
     public int top;
     public int right;
@@ -91,5 +93,15 @@ public class Box implements IAnimatable<Box> {
     @Override
     public Box copyOrImmutable() {
         return new Box().set(this);
+    }
+
+    @Override
+    public String toString() {
+        return "Box{" +
+                "left=" + left +
+                ", top=" + top +
+                ", right=" + right +
+                ", bottom=" + bottom +
+                '}';
     }
 }

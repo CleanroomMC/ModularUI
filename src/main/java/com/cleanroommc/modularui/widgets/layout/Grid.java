@@ -27,6 +27,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
     private int minRowHeight = 5, minColWidth = 5;
     private Alignment alignment = Alignment.Center;
     private boolean dirty = false;
+    private boolean collapseDisabledChild = false;
 
     public Grid() {
         super(null, null);
@@ -67,7 +68,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
                 if (i == 0) {
                     colSizes.add(this.minColWidth);
                 }
-                if (child != null && child.isEnabled()) {
+                if (!shouldIgnoreChildSize(child)) {
                     rowSizes.set(i, Math.max(rowSizes.getInt(i), getElementHeight(child.getArea())));
                     colSizes.set(j, Math.max(colSizes.getInt(j), getElementWidth(child.getArea())));
                 }
@@ -101,6 +102,11 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
     }
 
     @Override
+    public boolean shouldIgnoreChildSize(IWidget child) {
+        return child == null || (this.collapseDisabledChild && !child.isEnabled());
+    }
+
+    @Override
     public @NotNull List<IWidget> getChildren() {
         if (this.dirty) {
             makeFlatList();
@@ -120,7 +126,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
         for (List<IWidget> row : this.matrix) {
             int rowHeight = 0;
             for (IWidget child : row) {
-                if (child != null) {
+                if (!shouldIgnoreChildSize(child)) {
                     rowHeight = Math.max(rowHeight, getElementHeight(child.getArea()));
                 }
             }
@@ -139,7 +145,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
                 if (i == 0) {
                     colSizes.add(this.minColWidth);
                 }
-                if (child != null) {
+                if (!shouldIgnoreChildSize(child)) {
                     colSizes.set(j, Math.max(colSizes.getInt(j), getElementWidth(child.getArea())));
                 }
                 j++;
@@ -279,6 +285,14 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
 
     public Grid minElementMarginBottom(int val) {
         this.minElementMargin.bottom(val);
+        return getThis();
+    }
+
+    /**
+     * Configures this widget to collapse row/column if all the child widgets in that axis are disabled.
+     */
+    public Grid collapseDisabledChild() {
+        this.collapseDisabledChild = true;
         return getThis();
     }
 

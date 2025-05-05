@@ -349,6 +349,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         return this.flex;
     }
 
+    @NotNull
     @Override
     public IResizeable resizer() {
         return this.resizer;

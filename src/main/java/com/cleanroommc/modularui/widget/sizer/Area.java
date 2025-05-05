@@ -23,6 +23,8 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
 
     public static final Area SHARED = new Area();
 
+    public static final Area ZERO = new Area();
+
     /**
      * relative position (in most cases the direct parent)
      */
