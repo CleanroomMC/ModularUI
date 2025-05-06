@@ -17,6 +17,7 @@ public class SizerTest {
 
     @Test
     void test() {
+        Bootstrap.perform();
         ModularPanel panel = panel().child(new ButtonWidget<>().center());
         testPanel(panel);
         assertArea(panel.getArea(), W / 2 - 176 / 2, H / 2 - 166 / 2, 176, 166);
