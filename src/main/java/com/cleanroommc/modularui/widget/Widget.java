@@ -46,6 +46,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     private final Flex flex = new Flex(this);
     private IResizeable resizer = this.flex;
     private BiConsumer<W, IViewportStack> transform;
+    private boolean requiresResize = false;
     // syncing
     @Nullable private IValue<?> value;
     @Nullable private String syncKey;
@@ -58,7 +59,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @Nullable private RichTooltip tooltip;
     @Nullable private String widgetThemeOverride = null;
     // listener
-    @Nullable private List<IGuiAction> guiActionListeners;
+    @Nullable private List<IGuiAction> guiActionListeners; // TODO replace with proper event system
     @Nullable private Consumer<W> onUpdateListener;
 
     // -----------------
@@ -95,6 +96,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         }
         afterInit();
         onUpdate();
+        this.requiresResize = false;
     }
 
     @ApiStatus.OverrideOnly
@@ -335,6 +337,22 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     // ----------------
 
     @Override
+    public void scheduleResize() {
+        this.requiresResize = true;
+    }
+
+    @Override
+    public boolean requiresResize() {
+        return this.requiresResize;
+    }
+
+    @MustBeInvokedByOverriders
+    @Override
+    public void onResized() {
+        this.requiresResize = false;
+    }
+
+    @Override
     public Area getArea() {
         return this.area;
     }
@@ -390,7 +408,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @Override
     public @NotNull ModularPanel getPanel() {
         if (!isValid()) {
-            throw new IllegalStateException(getClass().getSimpleName() + " is not in a valid state!");
+            throw new IllegalStateException(this + " is not in a valid state!");
         }
         return this.panel;
     }
@@ -398,7 +416,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @Override
     public @NotNull IWidget getParent() {
         if (!isValid()) {
-            throw new IllegalStateException(getClass().getSimpleName() + " is not in a valid state!");
+            throw new IllegalStateException(this + " is not in a valid state!");
         }
         return this.parent;
     }
@@ -406,7 +424,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @Override
     public ModularGuiContext getContext() {
         if (!isValid()) {
-            throw new IllegalStateException(getClass().getSimpleName() + " is not in a valid state!");
+            throw new IllegalStateException(this + " is not in a valid state!");
         }
         return this.context;
     }
