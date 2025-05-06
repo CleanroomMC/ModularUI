@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.utils.MathUtils;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.util.Objects;
 
 /**
  * A rectangular widget area, composed of a position and a size.
@@ -484,7 +485,7 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
     }
 
     /**
-     * This creates a copy, but it only copies position and size.
+     * This creates a copy with size, pos, margin padding and z layer.
      *
      * @return copy
      */
@@ -504,12 +505,12 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
 
     @Override
     public Area interpolate(Area start, Area end, float t) {
-        this.x = Interpolations.lerp(this.x, end.x, t);
-        this.y = Interpolations.lerp(this.y, end.y, t);
-        this.width = Interpolations.lerp(this.width, end.width, t);
-        this.height = Interpolations.lerp(this.height, end.height, t);
-        this.rx = Interpolations.lerp(this.rx, end.rx, t);
-        this.ry = Interpolations.lerp(this.ry, end.ry, t);
+        this.x = Interpolations.lerp(start.x, end.x, t);
+        this.y = Interpolations.lerp(start.y, end.y, t);
+        this.width = Interpolations.lerp(start.width, end.width, t);
+        this.height = Interpolations.lerp(start.height, end.height, t);
+        this.rx = Interpolations.lerp(start.rx, end.rx, t);
+        this.ry = Interpolations.lerp(start.ry, end.ry, t);
         this.margin.interpolate(start.margin, end.margin, t);
         this.padding.interpolate(start.padding, end.padding, t);
         return this;
@@ -518,5 +519,27 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
     @Override
     public Area copyOrImmutable() {
         return createCopy();
+    }
+
+    @Override
+    public boolean shouldAnimate(Area target) {
+        return x != target.x || y != target.y || width != target.width || height != target.height ||
+                rx != target.rx || ry != target.ry || !margin.isEqual(target.margin) || !padding.isEqual(target.padding);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Area area = (Area) o;
+        return rx == area.rx && ry == area.ry && panelLayer == area.panelLayer && z == area.z && Objects.equals(margin,
+                area.margin) && Objects.equals(
+                padding, area.padding);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), rx, ry, panelLayer, z, margin, padding);
     }
 }

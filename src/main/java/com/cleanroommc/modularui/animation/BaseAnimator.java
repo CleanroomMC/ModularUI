@@ -58,4 +58,12 @@ public abstract class BaseAnimator implements IAnimator {
     public final byte getDirection() {
         return direction;
     }
+
+    public SequentialAnimator followedBy(IAnimator animator) {
+        return new SequentialAnimator(this, animator);
+    }
+
+    public ParallelAnimator inParallelWith(IAnimator animator) {
+        return new ParallelAnimator(this, animator);
+    }
 }

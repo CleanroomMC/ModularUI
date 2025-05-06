@@ -49,12 +49,13 @@ public class ParallelAnimator extends BaseAnimator implements IAnimator {
     public void stop(boolean force) {
         super.stop(force);
         for (IAnimator animator : animators) {
-            animator.stop(false);
+            animator.stop(force);
         }
     }
 
     @Override
     public void reset(boolean atEnd) {
+        this.startedAnimating = 0;
         this.finishedAnimating = 0;
         for (IAnimator animator : animators) {
             animator.reset(atEnd);
@@ -93,8 +94,23 @@ public class ParallelAnimator extends BaseAnimator implements IAnimator {
         return this.finishedAnimating == this.animators.size();
     }
 
+    @Override
+    public boolean hasProgressed() {
+        return isAnimating() && this.startedAnimating > 0;
+    }
+
     public ParallelAnimator waitTimeBetweenAnimators(int waitTime) {
         this.waitTimeBetweenAnimators = waitTime;
+        return this;
+    }
+
+    @Override
+    public ParallelAnimator inParallelWith(IAnimator animator) {
+        if (isAnimating()) {
+            throw new IllegalStateException("Can't add animators while animating");
+        }
+        reset();
+        this.animators.add(animator);
         return this;
     }
 }

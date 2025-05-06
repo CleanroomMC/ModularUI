@@ -65,4 +65,19 @@ public class SequentialAnimator extends BaseAnimator implements IAnimator {
         }
         return elapsedTime;
     }
+
+    @Override
+    public boolean hasProgressed() {
+        return !this.animators.isEmpty() && this.animators.get(0).hasProgressed();
+    }
+
+    @Override
+    public SequentialAnimator followedBy(IAnimator animator) {
+        if (isAnimating()) {
+            throw new IllegalStateException("Can't add animators while animating");
+        }
+        reset();
+        this.animators.add(animator);
+        return this;
+    }
 }

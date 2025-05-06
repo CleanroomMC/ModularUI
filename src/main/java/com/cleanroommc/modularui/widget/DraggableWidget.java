@@ -50,7 +50,7 @@ public class DraggableWidget<W extends DraggableWidget<W>> extends Widget<W> imp
                     .left(getContext().getAbsMouseX() - this.relativeClickX);
             this.movingArea.x = getArea().x;
             this.movingArea.y = getArea().y;
-            WidgetTree.resize(this);
+            scheduleResize();
         }
     }
 

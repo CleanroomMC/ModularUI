@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.layout.IViewportStack;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.utils.Matrix4f;
 import com.cleanroommc.modularui.utils.Vector3f;
 import com.cleanroommc.modularui.widget.DelegatingSingleChildWidget;
@@ -14,6 +15,12 @@ public class TransformWidget extends DelegatingSingleChildWidget<TransformWidget
     private final Matrix4f constTransform = new Matrix4f();
     private boolean hasConstTransform = false;
     private Consumer<IViewportStack> transform;
+
+    public TransformWidget() {}
+
+    public TransformWidget(IWidget child) {
+        child(child);
+    }
 
     @Override
     public void transform(IViewportStack stack) {

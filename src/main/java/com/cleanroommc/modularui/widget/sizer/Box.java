@@ -2,9 +2,9 @@ package com.cleanroommc.modularui.widget.sizer;
 
 import com.cleanroommc.modularui.animation.IAnimatable;
 import com.cleanroommc.modularui.api.GuiAxis;
-import com.cleanroommc.modularui.utils.Interpolation;
 import com.cleanroommc.modularui.utils.Interpolations;
-import com.cleanroommc.modularui.utils.MathUtils;
+
+import java.util.Objects;
 
 /**
  * A box with four edges.
@@ -103,5 +103,22 @@ public class Box implements IAnimatable<Box> {
                 ", right=" + right +
                 ", bottom=" + bottom +
                 '}';
+    }
+
+    public boolean isEqual(Box box) {
+        return left == box.left && top == box.top && right == box.right && bottom == box.bottom;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return isEqual((Box) o);
+    }
+
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(left, top, right, bottom);
     }
 }

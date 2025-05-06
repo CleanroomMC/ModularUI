@@ -52,7 +52,7 @@ public class DraggablePanelWrapper implements IDraggable {
             this.panel.flex().relativeToScreen();
             this.panel.flex().topRelAnchor(y, y)
                     .leftRelAnchor(x, x);
-            WidgetTree.resize(this.panel);
+            this.panel.scheduleResize();
         }
     }
 

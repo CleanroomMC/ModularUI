@@ -100,9 +100,20 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
     }
 
     @Override
+    public boolean remove(I child) {
+        return super.remove(child);
+    }
+
+    @Override
+    public boolean remove(int index) {
+        return super.remove(index);
+    }
+
+    @Override
     public void onChildAdd(I child) {
         super.onChildAdd(child);
         if (isValid()) {
+            scheduleResize();
             this.scrollData.clamp(getScrollArea());
         }
     }
@@ -111,6 +122,7 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
     public void onChildRemove(I child) {
         super.onChildRemove(child);
         if (isValid()) {
+            scheduleResize();
             this.scrollData.clamp(getScrollArea());
         }
     }

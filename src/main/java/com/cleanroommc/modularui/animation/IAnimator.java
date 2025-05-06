@@ -45,6 +45,8 @@ public interface IAnimator {
 
     boolean isAnimatingReverse();
 
+    boolean hasProgressed();
+
     default boolean isAnimatingForward() {
         return isAnimating() && !isAnimatingReverse();
     }

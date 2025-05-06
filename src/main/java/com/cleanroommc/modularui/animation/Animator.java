@@ -73,7 +73,7 @@ public class Animator extends BaseAnimator implements IAnimator {
     }
 
     protected boolean onUpdate() {
-        return this.onUpdate != null && this.onUpdate.test(this.progress);
+        return this.onUpdate != null && this.onUpdate.test(getRawValue());
     }
 
     protected void onAnimationFinished(boolean finishedOneCycle, boolean finishedAllRepeats) {
@@ -113,6 +113,12 @@ public class Animator extends BaseAnimator implements IAnimator {
     public float getValue() {
         //advance();
         return getRawValue();
+    }
+
+    @Override
+    public boolean hasProgressed() {
+        if (!isAnimating()) return false;
+        return isAnimatingForward() ? this.progress > 0 : this.progress < this.duration;
     }
 
     /**
