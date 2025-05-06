@@ -16,6 +16,7 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.Interpolation;
 import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.value.IntValue;
 import com.cleanroommc.modularui.value.StringValue;
@@ -109,10 +110,34 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                         .child(new PageButton(1, tabController)
                                 .tab(GuiTextures.TAB_TOP, 0))
                         .child(new PageButton(2, tabController)
-                                .tab(GuiTextures.TAB_TOP, 0))
-                        .child(new PageButton(3, tabController)
-                                .tab(GuiTextures.TAB_TOP, 0)
-                                .overlay(new ItemDrawable(Blocks.CRAFTING_TABLE).asIcon())))
+                                .tab(GuiTextures.TAB_TOP, 0)))
+                .child(new Expandable()
+                        .debugName("expandable")
+                        .top(0)
+                        .leftRelOffset(1f, 1)
+                        .background(GuiTextures.MC_BACKGROUND)
+                        .excludeAreaInJei()
+                        .stencilTransform((r, expanded) -> {
+                            if (expanded) {
+                                r.width -= 5;
+                                r.height -= 5;
+                            }
+                        })
+                        .animationDuration(500)
+                        .interpolation(Interpolation.BOUNCE_OUT)
+                        .normalView(new ItemDrawable(Blocks.CRAFTING_TABLE).asIcon().asWidget().size(20).pos(0, 0))
+                        .expandedView(new ParentWidget<>()
+                                .debugName("crafting tab")
+                                .coverChildren()
+                                .child(new ItemDrawable(Blocks.CRAFTING_TABLE).asIcon().asWidget().size(20).pos(0, 0))
+                                .child(SlotGroupWidget.builder()
+                                        .row("III   ")
+                                        .row("III  O")
+                                        .row("III   ")
+                                        .key('I', i -> new ItemSlot().slot(new ModularSlot(this.craftingInventory, i)))
+                                        .key('O', new ItemSlot().slot(new ModularCraftingSlot(this.craftingInventory, 9)))
+                                        .build()
+                                        .margin(5, 5, 20, 5))))
                 .child(Flow.column()
                         .sizeRel(1f)
                         .paddingBottom(7)
@@ -335,18 +360,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                         .size(14, 14))
                                                                 .child(IKey.lang("bogosort.gui.enabled").asWidget()
                                                                         .height(14)))))
-                                        .addPage(new ParentWidget<>()
-                                                .debugName("page 4 crafting")
-                                                .sizeRel(1f)
-                                                .child(SlotGroupWidget.builder()
-                                                        .row("III   ")
-                                                        .row("III  O")
-                                                        .row("III   ")
-                                                        .key('I', i -> new ItemSlot().slot(new ModularSlot(this.craftingInventory, i)))
-                                                        .key('O', new ItemSlot().slot(new ModularCraftingSlot(this.craftingInventory, 9)))
-                                                        .build()
-                                                        .center())
-                                        )))
+                                       ))
                         .child(SlotGroupWidget.playerInventory(false))
                 );
         /*panel.child(new ButtonWidget<>()

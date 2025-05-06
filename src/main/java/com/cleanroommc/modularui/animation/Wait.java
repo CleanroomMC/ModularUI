@@ -29,6 +29,11 @@ public class Wait extends BaseAnimator {
         return elapsedTime - prog;
     }
 
+    @Override
+    public boolean hasProgressed() {
+        return progress > 0 && isAnimating();
+    }
+
     public Wait duration(int duration) {
         this.duration = duration;
         return this;

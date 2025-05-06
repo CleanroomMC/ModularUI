@@ -36,6 +36,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     // other
     @Nullable private String debugName;
     private boolean enabled = true;
+    private boolean excludeAreaInJei = false;
     // gui context
     private boolean valid = false;
     private IWidget parent = null;
@@ -88,6 +89,9 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         if (!getScreen().isClientOnly()) {
             initialiseSyncHandler(getScreen().getSyncManager());
         }
+        if (isExcludeAreaInJei()) {
+            getContext().getJeiSettings().addJeiExclusionArea(this);
+        }
         onInit();
         if (hasChildren()) {
             for (IWidget child : getChildren()) {
@@ -128,7 +132,9 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
                     this.context.getScreen().removeGuiActionListener(action);
                 }
             }
-
+            if (isExcludeAreaInJei()) {
+                getContext().getJeiSettings().removeJeiExclusionArea(this);
+            }
         }
         if (hasChildren()) {
             for (IWidget child : getChildren()) {
@@ -491,8 +497,24 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         this.enabled = enabled;
     }
 
+    public boolean isExcludeAreaInJei() {
+        return this.excludeAreaInJei;
+    }
+
     public W disabled() {
         setEnabled(false);
+        return getThis();
+    }
+
+    public W excludeAreaInJei() {
+        return excludeAreaInJei(true);
+    }
+
+    public W excludeAreaInJei(boolean val) {
+        this.excludeAreaInJei = val;
+        if (isValid()) {
+            getContext().getJeiSettings().addJeiExclusionArea(this);
+        }
         return getThis();
     }
 
