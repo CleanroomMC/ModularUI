@@ -22,6 +22,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
 
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.EXTFramebufferObject;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
@@ -44,11 +45,12 @@ public class SchemaRenderer implements IDrawable {
     private boolean cameraSetup = false;
     private DoubleSupplier scale;
     private BooleanSupplier disableTESR;
-    private Consumer<IRayTracer> onRayTrace;
-    private Consumer<Projection> afterRender;
+    private BiConsumer<Projection, SchemaRenderer> afterRender;
     private BiConsumer<Camera, ISchema> cameraFunc;
     private int clearColor = 0;
     private boolean isometric = false;
+    private boolean rayTracing = false;
+    private RayTraceResult lastRayTrace = null;
 
     public SchemaRenderer(ISchema schema, Framebuffer framebuffer) {
         this.schema = schema;
@@ -65,12 +67,7 @@ public class SchemaRenderer implements IDrawable {
         return this;
     }
 
-    public SchemaRenderer onRayTrace(Consumer<IRayTracer> consumer) {
-        this.onRayTrace = consumer;
-        return this;
-    }
-
-    public SchemaRenderer afterRender(Consumer<Projection> consumer) {
+    public SchemaRenderer afterRender(BiConsumer<Projection, SchemaRenderer> consumer) {
         this.afterRender = consumer;
         return this;
     }
@@ -98,6 +95,16 @@ public class SchemaRenderer implements IDrawable {
         return this;
     }
 
+    public SchemaRenderer rayTracing(boolean rayTracing){
+        this.rayTracing = rayTracing;
+        return this;
+    }
+
+    @Nullable
+    public RayTraceResult getBlockUnderMouse(){
+        return lastRayTrace;
+    }
+
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
         render(x, y, width, height, context.getMouseX(), context.getMouseY());
@@ -118,18 +125,12 @@ public class SchemaRenderer implements IDrawable {
         int lastFbo = bindFBO();
         setupCamera(this.framebuffer.framebufferWidth, this.framebuffer.framebufferHeight);
         renderWorld();
-        if (this.onRayTrace != null && Area.isInside(x, y, width, height, mouseX, mouseY)) {
-            this.onRayTrace.accept(new IRayTracer() {
-                @Override
-                public RayTraceResult rayTrace(int screenX, int screenY) {
-                    return SchemaRenderer.this.rayTrace(Projection.INSTANCE.unProject(screenX, screenY));
-                }
-
-                @Override
-                public RayTraceResult rayTraceMousePos() {
-                    return rayTrace(mouseX, mouseY);
-                }
-            });
+        if (this.rayTracing) {
+            if (Area.isInside(x, y, width, height, mouseX, mouseY)) {
+                this.lastRayTrace = rayTrace(mouseX, mouseY, width, height);
+            } else {
+                this.lastRayTrace = null;
+            }
         }
         resetCamera();
         unbindFBO(lastFbo);
@@ -153,6 +154,21 @@ public class SchemaRenderer implements IDrawable {
         tessellator.draw();
 
         GlStateManager.bindTexture(lastFbo);
+    }
+
+    private RayTraceResult rayTrace(int mouseX, int mouseY, int width, int height) {
+        final float halfPI = (float) (Math.PI / 2);
+        Vec3d cameraPos = new Vec3d(camera.getPos().x, camera.getPos().y, camera.getPos().z);
+        float yaw = (float) camera.getYaw();
+        float pitch = (float) camera.getPitch();
+
+        Vec3d mouseXShift = new Vec3d(1, 0, 0).rotatePitch(pitch).rotateYaw(-yaw + halfPI).scale(mouseX - width / 2d).scale(1 / 32d);
+        Vec3d mouseYShift = new Vec3d(0, -1, 0).rotatePitch(pitch).rotateYaw(-yaw + halfPI).scale(mouseY - height / 2d).scale(1 / 32d);
+        Vec3d mousePos = cameraPos.add(mouseXShift).add(mouseYShift);
+        Vec3d focus = new Vec3d(camera.getLookAt().x, camera.getLookAt().y, camera.getLookAt().z);
+        double perspectiveCompensation = isometric? 1: cameraPos.distanceTo(focus) / 3 * width/100;
+        Vec3d underMousePos = focus.add(mouseXShift.scale(perspectiveCompensation)).add(mouseYShift.scale(perspectiveCompensation));
+        return schema.getWorld().rayTraceBlocks(mousePos, underMousePos);
     }
 
     private void renderWorld() {
@@ -213,7 +229,7 @@ public class SchemaRenderer implements IDrawable {
         GlStateManager.disableBlend();
         GlStateManager.depthMask(true);
         if (this.afterRender != null) {
-            this.afterRender.accept(Projection.INSTANCE);
+            this.afterRender.accept(Projection.INSTANCE, this);
         }
     }
 
@@ -311,22 +327,8 @@ public class SchemaRenderer implements IDrawable {
         OpenGlHelper.glBindFramebuffer(OpenGlHelper.GL_FRAMEBUFFER, lastID);
     }
 
-    private RayTraceResult rayTrace(Vector3f hitPos) {
-        Vec3d startPos = new Vec3d(this.camera.getPos().x, this.camera.getPos().y, this.camera.getPos().z);
-        hitPos.scale(2); // Double view range to ensure pos can be seen.
-        Vec3d endPos = new Vec3d((hitPos.x - startPos.x), (hitPos.y - startPos.y), (hitPos.z - startPos.z));
-        return this.schema.getWorld().rayTraceBlocks(startPos, endPos);
-    }
-
     public boolean isCameraSetup() {
         return cameraSetup;
-    }
-
-    public interface IRayTracer {
-
-        RayTraceResult rayTrace(int screenX, int screenY);
-
-        RayTraceResult rayTraceMousePos();
     }
 
     public interface ICamera {
