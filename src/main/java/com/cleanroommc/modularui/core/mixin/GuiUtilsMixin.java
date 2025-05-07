@@ -1,15 +1,11 @@
 package com.cleanroommc.modularui.core.mixin;
 
 import com.cleanroommc.modularui.ModularUIConfig;
-import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.screen.RichTooltip;
-import com.cleanroommc.modularui.screen.RichTooltipEvent;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.widget.sizer.Area;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.config.GuiUtils;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,16 +21,16 @@ public class GuiUtilsMixin {
     @Inject(method = "drawHoveringText(Lnet/minecraft/item/ItemStack;Ljava/util/List;IIIIILnet/minecraft/client/gui/FontRenderer;)V",
             at = @At("HEAD"), cancellable = true)
     private static void postRichTooltipEvent(ItemStack stack, List<String> textLines, int x, int y, int w, int h, int maxTextWidth, FontRenderer font, CallbackInfo ci) {
-        if (ModularUIConfig.replaceVanillaTooltips && !textLines.isEmpty()) {
+        if (ModularUIConfig.replaceVanillaTooltips) {
 
-            RichTooltip tooltip = new RichTooltip(Area.ZERO);
+            RichTooltip tooltip = new RichTooltip();
             // Other positions don't really work due to the lack of GuiContext in non-modular uis
-            tooltip.pos(RichTooltip.Pos.NEXT_TO_MOUSE);
-            textLines.forEach(line -> tooltip.addLine(IKey.str(line)));
-
-            // Post an event from ppl
-            RichTooltipEvent event = new RichTooltipEvent(stack, tooltip);
-            if (MinecraftForge.EVENT_BUS.post(event)) return; // Event canceled, returning
+            if (!stack.isEmpty() && !textLines.isEmpty()) {
+                tooltip.add(textLines.get(0)).spaceLine();
+                for (int i = 1, n = textLines.size(); i < n; i++) {
+                    tooltip.add(textLines.get(i)).newLine();
+                }
+            }
 
             tooltip.draw(GuiContext.getDefault(), stack);
             // Canceling vanilla tooltip rendering

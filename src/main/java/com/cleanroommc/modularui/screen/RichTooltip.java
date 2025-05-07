@@ -30,8 +30,8 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
 
     private static final Area HOLDER = new Area();
 
-    private final Consumer<Area> parent;
     private final RichText text = new RichText();
+    private Consumer<Area> parent;
     private Pos pos = null;
     private Consumer<RichTooltip> tooltipBuilder;
     private int showUpTimer = 0;
@@ -44,23 +44,28 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
 
     private boolean dirty;
 
-    public RichTooltip(IWidget parent) {
-        this(area -> {
-            area.setSize(parent.getArea());
-            area.setPos(0, 0);
-        });
+    public RichTooltip() {
+        parent(Area.ZERO);
     }
 
-    public RichTooltip(Area parent) {
-        this(area -> area.set(parent));
-    }
-
-    public RichTooltip(Supplier<Area> parent) {
-        this(area -> area.set(parent.get()));
-    }
-
-    public RichTooltip(Consumer<Area> parent) {
+    public RichTooltip parent(Consumer<Area> parent) {
         this.parent = parent;
+        return this;
+    }
+
+    public RichTooltip parent(Supplier<Area> parent) {
+        return parent(area -> area.set(parent.get()));
+    }
+
+    public RichTooltip parent(Area parent) {
+        return parent(area -> area.set(parent));
+    }
+
+    public RichTooltip parent(IWidget parent) {
+        return parent(area -> {
+            area.setPos(0, 0);
+            area.setSize(parent.getArea());
+        });
     }
 
     public void buildTooltip() {
@@ -94,9 +99,9 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
         this.maxWidth = Math.min(this.maxWidth, screen.width);
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
         TextRenderer renderer = TextRenderer.SHARED;
+        RichText copy = this.text.copy();
         // this only turns the text and not any drawables into strings
-        List<String> textLines = this.text.getStringRepresentation();
-        RenderTooltipEvent.Pre event = new RenderTooltipEvent.Pre(stack, textLines, mouseX, mouseY, screen.width, screen.height, this.maxWidth, TextRenderer.getFontRenderer());
+        RichTooltipEvent.Pre event = new RichTooltipEvent.Pre(stack, copy.getAsStrings(), mouseX, mouseY, screen.width, screen.height, this.maxWidth, TextRenderer.getFontRenderer(), copy);
         if (MinecraftForge.EVENT_BUS.post(event)) return; // canceled
         // we are supposed to now use the strings of the event, but we can't properly determine where to put them
         mouseX = event.getX();
@@ -105,10 +110,10 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
         this.maxWidth = event.getMaxWidth();
 
         // simulate to figure how big this tooltip is without any restrictions
-        this.text.setupRenderer(renderer, 0, 0, this.maxWidth, -1, Color.WHITE.main, false);
-        this.text.compileAndDraw(renderer, context, true);
+        copy.setupRenderer(renderer, 0, 0, this.maxWidth, -1, Color.WHITE.main, false);
+        copy.compileAndDraw(renderer, context, true);
 
-        Rectangle area = determineTooltipArea(context, renderer, screenWidth, screenHeight, mouseX, mouseY);
+        Rectangle area = determineTooltipArea(copy, context, renderer, screenWidth, screenHeight, mouseX, mouseY);
 
         GlStateManager.disableRescaleNormal();
         RenderHelper.disableStandardItemLighting();
@@ -116,19 +121,19 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
         GlStateManager.disableDepth();
         GlStateManager.disableBlend();
 
-        GuiDraw.drawTooltipBackground(stack, textLines, area.x, area.y, area.width, area.height);
+        GuiDraw.drawTooltipBackground(stack, copy.getAsStrings(), area.x, area.y, area.width, area.height, this);
 
-        MinecraftForge.EVENT_BUS.post(new RenderTooltipEvent.PostBackground(stack, textLines, area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height));
+        MinecraftForge.EVENT_BUS.post(new RichTooltipEvent.PostBackground(stack, copy.getAsStrings(), area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height, copy));
 
         GlStateManager.color(1f, 1f, 1f, 1f);
 
         renderer.setPos(area.x, area.y);
-        this.text.compileAndDraw(renderer, context, false);
+        copy.compileAndDraw(renderer, context, false);
 
-        MinecraftForge.EVENT_BUS.post(new RenderTooltipEvent.PostText(stack, textLines, area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height));
+        MinecraftForge.EVENT_BUS.post(new RichTooltipEvent.PostText(stack, copy.getAsStrings(), area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height, copy));
     }
 
-    public Rectangle determineTooltipArea(GuiContext context, TextRenderer renderer, int screenWidth, int screenHeight, int mouseX, int mouseY) {
+    public Rectangle determineTooltipArea(RichText text, GuiContext context, TextRenderer renderer, int screenWidth, int screenHeight, int mouseX, int mouseY) {
         int width = (int) renderer.getLastWidth();
         int height = (int) renderer.getLastHeight();
 
@@ -141,6 +146,12 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
             return new Rectangle(this.x, this.y, width, height);
         }
 
+        Area area = HOLDER;
+        this.parent.accept(area);
+        if (area.x == 0 && area.y == 0 && area.width == 0 && area.height == 0) {
+            pos = Pos.NEXT_TO_MOUSE;
+        }
+
         if (pos == Pos.NEXT_TO_MOUSE) {
             // vanilla style, tooltip floats next to mouse
             // note that this behaves slightly different from vanilla (better imo)
@@ -149,7 +160,7 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
             final int mouseOffset = 12;
             int x = mouseX + mouseOffset, y = mouseY - mouseOffset;
             if (x < padding) {
-                x = padding; // this cant happen mathematically since mouse is always positive
+                x = padding; // this can't happen mathematically since mouse is always positive
             } else if (x + width + padding > screenWidth) {
                 // doesn't fit on the right side of the screen
                 if (screenWidth - mouseX < mouseX) { // check if left side has more space
@@ -163,8 +174,8 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
                 }
                 // recalculate with and height
                 renderer.setPos(x, y);
-                renderer.setAlignment(this.text.getAlignment(), width, -1);
-                this.text.compileAndDraw(renderer, context, true);
+                renderer.setAlignment(text.getAlignment(), width, -1);
+                text.compileAndDraw(renderer, context, true);
                 width = (int) renderer.getLastWidth();
                 height = (int) renderer.getLastHeight();
             }
@@ -177,13 +188,11 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
             throw new IllegalStateException("Tooltip pos is " + pos.name() + ", but no widget parent is set!");
         }
 
-        int minWidth = this.text.getMinWidth();
+        int minWidth = text.getMinWidth();
 
         int shiftAmount = 10;
         int padding = 7;
 
-        Area area = HOLDER;
-        this.parent.accept(area);
         area.transformAndRectanglerize(context);
         int x = 0, y = 0;
         if (pos.axis.isVertical()) { // above or below
@@ -195,8 +204,8 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
                     x = padding;
                 } else if (x + width > screenWidth - padding) {
                     int maxWidth = Math.max(minWidth, screenWidth - x - padding);
-                    renderer.setAlignment(this.text.getAlignment(), maxWidth);
-                    this.text.compileAndDraw(renderer, context, true);
+                    renderer.setAlignment(text.getAlignment(), maxWidth);
+                    text.compileAndDraw(renderer, context, true);
                     width = (int) renderer.getLastWidth();
                     height = (int) renderer.getLastHeight();
                 }
@@ -242,8 +251,8 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
                     maxWidth = Math.max(minWidth, screenWidth - area.ex() - padding * 2);
                 }
                 usedMoreSpaceSide = true;
-                renderer.setAlignment(this.text.getAlignment(), maxWidth);
-                this.text.compileAndDraw(renderer, context, true);
+                renderer.setAlignment(text.getAlignment(), maxWidth);
+                text.compileAndDraw(renderer, context, true);
                 width = (int) renderer.getLastWidth();
                 height = (int) renderer.getLastHeight();
             }

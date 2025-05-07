@@ -1,23 +1,79 @@
 package com.cleanroommc.modularui.screen;
 
+import com.cleanroommc.modularui.api.drawable.IRichTextBuilder;
+
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
-import net.minecraftforge.fml.common.eventhandler.Event;
 
-import java.util.function.Consumer;
+import org.jetbrains.annotations.NotNull;
 
-@Cancelable
-public class RichTooltipEvent extends Event {
+import java.util.List;
 
-    protected ItemStack stack;
-    protected RichTooltip tooltip;
+public class RichTooltipEvent {
 
-    public RichTooltipEvent(ItemStack stack, RichTooltip tooltip) {
-        this.stack = stack;
-        this.tooltip = tooltip;
+    private RichTooltipEvent () {}
+
+    @Cancelable
+    public static class Pre extends RenderTooltipEvent.Pre {
+
+        private final IRichTextBuilder<?> tooltip;
+
+        public Pre(@NotNull ItemStack stack, @NotNull List<String> lines, int x, int y, int screenWidth, int screenHeight, int maxWidth,
+                   @NotNull FontRenderer fr, IRichTextBuilder<?> tooltip) {
+            super(stack, lines, x, y, screenWidth, screenHeight, maxWidth, fr);
+            this.tooltip = tooltip;
+        }
+
+        public IRichTextBuilder<?> getTooltip() {
+            return tooltip;
+        }
     }
 
-    public void addCustom(Consumer<RichTooltip> consumer) {
-        consumer.accept(tooltip);
+    public static class Color extends RenderTooltipEvent.Color {
+
+        private final IRichTextBuilder<?> tooltip;
+
+        public Color(@NotNull ItemStack stack, @NotNull List<String> lines, int x, int y,
+                     @NotNull FontRenderer fr, int background, int borderStart,
+                     int borderEnd, IRichTextBuilder<?> tooltip) {
+            super(stack, lines, x, y, fr, background, borderStart, borderEnd);
+            this.tooltip = tooltip;
+        }
+
+        public IRichTextBuilder<?> getTooltip() {
+            return tooltip;
+        }
+    }
+
+    public static class PostBackground extends RenderTooltipEvent.PostBackground {
+
+        private final IRichTextBuilder<?> tooltip;
+
+        public PostBackground(@NotNull ItemStack stack, @NotNull List<String> lines, int x, int y,
+                              @NotNull FontRenderer fr, int width, int height, IRichTextBuilder<?> tooltip) {
+            super(stack, lines, x, y, fr, width, height);
+            this.tooltip = tooltip;
+        }
+
+        public IRichTextBuilder<?> getTooltip() {
+            return tooltip;
+        }
+    }
+
+    public static class PostText extends RenderTooltipEvent.PostText {
+
+        private final IRichTextBuilder<?> tooltip;
+
+        public PostText(@NotNull ItemStack stack, @NotNull List<String> lines, int x, int y,
+                        @NotNull FontRenderer fr, int width, int height, IRichTextBuilder<?> tooltip) {
+            super(stack, lines, x, y, fr, width, height);
+            this.tooltip = tooltip;
+        }
+
+        public IRichTextBuilder<?> getTooltip() {
+            return tooltip;
+        }
     }
 }
