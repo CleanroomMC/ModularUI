@@ -127,12 +127,14 @@ public class TextRenderer {
         }
         if (!this.simulate) {
             GlStateManager.pushMatrix();
+            GlStateManager.translate(this.x, this.y, 10);
             GlStateManager.scale(this.scale, this.scale, 1f);
+            GlStateManager.translate(-this.x, -this.y, 0);
         }
-        int y0 = getStartY(height * this.scale);
+        int y0 = getStartY(height, height);
         this.lastY = y0;
         for (ITextLine line : lines) {
-            int x0 = getStartX(line.getWidth() * this.scale);
+            int x0 = getStartX(width, line.getWidth());
             if (!simulate) line.draw(context, getFontRenderer(), x0, y0, this.color, this.shadow);
             y0 += line.getHeight(getFontRenderer());
         }
@@ -209,15 +211,23 @@ public class TextRenderer {
     }
 
     protected int getStartY(float height) {
-        if (this.alignment.y > 0 && this.maxHeight > 0) {
-            return (int) (this.y + (this.maxHeight * this.alignment.y) - height * this.alignment.y);
+        return getStartY(this.maxHeight, height);
+    }
+
+    protected int getStartY(float maxHeight, float height) {
+        if (this.alignment.y > 0 && maxHeight > 0 && height != maxHeight) {
+            return (int) (this.y + (maxHeight * this.alignment.y) - height * this.alignment.y);
         }
         return this.y;
     }
 
     protected int getStartX(float lineWidth) {
-        if (this.alignment.x > 0 && this.maxWidth > 0) {
-            return (int) (this.x + (this.maxWidth * this.alignment.x) - lineWidth * this.alignment.x);
+        return getStartX(this.maxWidth, lineWidth);
+    }
+
+    protected int getStartX(float maxWidth, float lineWidth) {
+        if (this.alignment.x > 0 && maxWidth > 0) {
+            return (int) (this.x + (maxWidth * this.alignment.x) - lineWidth * this.alignment.x);
         }
         return this.x;
     }

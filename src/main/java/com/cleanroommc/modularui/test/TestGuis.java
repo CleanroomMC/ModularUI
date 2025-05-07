@@ -6,7 +6,9 @@ import com.cleanroommc.modularui.drawable.ItemDrawable;
 import com.cleanroommc.modularui.drawable.SpriteDrawable;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
 import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
+import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.GameObjectHelper;
 import com.cleanroommc.modularui.utils.SpriteHelper;
 import com.cleanroommc.modularui.utils.fakeworld.ArraySchema;
@@ -33,7 +35,7 @@ public class TestGuis extends CustomModularScreen {
 
     @Override
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {
-        return buildRichTextUI(context);
+        return buildSpriteUI(context);
     }
 
     public @NotNull ModularPanel buildSpriteUI(ModularGuiContext context) {
@@ -44,7 +46,15 @@ public class TestGuis extends CustomModularScreen {
                 .child(new DraggableWidget<>()
                         .background(new SpriteDrawable(sprite))
                         .size(20)
-                        .center());
+                        .center()
+                        .tooltipBuilder(tooltip -> {
+                            tooltip.addLine("Line 1");
+                            tooltip.addLine("Longer Line 2");
+                            tooltip.addLine("Line 3");
+                            tooltip.alignment(Alignment.Center);
+                            tooltip.scale(0.5f);
+                            tooltip.pos(RichTooltip.Pos.NEXT_TO_MOUSE);
+                        }));
     }
 
 
