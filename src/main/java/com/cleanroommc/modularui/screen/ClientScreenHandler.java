@@ -12,11 +12,11 @@ import com.cleanroommc.modularui.core.mixin.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.integration.jei.ModularUIJeiPlugin;
+import com.cleanroommc.modularui.overlay.OverlayManager;
 import com.cleanroommc.modularui.overlay.OverlayStack;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.utils.Animator;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.FpsCounter;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -24,6 +24,7 @@ import com.cleanroommc.modularui.widgets.RichTextWidget;
 import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
+import com.cleanroommc.neverenoughanimations.animations.OpeningAnimation;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -75,9 +76,32 @@ public class ClientScreenHandler {
     private static final FpsCounter fpsCounter = new FpsCounter();
     private static long ticks = 0L;
 
-    @SubscribeEvent
+    private static IMuiScreen lastMui;
+
+    // we need to know the actual gui and not some fake bs some other mod overwrites
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onGuiOpen(GuiOpenEvent event) {
         defaultContext.reset();
+        if (lastMui != null && event.getGui() == null) {
+            if (lastMui.getScreen().getPanelManager().isOpen()) {
+                lastMui.getScreen().getPanelManager().closeAll();
+            }
+            lastMui.getScreen().getPanelManager().dispose();
+            lastMui = null;
+        } else if (event.getGui() instanceof IMuiScreen screenWrapper) {
+            if (lastMui == null) {
+                lastMui = screenWrapper;
+            } else if (lastMui == event.getGui()) {
+                lastMui.getScreen().getPanelManager().reopen();
+            } else {
+                if (lastMui.getScreen().getPanelManager().isOpen()) {
+                    lastMui.getScreen().getPanelManager().closeAll();
+                }
+                lastMui.getScreen().getPanelManager().dispose();
+                lastMui = screenWrapper;
+            }
+        }
+
         if (event.getGui() instanceof IMuiScreen muiScreen) {
             Objects.requireNonNull(muiScreen.getScreen(), "ModularScreen must not be null!");
             if (currentScreen != muiScreen.getScreen()) {
@@ -94,6 +118,8 @@ public class ClientScreenHandler {
             currentScreen = null;
             lastChar = null;
         }
+
+        OverlayManager.onGuiOpen(event);
     }
 
     @SubscribeEvent
@@ -131,7 +157,7 @@ public class ClientScreenHandler {
         defaultContext.updateEventState();
         if (checkGui(event.getGui())) currentScreen.getContext().updateEventState();
         if (handleMouseInput(Mouse.getEventButton(), currentScreen, event.getGui())) {
-            if (ModularUI.isJeiLoaded()) {
+            if (ModularUI.Mods.JEI.isLoaded()) {
                 ((IngredientListOverlay) ModularUIJeiPlugin.getRuntime().getIngredientListOverlay()).setKeyboardFocus(false);
             }
             event.setCanceled(true);
@@ -191,7 +217,6 @@ public class ClientScreenHandler {
     public static void onFrameUpdate() {
         OverlayStack.foreach(ModularScreen::onFrameUpdate, true);
         if (currentScreen != null) currentScreen.onFrameUpdate();
-        Animator.advance();
     }
 
     private static boolean doAction(@Nullable ModularScreen muiScreen, Predicate<ModularScreen> action) {
@@ -276,7 +301,7 @@ public class ClientScreenHandler {
             if (currentScreen.getContext().hasDraggable()) {
                 currentScreen.getContext().dropDraggable();
             } else {
-                currentScreen.getPanelManager().closeTopPanel(true);
+                currentScreen.getPanelManager().closeTopPanel();
             }
             return true;
         }
@@ -319,17 +344,19 @@ public class ClientScreenHandler {
     }
 
     public static boolean shouldDrawWorldBackground() {
-        return ModularUI.isBlurLoaded() || Minecraft.getMinecraft().world == null;
+        return ModularUI.Mods.BLUR.isLoaded() || Minecraft.getMinecraft().world == null;
     }
 
     public static void drawDarkBackground(GuiScreen screen, int tint) {
         if (hasScreen()) {
-            float alpha = currentScreen.getMainPanel().getAlpha();
+            float alpha = ModularUI.Mods.NEA.isLoaded() ? OpeningAnimation.getValue(screen) : 1f;
             // vanilla color values as hex
             int color = 0x101010;
-            int startAlpha = 0xc0;
-            int endAlpha = 0xd0;
-            GuiDraw.drawVerticalGradientRect(0, 0, screen.width, screen.height, Color.withAlpha(color, (int) (startAlpha * alpha)), Color.withAlpha(color, (int) (endAlpha * alpha)));
+            int start = (int) (0xc0 * alpha);
+            int end = (int) (0xd0 * alpha);
+            start = Color.withAlpha(color, start);
+            end = Color.withAlpha(color, end);
+            GuiDraw.drawVerticalGradientRect(0, 0, screen.width, screen.height, start, end);
         }
     }
 
@@ -342,8 +369,10 @@ public class ClientScreenHandler {
     }
 
     public static void drawScreenInternal(ModularScreen muiScreen, GuiScreen mcScreen, int mouseX, int mouseY, float partialTicks) {
+        GlStateManager.pushMatrix(); // needed for open animation currently
         Stencil.reset();
         Stencil.apply(muiScreen.getScreenArea(), null);
+        handleAnimationScale(mcScreen);
         muiScreen.drawScreen(mouseX, mouseY, partialTicks);
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
@@ -358,6 +387,7 @@ public class ClientScreenHandler {
         GlStateManager.enableRescaleNormal();
         RenderHelper.enableStandardItemLighting();
         Stencil.remove();
+        GlStateManager.popMatrix();
     }
 
     public static void drawContainer(ModularScreen muiScreen, GuiContainer mcScreen, int mouseX, int mouseY, float partialTicks) {
@@ -369,6 +399,7 @@ public class ClientScreenHandler {
         int x = mcScreen.getGuiLeft();
         int y = mcScreen.getGuiTop();
 
+        //handleAnimationScale(mcScreen);
         acc.invokeDrawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
         muiScreen.drawScreen(mouseX, mouseY, partialTicks);
 
@@ -419,7 +450,7 @@ public class ClientScreenHandler {
                 }
             }
 
-            drawItemStack(mcScreen, itemstack, mouseX - x - 8, mouseY - y - k2, s);
+            drawItemStack(mcScreen, NEAAnimationHandler.injectVirtualCursorStack(mcScreen, itemstack), mouseX - x - 8, mouseY - y - k2, s);
         }
 
         if (!acc.getReturningStack().isEmpty()) {
@@ -436,6 +467,8 @@ public class ClientScreenHandler {
             int i2 = acc.getTouchUpY() + (int) ((float) i3 * f);
             drawItemStack(mcScreen, acc.getReturningStack(), l1, i2, null);
         }
+
+        NEAAnimationHandler.drawItemAnimation(mcScreen);
         GlStateManager.popMatrix();
         GlStateManager.enableLighting();
         GlStateManager.enableDepth();
@@ -611,6 +644,12 @@ public class ClientScreenHandler {
 
         public boolean isLate() {
             return this == LATE;
+        }
+    }
+
+    public static void handleAnimationScale(GuiScreen screen) {
+        if (ModularUI.Mods.NEA.isLoaded()) {
+            OpeningAnimation.handleScale(screen, true);
         }
     }
 }

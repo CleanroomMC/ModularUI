@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.layout.IResizeable;
+import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.value.IValue;
 import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.factory.GuiData;
@@ -26,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -34,6 +36,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     // other
     @Nullable private String debugName;
     private boolean enabled = true;
+    private boolean excludeAreaInJei = false;
     // gui context
     private boolean valid = false;
     private IWidget parent = null;
@@ -43,6 +46,8 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     private final Area area = new Area();
     private final Flex flex = new Flex(this);
     private IResizeable resizer = this.flex;
+    private BiConsumer<W, IViewportStack> transform;
+    private boolean requiresResize = false;
     // syncing
     @Nullable private IValue<?> value;
     @Nullable private String syncKey;
@@ -55,7 +60,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @Nullable private RichTooltip tooltip;
     @Nullable private String widgetThemeOverride = null;
     // listener
-    @Nullable private List<IGuiAction> guiActionListeners;
+    @Nullable private List<IGuiAction> guiActionListeners; // TODO replace with proper event system
     @Nullable private Consumer<W> onUpdateListener;
 
     // -----------------
@@ -84,6 +89,9 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         if (!getScreen().isClientOnly()) {
             initialiseSyncHandler(getScreen().getSyncManager());
         }
+        if (isExcludeAreaInJei()) {
+            getContext().getJeiSettings().addJeiExclusionArea(this);
+        }
         onInit();
         if (hasChildren()) {
             for (IWidget child : getChildren()) {
@@ -92,6 +100,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         }
         afterInit();
         onUpdate();
+        this.requiresResize = false;
     }
 
     @ApiStatus.OverrideOnly
@@ -123,7 +132,9 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
                     this.context.getScreen().removeGuiActionListener(action);
                 }
             }
-
+            if (isExcludeAreaInJei()) {
+                getContext().getJeiSettings().removeJeiExclusionArea(this);
+            }
         }
         if (hasChildren()) {
             for (IWidget child : getChildren()) {
@@ -332,6 +343,22 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     // ----------------
 
     @Override
+    public void scheduleResize() {
+        this.requiresResize = true;
+    }
+
+    @Override
+    public boolean requiresResize() {
+        return this.requiresResize;
+    }
+
+    @MustBeInvokedByOverriders
+    @Override
+    public void onResized() {
+        this.requiresResize = false;
+    }
+
+    @Override
     public Area getArea() {
         return this.area;
     }
@@ -357,6 +384,19 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         this.resizer = resizer != null ? resizer : IUnResizeable.INSTANCE;
     }
 
+    @Override
+    public void transform(IViewportStack stack) {
+        IWidget.super.transform(stack);
+        if (this.transform != null) {
+            this.transform.accept(getThis(), stack);
+        }
+    }
+
+    public W transform(BiConsumer<W, IViewportStack> transform) {
+        this.transform = transform;
+        return getThis();
+    }
+
     // -------------------
     // === Gui context ===
     // -------------------
@@ -374,7 +414,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @Override
     public @NotNull ModularPanel getPanel() {
         if (!isValid()) {
-            throw new IllegalStateException(getClass().getSimpleName() + " is not in a valid state!");
+            throw new IllegalStateException(this + " is not in a valid state!");
         }
         return this.panel;
     }
@@ -382,7 +422,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @Override
     public @NotNull IWidget getParent() {
         if (!isValid()) {
-            throw new IllegalStateException(getClass().getSimpleName() + " is not in a valid state!");
+            throw new IllegalStateException(this + " is not in a valid state!");
         }
         return this.parent;
     }
@@ -390,7 +430,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @Override
     public ModularGuiContext getContext() {
         if (!isValid()) {
-            throw new IllegalStateException(getClass().getSimpleName() + " is not in a valid state!");
+            throw new IllegalStateException(this + " is not in a valid state!");
         }
         return this.context;
     }
@@ -457,8 +497,24 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         this.enabled = enabled;
     }
 
+    public boolean isExcludeAreaInJei() {
+        return this.excludeAreaInJei;
+    }
+
     public W disabled() {
         setEnabled(false);
+        return getThis();
+    }
+
+    public W excludeAreaInJei() {
+        return excludeAreaInJei(true);
+    }
+
+    public W excludeAreaInJei(boolean val) {
+        this.excludeAreaInJei = val;
+        if (isValid()) {
+            getContext().getJeiSettings().addJeiExclusionArea(this);
+        }
         return getThis();
     }
 

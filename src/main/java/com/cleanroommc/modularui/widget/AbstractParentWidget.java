@@ -7,11 +7,10 @@ import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.widgets.VoidWidget;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 
 /**
  * A widget which can hold any amount of children.
@@ -23,12 +22,30 @@ public class AbstractParentWidget<I extends IWidget, W extends AbstractParentWid
 
     private final List<I> children = new ArrayList<>();
 
+    /**
+     * A list of all children of this widget. The list is modifiable contrary to the annotation.
+     * This just means that you shouldn't carelessly modify the list. Adding to the list also requires initialising the new child.
+     * Removing requires disposing the old child. Calling {@link #scheduleResize()} may also be expected.
+     *
+     * @return a view of all children.
+     */
+    @SuppressWarnings("unchecked")
+    @UnmodifiableView
     @NotNull
     @Override
     public List<IWidget> getChildren() {
         return (List<IWidget>) this.children;
     }
 
+    /**
+     * A list of all children of this widget with the given children type {@link I}. The list is modifiable contrary to the annotation.
+     * This just means that you shouldn't carelessly modify the list. Adding to the list also requires initialising the new child.
+     * Removing requires disposing the old child. Calling {@link #scheduleResize()} may also be expected.
+     *
+     * @return a view of all children.
+     */
+    @UnmodifiableView
+    @NotNull
     public List<I> getTypeChildren() {
         return children;
     }

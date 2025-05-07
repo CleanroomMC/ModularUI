@@ -58,7 +58,7 @@ public class SortButtons extends Widget<SortButtons> {
 
     @Override
     public boolean isEnabled() {
-        return super.isEnabled() && ModularUI.isSortModLoaded();
+        return super.isEnabled() && ModularUI.Mods.BOGOSORTER.isLoaded();
     }
 
     public String getSlotGroupName() {

@@ -48,7 +48,8 @@ public class TestGui extends CustomModularScreen {
         }
         final Map<String, SortableListWidget.Item<String>> items = new Object2ObjectOpenHashMap<>();
         for (String line : this.lines) {
-            items.put(line, new SortableListWidget.Item<>(line).child(item -> new Row()
+            items.put(line, new SortableListWidget.Item<>(line)
+                    .child(item -> new Row()
                     .child(new Widget<>()
                             .addTooltipLine(line)
                             .background(GuiTextures.BUTTON_CLEAN)

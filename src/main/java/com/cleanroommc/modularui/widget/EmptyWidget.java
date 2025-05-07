@@ -17,6 +17,7 @@ public class EmptyWidget implements IWidget {
 
     private final Area area = new Area();
     private final Flex flex = new Flex(this);
+    private boolean requiresResize = false;
     private IWidget parent;
 
     @Override
@@ -40,24 +41,19 @@ public class EmptyWidget implements IWidget {
     }
 
     @Override
-    public void drawBackground(ModularGuiContext context, WidgetTheme widgetTheme) {
-    }
+    public void drawBackground(ModularGuiContext context, WidgetTheme widgetTheme) {}
 
     @Override
-    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
-    }
+    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {}
 
     @Override
-    public void drawOverlay(ModularGuiContext context, WidgetTheme widgetTheme) {
-    }
+    public void drawOverlay(ModularGuiContext context, WidgetTheme widgetTheme) {}
 
     @Override
-    public void drawForeground(ModularGuiContext context) {
-    }
+    public void drawForeground(ModularGuiContext context) {}
 
     @Override
-    public void onUpdate() {
-    }
+    public void onUpdate() {}
 
     @Override
     public Area getArea() {
@@ -75,8 +71,22 @@ public class EmptyWidget implements IWidget {
     }
 
     @Override
-    public void setEnabled(boolean enabled) {
+    public void scheduleResize() {
+        this.requiresResize = true;
     }
+
+    @Override
+    public boolean requiresResize() {
+        return this.requiresResize;
+    }
+
+    @Override
+    public void onResized() {
+        this.requiresResize = false;
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {}
 
     @Override
     public boolean canBeSeen(IViewportStack stack) {
@@ -84,8 +94,7 @@ public class EmptyWidget implements IWidget {
     }
 
     @Override
-    public void markTooltipDirty() {
-    }
+    public void markTooltipDirty() {}
 
     @Override
     public @NotNull IWidget getParent() {
@@ -108,8 +117,7 @@ public class EmptyWidget implements IWidget {
     }
 
     @Override
-    public void resizer(IResizeable resizer) {
-    }
+    public void resizer(IResizeable resizer) {}
 
     @Override
     public Flex getFlex() {

@@ -36,4 +36,8 @@ public class SpriteHelper {
     public static List<BakedQuad> getQuadsOfItem(ItemStack item) {
         return Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(item, null, null).getQuads(null, null, 0);
     }
+
+    public static TextureAtlasSprite getDestroyBlockSprite(int stage) {
+        return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("minecraft:blocks/destroy_stage_" + stage);
+    }
 }
