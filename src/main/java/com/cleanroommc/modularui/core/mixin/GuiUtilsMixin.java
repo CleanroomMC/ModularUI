@@ -23,8 +23,9 @@ public class GuiUtilsMixin {
     private static void postRichTooltipEvent(ItemStack stack, List<String> textLines, int x, int y, int w, int h, int maxTextWidth, FontRenderer font, CallbackInfo ci) {
         if (ModularUIConfig.replaceVanillaTooltips && !textLines.isEmpty()) {
             RichTooltip tooltip = new RichTooltip();
+            tooltip.parent(area -> RichTooltip.findIngredientArea(area, x, y));
             // Other positions don't really work due to the lack of GuiContext in non-modular uis
-            tooltip.add(textLines.get(0));
+            tooltip.add(textLines.get(0)).newLine();
             if (!stack.isEmpty()) {
                 tooltip.spaceLine();
             }
