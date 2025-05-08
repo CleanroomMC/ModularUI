@@ -168,7 +168,7 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
                     if (x < padding) {
                         x = padding; // went of screen
                     }
-                    width = mouseX - 12 - x; // max space on left side
+                    width = mouseX - mouseOffset - padding; // max space on left side
                 } else {
                     width = screenWidth - padding - x; // max space on right side
                 }
