@@ -38,8 +38,7 @@ public class Area extends Rectangle implements IUnResizeable {
     private final Box margin = new Box();
     private final Box padding = new Box();
 
-    public Area() {
-    }
+    public Area() {}
 
     public Area(int x, int y, int w, int h) {
         super(x, y, w, h);
@@ -438,7 +437,7 @@ public class Area extends Rectangle implements IUnResizeable {
 
     /**
      * Transforms the four corners of this rectangle with the given pose stack. The new rectangle can be rotated.
-     * Then a min fit rectangle, which is not rotated and aligned with the screen, is put around the corner.
+     * Then a min fit rectangle, which is not rotated and aligned with the screen, is put around the corners.
      *
      * @param stack pose stack
      */

@@ -10,6 +10,7 @@
     "GuiContainerAccessor",
     "GuiContainerMixin",
     "GuiScreenAccessor",
+    "GuiUtilsMixin",
     "KeyBindAccess",
     "MinecraftMixin"
   ],

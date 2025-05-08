@@ -1,6 +1,8 @@
 package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
+import com.cleanroommc.modularui.screen.RichTooltip;
+import com.cleanroommc.modularui.screen.RichTooltipEvent;
 import com.cleanroommc.modularui.utils.Color;
 
 import net.minecraft.client.Minecraft;
@@ -19,6 +21,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
@@ -592,12 +595,17 @@ public class GuiDraw {
         GlStateManager.enableBlend();
     }
 
-    public static void drawTooltipBackground(ItemStack stack, List<String> lines, int x, int y, int textWidth, int height) {
+    public static void drawTooltipBackground(ItemStack stack, List<String> lines, int x, int y, int textWidth, int height, @Nullable RichTooltip tooltip) {
         // TODO theme color
         int backgroundColor = 0xF0100010;
         int borderColorStart = 0x505000FF;
         int borderColorEnd = (borderColorStart & 0xFEFEFE) >> 1 | borderColorStart & 0xFF000000;
-        RenderTooltipEvent.Color colorEvent = new RenderTooltipEvent.Color(stack, lines, x, y, TextRenderer.getFontRenderer(), backgroundColor, borderColorStart, borderColorEnd);
+        RenderTooltipEvent.Color colorEvent;
+        if (tooltip != null) {
+            colorEvent = new RichTooltipEvent.Color(stack, lines, x, y, TextRenderer.getFontRenderer(), backgroundColor, borderColorStart, borderColorEnd, tooltip);
+        } else {
+            colorEvent = new RenderTooltipEvent.Color(stack, lines, x, y, TextRenderer.getFontRenderer(), backgroundColor, borderColorStart, borderColorEnd);
+        }
         MinecraftForge.EVENT_BUS.post(colorEvent);
         backgroundColor = colorEvent.getBackground();
         borderColorStart = colorEvent.getBorderStart();
