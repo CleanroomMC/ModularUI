@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.widgets.slot;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
@@ -17,7 +16,7 @@ import java.util.Collections;
  */
 public class ModularCraftingSlot extends ModularSlot {
 
-    private InventoryCrafting craftMatrix;
+    private InventoryCraftingWrapper craftMatrix;
     private IRecipe recipeUsed;
     private int amountCrafted;
 
@@ -75,6 +74,13 @@ public class ModularCraftingSlot extends ModularSlot {
     }
 
     @Override
+    public void onCraftShiftClick(EntityPlayer player, ItemStack stack) {
+        if (!stack.isEmpty()) {
+            player.dropItem(stack, false);
+        }
+    }
+
+    @Override
     public @NotNull ItemStack onTake(@NotNull EntityPlayer thePlayer, @NotNull ItemStack stack) {
         net.minecraftforge.common.ForgeHooks.setCraftingPlayer(thePlayer);
         NonNullList<ItemStack> nonnulllist = CraftingManager.getRemainingItems(this.craftMatrix, thePlayer.world);
@@ -85,22 +91,22 @@ public class ModularCraftingSlot extends ModularSlot {
             ItemStack itemstack1 = nonnulllist.get(i);
 
             if (!itemstack.isEmpty()) {
-                this.craftMatrix.decrStackSize(i, 1);
+                this.craftMatrix.decrStackSize(i, 1, false);
                 itemstack = this.craftMatrix.getStackInSlot(i);
             }
 
             if (!itemstack1.isEmpty()) {
                 if (itemstack.isEmpty()) {
-                    this.craftMatrix.setInventorySlotContents(i, itemstack1);
+                    this.craftMatrix.setSlot(i, itemstack1, false);
                 } else if (ItemStack.areItemsEqual(itemstack, itemstack1) && ItemStack.areItemStackTagsEqual(itemstack, itemstack1)) {
                     itemstack1.grow(itemstack.getCount());
-                    this.craftMatrix.setInventorySlotContents(i, itemstack1);
+                    this.craftMatrix.setSlot(i, itemstack1, false);
                 } else if (!thePlayer.inventory.addItemStackToInventory(itemstack1)) {
                     thePlayer.dropItem(itemstack1, false);
                 }
             }
         }
-
+        this.craftMatrix.notifyContainer();
         return stack;
     }
 
@@ -113,7 +119,7 @@ public class ModularCraftingSlot extends ModularSlot {
         this.recipeUsed = recipeUsed;
     }
 
-    public void setCraftMatrix(InventoryCrafting craftMatrix) {
+    public void setCraftMatrix(InventoryCraftingWrapper craftMatrix) {
         this.craftMatrix = craftMatrix;
     }
 }
