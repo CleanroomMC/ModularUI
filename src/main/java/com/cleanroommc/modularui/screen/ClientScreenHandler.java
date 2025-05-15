@@ -486,13 +486,15 @@ public class ClientScreenHandler {
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
         int screenH = muiScreen.getScreenArea().height;
         int color = Color.argb(180, 40, 115, 220);
-        int lineY = screenH - 13;
-        Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Mouse Pos: " + mouseX + ", " + mouseY, 5, lineY, color);
-        lineY -= 11;
-        Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("FPS: " + fpsCounter.getFps(), 5, screenH - 24, color);
+        float scale = 0.80f;
+        int shift = (int) (11 * scale + 0.5f);
+        int lineY = screenH - shift - 2;
+        GuiDraw.drawText("Mouse Pos: " + mouseX + ", " + mouseY, 5, lineY, scale, color, true);
+        lineY -= shift;
+        GuiDraw.drawText("FPS: " + fpsCounter.getFps(), 5, lineY, scale, color, true);
         LocatedWidget locatedHovered = muiScreen.getPanelManager().getTopWidgetLocated(true);
         if (locatedHovered != null) {
-            drawSegmentLine(lineY -= 4, color);
+            drawSegmentLine(lineY -= 4, scale, color);
             lineY -= 10;
 
             IGuiElement hovered = locatedHovered.getElement();
@@ -503,43 +505,43 @@ public class ClientScreenHandler {
             Area area = hovered.getArea();
             IGuiElement parent = hovered.getParent();
 
-            GuiDraw.drawBorder(0, 0, area.width, area.height, color, 1f);
+            GuiDraw.drawBorder(0, 0, area.width, area.height, color, scale);
             if (hovered.hasParent()) {
-                GuiDraw.drawBorder(-area.rx, -area.ry, parent.getArea().width, parent.getArea().height, Color.withAlpha(color, 0.3f), 1f);
+                GuiDraw.drawBorder(-area.rx, -area.ry, parent.getArea().width, parent.getArea().height, Color.withAlpha(color, 0.3f), scale);
             }
             GlStateManager.popMatrix();
             locatedHovered.unapplyMatrix(context);
-            GuiDraw.drawText("Pos: " + area.x + ", " + area.y + "  Rel: " + area.rx + ", " + area.ry, 5, lineY, 1, color, false);
-            lineY -= 11;
-            GuiDraw.drawText("Size: " + area.width + ", " + area.height, 5, lineY, 1, color, false);
-            lineY -= 11;
-            GuiDraw.drawText("Class: " + hovered, 5, lineY, 1, color, false);
+            GuiDraw.drawText("Pos: " + area.x + ", " + area.y + "  Rel: " + area.rx + ", " + area.ry, 5, lineY, scale, color, true);
+            lineY -= shift;
+            GuiDraw.drawText("Size: " + area.width + ", " + area.height, 5, lineY, scale, color, true);
+            lineY -= shift;
+            GuiDraw.drawText("Class: " + hovered, 5, lineY, scale, color, true);
             if (hovered.hasParent()) {
-                drawSegmentLine(lineY -= 4, color);
+                drawSegmentLine(lineY -= 4, scale, color);
                 lineY -= 10;
                 area = parent.getArea();
-                GuiDraw.drawText("Parent size: " + area.width + ", " + area.height, 5, lineY, 1, color, false);
-                lineY -= 11;
-                GuiDraw.drawText("Parent: " + parent, 5, lineY, 1, color, false);
+                GuiDraw.drawText("Parent size: " + area.width + ", " + area.height, 5, lineY, scale, color, true);
+                lineY -= shift;
+                GuiDraw.drawText("Parent: " + parent, 5, lineY, scale, color, true);
             }
             if (hovered instanceof ItemSlot slotWidget) {
-                drawSegmentLine(lineY -= 4, color);
+                drawSegmentLine(lineY -= 4, scale, color);
                 lineY -= 10;
                 ModularSlot slot = slotWidget.getSlot();
-                GuiDraw.drawText("Slot Index: " + slot.getSlotIndex(), 5, lineY, 1, color, false);
-                lineY -= 11;
-                GuiDraw.drawText("Slot Number: " + slot.slotNumber, 5, lineY, 1, color, false);
-                lineY -= 11;
+                GuiDraw.drawText("Slot Index: " + slot.getSlotIndex(), 5, lineY, scale, color, false);
+                lineY -= shift;
+                GuiDraw.drawText("Slot Number: " + slot.slotNumber, 5, lineY, scale, color, false);
+                lineY -= shift;
                 if (slotWidget.isSynced()) {
                     SlotGroup slotGroup = slot.getSlotGroup();
                     boolean allowShiftTransfer = slotGroup != null && slotGroup.allowShiftTransfer();
-                    GuiDraw.drawText("Shift-Click Priority: " + (allowShiftTransfer ? slotGroup.getShiftClickPriority() : "DISABLED"), 5, lineY, 1, color, false);
+                    GuiDraw.drawText("Shift-Click Priority: " + (allowShiftTransfer ? slotGroup.getShiftClickPriority() : "DISABLED"), 5, lineY, scale, color, true);
                 }
             } else if (hovered instanceof RichTextWidget richTextWidget) {
-                drawSegmentLine(lineY -= 4, color);
+                drawSegmentLine(lineY -= 4, scale, color);
                 lineY -= 10;
                 Object hoveredElement = richTextWidget.getHoveredElement();
-                GuiDraw.drawText("Hovered: " + hoveredElement, 5, lineY, 1, color, false);
+                GuiDraw.drawText("Hovered: " + hoveredElement, 5, lineY, scale, color, true);
             }
         }
         // dot at mouse pos
@@ -547,8 +549,8 @@ public class ClientScreenHandler {
         GlStateManager.color(1f, 1f, 1f, 1f);
     }
 
-    private static void drawSegmentLine(int y, int color) {
-        GuiDraw.drawRect(5, y, 140, 1, color);
+    private static void drawSegmentLine(int y, float scale, int color) {
+        GuiDraw.drawRect(5, y, 140 * scale, 1 * scale, color);
     }
 
     public static void updateGuiArea(GuiContainer container, Rectangle area) {
