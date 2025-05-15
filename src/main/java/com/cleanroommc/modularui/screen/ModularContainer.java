@@ -459,7 +459,6 @@ public class ModularContainer extends Container implements ISortableContainer {
         // now insert into the first phantom slot we can find (will be non-empty)
         // unfortunately, when all phantom slots are used it will always overwrite the first one
         for (ModularSlot toSlot : getShiftClickSlots()) {
-            ItemStack itemstack = toSlot.getStack();
             SlotGroup slotGroup = Objects.requireNonNull(toSlot.getSlotGroup());
             if (slotGroup != fromSlotGroup && toSlot.isPhantom() && toSlot.isEnabled() && toSlot.isItemValid(fromStack)) {
                 // don't check for stackable, just overwrite
