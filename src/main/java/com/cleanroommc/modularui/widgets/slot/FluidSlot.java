@@ -176,11 +176,10 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
         return ITheme.getDefault().getFluidSlotTheme().getSlotHoverColor();
     }
 
-    @NotNull
     @Override
-    public Result onMouseTapped(int mouseButton) {
+    public @NotNull Result onMousePressed(int mouseButton) {
         if (!this.syncHandler.canFillSlot() && !this.syncHandler.canDrainSlot()) {
-            return Result.IGNORE;
+            return Result.ACCEPT;
         }
         ItemStack cursorStack = Minecraft.getMinecraft().player.inventory.getItemStack();
         if (this.syncHandler.isPhantom() || (!cursorStack.isEmpty() && cursorStack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null))) {
