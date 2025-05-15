@@ -108,6 +108,7 @@ public class GenericMapSyncHandler<K, V> extends ValueSyncHandler<Map<K, V>> {
     }
 
     public static class Builder<K, V> {
+
         private Supplier<Map<K, V>> getter;
         private Consumer<Map<K, V>> setter;
         private IByteBufDeserializer<K> keyDeserializer;

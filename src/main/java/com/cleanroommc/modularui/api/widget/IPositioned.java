@@ -366,14 +366,30 @@ public interface IPositioned<W extends IPositioned<W>> {
         return getThis();
     }
 
+    default W alignX(Alignment alignment) {
+        return alignX(alignment.x);
+    }
+
     default W alignY(float val) {
         topRel(val).anchorTop(val);
         return getThis();
     }
 
+    default W alignY(Alignment alignment) {
+        return alignY(alignment.y);
+    }
+
     default W align(Alignment alignment) {
-        return alignX(alignment.x).
-                alignY(alignment.y);
+        return alignX(alignment).
+                alignY(alignment);
+    }
+
+    default W horizontalCenter() {
+        return alignX(Alignment.CENTER);
+    }
+
+    default W verticalCenter() {
+        return alignY(Alignment.CENTER);
     }
 
     default W center() {
