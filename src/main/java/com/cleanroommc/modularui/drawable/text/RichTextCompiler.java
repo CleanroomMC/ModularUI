@@ -63,7 +63,9 @@ public class RichTextCompiler {
             if (o instanceof IKey key) {
                 if (key == IKey.EMPTY) continue;
                 if (key == IKey.SPACE) {
-                    addLineElement(key.get());
+                    text = key.get();
+                    addLineElement(text);
+                    x += fr.getStringWidth(text); // space is typically 4 pixels
                     continue;
                 }
                 if (key == IKey.LINE_FEED) {
@@ -209,7 +211,7 @@ public class RichTextCompiler {
         for (; i >= 0; i--) {
             if (!Character.isWhitespace(s.charAt(i))) break;
         }
-        if (i < s.length() - 1) s = s.substring(0, i);
+        if (i < s.length() - 1) s = s.substring(0, i + 1);
         return s;
     }
 
