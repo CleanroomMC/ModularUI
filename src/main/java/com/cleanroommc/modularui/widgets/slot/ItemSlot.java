@@ -217,8 +217,10 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             }
         }
 
-        ((GuiAccessor) guiScreen).setZLevel(100f);
-        renderItem.zLevel = 100.0F;
+        // makes sure items of different layers don't interfere with each other visually
+        float z = getContext().getCurrentDrawingZ() + 100;
+        ((GuiAccessor) guiScreen).setZLevel(z);
+        renderItem.zLevel = z;
 
         if (!flag1) {
             if (isDragPreview) {

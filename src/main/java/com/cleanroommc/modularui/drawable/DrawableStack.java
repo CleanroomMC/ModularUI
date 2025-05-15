@@ -10,13 +10,16 @@ import com.google.gson.JsonObject;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class DrawableArray implements IDrawable, IJsonSerializable {
+/**
+ * A stack of {@link IDrawable} backed by an array which are drawn on top of each other.
+ */
+public class DrawableStack implements IDrawable, IJsonSerializable {
 
     public static final IDrawable[] EMPTY_BACKGROUND = {};
 
     private final IDrawable[] drawables;
 
-    public DrawableArray(IDrawable... drawables) {
+    public DrawableStack(IDrawable... drawables) {
         this.drawables = drawables == null || drawables.length == 0 ? EMPTY_BACKGROUND : drawables;
     }
 

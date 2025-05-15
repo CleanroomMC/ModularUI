@@ -83,6 +83,8 @@ public class ModularSlot extends SlotItemHandler {
         if (!init && isInitialized()) getSyncHandler().getSyncManager().getContainer().onSlotChanged(this, itemStack, onlyChangedAmount);
     }
 
+    public void onCraftShiftClick(EntityPlayer player, ItemStack stack) {}
+
     @Override
     public void putStack(@NotNull ItemStack stack) {
         if (ItemStack.areItemStacksEqual(stack, getStack())) return;

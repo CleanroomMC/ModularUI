@@ -337,7 +337,7 @@ public class GuiDraw {
         tessellator.draw();
     }
 
-    public static void drawItem(ItemStack item, int x, int y, float width, float height) {
+    public static void drawItem(ItemStack item, int x, int y, float width, float height, int z) {
         if (item.isEmpty()) return;
         GlStateManager.pushMatrix();
         RenderHelper.enableGUIStandardItemLighting();
@@ -345,7 +345,7 @@ public class GuiDraw {
         GlStateManager.translate(x, y, 0);
         GlStateManager.scale(width / 16f, height / 16f, 1);
         RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
-        renderItem.zLevel = 200;
+        renderItem.zLevel = z + 100;
         renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().player, item, 0, 0);
         renderItem.zLevel = 0;
         GlStateManager.disableDepth();

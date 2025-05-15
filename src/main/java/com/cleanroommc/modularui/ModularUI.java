@@ -20,6 +20,7 @@ import java.util.function.Predicate;
 @Mod(modid = ModularUI.ID,
         name = ModularUI.NAME,
         version = ModularUI.VERSION,
+        acceptedMinecraftVersions = "[1.12,)",
         dependencies = "required-after:mixinbooter@[8.0,);" +
                 "after:bogorter@[1.4.0,);")
 public class ModularUI {
