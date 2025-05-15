@@ -64,9 +64,9 @@ public class GenericSetSyncHandler<T> extends GenericCollectionSyncHandler<T, Se
     public static class Builder<T> extends GenericCollectionSyncHandler.Builder<T, Set<T>, Builder<T>> {
 
         public GenericSetSyncHandler<T> build() {
-            if (this.getter == null) throw new NullPointerException("Getter in GenericListSyncHandler must not be null");
-            if (this.deserializer == null) throw new NullPointerException("Deserializer in GenericListSyncHandler must not be null");
-            if (this.serializer == null) throw new NullPointerException("Serializer in GenericListSyncHandler must not be null");
+            if (this.getter == null) throw new NullPointerException("Getter in GenericSetSyncHandler must not be null");
+            if (this.deserializer == null) throw new NullPointerException("Deserializer in GenericSetSyncHandler must not be null");
+            if (this.serializer == null) throw new NullPointerException("Serializer in GenericSetSyncHandler must not be null");
             return new GenericSetSyncHandler<>(this.getter, this.setter, this.deserializer, this.serializer, this.copy);
         }
     }
