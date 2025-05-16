@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.api.layout;
 
 import com.cleanroommc.modularui.screen.viewport.TransformationMatrix;
+import com.cleanroommc.modularui.utils.Matrix4f;
 import com.cleanroommc.modularui.utils.Vector3f;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
@@ -110,6 +111,8 @@ public interface IViewportStack {
      * @param y y scale factor
      */
     void scale(float x, float y);
+
+    void multiply(Matrix4f matrix);
 
     /**
      * Resets the top matrix to the matrix below.

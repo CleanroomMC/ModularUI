@@ -42,8 +42,7 @@ public class Unit {
 
     public State state = State.UNUSED;
 
-    public Unit() {
-    }
+    public Unit() {}
 
     public void reset() {
         this.state = State.UNUSED;
