@@ -108,8 +108,7 @@ public interface Interactable {
      * @param mouseButton    mouse button that drags
      * @param timeSinceClick time since drag began
      */
-    default void onMouseDrag(int mouseButton, long timeSinceClick) {
-    }
+    default void onMouseDrag(int mouseButton, long timeSinceClick) {}
 
     /**
      * @return if left or right ctrl/cmd is pressed

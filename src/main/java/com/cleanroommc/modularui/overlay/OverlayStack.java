@@ -58,9 +58,9 @@ public class OverlayStack {
             screen.getContext().updateState(mouseX, mouseY, partialTicks);
             GlStateManager.enableBlend();
             GlStateManager.color(1f, 1f, 1f, 1f);
-            screen.drawScreen(mouseX, mouseY, partialTicks);
+            screen.drawScreen();
             GlStateManager.color(1f, 1f, 1f, 1f);
-            screen.drawForeground(partialTicks);
+            screen.drawForeground();
             if (screen.getContext().getHovered() != null) hovered = screen;
             fallback = screen;
         }
