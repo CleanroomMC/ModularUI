@@ -246,15 +246,9 @@ public class ModularContainer extends Container implements ISortableContainer {
                 }
 
                 if (NEAAnimationHandler.shouldHandleNEA(this)) {
-                    // TODO
-                    returnable = NEAAnimationHandler.injectQuickMove(this, slotId, fromSlot);
+                    returnable = NEAAnimationHandler.injectQuickMove(this, player, slotId, fromSlot);
                 } else {
-                    // looping so that crafting works properly
-                    ItemStack remainder;
-                    do {
-                        remainder = transferStackInSlot(player, slotId);
-                        returnable = Platform.copyStack(remainder);
-                    } while (!Platform.isStackEmpty(remainder) && ItemHandlerHelper.canItemStacksStack(fromSlot.getStack(), remainder));
+                    returnable = handleQuickMove(player, slotId, fromSlot);
                 }
             } else {
                 Slot clickedSlot = getSlot(slotId);
@@ -327,6 +321,17 @@ public class ModularContainer extends Container implements ISortableContainer {
 
     protected final @NotNull ItemStack superSlotClick(int slotId, int mouseButton, @NotNull ClickType clickTypeIn, @NotNull EntityPlayer player) {
         return super.slotClick(slotId, mouseButton, clickTypeIn, player);
+    }
+
+    public final ItemStack handleQuickMove(EntityPlayer player, int slotId, Slot fromSlot) {
+        // looping so that crafting works properly
+        ItemStack returnable;
+        ItemStack remainder;
+        do {
+            remainder = transferStackInSlot(player, slotId);
+            returnable = Platform.copyStack(remainder);
+        } while (!Platform.isStackEmpty(remainder) && ItemHandlerHelper.canItemStacksStack(fromSlot.getStack(), remainder));
+        return returnable;
     }
 
     @Override

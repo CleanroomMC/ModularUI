@@ -17,6 +17,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
@@ -31,13 +32,13 @@ public class NEAAnimationHandler {
         return ModularUI.Mods.NEA.isLoaded() && NetworkUtils.isClient(container.getPlayer());
     }
 
-    public static ItemStack injectQuickMove(ModularContainer container, int slotId, Slot slot) {
+    public static ItemStack injectQuickMove(ModularContainer container, EntityPlayer player, int slotId, Slot slot) {
         if (slot == null || !slot.getHasStack()) {
             return ItemStack.EMPTY;
         }
         ItemStack oldStack = slot.getStack().copy();
         Pair<List<Slot>, List<ItemStack>> candidates = ItemMoveAnimation.getCandidates(slot, container.inventorySlots);
-        ItemStack returnable = container.transferStackInSlot(container.getPlayer(), slotId);
+        ItemStack returnable = container.handleQuickMove(player, slotId, slot);
         if (candidates != null) ItemMoveAnimation.handleMove(slot, oldStack, candidates);
         return returnable;
     }

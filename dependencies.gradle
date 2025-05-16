@@ -23,6 +23,6 @@
  */
 dependencies {
     embed 'org.mariuszgromada.math:MathParser.org-mXparser:6.1.0'
-    //implementation rfg.deobf("curse.maven:neverenoughanimation-1062347:6325536-sources-6325537")
-    implementation("com.cleanroommc:neverenoughanimations:1.0.6") { transitive false }
+    implementation rfg.deobf("curse.maven:neverenoughanimation-1062347:6533650-sources-6533651")
+    //implementation("com.cleanroommc:neverenoughanimations:1.0.6") { transitive false }
 }

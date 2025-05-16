@@ -11,8 +11,6 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.input.Cursor;
-import org.lwjgl.input.Mouse;
 import org.mariuszgromada.math.mxparser.License;
 
 import java.util.function.Predicate;
@@ -22,7 +20,8 @@ import java.util.function.Predicate;
         version = ModularUI.VERSION,
         acceptedMinecraftVersions = "[1.12,)",
         dependencies = "required-after:mixinbooter@[8.0,);" +
-                "after:bogorter@[1.4.0,);")
+                "after:bogorter@[1.4.0,);" +
+                "after:neverenoughanimations@[1.0.6,)")
 public class ModularUI {
 
     public static final String ID = MuiTags.MODID;
