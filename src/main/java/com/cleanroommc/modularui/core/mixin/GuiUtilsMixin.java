@@ -22,18 +22,7 @@ public class GuiUtilsMixin {
             at = @At("HEAD"), cancellable = true)
     private static void postRichTooltipEvent(ItemStack stack, List<String> textLines, int x, int y, int w, int h, int maxTextWidth, FontRenderer font, CallbackInfo ci) {
         if (ModularUIConfig.replaceVanillaTooltips && !textLines.isEmpty()) {
-            RichTooltip tooltip = new RichTooltip();
-            tooltip.parent(area -> RichTooltip.findIngredientArea(area, x, y));
-            // Other positions don't really work due to the lack of GuiContext in non-modular uis
-            tooltip.add(textLines.get(0)).newLine();
-            if (!stack.isEmpty()) {
-                tooltip.spaceLine();
-            }
-            for (int i = 1, n = textLines.size(); i < n; i++) {
-                tooltip.add(textLines.get(i)).newLine();
-            }
-
-            tooltip.draw(GuiContext.getDefault(), stack);
+            RichTooltip.injectRichTooltip(stack, textLines, x, y);
             // Canceling vanilla tooltip rendering
             ci.cancel();
         }

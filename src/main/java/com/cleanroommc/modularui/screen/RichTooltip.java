@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.drawable.IRichTextBuilder;
+import com.cleanroommc.modularui.api.drawable.ITextLine;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.text.RichText;
@@ -26,6 +27,7 @@ import net.minecraftforge.common.MinecraftForge;
 
 import mezz.jei.input.IClickedIngredient;
 import mezz.jei.input.IShowsRecipeFocuses;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
@@ -122,10 +124,10 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
 
         Rectangle area = determineTooltipArea(copy, context, renderer, screenWidth, screenHeight, mouseX, mouseY);
         renderer.setPos(area.x, area.y);
-        renderer.setAlignment(copy.getAlignment(), area.width, -1);
-        copy.compileAndDraw(renderer, context, true);
-        area.width = (int) renderer.getLastWidth();
-        area.height = (int) renderer.getLastHeight();
+        renderer.setAlignment(copy.getAlignment(), (float) Math.ceil(area.width + copy.getScale()), -1);
+        List<ITextLine> compiledLines = copy.compileAndDraw(renderer, context, true);
+        area.width = (int) renderer.getLastTrimmedWidth();
+        area.height = (int) renderer.getLastTrimmedHeight();
 
         GlStateManager.disableRescaleNormal();
         RenderHelper.disableStandardItemLighting();
@@ -140,14 +142,15 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
         GlStateManager.color(1f, 1f, 1f, 1f);
 
         renderer.setPos(area.x, area.y);
-        copy.compileAndDraw(renderer, context, false);
+        renderer.setSimulate(false);
+        renderer.drawCompiled(context, compiledLines);
 
         MinecraftForge.EVENT_BUS.post(new RichTooltipEvent.PostText(stack, copy.getAsStrings(), area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height, copy));
     }
 
     public Rectangle determineTooltipArea(RichText text, GuiContext context, TextRenderer renderer, int screenWidth, int screenHeight, int mouseX, int mouseY) {
-        int width = (int) renderer.getLastWidth();
-        int height = (int) renderer.getLastHeight();
+        int width = (int) renderer.getLastTrimmedWidth();
+        int height = (int) renderer.getLastTrimmedHeight();
         if (width > screenWidth - 14) {
             width = screenWidth - 14;
         }
@@ -191,8 +194,8 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
                 renderer.setPos(x, y);
                 renderer.setAlignment(text.getAlignment(), width, -1);
                 text.compileAndDraw(renderer, context, true);
-                width = (int) renderer.getLastWidth();
-                height = (int) renderer.getLastHeight();
+                width = (int) renderer.getLastTrimmedWidth();
+                height = (int) renderer.getLastTrimmedHeight();
             }
             y = MathHelper.clamp(y, padding, screenHeight - padding - height);
             return new Rectangle(x, y, width, height);
@@ -256,8 +259,8 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
                 usedMoreSpaceSide = true;
                 renderer.setAlignment(text.getAlignment(), maxWidth);
                 text.compileAndDraw(renderer, context, true);
-                width = (int) renderer.getLastWidth();
-                height = (int) renderer.getLastHeight();
+                width = (int) renderer.getLastTrimmedWidth();
+                height = (int) renderer.getLastTrimmedHeight();
             }
 
             if (oPos == Pos.HORIZONTAL && !usedMoreSpaceSide) {
@@ -343,7 +346,7 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
 
     public RichTooltip addFromItem(ItemStack item) {
         List<String> lines = MCHelper.getItemToolTip(item);
-        add(lines.get(0));
+        add(lines.get(0)).newLine();
         if (lines.size() > 1) {
             spaceLine();
             for (int i = 1, n = lines.size(); i < n; i++) {
@@ -363,7 +366,7 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
         return this;
     }
 
-    public static void findIngredientArea(Area area, int x, int y) {
+    private static void findIngredientArea(Area area, int x, int y) {
         GuiScreen screen = MCHelper.getCurrentScreen();
         if (screen instanceof GuiContainer guiContainer) {
             Slot slot = guiContainer.getSlotUnderMouse();
@@ -390,6 +393,24 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
             }
         }
         area.set(Area.ZERO);
+    }
+
+    @ApiStatus.Internal
+    public static void injectRichTooltip(ItemStack stack, List<String> lines, int x, int y) {
+        RichTooltip tooltip = new RichTooltip();
+        tooltip.parent(area -> RichTooltip.findIngredientArea(area, x, y));
+        // Other positions don't really work due to the lack of GuiContext in non-modular uis
+        tooltip.add(lines.get(0)).newLine();
+        if (lines.size() > 1) {
+            if (!stack.isEmpty()) {
+                tooltip.spaceLine();
+            }
+            for (int i = 1, n = lines.size(); i < n; i++) {
+                tooltip.add(lines.get(i)).newLine();
+            }
+        }
+
+        tooltip.draw(GuiContext.getDefault(), stack);
     }
 
     public enum Pos {

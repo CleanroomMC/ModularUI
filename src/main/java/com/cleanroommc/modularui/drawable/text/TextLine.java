@@ -40,4 +40,9 @@ public class TextLine implements ITextLine {
         if (x < lastX || x > lastX + getWidth()) return Boolean.FALSE; // not hovering, but we know that nothing else is hovered either
         return this.text;
     }
+
+    @Override
+    public String toString() {
+        return text;
+    }
 }

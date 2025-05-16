@@ -85,4 +85,19 @@ public class ComposedLine implements ITextLine {
         }
         return null;
     }
+
+    @Override
+    public String toString() {
+        if (this.elements.isEmpty()) return "[empty]";
+        StringBuilder builder = new StringBuilder("[");
+        for (Object o : this.elements) {
+            if (o instanceof String s) {
+                builder.append('"').append(s).append('"').append(", ");
+            } else {
+                builder.append(o).append(", ");
+            }
+        }
+        builder.delete(builder.length() - 2, builder.length());
+        return builder.append("]").toString();
+    }
 }
