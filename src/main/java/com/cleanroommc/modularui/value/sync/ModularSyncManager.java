@@ -32,7 +32,7 @@ public class ModularSyncManager {
 
     private final Map<String, PanelSyncManager> panelSyncManagerMap = new Object2ObjectOpenHashMap<>();
     // A set of all panels which have been opened during the ui. May also contain closed panels.
-    // This is used to detect if
+    // This is used to detect if packets are arriving too late
     private final Set<String> panelHistory = new ObjectOpenHashSet<>();
     private PanelSyncManager mainPSM;
     private final ModularContainer container;
