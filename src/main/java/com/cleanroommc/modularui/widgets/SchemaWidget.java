@@ -11,6 +11,7 @@ import com.cleanroommc.modularui.utils.fakeworld.SchemaRenderer;
 import com.cleanroommc.modularui.widget.Widget;
 
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -136,6 +137,10 @@ public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
     @Override
     public @Nullable IDrawable getOverlay() {
         return schema;
+    }
+
+    public RayTraceResult getBlockUnderMouse() {
+        return schema.getBlockUnderMouse();
     }
 
     public static class LayerButton extends ButtonWidget<LayerButton> {
