@@ -74,6 +74,7 @@ public class Platform {
 
     public static void setupDrawItem() {
         setupDrawTex();
+        GlStateManager.enableRescaleNormal();
         RenderHelper.enableGUIStandardItemLighting();
         GlStateManager.enableDepth();
     }
@@ -98,7 +99,7 @@ public class Platform {
         LINE_LOOP(GL11.GL_LINE_LOOP),
         TRIANGLES(GL11.GL_TRIANGLES),
         TRIANGLE_STRIP(GL11.GL_TRIANGLE_STRIP),
-        TRIANGLE_FAN(GL11.GL_TRIANGLE_FAN),;
+        TRIANGLE_FAN(GL11.GL_TRIANGLE_FAN);
 
         public final int mode;
 
