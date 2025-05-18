@@ -27,6 +27,7 @@ public class GenericSetSyncHandler<T> extends GenericCollectionSyncHandler<T, Se
 
     public GenericSetSyncHandler(@NotNull Supplier<Set<T>> getter, @Nullable Consumer<Set<T>> setter, @NotNull IByteBufDeserializer<T> deserializer, @NotNull IByteBufSerializer<T> serializer, @Nullable ICopy<T> copy) {
         super(getter, setter, deserializer, serializer, null, copy);
+        setCache(getter.get());
     }
 
     @Override

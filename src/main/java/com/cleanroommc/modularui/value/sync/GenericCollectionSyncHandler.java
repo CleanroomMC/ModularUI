@@ -33,7 +33,6 @@ public abstract class GenericCollectionSyncHandler<T, C extends Collection<T>> e
                                         @Nullable IEquals<T> equals,
                                         @Nullable ICopy<T> copy) {
         this.getter = Objects.requireNonNull(getter);
-        setCache(getter.get());
         this.setter = setter;
         this.deserializer = deserializer;
         this.serializer = serializer;

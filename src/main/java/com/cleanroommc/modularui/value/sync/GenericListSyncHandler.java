@@ -26,6 +26,7 @@ public class GenericListSyncHandler<T> extends GenericCollectionSyncHandler<T, L
 
     public GenericListSyncHandler(@NotNull Supplier<List<T>> getter, @Nullable Consumer<List<T>> setter, @NotNull IByteBufDeserializer<T> deserializer, @NotNull IByteBufSerializer<T> serializer, @Nullable IEquals<T> equals, @Nullable ICopy<T> copy) {
         super(getter, setter, deserializer, serializer, equals, copy);
+        setCache(getter.get());
     }
 
     @Override
