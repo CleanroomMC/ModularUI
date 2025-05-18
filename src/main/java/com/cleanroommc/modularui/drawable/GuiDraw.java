@@ -73,23 +73,20 @@ public class GuiDraw {
     public static void drawEllipse(float x0, float y0, float w, float h, int centerColor, int outerColor, int segments) {
         Platform.setupDrawColor();
         Platform.setupDrawGradient();
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
         float x_2 = x0 + w / 2f, y_2 = y0 + h / 2f;
         Platform.startDrawing(Platform.DrawMode.TRIANGLE_FAN, Platform.VertexFormat.POS_COLOR, bufferBuilder -> {
             // start at center
-            bufferbuilder.pos(x_2, y_2, 0.0f).color(Color.getRed(centerColor), Color.getGreen(centerColor), Color.getBlue(centerColor), Color.getAlpha(centerColor)).endVertex();
+            bufferBuilder.pos(x_2, y_2, 0.0f).color(Color.getRed(centerColor), Color.getGreen(centerColor), Color.getBlue(centerColor), Color.getAlpha(centerColor)).endVertex();
             int a = Color.getAlpha(outerColor), r = Color.getRed(outerColor), g = Color.getGreen(outerColor), b = Color.getBlue(outerColor);
             float incr = (float) (PI2 / segments);
             for (int i = 0; i <= segments; i++) {
                 float angle = incr * i;
                 float x = (float) (Math.sin(angle) * (w / 2) + x_2);
                 float y = (float) (Math.cos(angle) * (h / 2) + y_2);
-                bufferbuilder.pos(x, y, 0.0f).color(r, g, b, a).endVertex();
+                bufferBuilder.pos(x, y, 0.0f).color(r, g, b, a).endVertex();
             }
         });
         Platform.endDrawGradient();
-        //Platform.setupDrawTex();
     }
 
     public static void drawRoundedRect(float x0, float y0, float w, float h, int color, int cornerRadius, int segments) {

@@ -2,11 +2,9 @@ package com.cleanroommc.modularui.widgets.textfield;
 
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.Platform;
 
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -139,19 +137,10 @@ public class TextFieldRenderer extends TextRenderer {
         float alpha = Color.getAlphaF(this.markedColor);
         if (alpha == 0)
             alpha = 1f;
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
-        GlStateManager.color(red, green, blue, alpha);
-        GlStateManager.disableTexture2D();
-        bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
-        bufferbuilder.pos(x0, y1, 0.0D).endVertex();
-        bufferbuilder.pos(x1, y1, 0.0D).endVertex();
-        bufferbuilder.pos(x1, y0, 0.0D).endVertex();
-        bufferbuilder.pos(x0, y0, 0.0D).endVertex();
-        tessellator.draw();
-        GlStateManager.disableColorLogic();
-        GlStateManager.enableTexture2D();
-        GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(this.scale, this.scale, 0);
+        drawRect(x0, y0, x1, y1, red, green, blue, alpha);
+        GlStateManager.popMatrix();
     }
 
     @SideOnly(Side.CLIENT)
@@ -166,22 +155,21 @@ public class TextFieldRenderer extends TextRenderer {
         float alpha = Color.getAlphaF(this.cursorColor);
         if (alpha == 0)
             alpha = 1f;
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
-        GlStateManager.disableBlend();
         GlStateManager.pushMatrix();
         GlStateManager.scale(this.scale, this.scale, 0);
-        GlStateManager.color(red, green, blue, alpha);
-        GlStateManager.disableTexture2D();
-        bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
-        bufferbuilder.pos(x0, y1, 0.0D).endVertex();
-        bufferbuilder.pos(x1, y1, 0.0D).endVertex();
-        bufferbuilder.pos(x1, y0, 0.0D).endVertex();
-        bufferbuilder.pos(x0, y0, 0.0D).endVertex();
-        tessellator.draw();
-        GlStateManager.color(1, 1, 1, 1);
-        GlStateManager.enableTexture2D();
+        drawRect(x0, y0, x1, y1, red, green, blue, alpha);
         GlStateManager.popMatrix();
-        GlStateManager.enableBlend();
+    }
+
+    private static void drawRect(float x0, float y0, float x1, float y1, float red, float green, float blue, float alpha) {
+        Platform.setupDrawColor();
+        GlStateManager.color(red, green, blue, alpha);
+        Platform.startDrawing(Platform.DrawMode.QUADS, Platform.VertexFormat.POS, bufferBuilder -> {
+            bufferBuilder.pos(x0, y1, 0.0D).endVertex();
+            bufferBuilder.pos(x1, y1, 0.0D).endVertex();
+            bufferBuilder.pos(x1, y0, 0.0D).endVertex();
+            bufferBuilder.pos(x0, y0, 0.0D).endVertex();
+        });
+        GlStateManager.color(1, 1, 1, 1);
     }
 }
