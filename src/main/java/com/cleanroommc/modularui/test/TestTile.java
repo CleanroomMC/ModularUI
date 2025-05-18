@@ -369,6 +369,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                 .setDraggable(true)
                 .size(100, 100);
         SlotGroup slotGroup = new SlotGroup("small_inv", 2);
+        IntSyncValue timeSync = new IntSyncValue(() -> (int)java.lang.System.currentTimeMillis(), val -> {java.lang.System.out.println(val);});
+        syncManager.syncValue(123456,timeSync);
         syncManager.registerSlotGroup(slotGroup);
         AtomicInteger number = new AtomicInteger(0);
         syncManager.syncValue("int_value", new IntSyncValue(number::get, number::set));

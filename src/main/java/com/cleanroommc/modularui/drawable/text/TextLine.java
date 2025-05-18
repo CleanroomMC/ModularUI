@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.drawable.text;
 
 import com.cleanroommc.modularui.api.drawable.ITextLine;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.utils.Platform;
 
 import net.minecraft.client.gui.FontRenderer;
 
@@ -29,6 +30,7 @@ public class TextLine implements ITextLine {
 
     @Override
     public void draw(GuiContext context, FontRenderer fr, float x, float y, int color, boolean shadow) {
+        Platform.setupDrawFont();
         fr.drawString(this.text, x, y, color, shadow);
         this.lastX = x;
         this.lastY = y;

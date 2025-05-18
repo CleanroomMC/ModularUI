@@ -19,6 +19,7 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.Animator;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.FpsCounter;
+import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.RichTextWidget;
 import com.cleanroommc.modularui.widgets.slot.ItemSlot;
@@ -159,7 +160,7 @@ public class ClientScreenHandler {
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onGuiDraw(GuiScreenEvent.DrawScreenEvent.Post event) {
         OverlayStack.draw(event.getMouseX(), event.getMouseY(), event.getRenderPartialTicks());
     }
@@ -344,6 +345,11 @@ public class ClientScreenHandler {
     public static void drawScreenInternal(ModularScreen muiScreen, GuiScreen mcScreen, int mouseX, int mouseY, float partialTicks) {
         Stencil.reset();
         Stencil.apply(muiScreen.getScreenArea(), null);
+        Platform.setupDrawTex();
+        GlStateManager.enableLighting();
+        GlStateManager.enableDepth();
+        GlStateManager.enableRescaleNormal();
+        RenderHelper.enableStandardItemLighting();
         muiScreen.drawScreen();
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
@@ -365,6 +371,7 @@ public class ClientScreenHandler {
 
         Stencil.reset();
         Stencil.apply(muiScreen.getScreenArea(), null);
+        Platform.setupDrawTex();
         mcScreen.drawDefaultBackground();
         int x = mcScreen.getGuiLeft();
         int y = mcScreen.getGuiTop();

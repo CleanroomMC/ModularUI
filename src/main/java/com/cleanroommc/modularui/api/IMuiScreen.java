@@ -3,12 +3,12 @@ package com.cleanroommc.modularui.api;
 import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.ModularScreen;
-
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
+import com.cleanroommc.modularui.utils.Platform;
+
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
-
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -60,6 +60,10 @@ public interface IMuiScreen {
             drawFunction.accept(tint);
         }
         ClientScreenHandler.drawDarkBackground(getGuiScreen(), tint);
+        // after this JEI will draw itself
+        // for some reason JEI is too stupid to set up opengl properly
+        // without this (enableTexture2D() specifically) every item in JEI will be texture less (white)
+        Platform.setupDrawTex();
     }
 
     /**
