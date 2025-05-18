@@ -82,6 +82,10 @@ public class NumberFormat {
                     .considerMinusForLength(this.considerMinusForLength)
                     .considerSuffixForLength(this.considerSuffixForLength);
         }
+
+        public String format(double number) {
+            return NumberFormat.format(number, this);
+        }
     }
 
     public static class ParamsBuilder {

@@ -7,16 +7,12 @@ import com.cleanroommc.modularui.core.mixin.GuiAccessor;
 import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
 import com.cleanroommc.modularui.core.mixin.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
-import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.integration.jei.JeiIngredientProvider;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetSlotTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.utils.Alignment;
-import com.cleanroommc.modularui.utils.Color;
-import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
@@ -45,7 +41,6 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         return phantom ? new PhantomItemSlot() : new ItemSlot();
     }
 
-    private static final TextRenderer textRenderer = new TextRenderer();
     private ItemSlotSH syncHandler;
 
     public ItemSlot() {
@@ -231,33 +226,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 if (amount < 0) {
                     amount = itemstack.getCount();
                 }
-                // render the amount overlay
-                if (amount > 1 || format != null) {
-                    String amountText = NumberFormat.format(amount, NumberFormat.AMOUNT_TEXT);
-                    if (format != null) {
-                        amountText = format + amountText;
-                    }
-                    float scale = 1f;
-                    if (amountText.length() == 3) {
-                        scale = 0.8f;
-                    } else if (amountText.length() == 4) {
-                        scale = 0.6f;
-                    } else if (amountText.length() > 4) {
-                        scale = 0.5f;
-                    }
-                    textRenderer.setShadow(true);
-                    textRenderer.setScale(scale);
-                    textRenderer.setColor(Color.WHITE.main);
-                    textRenderer.setAlignment(Alignment.BottomRight, getArea().width - 1, getArea().height - 1);
-                    textRenderer.setPos(1, 1);
-                    GlStateManager.disableLighting();
-                    GlStateManager.disableDepth();
-                    GlStateManager.disableBlend();
-                    textRenderer.draw(amountText);
-                    GlStateManager.enableLighting();
-                    GlStateManager.enableDepth();
-                    GlStateManager.enableBlend();
-                }
+                GuiDraw.drawStandardSlotAmountText(amount, format, getArea());
 
                 int cachedCount = itemstack.getCount();
                 itemstack.setCount(1); // required to not render the amount overlay

@@ -3,8 +3,11 @@ package com.cleanroommc.modularui.drawable;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.RichTooltipEvent;
+import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.Platform;
+import com.cleanroommc.modularui.widget.sizer.Area;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -12,7 +15,6 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderItem;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.item.ItemStack;
@@ -29,6 +31,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class GuiDraw {
+
+    private static final TextRenderer textRenderer = new TextRenderer();
 
     public static final double PI2 = Math.PI * 2;
     public static final double PI_2 = Math.PI / 2;
@@ -302,6 +306,37 @@ public class GuiDraw {
         GlStateManager.color(Color.getRedF(fluidColor), Color.getGreenF(fluidColor), Color.getBlueF(fluidColor), Color.getAlphaF(fluidColor));
         drawTiledTexture(TextureMap.LOCATION_BLOCKS_TEXTURE, x0, y0, width, height, sprite.getMinU(), sprite.getMinV(), sprite.getMaxU(), sprite.getMaxV(), sprite.getIconWidth(), sprite.getIconHeight(), z);
         GlStateManager.color(1f, 1f, 1f, 1f);
+    }
+
+    public static void drawStandardSlotAmountText(int amount, String format, Area area) {
+        drawAmountText(amount, format, 1, 1, area.width - 1, area.height - 1, Alignment.BottomRight);
+    }
+
+    public static void drawAmountText(int amount, String format, int x, int y, int width, int height, Alignment alignment) {
+        if (amount > 1 || format != null) {
+            String amountText = NumberFormat.AMOUNT_TEXT.format(amount);
+            if (format != null) {
+                amountText = format + amountText;
+            }
+            float scale = 1f;
+            if (amountText.length() == 3) {
+                scale = 0.8f;
+            } else if (amountText.length() == 4) {
+                scale = 0.6f;
+            } else if (amountText.length() > 4) {
+                scale = 0.5f;
+            }
+            textRenderer.setShadow(true);
+            textRenderer.setScale(scale);
+            textRenderer.setColor(Color.WHITE.main);
+            textRenderer.setAlignment(alignment, width, height);
+            textRenderer.setPos(x, y);
+            textRenderer.setHardWrapOnBorder(false);
+            GlStateManager.disableLighting();
+            GlStateManager.disableDepth();
+            textRenderer.draw(amountText);
+            textRenderer.setHardWrapOnBorder(true);
+        }
     }
 
     public static void drawSprite(TextureAtlasSprite sprite, float x0, float y0, float w, float h) {

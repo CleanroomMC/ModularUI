@@ -1,12 +1,15 @@
 package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.utils.ICopy;
+import com.cleanroommc.modularui.utils.serialization.ByteBufAdapters;
 import com.cleanroommc.modularui.utils.serialization.IByteBufAdapter;
 import com.cleanroommc.modularui.utils.serialization.IByteBufDeserializer;
 import com.cleanroommc.modularui.utils.serialization.IByteBufSerializer;
 import com.cleanroommc.modularui.utils.serialization.IEquals;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fluids.FluidStack;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,6 +20,14 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class GenericSyncValue<T> extends ValueSyncHandler<T> {
+
+    public static GenericSyncValue<ItemStack> forItem(@NotNull Supplier<ItemStack> getter, @Nullable Consumer<ItemStack> setter) {
+        return new GenericSyncValue<>(getter, setter, ByteBufAdapters.ITEM_STACK);
+    }
+
+    public static GenericSyncValue<FluidStack> forFluid(@NotNull Supplier<FluidStack> getter, @Nullable Consumer<FluidStack> setter) {
+        return new GenericSyncValue<>(getter, setter, ByteBufAdapters.FLUID_STACK);
+    }
 
     private final Supplier<T> getter;
     private final Consumer<T> setter;
@@ -127,5 +138,30 @@ public class GenericSyncValue<T> extends ValueSyncHandler<T> {
     @Override
     public void read(PacketBuffer buffer) throws IOException {
         setValue(this.deserializer.deserialize(buffer), true, false);
+    }
+
+    @SuppressWarnings("unchecked")
+    public @Nullable Class<? extends T> getType() {
+        if (this.cache != null) {
+            return (Class<? extends T>) this.cache.getClass();
+        }
+        T t = this.getter.get();
+        if (t != null) {
+            return (Class<? extends T>) t.getClass();
+        }
+        return null;
+    }
+
+    public boolean isOfType(Class<?> expectedType) {
+        Class<? extends T> type = getType();
+        if (type == null) {
+            throw new IllegalStateException("Could not infer type of GenericSyncValue since value is null!");
+        }
+        return expectedType.isAssignableFrom(type);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <V> GenericSyncValue<V> cast() {
+        return (GenericSyncValue<V>) this;
     }
 }

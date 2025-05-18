@@ -33,6 +33,7 @@ public class TextRenderer {
     protected float lastActualHeight = 0;
     protected float lastTrimmedHeight = 0;
     protected float lastX = 0, lastY = 0;
+    protected boolean hardWrapOnBorder = true;
     protected boolean scrollOnOverflow = false;
 
     public void setAlignment(Alignment alignment, float maxWidth) {
@@ -62,12 +63,16 @@ public class TextRenderer {
         this.color = color;
     }
 
+    public void setHardWrapOnBorder(boolean hardWrapOnBorder) {
+        this.hardWrapOnBorder = hardWrapOnBorder;
+    }
+
     public void setSimulate(boolean simulate) {
         this.simulate = simulate;
     }
 
     public void draw(String text) {
-        if (this.maxWidth <= 0 && !text.contains("\n'")) {
+        if ((this.maxWidth <= 0 || !this.hardWrapOnBorder) && !text.contains("\n'")) {
             drawSimple(text);
         } else {
             draw(Collections.singletonList(text));
@@ -106,8 +111,12 @@ public class TextRenderer {
     public List<Line> measureLines(List<String> lines) {
         List<Line> measuredLines = new ArrayList<>();
         for (String line : lines) {
-            for (String subLine : wrapLine(line)) {
-                measuredLines.add(line(subLine));
+            if (this.hardWrapOnBorder) {
+                for (String subLine : wrapLine(line)) {
+                    measuredLines.add(line(subLine));
+                }
+            } else {
+                measuredLines.add(line(line));
             }
         }
         return measuredLines;

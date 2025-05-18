@@ -19,6 +19,7 @@ import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.value.IntValue;
 import com.cleanroommc.modularui.value.StringValue;
+import com.cleanroommc.modularui.value.sync.GenericSyncValue;
 import com.cleanroommc.modularui.value.sync.IntSyncValue;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandlers;
@@ -32,16 +33,20 @@ import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -57,6 +62,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
     private final int duration = 80;
     private int progress = 0;
     private int cycleState = 0;
+    private ItemStack displayItem = new ItemStack(Items.DIAMOND);
     private final IItemHandlerModifiable inventory = new ItemStackHandler(2) {
         @Override
         public int getSlotLimit(int slot) {
@@ -85,6 +91,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         guiSyncManager.syncValue("mixer_fluids", 1, SyncHandlers.fluidSlot(this.mixerFluids2));
         IntSyncValue cycleStateValue = new IntSyncValue(() -> this.cycleState, val -> this.cycleState = val);
         guiSyncManager.syncValue("cycle_state", cycleStateValue);
+        guiSyncManager.syncValue("display_item", GenericSyncValue.forItem(() -> this.displayItem, null));
         guiSyncManager.bindPlayerInventory(guiData.getPlayer());
 
         Rectangle colorPickerBackground = new Rectangle().setColor(Color.RED.main);
@@ -339,11 +346,12 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                 .debugName("page 4 crafting")
                                                 .sizeRel(1f)
                                                 .child(SlotGroupWidget.builder()
-                                                        .row("III   ")
+                                                        .row("III  D")
                                                         .row("III  O")
                                                         .row("III   ")
                                                         .key('I', i -> new ItemSlot().slot(new ModularSlot(this.craftingInventory, i)))
                                                         .key('O', new ItemSlot().slot(new ModularCraftingSlot(this.craftingInventory, 9)))
+                                                        .key('D', new ItemDisplayWidget().syncHandler("display_item").displayAmount(true))
                                                         .build()
                                                         .center())
                                         )))
@@ -369,7 +377,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                 .setDraggable(true)
                 .size(100, 100);
         SlotGroup slotGroup = new SlotGroup("small_inv", 2);
-        IntSyncValue timeSync = new IntSyncValue(() -> (int)java.lang.System.currentTimeMillis(), val -> {java.lang.System.out.println(val);});
+        IntSyncValue timeSync = new IntSyncValue(() -> (int)java.lang.System.currentTimeMillis());
         syncManager.syncValue(123456,timeSync);
         syncManager.registerSlotGroup(slotGroup);
         AtomicInteger number = new AtomicInteger(0);
@@ -442,8 +450,11 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                 this.val++;
             }
         } else {
-            if (this.time++ % 20 == 0 && ++this.val2 == 3) {
-                this.val2 = 0;
+            if (this.time++ % 20 == 0) {
+                if (++this.val2 == 3) this.val2 = 0;
+                Collection<Item> vals = ForgeRegistries.ITEMS.getValuesCollection();
+                Item item = vals.stream().skip(new Random().nextInt(vals.size())).findFirst().orElse(Items.DIAMOND);
+                this.displayItem = new ItemStack(item, 26735987);
             }
         }
         if (++this.progress == this.duration) {
