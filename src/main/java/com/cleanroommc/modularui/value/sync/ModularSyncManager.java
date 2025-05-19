@@ -17,10 +17,12 @@ import net.minecraftforge.items.wrapper.PlayerInvWrapper;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 
 public class ModularSyncManager {
 
@@ -29,6 +31,9 @@ public class ModularSyncManager {
     private static final String CURSOR_KEY = makeSyncKey("cursor_slot", 255255);
 
     private final Map<String, PanelSyncManager> panelSyncManagerMap = new Object2ObjectOpenHashMap<>();
+    // A set of all panels which have been opened during the ui. May also contain closed panels.
+    // This is used to detect if packets are arriving too late
+    private final Set<String> panelHistory = new ObjectOpenHashSet<>();
     private PanelSyncManager mainPSM;
     private final ModularContainer container;
     private final CursorSlotSyncHandler cursorSlotSyncHandler = new CursorSlotSyncHandler();
@@ -88,6 +93,7 @@ public class ModularSyncManager {
 
     public void open(String name, PanelSyncManager syncManager) {
         this.panelSyncManagerMap.put(name, syncManager);
+        this.panelHistory.add(name);
         syncManager.initialize(name, this);
     }
 
@@ -101,7 +107,14 @@ public class ModularSyncManager {
     }
 
     public void receiveWidgetUpdate(String panelName, String mapKey, int id, PacketBuffer buf) throws IOException {
-        getPanelSyncManager(panelName).receiveWidgetUpdate(mapKey, id, buf);
+        PanelSyncManager psm = this.panelSyncManagerMap.get(panelName);
+        if (psm != null) {
+            psm.receiveWidgetUpdate(mapKey, id, buf);
+        } else if (!this.panelHistory.contains(panelName)) {
+            ModularUI.LOGGER.throwing(new IllegalStateException("A packet was send to panel '" + panelName + "' which was not opened yet!."));
+        }
+        // else the panel was open at some point
+        // we simply discard the packet silently and assume the packet was correctly send, but the panel closed earlier
     }
 
     public EntityPlayer getPlayer() {

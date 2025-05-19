@@ -4,11 +4,17 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -142,16 +148,12 @@ public class SchemaRenderer implements IDrawable {
         GlStateManager.color(1, 1, 1, 1);
 
         // render rect with FBO texture
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
-        bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
-
-        bufferbuilder.pos(x + width, y + height, 0).tex(1, 0).endVertex();
-        bufferbuilder.pos(x + width, y, 0).tex(1, 1).endVertex();
-        bufferbuilder.pos(x, y, 0).tex(0, 1).endVertex();
-        bufferbuilder.pos(x, y + height, 0).tex(0, 0).endVertex();
-        tessellator.draw();
-
+        Platform.startDrawing(Platform.DrawMode.QUADS, Platform.VertexFormat.POS_TEX, bufferBuilder -> {
+            bufferBuilder.pos(x + width, y + height, 0).tex(1, 0).endVertex();
+            bufferBuilder.pos(x + width, y, 0).tex(1, 1).endVertex();
+            bufferBuilder.pos(x, y, 0).tex(0, 1).endVertex();
+            bufferBuilder.pos(x, y + height, 0).tex(0, 0).endVertex();
+        });
         GlStateManager.bindTexture(lastFbo);
     }
 

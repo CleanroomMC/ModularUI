@@ -26,6 +26,7 @@ public class GenericListSyncHandler<T> extends GenericCollectionSyncHandler<T, L
 
     public GenericListSyncHandler(@NotNull Supplier<List<T>> getter, @Nullable Consumer<List<T>> setter, @NotNull IByteBufDeserializer<T> deserializer, @NotNull IByteBufSerializer<T> serializer, @Nullable IEquals<T> equals, @Nullable ICopy<T> copy) {
         super(getter, setter, deserializer, serializer, equals, copy);
+        setCache(getter.get());
     }
 
     @Override
@@ -53,7 +54,8 @@ public class GenericListSyncHandler<T> extends GenericCollectionSyncHandler<T, L
     @Override
     public void read(PacketBuffer buffer) throws IOException {
         this.cache.clear();
-        for (int i = 0; i < buffer.readVarInt(); i++) {
+        int size = buffer.readVarInt();
+        for (int i = 0; i < size; i++) {
             this.cache.add(deserializeValue(buffer));
         }
         onSetCache(getValue(), true, false);

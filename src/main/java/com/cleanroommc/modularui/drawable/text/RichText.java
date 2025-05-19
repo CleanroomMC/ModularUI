@@ -5,6 +5,8 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 
+import com.cleanroommc.modularui.utils.TooltipLines;
+
 import net.minecraft.client.gui.FontRenderer;
 
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ public class RichText implements IDrawable, IRichTextBuilder<RichText> {
     private static final TextRenderer renderer = new TextRenderer();
 
     private final List<Object> elements = new ArrayList<>();
+    private TooltipLines stringList;
     private Alignment alignment = Alignment.CenterLeft;
     private float scale = 1f;
     private Integer color = null;
@@ -26,35 +29,17 @@ public class RichText implements IDrawable, IRichTextBuilder<RichText> {
         return this.elements.isEmpty();
     }
 
-    public List<String> getStringRepresentation() {
-        List<String> list = new ArrayList<>();
-        StringBuilder builder = new StringBuilder();
-        for (Object o : this.elements) {
-            if (o == IKey.LINE_FEED) {
-                list.add(builder.toString());
-                builder.delete(0, builder.length());
-                continue;
-            }
-            String s = null;
-            if (o instanceof IKey key) {
-                s = key.get();
-            } else if (o instanceof String s1) {
-                s = s1;
-            } else if (o instanceof TextIcon ti) {
-                s = ti.getText();
-            }
-            if (s != null) {
-                for (String part : s.split("\n")) {
-                    builder.append(part);
-                    list.add(builder.toString());
-                    builder.delete(0, builder.length());
-                }
-            }
+    public List<String> getAsStrings() {
+        if (this.stringList == null) {
+            this.stringList = new TooltipLines(this.elements);
         }
-        if (!list.isEmpty() && list.get(list.size() - 1).isEmpty()) {
-            list.remove(list.size() - 1);
+        return this.stringList;
+    }
+
+    private void clearStrings() {
+        if (this.stringList != null) {
+            this.stringList.clearCache();
         }
-        return list;
     }
 
     public int getMinWidth() {
@@ -95,6 +80,7 @@ public class RichText implements IDrawable, IRichTextBuilder<RichText> {
 
     public RichText add(String s) {
         this.elements.add(s);
+        clearStrings();
         return this;
     }
 
@@ -103,18 +89,21 @@ public class RichText implements IDrawable, IRichTextBuilder<RichText> {
         Object o = drawable;
         if (!(o instanceof IKey) && !(o instanceof IIcon)) o = drawable.asIcon();
         this.elements.add(o);
+        clearStrings();
         return this;
     }
 
     @Override
     public RichText addLine(ITextLine line) {
         this.elements.add(line);
+        clearStrings();
         return this;
     }
 
     @Override
     public RichText clearText() {
         this.elements.clear();
+        clearStrings();
         return this;
     }
 
@@ -154,6 +143,7 @@ public class RichText implements IDrawable, IRichTextBuilder<RichText> {
                 } else {
                     objects.add(i + 1, Spacer.of(margin));
                 }
+                clearStrings();
                 return this;
             }
         }
@@ -200,5 +190,15 @@ public class RichText implements IDrawable, IRichTextBuilder<RichText> {
             return o;
         }
         return null;
+    }
+
+    public RichText copy() {
+        RichText copy = new RichText();
+        copy.elements.addAll(this.elements);
+        copy.alignment = this.alignment;
+        copy.scale = this.scale;
+        copy.color = this.color;
+        copy.shadow = this.shadow;
+        return copy;
     }
 }

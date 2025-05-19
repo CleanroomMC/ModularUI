@@ -42,6 +42,9 @@ public class ModularSlot extends SlotItemHandler {
      */
     public ModularSlot(IItemHandler itemHandler, int index) {
         super(itemHandler, index, Integer.MIN_VALUE, Integer.MIN_VALUE);
+        if (index < 0 || index >= itemHandler.getSlots()) {
+            throw new IllegalArgumentException("Tried to create a slot with invalid index " + index + ". Valid index range is [0," + itemHandler.getSlots() + ")");
+        }
     }
 
     @ApiStatus.Internal

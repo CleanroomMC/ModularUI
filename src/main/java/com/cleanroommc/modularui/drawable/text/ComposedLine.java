@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.drawable.IHoverable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.drawable.ITextLine;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.utils.Platform;
 
 import net.minecraft.client.gui.FontRenderer;
 
@@ -41,6 +42,7 @@ public class ComposedLine implements ITextLine {
         for (Object o : this.elements) {
             if (o instanceof String s) {
                 float drawY = getHeight(fr) / 2f - fr.FONT_HEIGHT / 2f;
+                Platform.setupDrawFont();
                 fr.drawString(s, x, (int) (y + drawY), color, shadow);
                 x += fr.getStringWidth(s);
             } else if (o instanceof IIcon icon) {
@@ -84,5 +86,20 @@ public class ComposedLine implements ITextLine {
             x1 += w; // move to next element
         }
         return null;
+    }
+
+    @Override
+    public String toString() {
+        if (this.elements.isEmpty()) return "[empty]";
+        StringBuilder builder = new StringBuilder("[");
+        for (Object o : this.elements) {
+            if (o instanceof String s) {
+                builder.append('"').append(s).append('"').append(", ");
+            } else {
+                builder.append(o).append(", ");
+            }
+        }
+        builder.delete(builder.length() - 2, builder.length());
+        return builder.append("]").toString();
     }
 }
