@@ -62,6 +62,7 @@ public class ModularUI {
 
     public enum Mods {
 
+        BAUBLES(ModIds.BAUBLES),
         BLUR(ModIds.BLUR),
         BOGOSORTER(ModIds.BOGOSORTER),
         JEI(ModIds.JEI),
@@ -99,5 +100,6 @@ public class ModularUI {
         public static final String BOGOSORTER = "bogosorter";
         public static final String JEI = "jei";
         public static final String NEA = "neverenoughanimations";
+        public static final String BAUBLES = "baubles";
     }
 }

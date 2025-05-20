@@ -4,15 +4,15 @@ import com.cleanroommc.modularui.api.UIFactory;
 import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.factory.GuiManager;
 import com.cleanroommc.modularui.network.IPacket;
-import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.NetworkUtils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
+import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.PacketBuffer;
-
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -49,7 +49,14 @@ public class OpenGuiPacket<T extends GuiData> implements IPacket {
     @SideOnly(Side.CLIENT)
     @Override
     public @Nullable IPacket executeClient(NetHandlerPlayClient handler) {
-        GuiManager.open(this.windowId, this.factory, this.data, Minecraft.getMinecraft().player);
+        GuiManager.openFromClient(this.windowId, this.factory, this.data, Minecraft.getMinecraft().player);
+        return null;
+    }
+
+    @Override
+    public @Nullable IPacket executeServer(NetHandlerPlayServer handler) {
+        T guiData = this.factory.readGuiData(handler.player, this.data);
+        GuiManager.open(this.factory, guiData, handler.player);
         return null;
     }
 }

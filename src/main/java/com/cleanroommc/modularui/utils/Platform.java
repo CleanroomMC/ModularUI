@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.utils;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
@@ -8,7 +9,10 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 
 import java.util.function.Consumer;
@@ -20,6 +24,11 @@ import java.util.function.Consumer;
 public class Platform {
 
     public static final ItemStack EMPTY_STACK = ItemStack.EMPTY;
+
+    @SideOnly(Side.CLIENT)
+    public static @NotNull EntityPlayerSP getClientPlayer() {
+        return Minecraft.getMinecraft().player;
+    }
 
     public static boolean isStackEmpty(ItemStack stack) {
         return stack == null || stack.isEmpty();
