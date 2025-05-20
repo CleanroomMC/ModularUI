@@ -13,6 +13,7 @@ import com.cleanroommc.modularui.value.StringValue;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -230,6 +231,12 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     public TextFieldWidget setDefaultNumber(double defaultNumber) {
         this.defaultNumber = defaultNumber;
         return this;
+    }
+
+    @ApiStatus.Experimental
+    public TextFieldWidget setFormatAsInteger(boolean formatAsInteger) {
+        this.renderer.setFormatAsInteger(formatAsInteger);
+        return getThis();
     }
 
     public TextFieldWidget value(IStringValue<?> stringValue) {
