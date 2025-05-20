@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
@@ -28,6 +29,11 @@ public class Platform {
     @SideOnly(Side.CLIENT)
     public static @NotNull EntityPlayerSP getClientPlayer() {
         return Minecraft.getMinecraft().player;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static String getKeyDisplay(KeyBinding keyBinding) {
+        return keyBinding.getKeyDescription();
     }
 
     public static boolean isStackEmpty(ItemStack stack) {

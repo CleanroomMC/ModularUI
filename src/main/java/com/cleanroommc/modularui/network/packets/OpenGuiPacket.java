@@ -23,8 +23,7 @@ public class OpenGuiPacket<T extends GuiData> implements IPacket {
     private UIFactory<T> factory;
     private PacketBuffer data;
 
-    public OpenGuiPacket() {
-    }
+    public OpenGuiPacket() {}
 
     public OpenGuiPacket(int windowId, UIFactory<T> factory, PacketBuffer data) {
         this.windowId = windowId;

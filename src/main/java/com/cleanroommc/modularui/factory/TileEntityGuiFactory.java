@@ -26,7 +26,8 @@ public class TileEntityGuiFactory extends AbstractUIFactory<PosGuiData> {
 
     public <T extends TileEntity & IGuiHolder<PosGuiData>> void open(EntityPlayer player, T tile) {
         Objects.requireNonNull(player);
-        BlockPos pos = getPosFromTile(tile);
+        verifyTile(player, tile);
+        BlockPos pos = tile.getPos();
         PosGuiData data = new PosGuiData(player, pos.getX(), pos.getY(), pos.getZ());
         GuiManager.open(this, data, (EntityPlayerMP) player);
     }
@@ -40,7 +41,8 @@ public class TileEntityGuiFactory extends AbstractUIFactory<PosGuiData> {
 
     @SideOnly(Side.CLIENT)
     public <T extends TileEntity & IGuiHolder<PosGuiData>> void openClient(T tile) {
-        BlockPos pos = getPosFromTile(tile);
+        verifyTile(Platform.getClientPlayer(), tile);
+        BlockPos pos = tile.getPos();
         GuiManager.openFromClient(this, new PosGuiData(MCHelper.getPlayer(), pos.getX(), pos.getY(), pos.getZ()));
     }
 
@@ -72,7 +74,7 @@ public class TileEntityGuiFactory extends AbstractUIFactory<PosGuiData> {
         return new PosGuiData(player, buffer.readVarInt(), buffer.readVarInt(), buffer.readVarInt());
     }
 
-    public static BlockPos getPosFromTile(TileEntity tile) {
+    public static void verifyTile(EntityPlayer player, TileEntity tile) {
         Objects.requireNonNull(tile);
         if (tile.isInvalid()) {
             throw new IllegalArgumentException("Can't open invalid TileEntity GUI!");
@@ -80,6 +82,5 @@ public class TileEntityGuiFactory extends AbstractUIFactory<PosGuiData> {
         if (Platform.getClientPlayer().world != tile.getWorld()) {
             throw new IllegalArgumentException("TileEntity must be in same dimension as the player!");
         }
-        return tile.getPos();
     }
 }

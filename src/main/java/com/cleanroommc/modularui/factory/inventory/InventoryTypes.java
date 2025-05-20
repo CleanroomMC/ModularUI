@@ -8,7 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 import baubles.api.BaublesApi;
-import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
@@ -41,10 +41,10 @@ public class InventoryTypes {
         return InventoryType.getAll();
     }
 
-    public static Pair<InventoryType, Integer> findFirstStackable(EntityPlayer player, ItemStack stack) {
+    public static @Nullable SlotFindResult findFirstStackable(EntityPlayer player, ItemStack stack) {
         for (InventoryType type : getAll()) {
             int i = type.findFirstStackable(player, stack);
-            if (i >= 0) return Pair.of(type, i);
+            if (i >= 0) return new SlotFindResult(type, i);
         }
         return null;
     }
@@ -62,6 +62,16 @@ public class InventoryTypes {
             if (type.visitAll(player, visitor)) {
                 return;
             }
+        }
+    }
+
+    public static class SlotFindResult {
+        public final InventoryType type;
+        public final int slot;
+
+        public SlotFindResult(InventoryType type, int slot) {
+            this.type = type;
+            this.slot = slot;
         }
     }
 }
