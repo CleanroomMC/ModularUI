@@ -4,6 +4,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 
+/**
+ * A {@link InventoryType} implementation for {@link IInventory}.
+ */
 public abstract class Inventory extends InventoryType {
 
     public Inventory(String id) {

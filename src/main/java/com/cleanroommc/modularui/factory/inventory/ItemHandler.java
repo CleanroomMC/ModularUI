@@ -4,6 +4,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
+/**
+ * A {@link InventoryType} implementation for {@link IItemHandlerModifiable}.
+ */
 public abstract class ItemHandler extends InventoryType {
 
     public ItemHandler(String id) {

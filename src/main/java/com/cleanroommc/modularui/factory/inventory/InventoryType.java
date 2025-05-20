@@ -9,7 +9,6 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -50,6 +49,13 @@ public abstract class InventoryType {
 
     public abstract int getSlotCount(EntityPlayer player);
 
+    /**
+     * Returns the first stackable slot index for the given item
+     *
+     * @param player player of which inventory to visit
+     * @param stack stack which should be checked stackability with
+     * @return index of slot with stackable item or -1 if none found
+     */
     public int findFirstStackable(EntityPlayer player, ItemStack stack) {
         for (int i = 0, n = getSlotCount(player); i < n; ++i) {
             ItemStack stackInSlot = getStackInSlot(player, i);
@@ -66,6 +72,15 @@ public abstract class InventoryType {
         return -1;
     }
 
+    /**
+     * Visits all slots which item is stackable with the given item in the inventory with the given visitor function.
+     * Two empty items also count as stackable.
+     *
+     * @param player player of which inventory to visit
+     * @param stack stack which should be checked stackability with
+     * @param visitor visit function
+     * @return if the visitor function returned true on a slot
+     */
     public boolean visitAllStackable(EntityPlayer player, ItemStack stack, InventoryVisitor visitor) {
         for (int i = 0, n = getSlotCount(player); i < n; ++i) {
             ItemStack stackInSlot = getStackInSlot(player, i);
@@ -86,6 +101,13 @@ public abstract class InventoryType {
         return false;
     }
 
+    /**
+     * Visits all slots in the inventory with the given visitor function.
+     *
+     * @param player player of which inventory to visit
+     * @param visitor visit function
+     * @return if the visitor function returned true on a slot
+     */
     public boolean visitAll(EntityPlayer player, InventoryVisitor visitor) {
         for (int i = 0, n = getSlotCount(player); i < n; ++i) {
             ItemStack stackInSlot = getStackInSlot(player, i);
@@ -110,29 +132,5 @@ public abstract class InventoryType {
 
     public static Collection<InventoryType> getAll() {
         return Collections.unmodifiableCollection(inventoryTypes.values());
-    }
-
-    public static Pair<InventoryType, Integer> findFirstStackableInAll(EntityPlayer player, ItemStack stack) {
-        for (InventoryType type : getAll()) {
-            int i = type.findFirstStackable(player, stack);
-            if (i >= 0) return Pair.of(type, i);
-        }
-        return null;
-    }
-
-    public static void visitAllStackableInAll(EntityPlayer player, ItemStack stack, InventoryVisitor visitor) {
-        for (InventoryType type : getAll()) {
-            if (type.visitAllStackable(player, stack, visitor)) {
-                return;
-            }
-        }
-    }
-
-    public static void visitAllInAll(EntityPlayer player, InventoryVisitor visitor) {
-        for (InventoryType type : getAll()) {
-            if (type.visitAll(player, visitor)) {
-                return;
-            }
-        }
     }
 }
