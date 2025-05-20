@@ -3,13 +3,14 @@ package com.cleanroommc.modularui.factory;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.factory.inventory.InventoryType;
-
 import com.cleanroommc.modularui.factory.inventory.InventoryTypes;
+import com.cleanroommc.modularui.utils.Platform;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
-
 import net.minecraft.util.EnumHand;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -38,6 +39,30 @@ public class PlayerInventoryGuiFactory extends AbstractUIFactory<PlayerInventory
 
     public void open(EntityPlayer player, InventoryType type, int index) {
         GuiManager.open(this, new PlayerInventoryGuiData(player, type, index), verifyServerSide(player));
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void openFromPlayerInventoryClient(int index) {
+        GuiManager.openFromClient(this, new PlayerInventoryGuiData(Platform.getClientPlayer(), InventoryTypes.PLAYER, index));
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void openFromHandClient(EnumHand hand) {
+        openFromPlayerInventoryClient(hand == EnumHand.OFF_HAND ? 40 : Platform.getClientPlayer().inventory.currentItem);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void openFromBaublesClient(int index) {
+        if (!ModularUI.isBaubleLoaded()) {
+            throw new IllegalArgumentException("Can't open UI for baubles item when bauble is not loaded!");
+        }
+        GuiManager.openFromClient(
+                this, new PlayerInventoryGuiData(Platform.getClientPlayer(), InventoryTypes.BAUBLES, index));
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void openClient(InventoryType type, int index) {
+        GuiManager.openFromClient(this, new PlayerInventoryGuiData(Platform.getClientPlayer(), type, index));
     }
 
     private PlayerInventoryGuiFactory() {
