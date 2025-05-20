@@ -60,8 +60,6 @@ public interface ITheme {
         return null;
     }
 
-    int getOpenCloseAnimationOverride();
-
     boolean getSmoothProgressBarOverride();
 
     RichTooltip.Pos getTooltipPosOverride();

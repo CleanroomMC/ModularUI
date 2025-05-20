@@ -15,9 +15,6 @@ public class ModularUIConfig {
     @Config.Comment("If progress bar should step in texture pixels or screen pixels. (Screen pixels are way smaller and therefore smoother)")
     public static boolean smoothProgressBar = true;
 
-    @Config.Comment("Time in 1/60 sec to open and close panels.")
-    public static int panelOpenCloseAnimationTime = 8;
-
     // Default direction
     @Config.Comment("Default tooltip position around the widget or its panel.")
     public static RichTooltip.Pos tooltipPos = RichTooltip.Pos.VERTICAL;

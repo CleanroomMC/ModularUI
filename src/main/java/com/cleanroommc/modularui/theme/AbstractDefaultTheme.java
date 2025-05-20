@@ -67,11 +67,6 @@ public abstract class AbstractDefaultTheme implements ITheme {
     }
 
     @Override
-    public int getOpenCloseAnimationOverride() {
-        return ModularUIConfig.panelOpenCloseAnimationTime;
-    }
-
-    @Override
     public boolean getSmoothProgressBarOverride() {
         return ModularUIConfig.smoothProgressBar;
     }

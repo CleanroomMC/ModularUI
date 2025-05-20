@@ -123,14 +123,6 @@ public class Theme implements ITheme {
     }
 
     @Override
-    public int getOpenCloseAnimationOverride() {
-        if (this.openCloseAnimationOverride != -1) {
-            return this.openCloseAnimationOverride;
-        }
-        return ModularUIConfig.panelOpenCloseAnimationTime;
-    }
-
-    @Override
     public boolean getSmoothProgressBarOverride() {
         if (this.smoothProgressBarOverride != null) {
             return this.smoothProgressBarOverride;
