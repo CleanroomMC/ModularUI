@@ -1,10 +1,12 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.animation.IAnimatable;
 import com.cleanroommc.modularui.api.IJsonSerializable;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.JsonHelper;
 
 import net.minecraftforge.fml.relauncher.Side;
@@ -13,7 +15,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Contract;
 
-public class Circle implements IDrawable, IJsonSerializable {
+public class Circle implements IDrawable, IJsonSerializable, IAnimatable<Circle> {
 
     private int colorInner, colorOuter, segments;
 
@@ -84,5 +86,20 @@ public class Circle implements IDrawable, IJsonSerializable {
         json.addProperty("colorOuter", this.colorOuter);
         json.addProperty("segments", this.segments);
         return true;
+    }
+
+    @Override
+    public Circle interpolate(Circle start, Circle end, float t) {
+        this.colorInner = Color.interpolate(start.colorInner, end.colorInner, t);
+        this.colorOuter = Color.interpolate(start.colorOuter, end.colorOuter, t);
+        this.segments = Interpolations.lerp(start.segments, end.segments, t);
+        return this;
+    }
+
+    @Override
+    public Circle copyOrImmutable() {
+        return new Circle()
+                .setColor(this.colorInner, this.colorOuter)
+                .setSegments(this.segments);
     }
 }

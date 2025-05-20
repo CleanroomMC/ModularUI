@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui;
 
+import com.cleanroommc.modularui.animation.AnimatorManager;
 import com.cleanroommc.modularui.drawable.DrawableSerialization;
 import com.cleanroommc.modularui.factory.GuiFactories;
 import com.cleanroommc.modularui.factory.inventory.InventoryTypes;
@@ -44,8 +45,8 @@ public class ClientProxy extends CommonProxy {
         super.preInit(event);
 
         MinecraftForge.EVENT_BUS.register(ClientScreenHandler.class);
-        MinecraftForge.EVENT_BUS.register(OverlayManager.class);
         MinecraftForge.EVENT_BUS.register(KeyBindHandler.class);
+        AnimatorManager.init();
 
         if (ModularUIConfig.enableTestGuis) {
             MinecraftForge.EVENT_BUS.register(EventHandler.class);
@@ -75,7 +76,7 @@ public class ClientProxy extends CommonProxy {
 
     @SubscribeEvent
     public void onKeyboard(InputEvent.KeyInputEvent event) {
-        if (testKey.isPressed() && ModularUI.isBaubleLoaded()) {
+        if (ModularUIConfig.enableTestGuis && testKey.isPressed() && ModularUI.Mods.BAUBLES.isLoaded()) {
             InventoryTypes.BAUBLES.visitAll(Minecraft.getMinecraft().player, (type, index, stack) -> {
                 if (stack.getItem() instanceof TestItem) {
                     GuiFactories.playerInventory().openFromBaublesClient(index);

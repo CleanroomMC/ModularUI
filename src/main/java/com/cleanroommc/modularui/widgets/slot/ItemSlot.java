@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widgets.slot;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
@@ -9,6 +10,7 @@ import com.cleanroommc.modularui.core.mixin.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.integration.jei.JeiIngredientProvider;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
+import com.cleanroommc.modularui.screen.NEAAnimationHandler;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetSlotTheme;
@@ -16,6 +18,7 @@ import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
+import com.cleanroommc.neverenoughanimations.NEAConfig;
 
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -86,7 +89,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     protected void drawOverlay() {
-        if (isHovering()) {
+        if (isHovering() && (!ModularUI.Mods.NEA.isLoaded() || NEAConfig.itemHoverOverlay)) {
             GlStateManager.colorMask(true, true, true, false);
             GuiDraw.drawRect(1, 1, 16, 16, getSlotHoverColor());
             GlStateManager.colorMask(true, true, true, true);
@@ -169,9 +172,9 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     @SideOnly(Side.CLIENT)
-    private void drawSlot(Slot slotIn) {
+    private void drawSlot(ModularSlot slotIn) {
         GuiScreen guiScreen = getScreen().getScreenWrapper().getGuiScreen();
-        if (!(guiScreen instanceof GuiContainer))
+        if (!(guiScreen instanceof GuiContainer guiContainer))
             throw new IllegalStateException("The gui must be an instance of GuiContainer if it contains slots!");
         GuiContainerAccessor acc = (GuiContainerAccessor) guiScreen;
         RenderItem renderItem = ((GuiScreenAccessor) guiScreen).getItemRender();
@@ -219,10 +222,18 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 GuiDraw.drawRect(1, 1, 16, 16, -2130706433);
             }
 
+            ItemStack virtualStack = NEAAnimationHandler.injectVirtualStack(guiContainer, slotIn);
+            if (virtualStack != null) {
+                itemstack = virtualStack;
+            }
+
             if (!itemstack.isEmpty()) {
                 GlStateManager.enableDepth();
+                float itemScale = NEAAnimationHandler.injectHoverScale(guiContainer, slotIn);
                 // render the item itself
                 renderItem.renderItemAndEffectIntoGUI(guiScreen.mc.player, itemstack, 1, 1);
+                // TODO render item borders from item borders mod here
+
                 if (amount < 0) {
                     amount = itemstack.getCount();
                 }
@@ -232,6 +243,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 itemstack.setCount(1); // required to not render the amount overlay
                 // render other overlays like durability bar
                 renderItem.renderItemOverlayIntoGUI(((GuiScreenAccessor) guiScreen).getFontRenderer(), itemstack, 1, 1, null);
+                NEAAnimationHandler.endHoverScale();
                 itemstack.setCount(cachedCount);
                 GlStateManager.disableDepth();
             }
