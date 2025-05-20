@@ -8,11 +8,20 @@ import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
 public abstract class AbstractUIFactory<T extends GuiData> implements UIFactory<T> {
+
+    protected static EntityPlayerMP verifyServerSide(EntityPlayer player) {
+        if (player == null) throw new NullPointerException("Can't open UI for null player!");
+        if (player instanceof EntityPlayerMP entityPlayerMP) return entityPlayerMP;
+        throw new IllegalStateException("Synced GUI must be opened from server side!");
+    }
 
     private final String name;
 
