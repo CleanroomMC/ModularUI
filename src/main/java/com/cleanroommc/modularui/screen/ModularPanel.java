@@ -24,6 +24,7 @@ import com.cleanroommc.modularui.value.sync.PanelSyncHandler;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.ParentWidget;
+import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 
@@ -219,6 +220,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         this.screen = screen;
         getArea().z(1);
         initialise(this);
+        // call first tick after everything is initialised
+        WidgetTree.onUpdate(this);
         if (!isMainPanel() && shouldAnimate()) {
             getAnimator().onFinish(() -> {});
             getAnimator().reset();

@@ -113,7 +113,6 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
             }
         }
         afterInit();
-        onUpdate();
         this.requiresResize = false;
     }
 
@@ -826,7 +825,12 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
      */
     @Override
     public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+        if (this.enabled != enabled) {
+            this.enabled = enabled;
+            if (isValid() && getParent() instanceof INotifyEnabled notifyEnabled) {
+                notifyEnabled.onChildChangeEnabled(this, enabled);
+            }
+        }
     }
 
     public boolean isExcludeAreaInJei() {
