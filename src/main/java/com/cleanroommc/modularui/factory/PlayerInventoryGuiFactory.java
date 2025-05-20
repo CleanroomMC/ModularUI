@@ -30,7 +30,7 @@ public class PlayerInventoryGuiFactory extends AbstractUIFactory<PlayerInventory
     }
 
     public void openFromBaubles(EntityPlayer player, int index) {
-        if (!ModularUI.isBaubleLoaded()) {
+        if (!ModularUI.Mods.BAUBLES.isLoaded()) {
             throw new IllegalArgumentException("Can't open UI for baubles item when bauble is not loaded!");
         }
         GuiManager.open(
@@ -53,7 +53,7 @@ public class PlayerInventoryGuiFactory extends AbstractUIFactory<PlayerInventory
 
     @SideOnly(Side.CLIENT)
     public void openFromBaublesClient(int index) {
-        if (!ModularUI.isBaubleLoaded()) {
+        if (!ModularUI.Mods.BAUBLES.isLoaded()) {
             throw new IllegalArgumentException("Can't open UI for baubles item when bauble is not loaded!");
         }
         GuiManager.openFromClient(

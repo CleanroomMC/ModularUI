@@ -379,7 +379,7 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
                 }
             }
         }
-        if (ModularUI.isJeiLoaded()) {
+        if (ModularUI.Mods.JEI.isLoaded()) {
             IShowsRecipeFocuses overlay = (IShowsRecipeFocuses) ModularUIJeiPlugin.getRuntime().getIngredientListOverlay();
             IClickedIngredient<?> ingredient = overlay.getIngredientUnderMouse(x, y);
             if (ingredient == null || ingredient.getArea() == null) {
