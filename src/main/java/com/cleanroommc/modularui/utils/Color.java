@@ -15,7 +15,7 @@ import java.util.function.ToIntFunction;
 
 /**
  * Utility class for dealing with colors.
- * <b>All methods assume the color int to be AARRGGBB if not stated otherwise!</b>
+ * <b>All methods assume the color int to be AARRGGBB!</b>
  * Most of the conversion methods are written by me with the help of <a href=https://www.rapidtables.com/convert/color/>this website</a>.
  *
  * @author brachy
@@ -41,20 +41,6 @@ public class Color {
      */
     public static int argb(float red, float green, float blue, float alpha) {
         return argb((int) (red * 255), (int) (green * 255), (int) (blue * 255), (int) (alpha * 255));
-    }
-
-    /**
-     * Creates a color int. All values should be 0 - 255
-     */
-    public static int rgba(int red, int green, int blue, int alpha) {
-        return ((red & 0xFF) << 24) | ((green & 0xFF) << 16) | ((blue & 0xFF) << 8) | (alpha & 0xFF);
-    }
-
-    /**
-     * Creates a color int. All values should be 0 - 1
-     */
-    public static int rgba(float red, float green, float blue, float alpha) {
-        return rgba((int) (red * 255), (int) (green * 255), (int) (blue * 255), (int) (alpha * 255));
     }
 
     /**
@@ -629,7 +615,7 @@ public class Color {
      * @return RGBA color
      */
     public static int argbToRgba(int argb) {
-        return Color.rgba(getRed(argb), getGreen(argb), getBlue(argb), getAlpha(argb));
+        return argb(getGreen(argb), getBlue(argb), getAlpha(argb), getRed(argb));
     }
 
     /**
