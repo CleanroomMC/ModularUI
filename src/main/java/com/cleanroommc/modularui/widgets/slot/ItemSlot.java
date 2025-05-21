@@ -15,6 +15,7 @@ import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetSlotTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
@@ -225,7 +226,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             itemstack = NEAAnimationHandler.injectVirtualStack(itemstack, guiContainer, slotIn);
 
             if (!itemstack.isEmpty()) {
-                GlStateManager.enableDepth();
+                Platform.setupDrawItem();
                 float itemScale = NEAAnimationHandler.injectHoverScale(guiContainer, slotIn);
                 // render the item itself
                 renderItem.renderItemAndEffectIntoGUI(guiScreen.mc.player, itemstack, 1, 1);

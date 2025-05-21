@@ -8,11 +8,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 import baubles.api.BaublesApi;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
 public class InventoryTypes {
+
+    @ApiStatus.Internal
+    public static void init() {}
 
     public static final InventoryType PLAYER = new Inventory("player") {
         @Override

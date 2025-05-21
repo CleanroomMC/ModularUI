@@ -2,6 +2,7 @@ package com.cleanroommc.modularui;
 
 import com.cleanroommc.modularui.factory.GuiFactories;
 import com.cleanroommc.modularui.factory.GuiManager;
+import com.cleanroommc.modularui.factory.inventory.InventoryTypes;
 import com.cleanroommc.modularui.holoui.HoloScreenEntity;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.screen.ModularContainer;
@@ -38,8 +39,8 @@ public class CommonProxy {
         }
 
         NetworkHandler.init();
-
         GuiFactories.init();
+        InventoryTypes.init();
     }
 
     void postInit(FMLPostInitializationEvent event) {}
