@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.Widget;
+import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Box;
 
 import net.minecraft.util.text.TextFormatting;
@@ -20,6 +21,8 @@ public class TextWidget extends Widget<TextWidget> {
     private Boolean shadow = null;
     private float scale = 1f;
 
+    private String lastText = null;
+
     public TextWidget(IKey key) {
         this.key = key;
     }
@@ -27,6 +30,12 @@ public class TextWidget extends Widget<TextWidget> {
     @Override
     public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
         TextRenderer renderer = TextRenderer.SHARED;
+        String text = this.key.getFormatted();
+        if (this.lastText != null && !this.lastText.equals(text)) {
+            // scheduling it would resize it on next frame, but we need it now
+            WidgetTree.resizeInternal(this, false);
+        }
+        this.lastText = text;
         renderer.setColor(this.color != null ? this.color : widgetTheme.getTextColor());
         renderer.setAlignment(this.alignment, getArea().w() + this.scale, getArea().h());
         renderer.setShadow(this.shadow != null ? this.shadow : widgetTheme.getTextShadow());
@@ -44,6 +53,7 @@ public class TextWidget extends Widget<TextWidget> {
         renderer.setScale(this.scale);
         renderer.setSimulate(true);
         renderer.draw(this.key.getFormatted());
+        renderer.setSimulate(false);
         return renderer;
     }
 
@@ -58,8 +68,7 @@ public class TextWidget extends Widget<TextWidget> {
             maxWidth = getScreen().getScreenArea().width;
         }
         TextRenderer renderer = simulate(maxWidth);
-        Box padding = getArea().getPadding();
-        return Math.max(1, (int) (renderer.getLastActualHeight() + padding.vertical()));
+        return getWidgetHeight(renderer.getLastActualHeight());
     }
 
     @Override
@@ -69,8 +78,17 @@ public class TextWidget extends Widget<TextWidget> {
             maxWidth = getParent().getArea().width;
         }
         TextRenderer renderer = simulate(maxWidth);
+        return getWidgetWidth(renderer.getLastActualWidth());
+    }
+
+    protected int getWidgetWidth(float actualTextWidth) {
         Box padding = getArea().getPadding();
-        return Math.max(1, (int) Math.ceil(renderer.getLastActualWidth() + padding.horizontal()));
+        return Math.max(1, (int) Math.ceil(actualTextWidth + padding.horizontal()));
+    }
+
+    protected int getWidgetHeight(float actualTextHeight) {
+        Box padding = getArea().getPadding();
+        return Math.max(1, (int) Math.ceil(actualTextHeight + padding.vertical()));
     }
 
     public IKey getKey() {
