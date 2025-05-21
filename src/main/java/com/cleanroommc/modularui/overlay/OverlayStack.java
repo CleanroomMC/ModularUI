@@ -5,7 +5,6 @@ import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.ModularScreen;
 
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -58,17 +57,13 @@ public class OverlayStack {
             screen.getContext().updateState(mouseX, mouseY, partialTicks);
             GlStateManager.enableBlend();
             GlStateManager.color(1f, 1f, 1f, 1f);
-            screen.drawScreen(mouseX, mouseY, partialTicks);
+            screen.drawScreen();
             GlStateManager.color(1f, 1f, 1f, 1f);
-            screen.drawForeground(partialTicks);
+            screen.drawForeground();
             if (screen.getContext().getHovered() != null) hovered = screen;
             fallback = screen;
         }
         ClientScreenHandler.drawDebugScreen(hovered, fallback);
-        GlStateManager.enableLighting();
-        GlStateManager.enableDepth();
-        GlStateManager.enableRescaleNormal();
-        RenderHelper.enableStandardItemLighting();
     }
 
     public static void open(ModularScreen screen) {

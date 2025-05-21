@@ -42,6 +42,9 @@ public class ModularSlot extends SlotItemHandler {
      */
     public ModularSlot(IItemHandler itemHandler, int index) {
         super(itemHandler, index, Integer.MIN_VALUE, Integer.MIN_VALUE);
+        if (index < 0 || index >= itemHandler.getSlots()) {
+            throw new IllegalArgumentException("Tried to create a slot with invalid index " + index + ". Valid index range is [0," + itemHandler.getSlots() + ")");
+        }
     }
 
     @ApiStatus.Internal
@@ -82,6 +85,8 @@ public class ModularSlot extends SlotItemHandler {
         this.changeListener.onChange(itemStack, onlyChangedAmount, client, init);
         if (!init && isInitialized()) getSyncHandler().getSyncManager().getContainer().onSlotChanged(this, itemStack, onlyChangedAmount);
     }
+
+    public void onCraftShiftClick(EntityPlayer player, ItemStack stack) {}
 
     @Override
     public void putStack(@NotNull ItemStack stack) {

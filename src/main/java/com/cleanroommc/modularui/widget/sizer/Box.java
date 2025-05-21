@@ -1,14 +1,20 @@
 package com.cleanroommc.modularui.widget.sizer;
 
+import com.cleanroommc.modularui.animation.IAnimatable;
 import com.cleanroommc.modularui.api.GuiAxis;
+import com.cleanroommc.modularui.utils.Interpolations;
+
+import java.util.Objects;
 
 /**
  * A box with four edges.
  * Used for margins and paddings.
  */
-public class Box {
+public class Box implements IAnimatable<Box> {
 
     public static final Box SHARED = new Box();
+
+    public static final Box ZERO = new Box();
 
     public int left;
     public int top;
@@ -73,5 +79,46 @@ public class Box {
 
     public int getEnd(GuiAxis axis) {
         return axis.isHorizontal() ? this.right : this.bottom;
+    }
+
+    @Override
+    public Box interpolate(Box start, Box end, float t) {
+        this.left = Interpolations.lerp(start.left, end.left, t);
+        this.top = Interpolations.lerp(start.top, end.top, t);
+        this.right = Interpolations.lerp(start.right, end.right, t);
+        this.bottom = Interpolations.lerp(start.bottom, end.bottom, t);
+        return this;
+    }
+
+    @Override
+    public Box copyOrImmutable() {
+        return new Box().set(this);
+    }
+
+    @Override
+    public String toString() {
+        return "Box{" +
+                "left=" + left +
+                ", top=" + top +
+                ", right=" + right +
+                ", bottom=" + bottom +
+                '}';
+    }
+
+    public boolean isEqual(Box box) {
+        return left == box.left && top == box.top && right == box.right && bottom == box.bottom;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return isEqual((Box) o);
+    }
+
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(left, top, right, bottom);
     }
 }

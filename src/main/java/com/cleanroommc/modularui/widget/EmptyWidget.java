@@ -16,7 +16,8 @@ import org.jetbrains.annotations.Nullable;
 public class EmptyWidget implements IWidget {
 
     private final Area area = new Area();
-    private Flex flex;
+    private final Flex flex = new Flex(this);
+    private boolean requiresResize = false;
     private IWidget parent;
 
     @Override
@@ -70,6 +71,21 @@ public class EmptyWidget implements IWidget {
     }
 
     @Override
+    public void scheduleResize() {
+        this.requiresResize = true;
+    }
+
+    @Override
+    public boolean requiresResize() {
+        return this.requiresResize;
+    }
+
+    @Override
+    public void onResized() {
+        this.requiresResize = false;
+    }
+
+    @Override
     public void setEnabled(boolean enabled) {}
 
     @Override
@@ -92,20 +108,16 @@ public class EmptyWidget implements IWidget {
 
     @Override
     public Flex flex() {
-        if (this.flex == null) {
-            this.flex = new Flex(this);
-        }
         return this.flex;
     }
 
     @Override
-    public @Nullable IResizeable resizer() {
+    public @NotNull IResizeable resizer() {
         return this.flex;
     }
 
     @Override
-    public void resizer(IResizeable resizer) {
-    }
+    public void resizer(IResizeable resizer) {}
 
     @Override
     public Flex getFlex() {

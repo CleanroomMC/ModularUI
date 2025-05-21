@@ -45,10 +45,10 @@ public class ItemEditorGui implements IGuiHolder<GuiData> {
 
     @Override
     public ModularPanel buildUI(GuiData data, PanelSyncManager syncManager, UISettings settings) {
-        ItemStack itemStack = syncManager.getPlayer().getHeldItemMainhand();
+        ItemStack itemStack = data.getPlayer().getHeldItemMainhand();
         if (!itemStack.isEmpty()) {
             setStack(itemStack.copy());
-            syncManager.getPlayer().setHeldItem(EnumHand.MAIN_HAND, ItemStack.EMPTY);
+            data.getPlayer().setHeldItem(EnumHand.MAIN_HAND, ItemStack.EMPTY);
             syncManager.addCloseListener(player -> {
                 if (!getStack().isEmpty()) {
                     if (syncManager.getPlayer().getHeldItemMainhand().isEmpty()) {

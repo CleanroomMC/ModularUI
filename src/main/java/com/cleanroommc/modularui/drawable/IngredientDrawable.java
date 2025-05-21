@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.api.IJsonSerializable;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -10,7 +11,7 @@ import net.minecraft.item.crafting.Ingredient;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class IngredientDrawable implements IDrawable {
+public class IngredientDrawable implements IDrawable, IJsonSerializable {
 
     private ItemStack[] items;
 
@@ -28,7 +29,7 @@ public class IngredientDrawable implements IDrawable {
         if (this.items.length == 0) return;
         ItemStack item = this.items[(int) (Minecraft.getSystemTime() % (1000 * this.items.length)) / 1000];
         if (item != null) {
-            GuiDraw.drawItem(item, x, y, width, height);
+            GuiDraw.drawItem(item, x, y, width, height, context.getCurrentDrawingZ());
         }
     }
 

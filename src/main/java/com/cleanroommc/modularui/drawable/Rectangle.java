@@ -1,9 +1,12 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.animation.IAnimatable;
+import com.cleanroommc.modularui.api.IJsonSerializable;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.JsonHelper;
 
 import net.minecraftforge.fml.relauncher.Side;
@@ -14,7 +17,7 @@ import com.google.gson.JsonObject;
 
 import java.util.function.IntConsumer;
 
-public class Rectangle implements IDrawable {
+public class Rectangle implements IDrawable, IJsonSerializable, IAnimatable<Rectangle> {
 
     public static final double PI_2 = Math.PI / 2;
 
@@ -119,10 +122,41 @@ public class Rectangle implements IDrawable {
         this.cornerSegments = JsonHelper.getInt(json, 10, "cornerSegments");
     }
 
+    @Override
+    public boolean saveToJson(JsonObject json) {
+        json.addProperty("colorTL", this.colorTL);
+        json.addProperty("colorTR", this.colorTR);
+        json.addProperty("colorBL", this.colorBL);
+        json.addProperty("colorBR", this.colorBR);
+        json.addProperty("cornerRadius", this.cornerRadius);
+        json.addProperty("cornerSegments", this.cornerSegments);
+        return true;
+    }
+
     private void setColor(JsonObject json, IntConsumer color, String... keys) {
         JsonElement element = JsonHelper.getJsonElement(json, keys);
         if (element != null) {
             color.accept(Color.ofJson(element));
         }
+    }
+
+    @Override
+    public Rectangle interpolate(Rectangle start, Rectangle end, float t) {
+        this.cornerRadius = Interpolations.lerp(start.cornerRadius, end.cornerRadius, t);
+        this.cornerSegments = Interpolations.lerp(start.cornerSegments, end.cornerSegments, t);
+        this.colorTL = Color.interpolate(start.colorTL, end.colorTL, t);
+        this.colorTR = Color.interpolate(start.colorTR, end.colorTR, t);
+        this.colorBL = Color.interpolate(start.colorBL, end.colorBL, t);
+        this.colorBR = Color.interpolate(start.colorBR, end.colorBR, t);
+        return this;
+    }
+
+    @Override
+    public Rectangle copyOrImmutable() {
+        return new Rectangle()
+                .setColor(this.colorTL, this.colorTR, this.colorBL, this.colorBR)
+                .setCornerRadius(this.cornerRadius)
+                .setCornerSegments(this.cornerSegments)
+                .setCanApplyTheme(this.canApplyTheme);
     }
 }

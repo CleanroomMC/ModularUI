@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class JsonHelper {
@@ -22,6 +23,10 @@ public class JsonHelper {
             .create();
 
     public static final JsonParser parser = new JsonParser();
+
+    public static JsonElement serialize(Object object) {
+        return gson.toJsonTree(object);
+    }
 
     public static <T> T deserialize(JsonElement json, Class<T> clazz) {
         return gson.fromJson(json, clazz);
@@ -183,5 +188,11 @@ public class JsonHelper {
             base.add(entry.getKey(), entry.getValue());
         }
         return base;
+    }
+
+    public static JsonObject makeJson(Consumer<JsonObject> writer) {
+        JsonObject json = new JsonObject();
+        writer.accept(json);
+        return json;
     }
 }

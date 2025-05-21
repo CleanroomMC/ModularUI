@@ -195,6 +195,10 @@ public class ScrollArea extends Area {
         this.scrollBarBackgroundColor = scrollBarBackgroundColor;
     }
 
+    public boolean isDragging() {
+        return (this.scrollX != null && this.scrollX.isDragging()) || (this.scrollY != null && this.scrollY.isDragging());
+    }
+
     /**
      * This method is responsible for drawing a scroll bar
      */

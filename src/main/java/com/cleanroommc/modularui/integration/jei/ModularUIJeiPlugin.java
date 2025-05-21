@@ -3,12 +3,14 @@ package com.cleanroommc.modularui.integration.jei;
 import com.cleanroommc.modularui.core.mixin.jei.GhostIngredientDragManagerAccessor;
 import com.cleanroommc.modularui.core.mixin.jei.IngredientListOverlayAccessor;
 import com.cleanroommc.modularui.screen.GuiContainerWrapper;
+import com.cleanroommc.modularui.screen.GuiScreenWrapper;
+import com.cleanroommc.modularui.screen.ModularContainer;
+import com.cleanroommc.modularui.test.CraftingModularContainer;
 
 import mezz.jei.api.IJeiRuntime;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.IModRegistry;
 import mezz.jei.api.JEIPlugin;
-
 import mezz.jei.gui.ghost.GhostIngredientDrag;
 import mezz.jei.gui.ghost.GhostIngredientDragManager;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +22,10 @@ public class ModularUIJeiPlugin implements IModPlugin {
 
     @Override
     public void register(@NotNull IModRegistry registry) {
-        new ModularUIHandler<>(GuiContainerWrapper.class).register(registry);
+        ModularScreenJEIHandler.register(GuiContainerWrapper.class, registry);
+        ModularScreenJEIHandler.register(GuiScreenWrapper.class, registry);
+        ModularContainerJEIHandler.register(ModularContainer.class, registry);
+        ModularContainerJEIHandler.register(CraftingModularContainer.class, registry);
     }
 
     @Override

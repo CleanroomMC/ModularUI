@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.api.drawable;
 
-import com.cleanroommc.modularui.drawable.DrawableArray;
+import com.cleanroommc.modularui.drawable.DrawableStack;
 import com.cleanroommc.modularui.drawable.Icon;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
@@ -11,7 +11,6 @@ import com.cleanroommc.modularui.widget.sizer.Area;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -26,18 +25,18 @@ public interface IDrawable {
         } else if (drawables.length == 1) {
             return drawables[0];
         } else {
-            return new DrawableArray(drawables);
+            return new DrawableStack(drawables);
         }
     }
 
     /**
      * Draws this drawable at the given position with the given size.
      *
-     * @param context current context to draw with
-     * @param x       x position
-     * @param y       y position
-     * @param width   draw width
-     * @param height  draw height
+     * @param context     current context to draw with
+     * @param x           x position
+     * @param y           y position
+     * @param width       draw width
+     * @param height      draw height
      * @param widgetTheme current theme
      */
     @SideOnly(Side.CLIENT)
@@ -86,8 +85,8 @@ public interface IDrawable {
     /**
      * Draws this drawable in a given area.
      *
-     * @param context current context to draw with
-     * @param area    draw area
+     * @param context     current context to draw with
+     * @param area        draw area
      * @param widgetTheme current theme
      */
     @SideOnly(Side.CLIENT)
@@ -107,8 +106,8 @@ public interface IDrawable {
     /**
      * Draws this drawable at the current (0|0) with the given area's size.
      *
-     * @param context gui context
-     * @param area    draw area
+     * @param context     gui context
+     * @param area        draw area
      * @param widgetTheme current theme
      */
     @SideOnly(Side.CLIENT)
@@ -138,13 +137,6 @@ public interface IDrawable {
     }
 
     /**
-     * Reads extra json data after this drawable is created.
-     *
-     * @param json json to read from
-     */
-    default void loadFromJson(JsonObject json) {}
-
-    /**
      * An empty drawable. Does nothing.
      */
     IDrawable EMPTY = (context, x, y, width, height, widgetTheme) -> {};
@@ -156,7 +148,7 @@ public interface IDrawable {
 
     static boolean isVisible(@Nullable IDrawable drawable) {
         if (drawable == null || drawable == EMPTY || drawable == NONE) return false;
-        if (drawable instanceof DrawableArray array) {
+        if (drawable instanceof DrawableStack array) {
             return array.getDrawables().length > 0;
         }
         return true;

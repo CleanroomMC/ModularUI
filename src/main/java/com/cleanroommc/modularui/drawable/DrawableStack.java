@@ -1,19 +1,25 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.api.IJsonSerializable;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 
+import com.google.gson.JsonObject;
+
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class DrawableArray implements IDrawable {
+/**
+ * A stack of {@link IDrawable} backed by an array which are drawn on top of each other.
+ */
+public class DrawableStack implements IDrawable, IJsonSerializable {
 
     public static final IDrawable[] EMPTY_BACKGROUND = {};
 
     private final IDrawable[] drawables;
 
-    public DrawableArray(IDrawable... drawables) {
+    public DrawableStack(IDrawable... drawables) {
         this.drawables = drawables == null || drawables.length == 0 ? EMPTY_BACKGROUND : drawables;
     }
 
@@ -37,5 +43,12 @@ public class DrawableArray implements IDrawable {
 
     public IDrawable[] getDrawables() {
         return this.drawables;
+    }
+
+    @Override
+    public boolean saveToJson(JsonObject json) {
+        // serialized as special case
+        // this method should never be called
+        throw new IllegalStateException();
     }
 }

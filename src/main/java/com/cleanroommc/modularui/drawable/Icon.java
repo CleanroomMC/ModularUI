@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.api.IJsonSerializable;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -16,7 +17,7 @@ import com.google.gson.JsonObject;
 /**
  * A {@link IDrawable} wrapper with a fixed size and an alignment.
  */
-public class Icon implements IIcon {
+public class Icon implements IIcon, IJsonSerializable {
 
     private final IDrawable drawable;
     private int width = 0, height = 0;
@@ -91,6 +92,10 @@ public class Icon implements IIcon {
         return this;
     }
 
+    public Icon center() {
+        return alignment(Alignment.Center);
+    }
+
     public Icon color(int color) {
         this.color = color;
         return this;
@@ -157,6 +162,19 @@ public class Icon implements IIcon {
 
     public static Icon ofJson(JsonObject json) {
         return JsonHelper.deserialize(json, IDrawable.class, IDrawable.EMPTY, "drawable", "icon").asIcon();
+    }
+
+    @Override
+    public boolean saveToJson(JsonObject json) {
+        json.add("drawable", JsonHelper.serialize(this.drawable));
+        json.addProperty("width", this.width);
+        json.addProperty("height", this.height);
+        json.add("alignment", JsonHelper.serialize(this.alignment));
+        json.addProperty("marginTop", this.margin.top);
+        json.addProperty("marginBottom", this.margin.bottom);
+        json.addProperty("marginLeft", this.margin.left);
+        json.addProperty("marginRight", this.margin.right);
+        return true;
     }
 
     @Override

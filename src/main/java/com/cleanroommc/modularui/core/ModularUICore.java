@@ -40,6 +40,11 @@ public class ModularUICore implements IFMLLoadingPlugin, IEarlyMixinLoader {
 
     @Override
     public void injectData(Map<String, Object> data) {
+        // this checks needs to happen this early
+        // randompatches would otherwise crash shortly after this
+        if (classExists("com.therandomlabs.randompatches.core.RPCore")) {
+            throw new IllegalStateException("ModularUI is incompatible with RandomPatches. Please remove RandomPatches or replace it with UniversalTweaks as most features are replaced by it.");
+        }
         for (IClassTransformer transformer : Launch.classLoader.getTransformers()) {
             String name = transformer.getClass().getName();
             if (name.endsWith("appeng.core.transformer.AE2ELTransformer")) {
@@ -58,5 +63,14 @@ public class ModularUICore implements IFMLLoadingPlugin, IEarlyMixinLoader {
     @Override
     public List<String> getMixinConfigs() {
         return Collections.singletonList("mixin.modularui.json");
+    }
+
+    private static boolean classExists(String className) {
+        try {
+            Class.forName(className, false, Launch.classLoader);
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 }

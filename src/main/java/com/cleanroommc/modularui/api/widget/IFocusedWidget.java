@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 
 /**
  * An interface for {@link IWidget}'s, that makes them focusable.
+ * Usually used for text fields to receive keyboard and mouse input first, no matter if its hovered or not.
  */
 public interface IFocusedWidget {
 

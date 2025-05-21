@@ -1,9 +1,12 @@
 package com.cleanroommc.modularui.api.layout;
 
+import com.cleanroommc.modularui.api.widget.INotifyEnabled;
+import com.cleanroommc.modularui.api.widget.IWidget;
+
 /**
  * This is responsible for laying out widgets.
  */
-public interface ILayoutWidget {
+public interface ILayoutWidget extends INotifyEnabled {
 
     /**
      * Called after the children tried to calculate their size.
@@ -17,4 +20,20 @@ public interface ILayoutWidget {
      * The last call guarantees, that this widget is fully calculated.
      */
     default void postLayoutWidgets() {}
+
+    /**
+     * Called when determining wrapping size of this widget.
+     * If this method returns true, size and margin of the queried child will be ignored for calculation.
+     * Typically return true when the child is disabled and you want to collapse it for layout.
+     * This method should also be used for layouting children with {@link #layoutWidgets} if it might return true.
+     */
+    default boolean shouldIgnoreChildSize(IWidget child) {
+        return false;
+    }
+
+    @Override
+    default void onChildChangeEnabled(IWidget child, boolean enabled) {
+        layoutWidgets();
+        postLayoutWidgets();
+    }
 }

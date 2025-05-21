@@ -17,10 +17,16 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.Interpolation;
 import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.value.IntValue;
 import com.cleanroommc.modularui.value.StringValue;
-import com.cleanroommc.modularui.value.sync.*;
+import com.cleanroommc.modularui.value.sync.DynamicSyncHandler;
+import com.cleanroommc.modularui.value.sync.GenericSyncValue;
+import com.cleanroommc.modularui.value.sync.IntSyncValue;
+import com.cleanroommc.modularui.value.sync.ItemSlotSH;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+import com.cleanroommc.modularui.value.sync.SyncHandlers;
 import com.cleanroommc.modularui.widget.EmptyWidget;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widgets.*;
@@ -42,11 +48,14 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
+import java.util.Random;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -72,6 +81,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
     private final int duration = 80;
     private int progress = 0;
     private int cycleState = 0;
+    private ItemStack displayItem = new ItemStack(Items.DIAMOND);
     private final IItemHandlerModifiable inventory = new ItemStackHandler(2) {
         @Override
         public int getSlotLimit(int slot) {
@@ -102,6 +112,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         syncManager.syncValue("mixer_fluids", 1, SyncHandlers.fluidSlot(this.mixerFluids2));
         IntSyncValue cycleStateValue = new IntSyncValue(() -> this.cycleState, val -> this.cycleState = val);
         syncManager.syncValue("cycle_state", cycleStateValue);
+        syncManager.syncValue("display_item", GenericSyncValue.forItem(() -> this.displayItem, null));
         syncManager.bindPlayerInventory(guiData.getPlayer());
 
         DynamicSyncHandler.Notifier dynamicSyncNotifier = new DynamicSyncHandler.Notifier();
@@ -131,10 +142,35 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                 .tab(GuiTextures.TAB_TOP, 0))
                         .child(new PageButton(3, tabController)
                                 .tab(GuiTextures.TAB_TOP, 0)
-                                .overlay(new ItemDrawable(Blocks.CRAFTING_TABLE).asIcon()))
-                        .child(new PageButton(4, tabController)
-                                .tab(GuiTextures.TAB_TOP, 0)
                                 .overlay(new ItemDrawable(Blocks.CHEST).asIcon())))
+                .child(new Expandable()
+                        .debugName("expandable")
+                        .top(0)
+                        .leftRelOffset(1f, 1)
+                        .background(GuiTextures.MC_BACKGROUND)
+                        .excludeAreaInJei()
+                        .stencilTransform((r, expanded) -> {
+                            if (expanded) {
+                                r.width -= 5;
+                                r.height -= 5;
+                            }
+                        })
+                        .animationDuration(500)
+                        .interpolation(Interpolation.BOUNCE_OUT)
+                        .normalView(new ItemDrawable(Blocks.CRAFTING_TABLE).asIcon().asWidget().size(20).pos(0, 0))
+                        .expandedView(new ParentWidget<>()
+                                .debugName("crafting tab")
+                                .coverChildren()
+                                .child(new ItemDrawable(Blocks.CRAFTING_TABLE).asIcon().asWidget().size(20).pos(0, 0))
+                                .child(SlotGroupWidget.builder()
+                                        .row("III  D")
+                                        .row("III  O")
+                                        .row("III   ")
+                                        .key('I', i -> new ItemSlot().slot(new ModularSlot(this.craftingInventory, i)))
+                                        .key('O', new ItemSlot().slot(new ModularCraftingSlot(this.craftingInventory, 9)))
+                                        .key('D', new ItemDisplayWidget().syncHandler("display_item").displayAmount(true))
+                                        .build()
+                                        .margin(5, 5, 20, 5))))
                 .child(Flow.column()
                         .sizeRel(1f)
                         .paddingBottom(7)
@@ -199,11 +235,13 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                 .child(new TextFieldWidget()
                                                                         .size(60, 20)
                                                                         .value(SyncHandlers.string(() -> this.value, val -> this.value = val))
-                                                                        .margin(0, 3))
+                                                                        .margin(0, 3)
+                                                                        .hintText("hint"))
                                                                 .child(new TextFieldWidget()
                                                                         .size(60, 20)
                                                                         .value(SyncHandlers.doubleNumber(() -> this.doubleValue, val -> this.doubleValue = val))
-                                                                        .setNumbersDouble(Function.identity()))
+                                                                        .setNumbersDouble(Function.identity())
+                                                                        .hintText("number"))
                                                                 .child(IKey.str("Test string").asWidget().padding(2).debugName("test string"))
                                                                 .child(IKey.EMPTY.asWidget().debugName("Empty Ikey")))
                                                         .child(new Column()
@@ -356,19 +394,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                 .child(IKey.lang("bogosort.gui.enabled").asWidget()
                                                                         .height(14)))))
                                         .addPage(new ParentWidget<>()
-                                                .debugName("page 4 crafting")
-                                                .sizeRel(1f)
-                                                .child(SlotGroupWidget.builder()
-                                                        .row("III   ")
-                                                        .row("III  O")
-                                                        .row("III   ")
-                                                        .key('I', i -> new ItemSlot().slot(new ModularSlot(this.craftingInventory, i)))
-                                                        .key('O', new ItemSlot().slot(new ModularCraftingSlot(this.craftingInventory, 9)))
-                                                        .build()
-                                                        .center())
-                                        )
-                                        .addPage(new ParentWidget<>()
-                                                .debugName("page 5 storage")
+                                                .debugName("page 4 storage")
                                                 .sizeRel(1f)
                                                 .child(new Column()
                                                         .padding(7)
@@ -417,8 +443,11 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         ModularPanel panel = new Dialog<>("second_window", null)
                 .setDisablePanelsBelow(false)
                 .setCloseOnOutOfBoundsClick(false)
+                .setDraggable(true)
                 .size(100, 100);
         SlotGroup slotGroup = new SlotGroup("small_inv", 2);
+        IntSyncValue timeSync = new IntSyncValue(() -> (int)java.lang.System.currentTimeMillis());
+        syncManager.syncValue(123456,timeSync);
         syncManager.registerSlotGroup(slotGroup);
         AtomicInteger number = new AtomicInteger(0);
         syncManager.syncValue("int_value", new IntSyncValue(number::get, number::set));
@@ -490,8 +519,11 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                 this.val++;
             }
         } else {
-            if (this.time++ % 20 == 0 && ++this.val2 == 3) {
-                this.val2 = 0;
+            if (this.time++ % 20 == 0) {
+                if (++this.val2 == 3) this.val2 = 0;
+                Collection<Item> vals = ForgeRegistries.ITEMS.getValuesCollection();
+                Item item = vals.stream().skip(new Random().nextInt(vals.size())).findFirst().orElse(Items.DIAMOND);
+                this.displayItem = new ItemStack(item, 26735987);
             }
         }
         if (++this.progress == this.duration) {

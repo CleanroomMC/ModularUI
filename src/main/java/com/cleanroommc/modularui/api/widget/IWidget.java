@@ -27,7 +27,7 @@ public interface IWidget extends IGuiElement {
      * This element now becomes valid
      *
      * @param parent the parent this element belongs to
-     * @param late
+     * @param late true if this is called some time after the widget tree of the parent has been initialised
      */
     void initialise(@NotNull IWidget parent, boolean late);
 
@@ -91,7 +91,7 @@ public interface IWidget extends IGuiElement {
     void drawForeground(ModularGuiContext context);
 
     default void transform(IViewportStack stack) {
-        stack.translate(getArea().rx, getArea().ry);
+        stack.translate(getArea().rx, getArea().ry, getArea().getPanelLayer() * 20);
     }
 
     default WidgetTheme getWidgetTheme(ITheme theme) {
@@ -216,6 +216,8 @@ public interface IWidget extends IGuiElement {
     /**
      * @return resizer of this widget
      */
+    @NotNull
+    @Override
     IResizeable resizer();
 
     /**
@@ -228,7 +230,7 @@ public interface IWidget extends IGuiElement {
     /**
      * Called before a widget is resized.
      */
-    default void beforeResize() {}
+    default void beforeResize(boolean onOpen) {}
 
     /**
      * Called after a widget is fully resized.

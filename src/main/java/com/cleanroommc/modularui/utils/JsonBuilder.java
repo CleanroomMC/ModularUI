@@ -27,6 +27,16 @@ public class JsonBuilder {
         return this;
     }
 
+    public JsonBuilder mergeAdd(String key, JsonObject element) {
+        JsonElement merged = this.json.get(key);
+        if (merged == null || !merged.isJsonObject()) return add(key, element);
+        JsonObject mergedObj = merged.getAsJsonObject();
+        for (Map.Entry<String, JsonElement> entry : element.entrySet()) {
+            mergedObj.add(entry.getKey(), entry.getValue());
+        }
+        return this;
+    }
+
     public JsonBuilder add(String key, String element) {
         this.json.addProperty(key, element);
         return this;
@@ -53,6 +63,10 @@ public class JsonBuilder {
 
     public JsonBuilder add(String key, JsonArrayBuilder element) {
         return add(key, element.getJson());
+    }
+
+    public JsonBuilder mergeAdd(String key, JsonBuilder element) {
+        return mergeAdd(key, element.getJson());
     }
 
     public JsonBuilder addObject(String key, Consumer<JsonBuilder> builderConsumer) {

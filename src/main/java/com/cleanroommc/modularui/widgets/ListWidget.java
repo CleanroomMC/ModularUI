@@ -8,13 +8,11 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.widget.AbstractScrollWidget;
-import com.cleanroommc.modularui.widget.scroll.HorizontalScrollData;
 import com.cleanroommc.modularui.widget.scroll.ScrollData;
 import com.cleanroommc.modularui.widget.scroll.VerticalScrollData;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.function.IntFunction;
 
@@ -29,6 +27,7 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
     private ScrollData scrollData;
     private IIcon childSeparator;
     private final IntList separatorPositions = new IntArrayList();
+    private boolean collapseDisabledChild = true;
 
     public ListWidget() {
         super(null, null);
@@ -70,6 +69,7 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
         int separatorSize = getSeparatorSize();
         int p = getArea().getPadding().getStart(axis);
         for (IWidget widget : getChildren()) {
+            if (shouldIgnoreChildSize(widget)) continue;
             if (axis.isVertical() ?
                     widget.getFlex().hasYPos() || !widget.resizer().isHeightCalculated() :
                     widget.getFlex().hasXPos() || !widget.resizer().isWidthCalculated()) {
@@ -85,8 +85,23 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
             }
             this.separatorPositions.add(p);
             p += separatorSize;
+            if (isValid()) {
+                widget.flex().applyPos(widget);
+            }
         }
         getScrollData().setScrollSize(p + getArea().getPadding().getEnd(axis));
+    }
+
+    @Override
+    public boolean shouldIgnoreChildSize(IWidget child) {
+        return this.collapseDisabledChild && !child.isEnabled();
+    }
+
+    @Override
+    public void onChildChangeEnabled(IWidget child, boolean enabled) {
+        if (this.collapseDisabledChild) {
+            ILayoutWidget.super.onChildChangeEnabled(child, enabled);
+        }
     }
 
     @Override
@@ -95,9 +110,20 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
     }
 
     @Override
+    public boolean remove(I child) {
+        return super.remove(child);
+    }
+
+    @Override
+    public boolean remove(int index) {
+        return super.remove(index);
+    }
+
+    @Override
     public void onChildAdd(I child) {
         super.onChildAdd(child);
         if (isValid()) {
+            scheduleResize();
             this.scrollData.clamp(getScrollArea());
         }
     }
@@ -106,6 +132,7 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
     public void onChildRemove(I child) {
         super.onChildRemove(child);
         if (isValid()) {
+            scheduleResize();
             this.scrollData.clamp(getScrollArea());
         }
     }
@@ -146,6 +173,26 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
         for (int i = 0; i < amount; i++) {
             child(widgetCreator.apply(i));
         }
+        return getThis();
+    }
+
+    /**
+     * Sets if disabled children should be collapsed.
+     */
+    public W collapseDisabledChild() {
+        return collapseDisabledChild(true);
+    }
+
+    /**
+     * Sets if disabled children should be collapsed. This means that if a child changes enabled state, this widget gets notified and
+     * re-layouts its children. Children which are disabled will not be considered during layout, so that the list will not appear to have
+     * empty spots. This is enabled by default on lists.
+     *
+     * @param doCollapse true if disabled children should be collapsed.
+     * @return this
+     */
+    public W collapseDisabledChild(boolean doCollapse) {
+        this.collapseDisabledChild = doCollapse;
         return getThis();
     }
 }

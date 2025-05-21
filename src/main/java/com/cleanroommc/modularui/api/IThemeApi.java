@@ -17,6 +17,31 @@ import java.util.List;
  */
 public interface IThemeApi {
 
+    // widget themes
+    String FALLBACK = "default";
+    String PANEL = "panel";
+    String BUTTON = "button";
+    String ITEM_SLOT = "itemSlot";
+    String FLUID_SLOT = "fluidSlot";
+    String TEXT_FIELD = "textField";
+    String TOGGLE_BUTTON = "toggleButton";
+
+    // properties
+    String PARENT = "parent";
+    String BACKGROUND = "background";
+    String HOVER_BACKGROUND = "hoverBackground";
+    String COLOR = "color";
+    String TEXT_COLOR = "textColor";
+    String TEXT_SHADOW = "textShadow";
+    String SLOT_HOVER_COLOR = "slotHoverColor";
+    String MARKED_COLOR = "markedColor";
+    String HINT_COLOR = "hintColor";
+    String SELECTED_BACKGROUND = "selectedBackground";
+    String SELECTED_HOVER_BACKGROUND = "selectedHoverBackground";
+    String SELECTED_COLOR = "selectedColor";
+    String SELECTED_TEXT_COLOR = "selectedTextColor";
+    String SELECTED_TEXT_SHADOW = "selectedTextShadow";
+
     /**
      * @return the default api implementation
      */
