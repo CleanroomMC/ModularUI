@@ -11,6 +11,7 @@ import mezz.jei.api.IJeiRuntime;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.IModRegistry;
 import mezz.jei.api.JEIPlugin;
+import mezz.jei.config.Config;
 import mezz.jei.gui.ghost.GhostIngredientDrag;
 import mezz.jei.gui.ghost.GhostIngredientDragManager;
 import org.jetbrains.annotations.NotNull;
@@ -42,6 +43,7 @@ public class ModularUIJeiPlugin implements IModPlugin {
     }
 
     public static boolean hoveringOverIngredient(JeiGhostIngredientSlot<?> ingredientSlot) {
+        if (Config.isCheatItemsEnabled()) return false;
         Object hovered = getHoverdObject();
         if (hovered == null) return false;
         return ingredientSlot.castGhostIngredientIfValid(hovered) != null;
