@@ -278,7 +278,10 @@ public class WidgetTree {
 
     @ApiStatus.Internal
     public static void resizeInternal(IWidget parent, boolean onOpen) {
-        // TODO check if widget has a parent which depends on its children
+        // check if updating this widget's pos and size can potentially update its parents
+        while (!(parent instanceof ModularPanel) && (parent.getParent() instanceof ILayoutWidget || parent.getParent().flex().dependsOnChildren())) {
+            parent = parent.getParent();
+        }
         // resize each widget and calculate their relative pos
         if (!resizeWidget(parent, true, onOpen) && !resizeWidget(parent, false, onOpen)) {
             throw new IllegalStateException("Failed to resize widgets");

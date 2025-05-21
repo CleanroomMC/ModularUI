@@ -311,6 +311,10 @@ public class Flex implements IResizeable, IPositioned<Flex> {
         return axis.isHorizontal() ? xAxisDependsOnChildren() : yAxisDependsOnChildren();
     }
 
+    public boolean dependsOnChildren() {
+        return xAxisDependsOnChildren() || yAxisDependsOnChildren();
+    }
+
     public boolean hasFixedSize() {
         return this.x.hasFixedSize() && this.y.hasFixedSize();
     }
