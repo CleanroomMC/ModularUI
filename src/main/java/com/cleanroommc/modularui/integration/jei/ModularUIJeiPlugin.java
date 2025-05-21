@@ -49,6 +49,13 @@ public class ModularUIJeiPlugin implements IModPlugin {
         return ingredientSlot.castGhostIngredientIfValid(hovered) != null;
     }
 
+    public static boolean draggingValidIngredient(JeiGhostIngredientSlot<?> ingredientSlot) {
+        if (Config.isCheatItemsEnabled()) return false;
+        Object dragging = getGhostDrag();
+        if (dragging == null) return false;
+        return ingredientSlot.castGhostIngredientIfValid(dragging) != null;
+    }
+
     public static GhostIngredientDrag<?> getGhostDrag() {
         return ((GhostIngredientDragManagerAccessor) getGhostDragManager()).getGhostIngredientDrag();
     }

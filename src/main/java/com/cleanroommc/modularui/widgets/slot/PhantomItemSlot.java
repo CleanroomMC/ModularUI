@@ -33,7 +33,7 @@ public class PhantomItemSlot extends ItemSlot implements JeiGhostIngredientSlot<
 
     @Override
     protected void drawOverlay() {
-        if (ModularUI.Mods.JEI.isLoaded() && (ModularUIJeiPlugin.hasDraggingGhostIngredient() || ModularUIJeiPlugin.hoveringOverIngredient(this))) {
+        if (ModularUI.Mods.JEI.isLoaded() && (ModularUIJeiPlugin.draggingValidIngredient(this) || ModularUIJeiPlugin.hoveringOverIngredient(this))) {
             GlStateManager.colorMask(true, true, true, false);
             drawHighlight(getArea(), isHovering());
             GlStateManager.colorMask(true, true, true, true);
