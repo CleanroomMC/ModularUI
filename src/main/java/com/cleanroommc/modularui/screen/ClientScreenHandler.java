@@ -490,7 +490,7 @@ public class ClientScreenHandler {
         ((GuiScreenAccessor) mcScreen).getItemRender().zLevel = 200.0F;
         FontRenderer font = stack.getItem().getFontRenderer(stack);
         if (font == null) font = ((GuiScreenAccessor) mcScreen).getFontRenderer();
-        GlStateManager.enableDepth();
+        Platform.setupDrawItem();
         ((GuiScreenAccessor) mcScreen).getItemRender().renderItemAndEffectIntoGUI(stack, x, y);
         ((GuiScreenAccessor) mcScreen).getItemRender().renderItemOverlayIntoGUI(font, stack, x, y - (((GuiContainerAccessor) mcScreen).getDraggedStack().isEmpty() ? 0 : 8), altText);
         GlStateManager.disableDepth();

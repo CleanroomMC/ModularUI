@@ -72,11 +72,14 @@ public class NEAAnimationHandler {
         }
     }
 
-    public static ItemStack injectVirtualStack(GuiContainer guiContainer, ModularSlot slot) {
+    public static ItemStack injectVirtualStack(ItemStack original, GuiContainer guiContainer, ModularSlot slot) {
         if (!slot.isPhantom() && ModularUI.Mods.NEA.isLoaded() && NEAConfig.moveAnimationTime > 0) {
-            return ItemMoveAnimation.getVirtualStack(guiContainer, slot);
+            ItemStack virtual = ItemMoveAnimation.getVirtualStack(guiContainer, slot);
+            if (virtual != null) {
+                return virtual;
+            }
         }
-        return null;
+        return original;
     }
 
     public static float injectHoverScale(GuiContainer guiContainer, ModularSlot slot) {

@@ -222,10 +222,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 GuiDraw.drawRect(1, 1, 16, 16, -2130706433);
             }
 
-            ItemStack virtualStack = NEAAnimationHandler.injectVirtualStack(guiContainer, slotIn);
-            if (virtualStack != null) {
-                itemstack = virtualStack;
-            }
+            itemstack = NEAAnimationHandler.injectVirtualStack(itemstack, guiContainer, slotIn);
 
             if (!itemstack.isEmpty()) {
                 GlStateManager.enableDepth();
