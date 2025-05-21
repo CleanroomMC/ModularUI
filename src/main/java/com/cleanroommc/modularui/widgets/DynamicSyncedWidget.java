@@ -47,7 +47,7 @@ public class DynamicSyncedWidget<W extends DynamicSyncedWidget<W>> extends Widge
         this.child = widget;
         if (isValid()) {
             this.child.initialise(this, true);
-            WidgetTree.resize(this);
+            scheduleResize();
         }
     }
 
