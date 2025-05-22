@@ -29,7 +29,7 @@ public class IngredientDrawable implements IDrawable, IJsonSerializable {
         if (this.items.length == 0) return;
         ItemStack item = this.items[(int) (Minecraft.getSystemTime() % (1000 * this.items.length)) / 1000];
         if (item != null) {
-            GuiDraw.drawItem(item, x, y, width, height);
+            GuiDraw.drawItem(item, x, y, width, height, context.getCurrentDrawingZ());
         }
     }
 

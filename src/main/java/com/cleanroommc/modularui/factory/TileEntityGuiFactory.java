@@ -1,12 +1,16 @@
 package com.cleanroommc.modularui.factory;
 
 import com.cleanroommc.modularui.api.IGuiHolder;
+import com.cleanroommc.modularui.api.MCHelper;
+import com.cleanroommc.modularui.utils.Platform;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -22,13 +26,7 @@ public class TileEntityGuiFactory extends AbstractUIFactory<PosGuiData> {
 
     public <T extends TileEntity & IGuiHolder<PosGuiData>> void open(EntityPlayer player, T tile) {
         Objects.requireNonNull(player);
-        Objects.requireNonNull(tile);
-        if (tile.isInvalid()) {
-            throw new IllegalArgumentException("Can't open invalid TileEntity GUI!");
-        }
-        if (player.world != tile.getWorld()) {
-            throw new IllegalArgumentException("TileEntity must be in same dimension as the player!");
-        }
+        verifyTile(player, tile);
         BlockPos pos = tile.getPos();
         PosGuiData data = new PosGuiData(player, pos.getX(), pos.getY(), pos.getZ());
         GuiManager.open(this, data, (EntityPlayerMP) player);
@@ -39,6 +37,19 @@ public class TileEntityGuiFactory extends AbstractUIFactory<PosGuiData> {
         Objects.requireNonNull(pos);
         PosGuiData data = new PosGuiData(player, pos.getX(), pos.getY(), pos.getZ());
         GuiManager.open(this, data, (EntityPlayerMP) player);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public <T extends TileEntity & IGuiHolder<PosGuiData>> void openClient(T tile) {
+        verifyTile(Platform.getClientPlayer(), tile);
+        BlockPos pos = tile.getPos();
+        GuiManager.openFromClient(this, new PosGuiData(MCHelper.getPlayer(), pos.getX(), pos.getY(), pos.getZ()));
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void openClient(BlockPos pos) {
+        Objects.requireNonNull(pos);
+        GuiManager.openFromClient(this, new PosGuiData(MCHelper.getPlayer(), pos.getX(), pos.getY(), pos.getZ()));
     }
 
     @Override
@@ -61,5 +72,15 @@ public class TileEntityGuiFactory extends AbstractUIFactory<PosGuiData> {
     @Override
     public @NotNull PosGuiData readGuiData(EntityPlayer player, PacketBuffer buffer) {
         return new PosGuiData(player, buffer.readVarInt(), buffer.readVarInt(), buffer.readVarInt());
+    }
+
+    public static void verifyTile(EntityPlayer player, TileEntity tile) {
+        Objects.requireNonNull(tile);
+        if (tile.isInvalid()) {
+            throw new IllegalArgumentException("Can't open invalid TileEntity GUI!");
+        }
+        if (Platform.getClientPlayer().world != tile.getWorld()) {
+            throw new IllegalArgumentException("TileEntity must be in same dimension as the player!");
+        }
     }
 }

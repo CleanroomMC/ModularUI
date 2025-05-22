@@ -20,7 +20,7 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
                 .size(10).top(4).right(4)
                 .onMousePressed(mouseButton -> {
                     if (mouseButton == 0 || mouseButton == 1) {
-                        buttonWidget.getPanel().closeIfOpen(true);
+                        buttonWidget.getPanel().closeIfOpen();
                         return true;
                     }
                     return false;

@@ -1,11 +1,12 @@
 package com.cleanroommc.modularui.api.layout;
 
+import com.cleanroommc.modularui.api.widget.INotifyEnabled;
 import com.cleanroommc.modularui.api.widget.IWidget;
 
 /**
  * This is responsible for laying out widgets.
  */
-public interface ILayoutWidget {
+public interface ILayoutWidget extends INotifyEnabled {
 
     /**
      * Called after the children tried to calculate their size.
@@ -28,5 +29,11 @@ public interface ILayoutWidget {
      */
     default boolean shouldIgnoreChildSize(IWidget child) {
         return false;
+    }
+
+    @Override
+    default void onChildChangeEnabled(IWidget child, boolean enabled) {
+        layoutWidgets();
+        postLayoutWidgets();
     }
 }

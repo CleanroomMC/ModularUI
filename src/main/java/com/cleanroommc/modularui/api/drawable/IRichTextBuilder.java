@@ -19,6 +19,11 @@ public interface IRichTextBuilder<T extends IRichTextBuilder<T>> {
         return getThis();
     }
 
+    default T addLine(String s) {
+        getRichText().add(s).newLine();
+        return getThis();
+    }
+
     default T addLine(ITextLine line) {
         getRichText().addLine(line);
         return getThis();

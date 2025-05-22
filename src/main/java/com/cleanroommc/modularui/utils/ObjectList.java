@@ -79,14 +79,15 @@ public interface ObjectList<V> extends it.unimi.dsi.fastutil.objects.ObjectList<
     @NotNull
     V[] elements();
 
+    void ensureCapacity(int minCapacity);
+
     class ObjectArrayList<V> extends it.unimi.dsi.fastutil.objects.ObjectArrayList<V> implements ObjectList<V> {
 
         public ObjectArrayList(int capacity) {
             super(capacity);
         }
 
-        public ObjectArrayList() {
-        }
+        public ObjectArrayList() {}
 
         public ObjectArrayList(Collection<? extends V> c) {
             super(c);

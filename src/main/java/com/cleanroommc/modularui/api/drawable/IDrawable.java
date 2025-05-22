@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.api.drawable;
 
-import com.cleanroommc.modularui.drawable.DrawableArray;
+import com.cleanroommc.modularui.drawable.DrawableStack;
 import com.cleanroommc.modularui.drawable.Icon;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
@@ -11,7 +11,6 @@ import com.cleanroommc.modularui.widget.sizer.Area;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -26,7 +25,7 @@ public interface IDrawable {
         } else if (drawables.length == 1) {
             return drawables[0];
         } else {
-            return new DrawableArray(drawables);
+            return new DrawableStack(drawables);
         }
     }
 
@@ -149,7 +148,7 @@ public interface IDrawable {
 
     static boolean isVisible(@Nullable IDrawable drawable) {
         if (drawable == null || drawable == EMPTY || drawable == NONE) return false;
-        if (drawable instanceof DrawableArray array) {
+        if (drawable instanceof DrawableStack array) {
             return array.getDrawables().length > 0;
         }
         return true;

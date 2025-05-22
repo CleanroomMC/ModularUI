@@ -153,8 +153,13 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
                     }
                 }
                 widget.getArea().setRelativePoint(other, crossAxisPos);
+                widget.getArea().setPoint(other, getArea().getPoint(other) + crossAxisPos);
                 widget.resizer().setPosResized(other, true);
                 widget.resizer().setMarginPaddingApplied(other, true);
+            }
+            if (isValid()) {
+                // we changed rel pos, but we need to calculate the new absolute pos and other stuff
+                widget.flex().applyPos(widget);
             }
         }
     }
@@ -162,6 +167,13 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
     @Override
     public boolean shouldIgnoreChildSize(IWidget child) {
         return this.collapseDisabledChild && !child.isEnabled();
+    }
+
+    @Override
+    public void onChildChangeEnabled(IWidget child, boolean enabled) {
+        if (this.collapseDisabledChild) {
+            ILayoutWidget.super.onChildChangeEnabled(child, enabled);
+        }
     }
 
     public Flow crossAxisAlignment(Alignment.CrossAxis caa) {
@@ -180,10 +192,23 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
     }
 
     /**
-     * Configures this widget to collapse disabled child widgets.
+     * Sets if disabled children should be collapsed.
      */
     public Flow collapseDisabledChild() {
         this.collapseDisabledChild = true;
+        return this;
+    }
+
+    /**
+     * Sets if disabled children should be collapsed. This means that if a child changes enabled state, this widget gets notified and
+     * re-layouts its children. Children which are disabled will not be considered during layout, so that the flow will not appear to have
+     * empty spots. This is disabled by default on Flow.
+     *
+     * @param doCollapse true if disabled children should be collapsed.
+     * @return this
+     */
+    public Flow collapseDisabledChild(boolean doCollapse) {
+        this.collapseDisabledChild = doCollapse;
         return this;
     }
 

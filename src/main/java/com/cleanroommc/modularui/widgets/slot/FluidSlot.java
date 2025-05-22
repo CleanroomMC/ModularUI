@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widgets.slot;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
@@ -8,6 +9,7 @@ import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
 import com.cleanroommc.modularui.integration.jei.JeiIngredientProvider;
+import com.cleanroommc.modularui.integration.jei.ModularUIJeiPlugin;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
@@ -156,7 +158,15 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
             this.textRenderer.setPos((int) (this.contentOffsetX + 0.5f), (int) (getArea().height - 5.5f));
             this.textRenderer.draw(s);
         }
-        if (isHovering()) {
+    }
+
+    @Override
+    public void drawOverlay(ModularGuiContext context, WidgetTheme widgetTheme) {
+        if (ModularUI.Mods.JEI.isLoaded() && (ModularUIJeiPlugin.draggingValidIngredient(this) || ModularUIJeiPlugin.hoveringOverIngredient(this))) {
+            GlStateManager.colorMask(true, true, true, false);
+            drawHighlight(getArea(), isHovering());
+            GlStateManager.colorMask(true, true, true, true);
+        } else if (isHovering()) {
             GlStateManager.colorMask(true, true, true, false);
             GuiDraw.drawRect(1, 1, getArea().w() - 2, getArea().h() - 2, getSlotHoverColor());
             GlStateManager.colorMask(true, true, true, true);
@@ -176,11 +186,10 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
         return ITheme.getDefault().getFluidSlotTheme().getSlotHoverColor();
     }
 
-    @NotNull
     @Override
-    public Result onMouseTapped(int mouseButton) {
+    public @NotNull Result onMousePressed(int mouseButton) {
         if (!this.syncHandler.canFillSlot() && !this.syncHandler.canDrainSlot()) {
-            return Result.IGNORE;
+            return Result.ACCEPT;
         }
         ItemStack cursorStack = Minecraft.getMinecraft().player.inventory.getItemStack();
         if (this.syncHandler.isPhantom() || (!cursorStack.isEmpty() && cursorStack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null))) {

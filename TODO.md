@@ -8,8 +8,9 @@
 * [ ]  Pie menu
 
 ## High Priority
+
 - [ ]  merge animations with NEA
-- [ ]  check JEI click interactions
+- [x]  check JEI click interactions
 
 ## Medium Priority
 

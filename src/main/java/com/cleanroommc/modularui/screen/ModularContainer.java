@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.core.mixin.ContainerAccessor;
 import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.network.NetworkUtils;
+import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
@@ -28,7 +29,7 @@ import org.jetbrains.annotations.*;
 
 import java.util.*;
 
-@Interface(modid = ModularUI.BOGO_SORT, iface = "com.cleanroommc.bogosorter.api.ISortableContainer")
+@Interface(modid = ModularUI.ModIds.BOGOSORTER, iface = "com.cleanroommc.bogosorter.api.ISortableContainer")
 public class ModularContainer extends Container implements ISortableContainer {
 
     public static ModularContainer getCurrent(EntityPlayer player) {
@@ -127,12 +128,15 @@ public class ModularContainer extends Container implements ISortableContainer {
 
     @ApiStatus.Internal
     public void registerSlot(String panelName, ModularSlot slot) {
-        if (this.inventorySlots.contains(slot)) {
-            throw new IllegalArgumentException("Tried to register slot which already exists!");
-        }
         if (slot.isPhantom()) {
+            if (this.phantomSlots.contains(slot)) {
+                throw new IllegalArgumentException("Tried to register slot which already exists!");
+            }
             this.phantomSlots.add(slot);
         } else {
+            if (this.inventorySlots.contains(slot)) {
+                throw new IllegalArgumentException("Tried to register slot which already exists!");
+            }
             addSlotToContainer(slot);
         }
         if (slot.getSlotGroupName() != null) {
@@ -218,7 +222,7 @@ public class ModularContainer extends Container implements ISortableContainer {
 
     @Override
     public @NotNull ItemStack slotClick(int slotId, int mouseButton, @NotNull ClickType clickTypeIn, @NotNull EntityPlayer player) {
-        ItemStack returnable = ItemStack.EMPTY;
+        ItemStack returnable = Platform.EMPTY_STACK;
         InventoryPlayer inventoryplayer = player.inventory;
 
         if (clickTypeIn == ClickType.QUICK_CRAFT || acc().getDragEvent() != 0) {
@@ -228,31 +232,24 @@ public class ModularContainer extends Container implements ISortableContainer {
         if ((clickTypeIn == ClickType.PICKUP || clickTypeIn == ClickType.QUICK_MOVE) &&
                 (mouseButton == LEFT_MOUSE || mouseButton == RIGHT_MOUSE)) {
             if (slotId == DROP_TO_WORLD) {
-                // no dif
-                if (!inventoryplayer.getItemStack().isEmpty()) {
-                    if (mouseButton == LEFT_MOUSE) {
-                        player.dropItem(inventoryplayer.getItemStack(), true);
-                        inventoryplayer.setItemStack(ItemStack.EMPTY);
-                    }
-
-                    if (mouseButton == RIGHT_MOUSE) {
-                        player.dropItem(inventoryplayer.getItemStack().splitStack(1), true);
-                    }
-                }
-                return inventoryplayer.getItemStack();
+                return superSlotClick(slotId, mouseButton, clickTypeIn, player);
             }
 
             // early return
-            if (slotId < 0) return ItemStack.EMPTY;
+            if (slotId < 0) return Platform.EMPTY_STACK;
 
             if (clickTypeIn == ClickType.QUICK_MOVE) {
                 Slot fromSlot = getSlot(slotId);
 
                 if (!fromSlot.canTakeStack(player)) {
-                    return ItemStack.EMPTY;
+                    return Platform.EMPTY_STACK;
                 }
-                // simpler code, but effectivly no difference
-                returnable = transferStackInSlot(player, slotId);
+
+                if (NEAAnimationHandler.shouldHandleNEA(this)) {
+                    returnable = NEAAnimationHandler.injectQuickMove(this, player, slotId, fromSlot);
+                } else {
+                    returnable = handleQuickMove(player, slotId, fromSlot);
+                }
             } else {
                 Slot clickedSlot = getSlot(slotId);
 
@@ -306,7 +303,7 @@ public class ModularContainer extends Container implements ISortableContainer {
                             slotStack = clickedSlot.decrStackSize(stackCount);
 
                             if (slotStack.isEmpty()) {
-                                clickedSlot.putStack(ItemStack.EMPTY);
+                                clickedSlot.putStack(Platform.EMPTY_STACK);
                             }
 
                             clickedSlot.onTake(player, inventoryplayer.getItemStack());
@@ -317,49 +314,6 @@ public class ModularContainer extends Container implements ISortableContainer {
             }
             detectAndSendChanges();
             return returnable;
-        } else if (clickTypeIn == ClickType.PICKUP_ALL && slotId >= 0) {
-            Slot slot = inventorySlots.get(slotId);
-            ItemStack itemstack1 = inventoryplayer.getItemStack();
-
-            if (!itemstack1.isEmpty() && (slot == null || !slot.getHasStack() || !slot.canTakeStack(player))) {
-                int i = mouseButton == 0 ? 0 : inventorySlots.size() - 1;
-                int j = mouseButton == 0 ? 1 : -1;
-
-                for (int k = 0; k < 2; ++k) {
-                    for (int l = i; l >= 0 && l < inventorySlots.size() && itemstack1.getCount() < itemstack1.getMaxStackSize(); l += j) {
-                        Slot slot1 = inventorySlots.get(l);
-                        if (slot1 instanceof ModularSlot modularSlot && modularSlot.isPhantom()) continue;
-
-                        if (slot1.getHasStack() && Container.canAddItemToSlot(slot1, itemstack1, true) && slot1.canTakeStack(player) && canMergeSlot(itemstack1, slot1)) {
-                            ItemStack itemstack2 = slot1.getStack();
-
-                            if (k != 0 || itemstack2.getCount() != itemstack2.getMaxStackSize()) {
-                                int i1 = Math.min(itemstack1.getMaxStackSize() - itemstack1.getCount(), itemstack2.getCount());
-                                ItemStack itemstack3 = slot1.decrStackSize(i1);
-                                itemstack1.grow(i1);
-
-                                if (itemstack3.isEmpty()) {
-                                    slot1.putStack(ItemStack.EMPTY);
-                                }
-
-                                slot1.onTake(player, itemstack3);
-                            }
-                        }
-                    }
-                }
-            }
-
-            detectAndSendChanges();
-            return returnable;
-        } else if (clickTypeIn == ClickType.SWAP && mouseButton >= 0 && mouseButton < 9) {
-            ModularSlot phantom = getModularSlot(slotId);
-            ItemStack hotbarStack = inventoryplayer.getStackInSlot(mouseButton);
-            if (phantom.isPhantom()) {
-                // insert stack from hotbar slot into phantom slot
-                phantom.putStack(hotbarStack.isEmpty() ? ItemStack.EMPTY : hotbarStack.copy());
-                detectAndSendChanges();
-                return returnable;
-            }
         }
 
         return superSlotClick(slotId, mouseButton, clickTypeIn, player);
@@ -369,12 +323,24 @@ public class ModularContainer extends Container implements ISortableContainer {
         return super.slotClick(slotId, mouseButton, clickTypeIn, player);
     }
 
+    public final ItemStack handleQuickMove(EntityPlayer player, int slotId, Slot fromSlot) {
+        // looping so that crafting works properly
+        ItemStack returnable;
+        ItemStack remainder;
+        do {
+            remainder = transferStackInSlot(player, slotId);
+            returnable = Platform.copyStack(remainder);
+        } while (!Platform.isStackEmpty(remainder) && ItemHandlerHelper.canItemStacksStack(fromSlot.getStack(), remainder));
+        return returnable;
+    }
+
     @Override
     public @NotNull ItemStack transferStackInSlot(@NotNull EntityPlayer playerIn, int index) {
         ModularSlot slot = getModularSlot(index);
         if (!slot.isPhantom()) {
             ItemStack stack = slot.getStack();
             if (!stack.isEmpty()) {
+                ItemStack copy = stack.copy();
                 stack = stack.copy();
                 int base = 0;
                 if (stack.getCount() > stack.getMaxStackSize()) {
@@ -382,13 +348,17 @@ public class ModularContainer extends Container implements ISortableContainer {
                     stack.setCount(stack.getMaxStackSize());
                 }
                 ItemStack remainder = transferItem(slot, stack.copy());
-                if (base == 0 && remainder.isEmpty()) stack = ItemStack.EMPTY;
+                if (ItemStack.areItemStacksEqual(remainder, stack)) return Platform.EMPTY_STACK;
+                if (base == 0 && remainder.isEmpty()) stack = Platform.EMPTY_STACK;
                 else stack.setCount(base + remainder.getCount());
                 slot.putStack(stack);
-                return ItemStack.EMPTY;
+                slot.onSlotChange(remainder, copy);
+                slot.onTake(playerIn, remainder);
+                slot.onCraftShiftClick(playerIn, remainder);
+                return copy; // return a non-empty stack if insertion was successful, this causes this function to be called again, important for crafting
             }
         }
-        return ItemStack.EMPTY;
+        return Platform.EMPTY_STACK;
     }
 
     protected ItemStack transferItem(ModularSlot fromSlot, ItemStack fromStack) {
@@ -449,7 +419,6 @@ public class ModularContainer extends Container implements ISortableContainer {
         // now insert into the first phantom slot we can find (will be non-empty)
         // unfortunately, when all phantom slots are used it will always overwrite the first one
         for (ModularSlot toSlot : getShiftClickSlots()) {
-            ItemStack itemstack = toSlot.getStack();
             SlotGroup slotGroup = Objects.requireNonNull(toSlot.getSlotGroup());
             if (slotGroup != fromSlotGroup && toSlot.isPhantom() && toSlot.isEnabled() && toSlot.isItemValid(fromStack)) {
                 // don't check for stackable, just overwrite

@@ -128,7 +128,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
         } else {
             this.renderer.draw(this.handler.getText());
         }
-        getScrollArea().getScrollX().setScrollSize(Math.max(0, (int) (this.renderer.getLastWidth() + 0.5f)));
+        getScrollArea().getScrollX().setScrollSize(Math.max(0, (int) (this.renderer.getLastActualWidth() + 0.5f)));
     }
 
     @Override

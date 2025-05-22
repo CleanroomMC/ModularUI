@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IPanelHandler;
+import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.GuiTextures;
@@ -48,10 +49,11 @@ public class TestGui extends CustomModularScreen {
         }
         final Map<String, SortableListWidget.Item<String>> items = new Object2ObjectOpenHashMap<>();
         for (String line : this.lines) {
-            items.put(line, new SortableListWidget.Item<>(line).child(item -> new Row()
+            items.put(line, new SortableListWidget.Item<>(line)
+                    .child(item -> new Row()
                     .child(new Widget<>()
                             .addTooltipLine(line)
-                            .background(GuiTextures.BUTTON_CLEAN)
+                            .widgetTheme(IThemeApi.BUTTON)
                             .overlay(IKey.str(line))
                             .expanded().heightRel(1f))
                     .child(new ButtonWidget<>()

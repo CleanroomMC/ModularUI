@@ -94,7 +94,7 @@ public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDes
             if (list.size() == 1) {
                 return list.get(0);
             }
-            return new DrawableArray(list.toArray(new IDrawable[0]));
+            return new DrawableStack(list.toArray(new IDrawable[0]));
         }
         if (!element.isJsonObject()) {
             ModularUI.LOGGER.throwing(new JsonParseException("Drawable json should be an object or an array."));
@@ -123,9 +123,9 @@ public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDes
     public JsonElement serialize(IDrawable src, Type typeOfSrc, JsonSerializationContext context) {
         if (src == IDrawable.EMPTY) return JsonNull.INSTANCE;
         if (src == IDrawable.NONE) return new JsonPrimitive("none");
-        if (src instanceof DrawableArray drawableArray) {
+        if (src instanceof DrawableStack drawableStack) {
             JsonArray jsonArray = new JsonArray();
-            for (IDrawable drawable : drawableArray.getDrawables()) {
+            for (IDrawable drawable : drawableStack.getDrawables()) {
                 jsonArray.add(JsonHelper.serialize(drawable));
             }
             return jsonArray;

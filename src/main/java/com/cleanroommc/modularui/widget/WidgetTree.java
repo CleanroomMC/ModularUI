@@ -8,7 +8,6 @@ import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.ISynced;
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -118,11 +117,14 @@ public class WidgetTree {
     }
 
     public static void drawTree(IWidget parent, ModularGuiContext context) {
-        drawTree(parent, context, false);
+        drawTree(parent, context, false, true);
     }
 
-    public static void drawTree(IWidget parent, ModularGuiContext context, boolean ignoreEnabled) {
+    public static void drawTree(IWidget parent, ModularGuiContext context, boolean ignoreEnabled, boolean drawBackground) {
         if (!parent.isEnabled() && !ignoreEnabled) return;
+        if (parent.requiresResize()) {
+            resizeInternal(parent, false);
+        }
 
         float alpha = parent.getPanel().getAlpha();
         IViewport viewport = parent instanceof IViewport ? (IViewport) parent : null;
@@ -143,7 +145,7 @@ public class WidgetTree {
             GlStateManager.color(1f, 1f, 1f, alpha);
             GlStateManager.enableBlend();
             WidgetTheme widgetTheme = parent.getWidgetTheme(context.getTheme());
-            parent.drawBackground(context, widgetTheme);
+            if (drawBackground) parent.drawBackground(context, widgetTheme);
             parent.draw(context, widgetTheme);
             parent.drawOverlay(context, widgetTheme);
         }
@@ -174,7 +176,15 @@ public class WidgetTree {
         // render all children if there are any
         List<IWidget> children = parent.getChildren();
         if (!children.isEmpty()) {
-            children.forEach(widget -> drawTree(widget, context, false));
+            boolean backgroundSeparate = children.size() > 1;
+            // draw all backgrounds first if we have more than 1 child
+            // the whole reason this exists is because of the hover animation of items with NEA
+            // on hover the item scales up slightly, this causes the amount text to overlap nearby slots, but since the whole slot is drawn
+            // at once the backgrounds might draw on top of the text
+            // for now we'll apply this always without checking for NEA as it might be useful for other things
+            // maybe proper layer customization in the future?
+            if (backgroundSeparate) children.forEach(widget -> drawBackground(widget, context, ignoreEnabled));
+            children.forEach(widget -> drawTree(widget, context, false, !backgroundSeparate));
         }
 
         if (viewport != null) {
@@ -199,6 +209,36 @@ public class WidgetTree {
             }
         }
         // remove all widget transformations
+        context.popMatrix();
+    }
+
+    public static void drawBackground(IWidget parent, ModularGuiContext context, boolean ignoreEnabled) {
+        if (!parent.isEnabled() && !ignoreEnabled) return;
+
+        float alpha = parent.getPanel().getAlpha();
+
+        // transform stack according to the widget
+        context.pushMatrix();
+        parent.transform(context);
+
+        boolean canBeSeen = parent.canBeSeen(context);
+        if (!canBeSeen) {
+            context.popMatrix();
+            return;
+        }
+
+        // apply transformations to opengl
+        GlStateManager.pushMatrix();
+        context.applyToOpenGl();
+
+        // draw widget
+        GlStateManager.colorMask(true, true, true, true);
+        GlStateManager.color(1f, 1f, 1f, alpha);
+        GlStateManager.enableBlend();
+        WidgetTheme widgetTheme = parent.getWidgetTheme(context.getTheme());
+        parent.drawBackground(context, widgetTheme);
+
+        GlStateManager.popMatrix();
         context.popMatrix();
     }
 
@@ -231,11 +271,19 @@ public class WidgetTree {
         }, true);
     }
 
+    @Deprecated
     public static void resize(IWidget parent) {
-        if (!NetworkUtils.isClient()) return;
-        // TODO check if widget has a parent which depends on its children
+        parent.scheduleResize();
+    }
+
+    @ApiStatus.Internal
+    public static void resizeInternal(IWidget parent, boolean onOpen) {
+        // check if updating this widget's pos and size can potentially update its parents
+        while (!(parent instanceof ModularPanel) && (parent.getParent() instanceof ILayoutWidget || parent.getParent().flex().dependsOnChildren())) {
+            parent = parent.getParent();
+        }
         // resize each widget and calculate their relative pos
-        if (!resizeWidget(parent, true) && !resizeWidget(parent, false)) {
+        if (!resizeWidget(parent, true, onOpen) && !resizeWidget(parent, false, onOpen)) {
             throw new IllegalStateException("Failed to resize widgets");
         }
         // now apply the calculated pos
@@ -246,12 +294,12 @@ public class WidgetTree {
         }, true);
     }
 
-    private static boolean resizeWidget(IWidget widget, boolean init) {
+    private static boolean resizeWidget(IWidget widget, boolean init, boolean onOpen) {
         boolean alreadyCalculated = false;
         // first try to resize this widget
         IResizeable resizer = widget.resizer();
         if (init) {
-            widget.beforeResize();
+            widget.beforeResize(onOpen);
             resizer.initResizing();
         } else {
             // if this is not the first time check if this widget is already resized
@@ -266,7 +314,7 @@ public class WidgetTree {
             anotherResize = new ArrayList<>();
             for (IWidget child : widget.getChildren()) {
                 if (init && expandAxis != null) child.flex().checkExpanded(expandAxis);
-                if (!resizeWidget(child, init)) {
+                if (!resizeWidget(child, init, onOpen)) {
                     anotherResize.add(child);
                 }
             }
@@ -289,7 +337,7 @@ public class WidgetTree {
 
         // now fully resize all children which needs it
         if (!anotherResize.isEmpty()) {
-            anotherResize.removeIf(iWidget -> resizeWidget(iWidget, false));
+            anotherResize.removeIf(iWidget -> resizeWidget(iWidget, false, onOpen));
         }
 
         if (result && !alreadyCalculated) widget.onResized();
