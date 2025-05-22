@@ -22,6 +22,7 @@ public class TextWidget extends Widget<TextWidget> {
     private float scale = 1f;
 
     private String lastText = null;
+    private String textForDefaultSize = null;
 
     public TextWidget(IKey key) {
         this.key = key;
@@ -52,7 +53,7 @@ public class TextWidget extends Widget<TextWidget> {
         renderer.setPos(padding.left, padding.top);
         renderer.setScale(this.scale);
         renderer.setSimulate(true);
-        renderer.draw(this.key.getFormatted());
+        renderer.draw(getTextForDefaultSize());
         renderer.setSimulate(false);
         return renderer;
     }
@@ -89,6 +90,23 @@ public class TextWidget extends Widget<TextWidget> {
     protected int getWidgetHeight(float actualTextHeight) {
         Box padding = getArea().getPadding();
         return Math.max(1, (int) Math.ceil(actualTextHeight + padding.vertical()));
+    }
+
+    /**
+     * Makes sure the used text for {@link #getDefaultWidth()} and {@link #getDefaultHeight()} is always the same.
+     * Also sets the last rendered text.
+     */
+    protected String getTextForDefaultSize() {
+        if (this.textForDefaultSize == null) {
+            this.textForDefaultSize = this.key.getFormatted();
+            this.lastText = this.textForDefaultSize;
+        }
+        return this.textForDefaultSize;
+    }
+
+    @Override
+    public void postResize() {
+        this.textForDefaultSize = null;
     }
 
     public IKey getKey() {
