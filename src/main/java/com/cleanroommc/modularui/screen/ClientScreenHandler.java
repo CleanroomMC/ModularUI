@@ -193,7 +193,7 @@ public class ClientScreenHandler {
 
     @SubscribeEvent
     public static void onTick(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.START) {
+        if (event.phase == TickEvent.Phase.END) {
             OverlayStack.onTick();
             defaultContext.tick();
             if (checkGui()) {
