@@ -156,7 +156,7 @@ public class SchemaRenderer implements IDrawable {
         GlStateManager.bindTexture(lastFbo);
     }
 
-    private RayTraceResult rayTrace(int mouseX, int mouseY, int width, int height) {
+    protected RayTraceResult rayTrace(int mouseX, int mouseY, int width, int height) {
         final float halfPI = (float) (Math.PI / 2);
         Vec3d cameraPos = new Vec3d(camera.getPos().x, camera.getPos().y, camera.getPos().z);
         float yaw = (float) camera.getYaw();
