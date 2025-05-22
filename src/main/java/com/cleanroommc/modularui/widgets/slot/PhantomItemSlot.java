@@ -8,8 +8,11 @@ import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.value.sync.PhantomItemSlotSH;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 
+import mezz.jei.Internal;
+
 import net.minecraft.client.renderer.GlStateManager;
 
+import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.item.ItemStack;
 
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +36,7 @@ public class PhantomItemSlot extends ItemSlot implements JeiGhostIngredientSlot<
 
     @Override
     protected void drawOverlay() {
-        if (ModularUI.Mods.JEI.isLoaded() && (ModularUIJeiPlugin.hasDraggingGhostIngredient() || ModularUIJeiPlugin.hoveringOverIngredient(this))) {
+        if (ModularUI.Mods.JEI.isLoaded() && (ModularUIJeiPlugin.draggingValidIngredient(this) || ModularUIJeiPlugin.hoveringOverIngredient(this))) {
             GlStateManager.colorMask(true, true, true, false);
             drawHighlight(getArea(), isHovering());
             GlStateManager.colorMask(true, true, true, true);
@@ -73,10 +76,17 @@ public class PhantomItemSlot extends ItemSlot implements JeiGhostIngredientSlot<
 
     @Override
     public @Nullable ItemStack castGhostIngredientIfValid(@NotNull Object ingredient) {
-        return areAncestorsEnabled() &&
-                this.syncHandler.isPhantom() &&
-                ingredient instanceof ItemStack itemStack &&
-                this.syncHandler.isItemValid(itemStack) ? itemStack : null;
+        if (areAncestorsEnabled() && this.syncHandler.isPhantom()) {
+            if (ingredient instanceof EnchantmentData enchantmentData) {
+                ingredient = Internal.getIngredientRegistry().getIngredientHelper(enchantmentData).getCheatItemStack(enchantmentData);
+            }
+
+            if (ingredient instanceof ItemStack itemStack) {
+                return this.syncHandler.isItemValid(itemStack) ? itemStack : null;
+            }
+        }
+
+        return null;
     }
 
     @Override

@@ -15,6 +15,7 @@ import mezz.jei.config.Config;
 import mezz.jei.gui.ghost.GhostIngredientDrag;
 import mezz.jei.gui.ghost.GhostIngredientDragManager;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @JEIPlugin
 public class ModularUIJeiPlugin implements IModPlugin {
@@ -30,7 +31,7 @@ public class ModularUIJeiPlugin implements IModPlugin {
     }
 
     @Override
-    public void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
+    public void onRuntimeAvailable(@NotNull IJeiRuntime jeiRuntime) {
         ModularUIJeiPlugin.runtime = jeiRuntime;
     }
 
@@ -49,10 +50,24 @@ public class ModularUIJeiPlugin implements IModPlugin {
         return ingredientSlot.castGhostIngredientIfValid(hovered) != null;
     }
 
+    public static boolean draggingValidIngredient(JeiGhostIngredientSlot<?> ingredientSlot) {
+        Object dragging = getDraggedObject();
+        if (dragging == null) return false;
+        return ingredientSlot.castGhostIngredientIfValid(dragging) != null;
+    }
+
+    @Nullable
     public static GhostIngredientDrag<?> getGhostDrag() {
         return ((GhostIngredientDragManagerAccessor) getGhostDragManager()).getGhostIngredientDrag();
     }
 
+    @Nullable
+    public static Object getDraggedObject() {
+        GhostIngredientDrag<?> drag = getGhostDrag();
+        return drag == null ? null : drag.getIngredient();
+    }
+
+    @Nullable
     public static Object getHoverdObject() {
         return ((GhostIngredientDragManagerAccessor) getGhostDragManager()).getHoveredIngredient();
     }
