@@ -125,15 +125,6 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     @Override
-    public void onFocus(ModularGuiContext context) {
-        super.onFocus(context);
-        Point main = this.handler.getMainCursor();
-        if (main.x == 0) {
-            this.handler.setCursor(main.y, getText().length(), true, true);
-        }
-    }
-
-    @Override
     public void onRemoveFocus(ModularGuiContext context) {
         super.onRemoveFocus(context);
         if (this.handler.getText().isEmpty()) {
