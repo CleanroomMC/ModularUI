@@ -13,6 +13,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class EventHandler {
 
+    public static boolean enabledRichTooltipEventTest = false;
+
     @SubscribeEvent
     public static void onItemUse(PlayerInteractEvent.RightClickItem event) {
         if (event.getEntityPlayer().getEntityWorld().isRemote && event.getItemStack().getItem() == Items.DIAMOND) {
@@ -28,8 +30,10 @@ public class EventHandler {
 
     @SubscribeEvent
     public static void onRichTooltip(RichTooltipEvent.Pre event) {
-        event.getTooltip()
-                .add(IKey.str("Powered By: ").style(TextFormatting.GOLD, TextFormatting.ITALIC))
-                .add(GuiTextures.MUI_LOGO.asIcon().size(18)).newLine();
+        if (enabledRichTooltipEventTest) {
+            event.getTooltip()
+                    .add(IKey.str("Powered By: ").style(TextFormatting.GOLD, TextFormatting.ITALIC))
+                    .add(GuiTextures.MUI_LOGO.asIcon().size(18)).newLine();
+        }
     }
 }
