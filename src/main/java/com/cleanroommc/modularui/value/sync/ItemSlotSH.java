@@ -25,7 +25,6 @@ public class ItemSlotSH extends SyncHandler {
     private ItemStack lastStoredItem;
     private boolean registered = false;
 
-    @ApiStatus.Internal
     public ItemSlotSH(ModularSlot slot) {
         this.slot = slot;
     }
