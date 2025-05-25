@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.drawable.ItemDrawable;
 import com.cleanroommc.modularui.drawable.Rectangle;
 import com.cleanroommc.modularui.drawable.text.AnimatedText;
 import com.cleanroommc.modularui.factory.PosGuiData;
+import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.UISettings;
@@ -20,10 +21,13 @@ import com.cleanroommc.modularui.utils.Interpolation;
 import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.value.IntValue;
 import com.cleanroommc.modularui.value.StringValue;
+import com.cleanroommc.modularui.value.sync.DynamicSyncHandler;
 import com.cleanroommc.modularui.value.sync.GenericSyncValue;
 import com.cleanroommc.modularui.value.sync.IntSyncValue;
+import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandlers;
+import com.cleanroommc.modularui.widget.EmptyWidget;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widgets.*;
 import com.cleanroommc.modularui.widgets.layout.Column;
@@ -31,6 +35,10 @@ import com.cleanroommc.modularui.widgets.layout.Flow;
 import com.cleanroommc.modularui.widgets.layout.Row;
 import com.cleanroommc.modularui.widgets.slot.*;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
+
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -48,11 +56,21 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Random;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITickable {
+
+    private static final Object2IntMap<Item> handlerSizeMap = new Object2IntOpenHashMap<>() {{
+        put(Items.DIAMOND, 9);
+        put(Items.EMERALD, 9);
+        put(Items.GOLD_INGOT, 7);
+        put(Items.IRON_INGOT, 6);
+        put(Items.CLAY_BALL, 2);
+        defaultReturnValue(3);
+    }};
 
     private final FluidTank fluidTank = new FluidTank(10000);
     private final FluidTank fluidTankPhantom = new FluidTank(Integer.MAX_VALUE);
@@ -78,26 +96,44 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
     private final FluidTank mixerFluids1 = new FluidTank(16000);
     private final FluidTank mixerFluids2 = new FluidTank(16000);
     private final ItemStackHandler craftingInventory = new ItemStackHandler(10);
+    private final ItemStackHandler storageInventory0 = new ItemStackHandler(1);
+    private final Map<Item, ItemStackHandler> stackHandlerMap = new Object2ObjectOpenHashMap<>();
 
     private int num = 2;
 
     @Override
-    public ModularPanel buildUI(PosGuiData guiData, PanelSyncManager guiSyncManager, UISettings settings) {
+    public ModularPanel buildUI(PosGuiData guiData, PanelSyncManager syncManager, UISettings settings) {
         settings.customContainer(() -> new CraftingModularContainer(3, 3, this.craftingInventory));
 
-        guiSyncManager.registerSlotGroup("item_inv", 3);
-        guiSyncManager.registerSlotGroup("mixer_items", 2);
+        syncManager.registerSlotGroup("item_inv", 3);
+        syncManager.registerSlotGroup("mixer_items", 2);
 
-        guiSyncManager.syncValue("mixer_fluids", 0, SyncHandlers.fluidSlot(this.mixerFluids1));
-        guiSyncManager.syncValue("mixer_fluids", 1, SyncHandlers.fluidSlot(this.mixerFluids2));
+        syncManager.syncValue("mixer_fluids", 0, SyncHandlers.fluidSlot(this.mixerFluids1));
+        syncManager.syncValue("mixer_fluids", 1, SyncHandlers.fluidSlot(this.mixerFluids2));
         IntSyncValue cycleStateValue = new IntSyncValue(() -> this.cycleState, val -> this.cycleState = val);
-        guiSyncManager.syncValue("cycle_state", cycleStateValue);
-        guiSyncManager.syncValue("display_item", GenericSyncValue.forItem(() -> this.displayItem, null));
-        guiSyncManager.bindPlayerInventory(guiData.getPlayer());
+        syncManager.syncValue("cycle_state", cycleStateValue);
+        syncManager.syncValue("display_item", GenericSyncValue.forItem(() -> this.displayItem, null));
+        syncManager.bindPlayerInventory(guiData.getPlayer());
+
+        DynamicSyncHandler dynamicSyncHandler = new DynamicSyncHandler()
+                .widgetProvider((syncManager1, packet) -> {
+                    ItemStack itemStack = NetworkUtils.readItemStack(packet);
+                    if (itemStack.isEmpty()) return new EmptyWidget();
+                    Item item = itemStack.getItem();
+                    ItemStackHandler handler = stackHandlerMap.computeIfAbsent(item, k -> new ItemStackHandler(handlerSizeMap.getInt(k)));
+                    String name = item.getRegistryName().toString();
+                    Flow flow = Flow.row();
+                    for (int i = 0; i < handler.getSlots(); i++) {
+                        int finalI = i;
+                        flow.child(new ItemSlot()
+                                .syncHandler(syncManager1.getOrCreateSyncHandler(name, i, ItemSlotSH.class, () -> new ItemSlotSH(new ModularSlot(handler, finalI)))));
+                    }
+                    return flow;
+                });
 
         Rectangle colorPickerBackground = new Rectangle().setColor(Color.RED.main);
         ModularPanel panel = new ModularPanel("test_tile");
-        IPanelHandler panelSyncHandler = guiSyncManager.panel("other_panel", this::openSecondWindow, true);
+        IPanelHandler panelSyncHandler = syncManager.panel("other_panel", this::openSecondWindow, true);
         IPanelHandler colorPicker = IPanelHandler.simple(panel, (mainPanel, player) -> new ColorPickerDialog(colorPickerBackground::setColor, colorPickerBackground.getColor(), true)
                 .setDraggable(true)
                 .relative(panel)
@@ -117,7 +153,10 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                         .child(new PageButton(1, tabController)
                                 .tab(GuiTextures.TAB_TOP, 0))
                         .child(new PageButton(2, tabController)
-                                .tab(GuiTextures.TAB_TOP, 0)))
+                                .tab(GuiTextures.TAB_TOP, 0))
+                        .child(new PageButton(3, tabController)
+                                .tab(GuiTextures.TAB_TOP, 0)
+                                .overlay(new ItemDrawable(Blocks.CHEST).asIcon())))
                 .child(new Expandable()
                         .debugName("expandable")
                         .top(0)
@@ -368,7 +407,22 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                         .size(14, 14))
                                                                 .child(IKey.lang("bogosort.gui.enabled").asWidget()
                                                                         .height(14)))))
-                                       ))
+                                        .addPage(new ParentWidget<>()
+                                                .debugName("page 4 storage")
+                                                .sizeRel(1f)
+                                                .child(new Column()
+                                                        .padding(7)
+                                                        .child(new ItemSlot()
+                                                                .slot(new ModularSlot(this.storageInventory0, 0)
+                                                                        .changeListener(((newItem, onlyAmountChanged, client, init) -> {
+                                                                            if (client && !onlyAmountChanged) {
+                                                                                dynamicSyncHandler.notifyUpdate(packet -> NetworkUtils.writeItemStack(packet, newItem));
+                                                                            }
+                                                                        }))))
+                                                        .child(new DynamicSyncedWidget<>()
+                                                                .widthRel(1f)
+                                                                .syncHandler(dynamicSyncHandler)))
+                                                )))
                         .child(SlotGroupWidget.playerInventory(false))
                 );
         /*panel.child(new ButtonWidget<>()
