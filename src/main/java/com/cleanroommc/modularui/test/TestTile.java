@@ -115,7 +115,21 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         syncManager.syncValue("display_item", GenericSyncValue.forItem(() -> this.displayItem, null));
         syncManager.bindPlayerInventory(guiData.getPlayer());
 
-        DynamicSyncHandler.Notifier dynamicSyncNotifier = new DynamicSyncHandler.Notifier();
+        DynamicSyncHandler dynamicSyncHandler = new DynamicSyncHandler()
+                .widgetProvider((syncManager1, packet) -> {
+                    ItemStack itemStack = NetworkUtils.readItemStack(packet);
+                    if (itemStack.isEmpty()) return new EmptyWidget();
+                    Item item = itemStack.getItem();
+                    ItemStackHandler handler = stackHandlerMap.computeIfAbsent(item, k -> new ItemStackHandler(handlerSizeMap.getInt(k)));
+                    String name = item.getRegistryName().toString();
+                    Flow flow = Flow.row();
+                    for (int i = 0; i < handler.getSlots(); i++) {
+                        int finalI = i;
+                        flow.child(new ItemSlot()
+                                .syncHandler(syncManager1.getOrCreateSyncHandler(name, i, ItemSlotSH.class, () -> new ItemSlotSH(new ModularSlot(handler, finalI)))));
+                    }
+                    return flow;
+                });
 
         Rectangle colorPickerBackground = new Rectangle().setColor(Color.RED.main);
         ModularPanel panel = new ModularPanel("test_tile");
@@ -402,27 +416,12 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                 .slot(new ModularSlot(this.storageInventory0, 0)
                                                                         .changeListener(((newItem, onlyAmountChanged, client, init) -> {
                                                                             if (client && !onlyAmountChanged) {
-                                                                                dynamicSyncNotifier.notifyUpdate(packet -> NetworkUtils.writeItemStack(packet, newItem));
+                                                                                dynamicSyncHandler.notifyUpdate(packet -> NetworkUtils.writeItemStack(packet, newItem));
                                                                             }
                                                                         }))))
                                                         .child(new DynamicSyncedWidget<>()
                                                                 .widthRel(1f)
-                                                                .syncHandler(new DynamicSyncHandler()
-                                                                        .notifier(dynamicSyncNotifier)
-                                                                        .widgetProvider((syncManager1, packet) -> {
-                                                                            ItemStack itemStack = NetworkUtils.readItemStack(packet);
-                                                                            if (itemStack.isEmpty()) return new EmptyWidget();
-                                                                            Item item = itemStack.getItem();
-                                                                            ItemStackHandler handler = stackHandlerMap.computeIfAbsent(item, k -> new ItemStackHandler(handlerSizeMap.getInt(k)));
-                                                                            String name = item.getRegistryName().toString();
-                                                                            Flow flow = Flow.row();
-                                                                            for (int i = 0; i < handler.getSlots(); i++) {
-                                                                                int finalI = i;
-                                                                                flow.child(new ItemSlot()
-                                                                                        .syncHandler(syncManager1.getOrCreateSyncHandler(name, i, ItemSlotSH.class, () -> new ItemSlotSH(new ModularSlot(handler, finalI)))));
-                                                                            }
-                                                                            return flow;
-                                                                        }))))
+                                                                .syncHandler(dynamicSyncHandler)))
                                                 )))
                         .child(SlotGroupWidget.playerInventory(false))
                 );

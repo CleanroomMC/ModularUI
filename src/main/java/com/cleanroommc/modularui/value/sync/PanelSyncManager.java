@@ -213,6 +213,16 @@ public class PanelSyncManager {
         return itemSlot("_", id, slot);
     }
 
+    public DynamicSyncHandler dynamicSyncHandler(String key, DynamicSyncHandler.IWidgetProvider widgetProvider) {
+        return dynamicSyncHandler(key, 0, widgetProvider);
+    }
+
+    public DynamicSyncHandler dynamicSyncHandler(String key, int id, DynamicSyncHandler.IWidgetProvider widgetProvider) {
+        DynamicSyncHandler syncHandler = new DynamicSyncHandler().widgetProvider(widgetProvider);
+        syncValue(key, id, syncHandler);
+        return syncHandler;
+    }
+
     /**
      * Creates a synced panel handler. This can be used to automatically handle syncing for synced panels.
      * Synced panels do not need to be synced themselves, but contain at least one widget which is synced.

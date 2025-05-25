@@ -19,7 +19,7 @@ import java.util.function.Supplier;
  */
 public class DynamicSyncHandler extends SyncHandler {
 
-    private IWidgetCreator widgetProvider;
+    private IWidgetProvider widgetProvider;
     private Consumer<IWidget> onWidgetUpdate;
 
     @Override
@@ -65,9 +65,9 @@ public class DynamicSyncHandler extends SyncHandler {
      *
      * @param widgetProvider the widget creator function
      * @return this
-     * @see IWidgetCreator
+     * @see IWidgetProvider
      */
-    public DynamicSyncHandler widgetProvider(IWidgetCreator widgetProvider) {
+    public DynamicSyncHandler widgetProvider(IWidgetProvider widgetProvider) {
         this.widgetProvider = widgetProvider;
         return this;
     }
@@ -81,19 +81,7 @@ public class DynamicSyncHandler extends SyncHandler {
         return this;
     }
 
-    /**
-     * Sets a notifier to this sync handler.
-     *
-     * @param notifier notifier object
-     * @return this
-     * @see Notifier
-     */
-    public DynamicSyncHandler notifier(Notifier notifier) {
-        notifier.setSyncHandler(this);
-        return this;
-    }
-
-    public interface IWidgetCreator {
+    public interface IWidgetProvider {
 
         /**
          * This is the function which creates a widget on client and server.
@@ -104,29 +92,5 @@ public class DynamicSyncHandler extends SyncHandler {
          * @return a new widget or null if widget shouldn't be updated
          */
         @Nullable IWidget createWidget(PanelSyncManager syncManager, PacketBuffer buf);
-    }
-
-    /**
-     * This exists purely for convenience. This allows creating the sync handler directly in the sync tree.
-     * A notifier instance can be created before the tree and is then linked to the sync handler with {@link DynamicSyncHandler#notifier(Notifier)}.
-     * The sync handler can then be notified with {@link Notifier#notifyUpdate(IPacketWriter)}.
-     */
-    public static class Notifier {
-
-        private DynamicSyncHandler syncHandler;
-
-        private void setSyncHandler(DynamicSyncHandler syncHandler) {
-            this.syncHandler = syncHandler;
-        }
-
-        public void unbindSyncHandler() {
-            this.syncHandler = null;
-        }
-
-        public void notifyUpdate(IPacketWriter packetWriter) {
-            if (syncHandler != null && syncHandler.isValid()) {
-                syncHandler.notifyUpdate(packetWriter);
-            }
-        }
     }
 }
