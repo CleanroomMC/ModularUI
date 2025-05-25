@@ -176,7 +176,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
 
     public Grid row(@NotNull IWidget... row) {
         Objects.requireNonNull(row);
-        return row(Arrays.asList(row));
+        return row(new ArrayList<>(Arrays.asList(row)));
     }
 
     @Override
