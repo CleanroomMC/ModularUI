@@ -76,7 +76,7 @@ public class ClientProxy extends CommonProxy {
 
     @SubscribeEvent
     public void onKeyboard(InputEvent.KeyInputEvent event) {
-        if (ModularUIConfig.enableTestGuis && testKey.isPressed() && ModularUI.Mods.BAUBLES.isLoaded()) {
+        if (ModularUIConfig.enableTestGuis && testKey != null && testKey.isPressed() && ModularUI.Mods.BAUBLES.isLoaded()) {
             InventoryTypes.BAUBLES.visitAll(Minecraft.getMinecraft().player, (type, index, stack) -> {
                 if (stack.getItem() instanceof TestItem) {
                     GuiFactories.playerInventory().openFromBaublesClient(index);
