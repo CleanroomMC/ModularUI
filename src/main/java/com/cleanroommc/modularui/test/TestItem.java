@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.ClientProxy;
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.factory.GuiFactories;
 import com.cleanroommc.modularui.factory.PlayerInventoryGuiData;
@@ -29,6 +30,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
@@ -40,6 +42,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import javax.annotation.Nonnull;
 
+@Optional.Interface(modid = ModularUI.ModIds.BAUBLES, iface = "baubles.api.IBauble")
 public class TestItem extends Item implements IGuiHolder<PlayerInventoryGuiData>, IBauble {
 
     public static final TestItem testItem = new TestItem();
