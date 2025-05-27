@@ -8,6 +8,8 @@ import com.cleanroommc.modularui.utils.Alignment;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.IntSupplier;
+
 public class ScrollingTextWidget extends TextWidget {
 
     private static final int pauseTime = 60;
@@ -59,7 +61,7 @@ public class ScrollingTextWidget extends TextWidget {
     public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
         checkString();
         TextRenderer renderer = TextRenderer.SHARED;
-        renderer.setColor(getColor() != null ? getColor() : widgetTheme.getTextColor());
+        renderer.setColor(getColor() != null ? getColor().getAsInt() : widgetTheme.getTextColor());
         renderer.setAlignment(getAlignment(), getArea().w() + 1, getArea().h());
         renderer.setShadow(isShadow() != null ? isShadow() : widgetTheme.getTextShadow());
         renderer.setPos(getArea().getPadding().left, getArea().getPadding().top);
@@ -88,7 +90,12 @@ public class ScrollingTextWidget extends TextWidget {
     }
 
     @Override
-    public ScrollingTextWidget color(@Nullable Integer color) {
+    public ScrollingTextWidget color(int color) {
+        return color(() -> color);
+    }
+
+    @Override
+    public ScrollingTextWidget color(@Nullable IntSupplier color) {
         return (ScrollingTextWidget) super.color(color);
     }
 
