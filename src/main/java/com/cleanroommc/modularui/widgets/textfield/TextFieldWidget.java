@@ -95,7 +95,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         this.renderer.setSimulate(false);
         this.renderer.setPos(getArea().getPadding().left, 0);
         this.renderer.setScale(this.scale);
-        this.renderer.setAlignment(this.textAlignment, -1, getArea().height);
+        this.renderer.setAlignment(this.textAlignment, getArea().width - (getArea().getPadding().left * 2), getArea().height);
     }
 
     @Override
