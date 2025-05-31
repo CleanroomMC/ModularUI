@@ -254,7 +254,6 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                         .hintText("hint"))
                                                                 .child(new TextFieldWidget()
                                                                         .size(60, 20)
-                                                                        .setTextAlignment(Alignment.Center)
                                                                         .value(SyncHandlers.doubleNumber(() -> this.doubleValue, val -> this.doubleValue = val))
                                                                         .setNumbersDouble(Function.identity())
                                                                         .hintText("number"))

@@ -280,7 +280,7 @@ public class TextFieldHandler {
     public void insert(List<String> text) {
         List<String> copy = new ArrayList<>(this.text);
         Point point = insert(copy, text);
-        if (point == null || copy.size() > this.maxLines || !this.renderer.wouldFit(copy)) return;
+        if (point == null || copy.size() > this.maxLines || !this.renderer.wouldFit(copy, false)) return;
         this.text.clear();
         this.text.addAll(copy);
         setCursor(point, true);
