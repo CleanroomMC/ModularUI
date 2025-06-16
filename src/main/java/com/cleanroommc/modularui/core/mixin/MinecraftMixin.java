@@ -1,13 +1,10 @@
 package com.cleanroommc.modularui.core.mixin;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.core.IsGuiActuallyClosing;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
 
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -29,10 +26,5 @@ public class MinecraftMixin {
         for (int j = 0; j < Math.min(20, ModularUI.proxy.getTimer60Fps().elapsedTicks); ++j) {
             ClientScreenHandler.onFrameUpdate();
         }
-    }
-
-    @Inject(method = "displayGuiScreen", at = @At(value = "HEAD"))
-    public void checkIfGUIIsActuallyClosing(@Nullable GuiScreen guiScreenIn, CallbackInfo ci) {
-        IsGuiActuallyClosing.isGuiActuallyClosing = guiScreenIn == null;
     }
 }
