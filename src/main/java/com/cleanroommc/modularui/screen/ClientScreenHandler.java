@@ -78,21 +78,26 @@ public class ClientScreenHandler {
     private static long ticks = 0L;
 
     private static IMuiScreen lastMui;
+    
+    public static boolean guiIsClosing;
 
     // we need to know the actual gui and not some fake bs some other mod overwrites
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onGuiOpen(GuiOpenEvent event) {
+        GuiScreen newGui = event.getGui();
+        guiIsClosing = newGui == null;
+        
         defaultContext.reset();
-        if (lastMui != null && event.getGui() == null) {
+        if (lastMui != null && newGui == null) {
             if (lastMui.getScreen().getPanelManager().isOpen()) {
                 lastMui.getScreen().getPanelManager().closeAll();
             }
             lastMui.getScreen().getPanelManager().dispose();
             lastMui = null;
-        } else if (event.getGui() instanceof IMuiScreen screenWrapper) {
+        } else if (newGui instanceof IMuiScreen screenWrapper) {
             if (lastMui == null) {
                 lastMui = screenWrapper;
-            } else if (lastMui == event.getGui()) {
+            } else if (lastMui == newGui) {
                 lastMui.getScreen().getPanelManager().reopen();
             } else {
                 if (lastMui.getScreen().getPanelManager().isOpen()) {
@@ -103,7 +108,7 @@ public class ClientScreenHandler {
             }
         }
 
-        if (event.getGui() instanceof IMuiScreen muiScreen) {
+        if (newGui instanceof IMuiScreen muiScreen) {
             Objects.requireNonNull(muiScreen.getScreen(), "ModularScreen must not be null!");
             if (currentScreen != muiScreen.getScreen()) {
                 if (hasScreen()) {
@@ -114,7 +119,7 @@ public class ClientScreenHandler {
                 currentScreen = muiScreen.getScreen();
                 fpsCounter.reset();
             }
-        } else if (hasScreen() && getMCScreen() != null && event.getGui() != getMCScreen()) {
+        } else if (hasScreen() && getMCScreen() != null && newGui != getMCScreen()) {
             currentScreen.onCloseParent();
             currentScreen = null;
             lastChar = null;
