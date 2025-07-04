@@ -11,9 +11,9 @@ public class ClassTransformer implements IClassTransformer {
 
     @Override
     public byte[] transform(String name, String transformedName, byte[] basicClass) {
-        if (!ModularUICore.stackUpLoaded &&
-                (transformedName.equals(PacketByteBufferVisitor.PACKET_UTIL_CLASS) ||
-                        (transformedName.equals(PacketByteBufferVisitor.PACKET_BUFFER_CLASS) && !ModularUICore.ae2Loaded))) {
+        if (!ModularUICore.stackUpLoaded && !ModularUICore.ae2Loaded &&
+                (transformedName.equals(PacketByteBufferVisitor.PACKET_UTIL_CLASS)
+                        || transformedName.equals(PacketByteBufferVisitor.PACKET_BUFFER_CLASS))) {
             ClassWriter classWriter = new ClassWriter(0);
             new ClassReader(basicClass).accept(new PacketByteBufferVisitor(classWriter), 0);
             ModularUICore.LOGGER.info("Applied {} ASM from ModularUI", transformedName);
