@@ -15,17 +15,29 @@ public class ClassTransformer implements IClassTransformer {
 
     @Override
     public byte[] transform(String name, String transformedName, byte[] basicClass) {
-        if (!ModularUICore.stackUpLoaded &&
-                (transformedName.equals(PacketByteBufferVisitor.PACKET_UTIL_CLASS) ||
-                        (transformedName.equals(PacketByteBufferVisitor.PACKET_BUFFER_CLASS) && !ModularUICore.ae2Loaded))) {
+        if (!ModularUICore.stackUpLoaded) {
             // Temporarily use AE2's implementation
             Consumer<ClassNode> consumer = (n) -> {};
-            consumer = consumer.andThen((node) -> {
-                ClassSplicer.spliceClasses(node, "com.cleanroommc.modularui.core.temp.PacketUtilPatch",
-                        "writeItemStackFromClientToServer");
-            });
-            return ClassSplicer.processNode(basicClass, consumer);
+            Consumer<ClassNode> emptyConsumer = consumer;
 
+            if (transformedName.equals(PacketByteBufferVisitor.PACKET_UTIL_CLASS)) {
+                consumer = consumer.andThen((node) -> {
+                    ClassSplicer.spliceClasses(node, "com.cleanroommc.modularui.core.temp.PacketUtilPatch",
+                            "writeItemStackFromClientToServer");
+                });
+            } else if (!ModularUICore.ae2Loaded && transformedName.equals(PacketByteBufferVisitor.PACKET_BUFFER_CLASS)) {
+                consumer = consumer.andThen((node) -> {
+                    ClassSplicer.spliceClasses(node, "com.cleanroommc.modularui.core.temp.PacketBufferPatch",
+                            "readItemStack", "func_150791_c",
+                            "writeItemStack", "func_150788_a");
+                });
+            }
+
+            if (consumer != emptyConsumer) {
+                return ClassSplicer.processNode(basicClass, consumer);
+            } else {
+                return basicClass;
+            }
 //            ClassWriter classWriter = new ClassWriter(0);
 //            new ClassReader(basicClass).accept(new PacketByteBufferVisitor(classWriter), 0);
 //            ModularUICore.LOGGER.info("Applied {} ASM from ModularUI", transformedName);
