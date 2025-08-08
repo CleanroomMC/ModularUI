@@ -7,6 +7,7 @@ import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
+import com.cleanroommc.modularui.api.widget.IDragResizeable;
 import com.cleanroommc.modularui.api.widget.IFocusedWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
@@ -51,7 +52,7 @@ import java.util.function.Supplier;
  * To open another panel on top of the main panel you must use {@link IPanelHandler#simple(ModularPanel, SecondaryPanel.IPanelBuilder, boolean)}
  * or {@link PanelSyncManager#panel(String, PanelSyncHandler.IPanelBuilder, boolean)} if the panel should be synced.
  */
-public class ModularPanel extends ParentWidget<ModularPanel> implements IViewport {
+public class ModularPanel extends ParentWidget<ModularPanel> implements IViewport, IDragResizeable {
 
     public static ModularPanel defaultPanel(@NotNull String name) {
         return defaultPanel(name, 176, 166);
@@ -72,6 +73,12 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     private final ObjectList<LocatedWidget> hovering = ObjectList.create();
     private final Input keyboard = new Input();
     private final Input mouse = new Input();
+
+    private IDragResizeable currentResizing = null;
+    private LocatedWidget currentResizingWidget = null;
+    private Corner draggingCorner = null;
+    private Area startArea = new Area();
+    private int dragX, dragY;
 
     private final List<IPanelHandler> clientSubPanels = new ArrayList<>();
     private boolean invisible = false;
@@ -310,6 +317,22 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             } else {
                 for (LocatedWidget widget : this.hovering) {
                     widget.applyMatrix(getContext());
+                    IWidget w = widget.getElement();
+                    if (w instanceof IDragResizeable resizeable) {
+                        IDragResizeable.Corner corner = IDragResizeable.getDragResizeCornerUnderMouse(resizeable, w.getArea(), w.getContext());
+                        if (corner != null) {
+                            this.currentResizing = resizeable;
+                            this.currentResizingWidget = widget;
+                            this.dragX = getContext().getMouseX();
+                            this.dragY = getContext().getMouseY();
+                            this.startArea.set(w.getArea());
+                            this.startArea.rx = w.getArea().rx;
+                            this.startArea.ry = w.getArea().ry;
+                            this.draggingCorner = corner;
+                            widget.unapplyMatrix(getContext());
+                            break;
+                        }
+                    }
                     // click widget and see how it reacts
                     if (widget.getElement() instanceof Interactable interactable) {
                         Interactable.Result interactResult = interactable.onMousePressed(mouseButton);
@@ -387,6 +410,12 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             if (!this.mouse.doRelease) {
                 this.mouse.reset();
                 return false;
+            }
+            if (this.currentResizing != null) {
+                this.mouse.reset();
+                this.currentResizing = null;
+                this.currentResizingWidget = null;
+                return true;
             }
             if (interactFocused(widget -> widget.onMouseRelease(mouseButton), false)) {
                 return true;
@@ -560,6 +589,18 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     public boolean onMouseDrag(int mouseButton, long timeSinceClick) {
         return doSafeBool(() -> {
+            if (this.currentResizing != null) {
+                this.currentResizingWidget.applyMatrix(getContext());
+                int mx = getContext().getMouseX();
+                int my = getContext().getMouseY();
+                this.currentResizingWidget.unapplyMatrix(getContext());
+                int dx = mx - this.dragX;
+                int dy = my - this.dragY;
+                if (dx != 0 || dy != 0) {
+                    IDragResizeable.applyDrag(this.currentResizing, (IWidget) this.currentResizing, this.draggingCorner, this.startArea, dx, dy);
+                }
+                return true;
+            }
             if (this.mouse.held &&
                     mouseButton == this.mouse.lastButton &&
                     this.mouse.lastPressed != null &&
