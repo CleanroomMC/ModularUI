@@ -9,6 +9,10 @@ import com.cleanroommc.modularui.theme.WidgetThemeSelectable;
 
 import java.util.function.Consumer;
 
+/**
+ * A button which cycles between 2 states by clicking on it. Background, overlay and tooltip can be supplied per state.
+ * @see CycleButtonWidget
+ */
 public class ToggleButton extends AbstractCycleButtonWidget<ToggleButton> {
 
     private boolean invert = false;
