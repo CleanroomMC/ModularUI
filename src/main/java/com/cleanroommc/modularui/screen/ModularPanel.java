@@ -11,6 +11,7 @@ import com.cleanroommc.modularui.api.widget.IDragResizeable;
 import com.cleanroommc.modularui.api.widget.IFocusedWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
+import com.cleanroommc.modularui.api.widget.ResizeDragArea;
 import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
 import com.cleanroommc.modularui.integration.jei.ModularUIJeiPlugin;
 import com.cleanroommc.modularui.screen.viewport.GuiViewportStack;
@@ -76,7 +77,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     private IDragResizeable currentResizing = null;
     private LocatedWidget currentResizingWidget = null;
-    private Corner draggingCorner = null;
+    private ResizeDragArea draggingDragArea = null;
     private Area startArea = new Area();
     private int dragX, dragY;
 
@@ -175,11 +176,12 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     public void transform(IViewportStack stack) {
         super.transform(stack);
         // apply scaling for animation
-        if (getScale() != 1f) {
+        float scale = getScale();
+        if (scale != 1f) {
             float x = getArea().w() / 2f;
             float y = getArea().h() / 2f;
             stack.translate(x, y);
-            stack.scale(getScale(), getScale());
+            stack.scale(scale, scale);
             stack.translate(-x, -y);
         }
     }
@@ -194,7 +196,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @Override
     public void getSelfAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
         if (isInside(stack, x, y)) {
-            widgets.add(this, stack.peek());
+            widgets.add(this, stack.peek(), getAdditionalHoverInfo(stack, x, y));
         }
     }
 
@@ -215,6 +217,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         getWidgetsAt(stack, widgetList, getContext().getAbsMouseX(), getContext().getAbsMouseY());
         stack.popViewport(this);
         stack.popViewport(null);
+        stack.reset();
     }
 
     @Override
@@ -318,20 +321,17 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 for (LocatedWidget widget : this.hovering) {
                     widget.applyMatrix(getContext());
                     IWidget w = widget.getElement();
-                    if (w instanceof IDragResizeable resizeable) {
-                        IDragResizeable.Corner corner = IDragResizeable.getDragResizeCornerUnderMouse(resizeable, w.getArea(), w.getContext());
-                        if (corner != null) {
-                            this.currentResizing = resizeable;
-                            this.currentResizingWidget = widget;
-                            this.dragX = getContext().getMouseX();
-                            this.dragY = getContext().getMouseY();
-                            this.startArea.set(w.getArea());
-                            this.startArea.rx = w.getArea().rx;
-                            this.startArea.ry = w.getArea().ry;
-                            this.draggingCorner = corner;
-                            widget.unapplyMatrix(getContext());
-                            break;
-                        }
+                    if (w instanceof IDragResizeable resizeable && widget.getAdditionalHoverInfo() instanceof ResizeDragArea dragArea) {
+                        this.currentResizing = resizeable;
+                        this.currentResizingWidget = widget;
+                        this.dragX = getContext().getMouseX();
+                        this.dragY = getContext().getMouseY();
+                        this.startArea.set(w.getArea());
+                        this.startArea.rx = w.getArea().rx;
+                        this.startArea.ry = w.getArea().ry;
+                        this.draggingDragArea = dragArea;
+                        widget.unapplyMatrix(getContext());
+                        break;
                     }
                     // click widget and see how it reacts
                     if (widget.getElement() instanceof Interactable interactable) {
@@ -597,7 +597,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 int dx = mx - this.dragX;
                 int dy = my - this.dragY;
                 if (dx != 0 || dy != 0) {
-                    IDragResizeable.applyDrag(this.currentResizing, (IWidget) this.currentResizing, this.draggingCorner, this.startArea, dx, dy);
+                    IDragResizeable.applyDrag(this.currentResizing, (IWidget) this.currentResizing, this.draggingDragArea, this.startArea, dx, dy);
                 }
                 return true;
             }

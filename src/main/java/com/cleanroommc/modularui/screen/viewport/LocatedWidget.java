@@ -37,12 +37,19 @@ public class LocatedWidget extends LocatedElement<IWidget> {
                 widget1.transform(STACK);
             }
         }
-        return new LocatedWidget(widget, STACK.peek());
+        return new LocatedWidget(widget, STACK.peek(), null);
     }
 
-    public static final LocatedWidget EMPTY = new LocatedWidget(null, TransformationMatrix.EMPTY);
+    public static final LocatedWidget EMPTY = new LocatedWidget(null, TransformationMatrix.EMPTY, null);
 
-    public LocatedWidget(IWidget element, TransformationMatrix transformationMatrix) {
+    private final Object additionalHoverInfo;
+
+    public LocatedWidget(IWidget element, TransformationMatrix transformationMatrix, Object additionalHoverInfo) {
         super(element, transformationMatrix);
+        this.additionalHoverInfo = additionalHoverInfo;
+    }
+
+    public Object getAdditionalHoverInfo() {
+        return additionalHoverInfo;
     }
 }

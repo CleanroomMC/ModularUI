@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.api.widget;
 
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
 public interface IDragResizeable {
@@ -17,42 +17,45 @@ public interface IDragResizeable {
         return 3;
     }
 
-    static Corner getDragResizeCornerUnderMouse(IDragResizeable widget, Area area, GuiContext context) {
+    static ResizeDragArea getDragResizeCorner(IDragResizeable widget, Area area, IViewportStack stack, int x, int y) {
         if (!widget.isCurrentlyResizable()) return null;
 
-        int mx = context.getMouseX();
-        int my = context.getMouseY();
+        int mx = stack.unTransformX(x, y);
+        int my = stack.unTransformY(x, y);
 
         if (mx < 0 || my < 0 || mx > area.w() || my > area.h()) return null;
 
         int ras = widget.getDragAreaSize();
         if (mx < ras) {
-            if (my < ras) return Corner.TOP_LEFT;
-            if (my > area.h() - ras) return Corner.BOTTOM_LEFT;
-            return null;
+            if (my < ras) return ResizeDragArea.TOP_LEFT;
+            if (my > area.h() - ras) return ResizeDragArea.BOTTOM_LEFT;
+            return ResizeDragArea.LEFT;
         }
         if (mx > area.w() - ras) {
-            if (my < ras) return Corner.TOP_RIGHT;
-            if (my > area.h() - ras) return Corner.BOTTOM_RIGHT;
+            if (my < ras) return ResizeDragArea.TOP_RIGHT;
+            if (my > area.h() - ras) return ResizeDragArea.BOTTOM_RIGHT;
+            return ResizeDragArea.RIGHT;
         }
+        if (my < ras) return ResizeDragArea.TOP;
+        if (my > area.h() - ras) return ResizeDragArea.BOTTOM;
         return null;
     }
 
-    static void applyDrag(IDragResizeable resizeable, IWidget widget, Corner corner, Area startArea, int dx, int dy) {
+    static void applyDrag(IDragResizeable resizeable, IWidget widget, ResizeDragArea dragArea, Area startArea, int dx, int dy) {
         if (dx != 0) {
-            if (corner.left) {
+            if (dragArea.left) {
                 widget.flex().left(startArea.rx + dx);
                 widget.flex().width(startArea.width - dx);
-            } else {
+            } else if (dragArea.right) {
                 widget.flex().left(startArea.rx);
                 widget.flex().width(startArea.width + dx);
             }
         }
         if (dy != 0) {
-            if (corner.top) {
+            if (dragArea.top) {
                 widget.flex().top(startArea.ry + dy);
                 widget.flex().height(startArea.height - dy);
-            } else {
+            } else if (dragArea.bottom) {
                 widget.flex().top(startArea.ry);
                 widget.flex().height(startArea.height + dy);
             }
@@ -60,17 +63,4 @@ public interface IDragResizeable {
         resizeable.onDragResize();
     }
 
-    enum Corner {
-        TOP_LEFT(true, true),
-        TOP_RIGHT(true, false),
-        BOTTOM_LEFT(false, true),
-        BOTTOM_RIGHT(false, false);
-
-        public final boolean top, left;
-
-        Corner(boolean top, boolean left) {
-            this.top = top;
-            this.left = left;
-        }
-    }
 }

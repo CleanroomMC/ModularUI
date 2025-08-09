@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.screen.viewport;
 
+import com.cleanroommc.modularui.ClientProxy;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.widget.*;
@@ -30,7 +31,7 @@ public class ModularGuiContext extends GuiContext {
     public final ModularScreen screen;
     private LocatedWidget focusedWidget = LocatedWidget.EMPTY;
     @Nullable
-    private IWidget hovered;
+    private LocatedWidget hovered;
     private int timeHovered = 0;
     private final HoveredIterable hoveredWidgets;
 
@@ -63,7 +64,7 @@ public class ModularGuiContext extends GuiContext {
      * @return true if the widget is directly below the mouse
      */
     public boolean isHovered(IGuiElement guiElement) {
-        return isHovered() && this.hovered == guiElement;
+        return isHovered() && getHovered() == guiElement;
     }
 
     /**
@@ -82,7 +83,7 @@ public class ModularGuiContext extends GuiContext {
      */
     @Nullable
     public IWidget getHovered() {
-        return this.hovered;
+        return this.hovered != null ? this.hovered.getElement() : null;
     }
 
     /**
@@ -260,7 +261,7 @@ public class ModularGuiContext extends GuiContext {
     @ApiStatus.Internal
     public void dropDraggable() {
         this.draggable.applyMatrix(this);
-        this.draggable.getElement().onDragEnd(this.draggable.getElement().canDropHere(getAbsMouseX(), getAbsMouseY(), this.hovered));
+        this.draggable.getElement().onDragEnd(this.draggable.getElement().canDropHere(getAbsMouseX(), getAbsMouseY(), getHovered()));
         this.draggable.getElement().setMoving(false);
         this.draggable.unapplyMatrix(this);
         this.draggable = null;
@@ -310,7 +311,6 @@ public class ModularGuiContext extends GuiContext {
 
     @ApiStatus.Internal
     public void onFrameUpdate() {
-        IWidget hovered = this.screen.getPanelManager().getTopWidget();
         if (hasDraggable() && (this.lastDragX != getAbsMouseX() || this.lastDragY != getAbsMouseY())) {
             this.lastDragX = getAbsMouseX();
             this.lastDragY = getAbsMouseY();
@@ -318,20 +318,38 @@ public class ModularGuiContext extends GuiContext {
             this.draggable.getElement().onDrag(this.lastButton, this.lastClickTime);
             this.draggable.unapplyMatrix(this);
         }
-        if (this.hovered != hovered) {
-            if (this.hovered != null) {
-                this.hovered.onMouseEndHover();
+        LocatedWidget locatedHovered = this.screen.getPanelManager().getTopWidgetLocated(false);
+        IWidget hovered = locatedHovered != null ? locatedHovered.getElement() : null;
+        IWidget oldHovered = getHovered();
+        if (oldHovered != hovered) {
+            if (this.hovered != null && oldHovered != null) {
+                if (this.hovered.getAdditionalHoverInfo() instanceof ResizeDragArea) {
+                    ClientProxy.resetCursorIcon();
+                }
+                oldHovered.onMouseEndHover();
             }
-            this.hovered = hovered;
+            this.hovered = locatedHovered;
             this.timeHovered = 0;
             if (this.hovered != null) {
-                this.hovered.onMouseStartHover();
+                if (locatedHovered.getAdditionalHoverInfo() instanceof ResizeDragArea dragArea) {
+                    // new cursor
+                    ClientProxy.setCursorResizeIcon(dragArea);
+                }
+                hovered.onMouseStartHover();
                 if (this.hovered instanceof IVanillaSlot vanillaSlot && vanillaSlot.handleAsVanillaSlot()) {
                     this.screen.getScreenWrapper().setHoveredSlot(vanillaSlot.getVanillaSlot());
                 } else {
                     this.screen.getScreenWrapper().setHoveredSlot(null);
                 }
             }
+        } else if (this.hovered != null && locatedHovered != null && this.hovered.getAdditionalHoverInfo() != locatedHovered.getAdditionalHoverInfo()) {
+            if (locatedHovered.getAdditionalHoverInfo() instanceof ResizeDragArea dragArea) {
+                ClientProxy.setCursorResizeIcon(dragArea);
+            } else {
+                ClientProxy.resetCursorIcon();
+            }
+            // widget is unchanged, but additional info changed
+            this.hovered = locatedHovered;
         } else {
             this.timeHovered++;
         }
