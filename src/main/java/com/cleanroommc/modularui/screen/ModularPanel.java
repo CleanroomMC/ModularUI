@@ -85,6 +85,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     private boolean invisible = false;
     private Animator animator;;
 
+    private boolean resizable = false;
+
     public ModularPanel(@NotNull String name) {
         this.name = Objects.requireNonNull(name, "A panels name must not be null and should be unique!");
         center();
@@ -647,6 +649,16 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return false;
     }
 
+    @Override
+    public boolean isCurrentlyResizable() {
+        return this.resizable;
+    }
+
+    @Override
+    public boolean keepPosOnDragResize() {
+        return !isDraggable();
+    }
+
     public @NotNull String getName() {
         return this.name;
     }
@@ -783,6 +795,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     public ModularPanel invisible() {
         this.invisible = true;
         return background(IDrawable.EMPTY);
+    }
+
+    public ModularPanel resizeableOnDrag(boolean resizeable) {
+        this.resizable = resizeable;
+        return this;
     }
 
     @Override

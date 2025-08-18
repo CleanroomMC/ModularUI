@@ -92,6 +92,9 @@ public class ClientProxy extends CommonProxy {
             resizeCursorV = new Cursor(size, size, size / 2, size / 2, 1, readPixel(img, false, true), null);
         } catch (IOException | LWJGLException e) {
             throw new RuntimeException(e);
+        } catch (Throwable e) {
+            ModularUI.LOGGER.info("Custom Cursors failed to load. This is likely because an incompatible LWJGL version was used like with CleanroomLoader.");
+            // TODO: proper lwjgl 3 support
         }
     }
 
@@ -122,6 +125,7 @@ public class ClientProxy extends CommonProxy {
     }
 
     public static void setCursorResizeIcon(ResizeDragArea dragArea) {
+        if (resizeCursorV == null) return; // cursors failed to initialized
         try {
             if (dragArea == null) {
                 resetCursorIcon();
@@ -140,6 +144,7 @@ public class ClientProxy extends CommonProxy {
     }
 
     public static void resetCursorIcon() {
+        if (resizeCursorV == null) return; // cursors failed to initialized
         try {
             if (currentCursor == resizeCursorDiag || currentCursor == resizeCursorDiagInverse || currentCursor == resizeCursorH || currentCursor == resizeCursorV) {
                 currentCursor = null;
