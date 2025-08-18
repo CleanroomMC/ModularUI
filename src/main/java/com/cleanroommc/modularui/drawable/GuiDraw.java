@@ -291,7 +291,7 @@ public class GuiDraw {
         renderItem.zLevel = z + 100;
         renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().player, item, 0, 0);
         renderItem.zLevel = 0;
-        GlStateManager.disableDepth();
+        Platform.endDrawItem();
         GlStateManager.popMatrix();
     }
 
