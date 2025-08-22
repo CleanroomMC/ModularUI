@@ -15,7 +15,7 @@ public class LangKey extends BaseKey {
     private final Supplier<String> keySupplier;
     private final Supplier<Object[]> argsSupplier;
     private String string;
-    private long time = 0;
+    private long time = -1;
 
     public LangKey(@NotNull String key) {
         this(key, () -> null);
