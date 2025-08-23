@@ -91,7 +91,7 @@ public class RichTextCompiler {
             }
             if (delegate instanceof Icon icon1) {
                 int defaultSize = this.fr.FONT_HEIGHT;
-                if (icon1.getWidth() <= 0) icon1.width(defaultSize);
+                //if (icon1.getWidth() <= 0) icon1.width(defaultSize);
                 if (icon1.getHeight() <= 0) icon1.height(defaultSize);
             }
             if (icon.getWidth() > this.maxWidth) {
