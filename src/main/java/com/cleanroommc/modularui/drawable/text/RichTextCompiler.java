@@ -182,9 +182,10 @@ public class RichTextCompiler {
 
     private void addLineElement(Object o) {
         if (o instanceof String s2) {
-            if (this.currentLine.size() == 1 && this.currentLine.get(0) instanceof String s1) {
-                // if there is already one string in the line, merge them
-                this.currentLine.set(0, s1 + s2);
+            int s = this.currentLine.size();
+            if (s > 0 && this.currentLine.get(s - 1) instanceof String s1) {
+                // if the last element in the line is a string, merge them
+                this.currentLine.set(s - 1, s1 + s2);
                 return;
             }
             if (this.currentLine.isEmpty()) {

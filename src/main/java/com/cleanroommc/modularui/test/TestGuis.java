@@ -49,7 +49,7 @@ public class TestGuis extends CustomModularScreen {
 
     @Override
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {
-        return buildListUi(context);
+        return buildRichTextUI(context);
     }
 
     public @NotNull ModularPanel buildAnimationUI(ModularGuiContext context) {
