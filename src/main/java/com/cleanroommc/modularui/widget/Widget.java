@@ -834,10 +834,6 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         }
     }
 
-    public boolean isExcludeAreaInJei() {
-        return this.excludeAreaInJei;
-    }
-
     /**
      * Disables the widget from start. Useful inside widget tree creation, where widget references are usually not stored.
      *
@@ -846,6 +842,18 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     public W disabled() {
         setEnabled(false);
         return getThis();
+    }
+
+    @Override
+    public Object getAdditionalHoverInfo(IViewportStack viewportStack, int mouseX, int mouseY) {
+        if (this instanceof IDragResizeable dragResizeable) {
+            return IDragResizeable.getDragResizeCorner(dragResizeable, getArea(), viewportStack, mouseX, mouseY);
+        }
+        return null;
+    }
+
+    public boolean isExcludeAreaInJei() {
+        return this.excludeAreaInJei;
     }
 
     public W excludeAreaInJei() {

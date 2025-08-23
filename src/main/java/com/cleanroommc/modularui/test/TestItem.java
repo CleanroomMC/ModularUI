@@ -52,7 +52,7 @@ public class TestItem extends Item implements IGuiHolder<PlayerInventoryGuiData>
         IItemHandlerModifiable itemHandler = (IItemHandlerModifiable) guiData.getUsedItemStack().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
         guiSyncManager.registerSlotGroup("mixer_items", 2);
 
-        ModularPanel panel = ModularPanel.defaultPanel("knapping_gui");
+        ModularPanel panel = ModularPanel.defaultPanel("knapping_gui").resizeableOnDrag(true);
         panel.child(new Column().margin(7)
                 .child(new ParentWidget<>().widthRel(1f).expanded()
                         .child(SlotGroupWidget.builder()
