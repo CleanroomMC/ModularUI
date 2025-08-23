@@ -19,6 +19,7 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.*;
 import com.cleanroommc.modularui.utils.fakeworld.ArraySchema;
 import com.cleanroommc.modularui.utils.fakeworld.ISchema;
+import com.cleanroommc.modularui.value.StringValue;
 import com.cleanroommc.modularui.widget.DraggableWidget;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widgets.ListWidget;
@@ -27,8 +28,11 @@ import com.cleanroommc.modularui.widgets.SchemaWidget;
 import com.cleanroommc.modularui.widgets.SortableListWidget;
 import com.cleanroommc.modularui.widgets.TransformWidget;
 import com.cleanroommc.modularui.widgets.layout.Column;
+import com.cleanroommc.modularui.widgets.layout.Flow;
 import com.cleanroommc.modularui.widgets.layout.Row;
 import com.cleanroommc.modularui.widgets.TextWidget;
+
+import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -41,6 +45,7 @@ import net.minecraft.util.text.TextFormatting;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
@@ -49,7 +54,7 @@ public class TestGuis extends CustomModularScreen {
 
     @Override
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {
-        return buildRichTextUI(context);
+        return buildSearchTest(context);
     }
 
     public @NotNull ModularPanel buildAnimationUI(ModularGuiContext context) {
@@ -275,5 +280,28 @@ public class TestGuis extends CustomModularScreen {
                                         w.setEnabled(!w.isEnabled());
                                     }
                                 })));
+    }
+
+    public @NotNull ModularPanel buildSearchTest(ModularGuiContext context) {
+        List<String> items = Arrays.asList("Chicken", "Jockey", "Flint", "Steel", "Steve", "Diamond", "Ingot", "Iron", "Armor", "Greg");
+        StringValue searchValue = new StringValue("");
+        return ModularPanel.defaultPanel("search", 100, 150)
+                .child(Flow.column()
+                        .padding(5)
+                        .child(new TextFieldWidget()
+                                .value(searchValue)
+                                .height(16)
+                                .widthRel(1f))
+                        .child(new ListWidget<>()
+                                .collapseDisabledChild()
+                                .expanded()
+                                .widthRel(1f)
+                                .children(items.size(), i -> new TextWidget(IKey.str(items.get(i)))
+                                        .alignment(Alignment.Center)
+                                        .color(Color.WHITE.main)
+                                        .widthRel(1f)
+                                        .height(16)
+                                        .background(GuiTextures.MC_BUTTON)
+                                        .setEnabledIf(w -> items.get(i).toLowerCase().contains(searchValue.getStringValue())))));
     }
 }
