@@ -4,20 +4,33 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.widget.Widget;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.IntConsumer;
 
 public class PagedWidget<W extends PagedWidget<W>> extends Widget<W> {
 
     private final List<IWidget> pages = new ArrayList<>();
     private IWidget currentPage;
     private int currentPageIndex = 0;
+    @Nullable
+    private IntConsumer onPageChange;
 
     @Override
     public void afterInit() {
         setPage(0);
+    }
+
+    /**
+     * Set a consumer that is accepted <b>right after</b> the page is actually changed and the next page widget is enabled. <br/>
+     * Will also be called with {@code 0} when after this widget is initialized.
+     */
+    public W onPageChange(@Nullable IntConsumer onPageChange) {
+        this.onPageChange = onPageChange;
+        return getThis();
     }
 
     public void setPage(int page) {
@@ -30,6 +43,10 @@ public class PagedWidget<W extends PagedWidget<W>> extends Widget<W> {
         }
         this.currentPage = this.pages.get(this.currentPageIndex);
         this.currentPage.setEnabled(true);
+
+        if (this.onPageChange != null) {
+            this.onPageChange.accept(page);
+        }
     }
 
     public void nextPage() {
