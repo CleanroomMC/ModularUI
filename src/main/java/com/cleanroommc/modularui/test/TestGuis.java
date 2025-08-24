@@ -15,9 +15,12 @@ import com.cleanroommc.modularui.drawable.SpriteDrawable;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.RichTooltip;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
+import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.*;
 import com.cleanroommc.modularui.utils.fakeworld.ArraySchema;
+import com.cleanroommc.modularui.utils.fakeworld.FakeEntity;
 import com.cleanroommc.modularui.utils.fakeworld.ISchema;
 import com.cleanroommc.modularui.value.StringValue;
 import com.cleanroommc.modularui.widget.DraggableWidget;
@@ -34,8 +37,11 @@ import com.cleanroommc.modularui.widgets.TextWidget;
 
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -54,7 +60,7 @@ public class TestGuis extends CustomModularScreen {
 
     @Override
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {
-        return buildSearchTest(context);
+        return buildSpriteAndEntityUI(context);
     }
 
     public @NotNull ModularPanel buildAnimationUI(ModularGuiContext context) {
@@ -127,16 +133,19 @@ public class TestGuis extends CustomModularScreen {
                                 })));
     }
 
-    public @NotNull ModularPanel buildSpriteUI(ModularGuiContext context) {
+    public @NotNull ModularPanel buildSpriteAndEntityUI(ModularGuiContext context) {
         TextureAtlasSprite sprite = SpriteHelper.getSpriteOfBlockState(GameObjectHelper.getBlockState("minecraft", "command_block"), EnumFacing.UP);
         // SpriteHelper.getSpriteOfItem(new ItemStack(Items.DIAMOND));
+        Entity entity = FakeEntity.create(EntityDragon.class);
+        float period = 3000f;
         return ModularPanel.defaultPanel("main")
                 .size(150)
                 .child(new TextWidget(IKey.str("Test String")).scale(0.6f).horizontalCenter().top(7))
                 .child(new DraggableWidget<>()
                         .background(new SpriteDrawable(sprite))
                         .size(20)
-                        .center()
+                        .alignX(0.5f)
+                        .top(20)
                         .tooltipBuilder(tooltip -> {
                             tooltip.addLine(
                                     "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.  "
@@ -148,7 +157,19 @@ public class TestGuis extends CustomModularScreen {
                             tooltip.alignment(Alignment.Center);
                             tooltip.scale(0.5f);
                             tooltip.pos(RichTooltip.Pos.NEXT_TO_MOUSE);
-                        }));
+                        }))
+                .child(new IDrawable() {
+                    @Override
+                    public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
+                        GuiDraw.drawEntity(entity, 0, 0, width, height, context.getCurrentDrawingZ(), e -> {
+                            float scale = 0.9f;
+                            GlStateManager.scale(scale, scale, scale);
+                            GlStateManager.translate(0, 7, 0);
+                            GlStateManager.rotate(35, 1, 0, 0);
+                            GlStateManager.rotate(360 * (Minecraft.getSystemTime() % period) / period, 0, 1, 0);
+                        }, null);
+                    }
+                }.asWidget().alignX(0.5f).bottom(10).size(100, 75));
     }
 
 
