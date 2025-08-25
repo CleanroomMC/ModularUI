@@ -131,11 +131,7 @@ public class UITexture implements IDrawable, IJsonSerializable {
     @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
-        if (canApplyTheme()) {
-            Color.setGlColor(widgetTheme.getColor());
-        } else {
-            Color.setGlColorOpaque(Color.WHITE.main);
-        }
+        applyColor(widgetTheme.getColor());
         draw((float) x, y, width, height);
     }
 
@@ -265,7 +261,7 @@ public class UITexture implements IDrawable, IJsonSerializable {
         }
 
         /**
-         * Set the image size. Required for {@link #tiled()}, {@link #adaptable(int, int)} and {@link #uv(int, int, int, int)}
+         * Set the image size. Required for {@link #tiled()}, {@link #adaptable(int, int)} and {@link #xy(int, int, int, int)}
          *
          * @param w image width
          * @param h image height
