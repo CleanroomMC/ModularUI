@@ -21,7 +21,7 @@ public class PagedWidget<W extends PagedWidget<W>> extends Widget<W> {
 
     @Override
     public void afterInit() {
-        setPage(0);
+        setPage(this.currentPageIndex);
     }
 
     /**
@@ -35,7 +35,7 @@ public class PagedWidget<W extends PagedWidget<W>> extends Widget<W> {
 
     public void setPage(int page) {
         if (page < 0 || page >= this.pages.size()) {
-            throw new IndexOutOfBoundsException();
+            throw new IndexOutOfBoundsException("Setting page of " + this + " to " + page + " failed. Only values from 0 to " + (this.pages.size() - 1) + " are allowed.");
         }
         this.currentPageIndex = page;
         if (this.currentPage != null) {
@@ -78,6 +78,13 @@ public class PagedWidget<W extends PagedWidget<W>> extends Widget<W> {
     @Override
     public @Unmodifiable @NotNull List<IWidget> getChildren() {
         return this.pages;
+    }
+
+    public W initialPage(int page) {
+        if (!isValid()) {
+            this.currentPageIndex = page;
+        }
+        return getThis();
     }
 
     public W addPage(IWidget widget) {
