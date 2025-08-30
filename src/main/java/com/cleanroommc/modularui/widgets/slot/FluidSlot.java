@@ -13,7 +13,7 @@ import com.cleanroommc.modularui.integration.jei.ModularUIJeiPlugin;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetSlotTheme;
+import com.cleanroommc.modularui.theme.SlotTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
@@ -174,13 +174,13 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
     }
 
     @Override
-    public WidgetSlotTheme getWidgetThemeInternal(ITheme theme) {
+    public SlotTheme getWidgetThemeInternal(ITheme theme) {
         return theme.getFluidSlotTheme();
     }
 
     public int getSlotHoverColor() {
         WidgetTheme theme = getWidgetTheme(getContext().getTheme());
-        if (theme instanceof WidgetSlotTheme slotTheme) {
+        if (theme instanceof SlotTheme slotTheme) {
             return slotTheme.getSlotHoverColor();
         }
         return ITheme.getDefault().getFluidSlotTheme().getSlotHoverColor();

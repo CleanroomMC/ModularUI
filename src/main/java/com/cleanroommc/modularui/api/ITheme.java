@@ -1,9 +1,10 @@
 package com.cleanroommc.modularui.api;
 
-import com.cleanroommc.modularui.theme.WidgetSlotTheme;
-import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
+import com.cleanroommc.modularui.theme.SlotTheme;
+import com.cleanroommc.modularui.theme.TextFieldTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.theme.WidgetThemeSelectable;
+import com.cleanroommc.modularui.theme.WidgetThemeKey;
+import com.cleanroommc.modularui.theme.SelectableTheme;
 
 /**
  * A theme is parsed from json and contains style information like color or background texture.
@@ -41,21 +42,13 @@ public interface ITheme {
 
     WidgetTheme getButtonTheme();
 
-    WidgetSlotTheme getItemSlotTheme();
+    SlotTheme getItemSlotTheme();
 
-    WidgetSlotTheme getFluidSlotTheme();
+    SlotTheme getFluidSlotTheme();
 
-    WidgetTextFieldTheme getTextFieldTheme();
+    TextFieldTheme getTextFieldTheme();
 
-    WidgetThemeSelectable getToggleButtonTheme();
+    SelectableTheme getToggleButtonTheme();
 
-    WidgetTheme getWidgetTheme(String id);
-
-    default <T extends WidgetTheme> T getWidgetTheme(Class<T> clazz, String id) {
-        WidgetTheme theme = getWidgetTheme(id);
-        if (clazz.isInstance(theme)) {
-            return (T) theme;
-        }
-        return null;
-    }
+    <T extends WidgetTheme> T getWidgetTheme(WidgetThemeKey<T> key);
 }

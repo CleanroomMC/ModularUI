@@ -155,6 +155,7 @@ public interface GuiTextures {
             .location(ModularUI.ID, "gui/slot/item")
             .imageSize(18, 18)
             .adaptable(1)
+            .canApplyTheme()
             .name("slot_item")
             .build();
 
@@ -162,17 +163,20 @@ public interface GuiTextures {
             .location(ModularUI.ID, "gui/slot/fluid")
             .imageSize(18, 18)
             .adaptable(1)
+            .canApplyTheme()
             .name("slot_fluid")
             .build();
 
     UITexture PROGRESS_ARROW = UITexture.builder()
             .location(ModularUI.ID, "gui/widgets/progress_bar_arrow")
             .imageSize(20, 40)
+            .canApplyTheme()
             .build();
 
     UITexture PROGRESS_CYCLE = UITexture.builder()
             .location(ModularUI.ID, "gui/widgets/progress_bar_mixer")
             .imageSize(20, 40)
+            .canApplyTheme()
             .build();
 
     UITexture CYCLE_BUTTON_DEMO = UITexture.builder()

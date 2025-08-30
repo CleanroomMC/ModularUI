@@ -87,57 +87,57 @@ public class ThemeBuilder<B extends ThemeBuilder<B>> extends JsonBuilder {
     }
 
     public B itemSlotHoverColor(int v) {
-        mergeAdd(IThemeApi.ITEM_SLOT, new JsonBuilder().add("slotHoverColor", v));
+        mergeAdd(IThemeApi.ITEM_SLOT.getName(), new JsonBuilder().add("slotHoverColor", v));
         return getThis();
     }
 
     public B fluidSlotHoverColor(int v) {
-        mergeAdd(IThemeApi.FLUID_SLOT, new JsonBuilder().add("slotHoverColor", v));
+        mergeAdd(IThemeApi.FLUID_SLOT.getName(), new JsonBuilder().add("slotHoverColor", v));
         return getThis();
     }
 
     public B textFieldMarkedColor(int v) {
-        mergeAdd(IThemeApi.TEXT_FIELD, new JsonBuilder().add("markedColor", v));
+        mergeAdd(IThemeApi.TEXT_FIELD.getName(), new JsonBuilder().add("markedColor", v));
         return getThis();
     }
 
     public B textFieldHintColor(int v) {
-        mergeAdd(IThemeApi.TEXT_FIELD, new JsonBuilder().add("hintColor", v));
+        mergeAdd(IThemeApi.TEXT_FIELD.getName(), new JsonBuilder().add("hintColor", v));
         return getThis();
     }
 
     public  B toggleButtonSelectedBackground(IDrawable v) {
-        mergeAdd(IThemeApi.TOGGLE_BUTTON, new JsonBuilder().add("selectedBackground", DrawableSerialization.serialize(v)));
+        mergeAdd(IThemeApi.TOGGLE_BUTTON.getName(), new JsonBuilder().add("selectedBackground", DrawableSerialization.serialize(v)));
         return getThis();
     }
 
     public B toggleButtonSelectedBackground(String widgetTheme, String textureId) {
-        mergeAdd(IThemeApi.TOGGLE_BUTTON, new JsonBuilder().add("selectedBackground", new JsonBuilder().add("type", "texture").add("id", textureId)));
+        mergeAdd(IThemeApi.TOGGLE_BUTTON.getName(), new JsonBuilder().add("selectedBackground", new JsonBuilder().add("type", "texture").add("id", textureId)));
         return getThis();
     }
 
     public  B toggleButtonSelectedHoverBackground(IDrawable v) {
-        mergeAdd(IThemeApi.TOGGLE_BUTTON, new JsonBuilder().add("selectedHoverBackground", DrawableSerialization.serialize(v)));
+        mergeAdd(IThemeApi.TOGGLE_BUTTON.getName(), new JsonBuilder().add("selectedHoverBackground", DrawableSerialization.serialize(v)));
         return getThis();
     }
 
     public B toggleButtonSelectedHoverBackground(String widgetTheme, String textureId) {
-        mergeAdd(IThemeApi.TOGGLE_BUTTON, new JsonBuilder().add("selectedHoverBackground", new JsonBuilder().add("type", "texture").add("id", textureId)));
+        mergeAdd(IThemeApi.TOGGLE_BUTTON.getName(), new JsonBuilder().add("selectedHoverBackground", new JsonBuilder().add("type", "texture").add("id", textureId)));
         return getThis();
     }
 
     public B toggleButtonSelectedColor(int v) {
-        mergeAdd(IThemeApi.TOGGLE_BUTTON, new JsonBuilder().add("selectedColor", v));
+        mergeAdd(IThemeApi.TOGGLE_BUTTON.getName(), new JsonBuilder().add("selectedColor", v));
         return getThis();
     }
 
     public B toggleButtonSelectedTextColor(int v) {
-        mergeAdd(IThemeApi.TOGGLE_BUTTON, new JsonBuilder().add("selectedTextColor", v));
+        mergeAdd(IThemeApi.TOGGLE_BUTTON.getName(), new JsonBuilder().add("selectedTextColor", v));
         return getThis();
     }
 
     public B toggleButtonSelectedTextShadow(boolean v) {
-        mergeAdd(IThemeApi.TOGGLE_BUTTON, new JsonBuilder().add("selectedTextShadow", v));
+        mergeAdd(IThemeApi.TOGGLE_BUTTON.getName(), new JsonBuilder().add("selectedTextShadow", v));
         return getThis();
     }
 }

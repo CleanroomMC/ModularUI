@@ -5,7 +5,7 @@ import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.value.IStringValue;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
+import com.cleanroommc.modularui.theme.TextFieldTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.utils.ParseResult;
@@ -15,7 +15,6 @@ import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.text.ParsePosition;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -60,7 +59,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
     public int getMarkedColor() {
         WidgetTheme theme = getWidgetTheme(getContext().getTheme());
-        if (theme instanceof WidgetTextFieldTheme textFieldTheme) {
+        if (theme instanceof TextFieldTheme textFieldTheme) {
             return textFieldTheme.getMarkedColor();
         }
         return ITheme.getDefault().getTextFieldTheme().getMarkedColor();
@@ -91,7 +90,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     @Override
-    protected void setupDrawText(ModularGuiContext context, WidgetTextFieldTheme widgetTheme) {
+    protected void setupDrawText(ModularGuiContext context, TextFieldTheme widgetTheme) {
         this.renderer.setSimulate(false);
         this.renderer.setPos(getArea().getPadding().left, 0);
         this.renderer.setScale(this.scale);

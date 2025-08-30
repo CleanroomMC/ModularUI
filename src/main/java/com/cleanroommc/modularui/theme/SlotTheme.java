@@ -7,18 +7,18 @@ import com.cleanroommc.modularui.utils.JsonHelper;
 
 import com.google.gson.JsonObject;
 
-public class WidgetSlotTheme extends WidgetTheme {
+public class SlotTheme extends WidgetTheme {
 
     private final int slotHoverColor;
 
-    public WidgetSlotTheme(IDrawable background, int slotHoverColor) {
+    public SlotTheme(IDrawable background, int slotHoverColor) {
         super(18, 18, background, null, Color.WHITE.main, 0xFF404040, false);
         this.slotHoverColor = slotHoverColor;
     }
 
-    public WidgetSlotTheme(WidgetTheme parent, JsonObject json, JsonObject fallback) {
+    public SlotTheme(WidgetTheme parent, JsonObject json, JsonObject fallback) {
         super(parent, json, fallback);
-        this.slotHoverColor = JsonHelper.getColorWithFallback(json, fallback, ((WidgetSlotTheme) parent).getSlotHoverColor(), IThemeApi.SLOT_HOVER_COLOR);
+        this.slotHoverColor = JsonHelper.getColorWithFallback(json, fallback, ((SlotTheme) parent).getSlotHoverColor(), IThemeApi.SLOT_HOVER_COLOR);
     }
 
     public int getSlotHoverColor() {

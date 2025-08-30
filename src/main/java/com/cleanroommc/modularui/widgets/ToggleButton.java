@@ -5,7 +5,7 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.value.IBoolValue;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.theme.WidgetThemeSelectable;
+import com.cleanroommc.modularui.theme.SelectableTheme;
 
 import java.util.function.Consumer;
 
@@ -23,7 +23,7 @@ public class ToggleButton extends AbstractCycleButtonWidget<ToggleButton> {
 
     @Override
     public WidgetTheme getWidgetThemeInternal(ITheme theme) {
-        WidgetThemeSelectable widgetTheme = theme.getToggleButtonTheme();
+        SelectableTheme widgetTheme = theme.getToggleButtonTheme();
         return isValueSelected() ^ invertSelected() ? widgetTheme.getSelected() : widgetTheme;
     }
 

@@ -6,12 +6,19 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.value.IValue;
-import com.cleanroommc.modularui.api.widget.*;
+import com.cleanroommc.modularui.api.widget.IDragResizeable;
+import com.cleanroommc.modularui.api.widget.IGuiAction;
+import com.cleanroommc.modularui.api.widget.INotifyEnabled;
+import com.cleanroommc.modularui.api.widget.IPositioned;
+import com.cleanroommc.modularui.api.widget.ISynced;
+import com.cleanroommc.modularui.api.widget.ITooltip;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeKey;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
@@ -67,7 +74,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @Nullable private IDrawable hoverBackground = null;
     @Nullable private IDrawable hoverOverlay = null;
     @Nullable private RichTooltip tooltip;
-    @Nullable private String widgetThemeOverride = null;
+    @Nullable private WidgetThemeKey<?> widgetThemeOverride = null;
     // listener
     @Nullable private List<IGuiAction> guiActionListeners; // TODO replace with proper event system
     @Nullable private Consumer<W> onUpdateListener;
@@ -80,7 +87,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
      * Called when a panel is opened. Use {@link #onInit()} and {@link #afterInit()} for custom logic.
      *
      * @param parent the parent this element belongs to
-     * @param late true if this is called some time after the widget tree of the parent has been initialised
+     * @param late   true if this is called some time after the widget tree of the parent has been initialised
      */
     @ApiStatus.Internal
     @Override
@@ -469,8 +476,22 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
      * @return this
      */
     public W widgetTheme(String s) {
-        if (!IThemeApi.get().hasWidgetTheme(s)) {
+        WidgetThemeKey<?> widgetThemeKey = WidgetThemeKey.getFromFullName(s);
+        if (widgetThemeKey == null) {
             throw new IllegalArgumentException("No widget theme for id '" + s + "' exists.");
+        }
+        return widgetTheme(widgetThemeKey);
+    }
+
+    /**
+     * Sets an override widget theme. This will change of the appearance of this widget according to the widget theme.
+     *
+     * @param s id of the widget theme (see constants in {@link IThemeApi})
+     * @return this
+     */
+    public W widgetTheme(WidgetThemeKey<?> s) {
+        if (!IThemeApi.get().hasWidgetTheme(s)) {
+            throw new IllegalArgumentException("No widget theme for key '" + s.getFullName() + "' exists.");
         }
         this.widgetThemeOverride = s;
         return getThis();
