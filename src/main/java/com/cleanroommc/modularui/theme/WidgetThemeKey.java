@@ -89,6 +89,10 @@ public class WidgetThemeKey<T extends WidgetTheme> {
         return type.cast(theme);
     }
 
+    public T getDefault() {
+        return cast(ThemeAPI.INSTANCE.defaultWidgetThemes.get(this));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

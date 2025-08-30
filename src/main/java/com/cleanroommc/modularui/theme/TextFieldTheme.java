@@ -15,20 +15,20 @@ public class TextFieldTheme extends WidgetTheme {
     private final int hintColor;
 
     public TextFieldTheme(int defaultWidth, int defaultHeight, @Nullable IDrawable background, @Nullable IDrawable hoverBackground,
-                          int color, int textColor, boolean textShadow, int markedColor, int hintColor) {
-        super(defaultWidth, defaultHeight, background, hoverBackground, color, textColor, textShadow);
+                          int color, int textColor, boolean textShadow, int iconColor, int markedColor, int hintColor) {
+        super(defaultWidth, defaultHeight, background, hoverBackground, color, textColor, textShadow, iconColor);
         this.markedColor = markedColor;
         this.hintColor = hintColor;
     }
 
     public TextFieldTheme(int markedColor, int hintColor) {
-        this(56, 18, GuiTextures.DISPLAY_SMALL, null, Color.WHITE.main, Color.WHITE.main, false, markedColor, hintColor);
+        this(56, 18, GuiTextures.DISPLAY_SMALL, null, Color.WHITE.main, Color.WHITE.main, false, Color.WHITE.main, markedColor, hintColor);
     }
 
-    public TextFieldTheme(WidgetTheme parent, JsonObject fallback, JsonObject json) {
+    public TextFieldTheme(TextFieldTheme parent, JsonObject fallback, JsonObject json) {
         super(parent, json, fallback);
-        this.markedColor = JsonHelper.getColorWithFallback(json, fallback, ((TextFieldTheme) parent).getMarkedColor(), IThemeApi.MARKED_COLOR);
-        this.hintColor = JsonHelper.getColorWithFallback(json, fallback, ((TextFieldTheme) parent).getHintColor(), IThemeApi.HINT_COLOR);
+        this.markedColor = JsonHelper.getColorWithFallback(json, fallback, parent.getMarkedColor(), IThemeApi.MARKED_COLOR);
+        this.hintColor = JsonHelper.getColorWithFallback(json, fallback, parent.getHintColor(), IThemeApi.HINT_COLOR);
     }
 
     public int getMarkedColor() {

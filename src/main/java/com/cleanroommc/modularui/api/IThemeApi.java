@@ -27,28 +27,25 @@ import java.util.List;
 public interface IThemeApi {
 
     // widget themes
-    WidgetThemeKey<WidgetTheme> FALLBACK = get().registerWidgetTheme("default", new WidgetTheme(18, 18, null, null, Color.WHITE.main, 0xFF404040, false), WidgetTheme::new);
+    WidgetThemeKey<WidgetTheme> FALLBACK = get().registerWidgetTheme("default",
+            new WidgetTheme(18, 18, null, null, Color.WHITE.main, 0xFF404040, false, Color.WHITE.main),
+            WidgetTheme::new);
     WidgetThemeKey<WidgetTheme> PANEL = get().registerWidgetTheme("panel",
-            new WidgetTheme(176, 166, GuiTextures.MC_BACKGROUND, null, Color.WHITE.main, 0xFF404040, false),
+            new WidgetTheme(176, 166, GuiTextures.MC_BACKGROUND, null, Color.WHITE.main, 0xFF404040, false, Color.WHITE.main),
             WidgetTheme::new);
-
     WidgetThemeKey<WidgetTheme> BUTTON = get().registerWidgetTheme("button",
-            new WidgetTheme(18, 18, GuiTextures.MC_BUTTON, GuiTextures.MC_BUTTON_HOVERED, Color.WHITE.main, Color.WHITE.main, true),
+            new WidgetTheme(18, 18, GuiTextures.MC_BUTTON, GuiTextures.MC_BUTTON_HOVERED, Color.WHITE.main, Color.WHITE.main, true, Color.WHITE.main),
             WidgetTheme::new);
-
     WidgetThemeKey<SlotTheme> ITEM_SLOT = get().registerWidgetTheme("itemSlot",
             new SlotTheme(GuiTextures.SLOT_ITEM, Color.withAlpha(Color.WHITE.main, 0x60)), SlotTheme::new);
-
     WidgetThemeKey<SlotTheme> FLUID_SLOT = get().registerWidgetTheme("fluidSlot",
             new SlotTheme(GuiTextures.SLOT_FLUID, Color.withAlpha(Color.WHITE.main, 0x60)), SlotTheme::new);
-
     WidgetThemeKey<TextFieldTheme> TEXT_FIELD = get().registerWidgetTheme("textField",
             new TextFieldTheme(0xFF2F72A8, 0xFF5F5F5F),
             (parent, json, fallback) -> new TextFieldTheme(parent, fallback, json));
-
     WidgetThemeKey<SelectableTheme> TOGGLE_BUTTON = get().registerWidgetTheme("toggleButton",
-            new SelectableTheme(18, 18, GuiTextures.MC_BUTTON, GuiTextures.MC_BUTTON_HOVERED, Color.WHITE.main,
-                    Color.WHITE.main, true, GuiTextures.MC_BUTTON_DISABLED, IDrawable.NONE, Color.WHITE.main, Color.WHITE.main, true),
+            new SelectableTheme(18, 18, GuiTextures.MC_BUTTON, GuiTextures.MC_BUTTON_HOVERED, Color.WHITE.main, Color.WHITE.main, true,
+                    Color.WHITE.main, GuiTextures.MC_BUTTON_DISABLED, IDrawable.NONE, Color.WHITE.main, Color.WHITE.main, true, Color.WHITE.main),
             SelectableTheme::new);
 
     // sub widget themes
@@ -61,6 +58,7 @@ public interface IThemeApi {
     String COLOR = "color";
     String TEXT_COLOR = "textColor";
     String TEXT_SHADOW = "textShadow";
+    String ICON_COLOR = "iconColor";
     String SLOT_HOVER_COLOR = "slotHoverColor";
     String MARKED_COLOR = "markedColor";
     String HINT_COLOR = "hintColor";
@@ -69,6 +67,7 @@ public interface IThemeApi {
     String SELECTED_COLOR = "selectedColor";
     String SELECTED_TEXT_COLOR = "selectedTextColor";
     String SELECTED_TEXT_SHADOW = "selectedTextShadow";
+    String SELECTED_ICON_COLOR = "selectedIconColor";
 
     /**
      * @return the default api implementation
@@ -161,12 +160,12 @@ public interface IThemeApi {
     void registerThemeForScreen(String screen, String theme);
 
     /**
-     * Register a widget theme.
+     * Registers a widget theme. It is recommended to store the resulting key in a static variable and make it accessible by public methods.
      *
      * @param id           id of the widget theme
      * @param defaultTheme the fallback widget theme
-     * @param parser       the widget theme json parser function
-     * @return
+     * @param parser       the widget theme json parser function. This is usually another constructor.
+     * @return key to access the widget theme
      */
     <T extends WidgetTheme> WidgetThemeKey<T> registerWidgetTheme(String id, T defaultTheme, WidgetThemeParser<T> parser);
 }

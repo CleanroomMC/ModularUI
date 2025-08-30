@@ -12,22 +12,22 @@ public class SelectableTheme extends WidgetTheme {
     private final WidgetTheme selected;
 
     public SelectableTheme(int defaultWidth, int defaultHeight, @Nullable IDrawable background, @Nullable IDrawable hoverBackground,
-                           int color, int textColor, boolean textShadow,
+                           int color, int textColor, boolean textShadow, int iconColor,
                            @Nullable IDrawable selectedBackground, @Nullable IDrawable selectedHoverBackground,
-                           int selectedColor, int selectedTextColor, boolean selectedTextShadow) {
-        super(defaultWidth, defaultHeight, background, hoverBackground, color, textColor, textShadow);
-        this.selected = new WidgetTheme(defaultWidth, defaultHeight, selectedBackground, selectedHoverBackground, selectedColor, selectedTextColor, selectedTextShadow);
+                           int selectedColor, int selectedTextColor, boolean selectedTextShadow, int selectedIconColor) {
+        super(defaultWidth, defaultHeight, background, hoverBackground, color, textColor, textShadow, iconColor);
+        this.selected = new WidgetTheme(defaultWidth, defaultHeight, selectedBackground, selectedHoverBackground, selectedColor, selectedTextColor, selectedTextShadow, selectedIconColor);
     }
 
-    public SelectableTheme(WidgetTheme parent, JsonObject json, JsonObject fallback) {
+    public SelectableTheme(SelectableTheme parent, JsonObject json, JsonObject fallback) {
         super(parent, json, fallback);
-        SelectableTheme parentWTBT = (SelectableTheme) parent;
-        IDrawable selectedBackground = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, parentWTBT.getSelected().getBackground(), IThemeApi.SELECTED_BACKGROUND);
-        IDrawable selectedHoverBackground = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, parentWTBT.getSelected().getHoverBackground(), IThemeApi.SELECTED_HOVER_BACKGROUND);
-        int selectedColor = JsonHelper.getColorWithFallback(json, fallback, parentWTBT.getSelected().getColor(), IThemeApi.SELECTED_COLOR);
-        int selectedTextColor = JsonHelper.getColorWithFallback(json, fallback, parentWTBT.getSelected().getTextColor(), IThemeApi.SELECTED_TEXT_COLOR);
-        boolean selectedTextShadow = JsonHelper.getBoolWithFallback(json, fallback, parentWTBT.getSelected().getTextShadow(), IThemeApi.SELECTED_TEXT_SHADOW);
-        this.selected = new WidgetTheme(getDefaultWidth(), getDefaultHeight(), selectedBackground, selectedHoverBackground, selectedColor, selectedTextColor, selectedTextShadow);
+        IDrawable selectedBackground = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, parent.getSelected().getBackground(), IThemeApi.SELECTED_BACKGROUND);
+        IDrawable selectedHoverBackground = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, parent.getSelected().getHoverBackground(), IThemeApi.SELECTED_HOVER_BACKGROUND);
+        int selectedColor = JsonHelper.getColorWithFallback(json, fallback, parent.getSelected().getColor(), IThemeApi.SELECTED_COLOR);
+        int selectedTextColor = JsonHelper.getColorWithFallback(json, fallback, parent.getSelected().getTextColor(), IThemeApi.SELECTED_TEXT_COLOR);
+        boolean selectedTextShadow = JsonHelper.getBoolWithFallback(json, fallback, parent.getSelected().getTextShadow(), IThemeApi.SELECTED_TEXT_SHADOW);
+        int selectedIconColor = JsonHelper.getColorWithFallback(json, fallback, parent.getSelected().getTextColor(), IThemeApi.SELECTED_ICON_COLOR);
+        this.selected = new WidgetTheme(getDefaultWidth(), getDefaultHeight(), selectedBackground, selectedHoverBackground, selectedColor, selectedTextColor, selectedTextShadow, selectedIconColor);
     }
 
     public WidgetTheme getSelected() {
