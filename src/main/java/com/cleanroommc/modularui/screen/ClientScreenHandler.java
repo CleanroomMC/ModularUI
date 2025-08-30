@@ -537,6 +537,8 @@ public class ClientScreenHandler {
         GuiDraw.drawText("Mouse Pos: " + mouseX + ", " + mouseY, 5, lineY, scale, color, true);
         lineY -= shift;
         GuiDraw.drawText("FPS: " + fpsCounter.getFps(), 5, lineY, scale, color, true);
+        lineY -= shift;
+        GuiDraw.drawText("Theme ID: " + context.getTheme().getId(), 5, lineY, scale, color, true);
         LocatedWidget locatedHovered = muiScreen.getPanelManager().getTopWidgetLocated(true);
         if (locatedHovered != null) {
             drawSegmentLine(lineY -= 4, scale, color);
