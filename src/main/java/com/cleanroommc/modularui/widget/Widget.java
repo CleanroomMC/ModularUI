@@ -571,6 +571,16 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     // ----------------
 
     @Override
+    public int getDefaultWidth() {
+        return isValid() ? getWidgetTheme(getContext().getTheme()).getDefaultWidth() : 18;
+    }
+
+    @Override
+    public int getDefaultHeight() {
+        return isValid() ? getWidgetTheme(getContext().getTheme()).getDefaultHeight() : 18;
+    }
+
+    @Override
     public void scheduleResize() {
         this.requiresResize = true;
     }

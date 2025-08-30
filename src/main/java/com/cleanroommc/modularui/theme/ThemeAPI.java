@@ -20,8 +20,8 @@ import java.util.Objects;
 public class ThemeAPI implements IThemeApi {
 
     public static final ThemeAPI INSTANCE = new ThemeAPI();
-    public static final String DEFAULT = "DEFAULT";
-    public static final ITheme DEFAULT_DEFAULT = new DefaultTheme();
+    public static final String DEFAULT_ID = "DEFAULT";
+    public static final ITheme DEFAULT_THEME = new DefaultTheme();
 
     private final Object2ObjectMap<String, ITheme> themes = new Object2ObjectOpenHashMap<>();
     protected final Object2ObjectMap<String, List<JsonBuilder>> defaultThemes = new Object2ObjectOpenHashMap<>();
@@ -31,18 +31,18 @@ public class ThemeAPI implements IThemeApi {
     private final Object2ObjectMap<String, String> screenThemes = new Object2ObjectOpenHashMap<>();
 
     private ThemeAPI() {
-        registerWidgetTheme(Theme.PANEL, new WidgetTheme(GuiTextures.MC_BACKGROUND, null, Color.WHITE.main, 0xFF404040, false), WidgetTheme::new);
-        registerWidgetTheme(Theme.BUTTON, new WidgetTheme(GuiTextures.MC_BUTTON, GuiTextures.MC_BUTTON_HOVERED, Color.WHITE.main, Color.WHITE.main, true), WidgetTheme::new);
+        registerWidgetTheme(Theme.PANEL, new WidgetTheme(176, 166, GuiTextures.MC_BACKGROUND, null, Color.WHITE.main, 0xFF404040, false), WidgetTheme::new);
+        registerWidgetTheme(Theme.BUTTON, new WidgetTheme(18, 18, GuiTextures.MC_BUTTON, GuiTextures.MC_BUTTON_HOVERED, Color.WHITE.main, Color.WHITE.main, true), WidgetTheme::new);
         registerWidgetTheme(Theme.ITEM_SLOT, new WidgetSlotTheme(GuiTextures.SLOT_ITEM, Color.withAlpha(Color.WHITE.main, 0x60)), WidgetSlotTheme::new);
         registerWidgetTheme(Theme.FLUID_SLOT, new WidgetSlotTheme(GuiTextures.SLOT_FLUID, Color.withAlpha(Color.WHITE.main, 0x60)), WidgetSlotTheme::new);
         registerWidgetTheme(Theme.TEXT_FIELD, new WidgetTextFieldTheme(0xFF2F72A8, 0xFF5F5F5F), (parent, json, fallback) -> new WidgetTextFieldTheme(parent, fallback, json));
-        registerWidgetTheme(Theme.TOGGLE_BUTTON, new WidgetThemeSelectable(GuiTextures.MC_BUTTON, GuiTextures.MC_BUTTON_HOVERED, Color.WHITE.main, Color.WHITE.main, true,
+        registerWidgetTheme(Theme.TOGGLE_BUTTON, new WidgetThemeSelectable(18, 18, GuiTextures.MC_BUTTON, GuiTextures.MC_BUTTON_HOVERED, Color.WHITE.main, Color.WHITE.main, true,
                 GuiTextures.MC_BUTTON_DISABLED, IDrawable.NONE, Color.WHITE.main, Color.WHITE.main, true), WidgetThemeSelectable::new);
     }
 
     @Override
     public ITheme getDefaultTheme() {
-        return DEFAULT_DEFAULT;
+        return DEFAULT_THEME;
     }
 
     @Override
@@ -119,22 +119,21 @@ public class ThemeAPI implements IThemeApi {
     void onReload() {
         this.themes.clear();
         this.jsonScreenThemes.clear();
-        registerTheme(DEFAULT_DEFAULT);
+        registerTheme(DEFAULT_THEME);
     }
 
     public static class DefaultTheme extends AbstractDefaultTheme {
 
-        private DefaultTheme() {
-        }
+        private DefaultTheme() {}
 
         @Override
         public String getId() {
-            return DEFAULT;
+            return DEFAULT_ID;
         }
 
         @Override
         public WidgetTheme getFallback() {
-            return ThemeManager.defaultdefaultWidgetTheme;
+            return ThemeManager.defaultFallbackWidgetTheme;
         }
 
         @Override

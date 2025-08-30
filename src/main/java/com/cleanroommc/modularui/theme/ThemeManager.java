@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @SideOnly(Side.CLIENT)
 public class ThemeManager implements ISelectiveResourceReloadListener {
 
-    protected static final WidgetTheme defaultdefaultWidgetTheme = new WidgetTheme(null, null, Color.WHITE.main, 0xFF404040, false);
+    protected static final WidgetTheme defaultFallbackWidgetTheme = new WidgetTheme(18, 18, null, null, Color.WHITE.main, 0xFF404040, false);
 
     public static void reload() {
         ModularUI.LOGGER.info("Reloading Themes...");
@@ -113,7 +113,7 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
             iterator = themeMap.entrySet().iterator();
             while (iterator.hasNext()) {
                 Map.Entry<String, ThemeJson> entry = iterator.next();
-                if (ThemeAPI.DEFAULT.equals(entry.getValue().parent) || sortedThemes.containsKey(entry.getValue().parent)) {
+                if (ThemeAPI.DEFAULT_ID.equals(entry.getValue().parent) || sortedThemes.containsKey(entry.getValue().parent)) {
                     sortedThemes.put(entry.getKey(), entry.getValue());
                     iterator.remove();
                     changed = true;
@@ -139,7 +139,7 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
             parents.add(theme);
             ThemeJson parent = theme;
             do {
-                if (ThemeAPI.DEFAULT.equals(parent.parent)) {
+                if (ThemeAPI.DEFAULT_ID.equals(parent.parent)) {
                     break;
                 }
                 parent = themeMap.get(parent.parent);
@@ -270,8 +270,8 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
 
             // parse fallback theme for widget themes
             Map<String, WidgetTheme> widgetThemes = new Object2ObjectOpenHashMap<>();
-            WidgetTheme parentWidgetTheme = parent.getFallback();
-            WidgetTheme fallback = new WidgetTheme(parentWidgetTheme, jsonBuilder.getJson(), jsonBuilder.getJson());
+            WidgetTheme parentWidgetTheme = parent.getFallback(); // fallback theme of parent
+            WidgetTheme fallback = new WidgetTheme(parentWidgetTheme, jsonBuilder.getJson(), null); // fallback theme of new theme
             widgetThemes.put(Theme.FALLBACK, fallback);
 
             // parse all other widget themes
@@ -279,31 +279,24 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
             for (Map.Entry<String, WidgetThemeParser> entry : ThemeAPI.INSTANCE.widgetThemeFunctions.entrySet()) {
                 JsonObject widgetThemeJson;
                 if (jsonBuilder.getJson().has(entry.getKey())) {
+                    // theme has widget theme defined
                     JsonElement element = jsonBuilder.getJson().get(entry.getKey());
                     if (element.isJsonObject()) {
+                        // widget theme is a json object
                         widgetThemeJson = element.getAsJsonObject();
                     } else {
+                        // incorrect data format
+                        ModularUI.LOGGER.info("WidgetTheme '{}' of theme '{}' with parent '{}' was found to have an incorrect data format.", entry.getKey(), this.id, this.parent);
                         widgetThemeJson = emptyJson;
                     }
                 } else {
+                    // theme doesn't have widget theme defined
                     widgetThemeJson = emptyJson;
                 }
                 parentWidgetTheme = parent.getWidgetTheme(entry.getKey());
                 widgetThemes.put(entry.getKey(), entry.getValue().parse(parentWidgetTheme, widgetThemeJson, jsonBuilder.getJson()));
             }
-            Theme theme = new Theme(this.id, parent, widgetThemes);
-            // TODO: bad implementation
-            if (jsonBuilder.getJson().has("openCloseAnimation")) {
-                theme.setOpenCloseAnimationOverride(jsonBuilder.getJson().get("openCloseAnimation").getAsInt());
-            }
-            if (jsonBuilder.getJson().has("smoothProgressBar")) {
-                theme.setSmoothProgressBarOverride(jsonBuilder.getJson().get("smoothProgressBar").getAsBoolean());
-            }
-            if (jsonBuilder.getJson().has("tooltipPos")) {
-                String posName = jsonBuilder.getJson().get("tooltipPos").getAsString();
-                theme.setTooltipPosOverride(RichTooltip.Pos.valueOf(posName));
-            }
-            return theme;
+            return new Theme(this.id, parent, widgetThemes);
         }
     }
 }

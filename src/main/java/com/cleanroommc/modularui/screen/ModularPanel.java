@@ -699,16 +699,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return null;
     }
 
-    @Override
-    public int getDefaultHeight() {
-        return 166;
-    }
-
-    @Override
-    public int getDefaultWidth() {
-        return 176;
-    }
-
     final void setPanelGuiContext(@NotNull ModularGuiContext context) {
         setContext(context);
         if (!context.getScreen().isOverlay()) {

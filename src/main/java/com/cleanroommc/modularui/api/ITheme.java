@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.api;
 
-import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.theme.WidgetSlotTheme;
 import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -59,8 +58,4 @@ public interface ITheme {
         }
         return null;
     }
-
-    boolean getSmoothProgressBarOverride();
-
-    RichTooltip.Pos getTooltipPosOverride();
 }
