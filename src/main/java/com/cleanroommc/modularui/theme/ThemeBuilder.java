@@ -5,84 +5,135 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.drawable.DrawableSerialization;
 import com.cleanroommc.modularui.utils.JsonBuilder;
 
+/**
+ * A json builder with helper methods to make building themes in java easier.
+ * This class is meant to be extended for custom helper methods.
+ *
+ * @param <B> type of this builder class
+ */
 public class ThemeBuilder<B extends ThemeBuilder<B>> extends JsonBuilder {
 
+    private final String id;
+    private String parent;
+
+    public ThemeBuilder(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getParent() {
+        return parent;
+    }
+
+    @SuppressWarnings("unchecked")
     protected B getThis() {
         return (B) this;
     }
 
     public B parent(String v) {
-        add("parent", v);
+        add(IThemeApi.PARENT, v);
+        this.parent = v;
         return getThis();
     }
 
     public B defaultBackground(IDrawable v) {
-        add("background", DrawableSerialization.serialize(v));
+        add(IThemeApi.BACKGROUND, DrawableSerialization.serialize(v));
         return getThis();
     }
 
     public B defaultBackground(String textureId) {
-        add("background", new JsonBuilder().add("type", "texture").add("id", textureId));
+        add(IThemeApi.BACKGROUND, new JsonBuilder().add("type", "texture").add("id", textureId));
         return getThis();
     }
 
     public B defaultHoverBackground(IDrawable v) {
-        add("hoverBackground", DrawableSerialization.serialize(v));
+        add(IThemeApi.HOVER_BACKGROUND, DrawableSerialization.serialize(v));
         return getThis();
     }
 
     public B defaultHoverBackground(String textureId) {
-        add("hoverBackground", new JsonBuilder().add("type", "texture").add("id", textureId));
+        add(IThemeApi.HOVER_BACKGROUND, new JsonBuilder().add("type", "texture").add("id", textureId));
         return getThis();
     }
 
     public B defaultColor(int v) {
-        add("color", v);
+        add(IThemeApi.COLOR, v);
         return getThis();
     }
 
     public B defaultTextColor(int v) {
-        add("textColor", v);
+        add(IThemeApi.TEXT_COLOR, v);
         return getThis();
     }
 
     public B defaultTextShadow(boolean v) {
-        add("textShadow", v);
+        add(IThemeApi.TEXT_SHADOW, v);
         return getThis();
     }
 
-    public B background(String widgetTheme, IDrawable v) {
-        mergeAdd(widgetTheme, new JsonBuilder().add("background", DrawableSerialization.serialize(v)));
+    public B defaultIconColor(int v) {
+        add(IThemeApi.ICON_COLOR, v);
         return getThis();
     }
 
-    public B background(String widgetTheme, String textureId) {
-        mergeAdd(widgetTheme, new JsonBuilder().add("background", new JsonBuilder().add("type", "texture").add("id", textureId)));
+    public B defaultWidth(WidgetThemeKey<?> widgetTheme, int defaultWidth) {
+        mergeAdd(widgetTheme.getFullName(), new JsonBuilder().add(IThemeApi.DEFAULT_WIDTH, defaultWidth));
         return getThis();
     }
 
-    public B hoverBackground(String widgetTheme, IDrawable v) {
-        mergeAdd(widgetTheme, new JsonBuilder().add("hoverBackground", DrawableSerialization.serialize(v)));
+    public B defaultHeight(WidgetThemeKey<?> widgetTheme, int defaultHeight) {
+        mergeAdd(widgetTheme.getFullName(), new JsonBuilder().add(IThemeApi.DEFAULT_HEIGHT, defaultHeight));
         return getThis();
     }
 
-    public B hoverBackground(String widgetTheme, String textureId) {
-        mergeAdd(widgetTheme, new JsonBuilder().add("hoverBackground", new JsonBuilder().add("type", "texture").add("id", textureId)));
+    public B background(WidgetThemeKey<?> widgetTheme, IDrawable v) {
+        mergeAdd(widgetTheme.getFullName(), new JsonBuilder().add(IThemeApi.BACKGROUND, DrawableSerialization.serialize(v)));
         return getThis();
     }
 
-    public B color(String widgetTheme, int v) {
-        mergeAdd(widgetTheme, new JsonBuilder().add("color", v));
+    public B background(WidgetThemeKey<?> widgetTheme, String textureId) {
+        return background(widgetTheme, new JsonBuilder().add("type", "texture").add("id", textureId));
+    }
+
+    public B background(WidgetThemeKey<?> widgetTheme, JsonBuilder builder) {
+        mergeAdd(widgetTheme.getFullName(), new JsonBuilder().add(IThemeApi.BACKGROUND, builder));
         return getThis();
     }
 
-    public B textColor(String widgetTheme, int v) {
-        mergeAdd(widgetTheme, new JsonBuilder().add("textColor", v));
+    public B hoverBackground(WidgetThemeKey<?> widgetTheme, IDrawable v) {
+        mergeAdd(widgetTheme.getFullName(), new JsonBuilder().add(IThemeApi.HOVER_BACKGROUND, DrawableSerialization.serialize(v)));
         return getThis();
     }
 
-    public B textShadow(String widgetTheme, boolean v) {
-        mergeAdd(widgetTheme, new JsonBuilder().add("textShadow", v));
+    public B hoverBackground(WidgetThemeKey<?> widgetTheme, String textureId) {
+        return hoverBackground(widgetTheme, new JsonBuilder().add("type", "texture").add("id", textureId));
+    }
+
+    public B hoverBackground(WidgetThemeKey<?> widgetTheme, JsonBuilder builder) {
+        mergeAdd(widgetTheme.getFullName(), new JsonBuilder().add(IThemeApi.HOVER_BACKGROUND, builder));
+        return getThis();
+    }
+
+    public B color(WidgetThemeKey<?> widgetTheme, int v) {
+        mergeAdd(widgetTheme.getFullName(), new JsonBuilder().add(IThemeApi.COLOR, v));
+        return getThis();
+    }
+
+    public B textColor(WidgetThemeKey<?> widgetTheme, int v) {
+        mergeAdd(widgetTheme.getFullName(), new JsonBuilder().add(IThemeApi.TEXT_COLOR, v));
+        return getThis();
+    }
+
+    public B textShadow(WidgetThemeKey<?> widgetTheme, boolean v) {
+        mergeAdd(widgetTheme.getFullName(), new JsonBuilder().add(IThemeApi.TEXT_SHADOW, v));
+        return getThis();
+    }
+
+    public B iconColor(WidgetThemeKey<?> widgetTheme, int v) {
+        mergeAdd(widgetTheme.getFullName(), new JsonBuilder().add(IThemeApi.ICON_COLOR, v));
         return getThis();
     }
 
@@ -106,38 +157,16 @@ public class ThemeBuilder<B extends ThemeBuilder<B>> extends JsonBuilder {
         return getThis();
     }
 
-    public  B toggleButtonSelectedBackground(IDrawable v) {
-        mergeAdd(IThemeApi.TOGGLE_BUTTON.getName(), new JsonBuilder().add("selectedBackground", DrawableSerialization.serialize(v)));
-        return getThis();
-    }
-
-    public B toggleButtonSelectedBackground(String widgetTheme, String textureId) {
-        mergeAdd(IThemeApi.TOGGLE_BUTTON.getName(), new JsonBuilder().add("selectedBackground", new JsonBuilder().add("type", "texture").add("id", textureId)));
-        return getThis();
-    }
-
-    public  B toggleButtonSelectedHoverBackground(IDrawable v) {
-        mergeAdd(IThemeApi.TOGGLE_BUTTON.getName(), new JsonBuilder().add("selectedHoverBackground", DrawableSerialization.serialize(v)));
-        return getThis();
-    }
-
-    public B toggleButtonSelectedHoverBackground(String widgetTheme, String textureId) {
-        mergeAdd(IThemeApi.TOGGLE_BUTTON.getName(), new JsonBuilder().add("selectedHoverBackground", new JsonBuilder().add("type", "texture").add("id", textureId)));
-        return getThis();
-    }
-
-    public B toggleButtonSelectedColor(int v) {
-        mergeAdd(IThemeApi.TOGGLE_BUTTON.getName(), new JsonBuilder().add("selectedColor", v));
-        return getThis();
-    }
-
-    public B toggleButtonSelectedTextColor(int v) {
-        mergeAdd(IThemeApi.TOGGLE_BUTTON.getName(), new JsonBuilder().add("selectedTextColor", v));
-        return getThis();
-    }
-
-    public B toggleButtonSelectedTextShadow(boolean v) {
-        mergeAdd(IThemeApi.TOGGLE_BUTTON.getName(), new JsonBuilder().add("selectedTextShadow", v));
+    /**
+     * Customizes widget themes in a more organized way than with the methods above.
+     *
+     * @param widgetThemeKey     key of the widget theme to customize
+     * @param widgetThemeBuilder builder of the widget theme (take a look at its subclasses)
+     * @param <T>                type of the widget theme
+     * @return this
+     */
+    public <T extends WidgetTheme> B widgetTheme(WidgetThemeKey<T> widgetThemeKey, WidgetThemeBuilder<T, ?> widgetThemeBuilder) {
+        add(widgetThemeKey.getFullName(), widgetThemeBuilder);
         return getThis();
     }
 }

@@ -24,4 +24,12 @@ public class SlotTheme extends WidgetTheme {
     public int getSlotHoverColor() {
         return this.slotHoverColor;
     }
+
+    public static class Builder<T extends SlotTheme, B extends Builder<T, B>> extends WidgetThemeBuilder<T, B> {
+
+        public B hoverColor(int hoverColor) {
+            add(IThemeApi.SLOT_HOVER_COLOR, hoverColor);
+            return getThis();
+        }
+    }
 }

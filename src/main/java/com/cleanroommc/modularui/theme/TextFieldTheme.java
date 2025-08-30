@@ -38,4 +38,17 @@ public class TextFieldTheme extends WidgetTheme {
     public int getHintColor() {
         return hintColor;
     }
+
+    public static class Builder<T extends TextFieldTheme, B extends TextFieldTheme.Builder<T, B>> extends WidgetThemeBuilder<T, B> {
+
+        public B markedColor(int markedColor) {
+            add(IThemeApi.MARKED_COLOR, markedColor);
+            return getThis();
+        }
+
+        public B hintColor(int hintColor) {
+            add(IThemeApi.HINT_COLOR, hintColor);
+            return getThis();
+        }
+    }
 }

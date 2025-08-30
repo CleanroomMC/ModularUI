@@ -2,6 +2,8 @@ package com.cleanroommc.modularui.theme;
 
 import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.drawable.DrawableSerialization;
+import com.cleanroommc.modularui.utils.JsonBuilder;
 import com.cleanroommc.modularui.utils.JsonHelper;
 
 import com.google.gson.JsonObject;
@@ -32,5 +34,56 @@ public class SelectableTheme extends WidgetTheme {
 
     public WidgetTheme getSelected() {
         return selected;
+    }
+
+    public static class Builder<T extends TextFieldTheme, B extends TextFieldTheme.Builder<T, B>> extends WidgetThemeBuilder<T, B> {
+
+        public B selectedColor(int color) {
+            add(IThemeApi.SELECTED_COLOR, color);
+            return getThis();
+        }
+
+        public B selectedTextColor(int color) {
+            add(IThemeApi.SELECTED_TEXT_COLOR, color);
+            return getThis();
+        }
+
+        public B selectedTextShadow(int shadow) {
+            add(IThemeApi.SELECTED_TEXT_SHADOW, shadow);
+            return getThis();
+        }
+
+        public B selectedIconColor(int color) {
+            add(IThemeApi.SELECTED_ICON_COLOR, color);
+            return getThis();
+        }
+
+        public B selectedBackground(JsonBuilder builder) {
+            add(IThemeApi.SELECTED_BACKGROUND, builder);
+            return getThis();
+        }
+
+        public B selectedBackground(IDrawable drawable) {
+            add(IThemeApi.SELECTED_BACKGROUND, DrawableSerialization.serialize(drawable));
+            return getThis();
+        }
+
+        public B selectedBackground(String textureId) {
+            return background(new JsonBuilder().add("type", "texture").add("id", textureId));
+        }
+
+        public B selectedHoverBackground(JsonBuilder builder) {
+            add(IThemeApi.SELECTED_HOVER_BACKGROUND, builder);
+            return getThis();
+        }
+
+        public B selectedHoverBackground(IDrawable drawable) {
+            add(IThemeApi.SELECTED_HOVER_BACKGROUND, DrawableSerialization.serialize(drawable));
+            return getThis();
+        }
+
+        public B selectedHoverBackground(String textureId) {
+            return background(new JsonBuilder().add("type", "texture").add("id", textureId));
+        }
     }
 }

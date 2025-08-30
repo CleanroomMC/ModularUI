@@ -3,13 +3,14 @@ package com.cleanroommc.modularui.api;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.theme.ThemeAPI;
+import com.cleanroommc.modularui.theme.SelectableTheme;
 import com.cleanroommc.modularui.theme.SlotTheme;
 import com.cleanroommc.modularui.theme.TextFieldTheme;
+import com.cleanroommc.modularui.theme.ThemeAPI;
+import com.cleanroommc.modularui.theme.ThemeBuilder;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.theme.WidgetThemeKey;
 import com.cleanroommc.modularui.theme.WidgetThemeParser;
-import com.cleanroommc.modularui.theme.SelectableTheme;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.JsonBuilder;
 
@@ -53,6 +54,8 @@ public interface IThemeApi {
 
     // properties
     String PARENT = "parent";
+    String DEFAULT_WIDTH = "defaultWidth";
+    String DEFAULT_HEIGHT = "defaultHeight";
     String BACKGROUND = "background";
     String HOVER_BACKGROUND = "hoverBackground";
     String COLOR = "color";
@@ -105,11 +108,21 @@ public interface IThemeApi {
 
     /**
      * Registers a theme json object. Themes from resource packs always have greater priority.
+     * Json builders are used here as they are much easier to merge as opposed to normal java objects.
      *
      * @param id   id of the theme
      * @param json theme data
      */
     void registerTheme(String id, JsonBuilder json);
+
+    /**
+     * Registers a theme json object. Themes from resource packs always have greater priority.
+     *
+     * @param themeBuilder theme data
+     */
+    default void registerTheme(ThemeBuilder<?> themeBuilder) {
+        registerTheme(themeBuilder.getId(), themeBuilder);
+    }
 
     /**
      * Gets all currently from java side registered theme json's for a theme.
