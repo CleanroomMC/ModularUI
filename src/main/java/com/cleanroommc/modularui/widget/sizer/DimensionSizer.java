@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widget.sizer;
 
+import com.cleanroommc.modularui.GuiError;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.GuiAxis;
@@ -268,19 +269,45 @@ public class DimensionSizer {
         }
     }
 
-    public void applyMarginAndPaddingToPos(Area area, Area relativeTo) {
+    public void applyMarginAndPaddingToPos(IGuiElement parent, Area area, Area relativeTo) {
         // apply self margin and parent padding if not done yet
         if (isMarginPaddingApplied()) return;
         setMarginPaddingApplied(true);
-        int o = area.getMargin().getStart(this.axis) + relativeTo.getPadding().getStart(this.axis);
-        if (o == 0) return;
-        if (this.start != null && !this.start.isRelative()) return;
-        if (this.end != null && !this.end.isRelative() && (this.size == null || !this.size.isRelative())) return;
-        area.setRelativePoint(this.axis, area.getRelativePoint(this.axis) + o);
+        int left = area.getMargin().getStart(this.axis) + relativeTo.getPadding().getStart(this.axis);
+        int right = area.getMargin().getEnd(this.axis) + relativeTo.getPadding().getEnd(this.axis);
+        if (left > 0 && ((this.start != null && !this.start.isRelative()) ||
+                (this.end != null && !this.end.isRelative() && (this.size == null || !this.size.isRelative())))) {
+            left = 0;
+        }
+        if (right > 0 && ((this.end != null && !this.end.isRelative()) ||
+                (this.start != null && !this.start.isRelative() && (this.size == null || !this.size.isRelative())))) {
+            right = 0;
+        }
+        if (left == 0 && right == 0) return;
+        int parentS = relativeTo.getSize(this.axis);
+        int s = area.getSize(this.axis);
+        int rp = area.getRelativePoint(this.axis); // relative pos
+        if (left > 0) {
+            if (right > 0) {
+                if (left + right + s > parentS) {
+                    // widget and margin + padding is larger than available space
+                    area.setRelativePoint(this.axis, left);
+                    GuiError.throwNew(parent, GuiError.Type.SIZING, "Margin/padding is set on both sides on axis " + this.axis +
+                            ", but total size exceeds parent size.");
+                    return;
+                }
+                if (right > parentS - s - rp) area.setRelativePoint(this.axis, parentS - right - s);
+                else if (left > rp) area.setRelativePoint(this.axis, left);
+                return;
+            }
+            if (left > rp) area.setRelativePoint(this.axis, left);
+        } else if (right > 0) {
+            if (right > parentS - s - rp) area.setRelativePoint(this.axis, parentS - right - s);
+        }
     }
 
     private int calcSize(Unit s, int parentSize, boolean parentSizeCalculated) {
-        if (this.coverChildren) return 18;
+        if (this.coverChildren) return 18; // placeholder value
         float val = s.getValue();
         if (s.isRelative()) {
             if (!parentSizeCalculated) return (int) val;

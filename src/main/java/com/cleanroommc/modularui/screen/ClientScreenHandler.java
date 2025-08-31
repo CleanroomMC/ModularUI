@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.screen;
 
+import com.cleanroommc.modularui.GuiErrorHandler;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.IMuiScreen;
@@ -124,7 +125,7 @@ public class ClientScreenHandler {
             currentScreen = null;
             lastChar = null;
         }
-
+        GuiErrorHandler.INSTANCE.clear();
         OverlayManager.onGuiOpen(event);
     }
 

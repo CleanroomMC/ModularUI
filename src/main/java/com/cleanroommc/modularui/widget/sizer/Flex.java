@@ -502,8 +502,8 @@ public class Flex implements IResizeable, IPositioned<Flex> {
         Area relativeTo = getRelativeTo().getArea();
         Area area = parent.getArea();
         // apply margin and padding if not done yet
-        this.x.applyMarginAndPaddingToPos(area, relativeTo);
-        this.y.applyMarginAndPaddingToPos(area, relativeTo);
+        this.x.applyMarginAndPaddingToPos(parent, area, relativeTo);
+        this.y.applyMarginAndPaddingToPos(parent, area, relativeTo);
         // after all widgets x, y, width and height have been calculated we can now calculate the absolute position
         area.applyPos(relativeTo.x, relativeTo.y);
         Area parentArea = parent.getParentArea();
