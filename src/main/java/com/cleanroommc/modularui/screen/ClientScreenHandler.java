@@ -189,11 +189,13 @@ public class ClientScreenHandler {
             drawScreen(currentScreen, currentScreen.getScreenWrapper().getGuiScreen(), mx, my, pt);
             event.setCanceled(true);
         }
+        Platform.setupDrawTex(); // jei and other mods may expect this state
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onGuiDraw(GuiScreenEvent.DrawScreenEvent.Post event) {
         OverlayStack.draw(event.getMouseX(), event.getMouseY(), event.getRenderPartialTicks());
+        Platform.setupDrawTex(); // jei and other mods may expect this state
     }
 
     @SubscribeEvent
