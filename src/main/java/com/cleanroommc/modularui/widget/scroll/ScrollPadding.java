@@ -106,6 +106,10 @@ public class ScrollPadding extends Box {
         return axis.isHorizontal() ? this.right + this.scrollPaddingRight : this.bottom + this.scrollPaddingBottom;
     }
 
+    public int getTotalScrollPadding(GuiAxis axis) {
+        return axis.isHorizontal() ? this.scrollPaddingLeft + this.scrollPaddingRight : this.scrollPaddingTop + this.scrollPaddingBottom;
+    }
+
     @Override
     public Box interpolate(Box startBox, Box endBox, float t) {
         super.interpolate(startBox, endBox, t);

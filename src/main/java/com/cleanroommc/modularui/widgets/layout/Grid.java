@@ -130,7 +130,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
                     rowHeight = Math.max(rowHeight, getElementHeight(child.getArea()));
                 }
             }
-            h += Math.min(rowHeight, this.minRowHeight);
+            h += Math.max(rowHeight, this.minRowHeight);
         }
         return h;
     }
