@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@Deprecated
 public class IconRenderer {
 
     public static final IconRenderer SHARED = new IconRenderer();

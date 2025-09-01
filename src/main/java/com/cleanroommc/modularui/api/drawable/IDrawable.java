@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.drawable.Icon;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
@@ -14,8 +15,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * An object which can be drawn. This is mainly used for backgrounds and overlays in
+ * An object which can be drawn at any size. This is mainly used for backgrounds and overlays in
  * {@link com.cleanroommc.modularui.api.widget.IWidget}.
+ * To draw at a fixed size, use {@link IIcon} (see {@link #asIcon()}).
  */
 public interface IDrawable {
 
@@ -30,7 +32,8 @@ public interface IDrawable {
     }
 
     /**
-     * Draws this drawable at the given position with the given size.
+     * Draws this drawable at the given position with the given size. It's the implementors responsibility to properly apply the widget
+     * theme by calling {@link #applyColor(int)} before drawing.
      *
      * @param context     current context to draw with
      * @param x           x position
@@ -43,25 +46,8 @@ public interface IDrawable {
     void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme);
 
     /**
-     * @deprecated use {@link #draw(GuiContext, int, int, int, int, WidgetTheme)}
-     */
-    @SideOnly(Side.CLIENT)
-    @Deprecated
-    default void draw(GuiContext context, int x, int y, int width, int height) {
-        draw(context, x, y, width, height, WidgetTheme.getDefault());
-    }
-
-    /**
-     * @deprecated use {@link #drawAtZero(GuiContext, int, int, WidgetTheme)}
-     */
-    @SideOnly(Side.CLIENT)
-    @Deprecated
-    default void drawAtZero(GuiContext context, int width, int height) {
-        drawAtZero(context, width, height, WidgetTheme.getDefault());
-    }
-
-    /**
-     * Draws this drawable at the current (0|0) with the given size.
+     * Draws this drawable at the current (0|0) with the given size. This is useful inside widgets since GL is transformed to their
+     * position when they are drawing.
      *
      * @param context     gui context
      * @param width       draw width
@@ -71,15 +57,6 @@ public interface IDrawable {
     @SideOnly(Side.CLIENT)
     default void drawAtZero(GuiContext context, int width, int height, WidgetTheme widgetTheme) {
         draw(context, 0, 0, width, height, widgetTheme);
-    }
-
-    /**
-     * @deprecated use {@link #draw(GuiContext, Area, WidgetTheme)}
-     */
-    @SideOnly(Side.CLIENT)
-    @Deprecated
-    default void draw(GuiContext context, Area area) {
-        draw(context, area, WidgetTheme.getDefault());
     }
 
     /**
@@ -95,16 +72,8 @@ public interface IDrawable {
     }
 
     /**
-     * @deprecated use {@link #drawAtZero(GuiContext, Area, WidgetTheme)}
-     */
-    @Deprecated
-    @SideOnly(Side.CLIENT)
-    default void drawAtZero(GuiContext context, Area area) {
-        drawAtZero(context, area, WidgetTheme.getDefault());
-    }
-
-    /**
-     * Draws this drawable at the current (0|0) with the given area's size.
+     * Draws this drawable at the current (0|0) with the given area's size. This is useful inside widgets since GL is transformed to their
+     * position when they are drawing.
      *
      * @param context     gui context
      * @param area        draw area
@@ -120,6 +89,21 @@ public interface IDrawable {
      */
     default boolean canApplyTheme() {
         return false;
+    }
+
+    /**
+     * Applies the theme color to OpenGL if this drawable can have theme colors applied. This is determined by {@link #canApplyTheme()}.
+     * If this drawable does not allow theme colors, it will reset the current color (to white).
+     * This method should be called before drawing.
+     *
+     * @param themeColor theme color to apply (usually {@link WidgetTheme#getColor()})
+     */
+    default void applyColor(int themeColor) {
+        if (canApplyTheme()) {
+            Color.setGlColor(themeColor);
+        } else {
+            Color.setGlColorOpaque(Color.WHITE.main);
+        }
     }
 
     /**

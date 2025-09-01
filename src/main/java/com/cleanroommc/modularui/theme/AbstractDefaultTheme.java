@@ -1,17 +1,17 @@
 package com.cleanroommc.modularui.theme;
 
-import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.ITheme;
-import com.cleanroommc.modularui.screen.RichTooltip;
+import com.cleanroommc.modularui.api.IThemeApi;
 
 public abstract class AbstractDefaultTheme implements ITheme {
 
+    private WidgetTheme fallback;
     private WidgetTheme panel;
     private WidgetTheme button;
-    private WidgetSlotTheme itemSlot;
-    private WidgetSlotTheme fluidSlot;
-    private WidgetTextFieldTheme textField;
-    private WidgetThemeSelectable toggleButtonTheme;
+    private SlotTheme itemSlot;
+    private SlotTheme fluidSlot;
+    private TextFieldTheme textField;
+    private SelectableTheme toggleButtonTheme;
 
     @Override
     public ITheme getParentTheme() {
@@ -19,9 +19,17 @@ public abstract class AbstractDefaultTheme implements ITheme {
     }
 
     @Override
+    public WidgetTheme getFallback() {
+        if (this.fallback == null) {
+            this.fallback = getWidgetTheme(IThemeApi.FALLBACK);
+        }
+        return this.fallback;
+    }
+
+    @Override
     public WidgetTheme getPanelTheme() {
         if (this.panel == null) {
-            this.panel = getWidgetTheme(Theme.PANEL);
+            this.panel = getWidgetTheme(IThemeApi.PANEL);
         }
         return this.panel;
     }
@@ -29,50 +37,40 @@ public abstract class AbstractDefaultTheme implements ITheme {
     @Override
     public WidgetTheme getButtonTheme() {
         if (this.button == null) {
-            this.button = getWidgetTheme(Theme.BUTTON);
+            this.button = getWidgetTheme(IThemeApi.BUTTON);
         }
         return this.button;
     }
 
     @Override
-    public WidgetSlotTheme getItemSlotTheme() {
+    public SlotTheme getItemSlotTheme() {
         if (this.itemSlot == null) {
-            this.itemSlot = (WidgetSlotTheme) getWidgetTheme(Theme.ITEM_SLOT);
+            this.itemSlot = getWidgetTheme(IThemeApi.ITEM_SLOT);
         }
         return this.itemSlot;
     }
 
     @Override
-    public WidgetSlotTheme getFluidSlotTheme() {
+    public SlotTheme getFluidSlotTheme() {
         if (this.fluidSlot == null) {
-            this.fluidSlot = (WidgetSlotTheme) getWidgetTheme(Theme.FLUID_SLOT);
+            this.fluidSlot = getWidgetTheme(IThemeApi.FLUID_SLOT);
         }
         return this.fluidSlot;
     }
 
     @Override
-    public WidgetTextFieldTheme getTextFieldTheme() {
+    public TextFieldTheme getTextFieldTheme() {
         if (this.textField == null) {
-            this.textField = (WidgetTextFieldTheme) getWidgetTheme(Theme.TEXT_FIELD);
+            this.textField = getWidgetTheme(IThemeApi.TEXT_FIELD);
         }
         return this.textField;
     }
 
     @Override
-    public WidgetThemeSelectable getToggleButtonTheme() {
+    public SelectableTheme getToggleButtonTheme() {
         if (this.toggleButtonTheme == null) {
-            this.toggleButtonTheme = (WidgetThemeSelectable) getWidgetTheme(Theme.TOGGLE_BUTTON);
+            this.toggleButtonTheme = getWidgetTheme(IThemeApi.TOGGLE_BUTTON);
         }
         return this.toggleButtonTheme;
-    }
-
-    @Override
-    public boolean getSmoothProgressBarOverride() {
-        return ModularUIConfig.smoothProgressBar;
-    }
-
-    @Override
-    public RichTooltip.Pos getTooltipPosOverride() {
-        return ModularUIConfig.tooltipPos;
     }
 }

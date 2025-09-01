@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.widgets.slot;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.core.mixin.GuiAccessor;
@@ -13,7 +14,7 @@ import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.NEAAnimationHandler;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetSlotTheme;
+import com.cleanroommc.modularui.theme.SlotTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
@@ -111,13 +112,14 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     @Override
-    public WidgetSlotTheme getWidgetThemeInternal(ITheme theme) {
-        return theme.getItemSlotTheme();
+    public SlotTheme getWidgetThemeInternal(ITheme theme) {
+        return this.syncHandler != null && this.syncHandler.isPlayerSlot() ?
+                theme.getWidgetTheme(IThemeApi.ITEM_SLOT_PLAYER) : theme.getItemSlotTheme();
     }
 
     public int getSlotHoverColor() {
         WidgetTheme theme = getWidgetTheme(getContext().getTheme());
-        if (theme instanceof WidgetSlotTheme slotTheme) {
+        if (theme instanceof SlotTheme slotTheme) {
             return slotTheme.getSlotHoverColor();
         }
         return ITheme.getDefault().getItemSlotTheme().getSlotHoverColor();

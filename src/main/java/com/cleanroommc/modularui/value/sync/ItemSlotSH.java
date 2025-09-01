@@ -22,11 +22,13 @@ public class ItemSlotSH extends SyncHandler {
     public static final int SYNC_ENABLED = 2;
 
     private final ModularSlot slot;
+    private final boolean player;
     private ItemStack lastStoredItem;
     private boolean registered = false;
 
     public ItemSlotSH(ModularSlot slot) {
         this.slot = slot;
+        this.player = ModularSlot.isPlayerSlot(slot);
     }
 
     @Override
@@ -129,6 +131,10 @@ public class ItemSlotSH extends SyncHandler {
 
     public boolean isPhantom() {
         return false;
+    }
+
+    public boolean isPlayerSlot() {
+        return player;
     }
 
     @Nullable

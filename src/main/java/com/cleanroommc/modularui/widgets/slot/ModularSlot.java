@@ -4,11 +4,17 @@ import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
+
+import net.minecraftforge.items.wrapper.PlayerInvWrapper;
+
+import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -225,5 +231,13 @@ public class ModularSlot extends SlotItemHandler {
      */
     public ModularSlot singletonSlotGroup() {
         return singletonSlotGroup(SlotGroup.STORAGE_SLOT_PRIO);
+    }
+
+    public static boolean isPlayerSlot(Slot slot) {
+        return slot.inventory instanceof InventoryPlayer;
+    }
+
+    public static boolean isPlayerSlot(SlotItemHandler slot) {
+        return slot.getItemHandler() instanceof PlayerInvWrapper || slot.getItemHandler() instanceof PlayerMainInvWrapper;
     }
 }

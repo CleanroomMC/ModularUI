@@ -155,6 +155,7 @@ public interface GuiTextures {
             .location(ModularUI.ID, "gui/slot/item")
             .imageSize(18, 18)
             .adaptable(1)
+            .canApplyTheme()
             .name("slot_item")
             .build();
 
@@ -162,17 +163,20 @@ public interface GuiTextures {
             .location(ModularUI.ID, "gui/slot/fluid")
             .imageSize(18, 18)
             .adaptable(1)
+            .canApplyTheme()
             .name("slot_fluid")
             .build();
 
     UITexture PROGRESS_ARROW = UITexture.builder()
             .location(ModularUI.ID, "gui/widgets/progress_bar_arrow")
             .imageSize(20, 40)
+            .canApplyTheme()
             .build();
 
     UITexture PROGRESS_CYCLE = UITexture.builder()
             .location(ModularUI.ID, "gui/widgets/progress_bar_mixer")
             .imageSize(20, 40)
+            .canApplyTheme()
             .build();
 
     UITexture CYCLE_BUTTON_DEMO = UITexture.builder()
@@ -184,8 +188,8 @@ public interface GuiTextures {
     UITexture CROSS = UITexture.fullImage(ModularUI.ID, "gui/icons/cross");
     UITexture CROSS_TINY = UITexture.fullImage(ModularUI.ID, "gui/icons/cross_tiny");
 
-    TabTexture TAB_TOP = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_top", true), GuiAxis.Y, false, 28, 32, 4);
-    TabTexture TAB_BOTTOM = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_bottom", true), GuiAxis.Y, true, 28, 32, 4);
-    TabTexture TAB_LEFT = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_left", true), GuiAxis.X, false, 32, 28, 4);
-    TabTexture TAB_RIGHT = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_right", true), GuiAxis.X, true, 32, 28, 4);
+    TabTexture TAB_TOP = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_top", ColorType.DEFAULT), GuiAxis.Y, false, 28, 32, 4);
+    TabTexture TAB_BOTTOM = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_bottom", ColorType.DEFAULT), GuiAxis.Y, true, 28, 32, 4);
+    TabTexture TAB_LEFT = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_left", ColorType.DEFAULT), GuiAxis.X, false, 32, 28, 4);
+    TabTexture TAB_RIGHT = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_right", ColorType.DEFAULT), GuiAxis.X, true, 32, 28, 4);
 }
