@@ -140,7 +140,7 @@ public class TestGuis extends CustomModularScreen {
         float period = 3000f;
         return ModularPanel.defaultPanel("main")
                 .size(150)
-                .child(new TextWidget(IKey.str("Test String")).scale(0.6f).horizontalCenter().top(7))
+                .child(new TextWidget<>(IKey.str("Test String")).scale(0.6f).horizontalCenter().top(7))
                 .child(new DraggableWidget<>()
                         .background(new SpriteDrawable(sprite))
                         .size(20)
@@ -317,7 +317,7 @@ public class TestGuis extends CustomModularScreen {
                                 .collapseDisabledChild()
                                 .expanded()
                                 .widthRel(1f)
-                                .children(items.size(), i -> new TextWidget(IKey.str(items.get(i)))
+                                .children(items.size(), i -> new TextWidget<>(IKey.str(items.get(i)))
                                         .alignment(Alignment.Center)
                                         .color(Color.WHITE.main)
                                         .widthRel(1f)

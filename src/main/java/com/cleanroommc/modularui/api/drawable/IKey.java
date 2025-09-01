@@ -204,9 +204,8 @@ public interface IKey extends IDrawable, IJsonSerializable {
         return true;
     }
 
-    @Override
-    default TextWidget asWidget() {
-        return new TextWidget(this);
+    default TextWidget<?> asWidget() {
+        return new TextWidget<>(this);
     }
 
     default StyledText withStyle() {

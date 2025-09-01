@@ -117,8 +117,9 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
 
     protected void setupDrawText(ModularGuiContext context, TextFieldTheme widgetTheme) {
         this.renderer.setSimulate(false);
+        this.renderer.setPos(getArea().getPadding().getLeft(), getArea().getPadding().getTop());
         this.renderer.setScale(this.scale);
-        this.renderer.setAlignment(this.textAlignment, -2, getArea().height);
+        this.renderer.setAlignment(this.textAlignment, -1, getArea().paddedHeight());
     }
 
     protected void drawText(ModularGuiContext context, TextFieldTheme widgetTheme) {

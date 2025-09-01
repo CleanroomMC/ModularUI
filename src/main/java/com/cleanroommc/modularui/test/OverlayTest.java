@@ -26,7 +26,7 @@ public class OverlayTest {
 
         OverlayManager.register(new OverlayHandler(screen -> screen instanceof GuiMainMenu, screen -> {
             GuiMainMenu gui = (GuiMainMenu) screen;
-            TextWidget title = new TextWidget(IKey.str("ModularUI"));
+            TextWidget<?> title = new TextWidget<>(IKey.str("ModularUI"));
             int[] colors = {Color.WHITE.main, Color.AMBER.main, Color.BLUE.main, Color.GREEN.main, Color.DEEP_PURPLE.main, Color.RED.main};
             AtomicInteger k = new AtomicInteger();
             return new ModularScreen(ModularPanel.defaultPanel("overlay").sizeRel(1f)

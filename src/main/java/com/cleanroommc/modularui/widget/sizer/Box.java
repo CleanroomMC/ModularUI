@@ -3,6 +3,9 @@ package com.cleanroommc.modularui.widget.sizer;
 import com.cleanroommc.modularui.animation.IAnimatable;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.utils.Interpolations;
+import com.cleanroommc.modularui.utils.JsonHelper;
+
+import com.google.gson.JsonObject;
 
 import java.util.Objects;
 
@@ -13,13 +16,12 @@ import java.util.Objects;
 public class Box implements IAnimatable<Box> {
 
     public static final Box SHARED = new Box();
-
     public static final Box ZERO = new Box();
 
-    public int left;
-    public int top;
-    public int right;
-    public int bottom;
+    protected int left;
+    protected int top;
+    protected int right;
+    protected int bottom;
 
     public Box all(int all) {
         return this.all(all, all);
@@ -57,8 +59,41 @@ public class Box implements IAnimatable<Box> {
         return this;
     }
 
+    public Box set(GuiAxis axis, boolean start, int val) {
+        if (axis.isVertical()) {
+            if (start) {
+                top(val);
+            } else {
+                bottom(val);
+            }
+        } else {
+            if (start) {
+                left(val);
+            } else {
+                right(val);
+            }
+        }
+        return this;
+    }
+
     public Box set(Box box) {
         return all(box.left, box.right, box.top, box.bottom);
+    }
+
+    public int getLeft() {
+        return this.left;
+    }
+
+    public int getRight() {
+        return this.right;
+    }
+
+    public int getTop() {
+        return this.top;
+    }
+
+    public int getBottom() {
+        return this.bottom;
     }
 
     public int vertical() {
@@ -81,6 +116,29 @@ public class Box implements IAnimatable<Box> {
         return axis.isHorizontal() ? this.right : this.bottom;
     }
 
+    public void fromJson(JsonObject json) {
+        all(JsonHelper.getInt(json, 0, "margin"));
+        if (json.has("marginHorizontal")) {
+            this.left = json.get("marginHorizontal").getAsInt();
+            this.right = this.left;
+        }
+        if (json.has("marginVertical")) {
+            this.top = json.get("marginVertical").getAsInt();
+            this.bottom = this.top;
+        }
+        this.top = JsonHelper.getInt(json, this.top, "marginTop");
+        this.bottom = JsonHelper.getInt(json, this.bottom, "marginBottom");
+        this.left = JsonHelper.getInt(json, this.left, "marginLeft");
+        this.right = JsonHelper.getInt(json, this.right, "marginRight");
+    }
+
+    public void toJson(JsonObject json) {
+        json.addProperty("marginTop", this.top);
+        json.addProperty("marginBottom", this.bottom);
+        json.addProperty("marginLeft", this.left);
+        json.addProperty("marginRight", this.right);
+    }
+
     @Override
     public Box interpolate(Box start, Box end, float t) {
         this.left = Interpolations.lerp(start.left, end.left, t);
@@ -98,15 +156,15 @@ public class Box implements IAnimatable<Box> {
     @Override
     public String toString() {
         return "Box{" +
-                "left=" + left +
-                ", top=" + top +
-                ", right=" + right +
-                ", bottom=" + bottom +
+                "left=" + this.left +
+                ", top=" + this.top +
+                ", right=" + this.right +
+                ", bottom=" + this.bottom +
                 '}';
     }
 
     public boolean isEqual(Box box) {
-        return left == box.left && top == box.top && right == box.right && bottom == box.bottom;
+        return this.left == box.left && this.top == box.top && this.right == box.right && this.bottom == box.bottom;
     }
 
     @Override
@@ -119,6 +177,6 @@ public class Box implements IAnimatable<Box> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(left, top, right, bottom);
+        return Objects.hash(this.left, this.top, this.right, this.bottom);
     }
 }

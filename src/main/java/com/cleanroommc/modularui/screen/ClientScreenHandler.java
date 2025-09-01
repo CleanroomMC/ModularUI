@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.screen;
 
+import com.cleanroommc.modularui.GuiErrorHandler;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.IMuiScreen;
@@ -124,7 +125,7 @@ public class ClientScreenHandler {
             currentScreen = null;
             lastChar = null;
         }
-
+        GuiErrorHandler.INSTANCE.clear();
         OverlayManager.onGuiOpen(event);
     }
 
@@ -189,11 +190,13 @@ public class ClientScreenHandler {
             drawScreen(currentScreen, currentScreen.getScreenWrapper().getGuiScreen(), mx, my, pt);
             event.setCanceled(true);
         }
+        Platform.setupDrawTex(); // jei and other mods may expect this state
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onGuiDraw(GuiScreenEvent.DrawScreenEvent.Post event) {
         OverlayStack.draw(event.getMouseX(), event.getMouseY(), event.getRenderPartialTicks());
+        Platform.setupDrawTex(); // jei and other mods may expect this state
     }
 
     @SubscribeEvent
