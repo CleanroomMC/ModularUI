@@ -313,6 +313,7 @@ public class DimensionSizer {
             if (!parentSizeCalculated) return (int) val;
             val *= parentSize;
         }
+        val += s.getOffset();
         this.sizeCalculated = true;
         return (int) val;
     }
@@ -326,10 +327,8 @@ public class DimensionSizer {
             if (width > 0 && anchor != 0) {
                 val -= width * anchor;
             }
-            if (p.getOffset() != 0) {
-                val += p.getOffset();
-            }
         }
+        val += p.getOffset();
         if (p == this.end) {
             val = parentSize - val;
         }
