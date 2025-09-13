@@ -56,14 +56,16 @@ public class RichTextCompiler {
         for (Object o : raw) {
             if (o instanceof ITextLine line) {
                 newLine();
-                lines.add(line);
+                this.lines.add(line);
                 continue;
             }
             String text = null;
             if (o instanceof IKey key) {
                 if (key == IKey.EMPTY) continue;
                 if (key == IKey.SPACE) {
-                    addLineElement(key.get());
+                    String s = key.get();
+                    addLineElement(s);
+                    this.x += this.fr.getStringWidth(s);
                     continue;
                 }
                 if (key == IKey.LINE_FEED) {
@@ -88,10 +90,11 @@ public class RichTextCompiler {
                 delegate = di.findRootDelegate();
             }
             if (delegate instanceof Icon icon1) {
-                if (icon1.getWidth() <= 0) icon1.width(fr.FONT_HEIGHT);
-                if (icon1.getHeight() <= 0) icon1.height(fr.FONT_HEIGHT);
+                int defaultSize = this.fr.FONT_HEIGHT;
+                //if (icon1.getWidth() <= 0) icon1.width(defaultSize);
+                if (icon1.getHeight() <= 0) icon1.height(defaultSize);
             }
-            if (icon.getWidth() > maxWidth) {
+            if (icon.getWidth() > this.maxWidth) {
                 ModularUI.LOGGER.warn("Icon is wider than max width");
             }
             checkNewLine(icon.getWidth());
@@ -112,10 +115,10 @@ public class RichTextCompiler {
             k = l + 1; // start next sub string here
             while (!subText.isEmpty()) {
                 // how many chars fit
-                int i = ((FontRendererAccessor) fr).invokeSizeStringToWidth(subText, maxWidth - this.x);
+                int i = ((FontRendererAccessor) this.fr).invokeSizeStringToWidth(subText, this.maxWidth - this.x);
                 if (i == 0) {
                     // doesn't fit at the end of the line, try new line
-                    if (this.x > 0) i = ((FontRendererAccessor) fr).invokeSizeStringToWidth(subText, maxWidth);
+                    if (this.x > 0) i = ((FontRendererAccessor) fr).invokeSizeStringToWidth(subText, this.maxWidth);
                     if (i == 0) throw new IllegalStateException("No space for string '" + subText + "'");
                     newLine();
                 } else if (i < subText.length()) {
@@ -123,7 +126,7 @@ public class RichTextCompiler {
                     char c = subText.charAt(i);
                     if (c != ' ' && this.x > 0) {
                         // line was split in the middle of a word, try new line
-                        int j = ((FontRendererAccessor) fr).invokeSizeStringToWidth(subText, maxWidth);
+                        int j = ((FontRendererAccessor) fr).invokeSizeStringToWidth(subText, this.maxWidth);
                         if (j < subText.length()) {
                             c = subText.charAt(j);
                             if (j > i && c == ' ') {
@@ -138,10 +141,10 @@ public class RichTextCompiler {
                 }
                 // get fitting string
                 String current = subText.length() <= i ? subText : trimRight(subText.substring(0, i));
-                int width = fr.getStringWidth(current);
+                int width = this.fr.getStringWidth(current);
                 addLineElement(current); // add string
-                h = Math.max(h, fr.FONT_HEIGHT);
-                x += width;
+                this.h = Math.max(this.h, this.fr.FONT_HEIGHT);
+                this.x += width;
                 if (subText.length() <= i) break; // sub text reached the end
                 newLine(); // string was split -> line is full
                 char c = subText.charAt(i);
@@ -156,32 +159,33 @@ public class RichTextCompiler {
     }
 
     private void newLine() {
-        int i = currentLine.size() - 1;
-        if (!currentLine.isEmpty() && currentLine.get(i) instanceof String s) {
+        int i = this.currentLine.size() - 1;
+        if (!this.currentLine.isEmpty() && this.currentLine.get(i) instanceof String s) {
             if (s.equals(" ")) {
-                currentLine.remove(i);
+                this.currentLine.remove(i);
             } else {
-                currentLine.set(i, trimRight(s));
+                this.currentLine.set(i, trimRight(s));
             }
         }
-        if (currentLine.isEmpty()) {
-            //lines.add(null);
-        } else if (currentLine.size() == 1 && currentLine.get(0) instanceof String) {
-            lines.add(new TextLine((String) currentLine.get(0), x));
-            currentLine.clear();
-        } else {
-            lines.add(new ComposedLine(currentLine, x, h));
-            currentLine = new ArrayList<>();
+        if (!this.currentLine.isEmpty()) {
+            if (this.currentLine.size() == 1 && this.currentLine.get(0) instanceof String) {
+                this.lines.add(new TextLine((String) this.currentLine.get(0), this.x));
+                this.currentLine.clear();
+            } else {
+                this.lines.add(new ComposedLine(this.currentLine, this.x, this.h));
+                this.currentLine = new ArrayList<>();
+            }
         }
-        x = 0;
-        h = 0;
+        this.x = 0;
+        this.h = 0;
     }
 
     private void addLineElement(Object o) {
         if (o instanceof String s2) {
-            if (this.currentLine.size() == 1 && this.currentLine.get(0) instanceof String s1) {
-                // if there is already one string in the line, merge them
-                this.currentLine.set(0, s1 + s2);
+            int s = this.currentLine.size();
+            if (s > 0 && this.currentLine.get(s - 1) instanceof String s1) {
+                // if the last element in the line is a string, merge them
+                this.currentLine.set(s - 1, s1 + s2);
                 return;
             }
             if (this.currentLine.isEmpty()) {
@@ -199,7 +203,7 @@ public class RichTextCompiler {
     }
 
     private void checkNewLine(int width) {
-        if (x > 0 && x + width > maxWidth) {
+        if (this.x > 0 && this.x + width > this.maxWidth) {
             newLine();
         }
     }

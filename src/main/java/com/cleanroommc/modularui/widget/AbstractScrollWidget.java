@@ -11,6 +11,7 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.HoveredWidgetList;
 import com.cleanroommc.modularui.widget.scroll.HorizontalScrollData;
 import com.cleanroommc.modularui.widget.scroll.ScrollArea;
+import com.cleanroommc.modularui.widget.scroll.ScrollData;
 import com.cleanroommc.modularui.widget.scroll.VerticalScrollData;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
@@ -18,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * A scrollable parent widget. Children can be added
+ * A scrollable parent widget. Children can be added.
  *
  * @param <I> type of children (in most cases just {@link IWidget})
  * @param <W> type of this widget
@@ -26,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 public abstract class AbstractScrollWidget<I extends IWidget, W extends AbstractScrollWidget<I, W>> extends AbstractParentWidget<I, W> implements IViewport, Interactable {
 
     private final ScrollArea scroll = new ScrollArea();
-    private boolean keepScrollBarInArea = false;
+    private boolean scrollXActive, scrollYActive;
 
     public AbstractScrollWidget(@Nullable HorizontalScrollData x, @Nullable VerticalScrollData y) {
         super();
@@ -55,7 +56,7 @@ public abstract class AbstractScrollWidget<I extends IWidget, W extends Abstract
     @Override
     public void getSelfAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
         if (isInside(stack, x, y)) {
-            widgets.add(this, stack.peek());
+            widgets.add(this, stack.peek(), getAdditionalHoverInfo(stack, x, y));
         }
     }
 
@@ -67,19 +68,27 @@ public abstract class AbstractScrollWidget<I extends IWidget, W extends Abstract
     }
 
     @Override
-    public void onResized() {
-        super.onResized();
-        if (this.scroll.getScrollX() != null) {
-            this.scroll.getScrollX().clamp(this.scroll);
-            if (!this.keepScrollBarInArea) {
-                getArea().height += this.scroll.getScrollX().getThickness();
-            }
+    public void beforeResize(boolean onOpen) {
+        super.beforeResize(onOpen);
+        if (onOpen) checkScrollbarActive(true);
+        getScrollArea().getScrollPadding().scrollPaddingAll(0);
+        applyAdditionalOffset(this.scroll.getScrollX());
+        applyAdditionalOffset(this.scroll.getScrollY());
+    }
+
+    private void checkScrollbarActive(boolean onOpen) {
+        boolean scrollYActive = this.scroll.getScrollY() != null && this.scroll.getScrollY().isScrollBarActive(getScrollArea());
+        boolean scrollXActive = this.scroll.getScrollX() != null && this.scroll.getScrollX().isScrollBarActive(getScrollArea(), this.scrollYActive);
+        if (!onOpen && (scrollYActive != this.scrollYActive || scrollXActive != this.scrollXActive)) {
+            scheduleResize();
         }
-        if (this.scroll.getScrollY() != null) {
-            this.scroll.getScrollY().clamp(this.scroll);
-            if (!this.keepScrollBarInArea) {
-                getArea().width += this.scroll.getScrollY().getThickness();
-            }
+        this.scrollXActive = scrollXActive;
+        this.scrollYActive = scrollYActive;
+    }
+
+    private void applyAdditionalOffset(ScrollData data) {
+        if (data != null && data.isScrollBarActive(getScrollArea())) {
+            getScrollArea().getScrollPadding().scrollPadding(data.getAxis().getOther(), data.isOnAxisStart(), data.getThickness());
         }
     }
 
@@ -111,6 +120,7 @@ public abstract class AbstractScrollWidget<I extends IWidget, W extends Abstract
     @Override
     public void onUpdate() {
         super.onUpdate();
+        checkScrollbarActive(false);
         this.scroll.drag(getContext().getAbsMouseX(), getContext().getAbsMouseY());
     }
 
@@ -135,22 +145,5 @@ public abstract class AbstractScrollWidget<I extends IWidget, W extends Abstract
 
     public int getScrollY() {
         return this.scroll.getScrollY() != null ? this.scroll.getScrollY().getScroll() : 0;
-    }
-
-    /**
-     * Sets whether the scroll bar should be kept inside the area of this widget, which might cause it to overlap with the content of this widget.
-     * By setting the value to false, the size of this widget is expanded by the thickness of the scrollbars after the tree is resized.
-     * Default: false
-     *
-     * @param value if the scroll bar should be kept inside the widgets area
-     * @return this
-     */
-    public W keepScrollBarInArea(boolean value) {
-        this.keepScrollBarInArea = value;
-        return getThis();
-    }
-
-    public W keepScrollBarInArea() {
-        return keepScrollBarInArea(true);
     }
 }

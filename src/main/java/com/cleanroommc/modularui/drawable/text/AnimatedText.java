@@ -12,6 +12,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.IntSupplier;
+
 public class AnimatedText extends StyledText {
 
     private String fullString;
@@ -113,7 +115,12 @@ public class AnimatedText extends StyledText {
     }
 
     @Override
-    public AnimatedText color(@Nullable Integer color) {
+    public AnimatedText color(int color) {
+        return color(() -> color);
+    }
+
+    @Override
+    public AnimatedText color(@Nullable IntSupplier color) {
         return (AnimatedText) super.color(color);
     }
 

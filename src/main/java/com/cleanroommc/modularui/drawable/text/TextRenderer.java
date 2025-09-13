@@ -148,7 +148,7 @@ public class TextRenderer {
         this.lastY = y0;
         for (ITextLine line : lines) {
             int x0 = getStartX(width, line.getWidth());
-            if (!simulate) line.draw(context, getFontRenderer(), x0, y0, this.color, this.shadow);
+            if (!simulate) line.draw(context, getFontRenderer(), x0, y0, this.color, this.shadow, width, height);
             y0 += line.getHeight(getFontRenderer());
         }
         if (!this.simulate) GlStateManager.popMatrix();
@@ -174,18 +174,18 @@ public class TextRenderer {
         }
     }
 
-    public void drawScrolling(Line line, int scroll, Area area, GuiContext context) {
+    public void drawScrolling(Line line, float progress, Area area, GuiContext context) {
         if (line.getWidth() <= this.maxWidth) {
             drawMeasuredLines(Collections.singletonList(line));
             return;
         }
-        scroll = scroll % (int) (line.width + 1);
+        float scroll = (this.maxWidth - line.getWidth()) * progress;
+        //scroll = scroll % (int) (line.width + 1);
         String drawString = line.getText();//getFontRenderer().trimStringToWidth(line.getText(), (int) (this.maxWidth + scroll));
-        Area.SHARED.set(this.x, Integer.MIN_VALUE, this.x + (int) this.maxWidth, Integer.MAX_VALUE);
-        Stencil.apply(Area.SHARED, context);
-        GlStateManager.translate(-scroll, 0, 0);
-        drawMeasuredLines(Collections.singletonList(line(drawString)));
+        Stencil.apply(this.x, -500, (int) this.maxWidth, 1000, context);
         GlStateManager.translate(scroll, 0, 0);
+        drawMeasuredLines(Collections.singletonList(line(drawString)));
+        GlStateManager.translate(-scroll, 0, 0);
         Stencil.remove();
     }
 
@@ -326,7 +326,7 @@ public class TextRenderer {
         }
 
         public int lowerWidth() {
-            return (int) (this.width + 1);
+            return (int) this.width;
         }
     }
 }

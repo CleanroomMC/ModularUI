@@ -14,6 +14,7 @@ import com.cleanroommc.modularui.widget.scroll.HorizontalScrollData;
 import com.cleanroommc.modularui.widget.scroll.ScrollData;
 import com.cleanroommc.modularui.widgets.VoidWidget;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 
 import org.jetbrains.annotations.NotNull;
@@ -42,6 +43,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
     private static final Pattern BASE_PATTERN = Pattern.compile("[^§]");
 
     private static final int CURSOR_BLINK_RATE = 10;
+    private static final int DOUBLE_CLICK_THRESHOLD = 300; // max time between clicks to count as double-click in ms
 
     protected TextFieldHandler handler = new TextFieldHandler(this);
     protected TextFieldRenderer renderer = new TextFieldRenderer(this.handler);
@@ -51,6 +53,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
     protected float scale = 1f;
     protected boolean focusOnGuiOpen;
     private int cursorTimer;
+    protected long lastClickTime = 0;
 
     protected Integer textColor;
     protected Integer markedColor;
@@ -114,8 +117,9 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
 
     protected void setupDrawText(ModularGuiContext context, WidgetTextFieldTheme widgetTheme) {
         this.renderer.setSimulate(false);
+        this.renderer.setPos(getArea().getPadding().getLeft(), getArea().getPadding().getTop());
         this.renderer.setScale(this.scale);
-        this.renderer.setAlignment(this.textAlignment, -2, getArea().height);
+        this.renderer.setAlignment(this.textAlignment, -1, getArea().paddedHeight());
     }
 
     protected void drawText(ModularGuiContext context, WidgetTextFieldTheme widgetTheme) {
@@ -171,7 +175,27 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
             // the current transformation does not include the transformation of the children (the scroll) so we need to manually transform here
             int x = getContext().getMouseX() + getScrollX();
             int y = getContext().getMouseY() + getScrollY();
+            long now = Minecraft.getSystemTime();
+            if (this.lastClickTime < 0) {
+                // triple click
+                if (now + this.lastClickTime < DOUBLE_CLICK_THRESHOLD) {
+                    this.handler.markAll();
+                    this.lastClickTime = 0;
+                    return Result.SUCCESS;
+                }
+                this.lastClickTime = 0;
+            } else if (this.lastClickTime > 0) {
+                // double click
+                if (now - this.lastClickTime < DOUBLE_CLICK_THRESHOLD) {
+                    this.handler.markCurrentLine();
+                    this.lastClickTime = -Minecraft.getSystemTime();
+                    return Result.SUCCESS;
+                }
+                this.lastClickTime = 0;
+            }
+            // single click
             this.handler.setCursor(this.renderer.getCursorPos(this.handler.getText(), x, y), true);
+            this.lastClickTime = Minecraft.getSystemTime();
         }
         return Result.SUCCESS;
     }

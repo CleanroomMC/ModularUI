@@ -80,10 +80,11 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
      * Called when a panel is opened. Use {@link #onInit()} and {@link #afterInit()} for custom logic.
      *
      * @param parent the parent this element belongs to
+     * @param late true if this is called some time after the widget tree of the parent has been initialised
      */
     @ApiStatus.Internal
     @Override
-    public final void initialise(@NotNull IWidget parent) {
+    public final void initialise(@NotNull IWidget parent, boolean late) {
         if (!(this instanceof ModularPanel)) {
             this.parent = parent;
             this.panel = parent.getPanel();
@@ -101,7 +102,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         }
         this.valid = true;
         if (!getScreen().isClientOnly()) {
-            initialiseSyncHandler(getScreen().getSyncManager());
+            initialiseSyncHandler(getScreen().getSyncManager(), late);
         }
         if (isExcludeAreaInJei()) {
             getContext().getJeiSettings().addJeiExclusionArea(this);
@@ -109,7 +110,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         onInit();
         if (hasChildren()) {
             for (IWidget child : getChildren()) {
-                child.initialise(this);
+                child.initialise(this, false);
             }
         }
         afterInit();
@@ -133,7 +134,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
      * Custom logic should be handled in {@link #isValidSyncHandler(SyncHandler)}.
      */
     @Override
-    public void initialiseSyncHandler(ModularSyncManager syncManager) {
+    public void initialiseSyncHandler(ModularSyncManager syncManager, boolean late) {
         if (this.syncKey != null) {
             this.syncHandler = syncManager.getSyncHandler(getPanel().getName(), this.syncKey);
         }
@@ -833,10 +834,6 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         }
     }
 
-    public boolean isExcludeAreaInJei() {
-        return this.excludeAreaInJei;
-    }
-
     /**
      * Disables the widget from start. Useful inside widget tree creation, where widget references are usually not stored.
      *
@@ -845,6 +842,18 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     public W disabled() {
         setEnabled(false);
         return getThis();
+    }
+
+    @Override
+    public Object getAdditionalHoverInfo(IViewportStack viewportStack, int mouseX, int mouseY) {
+        if (this instanceof IDragResizeable dragResizeable) {
+            return IDragResizeable.getDragResizeCorner(dragResizeable, getArea(), viewportStack, mouseX, mouseY);
+        }
+        return null;
+    }
+
+    public boolean isExcludeAreaInJei() {
+        return this.excludeAreaInJei;
     }
 
     public W excludeAreaInJei() {
