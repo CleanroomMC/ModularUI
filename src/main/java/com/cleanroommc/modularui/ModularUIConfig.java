@@ -38,4 +38,7 @@ public class ModularUIConfig {
 
     @Config.Comment("If true, vanilla tooltip will be replaced with MUI's RichTooltip")
     public static boolean replaceVanillaTooltips = false;
+
+    @Config.Comment({"The format prefix of the mod name tooltip line.", "Default (Blue and Italic): §9§o"})
+    public static String modNameFormat = "§9§o";
 }
