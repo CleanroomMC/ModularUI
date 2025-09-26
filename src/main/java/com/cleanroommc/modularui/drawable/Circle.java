@@ -70,6 +70,7 @@ public class Circle implements IDrawable, IJsonSerializable, IAnimatable<Circle>
     @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiContext context, int x0, int y0, int width, int height, WidgetTheme widgetTheme) {
+        applyColor(widgetTheme.getColor());
         GuiDraw.drawEllipse(x0, y0, width, height, this.colorInner, this.colorOuter, this.segments);
     }
 

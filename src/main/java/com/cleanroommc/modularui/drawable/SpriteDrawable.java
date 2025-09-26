@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 public class SpriteDrawable implements IDrawable {
 
     private final TextureAtlasSprite sprite;
+    private boolean canApplyTheme = false;
 
     public SpriteDrawable(TextureAtlasSprite sprite) {
         this.sprite = sprite;
@@ -17,6 +18,7 @@ public class SpriteDrawable implements IDrawable {
 
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
+        applyColor(widgetTheme.getColor());
         GuiDraw.drawSprite(this.sprite, x, y, width, height);
     }
 
@@ -28,5 +30,15 @@ public class SpriteDrawable implements IDrawable {
     @Override
     public Icon asIcon() {
         return IDrawable.super.asIcon().size(this.sprite.getIconWidth(), this.sprite.getIconHeight());
+    }
+
+    @Override
+    public boolean canApplyTheme() {
+        return this.canApplyTheme;
+    }
+
+    public SpriteDrawable canApplyTheme(boolean canApplyTheme) {
+        this.canApplyTheme = canApplyTheme;
+        return this;
     }
 }

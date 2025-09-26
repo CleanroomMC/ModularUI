@@ -13,11 +13,11 @@ public class ModularUIConfig {
     public static int defaultScrollSpeed = 30;
 
     @Config.Comment("If progress bar should step in texture pixels or screen pixels. (Screen pixels are way smaller and therefore smoother)")
-    public static boolean smoothProgressBar = true;
+    public static boolean smoothProgressBar = false;
 
     // Default direction
     @Config.Comment("Default tooltip position around the widget or its panel.")
-    public static RichTooltip.Pos tooltipPos = RichTooltip.Pos.VERTICAL;
+    public static RichTooltip.Pos tooltipPos = RichTooltip.Pos.NEXT_TO_MOUSE;
 
     @Config.Comment("If true, pressing ESC key in the text field will restore the last text instead of confirming current one.")
     public static boolean escRestoreLastText = false;
