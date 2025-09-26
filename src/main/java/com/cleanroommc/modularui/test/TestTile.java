@@ -164,10 +164,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                         .background(GuiTextures.MC_BACKGROUND)
                         .excludeAreaInJei()
                         .stencilTransform((r, expanded) -> {
-                            if (expanded) {
-                                r.width -= 5;
-                                r.height -= 5;
-                            }
+                            r.width = Math.max(20, r.width - 5);
+                            r.height = Math.max(20, r.height - 5);
                         })
                         .animationDuration(500)
                         .interpolation(Interpolation.BOUNCE_OUT)
@@ -445,8 +443,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                 .setDraggable(true)
                 .size(100, 100);
         SlotGroup slotGroup = new SlotGroup("small_inv", 2);
-        IntSyncValue timeSync = new IntSyncValue(() -> (int)java.lang.System.currentTimeMillis());
-        syncManager.syncValue(123456,timeSync);
+        IntSyncValue timeSync = new IntSyncValue(() -> (int) java.lang.System.currentTimeMillis());
+        syncManager.syncValue(123456, timeSync);
         syncManager.registerSlotGroup(slotGroup);
         AtomicInteger number = new AtomicInteger(0);
         syncManager.syncValue("int_value", new IntSyncValue(number::get, number::set));

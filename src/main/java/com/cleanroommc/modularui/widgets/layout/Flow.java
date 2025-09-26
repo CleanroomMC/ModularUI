@@ -7,6 +7,8 @@ import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.sizer.Box;
 
+import java.util.function.IntFunction;
+
 public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander {
 
     public static Flow row() {
@@ -174,6 +176,20 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         if (this.collapseDisabledChild) {
             ILayoutWidget.super.onChildChangeEnabled(child, enabled);
         }
+    }
+
+    public Flow children(Iterable<IWidget> widgets) {
+        for (IWidget widget : widgets) {
+            child(widget);
+        }
+        return getThis();
+    }
+
+    public Flow children(int amount, IntFunction<IWidget> widgetCreator) {
+        for (int i = 0; i < amount; i++) {
+            child(widgetCreator.apply(i));
+        }
+        return getThis();
     }
 
     public Flow crossAxisAlignment(Alignment.CrossAxis caa) {
