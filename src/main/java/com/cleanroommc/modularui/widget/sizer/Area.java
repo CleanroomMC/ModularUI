@@ -106,7 +106,7 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
     }
 
     public void ey(int ey) {
-        this.y = ey - this.width;
+        this.y = ey - this.height;
     }
 
     public int mx() {
