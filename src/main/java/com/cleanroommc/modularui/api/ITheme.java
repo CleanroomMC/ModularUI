@@ -1,10 +1,15 @@
 package com.cleanroommc.modularui.api;
 
+import com.cleanroommc.modularui.theme.SelectableTheme;
 import com.cleanroommc.modularui.theme.SlotTheme;
 import com.cleanroommc.modularui.theme.TextFieldTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.theme.WidgetThemeKey;
-import com.cleanroommc.modularui.theme.SelectableTheme;
+
+import org.jetbrains.annotations.UnmodifiableView;
+
+import java.util.Collection;
 
 /**
  * A theme is parsed from json and contains style information like color or background texture.
@@ -36,19 +41,22 @@ public interface ITheme {
      */
     ITheme getParentTheme();
 
-    WidgetTheme getFallback();
+    @UnmodifiableView
+    Collection<WidgetThemeEntry<?>> getWidgetThemes();
 
-    WidgetTheme getPanelTheme();
+    WidgetThemeEntry<WidgetTheme> getFallback();
 
-    WidgetTheme getButtonTheme();
+    WidgetThemeEntry<WidgetTheme> getPanelTheme();
 
-    SlotTheme getItemSlotTheme();
+    WidgetThemeEntry<WidgetTheme> getButtonTheme();
 
-    SlotTheme getFluidSlotTheme();
+    WidgetThemeEntry<SlotTheme> getItemSlotTheme();
 
-    TextFieldTheme getTextFieldTheme();
+    WidgetThemeEntry<SlotTheme> getFluidSlotTheme();
 
-    SelectableTheme getToggleButtonTheme();
+    WidgetThemeEntry<TextFieldTheme> getTextFieldTheme();
 
-    <T extends WidgetTheme> T getWidgetTheme(WidgetThemeKey<T> key);
+    WidgetThemeEntry<SelectableTheme> getToggleButtonTheme();
+
+    <T extends WidgetTheme> WidgetThemeEntry<T> getWidgetTheme(WidgetThemeKey<T> key);
 }

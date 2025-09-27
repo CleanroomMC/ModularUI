@@ -110,7 +110,6 @@ public class ModularScreen {
         ModularPanel mainPanel = mainPanelCreator != null ? mainPanelCreator.apply(this.context) : buildUI(this.context);
         Objects.requireNonNull(mainPanel, "The main panel must not be null!");
         this.name = mainPanel.getName();
-        this.currentTheme = IThemeApi.get().getThemeForScreen(this, null);
         this.panelManager = new PanelManager(this, mainPanel);
     }
 
@@ -684,6 +683,9 @@ public class ModularScreen {
     }
 
     public ITheme getCurrentTheme() {
+        if (this.currentTheme == null) {
+            useTheme(null);
+        }
         return this.currentTheme;
     }
 

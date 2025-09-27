@@ -87,7 +87,8 @@ public interface GuiTextures {
             .location(ModularUI.ID, "gui/background/vanilla_background")
             .imageSize(195, 136)
             .adaptable(4)
-            .name("vanilla_background").canApplyTheme()
+            .name("vanilla_background")
+            .defaultColorType()
             .build();
 
     UITexture MC_BUTTON = UITexture.builder()
@@ -96,6 +97,7 @@ public interface GuiTextures {
             .uv(0f, 0f, 1f, 0.5f)
             .adaptable(2).tiled()
             .name("mc_button")
+            .defaultColorType()
             .build();
 
     UITexture MC_BUTTON_PRESSED = UITexture.builder()
@@ -104,6 +106,7 @@ public interface GuiTextures {
             .uv(0f, 0.5f, 1f, 1f)
             .adaptable(2).tiled()
             .name("mc_button_pressed")
+            .defaultColorType()
             .build();
 
     UITexture MC_BUTTON_HOVERED = UITexture.builder()
@@ -125,9 +128,10 @@ public interface GuiTextures {
     UITexture MC_BUTTON_DISABLED = UITexture.builder()
             .location(ModularUI.ID, "gui/widgets/mc_button_disabled")
             .imageSize(16, 16)
-            .uv(0f, 0f, 1f, 0.5f)
+            .fullImage()
             .adaptable(1).tiled()
             .name("mc_button_disabled")
+            .defaultColorType()
             .build();
 
     UITexture BUTTON_CLEAN = UITexture.builder()

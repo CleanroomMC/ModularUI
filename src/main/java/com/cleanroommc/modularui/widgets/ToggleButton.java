@@ -4,13 +4,15 @@ import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.value.IBoolValue;
 import com.cleanroommc.modularui.screen.RichTooltip;
-import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.theme.SelectableTheme;
+import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 
 import java.util.function.Consumer;
 
 /**
  * A button which cycles between 2 states by clicking on it. Background, overlay and tooltip can be supplied per state.
+ *
  * @see CycleButtonWidget
  */
 public class ToggleButton extends AbstractCycleButtonWidget<ToggleButton> {
@@ -22,9 +24,14 @@ public class ToggleButton extends AbstractCycleButtonWidget<ToggleButton> {
     }
 
     @Override
-    public WidgetTheme getWidgetThemeInternal(ITheme theme) {
-        SelectableTheme widgetTheme = theme.getToggleButtonTheme();
-        return isValueSelected() ^ invertSelected() ? widgetTheme.getSelected() : widgetTheme;
+    public WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
+        return theme.getToggleButtonTheme();
+    }
+
+    @Override
+    protected WidgetTheme getActiveWidgetTheme(WidgetThemeEntry<?> widgetTheme, boolean hover) {
+        SelectableTheme selectableTheme = widgetTheme.expectType(SelectableTheme.class).getTheme(hover);
+        return isValueSelected() ^ invertSelected() ? selectableTheme.getSelected() : selectableTheme;
     }
 
     public boolean isValueSelected() {

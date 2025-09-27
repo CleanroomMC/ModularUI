@@ -846,6 +846,8 @@ public class Color {
                 json.has("k") || json.has("black");
     }
 
+    public static final int TEXT_COLOR_DARK = 0xFF404040;
+
     public static final ColorShade WHITE = ColorShade.builder(0xFFFFFFFF)
             .addDarker(0xFFF7F7F7, 0xFFEFEFEF, 0xFFE7E7E7, 0xFFDFDFDF, 0xFFD7D7D7, 0xFFCFCFCF, 0xFFC7C7C7, 0xFFBFBFBF)
             .build();

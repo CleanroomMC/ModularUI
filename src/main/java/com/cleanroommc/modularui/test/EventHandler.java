@@ -1,17 +1,18 @@
 package com.cleanroommc.modularui.test;
 
+import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.factory.ClientGUI;
-
 import com.cleanroommc.modularui.screen.RichTooltipEvent;
-
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.theme.ReloadThemeEvent;
+import com.cleanroommc.modularui.theme.SelectableTheme;
+import com.cleanroommc.modularui.theme.ThemeBuilder;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-
 import com.cleanroommc.modularui.utils.Color;
 
 import net.minecraft.init.Items;
@@ -22,6 +23,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class EventHandler {
 
     public static boolean enabledRichTooltipEventTest = false;
+    public static final String TEST_THEME = "mui:test_theme";
+    private static final ThemeBuilder<?> testTheme = new ThemeBuilder<>(TEST_THEME)
+            .defaultColor(Color.BLUE_ACCENT.brighter(0))
+            .widgetTheme(IThemeApi.TOGGLE_BUTTON, new SelectableTheme.Builder<>()
+                    .color(Color.BLUE_ACCENT.brighter(0))
+                    .selectedColor(Color.WHITE.main)
+                    .selectedIconColor(Color.RED.brighter(0)))
+            .widgetThemeHover(IThemeApi.TOGGLE_BUTTON, new SelectableTheme.Builder<>()
+                    .selectedIconColor(Color.DEEP_PURPLE.brighter(0)));
 
     private static final IIcon tooltipLine = new IDrawable() {
         @Override
@@ -59,5 +69,10 @@ public class EventHandler {
                     .replace("Minecraft", key -> IKey.str("Chicken Jockey").style(TextFormatting.BLUE, TextFormatting.ITALIC))
                     .moveCursorToEnd();
         }
+    }
+
+    @SubscribeEvent
+    public static void onThemeTooltip(ReloadThemeEvent.Pre event) {
+        IThemeApi.get().registerTheme(testTheme);
     }
 }

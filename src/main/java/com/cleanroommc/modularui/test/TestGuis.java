@@ -22,6 +22,7 @@ import com.cleanroommc.modularui.utils.*;
 import com.cleanroommc.modularui.utils.fakeworld.ArraySchema;
 import com.cleanroommc.modularui.utils.fakeworld.FakeEntity;
 import com.cleanroommc.modularui.utils.fakeworld.ISchema;
+import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.value.StringValue;
 import com.cleanroommc.modularui.widget.DraggableWidget;
 import com.cleanroommc.modularui.widget.Widget;
@@ -29,6 +30,7 @@ import com.cleanroommc.modularui.widgets.ListWidget;
 import com.cleanroommc.modularui.widgets.RichTextWidget;
 import com.cleanroommc.modularui.widgets.SchemaWidget;
 import com.cleanroommc.modularui.widgets.SortableListWidget;
+import com.cleanroommc.modularui.widgets.ToggleButton;
 import com.cleanroommc.modularui.widgets.TransformWidget;
 import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Flow;
@@ -60,7 +62,26 @@ public class TestGuis extends CustomModularScreen {
 
     @Override
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {
-        return buildSpriteAndEntityUI(context);
+        return buildToggleUI(context);
+    }
+
+    public @NotNull ModularPanel buildToggleUI(ModularGuiContext context) {
+        useTheme(EventHandler.TEST_THEME);
+        boolean[] states = new boolean[60];
+        return new ModularPanel("toggle")
+                .size(150)
+                .padding(7)
+                .child(new ListWidget<>()
+                        .sizeRel(1f)
+                        .children(10, i -> Flow.row()
+                                .coverChildren()
+                                .children(6, j -> {
+                                    final int index = i * 6 + j;
+                                    return new ToggleButton()
+                                            .overlay(GuiTextures.BOOKMARK)
+                                            .value(new BoolValue.Dynamic(() -> states[index], val -> states[index] = val))
+                                            .margin(2);
+                                })));
     }
 
     public @NotNull ModularPanel buildAnimationUI(ModularGuiContext context) {

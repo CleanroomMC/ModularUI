@@ -14,15 +14,15 @@ public class TextFieldTheme extends WidgetTheme {
     private final int markedColor;
     private final int hintColor;
 
-    public TextFieldTheme(int defaultWidth, int defaultHeight, @Nullable IDrawable background, @Nullable IDrawable hoverBackground,
-                          int color, int textColor, boolean textShadow, int iconColor, int markedColor, int hintColor) {
-        super(defaultWidth, defaultHeight, background, hoverBackground, color, textColor, textShadow, iconColor);
-        this.markedColor = markedColor;
-        this.hintColor = hintColor;
+    public TextFieldTheme(int markedColor, int hintColor) {
+        this(56, 18, GuiTextures.DISPLAY_SMALL, Color.WHITE.main, Color.WHITE.main, false, Color.WHITE.main, markedColor, hintColor);
     }
 
-    public TextFieldTheme(int markedColor, int hintColor) {
-        this(56, 18, GuiTextures.DISPLAY_SMALL, null, Color.WHITE.main, Color.WHITE.main, false, Color.WHITE.main, markedColor, hintColor);
+    public TextFieldTheme(int defaultWidth, int defaultHeight, @Nullable IDrawable background,
+                          int color, int textColor, boolean textShadow, int iconColor, int markedColor, int hintColor) {
+        super(defaultWidth, defaultHeight, background, color, textColor, textShadow, iconColor);
+        this.markedColor = markedColor;
+        this.hintColor = hintColor;
     }
 
     public TextFieldTheme(TextFieldTheme parent, JsonObject fallback, JsonObject json) {

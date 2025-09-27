@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -19,14 +20,13 @@ public class ThemeAPI implements IThemeApi {
 
     public static final ThemeAPI INSTANCE = new ThemeAPI();
     public static final String DEFAULT_ID = "DEFAULT";
-    public static final ITheme DEFAULT_THEME = new DefaultTheme();
+    public static final ITheme DEFAULT_THEME = DefaultTheme.INSTANCE;
 
     public static final Pattern widgetThemeNamePattern = Pattern.compile("[a-zA-Z0-9_-]+");
 
     private final Object2ObjectMap<String, ITheme> themes = new Object2ObjectOpenHashMap<>();
     protected final Object2ObjectMap<String, List<JsonBuilder>> defaultThemes = new Object2ObjectOpenHashMap<>();
-    protected final Object2ObjectMap<WidgetThemeKey<?>, WidgetTheme> defaultWidgetThemes = new Object2ObjectOpenHashMap<>();
-    protected final Object2ObjectMap<WidgetThemeKey<?>, WidgetThemeParser<?>> widgetThemeFunctions = new Object2ObjectOpenHashMap<>();
+    private final List<WidgetThemeKey<?>> keys = new ArrayList<>();
     protected final Object2ObjectOpenHashMap<String, String> jsonScreenThemes = new Object2ObjectOpenHashMap<>();
     private final Object2ObjectMap<String, String> screenThemes = new Object2ObjectOpenHashMap<>();
 
@@ -45,11 +45,6 @@ public class ThemeAPI implements IThemeApi {
     @Override
     public boolean hasTheme(String id) {
         return this.themes.containsKey(id);
-    }
-
-    @Override
-    public boolean hasWidgetTheme(WidgetThemeKey<?> key) {
-        return this.widgetThemeFunctions.containsKey(key);
     }
 
     @Override
@@ -92,21 +87,26 @@ public class ThemeAPI implements IThemeApi {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends WidgetTheme> WidgetThemeKey<T> registerWidgetTheme(String id, T defaultTheme, WidgetThemeParser<T> parser) {
+    public <T extends WidgetTheme> WidgetThemeKey<T> registerWidgetTheme(String id, T defaultTheme, T defaultHoverTheme,
+                                                                         WidgetThemeParser<T> parser) {
         Objects.requireNonNull(id, "Id for widget theme must not be null");
         Objects.requireNonNull(defaultTheme, "Default widget theme must not be null, but is null for id '" + id + "'.");
         Objects.requireNonNull(parser, "Parser for widget theme must not be null, but is null for id '" + id + "'.");
-        if (this.widgetThemeFunctions.containsKey(id)) {
+        if (WidgetThemeKey.getFromFullName(id) != null) {
             throw new IllegalStateException("There already is a widget theme for id '" + id + "' registered.");
         }
         if (!widgetThemeNamePattern.matcher(id).matches()) {
             throw new IllegalArgumentException("Widget theme id '" + id + "' is invalid. Id must only contain letters, numbers, underscores and minus.");
         }
         Class<T> type = (Class<T>) defaultTheme.getClass();
-        WidgetThemeKey<T> key = new WidgetThemeKey<>(type, id);
-        this.widgetThemeFunctions.put(key, parser);
-        this.defaultWidgetThemes.put(key, defaultTheme);
+        WidgetThemeKey<T> key = new WidgetThemeKey<>(type, id, defaultTheme, defaultHoverTheme, parser);
+        this.keys.add(key);
         return key;
+    }
+
+    @Override
+    public List<WidgetThemeKey<?>> getWidgetThemeKeys() {
+        return Collections.unmodifiableList(this.keys);
     }
 
     // Internals
@@ -122,21 +122,5 @@ public class ThemeAPI implements IThemeApi {
         this.themes.clear();
         this.jsonScreenThemes.clear();
         registerTheme(DEFAULT_THEME);
-    }
-
-    public static class DefaultTheme extends AbstractDefaultTheme {
-
-        private DefaultTheme() {}
-
-        @Override
-        public String getId() {
-            return DEFAULT_ID;
-        }
-
-        @Override
-        public <T extends WidgetTheme> T getWidgetTheme(WidgetThemeKey<T> key) {
-            if (key.isSubWidgetTheme()) key = Objects.requireNonNull(key.getParent());
-            return key.cast(INSTANCE.defaultWidgetThemes.get(key));
-        }
     }
 }

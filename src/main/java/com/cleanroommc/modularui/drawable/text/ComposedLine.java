@@ -48,7 +48,7 @@ public class ComposedLine implements ITextLine {
             } else if (o instanceof IIcon icon) {
                 float drawY = getHeight(fr) / 2f - icon.getHeight() / 2f;
                 int w = icon.getWidth() > 0  ? icon.getWidth() : availableWidth;
-                icon.draw(context, (int) x, (int) (y + drawY), w, icon.getHeight(), IThemeApi.get().getDefaultTheme().getFallback());
+                icon.draw(context, (int) x, (int) (y + drawY), w, icon.getHeight(), IThemeApi.get().getDefaultTheme().getFallback().getTheme());
                 if (icon instanceof IHoverable hoverable) {
                     hoverable.setRenderedAt((int) x, (int) (y + drawY));
                 }

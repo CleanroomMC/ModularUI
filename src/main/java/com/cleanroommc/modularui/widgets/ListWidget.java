@@ -6,7 +6,7 @@ import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.widget.IParentWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.widget.AbstractScrollWidget;
 import com.cleanroommc.modularui.widget.scroll.ScrollData;
 import com.cleanroommc.modularui.widget.scroll.VerticalScrollData;
@@ -41,7 +41,7 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
     }
 
     @Override
-    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
+    public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         if (this.childSeparator == null || this.separatorPositions.isEmpty()) return;
         GuiAxis axis = this.scrollData.getAxis();
         int x = getArea().getPadding().getLeft(), y = getArea().getPadding().getTop(), w, h;
@@ -58,7 +58,7 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
             } else {
                 y = p;
             }
-            this.childSeparator.draw(context, x, y, w, h, widgetTheme);
+            this.childSeparator.draw(context, x, y, w, h, getActiveWidgetTheme(widgetTheme, isHovering()));
         }
     }
 

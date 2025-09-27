@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.theme;
 import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.drawable.DrawableSerialization;
+import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.JsonBuilder;
 import com.cleanroommc.modularui.utils.JsonHelper;
 
@@ -13,30 +14,39 @@ public class SelectableTheme extends WidgetTheme {
 
     private final WidgetTheme selected;
 
-    public SelectableTheme(int defaultWidth, int defaultHeight, @Nullable IDrawable background, @Nullable IDrawable hoverBackground,
+    public static SelectableTheme darkTextNoShadow(int defaultWidth, int defaultHeight, @Nullable IDrawable background, @Nullable IDrawable selectedBackground) {
+        return new SelectableTheme(defaultWidth, defaultHeight, background, Color.WHITE.main, Color.TEXT_COLOR_DARK, false,
+                Color.WHITE.main, selectedBackground, Color.WHITE.main, Color.TEXT_COLOR_DARK, false, Color.WHITE.main);
+    }
+
+    public static SelectableTheme whiteTextShadow(int defaultWidth, int defaultHeight, @Nullable IDrawable background, @Nullable IDrawable selectedBackground) {
+        return new SelectableTheme(defaultWidth, defaultHeight, background, Color.WHITE.main, Color.WHITE.main, true,
+                Color.WHITE.main, selectedBackground, Color.WHITE.main, Color.WHITE.main, true, Color.WHITE.main);
+    }
+
+    public SelectableTheme(int defaultWidth, int defaultHeight, @Nullable IDrawable background,
                            int color, int textColor, boolean textShadow, int iconColor,
-                           @Nullable IDrawable selectedBackground, @Nullable IDrawable selectedHoverBackground,
+                           @Nullable IDrawable selectedBackground,
                            int selectedColor, int selectedTextColor, boolean selectedTextShadow, int selectedIconColor) {
-        super(defaultWidth, defaultHeight, background, hoverBackground, color, textColor, textShadow, iconColor);
-        this.selected = new WidgetTheme(defaultWidth, defaultHeight, selectedBackground, selectedHoverBackground, selectedColor, selectedTextColor, selectedTextShadow, selectedIconColor);
+        super(defaultWidth, defaultHeight, background, color, textColor, textShadow, iconColor);
+        this.selected = new WidgetTheme(defaultWidth, defaultHeight, selectedBackground, selectedColor, selectedTextColor, selectedTextShadow, selectedIconColor);
     }
 
     public SelectableTheme(SelectableTheme parent, JsonObject json, JsonObject fallback) {
         super(parent, json, fallback);
         IDrawable selectedBackground = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, parent.getSelected().getBackground(), IThemeApi.SELECTED_BACKGROUND);
-        IDrawable selectedHoverBackground = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, parent.getSelected().getHoverBackground(), IThemeApi.SELECTED_HOVER_BACKGROUND);
         int selectedColor = JsonHelper.getColorWithFallback(json, fallback, parent.getSelected().getColor(), IThemeApi.SELECTED_COLOR);
         int selectedTextColor = JsonHelper.getColorWithFallback(json, fallback, parent.getSelected().getTextColor(), IThemeApi.SELECTED_TEXT_COLOR);
         boolean selectedTextShadow = JsonHelper.getBoolWithFallback(json, fallback, parent.getSelected().getTextShadow(), IThemeApi.SELECTED_TEXT_SHADOW);
         int selectedIconColor = JsonHelper.getColorWithFallback(json, fallback, parent.getSelected().getTextColor(), IThemeApi.SELECTED_ICON_COLOR);
-        this.selected = new WidgetTheme(getDefaultWidth(), getDefaultHeight(), selectedBackground, selectedHoverBackground, selectedColor, selectedTextColor, selectedTextShadow, selectedIconColor);
+        this.selected = new WidgetTheme(getDefaultWidth(), getDefaultHeight(), selectedBackground, selectedColor, selectedTextColor, selectedTextShadow, selectedIconColor);
     }
 
     public WidgetTheme getSelected() {
         return selected;
     }
 
-    public static class Builder<T extends TextFieldTheme, B extends TextFieldTheme.Builder<T, B>> extends WidgetThemeBuilder<T, B> {
+    public static class Builder<T extends SelectableTheme, B extends SelectableTheme.Builder<T, B>> extends WidgetThemeBuilder<T, B> {
 
         public B selectedColor(int color) {
             add(IThemeApi.SELECTED_COLOR, color);
@@ -69,20 +79,6 @@ public class SelectableTheme extends WidgetTheme {
         }
 
         public B selectedBackground(String textureId) {
-            return background(new JsonBuilder().add("type", "texture").add("id", textureId));
-        }
-
-        public B selectedHoverBackground(JsonBuilder builder) {
-            add(IThemeApi.SELECTED_HOVER_BACKGROUND, builder);
-            return getThis();
-        }
-
-        public B selectedHoverBackground(IDrawable drawable) {
-            add(IThemeApi.SELECTED_HOVER_BACKGROUND, DrawableSerialization.serialize(drawable));
-            return getThis();
-        }
-
-        public B selectedHoverBackground(String textureId) {
             return background(new JsonBuilder().add("type", "texture").add("id", textureId));
         }
     }

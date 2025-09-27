@@ -62,18 +62,4 @@ public class WidgetThemeBuilder<T extends WidgetTheme, B extends WidgetThemeBuil
     public B background(String textureId) {
         return background(new JsonBuilder().add("type", "texture").add("id", textureId));
     }
-
-    public B hoverBackground(JsonBuilder builder) {
-        add(IThemeApi.HOVER_BACKGROUND, builder);
-        return getThis();
-    }
-
-    public B hoverBackground(IDrawable drawable) {
-        add(IThemeApi.HOVER_BACKGROUND, DrawableSerialization.serialize(drawable));
-        return getThis();
-    }
-
-    public B hoverBackground(String textureId) {
-        return background(new JsonBuilder().add("type", "texture").add("id", textureId));
-    }
 }

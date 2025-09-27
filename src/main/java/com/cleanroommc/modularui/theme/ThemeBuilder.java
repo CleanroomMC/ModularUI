@@ -50,12 +50,12 @@ public class ThemeBuilder<B extends ThemeBuilder<B>> extends JsonBuilder {
     }
 
     public B defaultHoverBackground(IDrawable v) {
-        add(IThemeApi.HOVER_BACKGROUND, DrawableSerialization.serialize(v));
+        mergeAdd(IThemeApi.HOVER_SUFFIX, new JsonBuilder().add(IThemeApi.BACKGROUND, DrawableSerialization.serialize(v)));
         return getThis();
     }
 
     public B defaultHoverBackground(String textureId) {
-        add(IThemeApi.HOVER_BACKGROUND, new JsonBuilder().add("type", "texture").add("id", textureId));
+        mergeAdd(IThemeApi.HOVER_SUFFIX, new JsonBuilder().add(IThemeApi.BACKGROUND, new JsonBuilder().add("type", "texture").add("id", textureId)));
         return getThis();
     }
 
@@ -64,8 +64,18 @@ public class ThemeBuilder<B extends ThemeBuilder<B>> extends JsonBuilder {
         return getThis();
     }
 
+    public B defaultHoverColor(int v) {
+        mergeAdd(IThemeApi.HOVER_SUFFIX, new JsonBuilder().add(IThemeApi.COLOR, v));
+        return getThis();
+    }
+
     public B defaultTextColor(int v) {
         add(IThemeApi.TEXT_COLOR, v);
+        return getThis();
+    }
+
+    public B defaultTextHoverColor(int v) {
+        mergeAdd(IThemeApi.HOVER_SUFFIX, new JsonBuilder().add(IThemeApi.TEXT_COLOR, v));
         return getThis();
     }
 
@@ -74,8 +84,18 @@ public class ThemeBuilder<B extends ThemeBuilder<B>> extends JsonBuilder {
         return getThis();
     }
 
+    public B defaultTextHoverShadow(boolean v) {
+        mergeAdd(IThemeApi.HOVER_SUFFIX, new JsonBuilder().add(IThemeApi.TEXT_SHADOW, v));
+        return getThis();
+    }
+
     public B defaultIconColor(int v) {
         add(IThemeApi.ICON_COLOR, v);
+        return getThis();
+    }
+
+    public B defaultIconHoverColor(int v) {
+        mergeAdd(IThemeApi.HOVER_SUFFIX, new JsonBuilder().add(IThemeApi.ICON_COLOR, v));
         return getThis();
     }
 
@@ -104,7 +124,7 @@ public class ThemeBuilder<B extends ThemeBuilder<B>> extends JsonBuilder {
     }
 
     public B hoverBackground(WidgetThemeKey<?> widgetTheme, IDrawable v) {
-        mergeAdd(widgetTheme.getFullName(), new JsonBuilder().add(IThemeApi.HOVER_BACKGROUND, DrawableSerialization.serialize(v)));
+        mergeAdd(widgetTheme.getFullName() + IThemeApi.HOVER_SUFFIX, new JsonBuilder().add(IThemeApi.BACKGROUND, DrawableSerialization.serialize(v)));
         return getThis();
     }
 
@@ -113,7 +133,7 @@ public class ThemeBuilder<B extends ThemeBuilder<B>> extends JsonBuilder {
     }
 
     public B hoverBackground(WidgetThemeKey<?> widgetTheme, JsonBuilder builder) {
-        mergeAdd(widgetTheme.getFullName(), new JsonBuilder().add(IThemeApi.HOVER_BACKGROUND, builder));
+        mergeAdd(widgetTheme.getFullName() + IThemeApi.HOVER_SUFFIX, new JsonBuilder().add(IThemeApi.BACKGROUND, builder));
         return getThis();
     }
 
@@ -122,8 +142,18 @@ public class ThemeBuilder<B extends ThemeBuilder<B>> extends JsonBuilder {
         return getThis();
     }
 
+    public B hoverColor(WidgetThemeKey<?> widgetTheme, int v) {
+        mergeAdd(widgetTheme.getFullName() + IThemeApi.HOVER_SUFFIX, new JsonBuilder().add(IThemeApi.COLOR, v));
+        return getThis();
+    }
+
     public B textColor(WidgetThemeKey<?> widgetTheme, int v) {
         mergeAdd(widgetTheme.getFullName(), new JsonBuilder().add(IThemeApi.TEXT_COLOR, v));
+        return getThis();
+    }
+
+    public B textHoverColor(WidgetThemeKey<?> widgetTheme, int v) {
+        mergeAdd(widgetTheme.getFullName() + IThemeApi.HOVER_SUFFIX, new JsonBuilder().add(IThemeApi.TEXT_COLOR, v));
         return getThis();
     }
 
@@ -132,8 +162,18 @@ public class ThemeBuilder<B extends ThemeBuilder<B>> extends JsonBuilder {
         return getThis();
     }
 
+    public B textHoverShadow(WidgetThemeKey<?> widgetTheme, boolean v) {
+        mergeAdd(widgetTheme.getFullName() + IThemeApi.HOVER_SUFFIX, new JsonBuilder().add(IThemeApi.TEXT_SHADOW, v));
+        return getThis();
+    }
+
     public B iconColor(WidgetThemeKey<?> widgetTheme, int v) {
         mergeAdd(widgetTheme.getFullName(), new JsonBuilder().add(IThemeApi.ICON_COLOR, v));
+        return getThis();
+    }
+
+    public B iconHoverColor(WidgetThemeKey<?> widgetTheme, int v) {
+        mergeAdd(widgetTheme.getFullName() + IThemeApi.HOVER_SUFFIX, new JsonBuilder().add(IThemeApi.ICON_COLOR, v));
         return getThis();
     }
 
@@ -167,6 +207,19 @@ public class ThemeBuilder<B extends ThemeBuilder<B>> extends JsonBuilder {
      */
     public <T extends WidgetTheme> B widgetTheme(WidgetThemeKey<T> widgetThemeKey, WidgetThemeBuilder<T, ?> widgetThemeBuilder) {
         add(widgetThemeKey.getFullName(), widgetThemeBuilder);
+        return getThis();
+    }
+
+    /**
+     * Customizes widget themes in a more organized way than with the methods above.
+     *
+     * @param widgetThemeKey     key of the widget theme to customize
+     * @param widgetThemeBuilder builder of the widget theme (take a look at its subclasses)
+     * @param <T>                type of the widget theme
+     * @return this
+     */
+    public <T extends WidgetTheme> B widgetThemeHover(WidgetThemeKey<T> widgetThemeKey, WidgetThemeBuilder<T, ?> widgetThemeBuilder) {
+        add(widgetThemeKey.getFullName() + IThemeApi.HOVER_SUFFIX, widgetThemeBuilder);
         return getThis();
     }
 }

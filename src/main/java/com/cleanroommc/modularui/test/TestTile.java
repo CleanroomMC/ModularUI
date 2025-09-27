@@ -14,7 +14,7 @@ import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.Interpolation;
@@ -551,8 +551,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         }
 
         @Override
-        public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
-            this.animatedKey.draw(context, 0, 0, getArea().w(), getArea().h(), widgetTheme);
+        public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
+            this.animatedKey.draw(context, 0, 0, getArea().w(), getArea().h(), getActiveWidgetTheme(widgetTheme, isHovering()));
         }
 
         @Override

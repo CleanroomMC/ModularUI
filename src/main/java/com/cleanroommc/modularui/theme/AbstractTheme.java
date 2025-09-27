@@ -3,23 +3,36 @@ package com.cleanroommc.modularui.theme;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.IThemeApi;
 
-public abstract class AbstractDefaultTheme implements ITheme {
+public abstract class AbstractTheme implements ITheme {
 
-    private WidgetTheme fallback;
-    private WidgetTheme panel;
-    private WidgetTheme button;
-    private SlotTheme itemSlot;
-    private SlotTheme fluidSlot;
-    private TextFieldTheme textField;
-    private SelectableTheme toggleButtonTheme;
+    private final String id;
+    private final ITheme parentTheme;
 
-    @Override
-    public ITheme getParentTheme() {
-        return null;
+    private WidgetThemeEntry<WidgetTheme> fallback;
+    private WidgetThemeEntry<WidgetTheme> panel;
+    private WidgetThemeEntry<WidgetTheme> button;
+    private WidgetThemeEntry<SlotTheme> itemSlot;
+    private WidgetThemeEntry<SlotTheme> fluidSlot;
+    private WidgetThemeEntry<TextFieldTheme> textField;
+    private WidgetThemeEntry<SelectableTheme> toggleButtonTheme;
+
+    protected AbstractTheme(String id, ITheme parentTheme) {
+        this.id = id;
+        this.parentTheme = parentTheme;
     }
 
     @Override
-    public WidgetTheme getFallback() {
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public ITheme getParentTheme() {
+        return parentTheme;
+    }
+
+    @Override
+    public WidgetThemeEntry<WidgetTheme> getFallback() {
         if (this.fallback == null) {
             this.fallback = getWidgetTheme(IThemeApi.FALLBACK);
         }
@@ -27,7 +40,7 @@ public abstract class AbstractDefaultTheme implements ITheme {
     }
 
     @Override
-    public WidgetTheme getPanelTheme() {
+    public WidgetThemeEntry<WidgetTheme> getPanelTheme() {
         if (this.panel == null) {
             this.panel = getWidgetTheme(IThemeApi.PANEL);
         }
@@ -35,7 +48,7 @@ public abstract class AbstractDefaultTheme implements ITheme {
     }
 
     @Override
-    public WidgetTheme getButtonTheme() {
+    public WidgetThemeEntry<WidgetTheme> getButtonTheme() {
         if (this.button == null) {
             this.button = getWidgetTheme(IThemeApi.BUTTON);
         }
@@ -43,7 +56,7 @@ public abstract class AbstractDefaultTheme implements ITheme {
     }
 
     @Override
-    public SlotTheme getItemSlotTheme() {
+    public WidgetThemeEntry<SlotTheme> getItemSlotTheme() {
         if (this.itemSlot == null) {
             this.itemSlot = getWidgetTheme(IThemeApi.ITEM_SLOT);
         }
@@ -51,7 +64,7 @@ public abstract class AbstractDefaultTheme implements ITheme {
     }
 
     @Override
-    public SlotTheme getFluidSlotTheme() {
+    public WidgetThemeEntry<SlotTheme> getFluidSlotTheme() {
         if (this.fluidSlot == null) {
             this.fluidSlot = getWidgetTheme(IThemeApi.FLUID_SLOT);
         }
@@ -59,7 +72,7 @@ public abstract class AbstractDefaultTheme implements ITheme {
     }
 
     @Override
-    public TextFieldTheme getTextFieldTheme() {
+    public WidgetThemeEntry<TextFieldTheme> getTextFieldTheme() {
         if (this.textField == null) {
             this.textField = getWidgetTheme(IThemeApi.TEXT_FIELD);
         }
@@ -67,7 +80,7 @@ public abstract class AbstractDefaultTheme implements ITheme {
     }
 
     @Override
-    public SelectableTheme getToggleButtonTheme() {
+    public WidgetThemeEntry<SelectableTheme> getToggleButtonTheme() {
         if (this.toggleButtonTheme == null) {
             this.toggleButtonTheme = getWidgetTheme(IThemeApi.TOGGLE_BUTTON);
         }

@@ -22,32 +22,46 @@ public class WidgetThemeKey<T extends WidgetTheme> {
     private final Class<T> type;
     private final String name;
     @Nullable private final String subName;
+    private final T defaultValue;
+    private final T defaultHoverValue;
+    private final WidgetThemeParser<T> parser;
 
-    WidgetThemeKey(Class<T> type, String name) {
-        this(null, type, name, null);
+    WidgetThemeKey(Class<T> type, String name, T defaultValue, WidgetThemeParser<T> parser) {
+        this(type, name, defaultValue, defaultValue, parser);
     }
 
-    private WidgetThemeKey(@Nullable WidgetThemeKey<T> parent, Class<T> type, String name, @Nullable String subName) {
+    WidgetThemeKey(Class<T> type, String name, T defaultValue, T defaultHoverValue, WidgetThemeParser<T> parser) {
+        this(null, type, name, null, defaultValue, defaultHoverValue, parser);
+    }
+
+    private WidgetThemeKey(@Nullable WidgetThemeKey<T> parent, Class<T> type, String name, @Nullable String subName, T defaultValue, T defaultHoverValue, WidgetThemeParser<T> parser) {
         this.parent = parent;
         this.type = type;
         this.name = name;
         this.subName = subName;
+        this.defaultValue = defaultValue;
+        this.defaultHoverValue = defaultHoverValue;
+        this.parser = parser;
         KEYS.put(getFullName(), this);
     }
 
     public WidgetThemeKey<T> createSubKey(String subName) {
+        return createSubKey(subName, null, null);
+    }
+
+    public WidgetThemeKey<T> createSubKey(String subName, @Nullable T defaultValue, @Nullable T defaultHoverValue) {
         WidgetThemeKey<?> existing = KEYS.get(getName() + ":" + subName);
         if (existing != null) {
             if (existing.type == type) {
                 return (WidgetThemeKey<T>) existing;
             }
-            throw new IllegalStateException("A widget theme key for id " + getName() + ":" + subName + " already exists, but with a different type.");
+            throw new IllegalStateException("A widget theme key for id " + getName() + ":" + subName +
+                    " already exists, but with a different types '" + existing.type.getSimpleName() + "' and '" + type.getSimpleName() + "'.");
         }
-        WidgetThemeKey<T> parent = this;
-        if (parent.parent != null) {
-            parent = parent.parent;
-        }
-        return new WidgetThemeKey<>(parent, type, name, subName);
+        return new WidgetThemeKey<>(this, type, name, subName,
+                defaultValue != null ? defaultValue : getDefaultValue(),
+                defaultHoverValue != null ? defaultHoverValue : getDefaultValue(),
+                this.parser);
     }
 
     public @Nullable WidgetThemeKey<T> getParent() {
@@ -73,6 +87,18 @@ public class WidgetThemeKey<T extends WidgetTheme> {
         return name;
     }
 
+    public T getDefaultValue() {
+        return defaultValue;
+    }
+
+    public T getDefaultHoverValue() {
+        return defaultHoverValue;
+    }
+
+    public WidgetThemeParser<T> getParser() {
+        return parser;
+    }
+
     public boolean isSubWidgetTheme() {
         return parent != null;
     }
@@ -85,12 +111,12 @@ public class WidgetThemeKey<T extends WidgetTheme> {
         return theme != null && type == theme.getClass();
     }
 
-    public T cast(WidgetTheme theme) {
-        return type.cast(theme);
+    public boolean isOfType(Class<? extends WidgetTheme> type) {
+        return type.isAssignableFrom(this.type);
     }
 
-    public T getDefault() {
-        return cast(ThemeAPI.INSTANCE.defaultWidgetThemes.get(this));
+    public T cast(WidgetTheme theme) {
+        return type.cast(theme);
     }
 
     @Override
