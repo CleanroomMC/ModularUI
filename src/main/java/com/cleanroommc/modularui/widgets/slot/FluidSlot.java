@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.widgets.slot;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.Interactable;
@@ -71,6 +72,8 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
                     if (this.syncHandler.controlsAmount()) {
                         tooltip.addLine(IKey.lang("modularui.fluid.phantom.amount", formatFluidTooltipAmount(fluid.amount), getBaseUnit()));
                     }
+
+                    tooltip.addLine(MCHelper.getFluidModName(fluid));
                 } else {
                     tooltip.addLine(IKey.lang("modularui.fluid.empty"));
                 }
@@ -81,6 +84,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
                 if (fluid != null) {
                     tooltip.addLine(IKey.lang("modularui.fluid.amount", formatFluidTooltipAmount(fluid.amount), formatFluidTooltipAmount(fluidTank.getCapacity()), getBaseUnit()));
                     addAdditionalFluidInfo(tooltip, fluid);
+                    tooltip.addLine(MCHelper.getFluidModName(fluid));
                 } else {
                     tooltip.addLine(IKey.lang("modularui.fluid.empty"));
                 }

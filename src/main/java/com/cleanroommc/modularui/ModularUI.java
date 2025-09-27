@@ -66,7 +66,8 @@ public class ModularUI {
         BLUR(ModIds.BLUR),
         BOGOSORTER(ModIds.BOGOSORTER),
         JEI(ModIds.JEI),
-        NEA(ModIds.NEA);
+        NEA(ModIds.NEA),
+        MODNAMETOOLTIP(ModIds.MODNAMETOOLTIP);
 
         public final String id;
         private boolean loaded = false;
@@ -101,5 +102,6 @@ public class ModularUI {
         public static final String JEI = "jei";
         public static final String NEA = "neverenoughanimations";
         public static final String BAUBLES = "baubles";
+        public static final String MODNAMETOOLTIP = "modnametooltip";
     }
 }
