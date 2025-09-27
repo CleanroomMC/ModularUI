@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.test;
 import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.Circle;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.ItemDrawable;
@@ -18,6 +19,9 @@ import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.Interpolation;
+import com.cleanroommc.modularui.utils.fakeworld.ArraySchema;
+import com.cleanroommc.modularui.utils.fakeworld.BlockInfo;
+import com.cleanroommc.modularui.utils.fakeworld.SchemaRenderer;
 import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.value.IntValue;
 import com.cleanroommc.modularui.value.StringValue;
@@ -29,34 +33,64 @@ import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandlers;
 import com.cleanroommc.modularui.widget.EmptyWidget;
 import com.cleanroommc.modularui.widget.ParentWidget;
-import com.cleanroommc.modularui.widgets.*;
+import com.cleanroommc.modularui.widgets.ButtonWidget;
+import com.cleanroommc.modularui.widgets.ColorPickerDialog;
+import com.cleanroommc.modularui.widgets.CycleButtonWidget;
+import com.cleanroommc.modularui.widgets.Dialog;
+import com.cleanroommc.modularui.widgets.DynamicSyncedWidget;
+import com.cleanroommc.modularui.widgets.Expandable;
+import com.cleanroommc.modularui.widgets.ItemDisplayWidget;
+import com.cleanroommc.modularui.widgets.ListWidget;
+import com.cleanroommc.modularui.widgets.PageButton;
+import com.cleanroommc.modularui.widgets.PagedWidget;
+import com.cleanroommc.modularui.widgets.ProgressWidget;
+import com.cleanroommc.modularui.widgets.SchemaWidget;
+import com.cleanroommc.modularui.widgets.ScrollingTextWidget;
+import com.cleanroommc.modularui.widgets.SliderWidget;
+import com.cleanroommc.modularui.widgets.SlotGroupWidget;
+import com.cleanroommc.modularui.widgets.SortButtons;
+import com.cleanroommc.modularui.widgets.ToggleButton;
 import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Flow;
 import com.cleanroommc.modularui.widgets.layout.Row;
-import com.cleanroommc.modularui.widgets.slot.*;
+import com.cleanroommc.modularui.widgets.slot.FluidSlot;
+import com.cleanroommc.modularui.widgets.slot.ItemSlot;
+import com.cleanroommc.modularui.widgets.slot.ModularCraftingSlot;
+import com.cleanroommc.modularui.widgets.slot.ModularSlot;
+import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.opengl.GL11;
 
 import java.util.Collection;
-import java.util.Random;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -156,7 +190,10 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                 .tab(GuiTextures.TAB_TOP, 0))
                         .child(new PageButton(3, tabController)
                                 .tab(GuiTextures.TAB_TOP, 0)
-                                .overlay(new ItemDrawable(Blocks.CHEST).asIcon())))
+                                .overlay(new ItemDrawable(Blocks.CHEST).asIcon()))
+                        .child(new PageButton(4, tabController)
+                                .tab(GuiTextures.TAB_TOP, 0)
+                                .overlay(new ItemDrawable(Items.ENDER_EYE).asIcon())))
                 .child(new Expandable()
                         .debugName("expandable")
                         .top(0)
@@ -204,55 +241,55 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                         .verticalCenter()
                                                         //.padding(7)
                                                         .child(new Column()
-                                                                .debugName("buttons and slots test")
-                                                                .coverChildren()
-                                                                .marginRight(8)
-                                                                //.flex(flex -> flex.height(0.5f))
-                                                                //.widthRel(0.5f)
-                                                                .crossAxisAlignment(Alignment.CrossAxis.CENTER)
-                                                                .child(new ButtonWidget<>()
-                                                                        .size(60, 18)
-                                                                        .overlay(IKey.dynamic(() -> "Button " + this.val)))
-                                                                .child(new FluidSlot()
-                                                                        .margin(2)
-                                                                        .syncHandler(SyncHandlers.fluidSlot(this.fluidTank)))
-                                                                .child(new ButtonWidget<>()
-                                                                        .size(60, 18)
-                                                                        .tooltip(tooltip -> {
-                                                                            tooltip.showUpTimer(10);
-                                                                            tooltip.addLine(IKey.str("Test Line g"));
-                                                                            tooltip.addLine(IKey.str("An image inside of a tooltip:"));
-                                                                            tooltip.addLine(GuiTextures.MUI_LOGO.asIcon().size(50).alignment(Alignment.TopCenter));
-                                                                            tooltip.addLine(IKey.str("And here a circle:"));
-                                                                            tooltip.addLine(new Circle()
-                                                                                            .setColor(Color.RED.darker(2), Color.RED.brighter(2))
-                                                                                            .asIcon()
-                                                                                            .size(20))
-                                                                                    .addLine(new ItemDrawable(new ItemStack(Items.DIAMOND)).asIcon())
-                                                                                    .pos(RichTooltip.Pos.LEFT);
-                                                                        })
-                                                                        .onMousePressed(mouseButton -> {
-                                                                            //panel.getScreen().close(true);
-                                                                            //panel.getScreen().openDialog("dialog", this::buildDialog, ModularUI.LOGGER::info);
-                                                                            //openSecondWindow(context).openIn(panel.getScreen());
-                                                                            panelSyncHandler.openPanel();
-                                                                            return true;
-                                                                        })
-                                                                        //.flex(flex -> flex.left(3)) // ?
-                                                                        .overlay(IKey.str("Button 2")))
-                                                                .child(new TextFieldWidget()
-                                                                        .size(60, 18)
-                                                                        .paddingTop(1)
-                                                                        .value(SyncHandlers.string(() -> this.value, val -> this.value = val))
-                                                                        .margin(0, 2)
-                                                                        .hintText("hint"))
-                                                                .child(new TextFieldWidget()
-                                                                        .size(60, 18)
-                                                                        .paddingTop(1)
-                                                                        .value(SyncHandlers.doubleNumber(() -> this.doubleValue, val -> this.doubleValue = val))
-                                                                        .setNumbersDouble(Function.identity())
-                                                                        .hintText("number"))
-                                                                //.child(IKey.str("Test string").asWidget().padding(2).debugName("test string"))
+                                                                        .debugName("buttons and slots test")
+                                                                        .coverChildren()
+                                                                        .marginRight(8)
+                                                                        //.flex(flex -> flex.height(0.5f))
+                                                                        //.widthRel(0.5f)
+                                                                        .crossAxisAlignment(Alignment.CrossAxis.CENTER)
+                                                                        .child(new ButtonWidget<>()
+                                                                                .size(60, 18)
+                                                                                .overlay(IKey.dynamic(() -> "Button " + this.val)))
+                                                                        .child(new FluidSlot()
+                                                                                .margin(2)
+                                                                                .syncHandler(SyncHandlers.fluidSlot(this.fluidTank)))
+                                                                        .child(new ButtonWidget<>()
+                                                                                .size(60, 18)
+                                                                                .tooltip(tooltip -> {
+                                                                                    tooltip.showUpTimer(10);
+                                                                                    tooltip.addLine(IKey.str("Test Line g"));
+                                                                                    tooltip.addLine(IKey.str("An image inside of a tooltip:"));
+                                                                                    tooltip.addLine(GuiTextures.MUI_LOGO.asIcon().size(50).alignment(Alignment.TopCenter));
+                                                                                    tooltip.addLine(IKey.str("And here a circle:"));
+                                                                                    tooltip.addLine(new Circle()
+                                                                                                    .setColor(Color.RED.darker(2), Color.RED.brighter(2))
+                                                                                                    .asIcon()
+                                                                                                    .size(20))
+                                                                                            .addLine(new ItemDrawable(new ItemStack(Items.DIAMOND)).asIcon())
+                                                                                            .pos(RichTooltip.Pos.LEFT);
+                                                                                })
+                                                                                .onMousePressed(mouseButton -> {
+                                                                                    //panel.getScreen().close(true);
+                                                                                    //panel.getScreen().openDialog("dialog", this::buildDialog, ModularUI.LOGGER::info);
+                                                                                    //openSecondWindow(context).openIn(panel.getScreen());
+                                                                                    panelSyncHandler.openPanel();
+                                                                                    return true;
+                                                                                })
+                                                                                //.flex(flex -> flex.left(3)) // ?
+                                                                                .overlay(IKey.str("Button 2")))
+                                                                        .child(new TextFieldWidget()
+                                                                                .size(60, 18)
+                                                                                .paddingTop(1)
+                                                                                .value(SyncHandlers.string(() -> this.value, val -> this.value = val))
+                                                                                .margin(0, 2)
+                                                                                .hintText("hint"))
+                                                                        .child(new TextFieldWidget()
+                                                                                .size(60, 18)
+                                                                                .paddingTop(1)
+                                                                                .value(SyncHandlers.doubleNumber(() -> this.doubleValue, val -> this.doubleValue = val))
+                                                                                .setNumbersDouble(Function.identity())
+                                                                                .hintText("number"))
+                                                                        //.child(IKey.str("Test string").asWidget().padding(2).debugName("test string"))
                                                                         .child(new ScrollingTextWidget(IKey.str("Very very long test string")).widthRel(1f).height(16))
                                                                 //.child(IKey.EMPTY.asWidget().debugName("Empty IKey"))
                                                         )
@@ -420,7 +457,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                         .child(new DynamicSyncedWidget<>()
                                                                 .widthRel(1f)
                                                                 .syncHandler(dynamicSyncHandler)))
-                                                )))
+                                        )
+                                        .addPage(createSchemaPage())))
                         .child(SlotGroupWidget.playerInventory(false))
                 );
         /*panel.child(new ButtonWidget<>()
@@ -434,6 +472,57 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                 .left(0.5f))
                         .setSynced("fluid_slot"));*/
         return panel;
+    }
+
+    private IWidget createSchemaPage() {
+        ParentWidget page = new ParentWidget<>();
+        page.debugName("page 5 schema");
+        page.sizeRel(1f);
+        page.child(IKey.str("schema").asWidget());
+        if (world.isRemote)
+            page.child(new SchemaWidget(new SchemaRenderer(new ArraySchema(collectBlocksAround())).rayTracing(true).afterRender((__, schema) -> {
+                RayTraceResult trace = schema.getBlockUnderMouse();
+                if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK) {
+                    GlStateManager.disableTexture2D();
+                    BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+                    buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+                    for (Vec3d v : sideVertices.get(trace.sideHit)) {
+                        buffer.pos(
+                                        trace.getBlockPos().getX() + v.x,
+                                        trace.getBlockPos().getY() + v.y,
+                                        trace.getBlockPos().getZ() + v.z
+                                )
+                                .color(128, 255, 128, 100)
+                                .endVertex();
+                    }
+                    Tessellator.getInstance().draw();
+                }
+            })).pos(20, 20).size(100, 100));
+        return page;
+    }
+
+
+    double one = 1.001;
+    double zero = -0.001;
+    Map<EnumFacing, List<Vec3d>> sideVertices = ImmutableMap.<EnumFacing, List<Vec3d>>builder()
+            .put(EnumFacing.DOWN, ImmutableList.of(new Vec3d(one, zero, zero), new Vec3d(one, zero, one), new Vec3d(zero, zero, one), new Vec3d(zero, zero, zero)))
+            .put(EnumFacing.UP, ImmutableList.of(new Vec3d(zero, one, zero), new Vec3d(zero, one, one), new Vec3d(one, one, one), new Vec3d(one, one, zero)))
+            .put(EnumFacing.SOUTH, ImmutableList.of(new Vec3d(zero, zero, one), new Vec3d(one, zero, one), new Vec3d(one, one, one), new Vec3d(zero, one, one)))
+            .put(EnumFacing.NORTH, ImmutableList.of(new Vec3d(zero, one, zero), new Vec3d(one, one, zero), new Vec3d(one, zero, zero), new Vec3d(zero, zero, zero)))
+            .put(EnumFacing.EAST, ImmutableList.of(new Vec3d(one, one, zero), new Vec3d(one, one, one), new Vec3d(one, zero, one), new Vec3d(one, zero, zero)))
+            .put(EnumFacing.WEST, ImmutableList.of(new Vec3d(zero, zero, zero), new Vec3d(zero, zero, one), new Vec3d(zero, one, one), new Vec3d(zero, one, zero)))
+            .build();
+
+    public BlockInfo[][][] collectBlocksAround() {
+        BlockInfo[][][] blocks = new BlockInfo[11][11][11];
+        for (int x = -5; x <= 5; x++) {
+            for (int y = -5; y <= 5; y++) {
+                for (int z = -5; z <= 5; z++) {
+                    blocks[x + 5][y + 5][z + 5] = BlockInfo.of(world, pos.add(x, y, z));
+                }
+            }
+        }
+        return blocks;
     }
 
     public ModularPanel openSecondWindow(PanelSyncManager syncManager, IPanelHandler syncHandler) {
