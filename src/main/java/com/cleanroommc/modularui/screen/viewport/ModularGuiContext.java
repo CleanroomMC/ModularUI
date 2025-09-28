@@ -3,11 +3,22 @@ package com.cleanroommc.modularui.screen.viewport;
 import com.cleanroommc.modularui.ClientProxy;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.MCHelper;
-import com.cleanroommc.modularui.api.widget.*;
-import com.cleanroommc.modularui.screen.*;
+import com.cleanroommc.modularui.api.widget.IDraggable;
+import com.cleanroommc.modularui.api.widget.IFocusedWidget;
+import com.cleanroommc.modularui.api.widget.IGuiElement;
+import com.cleanroommc.modularui.api.widget.IVanillaSlot;
+import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.api.widget.ResizeDragArea;
+import com.cleanroommc.modularui.screen.DraggablePanelWrapper;
+import com.cleanroommc.modularui.screen.JeiSettingsImpl;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.PanelManager;
+import com.cleanroommc.modularui.screen.UISettings;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.GuiScreen;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -26,12 +37,10 @@ import java.util.function.Consumer;
  */
 public class ModularGuiContext extends GuiContext {
 
-    /* GUI elements */
-    @Deprecated
-    public final ModularScreen screen;
+    private final ModularScreen screen;
+    private @Nullable GuiScreen parent;
     private LocatedWidget focusedWidget = LocatedWidget.EMPTY;
-    @Nullable
-    private LocatedWidget hovered;
+    private @Nullable LocatedWidget hovered;
     private int timeHovered = 0;
     private final HoveredIterable hoveredWidgets;
 
@@ -51,6 +60,18 @@ public class ModularGuiContext extends GuiContext {
 
     public ModularScreen getScreen() {
         return screen;
+    }
+
+    /**
+     * @return the screen that was open before when this screen was opened or null of none was open
+     */
+    public @Nullable GuiScreen getParentScreen() {
+        return parent;
+    }
+
+    @ApiStatus.Internal
+    public void setParentScreen(@Nullable GuiScreen parent) {
+        this.parent = parent;
     }
 
     /**

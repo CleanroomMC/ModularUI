@@ -118,6 +118,7 @@ public class ClientScreenHandler {
                     lastChar = null;
                 }
                 currentScreen = muiScreen.getScreen();
+                currentScreen.getContext().setParentScreen(Minecraft.getMinecraft().currentScreen);
                 fpsCounter.reset();
             }
         } else if (hasScreen() && getMCScreen() != null && newGui != getMCScreen()) {
@@ -194,7 +195,7 @@ public class ClientScreenHandler {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public static void onGuiDraw(GuiScreenEvent.DrawScreenEvent.Post event) {
+    public void onGuiDraw(GuiScreenEvent.DrawScreenEvent.Post event) {
         OverlayStack.draw(event.getMouseX(), event.getMouseY(), event.getRenderPartialTicks());
         Platform.setupDrawTex(); // jei and other mods may expect this state
     }
