@@ -157,7 +157,6 @@ public class RecipeViewerSettingsImpl implements RecipeViewerSettings {
 
     @ApiStatus.Internal
     public List<Rectangle> getAllRecipeViewerExclusionAreas() {
-        this.recipeViewerExclusionWidgets.removeIf(widget -> !widget.isValid());
         List<Rectangle> areas = new ArrayList<>(this.recipeViewerExclusionAreas);
         for (Iterator<IWidget> iterator = this.recipeViewerExclusionWidgets.iterator(); iterator.hasNext(); ) {
             IWidget widget = iterator.next();

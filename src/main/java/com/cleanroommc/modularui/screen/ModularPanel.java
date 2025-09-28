@@ -325,7 +325,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                     animateClose();
                     result = true;
                 }
-            } else if (checkJeiGhostIngredient(mouseButton)) {
+            } else if (checkRecipeViewerGhostIngredient(mouseButton)) {
                 return true;
             } else {
                 for (LocatedWidget widget : this.hovering) {
@@ -386,7 +386,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         });
     }
 
-    private boolean checkJeiGhostIngredient(int mouseButton) {
+    private boolean checkRecipeViewerGhostIngredient(int mouseButton) {
         if (ModularUI.Mods.JEI.isLoaded() && ModularUIJeiPlugin.getGhostDrag() != null) {
             // try inserting ghost ingredient
             GhostIngredientDrag<?> drag = ModularUIJeiPlugin.getGhostDrag();
