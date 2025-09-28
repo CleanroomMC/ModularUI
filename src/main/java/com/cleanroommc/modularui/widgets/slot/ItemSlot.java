@@ -8,7 +8,7 @@ import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiAccessor;
 import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
-import com.cleanroommc.modularui.integration.jei.JeiIngredientProvider;
+import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerIngredientProvider;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.NEAAnimationHandler;
 import com.cleanroommc.modularui.screen.RichTooltip;
@@ -37,7 +37,7 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable, JeiIngredientProvider {
+public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable, RecipeViewerIngredientProvider {
 
     public static final int SIZE = 18;
 

@@ -12,7 +12,6 @@ import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccesso
 import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.Stencil;
-import com.cleanroommc.modularui.integration.jei.ModularUIJeiPlugin;
 import com.cleanroommc.modularui.overlay.OverlayManager;
 import com.cleanroommc.modularui.overlay.OverlayStack;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -53,7 +52,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import mezz.jei.gui.overlay.IngredientListOverlay;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
@@ -139,14 +137,14 @@ public class ClientScreenHandler {
         OverlayStack.foreach(ms -> ms.onResize(event.getGui().width, event.getGui().height), false);
     }
 
-    // before JEI
+    // before recipe viewer
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onGuiInputHigh(GuiScreenEvent.KeyboardInputEvent.Pre event) throws IOException {
         defaultContext.updateEventState();
         inputEvent(event, InputPhase.EARLY);
     }
 
-    // after JEI
+    // after recipe viewer
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onGuiInputLow(GuiScreenEvent.KeyboardInputEvent.Pre event) throws IOException {
         inputEvent(event, InputPhase.LATE);
@@ -159,15 +157,13 @@ public class ClientScreenHandler {
         }
     }
 
-    // before JEI
+    // before recipe viewer
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onGuiInputHigh(GuiScreenEvent.MouseInputEvent.Pre event) throws IOException {
         defaultContext.updateEventState();
         if (checkGui(event.getGui())) currentScreen.getContext().updateEventState();
         if (handleMouseInput(Mouse.getEventButton(), currentScreen, event.getGui())) {
-            if (ModularUI.Mods.JEI.isLoaded()) {
-                ((IngredientListOverlay) ModularUIJeiPlugin.getRuntime().getIngredientListOverlay()).setKeyboardFocus(false);
-            }
+            Platform.unFocusRecipeViewer();
             event.setCanceled(true);
             return;
         }
@@ -191,13 +187,13 @@ public class ClientScreenHandler {
             drawScreen(currentScreen, currentScreen.getScreenWrapper().getGuiScreen(), mx, my, pt);
             event.setCanceled(true);
         }
-        Platform.setupDrawTex(); // jei and other mods may expect this state
+        Platform.setupDrawTex(); // recipe viewer and other mods may expect this state
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onGuiDraw(GuiScreenEvent.DrawScreenEvent.Post event) {
         OverlayStack.draw(event.getMouseX(), event.getMouseY(), event.getRenderPartialTicks());
-        Platform.setupDrawTex(); // jei and other mods may expect this state
+        Platform.setupDrawTex(); // recipe viewer and other mods may expect this state
     }
 
     @SubscribeEvent

@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.integration.jei;
 
 import com.cleanroommc.modularui.core.mixins.late.jei.GhostIngredientDragManagerAccessor;
 import com.cleanroommc.modularui.core.mixins.late.jei.IngredientListOverlayAccessor;
+import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerGhostIngredientSlot;
 import com.cleanroommc.modularui.screen.GuiContainerWrapper;
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import com.cleanroommc.modularui.screen.ModularContainer;
@@ -43,14 +44,14 @@ public class ModularUIJeiPlugin implements IModPlugin {
         return ((IngredientListOverlayAccessor) runtime.getIngredientListOverlay()).getGhostIngredientDragManager();
     }
 
-    public static boolean hoveringOverIngredient(JeiGhostIngredientSlot<?> ingredientSlot) {
+    public static boolean hoveringOverIngredient(RecipeViewerGhostIngredientSlot<?> ingredientSlot) {
         if (Config.isCheatItemsEnabled()) return false;
         Object hovered = getHoverdObject();
         if (hovered == null) return false;
         return ingredientSlot.castGhostIngredientIfValid(hovered) != null;
     }
 
-    public static boolean draggingValidIngredient(JeiGhostIngredientSlot<?> ingredientSlot) {
+    public static boolean draggingValidIngredient(RecipeViewerGhostIngredientSlot<?> ingredientSlot) {
         Object dragging = getDraggedObject();
         if (dragging == null) return false;
         return ingredientSlot.castGhostIngredientIfValid(dragging) != null;

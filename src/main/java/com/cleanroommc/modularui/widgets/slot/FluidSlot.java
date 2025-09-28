@@ -7,9 +7,9 @@ import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
-import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
-import com.cleanroommc.modularui.integration.jei.JeiIngredientProvider;
 import com.cleanroommc.modularui.integration.jei.ModularUIJeiPlugin;
+import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerGhostIngredientSlot;
+import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerIngredientProvider;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
@@ -37,7 +37,7 @@ import org.lwjgl.input.Keyboard;
 
 import java.text.DecimalFormat;
 
-public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGhostIngredientSlot<FluidStack>, JeiIngredientProvider {
+public class FluidSlot extends Widget<FluidSlot> implements Interactable, RecipeViewerGhostIngredientSlot<FluidStack>, RecipeViewerIngredientProvider {
 
     public static final int DEFAULT_SIZE = 18;
     public static final String UNIT_BUCKET = "B";
@@ -126,7 +126,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, JeiGho
         this.textRenderer.setShadow(true);
         this.textRenderer.setScale(0.5f);
         this.textRenderer.setColor(Color.WHITE.main);
-        getContext().getJeiSettings().addJeiGhostIngredientSlot(this);
+        getContext().getRecipeViewerSettings().addRecipeViewerGhostIngredientSlot(this);
     }
 
     @Override

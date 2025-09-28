@@ -1,6 +1,10 @@
 package com.cleanroommc.modularui.utils;
 
+import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.integration.jei.ModularUIJeiPlugin;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+
+import mezz.jei.gui.overlay.IngredientListOverlay;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -46,6 +50,12 @@ public class Platform {
 
     public static ItemStack copyStack(ItemStack stack) {
         return isStackEmpty(stack) ? EMPTY_STACK : stack.copy();
+    }
+
+    public static void unFocusRecipeViewer() {
+        if (ModularUI.Mods.JEI.isLoaded()) {
+            ((IngredientListOverlay) ModularUIJeiPlugin.getRuntime().getIngredientListOverlay()).setKeyboardFocus(false);
+        }
     }
 
     public static void startDrawing(DrawMode drawMode, VertexFormat format, Consumer<BufferBuilder> bufferBuilder) {

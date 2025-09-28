@@ -13,8 +13,8 @@ import com.cleanroommc.modularui.api.widget.IFocusedWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.widget.ResizeDragArea;
-import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
 import com.cleanroommc.modularui.integration.jei.ModularUIJeiPlugin;
+import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerGhostIngredientSlot;
 import com.cleanroommc.modularui.screen.viewport.GuiViewportStack;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
@@ -258,7 +258,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @MustBeInvokedByOverriders
     public void onClose() {
         if (!getScreen().isOverlay()) {
-            getContext().getJeiSettings().removeJeiExclusionArea(this);
+            getContext().getRecipeViewerSettings().removeRecipeViewerExclusionArea(this);
         }
         this.state = State.CLOSED;
         if (this.panelHandler != null) {
@@ -391,7 +391,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             // try inserting ghost ingredient
             GhostIngredientDrag<?> drag = ModularUIJeiPlugin.getGhostDrag();
             for (LocatedWidget widget : this.hovering) {
-                if (widget.getElement() instanceof JeiGhostIngredientSlot<?> ghostSlot && JeiGhostIngredientSlot.insertGhostIngredient(drag, ghostSlot)) {
+                if (widget.getElement() instanceof RecipeViewerGhostIngredientSlot<?> ghostSlot && RecipeViewerGhostIngredientSlot.insertGhostIngredient(drag, ghostSlot)) {
                     ModularUIJeiPlugin.getGhostDragManager().stopDrag();
                     this.mouse.pressed(widget, mouseButton);
                     this.mouse.doRelease = false;
@@ -451,7 +451,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 }
             }
             // nothing worked, but since the pressed widget is still hovered we assume success
-            // otherwise JEI tries to pull some weird shit
+            // otherwise recipe viewer tries to pull some weird shit
             if (lastPressedIsHovered) {
                 this.mouse.reset();
                 return true;
@@ -548,7 +548,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 }
             }
             // nothing worked, but since the pressed widget is still hovered we assume success
-            // otherwise JEI tries to pull some weird shit
+            // otherwise recipe viewer tries to pull some weird shit
             if (lastPressedIsHovered) {
                 this.keyboard.reset();
                 return true;
@@ -720,7 +720,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     final void setPanelGuiContext(@NotNull ModularGuiContext context) {
         setContext(context);
         if (!context.getScreen().isOverlay()) {
-            context.getJeiSettings().addJeiExclusionArea(this);
+            context.getRecipeViewerSettings().addRecipeViewerExclusionArea(this);
         }
     }
 

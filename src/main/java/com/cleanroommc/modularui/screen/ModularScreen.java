@@ -507,7 +507,7 @@ public class ModularScreen {
     /**
      * Called with {@code true} after a widget which implements {@link com.cleanroommc.modularui.api.widget.IFocusedWidget IFocusedWidget}
      * has consumed a mouse press and called with {@code false} if a widget is currently focused and anything else has consumed a mouse
-     * press. This is required for other mods like JEI/NEI to not interfere with inputs.
+     * press. This is required for other mods like recipe viewer to not interfere with inputs.
      *
      * @param focus true if the gui screen will be focused
      */

@@ -29,16 +29,31 @@ import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandlers;
 import com.cleanroommc.modularui.widget.EmptyWidget;
 import com.cleanroommc.modularui.widget.ParentWidget;
-import com.cleanroommc.modularui.widgets.*;
+import com.cleanroommc.modularui.widgets.ButtonWidget;
+import com.cleanroommc.modularui.widgets.ColorPickerDialog;
+import com.cleanroommc.modularui.widgets.CycleButtonWidget;
+import com.cleanroommc.modularui.widgets.Dialog;
+import com.cleanroommc.modularui.widgets.DynamicSyncedWidget;
+import com.cleanroommc.modularui.widgets.Expandable;
+import com.cleanroommc.modularui.widgets.ItemDisplayWidget;
+import com.cleanroommc.modularui.widgets.ListWidget;
+import com.cleanroommc.modularui.widgets.PageButton;
+import com.cleanroommc.modularui.widgets.PagedWidget;
+import com.cleanroommc.modularui.widgets.ProgressWidget;
+import com.cleanroommc.modularui.widgets.ScrollingTextWidget;
+import com.cleanroommc.modularui.widgets.SliderWidget;
+import com.cleanroommc.modularui.widgets.SlotGroupWidget;
+import com.cleanroommc.modularui.widgets.SortButtons;
+import com.cleanroommc.modularui.widgets.ToggleButton;
 import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Flow;
 import com.cleanroommc.modularui.widgets.layout.Row;
-import com.cleanroommc.modularui.widgets.slot.*;
+import com.cleanroommc.modularui.widgets.slot.FluidSlot;
+import com.cleanroommc.modularui.widgets.slot.ItemSlot;
+import com.cleanroommc.modularui.widgets.slot.ModularCraftingSlot;
+import com.cleanroommc.modularui.widgets.slot.ModularSlot;
+import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
-
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -52,11 +67,14 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.Random;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -162,7 +180,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                         .top(0)
                         .leftRelOffset(1f, 1)
                         .background(GuiTextures.MC_BACKGROUND)
-                        .excludeAreaInJei()
+                        .excludeAreaInRecipeViewer()
                         .stencilTransform((r, expanded) -> {
                             r.width = Math.max(20, r.width - 5);
                             r.height = Math.max(20, r.height - 5);
@@ -204,55 +222,55 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                         .verticalCenter()
                                                         //.padding(7)
                                                         .child(new Column()
-                                                                .debugName("buttons and slots test")
-                                                                .coverChildren()
-                                                                .marginRight(8)
-                                                                //.flex(flex -> flex.height(0.5f))
-                                                                //.widthRel(0.5f)
-                                                                .crossAxisAlignment(Alignment.CrossAxis.CENTER)
-                                                                .child(new ButtonWidget<>()
-                                                                        .size(60, 18)
-                                                                        .overlay(IKey.dynamic(() -> "Button " + this.val)))
-                                                                .child(new FluidSlot()
-                                                                        .margin(2)
-                                                                        .syncHandler(SyncHandlers.fluidSlot(this.fluidTank)))
-                                                                .child(new ButtonWidget<>()
-                                                                        .size(60, 18)
-                                                                        .tooltip(tooltip -> {
-                                                                            tooltip.showUpTimer(10);
-                                                                            tooltip.addLine(IKey.str("Test Line g"));
-                                                                            tooltip.addLine(IKey.str("An image inside of a tooltip:"));
-                                                                            tooltip.addLine(GuiTextures.MUI_LOGO.asIcon().size(50).alignment(Alignment.TopCenter));
-                                                                            tooltip.addLine(IKey.str("And here a circle:"));
-                                                                            tooltip.addLine(new Circle()
-                                                                                            .setColor(Color.RED.darker(2), Color.RED.brighter(2))
-                                                                                            .asIcon()
-                                                                                            .size(20))
-                                                                                    .addLine(new ItemDrawable(new ItemStack(Items.DIAMOND)).asIcon())
-                                                                                    .pos(RichTooltip.Pos.LEFT);
-                                                                        })
-                                                                        .onMousePressed(mouseButton -> {
-                                                                            //panel.getScreen().close(true);
-                                                                            //panel.getScreen().openDialog("dialog", this::buildDialog, ModularUI.LOGGER::info);
-                                                                            //openSecondWindow(context).openIn(panel.getScreen());
-                                                                            panelSyncHandler.openPanel();
-                                                                            return true;
-                                                                        })
-                                                                        //.flex(flex -> flex.left(3)) // ?
-                                                                        .overlay(IKey.str("Button 2")))
-                                                                .child(new TextFieldWidget()
-                                                                        .size(60, 18)
-                                                                        .paddingTop(1)
-                                                                        .value(SyncHandlers.string(() -> this.value, val -> this.value = val))
-                                                                        .margin(0, 2)
-                                                                        .hintText("hint"))
-                                                                .child(new TextFieldWidget()
-                                                                        .size(60, 18)
-                                                                        .paddingTop(1)
-                                                                        .value(SyncHandlers.doubleNumber(() -> this.doubleValue, val -> this.doubleValue = val))
-                                                                        .setNumbersDouble(Function.identity())
-                                                                        .hintText("number"))
-                                                                //.child(IKey.str("Test string").asWidget().padding(2).debugName("test string"))
+                                                                        .debugName("buttons and slots test")
+                                                                        .coverChildren()
+                                                                        .marginRight(8)
+                                                                        //.flex(flex -> flex.height(0.5f))
+                                                                        //.widthRel(0.5f)
+                                                                        .crossAxisAlignment(Alignment.CrossAxis.CENTER)
+                                                                        .child(new ButtonWidget<>()
+                                                                                .size(60, 18)
+                                                                                .overlay(IKey.dynamic(() -> "Button " + this.val)))
+                                                                        .child(new FluidSlot()
+                                                                                .margin(2)
+                                                                                .syncHandler(SyncHandlers.fluidSlot(this.fluidTank)))
+                                                                        .child(new ButtonWidget<>()
+                                                                                .size(60, 18)
+                                                                                .tooltip(tooltip -> {
+                                                                                    tooltip.showUpTimer(10);
+                                                                                    tooltip.addLine(IKey.str("Test Line g"));
+                                                                                    tooltip.addLine(IKey.str("An image inside of a tooltip:"));
+                                                                                    tooltip.addLine(GuiTextures.MUI_LOGO.asIcon().size(50).alignment(Alignment.TopCenter));
+                                                                                    tooltip.addLine(IKey.str("And here a circle:"));
+                                                                                    tooltip.addLine(new Circle()
+                                                                                                    .setColor(Color.RED.darker(2), Color.RED.brighter(2))
+                                                                                                    .asIcon()
+                                                                                                    .size(20))
+                                                                                            .addLine(new ItemDrawable(new ItemStack(Items.DIAMOND)).asIcon())
+                                                                                            .pos(RichTooltip.Pos.LEFT);
+                                                                                })
+                                                                                .onMousePressed(mouseButton -> {
+                                                                                    //panel.getScreen().close(true);
+                                                                                    //panel.getScreen().openDialog("dialog", this::buildDialog, ModularUI.LOGGER::info);
+                                                                                    //openSecondWindow(context).openIn(panel.getScreen());
+                                                                                    panelSyncHandler.openPanel();
+                                                                                    return true;
+                                                                                })
+                                                                                //.flex(flex -> flex.left(3)) // ?
+                                                                                .overlay(IKey.str("Button 2")))
+                                                                        .child(new TextFieldWidget()
+                                                                                .size(60, 18)
+                                                                                .paddingTop(1)
+                                                                                .value(SyncHandlers.string(() -> this.value, val -> this.value = val))
+                                                                                .margin(0, 2)
+                                                                                .hintText("hint"))
+                                                                        .child(new TextFieldWidget()
+                                                                                .size(60, 18)
+                                                                                .paddingTop(1)
+                                                                                .value(SyncHandlers.doubleNumber(() -> this.doubleValue, val -> this.doubleValue = val))
+                                                                                .setNumbersDouble(Function.identity())
+                                                                                .hintText("number"))
+                                                                        //.child(IKey.str("Test string").asWidget().padding(2).debugName("test string"))
                                                                         .child(new ScrollingTextWidget(IKey.str("Very very long test string")).widthRel(1f).height(16))
                                                                 //.child(IKey.EMPTY.asWidget().debugName("Empty IKey"))
                                                         )
@@ -420,7 +438,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                         .child(new DynamicSyncedWidget<>()
                                                                 .widthRel(1f)
                                                                 .syncHandler(dynamicSyncHandler)))
-                                                )))
+                                        )))
                         .child(SlotGroupWidget.playerInventory(false))
                 );
         /*panel.child(new ButtonWidget<>()
