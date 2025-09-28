@@ -5,7 +5,7 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.drawable.ITextLine;
-import com.cleanroommc.modularui.core.mixin.FontRendererAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.FontRendererAccessor;
 import com.cleanroommc.modularui.drawable.DelegateIcon;
 import com.cleanroommc.modularui.drawable.Icon;
 
@@ -13,10 +13,8 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.util.text.TextFormatting;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -213,7 +211,7 @@ public class RichTextCompiler {
         for (; i >= 0; i--) {
             if (!Character.isWhitespace(s.charAt(i))) break;
         }
-        if (i < s.length() - 1) s = s.substring(0, i);
+        if (i < s.length() - 1) s = s.substring(0, i + 1);
         return s;
     }
 

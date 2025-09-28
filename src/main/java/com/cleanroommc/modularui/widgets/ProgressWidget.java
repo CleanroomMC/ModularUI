@@ -5,11 +5,10 @@ import com.cleanroommc.modularui.drawable.UITexture;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.value.DoubleValue;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
-
-import net.minecraft.util.math.MathHelper;
 
 import java.util.function.DoubleSupplier;
 
@@ -106,10 +105,10 @@ public class ProgressWidget extends Widget<ProgressWidget> {
 
     private void drawCircular(float progress, WidgetTheme widgetTheme) {
         float[] subAreas = {
-                getProgressUV(MathHelper.clamp(progress / 0.25f, 0, 1)),
-                getProgressUV(MathHelper.clamp((progress - 0.25f) / 0.25f, 0, 1)),
-                getProgressUV(MathHelper.clamp((progress - 0.5f) / 0.25f, 0, 1)),
-                getProgressUV(MathHelper.clamp((progress - 0.75f) / 0.25f, 0, 1))
+                getProgressUV(MathUtils.clamp(progress / 0.25f, 0, 1)),
+                getProgressUV(MathUtils.clamp((progress - 0.25f) / 0.25f, 0, 1)),
+                getProgressUV(MathUtils.clamp((progress - 0.5f) / 0.25f, 0, 1)),
+                getProgressUV(MathUtils.clamp((progress - 0.75f) / 0.25f, 0, 1))
         };
         float halfWidth = getArea().width / 2f;
         float halfHeight = getArea().height / 2f;

@@ -1,16 +1,16 @@
 package com.cleanroommc.modularui.widgets;
 
+import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
-import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.utils.VectorUtil;
 import com.cleanroommc.modularui.utils.fakeworld.ISchema;
 import com.cleanroommc.modularui.utils.fakeworld.SchemaRenderer;
 import com.cleanroommc.modularui.widget.Widget;
 
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +46,7 @@ public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
     }
 
     @Override
-    public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
+    public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
         if (this.enableScaling) {
             scale(-scrollDirection.modifier * amount / 120.0);
             return true;
@@ -70,7 +70,7 @@ public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
         if (mouseButton == 0 && this.enableRotation) {
             float moveScale = 0.025f;
             yaw = (yaw + dx * moveScale + PI2) % PI2;
-            pitch = MathHelper.clamp(pitch + dy * moveScale, -PI2 / 4 + 0.001f, PI2 / 4 - 0.001f);
+            pitch = MathUtils.clamp(pitch + dy * moveScale, -PI2 / 4 + 0.001f, PI2 / 4 - 0.001f);
         } else if (mouseButton == 2 && this.enableTranslation) {
             // the idea is to construct a vector which points upwards from the camerae pov (y-axis on screen)
             // this vector determines the amount of z offset from mouse movement in y

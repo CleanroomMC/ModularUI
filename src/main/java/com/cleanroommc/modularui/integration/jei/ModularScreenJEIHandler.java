@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.integration.jei;
 
 import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
+import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerIngredientProvider;
 
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -44,7 +45,7 @@ public class ModularScreenJEIHandler<T extends GuiScreen & IMuiScreen> implement
 
     @Override
     public <I> @NotNull List<Target<I>> getTargets(T gui, @NotNull I ingredient, boolean doStart) {
-        return gui.getScreen().getContext().getJeiSettings().getAllGhostIngredientTargets(ingredient);
+        return gui.getScreen().getContext().getRecipeViewerSettings().getAllGhostIngredientTargets(ingredient);
     }
 
     @Override
@@ -58,7 +59,7 @@ public class ModularScreenJEIHandler<T extends GuiScreen & IMuiScreen> implement
     @Nullable
     @Override
     public IGuiProperties apply(@NotNull T guiScreen) {
-        return guiScreen.getScreen().getContext().getJeiSettings().isJeiEnabled(guiScreen.getScreen()) ? new ModularUIProperties(guiScreen) : null;
+        return guiScreen.getScreen().getContext().getRecipeViewerSettings().isRecipeViewerEnabled(guiScreen.getScreen()) ? new ModularUIProperties(guiScreen) : null;
     }
 
     public static class ContainerScreen<T extends GuiContainer & IMuiScreen> extends ModularScreenJEIHandler<T> implements IAdvancedGuiHandler<T> {
@@ -76,14 +77,14 @@ public class ModularScreenJEIHandler<T extends GuiScreen & IMuiScreen> implement
         @Nullable
         @Override
         public List<Rectangle> getGuiExtraAreas(@NotNull T guiContainer) {
-            return guiContainer.getScreen().getContext().getJeiSettings().getAllJeiExclusionAreas();
+            return guiContainer.getScreen().getContext().getRecipeViewerSettings().getAllRecipeViewerExclusionAreas();
         }
 
         @Nullable
         @Override
         public Object getIngredientUnderMouse(@NotNull T guiContainer, int mouseX, int mouseY) {
             IGuiElement hovered = guiContainer.getScreen().getContext().getHovered();
-            return hovered instanceof JeiIngredientProvider jip ? jip.getIngredient() : null;
+            return hovered instanceof RecipeViewerIngredientProvider jip ? jip.getIngredient() : null;
         }
     }
 }

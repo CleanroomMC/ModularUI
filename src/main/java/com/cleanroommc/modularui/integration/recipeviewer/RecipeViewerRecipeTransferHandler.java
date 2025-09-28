@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.integration.jei;
+package com.cleanroommc.modularui.integration.recipeviewer;
 
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.recipe.transfer.IRecipeTransferError;
@@ -10,10 +10,10 @@ import org.jetbrains.annotations.ApiStatus;
  * No further registration needed.
  */
 @ApiStatus.Experimental
-public interface JeiRecipeTransferHandler {
+public interface RecipeViewerRecipeTransferHandler {
 
     /**
-     * Transfers a JEI recipe.
+     * Transfers a recipe viewer recipe.
      *
      * @param recipeLayout recipe layout
      * @param maxTransfer  true if shift is being held

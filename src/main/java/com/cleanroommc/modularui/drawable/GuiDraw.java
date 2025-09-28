@@ -294,7 +294,7 @@ public class GuiDraw {
         GlStateManager.scale(width / 16f, height / 16f, 1);
         RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
         renderItem.zLevel = z + 100;
-        renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().player, item, 0, 0);
+        renderItem.renderItemAndEffectIntoGUI(Platform.getClientPlayer(), item, 0, 0);
         renderItem.zLevel = 0;
         Platform.endDrawItem();
         GlStateManager.popMatrix();
@@ -569,10 +569,10 @@ public class GuiDraw {
 
     /**
      * Draws an entity. Note that this does NOT do any necessary setup for rendering the entity. Please see
-     * {@link #drawEntity(Entity, float, float, float, float, Consumer, Consumer)} for a full draw method.
+     * {@link #drawEntity(Entity, float, float, float, float, float, Consumer, Consumer)} for a full draw method.
      *
      * @param entity entity to draw.
-     * @see #drawEntity(Entity, float, float, float, float, Consumer, Consumer)
+     * @see #drawEntity(Entity, float, float, float, float, float, Consumer, Consumer)
      */
     public static void drawEntityRaw(Entity entity) {
         RenderManager rendermanager = Minecraft.getMinecraft().getRenderManager();
@@ -616,9 +616,9 @@ public class GuiDraw {
      * @param entity entity to draw
      * @param x      x pos
      * @param y      y pos
-     * @param w        the width of the area where the entity should be drawn
-     * @param h        the height of the area where the entity should be drawn
-     * @param z        the z layer ({@link GuiContext#getCurrentDrawingZ()} if drawn in a MUI)
+     * @param w      the width of the area where the entity should be drawn
+     * @param h      the height of the area where the entity should be drawn
+     * @param z      the z layer ({@link GuiContext#getCurrentDrawingZ()} if drawn in a MUI)
      * @param mouseX current x pos of the mouse
      * @param mouseY current y pos of the mouse
      */

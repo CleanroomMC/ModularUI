@@ -79,6 +79,9 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -199,12 +202,10 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                         .top(0)
                         .leftRelOffset(1f, 1)
                         .background(GuiTextures.MC_BACKGROUND)
-                        .excludeAreaInJei()
+                        .excludeAreaInRecipeViewer()
                         .stencilTransform((r, expanded) -> {
-                            if (expanded) {
-                                r.width -= 5;
-                                r.height -= 5;
-                            }
+                            r.width = Math.max(20, r.width - 5);
+                            r.height = Math.max(20, r.height - 5);
                         })
                         .animationDuration(500)
                         .interpolation(Interpolation.BOUNCE_OUT)

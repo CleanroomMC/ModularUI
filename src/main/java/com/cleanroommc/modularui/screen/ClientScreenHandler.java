@@ -5,14 +5,14 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.MCHelper;
+import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
-import com.cleanroommc.modularui.core.mixin.GuiAccessor;
-import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
-import com.cleanroommc.modularui.core.mixin.GuiScreenAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.Stencil;
-import com.cleanroommc.modularui.integration.jei.ModularUIJeiPlugin;
 import com.cleanroommc.modularui.overlay.OverlayManager;
 import com.cleanroommc.modularui.overlay.OverlayStack;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -20,6 +20,7 @@ import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.FpsCounter;
+import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.RichTextWidget;
@@ -41,7 +42,6 @@ import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.GuiContainerEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
@@ -53,7 +53,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import mezz.jei.gui.overlay.IngredientListOverlay;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
@@ -79,15 +78,15 @@ public class ClientScreenHandler {
     private static long ticks = 0L;
 
     private static IMuiScreen lastMui;
-    
+
     public static boolean guiIsClosing;
 
     // we need to know the actual gui and not some fake bs some other mod overwrites
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void onGuiOpen(GuiOpenEvent event) {
+    public void onGuiOpen(GuiOpenEvent event) {
         GuiScreen newGui = event.getGui();
         guiIsClosing = newGui == null;
-        
+
         defaultContext.reset();
         if (lastMui != null && newGui == null) {
             if (lastMui.getScreen().getPanelManager().isOpen()) {
@@ -118,6 +117,7 @@ public class ClientScreenHandler {
                     lastChar = null;
                 }
                 currentScreen = muiScreen.getScreen();
+                currentScreen.getContext().setParentScreen(Minecraft.getMinecraft().currentScreen);
                 fpsCounter.reset();
             }
         } else if (hasScreen() && getMCScreen() != null && newGui != getMCScreen()) {
@@ -130,7 +130,7 @@ public class ClientScreenHandler {
     }
 
     @SubscribeEvent
-    public static void onGuiInit(GuiScreenEvent.InitGuiEvent.Post event) {
+    public void onGuiInit(GuiScreenEvent.InitGuiEvent.Post event) {
         defaultContext.updateScreenArea(event.getGui().width, event.getGui().height);
         if (checkGui(event.getGui())) {
             currentScreen.onResize(event.getGui().width, event.getGui().height);
@@ -138,16 +138,16 @@ public class ClientScreenHandler {
         OverlayStack.foreach(ms -> ms.onResize(event.getGui().width, event.getGui().height), false);
     }
 
-    // before JEI
+    // before recipe viewer
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public static void onGuiInputHigh(GuiScreenEvent.KeyboardInputEvent.Pre event) throws IOException {
+    public void onGuiInputHigh(GuiScreenEvent.KeyboardInputEvent.Pre event) throws IOException {
         defaultContext.updateEventState();
         inputEvent(event, InputPhase.EARLY);
     }
 
-    // after JEI
+    // after recipe viewer
     @SubscribeEvent(priority = EventPriority.LOW)
-    public static void onGuiInputLow(GuiScreenEvent.KeyboardInputEvent.Pre event) throws IOException {
+    public void onGuiInputLow(GuiScreenEvent.KeyboardInputEvent.Pre event) throws IOException {
         inputEvent(event, InputPhase.LATE);
     }
 
@@ -158,21 +158,19 @@ public class ClientScreenHandler {
         }
     }
 
-    // before JEI
+    // before recipe viewer
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public static void onGuiInputHigh(GuiScreenEvent.MouseInputEvent.Pre event) throws IOException {
+    public void onGuiInputHigh(GuiScreenEvent.MouseInputEvent.Pre event) throws IOException {
         defaultContext.updateEventState();
         if (checkGui(event.getGui())) currentScreen.getContext().updateEventState();
         if (handleMouseInput(Mouse.getEventButton(), currentScreen, event.getGui())) {
-            if (ModularUI.Mods.JEI.isLoaded()) {
-                ((IngredientListOverlay) ModularUIJeiPlugin.getRuntime().getIngredientListOverlay()).setKeyboardFocus(false);
-            }
+            Platform.unFocusRecipeViewer();
             event.setCanceled(true);
             return;
         }
         int w = Mouse.getEventDWheel();
         if (w == 0) return;
-        ModularScreen.UpOrDown upOrDown = w > 0 ? ModularScreen.UpOrDown.UP : ModularScreen.UpOrDown.DOWN;
+        UpOrDown upOrDown = w > 0 ? UpOrDown.UP : UpOrDown.DOWN;
         checkGui(event.getGui());
         if (doAction(currentScreen, ms -> ms.onMouseScroll(upOrDown, Math.abs(w)))) {
             event.setCanceled(true);
@@ -180,7 +178,7 @@ public class ClientScreenHandler {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    public static void onGuiDraw(GuiScreenEvent.DrawScreenEvent.Pre event) {
+    public void onGuiDraw(GuiScreenEvent.DrawScreenEvent.Pre event) {
         int mx = event.getMouseX(), my = event.getMouseY();
         float pt = event.getRenderPartialTicks();
         defaultContext.updateState(mx, my, pt);
@@ -190,17 +188,17 @@ public class ClientScreenHandler {
             drawScreen(currentScreen, currentScreen.getScreenWrapper().getGuiScreen(), mx, my, pt);
             event.setCanceled(true);
         }
-        Platform.setupDrawTex(); // jei and other mods may expect this state
+        Platform.setupDrawTex(); // recipe viewer and other mods may expect this state
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public static void onGuiDraw(GuiScreenEvent.DrawScreenEvent.Post event) {
+    public void onGuiDraw(GuiScreenEvent.DrawScreenEvent.Post event) {
         OverlayStack.draw(event.getMouseX(), event.getMouseY(), event.getRenderPartialTicks());
-        Platform.setupDrawTex(); // jei and other mods may expect this state
+        Platform.setupDrawTex(); // recipe viewer and other mods may expect this state
     }
 
     @SubscribeEvent
-    public static void onTick(TickEvent.ClientTickEvent event) {
+    public void onTick(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             OverlayStack.onTick();
             defaultContext.tick();
@@ -212,7 +210,7 @@ public class ClientScreenHandler {
     }
 
     @SubscribeEvent
-    public static void preDraw(TickEvent.RenderTickEvent event) {
+    public void preDraw(TickEvent.RenderTickEvent event) {
         if (event.phase == TickEvent.Phase.START) {
             GL11.glEnable(GL11.GL_STENCIL_TEST);
         }
@@ -446,7 +444,7 @@ public class ClientScreenHandler {
         MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.DrawForeground(mcScreen, mouseX, mouseY));
         GlStateManager.popMatrix();
 
-        InventoryPlayer inventoryplayer = Minecraft.getMinecraft().player.inventory;
+        InventoryPlayer inventoryplayer = Platform.getClientPlayer().inventory;
         ItemStack itemstack = acc.getDraggedStack().isEmpty() ? inventoryplayer.getItemStack() : acc.getDraggedStack();
         GlStateManager.translate((float) x, (float) y, 0.0F);
         if (!itemstack.isEmpty()) {
@@ -455,7 +453,7 @@ public class ClientScreenHandler {
 
             if (!acc.getDraggedStack().isEmpty() && acc.getIsRightMouseClick()) {
                 itemstack = itemstack.copy();
-                itemstack.setCount(MathHelper.ceil((float) itemstack.getCount() / 2.0F));
+                itemstack.setCount(MathUtils.ceil((float) itemstack.getCount() / 2.0F));
             } else if (acc.getDragSplitting() && acc.getDragSplittingSlots().size() > 1) {
                 itemstack = itemstack.copy();
                 itemstack.setCount(acc.getDragSplittingRemnant());

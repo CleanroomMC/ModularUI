@@ -1,26 +1,26 @@
-package com.cleanroommc.modularui.integration.jei;
+package com.cleanroommc.modularui.integration.recipeviewer;
 
+import com.cleanroommc.modularui.api.RecipeViewerSettings;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.Widget;
 
 import mezz.jei.gui.ghost.GhostIngredientDrag;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 
 /**
- * An interface for compat with JEI's ghost slots.
+ * An interface for compat with recipe viewer ghost slots.
  * Implement this on any {@link IWidget}.
- * This slot must than be manually registered in something like {@link Widget#onInit()}
- * with {@link com.cleanroommc.modularui.api.JeiSettings#addJeiGhostIngredientSlot(IWidget) JeiSettings.addJeiGhostIngredientSlot(IWidget)}
+ * This slot must then be manually registered in something like {@link Widget#onInit()}
+ * with {@link RecipeViewerSettings#addRecipeViewerGhostIngredientSlot(IWidget) JeiSettings.addJeiGhostIngredientSlot(IWidget)}
  *
  * @param <I> type of the ingredient
  */
-public interface JeiGhostIngredientSlot<I> {
+public interface RecipeViewerGhostIngredientSlot<I> {
 
     /**
      * Puts the ingredient in this ghost slot.
@@ -46,7 +46,7 @@ public interface JeiGhostIngredientSlot<I> {
         GuiDraw.drawRect(0, 0, area.width, area.height, color);
     }
 
-    static <T> boolean insertGhostIngredient(GhostIngredientDrag<?> drag, JeiGhostIngredientSlot<T> slot) {
+    static <T> boolean insertGhostIngredient(GhostIngredientDrag<?> drag, RecipeViewerGhostIngredientSlot<T> slot) {
         T t = slot.castGhostIngredientIfValid(drag.getIngredient());
         if (t != null) {
             slot.setGhostIngredient(t);
