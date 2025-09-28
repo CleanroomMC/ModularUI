@@ -74,17 +74,9 @@ public class PhantomItemSlot extends ItemSlot implements RecipeViewerGhostIngred
 
     @Override
     public @Nullable ItemStack castGhostIngredientIfValid(@NotNull Object ingredient) {
-        if (areAncestorsEnabled() && this.syncHandler.isPhantom()) {
-            if (ingredient instanceof EnchantmentData enchantmentData) {
-                ingredient = Internal.getIngredientRegistry().getIngredientHelper(enchantmentData).getCheatItemStack(enchantmentData);
-            }
-
-            if (ingredient instanceof ItemStack itemStack) {
-                return this.syncHandler.isItemValid(itemStack) ? itemStack : null;
-            }
-        }
-
-        return null;
+        if (!this.syncHandler.isPhantom() || !areAncestorsEnabled()) return null;
+        ItemStack itemStack = Internal.getIngredientRegistry().getIngredientHelper(ingredient).getCheatItemStack(ingredient);
+        return this.syncHandler.isItemValid(itemStack) ? itemStack : null;
     }
 
     @Override

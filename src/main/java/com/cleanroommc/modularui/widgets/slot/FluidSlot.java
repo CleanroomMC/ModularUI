@@ -30,7 +30,10 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
 
+import mezz.jei.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
@@ -162,6 +165,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, Recipe
 
     @Override
     public void drawOverlay(ModularGuiContext context, WidgetTheme widgetTheme) {
+        super.drawOverlay(context, widgetTheme);
         if (ModularUI.Mods.JEI.isLoaded() && (ModularUIJeiPlugin.draggingValidIngredient(this) || ModularUIJeiPlugin.hoveringOverIngredient(this))) {
             GlStateManager.colorMask(true, true, true, false);
             drawHighlight(getArea(), isHovering());
@@ -276,7 +280,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, Recipe
         return this;
     }
 
-    /* === Jei ghost slot === */
+    /* === Recipe viewer ghost slot === */
 
     @Override
     public void setGhostIngredient(@NotNull FluidStack ingredient) {
@@ -287,7 +291,17 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, Recipe
 
     @Override
     public @Nullable FluidStack castGhostIngredientIfValid(@NotNull Object ingredient) {
-        return areAncestorsEnabled() && this.syncHandler.isPhantom() && ingredient instanceof FluidStack fluidStack ? fluidStack : null;
+        if (!this.syncHandler.isPhantom() || !areAncestorsEnabled()) return null;
+        if (ingredient instanceof FluidStack fluidStack) return fluidStack; // is fluid stack
+
+        // turn into an item and check if it contains exactly one fluid
+        ItemStack stack = Internal.getIngredientRegistry().getIngredientHelper(ingredient).getCheatItemStack(ingredient);
+        if (stack.isEmpty()) return null;
+        IFluidHandlerItem fluidHandlerItem = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null);
+        if (fluidHandlerItem == null) return null;
+        IFluidTankProperties[] fluidTanks = fluidHandlerItem.getTankProperties();
+        if (fluidTanks.length != 1 || fluidTanks[0].getContents() == null) return null;
+        return fluidTanks[0].getContents().copy();
     }
 
     @Override
