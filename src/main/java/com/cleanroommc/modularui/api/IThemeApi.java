@@ -60,10 +60,10 @@ public interface IThemeApi {
 
     // sub widget themes
     WidgetThemeKey<SlotTheme> ITEM_SLOT_PLAYER = ITEM_SLOT.createSubKey("player");
-    WidgetThemeKey<SlotTheme> ITEM_SLOT_PLAYER_HOTBAR = ITEM_SLOT_PLAYER.createSubKey("player_hotbar");
-    WidgetThemeKey<SlotTheme> ITEM_SLOT_PLAYER_MAIN_INV = ITEM_SLOT_PLAYER.createSubKey("player_main_inventory");
-    WidgetThemeKey<SlotTheme> ITEM_SLOT_PLAYER_OFFHAND = ITEM_SLOT_PLAYER.createSubKey("player_offhand");
-    WidgetThemeKey<SlotTheme> ITEM_SLOT_PLAYER_ARMOR = ITEM_SLOT_PLAYER.createSubKey("player_armor");
+    WidgetThemeKey<SlotTheme> ITEM_SLOT_PLAYER_HOTBAR = ITEM_SLOT_PLAYER.createSubKey("playerHotbar");
+    WidgetThemeKey<SlotTheme> ITEM_SLOT_PLAYER_MAIN_INV = ITEM_SLOT_PLAYER.createSubKey("playerMainInventory");
+    WidgetThemeKey<SlotTheme> ITEM_SLOT_PLAYER_OFFHAND = ITEM_SLOT_PLAYER.createSubKey("playerOffhand");
+    WidgetThemeKey<SlotTheme> ITEM_SLOT_PLAYER_ARMOR = ITEM_SLOT_PLAYER.createSubKey("playerArmor");
 
     String HOVER_SUFFIX = ":hover";
 
