@@ -1,15 +1,14 @@
 package com.cleanroommc.modularui.widgets.slot;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.integration.jei.ModularUIJeiPlugin;
 import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerGhostIngredientSlot;
-import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.value.sync.PhantomItemSlotSH;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.item.ItemStack;
 
 import mezz.jei.Internal;
@@ -56,7 +55,7 @@ public class PhantomItemSlot extends ItemSlot implements RecipeViewerGhostIngred
     }
 
     @Override
-    public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
+    public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
         MouseData mouseData = MouseData.create(scrollDirection.modifier);
         this.syncHandler.syncToServer(PhantomItemSlotSH.SYNC_SCROLL, mouseData::writeToPacket);
         return true;
