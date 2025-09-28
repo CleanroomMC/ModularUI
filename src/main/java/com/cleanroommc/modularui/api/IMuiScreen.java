@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.api;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;

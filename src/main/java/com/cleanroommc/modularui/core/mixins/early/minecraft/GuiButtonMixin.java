@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.core.mixin;
+package com.cleanroommc.modularui.core.mixins.early.minecraft;
 
 import com.cleanroommc.modularui.overlay.OverlayStack;
 

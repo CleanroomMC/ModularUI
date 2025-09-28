@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.widgets.slot;
 
-import com.cleanroommc.modularui.core.mixin.InventoryCraftingAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.InventoryCraftingAccessor;
 import com.cleanroommc.modularui.utils.Platform;
 
 import net.minecraft.client.util.RecipeItemHelper;

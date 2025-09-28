@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.core.mixin.ContainerAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.ContainerAccessor;
 import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.utils.Platform;

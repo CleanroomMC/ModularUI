@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.core.mixin;
+package com.cleanroommc.modularui.core.mixins.early.minecraft;
 
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryCrafting;

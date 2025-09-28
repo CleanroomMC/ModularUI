@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.core.mixin.jei;
+package com.cleanroommc.modularui.core.mixins.late.jei;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;

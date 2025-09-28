@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.core.mixin.jei;
+package com.cleanroommc.modularui.core.mixins.late.jei;
 
 import mezz.jei.gui.ghost.GhostIngredientDrag;
 import mezz.jei.gui.ghost.GhostIngredientDragManager;

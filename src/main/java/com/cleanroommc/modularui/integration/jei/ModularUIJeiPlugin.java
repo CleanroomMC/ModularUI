@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.integration.jei;
 
-import com.cleanroommc.modularui.core.mixin.jei.GhostIngredientDragManagerAccessor;
-import com.cleanroommc.modularui.core.mixin.jei.IngredientListOverlayAccessor;
+import com.cleanroommc.modularui.core.mixins.late.jei.GhostIngredientDragManagerAccessor;
+import com.cleanroommc.modularui.core.mixins.late.jei.IngredientListOverlayAccessor;
 import com.cleanroommc.modularui.screen.GuiContainerWrapper;
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import com.cleanroommc.modularui.screen.ModularContainer;

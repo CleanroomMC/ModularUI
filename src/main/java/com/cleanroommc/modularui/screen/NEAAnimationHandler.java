@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.core.mixin.GuiAccessor;
-import com.cleanroommc.modularui.core.mixin.GuiScreenAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.neverenoughanimations.NEA;
