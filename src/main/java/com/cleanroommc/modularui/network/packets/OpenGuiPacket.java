@@ -5,8 +5,8 @@ import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.factory.GuiManager;
 import com.cleanroommc.modularui.network.IPacket;
 import com.cleanroommc.modularui.network.NetworkUtils;
+import com.cleanroommc.modularui.utils.Platform;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.PacketBuffer;
@@ -48,7 +48,7 @@ public class OpenGuiPacket<T extends GuiData> implements IPacket {
     @SideOnly(Side.CLIENT)
     @Override
     public @Nullable IPacket executeClient(NetHandlerPlayClient handler) {
-        GuiManager.openFromClient(this.windowId, this.factory, this.data, Minecraft.getMinecraft().player);
+        GuiManager.openFromClient(this.windowId, this.factory, this.data, Platform.getClientPlayer());
         return null;
     }
 

@@ -14,6 +14,7 @@ import com.cleanroommc.modularui.test.OverlayTest;
 import com.cleanroommc.modularui.test.TestItem;
 import com.cleanroommc.modularui.theme.ThemeManager;
 import com.cleanroommc.modularui.theme.ThemeReloadCommand;
+import com.cleanroommc.modularui.utils.Platform;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
@@ -58,12 +59,12 @@ public class ClientProxy extends CommonProxy {
     void preInit(FMLPreInitializationEvent event) {
         super.preInit(event);
 
-        MinecraftForge.EVENT_BUS.register(ClientScreenHandler.class);
+        MinecraftForge.EVENT_BUS.register(new ClientScreenHandler());
         MinecraftForge.EVENT_BUS.register(KeyBindHandler.class);
         AnimatorManager.init();
 
         if (ModularUIConfig.enableTestGuis) {
-            MinecraftForge.EVENT_BUS.register(EventHandler.class);
+            MinecraftForge.EVENT_BUS.register(new EventHandler());
             testKey = new KeyBinding("key.test", KeyConflictContext.IN_GAME, Keyboard.KEY_NUMPAD4, "key.categories.modularui");
             ClientRegistry.registerKeyBinding(testKey);
         }
@@ -168,7 +169,7 @@ public class ClientProxy extends CommonProxy {
     @SubscribeEvent
     public void onKeyboard(InputEvent.KeyInputEvent event) {
         if (ModularUIConfig.enableTestGuis && testKey != null && testKey.isPressed() && ModularUI.Mods.BAUBLES.isLoaded()) {
-            InventoryTypes.BAUBLES.visitAll(Minecraft.getMinecraft().player, (type, index, stack) -> {
+            InventoryTypes.BAUBLES.visitAll(Platform.getClientPlayer(), (type, index, stack) -> {
                 if (stack.getItem() instanceof TestItem) {
                     GuiFactories.playerInventory().openFromBaublesClient(index);
                     return true;

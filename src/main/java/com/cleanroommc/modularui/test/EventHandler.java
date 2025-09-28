@@ -6,12 +6,9 @@ import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.factory.ClientGUI;
-
 import com.cleanroommc.modularui.screen.RichTooltipEvent;
-
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-
 import com.cleanroommc.modularui.utils.Color;
 
 import net.minecraft.init.Items;
@@ -36,9 +33,9 @@ public class EventHandler {
     @SubscribeEvent
     public static void onItemUse(PlayerInteractEvent.RightClickItem event) {
         if (event.getEntityPlayer().getEntityWorld().isRemote && event.getItemStack().getItem() == Items.DIAMOND) {
-            //GuiManager.openClientUI(Minecraft.getMinecraft().player, new TestGui());
+            //GuiManager.openClientUI(Platform.getClientPlayer(), new TestGui());
             /*HoloUI.builder()
-                    .inFrontOf(Minecraft.getMinecraft().player, 5, false)
+                    .inFrontOf(Platform.getClientPlayer(), 5, false)
                     .screenScale(0.5f)
                     .open(new TestGui());*/
             //ClientGUI.open(new ResizerTest());

@@ -8,6 +8,8 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -17,11 +19,11 @@ public class MCHelper {
         return getMc() != null;
     }
 
-    public static Minecraft getMc() {
+    public static @Nullable Minecraft getMc() {
         return Minecraft.getMinecraft();
     }
 
-    public static EntityPlayerSP getPlayer() {
+    public static @Nullable EntityPlayerSP getPlayer() {
         if (hasMc()) {
             return getMc().player;
         }
@@ -30,7 +32,7 @@ public class MCHelper {
 
     public static boolean closeScreen() {
         if (!hasMc()) return false;
-        EntityPlayerSP player = Minecraft.getMinecraft().player;
+        EntityPlayerSP player = getPlayer();
         if (player != null) {
             player.closeScreen();
             return true;

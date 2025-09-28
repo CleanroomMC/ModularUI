@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.factory;
 
 import com.cleanroommc.modularui.api.IGuiHolder;
-import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.utils.Platform;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -43,13 +42,13 @@ public class TileEntityGuiFactory extends AbstractUIFactory<PosGuiData> {
     public <T extends TileEntity & IGuiHolder<PosGuiData>> void openClient(T tile) {
         verifyTile(Platform.getClientPlayer(), tile);
         BlockPos pos = tile.getPos();
-        GuiManager.openFromClient(this, new PosGuiData(MCHelper.getPlayer(), pos.getX(), pos.getY(), pos.getZ()));
+        GuiManager.openFromClient(this, new PosGuiData(Platform.getClientPlayer(), pos.getX(), pos.getY(), pos.getZ()));
     }
 
     @SideOnly(Side.CLIENT)
     public void openClient(BlockPos pos) {
         Objects.requireNonNull(pos);
-        GuiManager.openFromClient(this, new PosGuiData(MCHelper.getPlayer(), pos.getX(), pos.getY(), pos.getZ()));
+        GuiManager.openFromClient(this, new PosGuiData(Platform.getClientPlayer(), pos.getX(), pos.getY(), pos.getZ()));
     }
 
     @Override

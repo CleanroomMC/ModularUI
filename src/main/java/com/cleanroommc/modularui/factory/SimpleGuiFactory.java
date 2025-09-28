@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.factory;
 
 import com.cleanroommc.modularui.api.IGuiHolder;
-import com.cleanroommc.modularui.api.MCHelper;
+import com.cleanroommc.modularui.utils.Platform;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -55,7 +55,7 @@ public class SimpleGuiFactory extends AbstractUIFactory<GuiData> {
 
     @SideOnly(Side.CLIENT)
     public void openClient() {
-        GuiManager.openFromClient(this, new GuiData(MCHelper.getPlayer()));
+        GuiManager.openFromClient(this, new GuiData(Platform.getClientPlayer()));
     }
 
     @Override
