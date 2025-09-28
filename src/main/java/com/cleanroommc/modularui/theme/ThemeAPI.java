@@ -99,9 +99,7 @@ public class ThemeAPI implements IThemeApi {
             throw new IllegalArgumentException("Widget theme id '" + id + "' is invalid. Id must only contain letters, numbers, underscores and minus.");
         }
         Class<T> type = (Class<T>) defaultTheme.getClass();
-        WidgetThemeKey<T> key = new WidgetThemeKey<>(type, id, defaultTheme, defaultHoverTheme, parser);
-        this.keys.add(key);
-        return key;
+        return new WidgetThemeKey<>(type, id, defaultTheme, defaultHoverTheme, parser);
     }
 
     @Override
@@ -116,6 +114,10 @@ public class ThemeAPI implements IThemeApi {
             throw new IllegalArgumentException("Theme with id " + theme.getId() + " already exists!");
         }
         this.themes.put(theme.getId(), theme);
+    }
+
+    void registerWidgetThemeKey(WidgetThemeKey<?> key) {
+        this.keys.add(key);
     }
 
     void onReload() {

@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.theme;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -10,7 +11,7 @@ import java.util.Objects;
  * A key used to identify widget themes.
  * @param <T> type of associated widget theme
  */
-public class WidgetThemeKey<T extends WidgetTheme> {
+public class WidgetThemeKey<T extends WidgetTheme> implements Comparable<WidgetThemeKey<?>> {
 
     private static final Map<String, WidgetThemeKey<?>> KEYS = new Object2ObjectOpenHashMap<>();
 
@@ -43,6 +44,7 @@ public class WidgetThemeKey<T extends WidgetTheme> {
         this.defaultHoverValue = defaultHoverValue;
         this.parser = parser;
         KEYS.put(getFullName(), this);
+        ThemeAPI.INSTANCE.registerWidgetThemeKey(this);
     }
 
     public WidgetThemeKey<T> createSubKey(String subName) {
@@ -130,5 +132,29 @@ public class WidgetThemeKey<T extends WidgetTheme> {
     @Override
     public int hashCode() {
         return Objects.hash(name, subName);
+    }
+
+    @Override
+    public int compareTo(@NotNull WidgetThemeKey<?> o) {
+        if (o == this) return 0;
+        int i = Boolean.compare(isSubWidgetTheme(), o.isSubWidgetTheme());
+        if (i != 0) return i;
+        i = isAncestor(o);
+        if (i != 0) return i;
+        return name.compareTo(o.name);
+    }
+
+    private int isAncestor(WidgetThemeKey<?> other) {
+        WidgetThemeKey<?> parent = getParent();
+        while (parent != null) {
+            if (parent == other) return 1;
+            parent = parent.getParent();
+        }
+        parent = other.getParent();
+        while (parent != null) {
+            if (parent == this) return -1;
+            parent = parent.getParent();
+        }
+        return 0;
     }
 }

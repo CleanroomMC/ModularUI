@@ -41,8 +41,4 @@ public class WidgetThemeEntry<T extends WidgetTheme> {
                 String.format("Got widget theme with invalid type. Got type '%s', but expected type '%s'!",
                         this.key.getWidgetThemeType().getSimpleName(), expectedType.getSimpleName()));
     }
-
-    public WidgetThemeEntry<T> withHoverTheme(T theme) {
-        return new WidgetThemeEntry<>(key, this.theme, theme);
-    }
 }
