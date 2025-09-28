@@ -31,7 +31,7 @@ public class EventHandler {
     }.asIcon().height(3);
 
     @SubscribeEvent
-    public static void onItemUse(PlayerInteractEvent.RightClickItem event) {
+    public void onItemUse(PlayerInteractEvent.RightClickItem event) {
         if (event.getEntityPlayer().getEntityWorld().isRemote && event.getItemStack().getItem() == Items.DIAMOND) {
             //GuiManager.openClientUI(Platform.getClientPlayer(), new TestGui());
             /*HoloUI.builder()
@@ -44,7 +44,7 @@ public class EventHandler {
     }
 
     @SubscribeEvent
-    public static void onRichTooltip(RichTooltipEvent.Pre event) {
+    public void onRichTooltip(RichTooltipEvent.Pre event) {
         if (enabledRichTooltipEventTest) {
             event.getTooltip()
                     .add(IKey.str("Powered By: ").style(TextFormatting.GOLD, TextFormatting.ITALIC))

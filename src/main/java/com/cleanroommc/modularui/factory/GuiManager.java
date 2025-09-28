@@ -139,7 +139,7 @@ public class GuiManager {
     }
 
     @SubscribeEvent
-    public static void onTick(TickEvent.ServerTickEvent event) {
+    public void onTick(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             openedContainers.clear();
         }

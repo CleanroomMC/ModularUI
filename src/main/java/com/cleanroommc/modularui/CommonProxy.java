@@ -32,7 +32,7 @@ public class CommonProxy {
 
     void preInit(FMLPreInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.register(GuiManager.class);
+        MinecraftForge.EVENT_BUS.register(new GuiManager());
 
         if (ModularUIConfig.enableTestGuis) {
             MinecraftForge.EVENT_BUS.register(TestBlock.class);
@@ -84,7 +84,7 @@ public class CommonProxy {
     }
 
     @SubscribeEvent
-    public static void onTick(TickEvent.PlayerTickEvent event) {
+    public void onTick(TickEvent.PlayerTickEvent event) {
         if (event.player.openContainer instanceof ModularContainer container) {
             container.onUpdate();
         }

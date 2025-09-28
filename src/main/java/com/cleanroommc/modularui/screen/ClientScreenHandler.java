@@ -79,15 +79,15 @@ public class ClientScreenHandler {
     private static long ticks = 0L;
 
     private static IMuiScreen lastMui;
-    
+
     public static boolean guiIsClosing;
 
     // we need to know the actual gui and not some fake bs some other mod overwrites
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void onGuiOpen(GuiOpenEvent event) {
+    public void onGuiOpen(GuiOpenEvent event) {
         GuiScreen newGui = event.getGui();
         guiIsClosing = newGui == null;
-        
+
         defaultContext.reset();
         if (lastMui != null && newGui == null) {
             if (lastMui.getScreen().getPanelManager().isOpen()) {
@@ -130,7 +130,7 @@ public class ClientScreenHandler {
     }
 
     @SubscribeEvent
-    public static void onGuiInit(GuiScreenEvent.InitGuiEvent.Post event) {
+    public void onGuiInit(GuiScreenEvent.InitGuiEvent.Post event) {
         defaultContext.updateScreenArea(event.getGui().width, event.getGui().height);
         if (checkGui(event.getGui())) {
             currentScreen.onResize(event.getGui().width, event.getGui().height);
@@ -140,14 +140,14 @@ public class ClientScreenHandler {
 
     // before JEI
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public static void onGuiInputHigh(GuiScreenEvent.KeyboardInputEvent.Pre event) throws IOException {
+    public void onGuiInputHigh(GuiScreenEvent.KeyboardInputEvent.Pre event) throws IOException {
         defaultContext.updateEventState();
         inputEvent(event, InputPhase.EARLY);
     }
 
     // after JEI
     @SubscribeEvent(priority = EventPriority.LOW)
-    public static void onGuiInputLow(GuiScreenEvent.KeyboardInputEvent.Pre event) throws IOException {
+    public void onGuiInputLow(GuiScreenEvent.KeyboardInputEvent.Pre event) throws IOException {
         inputEvent(event, InputPhase.LATE);
     }
 
@@ -160,7 +160,7 @@ public class ClientScreenHandler {
 
     // before JEI
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public static void onGuiInputHigh(GuiScreenEvent.MouseInputEvent.Pre event) throws IOException {
+    public void onGuiInputHigh(GuiScreenEvent.MouseInputEvent.Pre event) throws IOException {
         defaultContext.updateEventState();
         if (checkGui(event.getGui())) currentScreen.getContext().updateEventState();
         if (handleMouseInput(Mouse.getEventButton(), currentScreen, event.getGui())) {
@@ -180,7 +180,7 @@ public class ClientScreenHandler {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    public static void onGuiDraw(GuiScreenEvent.DrawScreenEvent.Pre event) {
+    public void onGuiDraw(GuiScreenEvent.DrawScreenEvent.Pre event) {
         int mx = event.getMouseX(), my = event.getMouseY();
         float pt = event.getRenderPartialTicks();
         defaultContext.updateState(mx, my, pt);
@@ -200,7 +200,7 @@ public class ClientScreenHandler {
     }
 
     @SubscribeEvent
-    public static void onTick(TickEvent.ClientTickEvent event) {
+    public void onTick(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             OverlayStack.onTick();
             defaultContext.tick();
@@ -212,7 +212,7 @@ public class ClientScreenHandler {
     }
 
     @SubscribeEvent
-    public static void preDraw(TickEvent.RenderTickEvent event) {
+    public void preDraw(TickEvent.RenderTickEvent event) {
         if (event.phase == TickEvent.Phase.START) {
             GL11.glEnable(GL11.GL_STENCIL_TEST);
         }
@@ -446,7 +446,7 @@ public class ClientScreenHandler {
         MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.DrawForeground(mcScreen, mouseX, mouseY));
         GlStateManager.popMatrix();
 
-        InventoryPlayer inventoryplayer = Minecraft.getMinecraft().player.inventory;
+        InventoryPlayer inventoryplayer = Platform.getClientPlayer().inventory;
         ItemStack itemstack = acc.getDraggedStack().isEmpty() ? inventoryplayer.getItemStack() : acc.getDraggedStack();
         GlStateManager.translate((float) x, (float) y, 0.0F);
         if (!itemstack.isEmpty()) {
