@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.drawable.text;
 
 import com.cleanroommc.modularui.api.MCHelper;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -28,6 +29,11 @@ public class KeyIcon implements IIcon {
     }
 
     @Override
+    public IKey getWrappedDrawable() {
+        return key;
+    }
+
+    @Override
     public int getWidth() {
         return getFontRenderer().getStringWidth(key.get()) + this.margin.horizontal();
     }
@@ -40,6 +46,10 @@ public class KeyIcon implements IIcon {
     @Override
     public Box getMargin() {
         return null;
+    }
+
+    public IKey getKey() {
+        return key;
     }
 
     @Override
