@@ -2,25 +2,22 @@ package com.cleanroommc.modularui.utils.fakeworld;
 
 import com.cleanroommc.modularui.ModularUI;
 
-import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
-
-import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
-
-import it.unimi.dsi.fastutil.chars.CharArraySet;
-import it.unimi.dsi.fastutil.chars.CharSet;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
-
-import com.google.common.collect.AbstractIterator;
-
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
+import com.google.common.collect.AbstractIterator;
+import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
+import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.chars.CharArraySet;
+import it.unimi.dsi.fastutil.chars.CharSet;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,9 +34,44 @@ public class ArraySchema implements ISchema {
         return new Builder();
     }
 
+    public static ArraySchema of(Entity entity, int radius) {
+        return of(entity.world, entity.getPosition(), radius);
+    }
+
+    public static ArraySchema of(World world, BlockPos center, int radius) {
+        int s = 2 * radius + 1;
+        BlockInfo[][][] blocks = new BlockInfo[s][s][s];
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        BlockPosUtil.add(pos.setPos(center), -radius, -radius, -radius);
+        for (int x = 0; x < s; x++) {
+            for (int y = 0; y < s; y++) {
+                for (int z = 0; z < s; z++) {
+                    blocks[x][y][z] = BlockInfo.of(world, pos);
+                    BlockPosUtil.add(pos, 0, 0, 1);
+                }
+                BlockPosUtil.add(pos, 0, 1, -s);
+            }
+            BlockPosUtil.add(pos, 1, -s, 0);
+        }
+        return new ArraySchema(blocks);
+    }
+
+    public static ArraySchema of(World world, Vec3i p1, Vec3i p2) {
+        int x0 = Math.min(p1.getX(), p2.getX()), y0 = Math.min(p1.getY(), p2.getY()), z0 = Math.min(p1.getZ(), p2.getZ());
+        int x1 = Math.max(p1.getX(), p2.getX()), y1 = Math.max(p1.getY(), p2.getY()), z1 = Math.max(p1.getZ(), p2.getZ());
+        x0--;
+        y0--;
+        z0--;
+        BlockInfo[][][] blocks = new BlockInfo[x1 - x0][y1 - y0][z1 - z0];
+        for (BlockPos.MutableBlockPos pos : BlockPos.getAllInBoxMutable(x0, y0, z0, x1, y1, z1)) {
+            blocks[pos.getX() - x0][pos.getY() - y0][pos.getZ() - z0] = BlockInfo.of(world, pos);
+        }
+        return new ArraySchema(blocks);
+    }
+
     private final World world;
     private final BlockInfo[][][] blocks;
-    private BiPredicate<BlockPos, BlockInfo> renderFilter = (__,___) -> true;
+    private BiPredicate<BlockPos, BlockInfo> renderFilter = (__, ___) -> true;
     private final Vec3d center;
 
     public ArraySchema(BlockInfo[][][] blocks) {

@@ -1,9 +1,16 @@
 package com.cleanroommc.modularui.utils;
 
+import net.minecraft.util.math.MathHelper;
+
 import org.mariuszgromada.math.mxparser.Constant;
 import org.mariuszgromada.math.mxparser.Expression;
 
 public class MathUtils {
+
+    public static final float PI = (float) Math.PI;
+    public static final float PI2 = 2f * PI;
+    public static final float PI_HALF = PI / 2f;
+    public static final float PI_QUART = PI / 4f;
 
     // SI prefixes
     public static final Constant k = new Constant("k", 1e3);
@@ -153,5 +160,17 @@ public class MathUtils {
         if (angle >= 180) angle -= 360;
         if (angle < -180) angle += 360;
         return angle;
+    }
+
+    public static float sin(float v) {
+        return MathHelper.sin(v);
+    }
+
+    public static float cos(float v) {
+        return MathHelper.cos(v);
+    }
+
+    public static float tan(float v) {
+        return MathHelper.sin(v) / MathHelper.cos(v);
     }
 }
