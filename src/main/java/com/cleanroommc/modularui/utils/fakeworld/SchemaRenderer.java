@@ -18,8 +18,7 @@ public class SchemaRenderer extends BaseSchemaRenderer {
     private BiConsumer<Camera, ISchema> cameraFunc;
     private boolean isometric = false;
     private boolean rayTracing = false;
-
-    private IBlockHighlight blockHighlight = new IBlockHighlight.FullHighlight();
+    private BlockHighlight highlight;
 
     public SchemaRenderer(ISchema schema, Framebuffer framebuffer) {
         super(schema, framebuffer);
@@ -67,6 +66,11 @@ public class SchemaRenderer extends BaseSchemaRenderer {
         return this;
     }
 
+    public SchemaRenderer highlightRenderer(BlockHighlight highlight) {
+        this.highlight = highlight;
+        return rayTracing(true);
+    }
+
     @Override
     protected void onSetupCamera() {
         if (this.scale != null) {
@@ -86,7 +90,9 @@ public class SchemaRenderer extends BaseSchemaRenderer {
 
     @Override
     protected void onSuccessfulRayTrace(@NotNull RayTraceResult result) {
-        this.blockHighlight.renderHighlight(result);
+        if (this.highlight != null) {
+            this.highlight.renderHighlight(result.getBlockPos(), result.sideHit, getCamera().getPos());
+        }
     }
 
     @Override

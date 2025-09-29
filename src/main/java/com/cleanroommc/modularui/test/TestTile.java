@@ -21,6 +21,7 @@ import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.Interpolation;
 import com.cleanroommc.modularui.utils.fakeworld.ArraySchema;
+import com.cleanroommc.modularui.utils.fakeworld.BlockHighlight;
 import com.cleanroommc.modularui.utils.fakeworld.SchemaRenderer;
 import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.value.IntValue;
@@ -470,7 +471,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         page.child(IKey.str("schema").asWidget());
         if (world.isRemote)
             page.child(new SchemaWidget(new SchemaRenderer(ArraySchema.of(data.getPlayer(), 5))
-                    .rayTracing(true))
+                    .highlightRenderer(new BlockHighlight(Color.withAlpha(Color.GREEN.brighter(1), 0.9f), 1/32f)))
                     .pos(20, 20)
                     .size(100, 100));
         return page;
