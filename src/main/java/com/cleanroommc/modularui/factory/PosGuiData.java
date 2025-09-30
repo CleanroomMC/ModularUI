@@ -4,7 +4,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 /**
  * See {@link GuiData} for an explanation for what this is for.
@@ -20,10 +19,6 @@ public class PosGuiData extends GuiData {
         this.x = x;
         this.y = y;
         this.z = z;
-    }
-
-    public World getWorld() {
-        return getPlayer().world;
     }
 
     public int getX() {

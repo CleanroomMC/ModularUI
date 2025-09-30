@@ -63,6 +63,10 @@ public class ItemDrawable implements IDrawable, IJsonSerializable {
         setItem(new ItemStack(item, amount, meta));
     }
 
+    public ItemStack getItem() {
+        return item;
+    }
+
     @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {

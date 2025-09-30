@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.widget.IFocusedWidget;
@@ -118,8 +117,9 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
 
     protected void setupDrawText(ModularGuiContext context, WidgetTextFieldTheme widgetTheme) {
         this.renderer.setSimulate(false);
+        this.renderer.setPos(getArea().getPadding().getLeft(), getArea().getPadding().getTop());
         this.renderer.setScale(this.scale);
-        this.renderer.setAlignment(this.textAlignment, -2, getArea().height);
+        this.renderer.setAlignment(this.textAlignment, -1, getArea().paddedHeight());
     }
 
     protected void drawText(ModularGuiContext context, WidgetTextFieldTheme widgetTheme) {

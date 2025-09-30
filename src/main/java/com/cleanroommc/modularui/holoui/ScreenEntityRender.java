@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.holoui;
 
 import com.cleanroommc.modularui.screen.GuiContainerWrapper;
+import com.cleanroommc.modularui.utils.Platform;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -36,7 +36,7 @@ public class ScreenEntityRender extends Render<HoloScreenEntity> {
 
         Plane3D plane3D = entity.getPlane3D();
         if (entity.getOrientation() == ScreenOrientation.TO_PLAYER) {
-            EntityPlayer player = Minecraft.getMinecraft().player;
+            EntityPlayer player = Platform.getClientPlayer();
             float xN = (float) (player.posX - entity.posX);
             float yN = (float) (player.posY - entity.posY);
             float zN = (float) (player.posZ - entity.posZ);

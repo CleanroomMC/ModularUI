@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.integration.jei;
 
+import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerRecipeTransferHandler;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.screen.ModularScreen;
 
@@ -37,7 +38,7 @@ public class ModularContainerJEIHandler<T extends ModularContainer> implements I
     @Override
     public IRecipeTransferError transferRecipe(@NotNull ModularContainer container, @NotNull IRecipeLayout recipeLayout, @NotNull EntityPlayer player, boolean maxTransfer, boolean doTransfer) {
         ModularScreen screen = container.getScreen();
-        if (screen instanceof JeiRecipeTransferHandler recipeTransferHandler) {
+        if (screen instanceof RecipeViewerRecipeTransferHandler recipeTransferHandler) {
             return recipeTransferHandler.transferRecipe(recipeLayout, maxTransfer, !doTransfer);
         }
         return null;

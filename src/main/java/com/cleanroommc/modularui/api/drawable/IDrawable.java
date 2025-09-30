@@ -91,7 +91,7 @@ public interface IDrawable {
      */
     @SideOnly(Side.CLIENT)
     default void draw(GuiContext context, Area area, WidgetTheme widgetTheme) {
-        draw(context, area.x + area.getPadding().left, area.y + area.getPadding().top, area.paddedWidth(), area.paddedHeight(), widgetTheme);
+        draw(context, area.x + area.getPadding().getLeft(), area.y + area.getPadding().getTop(), area.paddedWidth(), area.paddedHeight(), widgetTheme);
     }
 
     /**

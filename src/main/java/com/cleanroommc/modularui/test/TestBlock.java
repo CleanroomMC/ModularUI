@@ -67,6 +67,8 @@ public class TestBlock extends Block implements ITileEntityProvider {
     public static void registerModel(ModelRegistryEvent event) {
         ModelResourceLocation mrl = new ModelResourceLocation(new ResourceLocation("diamond"), "inventory");
         ModelLoader.setCustomModelResourceLocation(TestItem.testItem, 0, mrl);
+        ModelLoader.setCustomModelResourceLocation(testItemBlock, 0, new ModelResourceLocation(testItemBlock.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(testItemBlock2, 0, new ModelResourceLocation(testItemBlock2.getRegistryName(), "inventory"));
     }
 
     private final Supplier<TileEntity> tileEntitySupplier;

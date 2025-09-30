@@ -1,13 +1,13 @@
-package com.cleanroommc.modularui.integration.jei;
+package com.cleanroommc.modularui.integration.recipeviewer;
 
 import org.jetbrains.annotations.Nullable;
 
 /**
- * An interface for JEI to get the ingredient from a widget to show recipes for example.
+ * An interface for recipe viewer to get the ingredient from a widget to show recipes for example.
  * Implement this on {@link com.cleanroommc.modularui.api.widget.IWidget}.
  * No further registration needed.
  */
-public interface JeiIngredientProvider {
+public interface RecipeViewerIngredientProvider {
 
     @Nullable
     Object getIngredient();

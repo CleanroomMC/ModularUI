@@ -1,22 +1,24 @@
 package com.cleanroommc.modularui.widgets;
 
+import com.cleanroommc.modularui.animation.Animator;
+import com.cleanroommc.modularui.animation.IAnimator;
+import com.cleanroommc.modularui.animation.SequentialAnimator;
+import com.cleanroommc.modularui.animation.Wait;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.Interpolation;
 
-import org.jetbrains.annotations.Nullable;
+public class ScrollingTextWidget extends TextWidget<ScrollingTextWidget> {
 
-public class ScrollingTextWidget extends TextWidget {
-
-    private static final int pauseTime = 60;
-
-    private TextRenderer.Line line = new TextRenderer.Line("", 0);
-    private long time = 0;
-    private int scroll = 0;
+    private TextRenderer.Line line;
+    private float progress = 0;
     private boolean hovering = false;
-    private int pauseTimer = 0;
+    private IAnimator animator;
+    private Animator forward;
+    private Animator backward;
+    private int speed = 15;
 
     public ScrollingTextWidget(IKey key) {
         super(key);
@@ -29,81 +31,80 @@ public class ScrollingTextWidget extends TextWidget {
     }
 
     @Override
+    public void dispose() {
+        super.dispose();
+        this.animator.stop(true);
+    }
+
+    @Override
     public void onMouseStartHover() {
         this.hovering = true;
+        this.animator.resume(false);
     }
 
     @Override
     public void onMouseEndHover() {
         this.hovering = false;
-        this.scroll = 0;
-        this.time = 0;
-    }
-
-    @Override
-    public void onUpdate() {
-        super.onUpdate();
-        if (this.pauseTimer > 0) {
-            if (++this.pauseTimer == pauseTime) {
-                this.pauseTimer = this.scroll == 0 ? 0 : 1;
-                this.scroll = 0;
-            }
-            return;
-        }
-        if (this.hovering && ++this.time % 2 == 0 && ++this.scroll == this.line.upperWidth() - getArea().width - 1) {
-            this.pauseTimer = 1;
-        }
+        this.animator.stop(true);
+        this.animator.reset();
+        this.progress = 0;
     }
 
     @Override
     public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
+        if (this.animator == null) {
+            animator(new Animator().curve(Interpolation.SINE_INOUT));
+        }
+        if (this.line == null) {
+            updateLine(getKey().getFormatted());
+        }
         checkString();
         TextRenderer renderer = TextRenderer.SHARED;
-        renderer.setColor(getColor() != null ? getColor() : widgetTheme.getTextColor());
-        renderer.setAlignment(getAlignment(), getArea().w() + 1, getArea().h());
+        renderer.setColor(getColor() != null ? getColor().getAsInt() : widgetTheme.getTextColor());
+        renderer.setAlignment(getAlignment(), getArea().w(), getArea().h());
         renderer.setShadow(isShadow() != null ? isShadow() : widgetTheme.getTextShadow());
-        renderer.setPos(getArea().getPadding().left, getArea().getPadding().top);
+        renderer.setPos(getArea().getPadding().getLeft(), getArea().getPadding().getTop());
         renderer.setScale(getScale());
         renderer.setSimulate(false);
         if (this.hovering) {
-            renderer.drawScrolling(this.line, this.scroll, getArea(), context);
+            renderer.drawScrolling(this.line, this.progress, getArea(), context);
         } else {
             renderer.drawCut(this.line);
         }
     }
 
-    private void checkString() {
-        String s = getKey().get();
-        if (!s.equals(this.line.getText())) {
-            TextRenderer.SHARED.setScale(getScale());
-            this.line = TextRenderer.SHARED.line(s);
-            this.scroll = 0;
-            markTooltipDirty();
-        }
+    @Override
+    protected void onTextChanged(String newText) {
+        super.onTextChanged(newText);
+        updateLine(newText);
+        markTooltipDirty();
     }
 
-    @Override
-    public ScrollingTextWidget alignment(Alignment alignment) {
-        return (ScrollingTextWidget) super.alignment(alignment);
+    protected void updateLine(String newText) {
+        TextRenderer.SHARED.setScale(getScale());
+        this.line = TextRenderer.SHARED.line(newText);
+        this.animator.stop(true);
+        this.animator.reset();
+        this.forward.duration(this.line.upperWidth() * this.speed);
+        this.backward.duration(this.forward.getDuration() * 3 / 4);
     }
 
-    @Override
-    public ScrollingTextWidget color(@Nullable Integer color) {
-        return (ScrollingTextWidget) super.color(color);
+    /**
+     * Sets the scroll speed when hovered. This sets not the speed directly, but the duration per pixel in milliseconds.
+     * So if the text is 100 lines long and the "speed" is set to 10, then the whole animation is 1000 milliseconds long.
+     *
+     * @param speed duration per pixel in milliseconds (default is 15)
+     * @return this
+     */
+    public ScrollingTextWidget scrollSpeed(int speed) {
+        this.speed = speed;
+        return this;
     }
 
-    @Override
-    public ScrollingTextWidget scale(float scale) {
-        return (ScrollingTextWidget) super.scale(scale);
-    }
-
-    @Override
-    public ScrollingTextWidget shadow(@Nullable Boolean shadow) {
-        return (ScrollingTextWidget) super.shadow(shadow);
-    }
-
-    @Override
-    public ScrollingTextWidget widgetTheme(String widgetTheme) {
-        return (ScrollingTextWidget) super.widgetTheme(widgetTheme);
+    public ScrollingTextWidget animator(Animator animator) {
+        this.forward = animator.onUpdate((double val) -> this.progress = (float) (val));
+        this.backward = animator.copy(true);
+        this.animator = new SequentialAnimator(this.forward, new Wait(500), this.backward, new Wait(1000)).repeatsOnFinish(20);
+        return this;
     }
 }

@@ -1,31 +1,28 @@
 package com.cleanroommc.modularui.widgets.slot;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
+import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.integration.jei.ModularUIJeiPlugin;
-import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerGhostIngredientSlot;
 import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.value.sync.PhantomItemSlotSH;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 
-import mezz.jei.Internal;
-
 import net.minecraft.client.renderer.GlStateManager;
-
-import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.item.ItemStack;
 
+import mezz.jei.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class PhantomItemSlot extends ItemSlot implements JeiGhostIngredientSlot<ItemStack> {
+public class PhantomItemSlot extends ItemSlot implements RecipeViewerGhostIngredientSlot<ItemStack> {
 
     private PhantomItemSlotSH syncHandler;
 
     @Override
     public void onInit() {
         super.onInit();
-        getContext().getJeiSettings().addJeiGhostIngredientSlot(this);
+        getContext().getRecipeViewerSettings().addRecipeViewerGhostIngredientSlot(this);
     }
 
     @Override
@@ -58,7 +55,7 @@ public class PhantomItemSlot extends ItemSlot implements JeiGhostIngredientSlot<
     }
 
     @Override
-    public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
+    public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
         MouseData mouseData = MouseData.create(scrollDirection.modifier);
         this.syncHandler.syncToServer(PhantomItemSlotSH.SYNC_SCROLL, mouseData::writeToPacket);
         return true;
@@ -76,17 +73,9 @@ public class PhantomItemSlot extends ItemSlot implements JeiGhostIngredientSlot<
 
     @Override
     public @Nullable ItemStack castGhostIngredientIfValid(@NotNull Object ingredient) {
-        if (areAncestorsEnabled() && this.syncHandler.isPhantom()) {
-            if (ingredient instanceof EnchantmentData enchantmentData) {
-                ingredient = Internal.getIngredientRegistry().getIngredientHelper(enchantmentData).getCheatItemStack(enchantmentData);
-            }
-
-            if (ingredient instanceof ItemStack itemStack) {
-                return this.syncHandler.isItemValid(itemStack) ? itemStack : null;
-            }
-        }
-
-        return null;
+        if (!this.syncHandler.isPhantom() || !areAncestorsEnabled()) return null;
+        ItemStack itemStack = Internal.getIngredientRegistry().getIngredientHelper(ingredient).getCheatItemStack(ingredient);
+        return this.syncHandler.isItemValid(itemStack) ? itemStack : null;
     }
 
     @Override

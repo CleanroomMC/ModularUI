@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.drawable;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.RichTooltipEvent;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.NumberFormat;
@@ -15,8 +16,11 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderTooltipEvent;
@@ -29,6 +33,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class GuiDraw {
 
@@ -289,9 +294,9 @@ public class GuiDraw {
         GlStateManager.scale(width / 16f, height / 16f, 1);
         RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
         renderItem.zLevel = z + 100;
-        renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().player, item, 0, 0);
+        renderItem.renderItemAndEffectIntoGUI(Platform.getClientPlayer(), item, 0, 0);
         renderItem.zLevel = 0;
-        GlStateManager.disableDepth();
+        Platform.endDrawItem();
         GlStateManager.popMatrix();
     }
 
@@ -560,5 +565,90 @@ public class GuiDraw {
         drawVerticalGradientRect(x - 3, y - 3, textWidth + 6, 1, borderColorStart, borderColorStart);
         // bottom accent border
         drawVerticalGradientRect(x - 3, y + height + 2, textWidth + 6, 1, borderColorEnd, borderColorEnd);
+    }
+
+    /**
+     * Draws an entity. Note that this does NOT do any necessary setup for rendering the entity. Please see
+     * {@link #drawEntity(Entity, float, float, float, float, float, Consumer, Consumer)} for a full draw method.
+     *
+     * @param entity entity to draw.
+     * @see #drawEntity(Entity, float, float, float, float, float, Consumer, Consumer)
+     */
+    public static void drawEntityRaw(Entity entity) {
+        RenderManager rendermanager = Minecraft.getMinecraft().getRenderManager();
+        rendermanager.setPlayerViewY(180.0F);
+        rendermanager.setRenderShadow(false);
+        rendermanager.renderEntity(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);
+        rendermanager.setRenderShadow(true);
+    }
+
+    /**
+     * A simple method to a draw an entity in a GUI. Using the consumers is not always ideal to modify and restore entity state. In those
+     * cases just copy and paste this method and put your code where the consumers would be called. The entity will be scaled so that it
+     * fits right in the given size when untransformed (default). When transforming during pre draw, you may need to manually correct the
+     * scale and offset.
+     *
+     * @param entity   entity to draw
+     * @param x        x pos
+     * @param y        y pos
+     * @param w        the width of the area where the entity should be drawn
+     * @param h        the height of the area where the entity should be drawn
+     * @param z        the z layer ({@link GuiContext#getCurrentDrawingZ()} if drawn in a MUI)
+     * @param preDraw  a function to call before rendering. Transform or modify the entity here.
+     * @param postDraw a function to call after rendering. Restore old entity state here if needed.
+     * @param <T>      type of the entity to render
+     */
+    public static <T extends Entity> void drawEntity(T entity, float x, float y, float w, float h, float z, @Nullable Consumer<T> preDraw, @Nullable Consumer<T> postDraw) {
+        GlStateManager.pushMatrix();
+        Platform.setupDrawEntity(entity, x, y, w, h, z);
+        if (preDraw != null) preDraw.accept(entity);
+        drawEntityRaw(entity);
+        if (postDraw != null) postDraw.accept(entity);
+        Platform.endDrawEntity();
+        GlStateManager.popMatrix();
+    }
+
+    /**
+     * Draws an entity which looks in the direction of the mouse like the player render in the player inventory does.
+     * The code was copied from
+     * {@link net.minecraft.client.gui.inventory.GuiInventory#drawEntityOnScreen(int, int, int, float, float, EntityLivingBase) GuiInventory.drawEntityOnScreen}.
+     *
+     * @param entity entity to draw
+     * @param x      x pos
+     * @param y      y pos
+     * @param w      the width of the area where the entity should be drawn
+     * @param h      the height of the area where the entity should be drawn
+     * @param z      the z layer ({@link GuiContext#getCurrentDrawingZ()} if drawn in a MUI)
+     * @param mouseX current x pos of the mouse
+     * @param mouseY current y pos of the mouse
+     */
+    public static void drawEntityLookingAtMouse(EntityLivingBase entity, float x, float y, float w, float h, float z, int mouseX, int mouseY) {
+        GlStateManager.pushMatrix();
+        Platform.setupDrawEntity(entity, x, y, w, h, z);
+
+        // pre draw
+        float f = entity.renderYawOffset;
+        float f1 = entity.rotationYaw;
+        float f2 = entity.rotationPitch;
+        float f3 = entity.prevRotationYawHead;
+        float f4 = entity.rotationYawHead;
+        GlStateManager.rotate(-((float) Math.atan(mouseY / 40.0F)) * 20.0F, 1.0F, 0.0F, 0.0F);
+        entity.renderYawOffset = (float) Math.atan(mouseX / 40.0F) * 20.0F;
+        entity.rotationYaw = (float) Math.atan(mouseX / 40.0F) * 40.0F;
+        entity.rotationPitch = -((float) Math.atan(mouseY / 40.0F)) * 20.0F;
+        entity.rotationYawHead = entity.rotationYaw;
+        entity.prevRotationYawHead = entity.rotationYaw;
+
+        drawEntityRaw(entity);
+
+        // post draw
+        entity.renderYawOffset = f;
+        entity.rotationYaw = f1;
+        entity.rotationPitch = f2;
+        entity.prevRotationYawHead = f3;
+        entity.rotationYawHead = f4;
+
+        Platform.endDrawEntity();
+        GlStateManager.popMatrix();
     }
 }

@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.core.mixin.ContainerAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.ContainerAccessor;
 import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.utils.Platform;
@@ -13,7 +13,6 @@ import com.cleanroommc.bogosorter.api.IPosSetter;
 import com.cleanroommc.bogosorter.api.ISortableContainer;
 import com.cleanroommc.bogosorter.api.ISortingContextBuilder;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
@@ -25,9 +24,17 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-import org.jetbrains.annotations.*;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 
 @Interface(modid = ModularUI.ModIds.BOGOSORTER, iface = "com.cleanroommc.bogosorter.api.ISortableContainer")
 public class ModularContainer extends Container implements ISortableContainer {
@@ -75,7 +82,7 @@ public class ModularContainer extends Container implements ISortableContainer {
     @ApiStatus.Internal
     @SideOnly(Side.CLIENT)
     public void constructClientOnly() {
-        this.player = Minecraft.getMinecraft().player;
+        this.player = Platform.getClientPlayer();
         this.syncManager = null;
     }
 

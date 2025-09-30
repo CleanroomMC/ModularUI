@@ -3,11 +3,13 @@ package com.cleanroommc.modularui.test;
 import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.Circle;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.ItemDrawable;
 import com.cleanroommc.modularui.drawable.Rectangle;
 import com.cleanroommc.modularui.drawable.text.AnimatedText;
+import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.factory.PosGuiData;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.screen.ModularPanel;
@@ -18,6 +20,9 @@ import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.Interpolation;
+import com.cleanroommc.modularui.utils.fakeworld.ArraySchema;
+import com.cleanroommc.modularui.utils.fakeworld.BlockHighlight;
+import com.cleanroommc.modularui.utils.fakeworld.SchemaRenderer;
 import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.value.IntValue;
 import com.cleanroommc.modularui.value.StringValue;
@@ -29,16 +34,32 @@ import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandlers;
 import com.cleanroommc.modularui.widget.EmptyWidget;
 import com.cleanroommc.modularui.widget.ParentWidget;
-import com.cleanroommc.modularui.widgets.*;
+import com.cleanroommc.modularui.widgets.ButtonWidget;
+import com.cleanroommc.modularui.widgets.ColorPickerDialog;
+import com.cleanroommc.modularui.widgets.CycleButtonWidget;
+import com.cleanroommc.modularui.widgets.Dialog;
+import com.cleanroommc.modularui.widgets.DynamicSyncedWidget;
+import com.cleanroommc.modularui.widgets.Expandable;
+import com.cleanroommc.modularui.widgets.ItemDisplayWidget;
+import com.cleanroommc.modularui.widgets.ListWidget;
+import com.cleanroommc.modularui.widgets.PageButton;
+import com.cleanroommc.modularui.widgets.PagedWidget;
+import com.cleanroommc.modularui.widgets.ProgressWidget;
+import com.cleanroommc.modularui.widgets.SchemaWidget;
+import com.cleanroommc.modularui.widgets.ScrollingTextWidget;
+import com.cleanroommc.modularui.widgets.SliderWidget;
+import com.cleanroommc.modularui.widgets.SlotGroupWidget;
+import com.cleanroommc.modularui.widgets.SortButtons;
+import com.cleanroommc.modularui.widgets.ToggleButton;
 import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Flow;
 import com.cleanroommc.modularui.widgets.layout.Row;
-import com.cleanroommc.modularui.widgets.slot.*;
+import com.cleanroommc.modularui.widgets.slot.FluidSlot;
+import com.cleanroommc.modularui.widgets.slot.ItemSlot;
+import com.cleanroommc.modularui.widgets.slot.ModularCraftingSlot;
+import com.cleanroommc.modularui.widgets.slot.ModularSlot;
+import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
-
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -52,11 +73,14 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.Random;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -156,22 +180,23 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                 .tab(GuiTextures.TAB_TOP, 0))
                         .child(new PageButton(3, tabController)
                                 .tab(GuiTextures.TAB_TOP, 0)
-                                .overlay(new ItemDrawable(Blocks.CHEST).asIcon())))
+                                .overlay(new ItemDrawable(Blocks.CHEST).asIcon()))
+                        .child(new PageButton(4, tabController)
+                                .tab(GuiTextures.TAB_TOP, 0)
+                                .overlay(new ItemDrawable(Items.ENDER_EYE).asIcon())))
                 .child(new Expandable()
                         .debugName("expandable")
                         .top(0)
                         .leftRelOffset(1f, 1)
                         .background(GuiTextures.MC_BACKGROUND)
-                        .excludeAreaInJei()
+                        .excludeAreaInRecipeViewer()
                         .stencilTransform((r, expanded) -> {
-                            if (expanded) {
-                                r.width -= 5;
-                                r.height -= 5;
-                            }
+                            r.width = Math.max(20, r.width - 5);
+                            r.height = Math.max(20, r.height - 5);
                         })
                         .animationDuration(500)
                         .interpolation(Interpolation.BOUNCE_OUT)
-                        .normalView(new ItemDrawable(Blocks.CRAFTING_TABLE).asIcon().asWidget().size(20).pos(0, 0))
+                        .collapsedView(new ItemDrawable(Blocks.CRAFTING_TABLE).asIcon().asWidget().size(20).pos(0, 0))
                         .expandedView(new ParentWidget<>()
                                 .debugName("crafting tab")
                                 .coverChildren()
@@ -184,7 +209,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                         .key('O', new ItemSlot().slot(new ModularCraftingSlot(this.craftingInventory, 9)))
                                         .key('D', new ItemDisplayWidget().syncHandler("display_item").displayAmount(true))
                                         .build()
-                                        .margin(5, 5, 20, 5))))
+                                        .margin(5, 5, 20, 5).debugName("crafting"))))
                 .child(Flow.column()
                         .sizeRel(1f)
                         .paddingBottom(7)
@@ -198,67 +223,66 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                         .addPage(new ParentWidget<>()
                                                 .debugName("page 1 parent")
                                                 .sizeRel(1f, 1f)
-                                                .padding(7)
+                                                .padding(7, 0)
                                                 .child(new Row()
                                                         .debugName("buttons, slots and more tests")
                                                         .height(137)
                                                         .coverChildrenWidth()
+                                                        .verticalCenter()
                                                         //.padding(7)
                                                         .child(new Column()
-                                                                .debugName("buttons and slots test")
-                                                                .coverChildren()
-                                                                .marginRight(8)
-                                                                //.flex(flex -> flex.height(0.5f))
-                                                                //.widthRel(0.5f)
-                                                                .crossAxisAlignment(Alignment.CrossAxis.CENTER)
-                                                                .child(new ButtonWidget<>()
-                                                                        .size(60, 18)
-                                                                        .overlay(IKey.dynamic(() -> "Button " + this.val)))
-                                                                .child(new Rectangle()
-                                                                        .setColor(Color.RED.main)
-                                                                        .asWidget()
-                                                                        .size(32, 2)
-                                                                        .setEnabledIf(widget -> this.val > 10))
-                                                                .child(new FluidSlot()
-                                                                        .margin(2)
-                                                                        .syncHandler(SyncHandlers.fluidSlot(this.fluidTank)))
-                                                                .child(new ButtonWidget<>()
-                                                                        .size(60, 18)
-                                                                        .tooltip(tooltip -> {
-                                                                            tooltip.showUpTimer(10);
-                                                                            tooltip.addLine(IKey.str("Test Line g"));
-                                                                            tooltip.addLine(IKey.str("An image inside of a tooltip:"));
-                                                                            tooltip.addLine(GuiTextures.MUI_LOGO.asIcon().size(50).alignment(Alignment.TopCenter));
-                                                                            tooltip.addLine(IKey.str("And here a circle:"));
-                                                                            tooltip.addLine(new Circle()
-                                                                                            .setColor(Color.RED.darker(2), Color.RED.brighter(2))
-                                                                                            .asIcon()
-                                                                                            .size(20))
-                                                                                    .addLine(new ItemDrawable(new ItemStack(Items.DIAMOND)).asIcon())
-                                                                                    .pos(RichTooltip.Pos.LEFT);
-                                                                        })
-                                                                        .onMousePressed(mouseButton -> {
-                                                                            //panel.getScreen().close(true);
-                                                                            //panel.getScreen().openDialog("dialog", this::buildDialog, ModularUI.LOGGER::info);
-                                                                            //openSecondWindow(context).openIn(panel.getScreen());
-                                                                            panelSyncHandler.openPanel();
-                                                                            return true;
-                                                                        })
-                                                                        //.flex(flex -> flex.left(3)) // ?
-                                                                        .overlay(IKey.str("Button 2")))
-                                                                .child(new TextFieldWidget()
-                                                                        .size(60, 20)
-                                                                        .setTextAlignment(Alignment.Center)
-                                                                        .value(SyncHandlers.string(() -> this.value, val -> this.value = val))
-                                                                        .margin(0, 3)
-                                                                        .hintText("hint"))
-                                                                .child(new TextFieldWidget()
-                                                                        .size(60, 20)
-                                                                        .value(SyncHandlers.doubleNumber(() -> this.doubleValue, val -> this.doubleValue = val))
-                                                                        .setNumbersDouble(Function.identity())
-                                                                        .hintText("number"))
-                                                                .child(IKey.str("Test string").asWidget().padding(2).debugName("test string"))
-                                                                .child(IKey.EMPTY.asWidget().debugName("Empty Ikey")))
+                                                                        .debugName("buttons and slots test")
+                                                                        .coverChildren()
+                                                                        .marginRight(8)
+                                                                        //.flex(flex -> flex.height(0.5f))
+                                                                        //.widthRel(0.5f)
+                                                                        .crossAxisAlignment(Alignment.CrossAxis.CENTER)
+                                                                        .child(new ButtonWidget<>()
+                                                                                .size(60, 18)
+                                                                                .overlay(IKey.dynamic(() -> "Button " + this.val)))
+                                                                        .child(new FluidSlot()
+                                                                                .margin(2)
+                                                                                .syncHandler(SyncHandlers.fluidSlot(this.fluidTank)))
+                                                                        .child(new ButtonWidget<>()
+                                                                                .size(60, 18)
+                                                                                .tooltip(tooltip -> {
+                                                                                    tooltip.showUpTimer(10);
+                                                                                    tooltip.addLine(IKey.str("Test Line g"));
+                                                                                    tooltip.addLine(IKey.str("An image inside of a tooltip:"));
+                                                                                    tooltip.addLine(GuiTextures.MUI_LOGO.asIcon().size(50).alignment(Alignment.TopCenter));
+                                                                                    tooltip.addLine(IKey.str("And here a circle:"));
+                                                                                    tooltip.addLine(new Circle()
+                                                                                                    .setColor(Color.RED.darker(2), Color.RED.brighter(2))
+                                                                                                    .asIcon()
+                                                                                                    .size(20))
+                                                                                            .addLine(new ItemDrawable(new ItemStack(Items.DIAMOND)).asIcon())
+                                                                                            .pos(RichTooltip.Pos.LEFT);
+                                                                                })
+                                                                                .onMousePressed(mouseButton -> {
+                                                                                    //panel.getScreen().close(true);
+                                                                                    //panel.getScreen().openDialog("dialog", this::buildDialog, ModularUI.LOGGER::info);
+                                                                                    //openSecondWindow(context).openIn(panel.getScreen());
+                                                                                    panelSyncHandler.openPanel();
+                                                                                    return true;
+                                                                                })
+                                                                                //.flex(flex -> flex.left(3)) // ?
+                                                                                .overlay(IKey.str("Button 2")))
+                                                                        .child(new TextFieldWidget()
+                                                                                .size(60, 18)
+                                                                                .setTextAlignment(Alignment.Center)
+                                                                                .value(SyncHandlers.string(() -> this.value, val -> this.value = val))
+                                                                                .margin(0, 2)
+                                                                                .hintText("hint"))
+                                                                        .child(new TextFieldWidget()
+                                                                                .size(60, 18)
+                                                                                .paddingTop(1)
+                                                                                .value(SyncHandlers.doubleNumber(() -> this.doubleValue, val -> this.doubleValue = val))
+                                                                                .setNumbersDouble(Function.identity())
+                                                                                .hintText("number"))
+                                                                        //.child(IKey.str("Test string").asWidget().padding(2).debugName("test string"))
+                                                                        .child(new ScrollingTextWidget(IKey.str("Very very long test string")).widthRel(1f).height(16))
+                                                                //.child(IKey.EMPTY.asWidget().debugName("Empty IKey"))
+                                                        )
                                                         .child(new Column()
                                                                 .debugName("button and slots test 2")
                                                                 .coverChildren()
@@ -271,7 +295,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                         .progress(() -> this.progress / (double) this.duration)
                                                                         .texture(GuiTextures.PROGRESS_CYCLE, 20)
                                                                         .direction(ProgressWidget.Direction.CIRCULAR_CW))
-                                                                .child(new Row().widthRel(1f).height(18)
+                                                                .child(new Row().coverChildrenWidth().height(18)
                                                                         .child(new ToggleButton()
                                                                                 .value(new BoolValue.Dynamic(() -> cycleStateValue.getIntValue() == 0, val -> cycleStateValue.setIntValue(0)))
                                                                                 .overlay(GuiTextures.CYCLE_BUTTON_DEMO.getSubArea(0, 0, 1, 1 / 3f)))
@@ -314,7 +338,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                     }
                                                                     return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).slotGroup("item_inv"));
                                                                 })
-                                                                .build()
+                                                                .build().debugName("9 slot inv")
                                                                 //.marginBottom(2)
                                                                 .child(new SortButtons()
                                                                         .slotGroup("item_inv")
@@ -324,7 +348,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                 .row("FII")
                                                                 .key('F', index -> new FluidSlot().syncHandler("mixer_fluids", index))
                                                                 .key('I', index -> ItemSlot.create(index >= 2).slot(new ModularSlot(this.mixerItems, index).slotGroup("mixer_items")))
-                                                                .build())
+                                                                .build().debugName("mixer inv"))
                                                         .child(new Row()
                                                                 .coverChildrenHeight()
                                                                 .child(new CycleButtonWidget()
@@ -361,13 +385,14 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                             return true;
                                                         }))
                                                 .child(new ListWidget<>()
+                                                        .debugName("test config list")
                                                         .widthRel(1f).top(50).bottom(2)
                                                         /*.child(new Rectangle().setColor(0xFF606060).asWidget()
                                                                 .top(1)
                                                                 .left(32)
                                                                 .size(1, 40))*/
                                                         .child(new Row()
-                                                                .debugName("bogo test config 1")
+                                                                .debugName("test config 1")
                                                                 .widthRel(1f).coverChildrenHeight()
                                                                 .crossAxisAlignment(Alignment.CrossAxis.CENTER)
                                                                 .childPadding(2)
@@ -376,11 +401,10 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                         .stateOverlay(GuiTextures.CHECK_BOX)
                                                                         .size(14, 14)
                                                                         .margin(8, 4))
-                                                                .child(IKey.lang("bogosort.gui.enable_refill").asWidget()
-                                                                        .height(14)
-                                                                        .marginLeft(10)))
+                                                                .child(IKey.str("Boolean config").asWidget()
+                                                                        .height(14)))
                                                         .child(new Row()
-                                                                .debugName("bogo test config 2")
+                                                                .debugName("test config 2")
                                                                 .widthRel(1f).height(14)
                                                                 .childPadding(2)
                                                                 .child(new TextFieldWidget()
@@ -389,24 +413,24 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                         .setTextAlignment(Alignment.Center)
                                                                         .background(new Rectangle().setColor(0xFFb1b1b1))
                                                                         .setTextColor(IKey.TEXT_COLOR)
-                                                                        .size(30, 14))
-                                                                .child(IKey.lang("bogosort.gui.refill_threshold").asWidget()
+                                                                        .size(20, 14))
+                                                                .child(IKey.str("Number config").asWidget()
                                                                         .height(14)))
-                                                        .child(IKey.lang("bogosort.gui.hotbar_scrolling").asWidget()
+                                                        .child(IKey.str("Config title").asWidget()
                                                                 .color(0xFF404040)
                                                                 .alignment(Alignment.CenterLeft)
                                                                 .left(5).height(14)
                                                                 .tooltip(tooltip -> tooltip.showUpTimer(10)
-                                                                        .addLine(IKey.lang("bogosort.gui.hotbar_scrolling.tooltip"))))
+                                                                        .addLine(IKey.str("Config title tooltip"))))
                                                         .child(new Row()
-                                                                .debugName("bogo test config 3")
+                                                                .debugName("test config 3")
                                                                 .widthRel(1f).height(14)
                                                                 .childPadding(2)
                                                                 .child(new CycleButtonWidget()
                                                                         .value(new BoolValue(false))
                                                                         .stateOverlay(GuiTextures.CHECK_BOX)
                                                                         .size(14, 14))
-                                                                .child(IKey.lang("bogosort.gui.enabled").asWidget()
+                                                                .child(IKey.str("Boolean config 3").asWidget()
                                                                         .height(14)))))
                                         .addPage(new ParentWidget<>()
                                                 .debugName("page 4 storage")
@@ -423,7 +447,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                         .child(new DynamicSyncedWidget<>()
                                                                 .widthRel(1f)
                                                                 .syncHandler(dynamicSyncHandler)))
-                                                )))
+                                        )
+                                        .addPage(createSchemaPage(guiData))))
                         .child(SlotGroupWidget.playerInventory(false))
                 );
         /*panel.child(new ButtonWidget<>()
@@ -439,6 +464,19 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         return panel;
     }
 
+    private IWidget createSchemaPage(GuiData data) {
+        ParentWidget<?> page = new ParentWidget<>();
+        page.debugName("page 5 schema");
+        page.sizeRel(1f);
+        page.child(IKey.str("schema").asWidget());
+        if (world.isRemote)
+            page.child(new SchemaWidget(new SchemaRenderer(ArraySchema.of(data.getPlayer(), 5))
+                    .highlightRenderer(new BlockHighlight(Color.withAlpha(Color.GREEN.brighter(1), 0.9f), 1/32f)))
+                    .pos(20, 20)
+                    .size(100, 100));
+        return page;
+    }
+
     public ModularPanel openSecondWindow(PanelSyncManager syncManager, IPanelHandler syncHandler) {
         ModularPanel panel = new Dialog<>("second_window", null)
                 .setDisablePanelsBelow(false)
@@ -446,8 +484,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                 .setDraggable(true)
                 .size(100, 100);
         SlotGroup slotGroup = new SlotGroup("small_inv", 2);
-        IntSyncValue timeSync = new IntSyncValue(() -> (int)java.lang.System.currentTimeMillis());
-        syncManager.syncValue(123456,timeSync);
+        IntSyncValue timeSync = new IntSyncValue(() -> (int) java.lang.System.currentTimeMillis());
+        syncManager.syncValue(123456, timeSync);
         syncManager.registerSlotGroup(slotGroup);
         AtomicInteger number = new AtomicInteger(0);
         syncManager.syncValue("int_value", new IntSyncValue(number::get, number::set));

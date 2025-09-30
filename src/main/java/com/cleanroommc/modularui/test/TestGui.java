@@ -66,7 +66,7 @@ public class TestGui extends CustomModularScreen {
                 .debugName("sortable list");
         List<List<AvailableElement>> availableMatrix = Grid.mapToMatrix(2, this.lines, (index, value) -> {
             AvailableElement availableElement = new AvailableElement().overlay(IKey.str(value))
-                    .size(60, 14)
+                    .widthRel(0.5f).height(14)
                     .addTooltipLine(value)
                     .onMousePressed(mouseButton1 -> {
                         if (this.availableElements.get(value).available) {
@@ -95,7 +95,7 @@ public class TestGui extends CustomModularScreen {
                     .child(new Grid()
                             .matrix(availableMatrix)
                             .scrollable()
-                            .pos(7, 7).right(14).bottom(7).debugName("available list"));
+                            .pos(7, 7).right(16).bottom(7).debugName("available list"));
         }, true);
         panel.child(new ButtonWidget<>()
                 .bottom(7).size(12, 12).leftRel(0.5f)

@@ -29,12 +29,15 @@ public class SingleChildWidget<W extends SingleChildWidget<W>> extends Widget<W>
         if (child == this || this.child == child) {
             return getThis();
         }
-
-        this.child = child;
-        if (isValid()) {
-            child.initialise(this, true);
+        if (this.child != null) {
+            this.child.dispose();
         }
+        this.child = child;
         updateList();
+        if (child != null && isValid()) {
+            child.initialise(this, true);
+            scheduleResize();
+        }
         return getThis();
     }
 }
