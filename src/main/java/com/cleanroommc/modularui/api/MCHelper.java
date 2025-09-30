@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.api;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
-
 import com.cleanroommc.modularui.api.drawable.IKey;
 
 import net.minecraft.client.Minecraft;
@@ -12,7 +11,6 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
-
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;

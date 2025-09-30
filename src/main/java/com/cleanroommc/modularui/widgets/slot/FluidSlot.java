@@ -75,8 +75,6 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, Recipe
                     if (this.syncHandler.controlsAmount()) {
                         tooltip.addLine(IKey.lang("modularui.fluid.phantom.amount", formatFluidTooltipAmount(fluid.amount), getBaseUnit()));
                     }
-
-                    tooltip.addLine(MCHelper.getFluidModName(fluid));
                 } else {
                     tooltip.addLine(IKey.lang("modularui.fluid.empty"));
                 }
@@ -87,7 +85,6 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, Recipe
                 if (fluid != null) {
                     tooltip.addLine(IKey.lang("modularui.fluid.amount", formatFluidTooltipAmount(fluid.amount), formatFluidTooltipAmount(fluidTank.getCapacity()), getBaseUnit()));
                     addAdditionalFluidInfo(tooltip, fluid);
-                    tooltip.addLine(MCHelper.getFluidModName(fluid));
                 } else {
                     tooltip.addLine(IKey.lang("modularui.fluid.empty"));
                 }
@@ -105,6 +102,9 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, Recipe
                         tooltip.addLine(IKey.lang("modularui.tooltip.shift"));
                     }
                 }
+            }
+            if (fluid != null) {
+                tooltip.addLine(MCHelper.getFluidModName(fluid));
             }
         });
     }
