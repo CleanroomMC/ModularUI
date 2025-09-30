@@ -273,14 +273,15 @@ public class TextFieldHandler {
         return this.maxLines > 1 || ((this.pattern == null || this.pattern.matcher(text).matches()) && (this.maxCharacters < 0 || this.maxCharacters >= text.length()));
     }
 
-    public void insert(String text) {
-        insert(Arrays.asList(text.split("\n")));
+    public void insert(String text, boolean hasHorizontalScrolling) {
+        insert(Arrays.asList(text.split("\n")), hasHorizontalScrolling);
     }
 
-    public void insert(List<String> text) {
+    public void insert(List<String> text, boolean hasHorizontalScrolling) {
         List<String> copy = new ArrayList<>(this.text);
         Point point = insert(copy, text);
-        if (point == null || copy.size() > this.maxLines || !this.renderer.wouldFit(copy)) return;
+        // if we can scroll horizontally, we have virtually an infinite amount of space and don't need to check width
+        if (point == null || copy.size() > this.maxLines || !this.renderer.wouldFit(copy, !hasHorizontalScrolling)) return;
         this.text.clear();
         this.text.addAll(copy);
         setCursor(point, true);

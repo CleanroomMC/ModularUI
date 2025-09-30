@@ -269,7 +269,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                                 .overlay(IKey.str("Button 2")))
                                                                         .child(new TextFieldWidget()
                                                                                 .size(60, 18)
-                                                                                .paddingTop(1)
+                                                                                .setTextAlignment(Alignment.Center)
                                                                                 .value(SyncHandlers.string(() -> this.value, val -> this.value = val))
                                                                                 .margin(0, 2)
                                                                                 .hintText("hint"))

@@ -119,7 +119,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
         this.renderer.setSimulate(false);
         this.renderer.setPos(getArea().getPadding().getLeft(), getArea().getPadding().getTop());
         this.renderer.setScale(this.scale);
-        this.renderer.setAlignment(this.textAlignment, -1, getArea().paddedHeight());
+        this.renderer.setAlignment(this.textAlignment, getArea().paddedWidth(), getArea().paddedHeight());
     }
 
     protected void drawText(ModularGuiContext context, WidgetTextFieldTheme widgetTheme) {
@@ -226,7 +226,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
             case Keyboard.KEY_ESCAPE:
                 if (ModularUIConfig.escRestoreLastText) {
                     this.handler.clear();
-                    this.handler.insert(this.lastText);
+                    this.handler.insert(this.lastText, canScrollHorizontally());
                 }
                 getContext().removeFocus();
                 return Result.SUCCESS;
@@ -267,7 +267,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
                 this.handler.delete();
             }
             // paste copied text in marked text
-            this.handler.insert(GuiScreen.getClipboardString().replace("§", ""));
+            this.handler.insert(GuiScreen.getClipboardString().replace("§", ""), canScrollHorizontally());
             return Result.SUCCESS;
         } else if (GuiScreen.isKeyComboCtrlX(keyCode) && this.handler.hasTextMarked()) {
             // copy and delete copied text
@@ -283,10 +283,14 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
                 this.handler.delete();
             }
             // insert typed char
-            this.handler.insert(String.valueOf(character));
+            this.handler.insert(String.valueOf(character), canScrollHorizontally());
             return Result.SUCCESS;
         }
         return Result.STOP;
+    }
+
+    public boolean canScrollHorizontally() {
+        return getScrollArea().getScrollX() != null;
     }
 
     public int getMaxLines() {

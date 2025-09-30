@@ -92,7 +92,7 @@ public class TextRenderer {
             draw(measuredLine.text, x0, y0);
             y0 += (int) getFontHeight();
         }
-        this.lastActualWidth = this.maxWidth > 0 ? Math.min(maxW, this.maxWidth) : maxW;
+        this.lastActualWidth = maxW;
         this.lastActualHeight = measuredLines.size() * getFontHeight();
         this.lastTrimmedWidth = Math.max(0, this.lastActualWidth - this.scale);
         this.lastTrimmedHeight = Math.max(0, this.lastActualHeight - this.scale);
@@ -193,11 +193,11 @@ public class TextRenderer {
         return this.maxWidth > 0 ? getFontRenderer().listFormattedStringToWidth(line, (int) (this.maxWidth / this.scale)) : Collections.singletonList(line);
     }
 
-    public boolean wouldFit(List<String> text) {
+    public boolean wouldFit(List<String> text, boolean shouldCheckWidth) {
         if (this.maxHeight > 0 && this.maxHeight < text.size() * getFontHeight() - this.scale) {
             return false;
         }
-        if (this.maxWidth > 0) {
+        if (this.maxWidth > 0 && shouldCheckWidth) {
             for (String line : text) {
                 if (this.maxWidth < getFontRenderer().getStringWidth(line)) {
                     return false;
@@ -240,7 +240,7 @@ public class TextRenderer {
 
     protected int getStartX(float maxWidth, float lineWidth) {
         if (this.alignment.x > 0 && maxWidth > 0) {
-            return (int) (this.x + (maxWidth * this.alignment.x) - lineWidth * this.alignment.x);
+            return Math.max(this.x, (int) (this.x + (maxWidth * this.alignment.x) - lineWidth * this.alignment.x));
         }
         return this.x;
     }
