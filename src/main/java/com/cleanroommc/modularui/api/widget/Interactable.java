@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.api.widget;
 
-import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.api.UpOrDown;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -98,7 +98,7 @@ public interface Interactable {
      * @param amount          amount scrolled by (usually irrelevant)
      * @return true if this widget can be scrolled at all
      */
-    default boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
+    default boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
         return false;
     }
 

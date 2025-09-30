@@ -2,6 +2,10 @@ package com.cleanroommc.modularui;
 
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 
+import com.cleanroommc.modularui.network.NetworkHandler;
+
+import com.cleanroommc.modularui.network.NetworkUtils;
+
 import org.apache.logging.log4j.Level;
 
 import java.util.Objects;
@@ -9,7 +13,9 @@ import java.util.Objects;
 public class GuiError {
 
     public static void throwNew(IGuiElement guiElement, Type type, String msg) {
-        GuiErrorHandler.INSTANCE.pushError(guiElement, type, msg);
+        if (NetworkUtils.isClient()) {
+            GuiErrorHandler.INSTANCE.pushError(guiElement, type, msg);
+        }
     }
 
     private final Level level = Level.ERROR;
@@ -23,9 +29,25 @@ public class GuiError {
         this.type = type;
     }
 
+    public Level getLevel() {
+        return level;
+    }
+
+    public IGuiElement getReference() {
+        return reference;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
     @Override
     public String toString() {
-        return "[" + this.level.name() + "][" + this.reference.toString() + "][" + this.type.toString() + "]: " + this.msg;
+        return "MUI [" + this.type.toString() + "][" + this.reference.toString() + "]: " + this.msg;
     }
 
     @Override

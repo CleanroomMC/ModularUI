@@ -1,53 +1,59 @@
 package com.cleanroommc.modularui.widgets;
 
-import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
-import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.utils.VectorUtil;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
+import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.utils.MathUtils;
+import com.cleanroommc.modularui.utils.Vector3f;
+import com.cleanroommc.modularui.utils.fakeworld.BaseSchemaRenderer;
 import com.cleanroommc.modularui.utils.fakeworld.ISchema;
-import com.cleanroommc.modularui.utils.fakeworld.SchemaRenderer;
 import com.cleanroommc.modularui.widget.Widget;
 
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.lwjgl.util.vector.Vector3f;
 
 public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
 
     public static final float PI = (float) Math.PI;
-    public static final float PI2 = 2 * PI;
+    public static final float PI2 = 2f * PI;
+    public static final float PI_HALF = PI / 2f;
+    public static final float PI_QUART = PI / 4f;
 
-    private final SchemaRenderer schema;
+    private final BaseSchemaRenderer schema;
     private boolean enableRotation = true;
     private boolean enableTranslation = true;
     private boolean enableScaling = true;
     private int lastMouseX;
     private int lastMouseY;
-    private double scale = 10;
-    private float pitch = (float) (Math.PI / 4f);
-    private float yaw = (float) (Math.PI / 4f);
+    private float scale = 10;
+    private float pitch = PI_QUART;
+    private float yaw = 0;
     private final Vector3f offset = new Vector3f();
 
     public SchemaWidget(ISchema schema) {
-        this(new SchemaRenderer(schema));
+        this(new BaseSchemaRenderer(schema));
     }
 
-    public SchemaWidget(SchemaRenderer schema) {
+    public SchemaWidget(BaseSchemaRenderer schema) {
         this.schema = schema;
-        schema.cameraFunc((camera, $schema) -> {
-            Vector3f focus = VectorUtil.vec3fAdd(this.offset, null, $schema.getFocus());
-            camera.setLookAt(focus, scale, yaw, pitch);
-        });
     }
 
     @Override
-    public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
+    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
+        Vec3d f = this.schema.getSchema().getFocus();
+        this.schema.getCamera().setLookAtAndAngle((float) (f.x + this.offset.x), (float) (f.y + this.offset.y), (float) (f.z + this.offset.z), scale, yaw, pitch);
+        this.schema.drawAtZero(context, getArea(), widgetTheme);
+    }
+
+    @Override
+    public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
         if (this.enableScaling) {
-            scale(-scrollDirection.modifier * amount / 120.0);
+            incrementScale(-scrollDirection.modifier * amount / 120.0f);
             return true;
         }
         return false;
@@ -67,39 +73,38 @@ public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
         int dx = mouseX - lastMouseX;
         int dy = mouseY - lastMouseY;
         if (mouseButton == 0 && this.enableRotation) {
-            float moveScale = 0.025f;
-            yaw = (yaw + dx * moveScale + PI2) % PI2;
-            pitch = MathHelper.clamp(pitch + dy * moveScale, -PI2 / 4 + 0.001f, PI2 / 4 - 0.001f);
+            float moveScale = 0.03f;
+            yaw(this.yaw + dx * moveScale);
+            pitch(this.pitch + dy * moveScale);
         } else if (mouseButton == 2 && this.enableTranslation) {
-            // the idea is to construct a vector which points upwards from the camerae pov (y-axis on screen)
-            // this vector determines the amount of z offset from mouse movement in y
-            float y = (float) Math.cos(pitch);
-            float moveScale = 0.06f;
-            // with this the offset can be moved by dy
-            offset.translate(0, dy * y * moveScale, 0);
-            // to respect dx we need a new vector which is perpendicular on the previous vector (x-axis on screen)
-            // y = 0 => mouse movement in x does not move y
-            float phi = (yaw + PI / 2) % PI2;
-            float x = (float) Math.cos(phi);
-            float z = (float) Math.sin(phi);
-            offset.translate(dx * x * moveScale, 0, dx * z * moveScale);
+            float moveScale = 0.09f;
+            Vector3f.resetUnitVectors();
+            Vector3f look = this.schema.getCamera().getLookVec().normalise(); // direction camera is looking
+            Vector3f right = Vector3f.cross(look, Vector3f.UNIT_Y, null).normalise(); // right relative to screen
+            Vector3f up = Vector3f.cross(right, look, null); // up relative to screen
+            this.offset.add(right.scale(-dx * moveScale)).add(up.scale(dy * moveScale));
         }
         this.lastMouseX = mouseX;
         this.lastMouseY = mouseY;
     }
 
-    public SchemaWidget scale(double scale) {
-        this.scale += scale;
+    public void incrementScale(float amount) {
+        this.scale += amount;
+    }
+
+    public SchemaWidget scale(float scale) {
+        this.scale = scale;
         return this;
     }
 
     public SchemaWidget pitch(float pitch) {
-        this.pitch += pitch;
+        this.pitch = MathUtils.clamp(pitch, -PI_HALF + 0.001f, PI_HALF - 0.001f);
+        ;
         return this;
     }
 
     public SchemaWidget yaw(float yaw) {
-        this.yaw += yaw;
+        this.yaw = (yaw + PI2) % PI2;
         return this;
     }
 
@@ -133,9 +138,8 @@ public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
         return enableInteraction(enable, enable, enable);
     }
 
-    @Override
-    public @Nullable IDrawable getOverlay() {
-        return schema;
+    public RayTraceResult getBlockUnderMouse() {
+        return schema.getLastRayTrace();
     }
 
     public static class LayerButton extends ButtonWidget<LayerButton> {

@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.MCHelper;
+import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.GuiDraw;
@@ -507,7 +508,7 @@ public class ModularScreen {
     /**
      * Called with {@code true} after a widget which implements {@link com.cleanroommc.modularui.api.widget.IFocusedWidget IFocusedWidget}
      * has consumed a mouse press and called with {@code false} if a widget is currently focused and anything else has consumed a mouse
-     * press. This is required for other mods like JEI/NEI to not interfere with inputs.
+     * press. This is required for other mods like recipe viewer to not interfere with inputs.
      *
      * @param focus true if the gui screen will be focused
      */
@@ -711,22 +712,4 @@ public class ModularScreen {
         return this;
     }
 
-    // TODO move this to a more appropriate place
-    public enum UpOrDown {
-        UP(1), DOWN(-1);
-
-        public final int modifier;
-
-        UpOrDown(int modifier) {
-            this.modifier = modifier;
-        }
-
-        public boolean isUp() {
-            return this == UP;
-        }
-
-        public boolean isDown() {
-            return this == DOWN;
-        }
-    }
 }

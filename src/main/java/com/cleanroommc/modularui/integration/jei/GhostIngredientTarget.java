@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.integration.jei;
 
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerGhostIngredientSlot;
 
 import net.minecraftforge.fml.common.Optional;
 
@@ -14,20 +15,20 @@ import java.awt.*;
 public class GhostIngredientTarget<I> implements IGhostIngredientHandler.Target<I> {
 
     private final IGuiElement guiElement;
-    private final JeiGhostIngredientSlot<I> ghostSlot;
+    private final RecipeViewerGhostIngredientSlot<I> ghostSlot;
 
-    public static <I> GhostIngredientTarget<I> of(JeiGhostIngredientSlot<I> slot) {
+    public static <I> GhostIngredientTarget<I> of(RecipeViewerGhostIngredientSlot<I> slot) {
         if (slot instanceof IGuiElement guiElement) {
             return new GhostIngredientTarget<>(guiElement, slot);
         }
         throw new IllegalArgumentException();
     }
 
-    public static <I, W extends IWidget & JeiGhostIngredientSlot<I>> GhostIngredientTarget<I> of(W slot) {
+    public static <I, W extends IWidget & RecipeViewerGhostIngredientSlot<I>> GhostIngredientTarget<I> of(W slot) {
         return new GhostIngredientTarget<>(slot, slot);
     }
 
-    public GhostIngredientTarget(IGuiElement guiElement, JeiGhostIngredientSlot<I> ghostSlot) {
+    public GhostIngredientTarget(IGuiElement guiElement, RecipeViewerGhostIngredientSlot<I> ghostSlot) {
         this.guiElement = guiElement;
         this.ghostSlot = ghostSlot;
     }

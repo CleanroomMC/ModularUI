@@ -1,9 +1,16 @@
 package com.cleanroommc.modularui.utils;
 
+import net.minecraft.util.math.MathHelper;
+
 import org.mariuszgromada.math.mxparser.Constant;
 import org.mariuszgromada.math.mxparser.Expression;
 
 public class MathUtils {
+
+    public static final float PI = (float) Math.PI;
+    public static final float PI2 = 2f * PI;
+    public static final float PI_HALF = PI / 2f;
+    public static final float PI_QUART = PI / 4f;
 
     // SI prefixes
     public static final Constant k = new Constant("k", 1e3);
@@ -113,5 +120,57 @@ public class MathUtils {
             }
         }
         return max;
+    }
+
+    public static int ceil(float value) {
+        int i = (int) value;
+        return value > (float) i ? i + 1 : i;
+    }
+
+    public static int ceil(double value) {
+        int i = (int) value;
+        return value > (double) i ? i + 1 : i;
+    }
+
+    /**
+     * the angle is reduced to an angle between -180 and +180 by mod, and a 360 check
+     */
+    public static float wrapDegrees(float value) {
+        value = value % 360.0F;
+        if (value >= 180.0F) value -= 360.0F;
+        if (value < -180.0F) value += 360.0F;
+        return value;
+    }
+
+    /**
+     * the angle is reduced to an angle between -180 and +180 by mod, and a 360 check
+     */
+    public static double wrapDegrees(double value) {
+        value = value % 360.0D;
+        if (value >= 180.0D) value -= 360.0D;
+        if (value < -180.0D) value += 360.0D;
+        return value;
+    }
+
+    /**
+     * Adjust the angle so that his value is in range [-180;180[
+     */
+    public static int wrapDegrees(int angle) {
+        angle = angle % 360;
+        if (angle >= 180) angle -= 360;
+        if (angle < -180) angle += 360;
+        return angle;
+    }
+
+    public static float sin(float v) {
+        return MathHelper.sin(v);
+    }
+
+    public static float cos(float v) {
+        return MathHelper.cos(v);
+    }
+
+    public static float tan(float v) {
+        return MathHelper.sin(v) / MathHelper.cos(v);
     }
 }

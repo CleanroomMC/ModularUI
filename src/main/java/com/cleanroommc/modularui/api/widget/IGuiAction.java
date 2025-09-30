@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.api.widget;
 
+import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.screen.ModularScreen;
 
 /**
@@ -34,7 +35,7 @@ public interface IGuiAction {
     @FunctionalInterface
     interface MouseScroll extends IGuiAction {
 
-        boolean scroll(ModularScreen.UpOrDown direction, int amount);
+        boolean scroll(UpOrDown direction, int amount);
     }
 
     @FunctionalInterface

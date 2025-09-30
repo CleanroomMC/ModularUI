@@ -15,23 +15,37 @@ import com.cleanroommc.modularui.drawable.SpriteDrawable;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.RichTooltip;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.utils.*;
+import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.GameObjectHelper;
+import com.cleanroommc.modularui.utils.Interpolation;
+import com.cleanroommc.modularui.utils.Interpolations;
+import com.cleanroommc.modularui.utils.SpriteHelper;
 import com.cleanroommc.modularui.utils.fakeworld.ArraySchema;
+import com.cleanroommc.modularui.utils.fakeworld.FakeEntity;
 import com.cleanroommc.modularui.utils.fakeworld.ISchema;
+import com.cleanroommc.modularui.value.StringValue;
 import com.cleanroommc.modularui.widget.DraggableWidget;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widgets.ListWidget;
 import com.cleanroommc.modularui.widgets.RichTextWidget;
 import com.cleanroommc.modularui.widgets.SchemaWidget;
 import com.cleanroommc.modularui.widgets.SortableListWidget;
+import com.cleanroommc.modularui.widgets.TextWidget;
 import com.cleanroommc.modularui.widgets.TransformWidget;
 import com.cleanroommc.modularui.widgets.layout.Column;
+import com.cleanroommc.modularui.widgets.layout.Flow;
 import com.cleanroommc.modularui.widgets.layout.Row;
-import com.cleanroommc.modularui.widgets.TextWidget;
+import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -41,6 +55,7 @@ import net.minecraft.util.text.TextFormatting;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
@@ -49,7 +64,7 @@ public class TestGuis extends CustomModularScreen {
 
     @Override
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {
-        return buildListUi(context);
+        return buildSpriteAndEntityUI(context);
     }
 
     public @NotNull ModularPanel buildAnimationUI(ModularGuiContext context) {
@@ -122,16 +137,19 @@ public class TestGuis extends CustomModularScreen {
                                 })));
     }
 
-    public @NotNull ModularPanel buildSpriteUI(ModularGuiContext context) {
+    public @NotNull ModularPanel buildSpriteAndEntityUI(ModularGuiContext context) {
         TextureAtlasSprite sprite = SpriteHelper.getSpriteOfBlockState(GameObjectHelper.getBlockState("minecraft", "command_block"), EnumFacing.UP);
         // SpriteHelper.getSpriteOfItem(new ItemStack(Items.DIAMOND));
+        Entity entity = FakeEntity.create(EntityDragon.class);
+        float period = 3000f;
         return ModularPanel.defaultPanel("main")
                 .size(150)
-                .child(new TextWidget(IKey.str("Test String")).scale(0.6f).horizontalCenter().top(7))
+                .child(new TextWidget<>(IKey.str("Test String")).scale(0.6f).horizontalCenter().top(7))
                 .child(new DraggableWidget<>()
                         .background(new SpriteDrawable(sprite))
                         .size(20)
-                        .center()
+                        .alignX(0.5f)
+                        .top(20)
                         .tooltipBuilder(tooltip -> {
                             tooltip.addLine(
                                     "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.  "
@@ -143,7 +161,19 @@ public class TestGuis extends CustomModularScreen {
                             tooltip.alignment(Alignment.Center);
                             tooltip.scale(0.5f);
                             tooltip.pos(RichTooltip.Pos.NEXT_TO_MOUSE);
-                        }));
+                        }))
+                .child(new IDrawable() {
+                    @Override
+                    public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
+                        GuiDraw.drawEntity(entity, 0, 0, width, height, context.getCurrentDrawingZ(), e -> {
+                            float scale = 0.9f;
+                            GlStateManager.scale(scale, scale, scale);
+                            GlStateManager.translate(0, 7, 0);
+                            GlStateManager.rotate(35, 1, 0, 0);
+                            GlStateManager.rotate(360 * (Minecraft.getSystemTime() % period) / period, 0, 1, 0);
+                        }, null);
+                    }
+                }.asWidget().alignX(0.5f).bottom(10).size(100, 75));
     }
 
 
@@ -218,12 +248,12 @@ public class TestGuis extends CustomModularScreen {
         world.addBlock(new BlockPos(1, 0, 1), new BlockInfo(Blocks.GOLD_BLOCK.getDefaultState()));*/
 /*        return ModularPanel.defaultPanel("main")
                 .size(150)
-                .overlay(new SchemaRenderer(BoxSchema.of(Minecraft.getMinecraft().world, new BlockPos(Minecraft.getMinecraft().player), 5))
+                .overlay(new SchemaRenderer(BoxSchema.of(Minecraft.getMinecraft().world, new BlockPos(Platform.getClientPlayer()), 5))
                         .cameraFunc((camera, schema) -> {
                             double pitch = Math.PI / 4;
                             double T = 4000D;
                             double yaw = Minecraft.getSystemTime() % T / T * Math.PI * 2;
-                            camera.setLookAt(new BlockPos(Minecraft.getMinecraft().player), 20, yaw, pitch);
+                            camera.setLookAt(new BlockPos(Platform.getClientPlayer()), 20, yaw, pitch);
                         })
                         .isometric(true)
                         .asIcon().size(140));*/
@@ -275,5 +305,28 @@ public class TestGuis extends CustomModularScreen {
                                         w.setEnabled(!w.isEnabled());
                                     }
                                 })));
+    }
+
+    public @NotNull ModularPanel buildSearchTest(ModularGuiContext context) {
+        List<String> items = Arrays.asList("Chicken", "Jockey", "Flint", "Steel", "Steve", "Diamond", "Ingot", "Iron", "Armor", "Greg");
+        StringValue searchValue = new StringValue("");
+        return ModularPanel.defaultPanel("search", 100, 150)
+                .child(Flow.column()
+                        .padding(5)
+                        .child(new TextFieldWidget()
+                                .value(searchValue)
+                                .height(16)
+                                .widthRel(1f))
+                        .child(new ListWidget<>()
+                                .collapseDisabledChild()
+                                .expanded()
+                                .widthRel(1f)
+                                .children(items.size(), i -> new TextWidget<>(IKey.str(items.get(i)))
+                                        .alignment(Alignment.Center)
+                                        .color(Color.WHITE.main)
+                                        .widthRel(1f)
+                                        .height(16)
+                                        .background(GuiTextures.MC_BUTTON)
+                                        .setEnabledIf(w -> items.get(i).toLowerCase().contains(searchValue.getStringValue())))));
     }
 }

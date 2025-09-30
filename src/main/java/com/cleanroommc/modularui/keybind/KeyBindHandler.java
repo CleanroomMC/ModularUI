@@ -1,8 +1,7 @@
 package com.cleanroommc.modularui.keybind;
 
-import com.cleanroommc.modularui.core.mixin.KeyBindAccess;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.KeyBindAccess;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.settings.KeyBindingMap;
