@@ -163,15 +163,21 @@ public class MathUtils {
     }
 
     public static float sin(float v) {
-        return MathHelper.sin(v);
+        // MathHelper.sin doesn't account for negative numbers
+        // with the point symmetry property of sin we can easily fix it
+        // if v is negative, negate the input and then the output
+        float s = Math.signum(v);
+        return s * MathHelper.sin(s * v);
     }
 
     public static float cos(float v) {
-        return MathHelper.cos(v);
+        // MathHelper.cos doesn't account for negative numbers
+        // with the axis symmetry property of cos we can easily fix it
+        return MathHelper.cos(Math.abs(v));
     }
 
     public static float tan(float v) {
-        return MathHelper.sin(v) / MathHelper.cos(v);
+        return sin(v) / cos(v);
     }
 
     public static double sqrt(double v) {
@@ -180,22 +186,5 @@ public class MathUtils {
 
     public static float sqrt(float v) {
         return (float) Math.sqrt(v);
-    }
-
-    /**
-     * Computes 1/sqrt(n) using <a href="https://en.wikipedia.org/wiki/Fast_inverse_square_root">the fast inverse square
-     * root</a> with a constant of 0x5FE6EB50C7B537AA.
-     */
-    public static double fastInvSqrt(double v) {
-        double d0 = 0.5D * v;
-        long i = Double.doubleToRawLongBits(v);
-        i = 6910469410427058090L - (i >> 1);
-        v = Double.longBitsToDouble(i);
-        v = v * (1.5D - d0 * v * v);
-        return v;
-    }
-
-    public static float fastInvSqrt(float v) {
-        return (float) fastInvSqrt((double) v);
     }
 }

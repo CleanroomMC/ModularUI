@@ -221,7 +221,7 @@ public class Vector3f {
         if (dest == null) dest = new Vector3f();
         float lsq = lengthSquared();
         if (lsq == 1) return dest.set(this);
-        float f = MathUtils.fastInvSqrt(lsq);
+        float f = (float) (1f / Math.sqrt(lsq));
         dest.set(x * f, y * f, z * f);
         return dest;
     }
