@@ -3,11 +3,13 @@ package com.cleanroommc.modularui.test;
 import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.Circle;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.ItemDrawable;
 import com.cleanroommc.modularui.drawable.Rectangle;
 import com.cleanroommc.modularui.drawable.text.AnimatedText;
+import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.factory.PosGuiData;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.screen.ModularPanel;
@@ -18,6 +20,9 @@ import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.Interpolation;
+import com.cleanroommc.modularui.utils.fakeworld.ArraySchema;
+import com.cleanroommc.modularui.utils.fakeworld.BlockHighlight;
+import com.cleanroommc.modularui.utils.fakeworld.SchemaRenderer;
 import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.value.IntValue;
 import com.cleanroommc.modularui.value.StringValue;
@@ -40,6 +45,7 @@ import com.cleanroommc.modularui.widgets.ListWidget;
 import com.cleanroommc.modularui.widgets.PageButton;
 import com.cleanroommc.modularui.widgets.PagedWidget;
 import com.cleanroommc.modularui.widgets.ProgressWidget;
+import com.cleanroommc.modularui.widgets.SchemaWidget;
 import com.cleanroommc.modularui.widgets.ScrollingTextWidget;
 import com.cleanroommc.modularui.widgets.SliderWidget;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
@@ -174,7 +180,10 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                 .tab(GuiTextures.TAB_TOP, 0))
                         .child(new PageButton(3, tabController)
                                 .tab(GuiTextures.TAB_TOP, 0)
-                                .overlay(new ItemDrawable(Blocks.CHEST).asIcon())))
+                                .overlay(new ItemDrawable(Blocks.CHEST).asIcon()))
+                        .child(new PageButton(4, tabController)
+                                .tab(GuiTextures.TAB_TOP, 0)
+                                .overlay(new ItemDrawable(Items.ENDER_EYE).asIcon())))
                 .child(new Expandable()
                         .debugName("expandable")
                         .top(0)
@@ -438,7 +447,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                         .child(new DynamicSyncedWidget<>()
                                                                 .widthRel(1f)
                                                                 .syncHandler(dynamicSyncHandler)))
-                                        )))
+                                        )
+                                        .addPage(createSchemaPage(guiData))))
                         .child(SlotGroupWidget.playerInventory(false))
                 );
         /*panel.child(new ButtonWidget<>()
@@ -452,6 +462,19 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                 .left(0.5f))
                         .setSynced("fluid_slot"));*/
         return panel;
+    }
+
+    private IWidget createSchemaPage(GuiData data) {
+        ParentWidget<?> page = new ParentWidget<>();
+        page.debugName("page 5 schema");
+        page.sizeRel(1f);
+        page.child(IKey.str("schema").asWidget());
+        if (world.isRemote)
+            page.child(new SchemaWidget(new SchemaRenderer(ArraySchema.of(data.getPlayer(), 5))
+                    .highlightRenderer(new BlockHighlight(Color.withAlpha(Color.GREEN.brighter(1), 0.9f), 1/32f)))
+                    .pos(20, 20)
+                    .size(100, 100));
+        return page;
     }
 
     public ModularPanel openSecondWindow(PanelSyncManager syncManager, IPanelHandler syncHandler) {
