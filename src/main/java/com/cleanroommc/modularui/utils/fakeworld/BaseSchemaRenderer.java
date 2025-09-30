@@ -37,6 +37,10 @@ import org.lwjgl.opengl.EXTFramebufferObject;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 public class BaseSchemaRenderer implements IDrawable {
 
     private static final Framebuffer FBO = new Framebuffer(1080, 1080, true);
@@ -163,23 +167,14 @@ public class BaseSchemaRenderer implements IDrawable {
         GlStateManager.disableLighting();
         Platform.setupDrawGradient(); // needed for ambient occlusion
 
+        List<TileEntity> tesr = null;
         try { // render block in each layer
             for (BlockRenderLayer layer : BlockRenderLayer.values()) {
-                ForgeHooksClient.setRenderLayer(layer);
-                int pass = layer == BlockRenderLayer.TRANSLUCENT ? 1 : 0;
-                setDefaultPassRenderState(pass);
-                BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-                BlockRendererDispatcher blockrendererdispatcher = mc.getBlockRendererDispatcher();
-                this.schema.forEach(pair -> {
-                    BlockPos pos = pair.getKey();
-                    IBlockState state = pair.getValue().getBlockState();
-                    if (!state.getBlock().isAir(state, this.renderWorld, pos) && state.getBlock().canRenderInLayer(state, layer)) {
-                        blockrendererdispatcher.renderBlock(state, pos, this.renderWorld, buffer);
-                    }
-                });
-                Tessellator.getInstance().draw();
-                Tessellator.getInstance().getBuffer().setTranslation(0, 0, 0);
+                if (layer.ordinal() == 0 && isTesrEnabled()) {
+                    tesr = renderBlocksInLayer(mc, layer, true);
+                } else {
+                    renderBlocksInLayer(mc, layer, false);
+                }
             }
         } finally {
             ForgeHooksClient.setRenderLayer(oldRenderLayer);
@@ -188,27 +183,71 @@ public class BaseSchemaRenderer implements IDrawable {
         RenderHelper.enableStandardItemLighting();
         GlStateManager.enableLighting();
 
-        // render TESR
-        if (isTesrEnabled()) {
-            for (int pass = 0; pass < 2; pass++) {
-                ForgeHooksClient.setRenderPass(pass);
-                int finalPass = pass;
-                GlStateManager.color(1, 1, 1, 1);
-                setDefaultPassRenderState(pass);
-                this.schema.forEach(pair -> {
-                    BlockPos pos = pair.getKey();
-                    TileEntity tile = pair.getValue().getTileEntity();
-                    if (tile != null && tile.shouldRenderInPass(finalPass)) {
-                        TileEntityRendererDispatcher.instance.render(tile, pos.getX(), pos.getY(), pos.getZ(), 0);
-                    }
-                });
+        try { // render TESR
+            if (tesr != null && !tesr.isEmpty()) {
+                renderTesr(tesr, 0);
+                if (!tesr.isEmpty()) { // any tesr that don't render in pass 1 or 2 are removed from the list
+                    renderTesr(tesr, 1);
+                    renderTesr(tesr, 2);
+                }
             }
+        } finally {
+            ForgeHooksClient.setRenderPass(-1);
         }
+
         Platform.endDrawGradient();
-        ForgeHooksClient.setRenderPass(-1);
         GlStateManager.enableDepth();
         GlStateManager.disableBlend();
         GlStateManager.depthMask(true);
+    }
+
+    private List<TileEntity> renderBlocksInLayer(Minecraft mc, BlockRenderLayer layer, boolean collectTesr) {
+        List<TileEntity> tesr = collectTesr ? new ArrayList<>() : null;
+        ForgeHooksClient.setRenderLayer(layer);
+        int pass = layer == BlockRenderLayer.TRANSLUCENT ? 1 : 0;
+        setDefaultPassRenderState(pass);
+        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+        BlockRendererDispatcher blockrendererdispatcher = mc.getBlockRendererDispatcher();
+        this.schema.forEach(pair -> {
+            BlockPos pos = pair.getKey();
+            IBlockState state = pair.getValue().getBlockState();
+            if (state.getBlock().isAir(state, this.renderWorld, pos)) return;
+            if (collectTesr) {
+                TileEntity te = pair.getValue().getTileEntity();
+                if (te != null && !te.isInvalid()) {
+                    if (!te.getPos().equals(pos)) te.setPos(pos.toImmutable());
+                    if (TileEntityRendererDispatcher.instance.getRenderer(te.getClass()) != null) {
+                        // only collect tiles to render which actually have a tesr
+                        tesr.add(te);
+                    }
+                }
+            }
+            if (state.getBlock().canRenderInLayer(state, layer)) {
+                blockrendererdispatcher.renderBlock(state, pos, this.renderWorld, buffer);
+            }
+        });
+        Tessellator.getInstance().draw();
+        Tessellator.getInstance().getBuffer().setTranslation(0, 0, 0);
+        return tesr;
+    }
+
+    private static void renderTesr(List<TileEntity> tileEntities, int pass) {
+        ForgeHooksClient.setRenderPass(pass);
+        GlStateManager.color(1, 1, 1, 1);
+        setDefaultPassRenderState(pass);
+        for (Iterator<TileEntity> iterator = tileEntities.iterator(); iterator.hasNext(); ) {
+            TileEntity tile = iterator.next();
+            if (tile == null || tile.isInvalid()) continue;
+            if (pass == 0 && (!tile.shouldRenderInPass(1) || !tile.shouldRenderInPass(2))) {
+                // remove tiles that don't render in further passes
+                iterator.remove();
+            }
+            if (tile.shouldRenderInPass(pass)) {
+                BlockPos pos = tile.getPos();
+                TileEntityRendererDispatcher.instance.render(tile, pos.getX(), pos.getY(), pos.getZ(), 0);
+            }
+        }
     }
 
     private static void setDefaultPassRenderState(int pass) {

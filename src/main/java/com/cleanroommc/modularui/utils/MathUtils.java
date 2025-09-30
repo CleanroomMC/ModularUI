@@ -173,4 +173,29 @@ public class MathUtils {
     public static float tan(float v) {
         return MathHelper.sin(v) / MathHelper.cos(v);
     }
+
+    public static double sqrt(double v) {
+        return Math.sqrt(v);
+    }
+
+    public static float sqrt(float v) {
+        return (float) Math.sqrt(v);
+    }
+
+    /**
+     * Computes 1/sqrt(n) using <a href="https://en.wikipedia.org/wiki/Fast_inverse_square_root">the fast inverse square
+     * root</a> with a constant of 0x5FE6EB50C7B537AA.
+     */
+    public static double fastInvSqrt(double v) {
+        double d0 = 0.5D * v;
+        long i = Double.doubleToRawLongBits(v);
+        i = 6910469410427058090L - (i >> 1);
+        v = Double.longBitsToDouble(i);
+        v = v * (1.5D - d0 * v * v);
+        return v;
+    }
+
+    public static float fastInvSqrt(float v) {
+        return (float) fastInvSqrt((double) v);
+    }
 }

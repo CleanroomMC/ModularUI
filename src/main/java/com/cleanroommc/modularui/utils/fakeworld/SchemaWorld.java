@@ -9,11 +9,11 @@ import com.google.common.collect.AbstractIterator;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectListIterator;
 import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
-import java.util.Map;
 import java.util.function.BiPredicate;
 
 public class SchemaWorld extends DummyWorld implements ISchema {
@@ -95,14 +95,14 @@ public class SchemaWorld extends DummyWorld implements ISchema {
 
     @NotNull
     @Override
-    public Iterator<Map.Entry<BlockPos, BlockInfo>> iterator() {
+    public Iterator<Pair<BlockPos, BlockInfo>> iterator() {
         return new AbstractIterator<>() {
             private final ObjectListIterator<BlockPos> it = blocks.iterator();
             private final BlockInfo.Mut info = new BlockInfo.Mut();
             private final MutablePair<BlockPos, BlockInfo> pair = new MutablePair<>(null, this.info);
 
             @Override
-            protected Map.Entry<BlockPos, BlockInfo> computeNext() {
+            protected Pair<BlockPos, BlockInfo> computeNext() {
                 while (it.hasNext()) {
                     var pos = it.next();
                     this.info.set(SchemaWorld.this, pos);

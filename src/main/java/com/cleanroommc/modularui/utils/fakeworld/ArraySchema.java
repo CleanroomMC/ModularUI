@@ -19,13 +19,13 @@ import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.chars.CharArraySet;
 import it.unimi.dsi.fastutil.chars.CharSet;
 import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiPredicate;
 
 public class ArraySchema implements ISchema {
@@ -120,7 +120,7 @@ public class ArraySchema implements ISchema {
 
     @NotNull
     @Override
-    public Iterator<Map.Entry<BlockPos, BlockInfo>> iterator() {
+    public Iterator<Pair<BlockPos, BlockInfo>> iterator() {
         return new AbstractIterator<>() {
 
             private final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
@@ -128,7 +128,7 @@ public class ArraySchema implements ISchema {
             private int x = 0, y = 0, z = -1;
 
             @Override
-            protected Map.Entry<BlockPos, BlockInfo> computeNext() {
+            protected Pair<BlockPos, BlockInfo> computeNext() {
                 BlockInfo info;
                 while (true) {
                     if (++z >= blocks[x][y].length) {
