@@ -5,7 +5,7 @@ import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.utils.Vector3f;
 import com.cleanroommc.modularui.utils.fakeworld.BaseSchemaRenderer;
@@ -44,10 +44,10 @@ public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
     }
 
     @Override
-    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
+    public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         Vec3d f = this.schema.getSchema().getFocus();
         this.schema.getCamera().setLookAtAndAngle((float) (f.x + this.offset.x), (float) (f.y + this.offset.y), (float) (f.z + this.offset.z), scale, yaw, pitch);
-        this.schema.drawAtZero(context, getArea(), widgetTheme);
+        this.schema.drawAtZero(context, getArea(), widgetTheme.getTheme());
     }
 
     @Override

@@ -48,10 +48,6 @@ public class Icon implements IIcon, IJsonSerializable {
         return this.margin;
     }
 
-    public int getColor() {
-        return color;
-    }
-
     @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {

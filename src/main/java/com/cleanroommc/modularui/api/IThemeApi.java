@@ -64,6 +64,14 @@ public interface IThemeApi {
     WidgetThemeKey<SlotTheme> ITEM_SLOT_PLAYER_MAIN_INV = ITEM_SLOT_PLAYER.createSubKey("playerMainInventory");
     WidgetThemeKey<SlotTheme> ITEM_SLOT_PLAYER_OFFHAND = ITEM_SLOT_PLAYER.createSubKey("playerOffhand");
     WidgetThemeKey<SlotTheme> ITEM_SLOT_PLAYER_ARMOR = ITEM_SLOT_PLAYER.createSubKey("playerArmor");
+    /* copy and paste into theme for testing
+      "itemSlot:player": {
+        "color": "#FF914354"
+      },
+      "itemSlot:playerHotbar": {
+        "color": "#FF60917c"
+      }
+     */
 
     String HOVER_SUFFIX = ":hover";
 
