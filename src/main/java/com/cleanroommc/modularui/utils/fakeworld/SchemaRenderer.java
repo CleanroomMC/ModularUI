@@ -91,7 +91,7 @@ public class SchemaRenderer extends BaseSchemaRenderer {
     @Override
     protected void onSuccessfulRayTrace(@NotNull RayTraceResult result) {
         if (this.highlight != null) {
-            this.highlight.renderHighlight(result.getBlockPos(), result.sideHit, getCamera().getPos());
+            this.highlight.renderHighlight(result, getCamera().getPos());
         }
     }
 

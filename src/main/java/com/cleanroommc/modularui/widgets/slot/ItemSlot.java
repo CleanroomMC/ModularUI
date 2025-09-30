@@ -234,6 +234,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 float itemScale = NEAAnimationHandler.injectHoverScale(guiContainer, slotIn);
                 // render the item itself
                 renderItem.renderItemAndEffectIntoGUI(guiScreen.mc.player, itemstack, 1, 1);
+                Platform.endDrawItem();
                 // TODO render item borders from item borders mod here
 
                 if (amount < 0) {

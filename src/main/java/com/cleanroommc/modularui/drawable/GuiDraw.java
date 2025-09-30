@@ -337,8 +337,6 @@ public class GuiDraw {
             textRenderer.setAlignment(alignment, width, height);
             textRenderer.setPos(x, y);
             textRenderer.setHardWrapOnBorder(false);
-            GlStateManager.disableLighting();
-            GlStateManager.disableDepth();
             textRenderer.draw(amountText);
             textRenderer.setHardWrapOnBorder(true);
         }

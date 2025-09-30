@@ -3,7 +3,6 @@ package com.cleanroommc.modularui.utils.fakeworld;
 import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.utils.Vector3f;
 
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
 
 import org.jetbrains.annotations.Nullable;
@@ -86,7 +85,7 @@ public class Camera {
         this.pitch = pitch;
         this.dist = dist;
         Vector3f v = this.temp;
-        v.set(MathHelper.cos(yaw), 0, MathHelper.sin(yaw));
+        v.set(MathUtils.cos(yaw), 0, MathUtils.sin(yaw));
         v.y = MathUtils.tan(pitch) * v.length();
         v.normalise().scale(dist);
         this.pos.set(v.translate(lookAtX, lookAtY, lookAtZ));
