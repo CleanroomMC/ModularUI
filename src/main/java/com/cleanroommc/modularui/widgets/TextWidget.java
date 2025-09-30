@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.WidgetTree;
@@ -35,12 +36,13 @@ public class TextWidget<W extends TextWidget<W>> extends Widget<W> {
     }
 
     @Override
-    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
+    public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         TextRenderer renderer = TextRenderer.SHARED;
         this.lastText = checkString();
-        renderer.setColor(this.color != null ? this.color.getAsInt() : widgetTheme.getTextColor());
+        WidgetTheme theme = getActiveWidgetTheme(widgetTheme, isHovering());
+        renderer.setColor(this.color != null ? this.color.getAsInt() : theme.getTextColor());
         renderer.setAlignment(this.alignment, getArea().paddedWidth() + this.scale, getArea().paddedHeight());
-        renderer.setShadow(this.shadow != null ? this.shadow : widgetTheme.getTextShadow());
+        renderer.setShadow(this.shadow != null ? this.shadow : theme.getTextShadow());
         renderer.setPos(getArea().getPadding().getLeft(), getArea().getPadding().getTop());
         renderer.setScale(this.scale);
         renderer.setSimulate(false);

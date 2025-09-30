@@ -1,12 +1,9 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.value.IStringValue;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
-import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.utils.ParseResult;
 import com.cleanroommc.modularui.value.StringValue;
@@ -15,7 +12,6 @@ import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.text.ParsePosition;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -56,14 +52,6 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         if (!hasTooltip()) {
             tooltipBuilder(tooltip -> tooltip.addLine(IKey.str(getText())));
         }
-    }
-
-    public int getMarkedColor() {
-        WidgetTheme theme = getWidgetTheme(getContext().getTheme());
-        if (theme instanceof WidgetTextFieldTheme textFieldTheme) {
-            return textFieldTheme.getMarkedColor();
-        }
-        return ITheme.getDefault().getTextFieldTheme().getMarkedColor();
     }
 
     @Override

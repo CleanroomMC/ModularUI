@@ -1,3 +1,9 @@
 {
-  "parent": "DEFAULT"
+  "parent": "DEFAULT",
+  "itemSlot:player": {
+    "color": "#FF914354"
+  },
+  "itemSlot:player_hotbar": {
+    "color": "#FF60917c"
+  }
 }

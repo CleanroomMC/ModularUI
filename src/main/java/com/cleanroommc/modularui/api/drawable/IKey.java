@@ -200,6 +200,10 @@ public interface IKey extends IDrawable, IJsonSerializable {
     }
 
     @Override
+    default boolean canApplyTheme() {
+        return true;
+    }
+
     default TextWidget<?> asWidget() {
         return new TextWidget<>(this);
     }

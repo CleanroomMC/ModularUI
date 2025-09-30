@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Interpolation;
 
 public class ScrollingTextWidget extends TextWidget<ScrollingTextWidget> {
@@ -51,7 +52,7 @@ public class ScrollingTextWidget extends TextWidget<ScrollingTextWidget> {
     }
 
     @Override
-    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
+    public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         if (this.animator == null) {
             animator(new Animator().curve(Interpolation.SINE_INOUT));
         }
@@ -59,10 +60,11 @@ public class ScrollingTextWidget extends TextWidget<ScrollingTextWidget> {
             updateLine(getKey().getFormatted());
         }
         checkString();
+        WidgetTheme theme = getActiveWidgetTheme(widgetTheme, isHovering());
         TextRenderer renderer = TextRenderer.SHARED;
-        renderer.setColor(getColor() != null ? getColor().getAsInt() : widgetTheme.getTextColor());
+        renderer.setColor(getColor() != null ? getColor().getAsInt() : theme.getTextColor());
         renderer.setAlignment(getAlignment(), getArea().w(), getArea().h());
-        renderer.setShadow(isShadow() != null ? isShadow() : widgetTheme.getTextShadow());
+        renderer.setShadow(isShadow() != null ? isShadow() : theme.getTextShadow());
         renderer.setPos(getArea().getPadding().getLeft(), getArea().getPadding().getTop());
         renderer.setScale(getScale());
         renderer.setSimulate(false);

@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.Rectangle;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.value.DoubleValue;
@@ -67,7 +68,7 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     }
 
     @Override
-    public void drawBackground(ModularGuiContext context, WidgetTheme widgetTheme) {
+    public void drawBackground(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         super.drawBackground(context, widgetTheme);
         if (this.stopper != null && this.stopperDrawable != null && this.stopperWidth > 0 && this.stopperHeight > 0) {
             for (double stop : this.stopper) {
@@ -75,20 +76,20 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
                 if (this.axis.isHorizontal()) {
                     pos -= this.stopperWidth / 2;
                     int crossAxisPos = (int) (getArea().height / 2D - this.stopperHeight / 2D);
-                    this.stopperDrawable.draw(context, pos, crossAxisPos, this.stopperWidth, this.stopperHeight, WidgetTheme.getDefault());
+                    this.stopperDrawable.draw(context, pos, crossAxisPos, this.stopperWidth, this.stopperHeight, WidgetTheme.getDefault().getTheme());
                 } else {
                     pos -= this.stopperHeight / 2;
                     int crossAxisPos = (int) (getArea().width / 2D - this.stopperWidth / 2D);
-                    this.stopperDrawable.draw(context, crossAxisPos, pos, this.stopperWidth, this.stopperHeight, WidgetTheme.getDefault());
+                    this.stopperDrawable.draw(context, crossAxisPos, pos, this.stopperWidth, this.stopperHeight, WidgetTheme.getDefault().getTheme());
                 }
             }
         }
     }
 
     @Override
-    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
+    public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         if (this.handleDrawable != null) {
-            this.handleDrawable.draw(context, this.sliderArea, context.getTheme().getButtonTheme());
+            this.handleDrawable.draw(context, this.sliderArea, context.getTheme().getButtonTheme().getTheme());
         }
     }
 

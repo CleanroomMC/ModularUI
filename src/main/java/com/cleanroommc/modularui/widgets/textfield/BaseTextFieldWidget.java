@@ -7,7 +7,8 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
+import com.cleanroommc.modularui.theme.TextFieldTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.AbstractScrollWidget;
 import com.cleanroommc.modularui.widget.scroll.HorizontalScrollData;
@@ -104,7 +105,8 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
     @Override
     public void preDraw(ModularGuiContext context, boolean transformed) {
         if (transformed) {
-            WidgetTextFieldTheme widgetTheme = (WidgetTextFieldTheme) getWidgetTheme(context.getTheme());
+            WidgetThemeEntry<TextFieldTheme> entry = getWidgetTheme(context.getTheme(), TextFieldTheme.class);
+            TextFieldTheme widgetTheme = entry.getTheme();
             this.renderer.setColor(this.textColor != null ? this.textColor : widgetTheme.getTextColor());
             this.renderer.setCursorColor(this.textColor != null ? this.textColor : widgetTheme.getTextColor());
             this.renderer.setMarkedColor(this.markedColor != null ? this.markedColor : widgetTheme.getMarkedColor());
@@ -115,14 +117,14 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
         }
     }
 
-    protected void setupDrawText(ModularGuiContext context, WidgetTextFieldTheme widgetTheme) {
+    protected void setupDrawText(ModularGuiContext context, TextFieldTheme widgetTheme) {
         this.renderer.setSimulate(false);
         this.renderer.setPos(getArea().getPadding().getLeft(), getArea().getPadding().getTop());
         this.renderer.setScale(this.scale);
         this.renderer.setAlignment(this.textAlignment, getArea().paddedWidth(), getArea().paddedHeight());
     }
 
-    protected void drawText(ModularGuiContext context, WidgetTextFieldTheme widgetTheme) {
+    protected void drawText(ModularGuiContext context, TextFieldTheme widgetTheme) {
         if (this.handler.isTextEmpty() && this.hintText != null) {
             int c = this.renderer.getColor();
             int hintColor = this.hintTextColor != null ? this.hintTextColor : widgetTheme.getHintColor();
@@ -136,7 +138,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
     }
 
     @Override
-    public WidgetTextFieldTheme getWidgetThemeInternal(ITheme theme) {
+    public WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
         return theme.getTextFieldTheme();
     }
 

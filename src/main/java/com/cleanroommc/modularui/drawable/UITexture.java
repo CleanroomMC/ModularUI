@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IJsonSerializable;
-import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -17,10 +16,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import org.jetbrains.annotations.Nullable;
 
 public class UITexture implements IDrawable, IJsonSerializable {
 
-    public static final UITexture DEFAULT = fullImage("gui/options_background", true);
+    public static final UITexture DEFAULT = fullImage("gui/options_background", ColorType.DEFAULT);
 
     private static final ResourceLocation ICONS_LOCATION = new ResourceLocation(ModularUI.ID, "textures/gui/icons.png");
 
@@ -30,6 +30,7 @@ public class UITexture implements IDrawable, IJsonSerializable {
                 .location(ICONS_LOCATION)
                 .imageSize(256, 256)
                 .xy(x, y, w, h)
+                .iconColorType()
                 .name(name)
                 .build();
     }
@@ -43,20 +44,20 @@ public class UITexture implements IDrawable, IJsonSerializable {
 
     public final ResourceLocation location;
     public final float u0, v0, u1, v1;
-    public final boolean canApplyTheme;
+    @Nullable public final ColorType colorType;
 
     /**
      * Creates a drawable texture
      *
-     * @param location      location of the texture
-     * @param u0            x offset of the image (0-1)
-     * @param v0            y offset of the image (0-1)
-     * @param u1            x end offset of the image (0-1)
-     * @param v1            y end offset of the image (0-1)
-     * @param canApplyTheme if theme colors can modify how this texture is drawn
+     * @param location  location of the texture
+     * @param u0        x offset of the image (0-1)
+     * @param v0        y offset of the image (0-1)
+     * @param u1        x end offset of the image (0-1)
+     * @param v1        y end offset of the image (0-1)
+     * @param colorType a function to get which color from a widget theme should be used to color this texture. Can be null.
      */
-    public UITexture(ResourceLocation location, float u0, float v0, float u1, float v1, boolean canApplyTheme) {
-        this.canApplyTheme = canApplyTheme;
+    public UITexture(ResourceLocation location, float u0, float v0, float u1, float v1, @Nullable ColorType colorType) {
+        this.colorType = colorType;
         boolean png = !location.getPath().endsWith(".png");
         boolean textures = !location.getPath().startsWith("textures/");
         if (png || textures) {
@@ -76,27 +77,27 @@ public class UITexture implements IDrawable, IJsonSerializable {
     }
 
     public static UITexture fullImage(ResourceLocation location) {
-        return new UITexture(location, 0, 0, 1, 1, false);
+        return new UITexture(location, 0, 0, 1, 1, null);
     }
 
     public static UITexture fullImage(String location) {
-        return fullImage(new ResourceLocation(location), false);
+        return fullImage(new ResourceLocation(location), null);
     }
 
     public static UITexture fullImage(String mod, String location) {
-        return fullImage(new ResourceLocation(mod, location), false);
+        return fullImage(new ResourceLocation(mod, location), null);
     }
 
-    public static UITexture fullImage(ResourceLocation location, boolean canApplyTheme) {
-        return new UITexture(location, 0, 0, 1, 1, canApplyTheme);
+    public static UITexture fullImage(ResourceLocation location, ColorType colorType) {
+        return new UITexture(location, 0, 0, 1, 1, colorType);
     }
 
-    public static UITexture fullImage(String location, boolean canApplyTheme) {
-        return fullImage(new ResourceLocation(location), canApplyTheme);
+    public static UITexture fullImage(String location, ColorType colorType) {
+        return fullImage(new ResourceLocation(location), colorType);
     }
 
-    public static UITexture fullImage(String mod, String location, boolean canApplyTheme) {
-        return fullImage(new ResourceLocation(mod, location), canApplyTheme);
+    public static UITexture fullImage(String mod, String location, ColorType colorType) {
+        return fullImage(new ResourceLocation(mod, location), colorType);
     }
 
     public UITexture getSubArea(Area bounds) {
@@ -113,7 +114,7 @@ public class UITexture implements IDrawable, IJsonSerializable {
      * @return relative sub area
      */
     public UITexture getSubArea(float uStart, float vStart, float uEnd, float vEnd) {
-        return new UITexture(this.location, lerpU(uStart), lerpV(vStart), lerpU(uEnd), lerpV(vEnd), this.canApplyTheme);
+        return new UITexture(this.location, lerpU(uStart), lerpV(vStart), lerpU(uEnd), lerpV(vEnd), this.colorType);
     }
 
     public ResourceLocation getLocation() {
@@ -131,11 +132,7 @@ public class UITexture implements IDrawable, IJsonSerializable {
     @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
-        if (canApplyTheme()) {
-            Color.setGlColor(widgetTheme.getColor());
-        } else {
-            Color.setGlColorOpaque(Color.WHITE.main);
-        }
+        applyColor(this.colorType != null ? this.colorType.getColor(widgetTheme) : ColorType.DEFAULT.getColor(widgetTheme));
         draw((float) x, y, width, height);
     }
 
@@ -145,7 +142,7 @@ public class UITexture implements IDrawable, IJsonSerializable {
 
     @Deprecated
     public void drawSubArea(float x, float y, float width, float height, float uStart, float vStart, float uEnd, float vEnd) {
-        drawSubArea(x, y, width, height, uStart, vStart, uEnd, vEnd, WidgetTheme.getDefault());
+        drawSubArea(x, y, width, height, uStart, vStart, uEnd, vEnd, WidgetTheme.getDefault().getTheme());
     }
 
     public void drawSubArea(float x, float y, float width, float height, float uStart, float vStart, float uEnd, float vEnd, WidgetTheme widgetTheme) {
@@ -159,7 +156,7 @@ public class UITexture implements IDrawable, IJsonSerializable {
 
     @Override
     public boolean canApplyTheme() {
-        return this.canApplyTheme;
+        return colorType != null;
     }
 
     public static UITexture parseFromJson(JsonObject json) {
@@ -197,7 +194,12 @@ public class UITexture implements IDrawable, IJsonSerializable {
         if (JsonHelper.getBoolean(json, false, "tiled")) {
             builder.tiled();
         }
-        builder.canApplyTheme(JsonHelper.getBoolean(json, false, "canApplyTheme"));
+        String colorTypeName = JsonHelper.getString(json, null, "colorType", "color");
+        if (colorTypeName != null) {
+            builder.colorType(ColorType.get(colorTypeName));
+        } else if (JsonHelper.getBoolean(json, false, "canApplyTheme")) {
+            builder.canApplyTheme();
+        }
         return builder.build();
     }
 
@@ -213,7 +215,7 @@ public class UITexture implements IDrawable, IJsonSerializable {
         json.addProperty("v0", this.v0);
         json.addProperty("u1", this.u1);
         json.addProperty("v1", this.v1);
-        json.addProperty("canApplyTheme", this.canApplyTheme);
+        if (this.colorType != null) json.addProperty("colorType", this.colorType.getName());
         return true;
     }
 
@@ -237,7 +239,7 @@ public class UITexture implements IDrawable, IJsonSerializable {
         private int bl = 0, bt = 0, br = 0, bb = 0;
         private String name;
         private boolean tiled = false;
-        private boolean canApplyTheme = false;
+        private ColorType colorType = null;
 
         /**
          * @param loc location of the image to draw
@@ -265,7 +267,7 @@ public class UITexture implements IDrawable, IJsonSerializable {
         }
 
         /**
-         * Set the image size. Required for {@link #tiled()}, {@link #adaptable(int, int)} and {@link #uv(int, int, int, int)}
+         * Set the image size. Required for {@link #tiled()}, {@link #adaptable(int, int)} and {@link #xy(int, int, int, int)}
          *
          * @param w image width
          * @param h image height
@@ -373,14 +375,61 @@ public class UITexture implements IDrawable, IJsonSerializable {
 
         /**
          * Specify if theme color should apply to this texture.
+         *
+         * @see #defaultColorType()
          */
         public Builder canApplyTheme() {
-            return canApplyTheme(true);
+            return defaultColorType();
         }
 
-        public Builder canApplyTheme(boolean canApplyTheme) {
-            this.canApplyTheme = canApplyTheme;
+        /**
+         * Sets a function which defines how theme color is applied to this texture. Null means no color will be applied.
+         * <il>
+         * <li>Background textures should use {@link ColorType#DEFAULT} or {@link #defaultColorType()}</li>
+         * <li>White icons (only has a shape and some grey shading) should use {@link ColorType#ICON} or {@link #iconColorType()}</li>
+         * <li>Text should use {@link ColorType#TEXT} or {@link #textColorType()}</li>
+         * <li>Everything else (f.e. colored icons and overlays) should use null</li>
+         * </il>
+         *
+         * @param colorType function which defines how theme color is applied to this texture
+         * @return this
+         */
+        public Builder colorType(@Nullable ColorType colorType) {
+            this.colorType = colorType;
             return this;
+        }
+
+        /**
+         * Sets this texture to use default theme color.
+         * Usually used for background textures (grey shaded).
+         *
+         * @return this
+         * @see #colorType(ColorType)
+         */
+        public Builder defaultColorType() {
+            return colorType(ColorType.DEFAULT);
+        }
+
+        /**
+         * Sets this texture to use text theme color.
+         * Usually used for texts.
+         *
+         * @return this
+         * @see #colorType(ColorType)
+         */
+        public Builder textColorType() {
+            return colorType(ColorType.TEXT);
+        }
+
+        /**
+         * Sets this texture to use icon theme color.
+         * Usually used for grey shaded icons without color.
+         *
+         * @return this
+         * @see #colorType(ColorType)
+         */
+        public Builder iconColorType() {
+            return colorType(ColorType.ICON);
         }
 
         /**
@@ -435,13 +484,13 @@ public class UITexture implements IDrawable, IJsonSerializable {
             if (this.mode == Mode.RELATIVE) {
                 if (this.u0 < 0 || this.v0 < 0 || this.u1 > 1 || this.v1 > 1)
                     throw new IllegalArgumentException("UV values must be 0 - 1");
-                if (this.bl > 0 || this.bt > 0 || this.br > 0|| this.bb > 0) {
-                    return new AdaptableUITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.canApplyTheme, this.iw, this.ih, this.bl, this.bt, this.br, this.bb, this.tiled);
+                if (this.bl > 0 || this.bt > 0 || this.br > 0 || this.bb > 0) {
+                    return new AdaptableUITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.colorType, this.iw, this.ih, this.bl, this.bt, this.br, this.bb, this.tiled);
                 }
                 if (this.tiled) {
-                    return new TiledUITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.iw, this.ih, this.canApplyTheme);
+                    return new TiledUITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.iw, this.ih, this.colorType);
                 }
-                return new UITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.canApplyTheme);
+                return new UITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.colorType);
             }
             throw new IllegalStateException();
         }

@@ -19,7 +19,7 @@ import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerGhostIngre
 import com.cleanroommc.modularui.screen.viewport.GuiViewportStack;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.HoveredWidgetList;
 import com.cleanroommc.modularui.utils.Interpolation;
 import com.cleanroommc.modularui.utils.Interpolations;
@@ -179,7 +179,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     @Override
-    public WidgetTheme getWidgetThemeInternal(ITheme theme) {
+    public WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
         return theme.getPanelTheme();
     }
 
@@ -706,16 +706,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             i++;
         }
         return null;
-    }
-
-    @Override
-    public int getDefaultHeight() {
-        return 166;
-    }
-
-    @Override
-    public int getDefaultWidth() {
-        return 176;
     }
 
     final void setPanelGuiContext(@NotNull ModularGuiContext context) {

@@ -10,7 +10,7 @@ import com.cleanroommc.modularui.api.value.IIntValue;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.UITexture;
 import com.cleanroommc.modularui.screen.RichTooltip;
-import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.value.IntValue;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
@@ -97,12 +97,12 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
     }
 
     @Override
-    public WidgetTheme getWidgetThemeInternal(ITheme theme) {
+    public WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
         return theme.getButtonTheme();
     }
 
     @Override
-    public IDrawable getCurrentBackground(ITheme theme, WidgetTheme widgetTheme) {
+    public IDrawable getCurrentBackground(ITheme theme, WidgetThemeEntry<?> widgetTheme) {
         // make sure texture is up-to-date
         int state = getState();
         if (isHovering() && this.hoverBackground != null && this.hoverBackground[state] != null && this.hoverBackground[state] != IDrawable.NONE) {
@@ -112,7 +112,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
     }
 
     @Override
-    public IDrawable getCurrentOverlay(ITheme theme, WidgetTheme widgetTheme) {
+    public IDrawable getCurrentOverlay(ITheme theme, WidgetThemeEntry<?> widgetTheme) {
         int state = getState();
         if (isHovering() && this.hoverOverlay != null && this.hoverOverlay[state] != null && this.hoverBackground[state] != IDrawable.NONE) {
             return this.hoverOverlay[state];

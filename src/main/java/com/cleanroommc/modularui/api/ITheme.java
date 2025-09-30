@@ -1,10 +1,15 @@
 package com.cleanroommc.modularui.api;
 
-import com.cleanroommc.modularui.screen.RichTooltip;
-import com.cleanroommc.modularui.theme.WidgetSlotTheme;
-import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
+import com.cleanroommc.modularui.theme.SelectableTheme;
+import com.cleanroommc.modularui.theme.SlotTheme;
+import com.cleanroommc.modularui.theme.TextFieldTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.theme.WidgetThemeSelectable;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
+import com.cleanroommc.modularui.theme.WidgetThemeKey;
+
+import org.jetbrains.annotations.UnmodifiableView;
+
+import java.util.Collection;
 
 /**
  * A theme is parsed from json and contains style information like color or background texture.
@@ -36,31 +41,22 @@ public interface ITheme {
      */
     ITheme getParentTheme();
 
-    WidgetTheme getFallback();
+    @UnmodifiableView
+    Collection<WidgetThemeEntry<?>> getWidgetThemes();
 
-    WidgetTheme getPanelTheme();
+    WidgetThemeEntry<WidgetTheme> getFallback();
 
-    WidgetTheme getButtonTheme();
+    WidgetThemeEntry<WidgetTheme> getPanelTheme();
 
-    WidgetSlotTheme getItemSlotTheme();
+    WidgetThemeEntry<WidgetTheme> getButtonTheme();
 
-    WidgetSlotTheme getFluidSlotTheme();
+    WidgetThemeEntry<SlotTheme> getItemSlotTheme();
 
-    WidgetTextFieldTheme getTextFieldTheme();
+    WidgetThemeEntry<SlotTheme> getFluidSlotTheme();
 
-    WidgetThemeSelectable getToggleButtonTheme();
+    WidgetThemeEntry<TextFieldTheme> getTextFieldTheme();
 
-    WidgetTheme getWidgetTheme(String id);
+    WidgetThemeEntry<SelectableTheme> getToggleButtonTheme();
 
-    default <T extends WidgetTheme> T getWidgetTheme(Class<T> clazz, String id) {
-        WidgetTheme theme = getWidgetTheme(id);
-        if (clazz.isInstance(theme)) {
-            return (T) theme;
-        }
-        return null;
-    }
-
-    boolean getSmoothProgressBarOverride();
-
-    RichTooltip.Pos getTooltipPosOverride();
+    <T extends WidgetTheme> WidgetThemeEntry<T> getWidgetTheme(WidgetThemeKey<T> key);
 }

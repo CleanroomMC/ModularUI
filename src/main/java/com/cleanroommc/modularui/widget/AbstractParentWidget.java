@@ -3,7 +3,7 @@ package com.cleanroommc.modularui.widget;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.widgets.VoidWidget;
 
 import org.jetbrains.annotations.NotNull;
@@ -56,9 +56,9 @@ public class AbstractParentWidget<I extends IWidget, W extends AbstractParentWid
                 IDrawable.isVisible(getHoverBackground()) ||
                 IDrawable.isVisible(getHoverOverlay()) ||
                 getTooltip() != null) return true;
-        WidgetTheme widgetTheme = getWidgetTheme(getContext().getTheme());
-        if (getBackground() == null && IDrawable.isVisible(widgetTheme.getBackground())) return true;
-        return getHoverBackground() == null && IDrawable.isVisible(widgetTheme.getHoverBackground());
+        WidgetThemeEntry<?> widgetTheme = getWidgetTheme(getContext().getTheme());
+        if (getBackground() == null && IDrawable.isVisible(widgetTheme.getTheme().getBackground())) return true;
+        return getHoverBackground() == null && IDrawable.isVisible(widgetTheme.getHoverTheme().getBackground());
     }
 
     @Override
