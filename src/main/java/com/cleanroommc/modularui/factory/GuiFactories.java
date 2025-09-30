@@ -16,6 +16,10 @@ public class GuiFactories {
         return SidedTileEntityGuiFactory.INSTANCE;
     }
 
+    public static EntityGuiFactory entity() {
+        return EntityGuiFactory.INSTANCE;
+    }
+
     @Deprecated
     public static ItemGuiFactory item() {
         return ItemGuiFactory.INSTANCE;
@@ -37,6 +41,7 @@ public class GuiFactories {
     public static void init() {
         GuiManager.registerFactory(tileEntity());
         GuiManager.registerFactory(sidedTileEntity());
+        GuiManager.registerFactory(entity());
         GuiManager.registerFactory(item());
         GuiManager.registerFactory(playerInventory());
     }
