@@ -11,13 +11,12 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.value.DoubleValue;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Unit;
-
-import net.minecraft.util.math.MathHelper;
 
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
@@ -171,7 +170,7 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
                 value = this.stopper.get(this.stopper.size() - 1);
             }
         }
-        value = MathHelper.clamp(value, this.min, this.max);
+        value = MathUtils.clamp(value, this.min, this.max);
         this.cache = value;
         this.sliderArea.setPoint(this.axis, valueToPos(value));
         if (setSource) {

@@ -29,6 +29,11 @@ public class Icon implements IIcon, IJsonSerializable {
     }
 
     @Override
+    public IDrawable getWrappedDrawable() {
+        return drawable;
+    }
+
+    @Override
     public int getWidth() {
         return this.width;
     }
@@ -41,6 +46,10 @@ public class Icon implements IIcon, IJsonSerializable {
     @Override
     public Box getMargin() {
         return this.margin;
+    }
+
+    public int getColor() {
+        return color;
     }
 
     @SideOnly(Side.CLIENT)

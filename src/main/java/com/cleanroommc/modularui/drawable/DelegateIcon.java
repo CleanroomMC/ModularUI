@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -11,6 +12,11 @@ public class DelegateIcon implements IIcon {
 
     public DelegateIcon(IIcon icon) {
         this.icon = icon;
+    }
+
+    @Override
+    public IIcon getWrappedDrawable() {
+        return icon;
     }
 
     @Override

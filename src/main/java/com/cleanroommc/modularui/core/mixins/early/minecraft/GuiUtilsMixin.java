@@ -1,8 +1,7 @@
-package com.cleanroommc.modularui.core.mixin;
+package com.cleanroommc.modularui.core.mixins.early.minecraft;
 
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.screen.RichTooltip;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.item.ItemStack;

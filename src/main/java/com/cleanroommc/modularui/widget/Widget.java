@@ -53,7 +53,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     // other
     @Nullable private String debugName;
     private boolean enabled = true;
-    private boolean excludeAreaInJei = false;
+    private boolean excludeAreaInRecipeViewer = false;
     // gui context
     private boolean valid = false;
     private IWidget parent = null;
@@ -112,8 +112,8 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         if (!getScreen().isClientOnly()) {
             initialiseSyncHandler(getScreen().getSyncManager(), late);
         }
-        if (isExcludeAreaInJei()) {
-            getContext().getJeiSettings().addJeiExclusionArea(this);
+        if (isExcludeAreaInRecipeViewer()) {
+            getContext().getRecipeViewerSettings().addRecipeViewerExclusionArea(this);
         }
         onInit();
         if (hasChildren()) {
@@ -169,8 +169,8 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
                     this.context.getScreen().removeGuiActionListener(action);
                 }
             }
-            if (isExcludeAreaInJei()) {
-                getContext().getJeiSettings().removeJeiExclusionArea(this);
+            if (isExcludeAreaInRecipeViewer()) {
+                getContext().getRecipeViewerSettings().removeRecipeViewerExclusionArea(this);
             }
         }
         if (hasChildren()) {
@@ -900,18 +900,18 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         return null;
     }
 
-    public boolean isExcludeAreaInJei() {
-        return this.excludeAreaInJei;
+    public boolean isExcludeAreaInRecipeViewer() {
+        return this.excludeAreaInRecipeViewer;
     }
 
-    public W excludeAreaInJei() {
-        return excludeAreaInJei(true);
+    public W excludeAreaInRecipeViewer() {
+        return excludeAreaInRecipeViewer(true);
     }
 
-    public W excludeAreaInJei(boolean val) {
-        this.excludeAreaInJei = val;
+    public W excludeAreaInRecipeViewer(boolean val) {
+        this.excludeAreaInRecipeViewer = val;
         if (isValid()) {
-            getContext().getJeiSettings().addJeiExclusionArea(this);
+            getContext().getRecipeViewerSettings().addRecipeViewerExclusionArea(this);
         }
         return getThis();
     }

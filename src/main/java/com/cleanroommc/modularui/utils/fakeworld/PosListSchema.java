@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
-import java.util.Map;
 import java.util.function.BiPredicate;
 
 public abstract class PosListSchema implements ISchema {
@@ -41,7 +40,7 @@ public abstract class PosListSchema implements ISchema {
 
     @NotNull
     @Override
-    public Iterator<Map.Entry<BlockPos, BlockInfo>> iterator() {
+    public Iterator<Pair<BlockPos, BlockInfo>> iterator() {
         return new Iterator<>() {
 
             private final Iterator<? extends BlockPos> posIt = PosListSchema.this.posList.iterator();

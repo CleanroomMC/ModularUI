@@ -5,11 +5,11 @@ import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
-import com.cleanroommc.modularui.core.mixin.GuiAccessor;
-import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
-import com.cleanroommc.modularui.core.mixin.GuiScreenAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
-import com.cleanroommc.modularui.integration.jei.JeiIngredientProvider;
+import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerIngredientProvider;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.NEAAnimationHandler;
 import com.cleanroommc.modularui.screen.RichTooltip;
@@ -38,7 +38,7 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable, JeiIngredientProvider {
+public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable, RecipeViewerIngredientProvider {
 
     public static final int SIZE = 18;
 
@@ -239,6 +239,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 float itemScale = NEAAnimationHandler.injectHoverScale(guiContainer, slotIn);
                 // render the item itself
                 renderItem.renderItemAndEffectIntoGUI(guiScreen.mc.player, itemstack, 1, 1);
+                Platform.endDrawItem();
                 // TODO render item borders from item borders mod here
 
                 if (amount < 0) {

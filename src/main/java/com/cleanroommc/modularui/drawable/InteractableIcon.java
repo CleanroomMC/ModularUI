@@ -1,9 +1,9 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.Interactable;
-import com.cleanroommc.modularui.screen.ModularScreen;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -74,7 +74,7 @@ public class InteractableIcon extends DelegateIcon implements Interactable {
     }
 
     @Override
-    public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
+    public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
         return this.mouseScroll != null && this.mouseScroll.scroll(scrollDirection, amount);
     }
 

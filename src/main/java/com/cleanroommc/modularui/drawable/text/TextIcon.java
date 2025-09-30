@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.drawable.text;
 
+import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -8,6 +9,8 @@ import com.cleanroommc.modularui.widget.sizer.Box;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import org.jetbrains.annotations.Nullable;
 
 public class TextIcon implements IIcon {
 
@@ -32,6 +35,11 @@ public class TextIcon implements IIcon {
         TextRenderer.SHARED.setAlignment(this.alignment, width);
         TextRenderer.SHARED.setScale(this.scale);
         TextRenderer.SHARED.drawSimple(this.text);
+    }
+
+    @Override
+    public @Nullable IDrawable getWrappedDrawable() {
+        return null;
     }
 
     @Override

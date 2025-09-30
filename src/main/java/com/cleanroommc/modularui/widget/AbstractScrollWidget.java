@@ -1,12 +1,12 @@
 package com.cleanroommc.modularui.widget;
 
+import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.Stencil;
-import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.HoveredWidgetList;
 import com.cleanroommc.modularui.widget.scroll.HorizontalScrollData;
@@ -107,7 +107,7 @@ public abstract class AbstractScrollWidget<I extends IWidget, W extends Abstract
     }
 
     @Override
-    public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
+    public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
         return this.scroll.mouseScroll(getContext());
     }
 

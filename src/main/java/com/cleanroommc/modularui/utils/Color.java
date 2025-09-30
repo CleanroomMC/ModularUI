@@ -4,7 +4,6 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.IInterpolation;
 
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -75,9 +74,9 @@ public class Color {
     public static int ofHSV(float hue, float saturation, float value, float alpha) {
         hue %= 360;
         if (hue < 0) hue += 360;
-        saturation = MathHelper.clamp(saturation, 0f, 1f);
-        value = MathHelper.clamp(value, 0f, 1f);
-        alpha = MathHelper.clamp(alpha, 0f, 1f);
+        saturation = MathUtils.clamp(saturation, 0f, 1f);
+        value = MathUtils.clamp(value, 0f, 1f);
+        alpha = MathUtils.clamp(alpha, 0f, 1f);
         float c = value * saturation;
         float x = c * (1 - Math.abs(hue / 60f % 2 - 1));
         float m = value - c;
@@ -108,9 +107,9 @@ public class Color {
     public static int ofHSL(float hue, float saturation, float lightness, float alpha) {
         hue %= 360;
         if (hue < 0) hue += 360;
-        saturation = MathHelper.clamp(saturation, 0f, 1f);
-        lightness = MathHelper.clamp(lightness, 0f, 1f);
-        alpha = MathHelper.clamp(alpha, 0f, 1f);
+        saturation = MathUtils.clamp(saturation, 0f, 1f);
+        lightness = MathUtils.clamp(lightness, 0f, 1f);
+        alpha = MathUtils.clamp(alpha, 0f, 1f);
         float c = (1 - Math.abs(2 * lightness - 1)) * saturation;
         float x = c * (1 - Math.abs(hue / 60f % 2 - 1));
         float m = lightness - c / 2;
@@ -700,7 +699,7 @@ public class Color {
      * @return interpolated ARGB color
      */
     public static int interpolate(IInterpolation curve, int color1, int color2, float value) {
-        value = MathHelper.clamp(value, 0, 1);
+        value = MathUtils.clamp(value, 0, 1);
         int r = (int) curve.interpolate(Color.getRed(color1), Color.getRed(color2), value);
         int g = (int) curve.interpolate(Color.getGreen(color1), Color.getGreen(color2), value);
         int b = (int) curve.interpolate(Color.getBlue(color1), Color.getBlue(color2), value);
@@ -796,14 +795,14 @@ public class Color {
             int alpha;
             if (alphaS.contains(".") || alphaS.endsWith("f") || alphaS.endsWith("F") || alphaS.endsWith("d") || alphaS.endsWith("D")) {
                 try {
-                    alphaF = MathHelper.clamp(Float.parseFloat(alphaS), 0f, 1f);
+                    alphaF = MathUtils.clamp(Float.parseFloat(alphaS), 0f, 1f);
                     alpha = (int) (alphaF * 255);
                 } catch (NumberFormatException e) {
                     throw new JsonParseException("Failed to parse alpha value", e);
                 }
             } else {
                 try {
-                    alpha = MathHelper.clamp(Integer.parseInt(alphaS), 0, 255);
+                    alpha = MathUtils.clamp(Integer.parseInt(alphaS), 0, 255);
                     alphaF = alpha / 255f;
                 } catch (NumberFormatException e) {
                     throw new JsonParseException("Failed to parse alpha value", e);

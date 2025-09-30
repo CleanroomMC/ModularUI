@@ -22,7 +22,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
 
 import mezz.jei.input.IClickedIngredient;
@@ -196,7 +195,7 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
                 width = (int) renderer.getLastTrimmedWidth();
                 height = (int) renderer.getLastTrimmedHeight();
             }
-            y = MathHelper.clamp(y, padding, screenHeight - padding - height);
+            y = MathUtils.clamp(y, padding, screenHeight - padding - height);
             return new Rectangle(x, y, width, height);
         }
 

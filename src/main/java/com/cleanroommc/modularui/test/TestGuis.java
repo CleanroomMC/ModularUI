@@ -18,7 +18,12 @@ import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.utils.*;
+import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.GameObjectHelper;
+import com.cleanroommc.modularui.utils.Interpolation;
+import com.cleanroommc.modularui.utils.Interpolations;
+import com.cleanroommc.modularui.utils.SpriteHelper;
 import com.cleanroommc.modularui.utils.fakeworld.ArraySchema;
 import com.cleanroommc.modularui.utils.fakeworld.FakeEntity;
 import com.cleanroommc.modularui.utils.fakeworld.ISchema;
@@ -30,13 +35,12 @@ import com.cleanroommc.modularui.widgets.ListWidget;
 import com.cleanroommc.modularui.widgets.RichTextWidget;
 import com.cleanroommc.modularui.widgets.SchemaWidget;
 import com.cleanroommc.modularui.widgets.SortableListWidget;
+import com.cleanroommc.modularui.widgets.TextWidget;
 import com.cleanroommc.modularui.widgets.ToggleButton;
 import com.cleanroommc.modularui.widgets.TransformWidget;
 import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Flow;
 import com.cleanroommc.modularui.widgets.layout.Row;
-import com.cleanroommc.modularui.widgets.TextWidget;
-
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
 import net.minecraft.client.Minecraft;
@@ -265,12 +269,12 @@ public class TestGuis extends CustomModularScreen {
         world.addBlock(new BlockPos(1, 0, 1), new BlockInfo(Blocks.GOLD_BLOCK.getDefaultState()));*/
 /*        return ModularPanel.defaultPanel("main")
                 .size(150)
-                .overlay(new SchemaRenderer(BoxSchema.of(Minecraft.getMinecraft().world, new BlockPos(Minecraft.getMinecraft().player), 5))
+                .overlay(new SchemaRenderer(BoxSchema.of(Minecraft.getMinecraft().world, new BlockPos(Platform.getClientPlayer()), 5))
                         .cameraFunc((camera, schema) -> {
                             double pitch = Math.PI / 4;
                             double T = 4000D;
                             double yaw = Minecraft.getSystemTime() % T / T * Math.PI * 2;
-                            camera.setLookAt(new BlockPos(Minecraft.getMinecraft().player), 20, yaw, pitch);
+                            camera.setLookAt(new BlockPos(Platform.getClientPlayer()), 20, yaw, pitch);
                         })
                         .isometric(true)
                         .asIcon().size(140));*/

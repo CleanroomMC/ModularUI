@@ -11,6 +11,8 @@ import com.google.common.collect.AbstractIterator;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -80,17 +82,20 @@ public class MapSchema implements ISchema {
 
     @NotNull
     @Override
-    public Iterator<Map.Entry<BlockPos, BlockInfo>> iterator() {
+    public Iterator<Pair<BlockPos, BlockInfo>> iterator() {
         return new AbstractIterator<>() {
 
             private final ObjectIterator<Object2ObjectMap.Entry<BlockPos, BlockInfo>> it = blocks.object2ObjectEntrySet().fastIterator();
+            private final MutablePair<BlockPos, BlockInfo> pair = new MutablePair<>(null, null);
 
             @Override
-            protected Map.Entry<BlockPos, BlockInfo> computeNext() {
+            protected Pair<BlockPos, BlockInfo> computeNext() {
                 while (it.hasNext()) {
                     Map.Entry<BlockPos, BlockInfo> entry = it.next();
                     if (renderFilter == null || renderFilter.test(entry.getKey(), entry.getValue())) {
-                        return entry;
+                        pair.setLeft(entry.getKey());
+                        pair.setRight(entry.getValue());
+                        return pair;
                     }
                 }
                 return endOfData();
