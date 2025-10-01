@@ -67,10 +67,11 @@ public class TestGuis extends CustomModularScreen {
 
     @Override
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {
-        return buildGridListUI(context);
+        return buildToggleGridListUI(context);
     }
 
-    public @NotNull ModularPanel buildGridListUI(ModularGuiContext context) {
+    public @NotNull ModularPanel buildToggleGridListUI(ModularGuiContext context) {
+        useTheme(EventHandler.TEST_THEME);
         boolean[][] states = new boolean[4][16];
         return new ModularPanel("grid_list")
                 .height(100)
@@ -86,30 +87,11 @@ public class TestGuis extends CustomModularScreen {
                                     return new ToggleButton()
                                             .overlay(GuiTextures.BOOKMARK)
                                             .value(new BoolValue.Dynamic(() -> states[i][j], val -> states[i][j] = val))
-                                            .size(8)
+                                            .size(10)
                                             .margin(1)
-                                            .debugName("G" + i + ",I" + j);
+                                            .debugName("G:" + i + ",W:" + j);
                                 })));
 
-    }
-
-    public @NotNull ModularPanel buildToggleUI(ModularGuiContext context) {
-        useTheme(EventHandler.TEST_THEME);
-        boolean[] states = new boolean[60];
-        return new ModularPanel("toggle")
-                .size(150)
-                .padding(7)
-                .child(new ListWidget<>()
-                        .sizeRel(1f)
-                        .children(10, i -> Flow.row()
-                                .coverChildren()
-                                .children(6, j -> {
-                                    final int index = i * 6 + j;
-                                    return new ToggleButton()
-                                            .overlay(GuiTextures.BOOKMARK)
-                                            .value(new BoolValue.Dynamic(() -> states[index], val -> states[index] = val))
-                                            .margin(2);
-                                })));
     }
 
     public @NotNull ModularPanel buildAnimationUI(ModularGuiContext context) {
