@@ -197,20 +197,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         }
     }
 
-    @Override
-    public void getWidgetsAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
-        if (hasChildren()) {
-            IViewport.getChildrenAt(this, stack, widgets, x, y);
-        }
-    }
-
-    @Override
-    public void getSelfAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
-        if (isInside(stack, x, y)) {
-            widgets.add(this, stack.peek(), getAdditionalHoverInfo(stack, x, y));
-        }
-    }
-
     private void findHoveredWidgets() {
         this.hovering.clear();
         this.hovering.trim();

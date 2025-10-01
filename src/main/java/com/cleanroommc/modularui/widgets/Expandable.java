@@ -120,20 +120,6 @@ public class Expandable extends Widget<Expandable> implements Interactable, IVie
         }
     }
 
-    @Override
-    public void getSelfAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
-        if (isInside(stack, x, y)) {
-            widgets.add(this, stack.peek(), getAdditionalHoverInfo(stack, x, y));
-        }
-    }
-
-    @Override
-    public void getWidgetsAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
-        if (hasChildren()) {
-            IViewport.getChildrenAt(this, stack, widgets, x, y);
-        }
-    }
-
     public Expandable expanded(boolean expanded) {
         if (this.expanded == expanded) return this;
         this.expanded = expanded;

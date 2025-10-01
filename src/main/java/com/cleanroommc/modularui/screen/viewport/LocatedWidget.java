@@ -52,4 +52,9 @@ public class LocatedWidget extends LocatedElement<IWidget> {
     public Object getAdditionalHoverInfo() {
         return additionalHoverInfo;
     }
+
+    @Override
+    public String toString() {
+        return "LocatedWidget[" + getElement() + " | " + additionalHoverInfo + "]";
+    }
 }

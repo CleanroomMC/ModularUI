@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widget;
 
+import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IDraggable;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
@@ -7,12 +8,11 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.DraggablePanelWrapper;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.utils.HoveredWidgetList;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
 import org.jetbrains.annotations.Nullable;
 
-public class DragHandle extends Widget<DragHandle> implements IDraggable {
+public class DragHandle extends Widget<DragHandle> implements IDraggable, IViewport {
 
     private IDraggable parentDraggable;
 
@@ -85,7 +85,8 @@ public class DragHandle extends Widget<DragHandle> implements IDraggable {
         super.transform(stack);
     }
 
-    @Override
+    // TODO
+    /*@Override
     public void transformChildren(IViewportStack stack) {
         if (this.parentDraggable != null) {
             this.parentDraggable.transformChildren(stack);
@@ -104,5 +105,5 @@ public class DragHandle extends Widget<DragHandle> implements IDraggable {
         if (this.parentDraggable != null) {
             this.parentDraggable.getSelfAt(stack, widgets, x, y);
         }
-    }
+    }*/
 }

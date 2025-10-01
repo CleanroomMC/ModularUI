@@ -54,16 +54,11 @@ public abstract class AbstractScrollWidget<I extends IWidget, W extends Abstract
     }
 
     @Override
-    public void getSelfAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
-        if (isInside(stack, x, y)) {
-            widgets.add(this, stack.peek(), getAdditionalHoverInfo(stack, x, y));
-        }
-    }
-
-    @Override
     public void getWidgetsAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
-        if (getArea().isInside(x, y) && !getScrollArea().isInsideScrollbarArea(x, y) && hasChildren()) {
-            IViewport.getChildrenAt(this, stack, widgets, x, y);
+        // if 'widgets.peek() == this' is true, only then this widget is hovered
+        // we should require this since a stencil is applied to this widget
+        if (widgets.peek() == this && !getScrollArea().isInsideScrollbarArea(x, y)) {
+            IViewport.super.getWidgetsAt(stack, widgets, x, y);
         }
     }
 

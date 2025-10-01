@@ -40,6 +40,7 @@ import com.cleanroommc.modularui.widgets.ToggleButton;
 import com.cleanroommc.modularui.widgets.TransformWidget;
 import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Flow;
+import com.cleanroommc.modularui.widgets.layout.Grid;
 import com.cleanroommc.modularui.widgets.layout.Row;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
@@ -66,7 +67,30 @@ public class TestGuis extends CustomModularScreen {
 
     @Override
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {
-        return buildToggleUI(context);
+        return buildGridListUI(context);
+    }
+
+    public @NotNull ModularPanel buildGridListUI(ModularGuiContext context) {
+        boolean[][] states = new boolean[4][16];
+        return new ModularPanel("grid_list")
+                .height(100)
+                .coverChildrenWidth()
+                .padding(7)
+                .child(new ListWidget<>()
+                        .coverChildrenWidth()
+                        .heightRel(1f)
+                        .children(4, i -> new Grid()
+                                .left(0)
+                                .coverChildren()
+                                .mapTo(4, 16, j -> {
+                                    return new ToggleButton()
+                                            .overlay(GuiTextures.BOOKMARK)
+                                            .value(new BoolValue.Dynamic(() -> states[i][j], val -> states[i][j] = val))
+                                            .size(8)
+                                            .margin(1)
+                                            .debugName("G" + i + ",I" + j);
+                                })));
+
     }
 
     public @NotNull ModularPanel buildToggleUI(ModularGuiContext context) {

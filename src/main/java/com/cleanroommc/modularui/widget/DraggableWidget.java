@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
  * A widget that can be picked up by the cursor.
  * Might not work as expected when a parent is scaling or rotating itself.
  */
-public class DraggableWidget<W extends DraggableWidget<W>> extends Widget<W> implements IDraggable {
+public class DraggableWidget<W extends DraggableWidget<W>> extends Widget<W> implements IDraggable, IViewport {
 
     private boolean moving = false;
     private int relativeClickX, relativeClickY;
@@ -79,7 +79,7 @@ public class DraggableWidget<W extends DraggableWidget<W>> extends Widget<W> imp
     @Override
     public void getSelfAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
         if (!isMoving() && isInside(stack, x, y)) {
-            widgets.add(this, stack.peek(), getAdditionalHoverInfo(stack, x, y));
+            widgets.add(this, stack, getAdditionalHoverInfo(stack, x, y));
         }
     }
 

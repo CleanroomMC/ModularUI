@@ -5,12 +5,14 @@ import com.cleanroommc.modularui.utils.Matrix4f;
 import com.cleanroommc.modularui.utils.Vector3f;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * This handles all viewports in a GUI. Also keeps track of a matrix stack used for rendering and
  * user interaction.
  */
+@ApiStatus.NonExtendable
 public interface IViewportStack {
 
     /**
