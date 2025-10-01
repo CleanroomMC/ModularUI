@@ -9,6 +9,7 @@
    - [ ]  Context Menu
    - [ ]  Dropdown menu
 - [ ]  create JEI UIs (?)
+- [ ]  ignorable characters in text field (group number separator for example)
 
 ## Medium Priority
 
