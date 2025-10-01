@@ -10,16 +10,12 @@ import com.cleanroommc.modularui.widgets.ButtonWidget;
 import org.junit.jupiter.api.AssertionFailureBuilder;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class SizerTest {
 
     static final int W = 800, H = 450;
 
     @Test
     void test() {
-        Bootstrap.perform();
         ModularPanel panel = panel().child(new ButtonWidget<>().center());
         testPanel(panel);
         assertArea(panel.getArea(), W / 2 - 176 / 2, H / 2 - 166 / 2, 176, 166);
