@@ -2,7 +2,6 @@
 
 ## High Priority
 
-- [ ]  fix issue with multiple grids in a list widget
 - [ ]  figure out a good way to propagate hover to widgets below
 - [ ]  properly figure out z layer
 - [ ]  floating widgets
