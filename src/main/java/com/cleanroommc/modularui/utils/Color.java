@@ -758,7 +758,9 @@ public class Color {
         if (jsonElement.isJsonPrimitive()) {
             String colorString = jsonElement.getAsString();
             if (colorString.isEmpty()) return WHITE.main;
-            if (colorString.charAt(0) == '0' || colorString.charAt(0) == '#') {
+            char c = colorString.charAt(0);
+            // a normal int string
+            if (Character.isDigit(c) || c == '-' || c == '#') {
                 int color = (int) (long) Long.decode(colorString); // bruh
                 if (color != 0 && getAlpha(color) == 0) {
                     return withAlpha(color, 255);

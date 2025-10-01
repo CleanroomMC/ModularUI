@@ -72,7 +72,7 @@ public class EventHandler {
     }
 
     @SubscribeEvent
-    public static void onThemeTooltip(ReloadThemeEvent.Pre event) {
+    public void onThemeTooltip(ReloadThemeEvent.Pre event) {
         IThemeApi.get().registerTheme(testTheme);
     }
 }
