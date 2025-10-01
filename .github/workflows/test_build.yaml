@@ -12,6 +12,7 @@ on:
       - '.github/**' # Release GHA file, please change this when you change the file name
       - 'LICENSE'
       - 'README.md'
+      - 'TODO.md'
       - '.editorconfig'
   workflow_dispatch:
 
