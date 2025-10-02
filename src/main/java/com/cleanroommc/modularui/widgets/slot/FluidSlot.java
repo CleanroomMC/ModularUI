@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.widgets.slot;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
@@ -101,6 +102,9 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, Recipe
                         tooltip.addLine(IKey.lang("modularui.tooltip.shift"));
                     }
                 }
+            }
+            if (fluid != null) {
+                tooltip.addLine(MCHelper.getFluidModName(fluid));
             }
         });
     }
