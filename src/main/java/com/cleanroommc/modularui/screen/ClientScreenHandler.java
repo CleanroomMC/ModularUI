@@ -588,7 +588,9 @@ public class ClientScreenHandler {
             } else if (hovered instanceof RichTextWidget richTextWidget) {
                 drawSegmentLine(lineY -= 4, scale, color);
                 lineY -= 10;
+                locatedHovered.applyMatrix(context);
                 Object hoveredElement = richTextWidget.getHoveredElement();
+                locatedHovered.unapplyMatrix(context);
                 GuiDraw.drawText("Hovered: " + hoveredElement, 5, lineY, scale, color, true);
             }
         }

@@ -1,11 +1,14 @@
 package com.cleanroommc.modularui.drawable.text;
 
-import com.cleanroommc.modularui.api.drawable.*;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.drawable.IIcon;
+import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.drawable.IRichTextBuilder;
+import com.cleanroommc.modularui.api.drawable.ITextLine;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.TooltipLines;
-import com.cleanroommc.modularui.widget.sizer.Area;
 
 import net.minecraft.client.gui.FontRenderer;
 
@@ -276,11 +279,11 @@ public class RichText implements IDrawable, IRichTextBuilder<RichText> {
     }
 
     public int getLastHeight() {
-        return (int) renderer.getLastHeight();
+        return (int) renderer.getLastTrimmedHeight();
     }
 
     public int getLastWidth() {
-        return (int) renderer.getLastWidth();
+        return (int) renderer.getLastTrimmedWidth();
     }
 
     public void setupRenderer(TextRenderer renderer, int x, int y, float width, float height, int color, boolean shadow) {
@@ -298,6 +301,14 @@ public class RichText implements IDrawable, IRichTextBuilder<RichText> {
         return this.cachedText;
     }
 
+    /**
+     * Returns the currently hovered element of this rich text or {@code null} if none is hovered.
+     * Note that this method assumes, that the {@link com.cleanroommc.modularui.api.layout.IViewportStack IViewportStack}
+     * is transformed to 0,0 of this {@link IDrawable}.
+     *
+     * @param context the viewport stack with transformation to this widget
+     * @return hovered element or null
+     */
     public Object getHoveringElement(GuiContext context) {
         return getHoveringElement(context.getFontRenderer(), context.getMouseX(), context.getMouseY());
     }

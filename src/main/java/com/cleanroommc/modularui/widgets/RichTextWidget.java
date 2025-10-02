@@ -114,11 +114,26 @@ public class RichTextWidget extends Widget<RichTextWidget> implements IRichTextB
         }
     }
 
+    /**
+     * Returns the currently hovered element of this rich text or {@code null} if none is hovered.
+     * Note that this method assumes, that the {@link com.cleanroommc.modularui.api.layout.IViewportStack IViewportStack}
+     * is transformed to this widget.
+     *
+     * @return hovered element or null
+     */
     @Nullable
     public Object getHoveredElement() {
         return getHoveredElement(getContext());
     }
 
+    /**
+     * Returns the currently hovered element of this rich text or {@code null} if none is hovered.
+     * Note that this method assumes, that the {@link com.cleanroommc.modularui.api.layout.IViewportStack IViewportStack}
+     * is transformed to this widget.
+     *
+     * @param context the viewport stack with transformation to this widget
+     * @return hovered element or null
+     */
     @Nullable
     public Object getHoveredElement(ModularGuiContext context) {
         if (!isHovering()) return null;
