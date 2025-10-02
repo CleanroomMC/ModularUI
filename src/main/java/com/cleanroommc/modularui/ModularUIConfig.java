@@ -13,14 +13,11 @@ public class ModularUIConfig {
     public static int defaultScrollSpeed = 30;
 
     @Config.Comment("If progress bar should step in texture pixels or screen pixels. (Screen pixels are way smaller and therefore smoother)")
-    public static boolean smoothProgressBar = true;
-
-    @Config.Comment("Time in 1/60 sec to open and close panels.")
-    public static int panelOpenCloseAnimationTime = 8;
+    public static boolean smoothProgressBar = false;
 
     // Default direction
     @Config.Comment("Default tooltip position around the widget or its panel.")
-    public static RichTooltip.Pos tooltipPos = RichTooltip.Pos.VERTICAL;
+    public static RichTooltip.Pos tooltipPos = RichTooltip.Pos.NEXT_TO_MOUSE;
 
     @Config.Comment("If true, pressing ESC key in the text field will restore the last text instead of confirming current one.")
     public static boolean escRestoreLastText = false;
@@ -38,4 +35,7 @@ public class ModularUIConfig {
     @Config.RequiresMcRestart
     @Config.Comment("Enables a test overlay shown on title screen and watermark shown on every GuiContainer.")
     public static boolean enableTestOverlays = false;
+
+    @Config.Comment("If true, vanilla tooltip will be replaced with MUI's RichTooltip")
+    public static boolean replaceVanillaTooltips = false;
 }

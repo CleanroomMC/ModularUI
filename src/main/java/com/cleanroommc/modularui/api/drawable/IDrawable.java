@@ -1,22 +1,24 @@
 package com.cleanroommc.modularui.api.drawable;
 
-import com.cleanroommc.modularui.drawable.DrawableArray;
+import com.cleanroommc.modularui.drawable.DrawableStack;
 import com.cleanroommc.modularui.drawable.Icon;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
+import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * An object which can be drawn. This is mainly used for backgrounds and overlays in
+ * An object which can be drawn at any size. This is mainly used for backgrounds and overlays in
  * {@link com.cleanroommc.modularui.api.widget.IWidget}.
+ * To draw at a fixed size, use {@link IIcon} (see {@link #asIcon()}).
  */
 public interface IDrawable {
 
@@ -26,43 +28,27 @@ public interface IDrawable {
         } else if (drawables.length == 1) {
             return drawables[0];
         } else {
-            return new DrawableArray(drawables);
+            return new DrawableStack(drawables);
         }
     }
 
     /**
-     * Draws this drawable at the given position with the given size.
+     * Draws this drawable at the given position with the given size. It's the implementors responsibility to properly apply the widget
+     * theme by calling {@link #applyColor(int)} before drawing.
      *
-     * @param context current context to draw with
-     * @param x       x position
-     * @param y       y position
-     * @param width   draw width
-     * @param height  draw height
+     * @param context     current context to draw with
+     * @param x           x position
+     * @param y           y position
+     * @param width       draw width
+     * @param height      draw height
      * @param widgetTheme current theme
      */
     @SideOnly(Side.CLIENT)
     void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme);
 
     /**
-     * @deprecated use {@link #draw(GuiContext, int, int, int, int, WidgetTheme)}
-     */
-    @SideOnly(Side.CLIENT)
-    @Deprecated
-    default void draw(GuiContext context, int x, int y, int width, int height) {
-        draw(context, x, y, width, height, WidgetTheme.getDefault());
-    }
-
-    /**
-     * @deprecated use {@link #drawAtZero(GuiContext, int, int, WidgetTheme)}
-     */
-    @SideOnly(Side.CLIENT)
-    @Deprecated
-    default void drawAtZero(GuiContext context, int width, int height) {
-        drawAtZero(context, width, height, WidgetTheme.getDefault());
-    }
-
-    /**
-     * Draws this drawable at the current (0|0) with the given size.
+     * Draws this drawable at the current (0|0) with the given size. This is useful inside widgets since GL is transformed to their
+     * position when they are drawing.
      *
      * @param context     gui context
      * @param width       draw width
@@ -75,40 +61,23 @@ public interface IDrawable {
     }
 
     /**
-     * @deprecated use {@link #draw(GuiContext, Area, WidgetTheme)}
-     */
-    @SideOnly(Side.CLIENT)
-    @Deprecated
-    default void draw(GuiContext context, Area area) {
-        draw(context, area, WidgetTheme.getDefault());
-    }
-
-    /**
      * Draws this drawable in a given area.
      *
-     * @param context current context to draw with
-     * @param area    draw area
+     * @param context     current context to draw with
+     * @param area        draw area
      * @param widgetTheme current theme
      */
     @SideOnly(Side.CLIENT)
     default void draw(GuiContext context, Area area, WidgetTheme widgetTheme) {
-        draw(context, area.x + area.getPadding().left, area.y + area.getPadding().top, area.paddedWidth(), area.paddedHeight(), widgetTheme);
+        draw(context, area.x + area.getPadding().getLeft(), area.y + area.getPadding().getTop(), area.paddedWidth(), area.paddedHeight(), widgetTheme);
     }
 
     /**
-     * @deprecated use {@link #drawAtZero(GuiContext, Area, WidgetTheme)}
-     */
-    @Deprecated
-    @SideOnly(Side.CLIENT)
-    default void drawAtZero(GuiContext context, Area area) {
-        drawAtZero(context, area, WidgetTheme.getDefault());
-    }
-
-    /**
-     * Draws this drawable at the current (0|0) with the given area's size.
+     * Draws this drawable at the current (0|0) with the given area's size. This is useful inside widgets since GL is transformed to their
+     * position when they are drawing.
      *
-     * @param context gui context
-     * @param area    draw area
+     * @param context     gui context
+     * @param area        draw area
      * @param widgetTheme current theme
      */
     @SideOnly(Side.CLIENT)
@@ -121,6 +90,21 @@ public interface IDrawable {
      */
     default boolean canApplyTheme() {
         return false;
+    }
+
+    /**
+     * Applies the theme color to OpenGL if this drawable can have theme colors applied. This is determined by {@link #canApplyTheme()}.
+     * If this drawable does not allow theme colors, it will reset the current color (to white).
+     * This method should be called before drawing.
+     *
+     * @param themeColor theme color to apply (usually {@link WidgetTheme#getColor()})
+     */
+    default void applyColor(int themeColor) {
+        if (canApplyTheme()) {
+            Color.setGlColor(themeColor);
+        } else {
+            Color.setGlColorOpaque(Color.WHITE.main);
+        }
     }
 
     /**
@@ -138,13 +122,6 @@ public interface IDrawable {
     }
 
     /**
-     * Reads extra json data after this drawable is created.
-     *
-     * @param json json to read from
-     */
-    default void loadFromJson(JsonObject json) {}
-
-    /**
      * An empty drawable. Does nothing.
      */
     IDrawable EMPTY = (context, x, y, width, height, widgetTheme) -> {};
@@ -156,7 +133,7 @@ public interface IDrawable {
 
     static boolean isVisible(@Nullable IDrawable drawable) {
         if (drawable == null || drawable == EMPTY || drawable == NONE) return false;
-        if (drawable instanceof DrawableArray array) {
+        if (drawable instanceof DrawableStack array) {
             return array.getDrawables().length > 0;
         }
         return true;
@@ -175,8 +152,8 @@ public interface IDrawable {
 
         @SideOnly(Side.CLIENT)
         @Override
-        public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
-            this.drawable.drawAtZero(context, getArea(), widgetTheme);
+        public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
+            this.drawable.drawAtZero(context, getArea(), getActiveWidgetTheme(widgetTheme, isHovering()));
         }
     }
 }

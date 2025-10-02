@@ -1,28 +1,33 @@
 package com.cleanroommc.modularui.screen;
 
+import com.cleanroommc.modularui.GuiErrorHandler;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.MCHelper;
+import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
-import com.cleanroommc.modularui.core.mixin.GuiAccessor;
-import com.cleanroommc.modularui.core.mixin.GuiContainerAccessor;
-import com.cleanroommc.modularui.core.mixin.GuiScreenAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.Stencil;
+import com.cleanroommc.modularui.overlay.OverlayManager;
 import com.cleanroommc.modularui.overlay.OverlayStack;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.utils.Animator;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.FpsCounter;
+import com.cleanroommc.modularui.utils.MathUtils;
+import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import com.cleanroommc.modularui.widgets.ItemSlot;
 import com.cleanroommc.modularui.widgets.RichTextWidget;
+import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
+import com.cleanroommc.neverenoughanimations.animations.OpeningAnimation;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -37,7 +42,6 @@ import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.GuiContainerEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
@@ -49,6 +53,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -61,6 +66,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+@ApiStatus.Internal
 @SideOnly(Side.CLIENT)
 public class ClientScreenHandler {
 
@@ -71,10 +77,38 @@ public class ClientScreenHandler {
     private static final FpsCounter fpsCounter = new FpsCounter();
     private static long ticks = 0L;
 
-    @SubscribeEvent
-    public static void onGuiOpen(GuiOpenEvent event) {
+    private static IMuiScreen lastMui;
+
+    public static boolean guiIsClosing;
+
+    // we need to know the actual gui and not some fake bs some other mod overwrites
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onGuiOpen(GuiOpenEvent event) {
+        GuiScreen newGui = event.getGui();
+        guiIsClosing = newGui == null;
+
         defaultContext.reset();
-        if (event.getGui() instanceof IMuiScreen muiScreen) {
+        if (lastMui != null && newGui == null) {
+            if (lastMui.getScreen().getPanelManager().isOpen()) {
+                lastMui.getScreen().getPanelManager().closeAll();
+            }
+            lastMui.getScreen().getPanelManager().dispose();
+            lastMui = null;
+        } else if (newGui instanceof IMuiScreen screenWrapper) {
+            if (lastMui == null) {
+                lastMui = screenWrapper;
+            } else if (lastMui == newGui) {
+                lastMui.getScreen().getPanelManager().reopen();
+            } else {
+                if (lastMui.getScreen().getPanelManager().isOpen()) {
+                    lastMui.getScreen().getPanelManager().closeAll();
+                }
+                lastMui.getScreen().getPanelManager().dispose();
+                lastMui = screenWrapper;
+            }
+        }
+
+        if (newGui instanceof IMuiScreen muiScreen) {
             Objects.requireNonNull(muiScreen.getScreen(), "ModularScreen must not be null!");
             if (currentScreen != muiScreen.getScreen()) {
                 if (hasScreen()) {
@@ -83,17 +117,20 @@ public class ClientScreenHandler {
                     lastChar = null;
                 }
                 currentScreen = muiScreen.getScreen();
+                currentScreen.getContext().setParentScreen(Minecraft.getMinecraft().currentScreen);
                 fpsCounter.reset();
             }
-        } else if (hasScreen() && getMCScreen() != null && event.getGui() != getMCScreen()) {
+        } else if (hasScreen() && getMCScreen() != null && newGui != getMCScreen()) {
             currentScreen.onCloseParent();
             currentScreen = null;
             lastChar = null;
         }
+        GuiErrorHandler.INSTANCE.clear();
+        OverlayManager.onGuiOpen(event);
     }
 
     @SubscribeEvent
-    public static void onGuiInit(GuiScreenEvent.InitGuiEvent.Post event) {
+    public void onGuiInit(GuiScreenEvent.InitGuiEvent.Post event) {
         defaultContext.updateScreenArea(event.getGui().width, event.getGui().height);
         if (checkGui(event.getGui())) {
             currentScreen.onResize(event.getGui().width, event.getGui().height);
@@ -101,26 +138,39 @@ public class ClientScreenHandler {
         OverlayStack.foreach(ms -> ms.onResize(event.getGui().width, event.getGui().height), false);
     }
 
+    // before recipe viewer
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public static void onGuiInputLow(GuiScreenEvent.KeyboardInputEvent.Pre event) throws IOException {
+    public void onGuiInputHigh(GuiScreenEvent.KeyboardInputEvent.Pre event) throws IOException {
         defaultContext.updateEventState();
+        inputEvent(event, InputPhase.EARLY);
+    }
+
+    // after recipe viewer
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public void onGuiInputLow(GuiScreenEvent.KeyboardInputEvent.Pre event) throws IOException {
+        inputEvent(event, InputPhase.LATE);
+    }
+
+    private static void inputEvent(GuiScreenEvent.KeyboardInputEvent.Pre event, InputPhase phase) throws IOException {
         if (checkGui(event.getGui())) currentScreen.getContext().updateEventState();
-        if (handleKeyboardInput(currentScreen, event.getGui())) {
+        if (handleKeyboardInput(currentScreen, event.getGui(), phase)) {
             event.setCanceled(true);
         }
     }
 
+    // before recipe viewer
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public static void onGuiInputLow(GuiScreenEvent.MouseInputEvent.Pre event) throws IOException {
+    public void onGuiInputHigh(GuiScreenEvent.MouseInputEvent.Pre event) throws IOException {
         defaultContext.updateEventState();
         if (checkGui(event.getGui())) currentScreen.getContext().updateEventState();
         if (handleMouseInput(Mouse.getEventButton(), currentScreen, event.getGui())) {
+            Platform.unFocusRecipeViewer();
             event.setCanceled(true);
             return;
         }
         int w = Mouse.getEventDWheel();
         if (w == 0) return;
-        ModularScreen.UpOrDown upOrDown = w > 0 ? ModularScreen.UpOrDown.UP : ModularScreen.UpOrDown.DOWN;
+        UpOrDown upOrDown = w > 0 ? UpOrDown.UP : UpOrDown.DOWN;
         checkGui(event.getGui());
         if (doAction(currentScreen, ms -> ms.onMouseScroll(upOrDown, Math.abs(w)))) {
             event.setCanceled(true);
@@ -128,7 +178,7 @@ public class ClientScreenHandler {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    public static void onGuiDraw(GuiScreenEvent.DrawScreenEvent.Pre event) {
+    public void onGuiDraw(GuiScreenEvent.DrawScreenEvent.Pre event) {
         int mx = event.getMouseX(), my = event.getMouseY();
         float pt = event.getRenderPartialTicks();
         defaultContext.updateState(mx, my, pt);
@@ -138,16 +188,18 @@ public class ClientScreenHandler {
             drawScreen(currentScreen, currentScreen.getScreenWrapper().getGuiScreen(), mx, my, pt);
             event.setCanceled(true);
         }
+        Platform.setupDrawTex(); // recipe viewer and other mods may expect this state
     }
 
-    @SubscribeEvent
-    public static void onGuiDraw(GuiScreenEvent.DrawScreenEvent.Post event) {
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public void onGuiDraw(GuiScreenEvent.DrawScreenEvent.Post event) {
         OverlayStack.draw(event.getMouseX(), event.getMouseY(), event.getRenderPartialTicks());
+        Platform.setupDrawTex(); // recipe viewer and other mods may expect this state
     }
 
     @SubscribeEvent
-    public static void onTick(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.START) {
+    public void onTick(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
             OverlayStack.onTick();
             defaultContext.tick();
             if (checkGui()) {
@@ -158,7 +210,7 @@ public class ClientScreenHandler {
     }
 
     @SubscribeEvent
-    public static void preDraw(TickEvent.RenderTickEvent event) {
+    public void preDraw(TickEvent.RenderTickEvent event) {
         if (event.phase == TickEvent.Phase.START) {
             GL11.glEnable(GL11.GL_STENCIL_TEST);
         }
@@ -172,7 +224,6 @@ public class ClientScreenHandler {
     public static void onFrameUpdate() {
         OverlayStack.foreach(ModularScreen::onFrameUpdate, true);
         if (currentScreen != null) currentScreen.onFrameUpdate();
-        Animator.advance();
     }
 
     private static boolean doAction(@Nullable ModularScreen muiScreen, Predicate<ModularScreen> action) {
@@ -194,7 +245,7 @@ public class ClientScreenHandler {
             }
             acc.setEventButton(button);
             acc.setLastMouseEvent(Minecraft.getSystemTime());
-            if (muiScreen != null && muiScreen.handleDraggableInput(button, true)) return true;
+            if (muiScreen != null && muiScreen.onMouseInputPre(button, true)) return true;
             return doAction(muiScreen, ms -> ms.onMousePressed(button));
         }
         if (button != -1) {
@@ -208,7 +259,7 @@ public class ClientScreenHandler {
                 }
             }
             acc.setEventButton(-1);
-            if (muiScreen != null && muiScreen.handleDraggableInput(button, false)) return true;
+            if (muiScreen != null && muiScreen.onMouseInputPre(button, false)) return true;
             return doAction(muiScreen, ms -> ms.onMouseRelease(button));
         }
         if (acc.getEventButton() != -1 && acc.getLastMouseEvent() > 0L) {
@@ -221,7 +272,7 @@ public class ClientScreenHandler {
     /**
      * This replicates vanilla behavior while also injecting custom behavior for consistency
      */
-    private static boolean handleKeyboardInput(@Nullable ModularScreen muiScreen, GuiScreen mcScreen) throws IOException {
+    private static boolean handleKeyboardInput(@Nullable ModularScreen muiScreen, GuiScreen mcScreen, InputPhase inputPhase) throws IOException {
         char c0 = Keyboard.getEventCharacter();
         int key = Keyboard.getEventKey();
         boolean state = Keyboard.getEventKeyState();
@@ -229,15 +280,17 @@ public class ClientScreenHandler {
         if (state) {
             // pressing a key
             lastChar = c0;
-            return doAction(muiScreen, ms -> ms.onKeyPressed(c0, key)) || keyTyped(mcScreen, c0, key);
+            return inputPhase.isEarly() ? doAction(muiScreen, ms -> ms.onKeyPressed(c0, key)) : keyTyped(mcScreen, c0, key);
         } else {
             // releasing a key
             // for some reason when you press E after joining a world the button will not trigger the press event,
             // but ony the release event, causing this to be null
             if (lastChar == null) return false;
             // when the key is released, the event char is empty
-            if (doAction(muiScreen, ms -> ms.onKeyRelease(lastChar, key))) return true;
-            if (key == 0 && c0 >= ' ') {
+            if (inputPhase.isEarly() && doAction(muiScreen, ms -> ms.onKeyRelease(lastChar, key))) {
+                return true;
+            }
+            if (inputPhase.isLate() && key == 0 && c0 >= ' ') {
                 return keyTyped(mcScreen, c0, key);
             }
         }
@@ -255,7 +308,7 @@ public class ClientScreenHandler {
             if (currentScreen.getContext().hasDraggable()) {
                 currentScreen.getContext().dropDraggable();
             } else {
-                currentScreen.getPanelManager().closeTopPanel(true);
+                currentScreen.getPanelManager().closeTopPanel();
             }
             return true;
         }
@@ -298,17 +351,19 @@ public class ClientScreenHandler {
     }
 
     public static boolean shouldDrawWorldBackground() {
-        return ModularUI.isBlurLoaded() || Minecraft.getMinecraft().world == null;
+        return ModularUI.Mods.BLUR.isLoaded() || Minecraft.getMinecraft().world == null;
     }
 
     public static void drawDarkBackground(GuiScreen screen, int tint) {
         if (hasScreen()) {
-            float alpha = currentScreen.getMainPanel().getAlpha();
+            float alpha = ModularUI.Mods.NEA.isLoaded() ? OpeningAnimation.getValue(screen) : 1f;
             // vanilla color values as hex
             int color = 0x101010;
-            int startAlpha = 0xc0;
-            int endAlpha = 0xd0;
-            GuiDraw.drawVerticalGradientRect(0, 0, screen.width, screen.height, Color.withAlpha(color, (int) (startAlpha * alpha)), Color.withAlpha(color, (int) (endAlpha * alpha)));
+            int start = (int) (0xc0 * alpha);
+            int end = (int) (0xd0 * alpha);
+            start = Color.withAlpha(color, start);
+            end = Color.withAlpha(color, end);
+            GuiDraw.drawVerticalGradientRect(0, 0, screen.width, screen.height, start, end);
         }
     }
 
@@ -321,9 +376,16 @@ public class ClientScreenHandler {
     }
 
     public static void drawScreenInternal(ModularScreen muiScreen, GuiScreen mcScreen, int mouseX, int mouseY, float partialTicks) {
+        GlStateManager.pushMatrix(); // needed for open animation currently
         Stencil.reset();
         Stencil.apply(muiScreen.getScreenArea(), null);
-        muiScreen.drawScreen(mouseX, mouseY, partialTicks);
+        Platform.setupDrawTex();
+        GlStateManager.enableLighting();
+        GlStateManager.enableDepth();
+        GlStateManager.enableRescaleNormal();
+        RenderHelper.enableStandardItemLighting();
+        handleAnimationScale(mcScreen);
+        muiScreen.drawScreen();
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
         drawVanillaElements(mcScreen, mouseX, mouseY, partialTicks);
@@ -331,12 +393,13 @@ public class ClientScreenHandler {
         GlStateManager.enableRescaleNormal();
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
         RenderHelper.disableStandardItemLighting();
-        muiScreen.drawForeground(partialTicks);
+        muiScreen.drawForeground();
         GlStateManager.enableLighting();
         GlStateManager.enableDepth();
         GlStateManager.enableRescaleNormal();
         RenderHelper.enableStandardItemLighting();
         Stencil.remove();
+        GlStateManager.popMatrix();
     }
 
     public static void drawContainer(ModularScreen muiScreen, GuiContainer mcScreen, int mouseX, int mouseY, float partialTicks) {
@@ -344,12 +407,14 @@ public class ClientScreenHandler {
 
         Stencil.reset();
         Stencil.apply(muiScreen.getScreenArea(), null);
+        Platform.setupDrawTex();
         mcScreen.drawDefaultBackground();
         int x = mcScreen.getGuiLeft();
         int y = mcScreen.getGuiTop();
 
+        //handleAnimationScale(mcScreen);
         acc.invokeDrawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
-        muiScreen.drawScreen(mouseX, mouseY, partialTicks);
+        muiScreen.drawScreen();
 
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
@@ -364,12 +429,12 @@ public class ClientScreenHandler {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         RenderHelper.disableStandardItemLighting();
         acc.invokeDrawGuiContainerForegroundLayer(mouseX, mouseY);
-        muiScreen.drawForeground(partialTicks);
+        muiScreen.drawForeground();
         RenderHelper.enableGUIStandardItemLighting();
 
         acc.setHoveredSlot(null);
         IGuiElement hovered = muiScreen.getContext().getHovered();
-        if (hovered instanceof IVanillaSlot vanillaSlot) {
+        if (hovered instanceof IVanillaSlot vanillaSlot && vanillaSlot.handleAsVanillaSlot()) {
             acc.setHoveredSlot(vanillaSlot.getVanillaSlot());
         }
 
@@ -379,7 +444,7 @@ public class ClientScreenHandler {
         MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.DrawForeground(mcScreen, mouseX, mouseY));
         GlStateManager.popMatrix();
 
-        InventoryPlayer inventoryplayer = Minecraft.getMinecraft().player.inventory;
+        InventoryPlayer inventoryplayer = Platform.getClientPlayer().inventory;
         ItemStack itemstack = acc.getDraggedStack().isEmpty() ? inventoryplayer.getItemStack() : acc.getDraggedStack();
         GlStateManager.translate((float) x, (float) y, 0.0F);
         if (!itemstack.isEmpty()) {
@@ -388,7 +453,7 @@ public class ClientScreenHandler {
 
             if (!acc.getDraggedStack().isEmpty() && acc.getIsRightMouseClick()) {
                 itemstack = itemstack.copy();
-                itemstack.setCount(MathHelper.ceil((float) itemstack.getCount() / 2.0F));
+                itemstack.setCount(MathUtils.ceil((float) itemstack.getCount() / 2.0F));
             } else if (acc.getDragSplitting() && acc.getDragSplittingSlots().size() > 1) {
                 itemstack = itemstack.copy();
                 itemstack.setCount(acc.getDragSplittingRemnant());
@@ -398,7 +463,7 @@ public class ClientScreenHandler {
                 }
             }
 
-            drawItemStack(mcScreen, itemstack, mouseX - x - 8, mouseY - y - k2, s);
+            drawItemStack(mcScreen, NEAAnimationHandler.injectVirtualCursorStack(mcScreen, itemstack), mouseX - x - 8, mouseY - y - k2, s);
         }
 
         if (!acc.getReturningStack().isEmpty()) {
@@ -415,6 +480,8 @@ public class ClientScreenHandler {
             int i2 = acc.getTouchUpY() + (int) ((float) i3 * f);
             drawItemStack(mcScreen, acc.getReturningStack(), l1, i2, null);
         }
+
+        NEAAnimationHandler.drawItemAnimation(mcScreen);
         GlStateManager.popMatrix();
         GlStateManager.enableLighting();
         GlStateManager.enableDepth();
@@ -429,7 +496,7 @@ public class ClientScreenHandler {
         ((GuiScreenAccessor) mcScreen).getItemRender().zLevel = 200.0F;
         FontRenderer font = stack.getItem().getFontRenderer(stack);
         if (font == null) font = ((GuiScreenAccessor) mcScreen).getFontRenderer();
-        GlStateManager.enableDepth();
+        Platform.setupDrawItem();
         ((GuiScreenAccessor) mcScreen).getItemRender().renderItemAndEffectIntoGUI(stack, x, y);
         ((GuiScreenAccessor) mcScreen).getItemRender().renderItemOverlayIntoGUI(font, stack, x, y - (((GuiContainerAccessor) mcScreen).getDraggedStack().isEmpty() ? 0 : 8), altText);
         GlStateManager.disableDepth();
@@ -465,13 +532,17 @@ public class ClientScreenHandler {
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
         int screenH = muiScreen.getScreenArea().height;
         int color = Color.argb(180, 40, 115, 220);
-        int lineY = screenH - 13;
-        Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Mouse Pos: " + mouseX + ", " + mouseY, 5, lineY, color);
-        lineY -= 11;
-        Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("FPS: " + fpsCounter.getFps(), 5, screenH - 24, color);
+        float scale = 0.80f;
+        int shift = (int) (11 * scale + 0.5f);
+        int lineY = screenH - shift - 2;
+        GuiDraw.drawText("Mouse Pos: " + mouseX + ", " + mouseY, 5, lineY, scale, color, true);
+        lineY -= shift;
+        GuiDraw.drawText("FPS: " + fpsCounter.getFps(), 5, lineY, scale, color, true);
+        lineY -= shift;
+        GuiDraw.drawText("Theme ID: " + context.getTheme().getId(), 5, lineY, scale, color, true);
         LocatedWidget locatedHovered = muiScreen.getPanelManager().getTopWidgetLocated(true);
         if (locatedHovered != null) {
-            drawSegmentLine(lineY -= 4, color);
+            drawSegmentLine(lineY -= 4, scale, color);
             lineY -= 10;
 
             IGuiElement hovered = locatedHovered.getElement();
@@ -482,46 +553,43 @@ public class ClientScreenHandler {
             Area area = hovered.getArea();
             IGuiElement parent = hovered.getParent();
 
-            GuiDraw.drawBorder(0, 0, area.width, area.height, color, 1f);
+            GuiDraw.drawBorder(0, 0, area.width, area.height, color, scale);
             if (hovered.hasParent()) {
-                GuiDraw.drawBorder(-area.rx, -area.ry, parent.getArea().width, parent.getArea().height, Color.withAlpha(color, 0.3f), 1f);
+                GuiDraw.drawBorder(-area.rx, -area.ry, parent.getArea().width, parent.getArea().height, Color.withAlpha(color, 0.3f), scale);
             }
             GlStateManager.popMatrix();
             locatedHovered.unapplyMatrix(context);
-            GuiDraw.drawText("Pos: " + area.x + ", " + area.y + "  Rel: " + area.rx + ", " + area.ry, 5, lineY, 1, color, false);
-            lineY -= 11;
-            GuiDraw.drawText("Size: " + area.width + ", " + area.height, 5, lineY, 1, color, false);
-            lineY -= 11;
-            GuiDraw.drawText("Class: " + hovered, 5, lineY, 1, color, false);
+            GuiDraw.drawText("Pos: " + area.x + ", " + area.y + "  Rel: " + area.rx + ", " + area.ry, 5, lineY, scale, color, true);
+            lineY -= shift;
+            GuiDraw.drawText("Size: " + area.width + ", " + area.height, 5, lineY, scale, color, true);
+            lineY -= shift;
+            GuiDraw.drawText("Class: " + hovered, 5, lineY, scale, color, true);
             if (hovered.hasParent()) {
-                drawSegmentLine(lineY -= 4, color);
+                drawSegmentLine(lineY -= 4, scale, color);
                 lineY -= 10;
                 area = parent.getArea();
-                GuiDraw.drawText("Parent size: " + area.width + ", " + area.height, 5, lineY, 1, color, false);
-                lineY -= 11;
-                GuiDraw.drawText("Parent: " + parent, 5, lineY, 1, color, false);
+                GuiDraw.drawText("Parent size: " + area.width + ", " + area.height, 5, lineY, scale, color, true);
+                lineY -= shift;
+                GuiDraw.drawText("Parent: " + parent, 5, lineY, scale, color, true);
             }
             if (hovered instanceof ItemSlot slotWidget) {
-                drawSegmentLine(lineY -= 4, color);
+                drawSegmentLine(lineY -= 4, scale, color);
                 lineY -= 10;
                 ModularSlot slot = slotWidget.getSlot();
-                GuiDraw.drawText("Slot Index: " + slot.getSlotIndex(), 5, lineY, 1, color, false);
-                lineY -= 11;
-                GuiDraw.drawText("Slot Number: " + slot.slotNumber, 5, lineY, 1, color, false);
-                lineY -= 11;
+                GuiDraw.drawText("Slot Index: " + slot.getSlotIndex(), 5, lineY, scale, color, false);
+                lineY -= shift;
+                GuiDraw.drawText("Slot Number: " + slot.slotNumber, 5, lineY, scale, color, false);
+                lineY -= shift;
                 if (slotWidget.isSynced()) {
                     SlotGroup slotGroup = slot.getSlotGroup();
                     boolean allowShiftTransfer = slotGroup != null && slotGroup.allowShiftTransfer();
-                    GuiDraw.drawText("Shift-Click Priority: " + (allowShiftTransfer ? slotGroup.getShiftClickPriority() : "DISABLED"), 5, lineY, 1, color, false);
+                    GuiDraw.drawText("Shift-Click Priority: " + (allowShiftTransfer ? slotGroup.getShiftClickPriority() : "DISABLED"), 5, lineY, scale, color, true);
                 }
             } else if (hovered instanceof RichTextWidget richTextWidget) {
-                drawSegmentLine(lineY -= 4, color);
+                drawSegmentLine(lineY -= 4, scale, color);
                 lineY -= 10;
-                context.pushMatrix();
-                context.translate(richTextWidget.getArea().x, richTextWidget.getArea().y);
                 Object hoveredElement = richTextWidget.getHoveredElement();
-                context.popMatrix();
-                GuiDraw.drawText("Hovered: " + hoveredElement, 5, lineY, 1, color, false);
+                GuiDraw.drawText("Hovered: " + hoveredElement, 5, lineY, scale, color, true);
             }
         }
         // dot at mouse pos
@@ -529,8 +597,8 @@ public class ClientScreenHandler {
         GlStateManager.color(1f, 1f, 1f, 1f);
     }
 
-    private static void drawSegmentLine(int y, int color) {
-        GuiDraw.drawRect(5, y, 140, 1, color);
+    private static void drawSegmentLine(int y, float scale, int color) {
+        GuiDraw.drawRect(5, y, 140 * scale, 1 * scale, color);
     }
 
     public static void updateGuiArea(GuiContainer container, Rectangle area) {
@@ -579,5 +647,26 @@ public class ClientScreenHandler {
             return currentScreen.getContext();
         }
         return defaultContext;
+    }
+
+    private enum InputPhase {
+        // for mui interactions
+        EARLY,
+        // for mc interactions (like E and ESC)
+        LATE;
+
+        public boolean isEarly() {
+            return this == EARLY;
+        }
+
+        public boolean isLate() {
+            return this == LATE;
+        }
+    }
+
+    public static void handleAnimationScale(GuiScreen screen) {
+        if (ModularUI.Mods.NEA.isLoaded()) {
+            OpeningAnimation.handleScale(screen, true);
+        }
     }
 }

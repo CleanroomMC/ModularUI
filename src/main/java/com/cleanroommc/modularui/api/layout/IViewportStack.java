@@ -1,15 +1,18 @@
 package com.cleanroommc.modularui.api.layout;
 
 import com.cleanroommc.modularui.screen.viewport.TransformationMatrix;
+import com.cleanroommc.modularui.utils.Matrix4f;
 import com.cleanroommc.modularui.utils.Vector3f;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * This handles all viewports in a GUI. Also keeps track of a matrix stack used for rendering and
  * user interaction.
  */
+@ApiStatus.NonExtendable
 public interface IViewportStack {
 
     /**
@@ -110,6 +113,8 @@ public interface IViewportStack {
      * @param y y scale factor
      */
     void scale(float x, float y);
+
+    void multiply(Matrix4f matrix);
 
     /**
      * Resets the top matrix to the matrix below.

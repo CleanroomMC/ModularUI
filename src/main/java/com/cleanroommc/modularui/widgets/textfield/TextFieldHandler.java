@@ -96,7 +96,7 @@ public class TextFieldHandler {
                 this.renderer.setSimulate(true);
                 this.renderer.draw(this.text);
                 this.renderer.setSimulate(false);
-                this.scrollArea.getScrollX().setScrollSize((int) (this.renderer.getLastWidth() + 0.5f));
+                this.scrollArea.getScrollX().setScrollSize((int) this.renderer.getLastActualWidth());
                 if (this.scrollArea.getScrollX().isScrollBarActive(this.scrollArea)) {
                     String line = this.text.get(main.y);
                     int scrollTo = (int) this.renderer.getPosOf(this.renderer.measureLines(Collections.singletonList(line)), main).x;
@@ -226,12 +226,25 @@ public class TextFieldHandler {
         setMainCursor(this.text.size() - 1, this.text.get(this.text.size() - 1).length(), true);
     }
 
+    public void markCurrentLine() {
+        setOffsetCursor(getMainCursor().y, 0);
+        setMainCursor(getMainCursor().y, this.text.get(getMainCursor().y).length(), true);
+    }
+
     public String getTextAsString() {
         return JOINER.join(this.text);
     }
 
     public List<String> getText() {
         return this.text;
+    }
+
+    public boolean isTextEmpty() {
+        if (this.text.isEmpty()) return true;
+        for (String line : this.text) {
+            if (!line.isEmpty()) return false;
+        }
+        return true;
     }
 
     public void onChanged() {
@@ -260,14 +273,15 @@ public class TextFieldHandler {
         return this.maxLines > 1 || ((this.pattern == null || this.pattern.matcher(text).matches()) && (this.maxCharacters < 0 || this.maxCharacters >= text.length()));
     }
 
-    public void insert(String text) {
-        insert(Arrays.asList(text.split("\n")));
+    public void insert(String text, boolean hasHorizontalScrolling) {
+        insert(Arrays.asList(text.split("\n")), hasHorizontalScrolling);
     }
 
-    public void insert(List<String> text) {
+    public void insert(List<String> text, boolean hasHorizontalScrolling) {
         List<String> copy = new ArrayList<>(this.text);
         Point point = insert(copy, text);
-        if (point == null || copy.size() > this.maxLines || !this.renderer.wouldFit(copy)) return;
+        // if we can scroll horizontally, we have virtually an infinite amount of space and don't need to check width
+        if (point == null || copy.size() > this.maxLines || !this.renderer.wouldFit(copy, !hasHorizontalScrolling)) return;
         this.text.clear();
         this.text.addAll(copy);
         setCursor(point, true);

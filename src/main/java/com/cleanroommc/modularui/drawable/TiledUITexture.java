@@ -1,5 +1,7 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.google.gson.JsonObject;
+
 import net.minecraft.util.ResourceLocation;
 
 public class TiledUITexture extends UITexture {
@@ -9,8 +11,8 @@ public class TiledUITexture extends UITexture {
     /**
      * Use {@link UITexture#builder()} with {@link Builder#tiled()}
      */
-    TiledUITexture(ResourceLocation location, float u0, float v0, float u1, float v1, int imageWidth, int imageHeight, boolean canApplyTheme) {
-        super(location, u0, v0, u1, v1, canApplyTheme);
+    TiledUITexture(ResourceLocation location, float u0, float v0, float u1, float v1, int imageWidth, int imageHeight, ColorType colorType) {
+        super(location, u0, v0, u1, v1, colorType);
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;
     }
@@ -22,5 +24,14 @@ public class TiledUITexture extends UITexture {
             return;
         }
         GuiDraw.drawTiledTexture(this.location, x, y, width, height, this.u0, this.v0, this.u1, this.v1, this.imageWidth, this.imageHeight, 0);
+    }
+
+    @Override
+    public boolean saveToJson(JsonObject json) {
+        super.saveToJson(json);
+        if (json.entrySet().size() > 1) {
+            json.addProperty("tiled", true);
+        }
+        return true;
     }
 }

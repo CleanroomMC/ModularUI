@@ -1,15 +1,16 @@
 package com.cleanroommc.modularui.widgets;
 
+import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.value.IDoubleValue;
 import com.cleanroommc.modularui.drawable.UITexture;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.value.DoubleValue;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
-
-import net.minecraft.util.math.MathHelper;
 
 import java.util.function.DoubleSupplier;
 
@@ -44,6 +45,7 @@ public class ProgressWidget extends Widget<ProgressWidget> {
 
     @Override
     public void onResized() {
+        super.onResized();
         if (this.imageSize < 0) {
             this.imageSize = getArea().width;
         }
@@ -54,7 +56,8 @@ public class ProgressWidget extends Widget<ProgressWidget> {
     }
 
     @Override
-    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
+    public void draw(ModularGuiContext context, WidgetThemeEntry<?> entry) {
+        WidgetTheme widgetTheme = getActiveWidgetTheme(entry, isHovering());
         if (this.emptyTexture != null) {
             this.emptyTexture.draw(context, 0, 0, getArea().w(), getArea().h(), widgetTheme);
             Color.setGlColorOpaque(Color.WHITE.main);
@@ -97,7 +100,7 @@ public class ProgressWidget extends Widget<ProgressWidget> {
     }
 
     public float getProgressUV(float uv) {
-        if (getScreen().getCurrentTheme().getSmoothProgressBarOverride()) {
+        if (ModularUIConfig.smoothProgressBar) {
             return uv;
         }
         return (float) (Math.floor(uv * this.imageSize) / this.imageSize);
@@ -105,10 +108,10 @@ public class ProgressWidget extends Widget<ProgressWidget> {
 
     private void drawCircular(float progress, WidgetTheme widgetTheme) {
         float[] subAreas = {
-                getProgressUV(MathHelper.clamp(progress / 0.25f, 0, 1)),
-                getProgressUV(MathHelper.clamp((progress - 0.25f) / 0.25f, 0, 1)),
-                getProgressUV(MathHelper.clamp((progress - 0.5f) / 0.25f, 0, 1)),
-                getProgressUV(MathHelper.clamp((progress - 0.75f) / 0.25f, 0, 1))
+                getProgressUV(MathUtils.clamp(progress / 0.25f, 0, 1)),
+                getProgressUV(MathUtils.clamp((progress - 0.25f) / 0.25f, 0, 1)),
+                getProgressUV(MathUtils.clamp((progress - 0.5f) / 0.25f, 0, 1)),
+                getProgressUV(MathUtils.clamp((progress - 0.75f) / 0.25f, 0, 1))
         };
         float halfWidth = getArea().width / 2f;
         float halfHeight = getArea().height / 2f;

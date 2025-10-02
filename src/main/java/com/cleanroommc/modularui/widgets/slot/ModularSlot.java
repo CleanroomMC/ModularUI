@@ -1,12 +1,20 @@
 package com.cleanroommc.modularui.widgets.slot;
 
+import com.cleanroommc.modularui.value.sync.ItemSlotSH;
+
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
+
+import net.minecraftforge.items.wrapper.PlayerInvWrapper;
+
+import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +29,6 @@ import java.util.function.Predicate;
  */
 public class ModularSlot extends SlotItemHandler {
 
-    private final boolean phantom;
     private boolean enabled = true;
     private boolean canTake = true, canPut = true;
     private Predicate<ItemStack> filter = stack -> true;
@@ -29,21 +36,37 @@ public class ModularSlot extends SlotItemHandler {
     private boolean ignoreMaxStackSize = false;
     private String slotGroupName = null;
     private SlotGroup slotGroup = null;
+    private boolean phantom = false;
 
-    public ModularSlot(IItemHandler itemHandler, int index) {
-        this(itemHandler, index, false);
-    }
+    private ItemSlotSH syncHandler = null;
 
     /**
      * Creates a ModularSlot
      *
      * @param itemHandler item handler of the slot
      * @param index       slot index in the item handler
-     * @param phantom     true if the slot should not be a real slot, but only a phantom of the item that would be in the slot
      */
-    public ModularSlot(IItemHandler itemHandler, int index, boolean phantom) {
+    public ModularSlot(IItemHandler itemHandler, int index) {
         super(itemHandler, index, Integer.MIN_VALUE, Integer.MIN_VALUE);
+        if (index < 0 || index >= itemHandler.getSlots()) {
+            throw new IllegalArgumentException("Tried to create a slot with invalid index " + index + ". Valid index range is [0," + itemHandler.getSlots() + ")");
+        }
+    }
+
+    @ApiStatus.Internal
+    public void initialize(ItemSlotSH syncManager, boolean phantom) {
+        this.syncHandler = syncManager;
         this.phantom = phantom;
+    }
+
+    @ApiStatus.Internal
+    public void dispose() {
+        this.syncHandler = null;
+        this.phantom = false;
+    }
+
+    public boolean isInitialized() {
+        return this.syncHandler != null;
     }
 
     @Override
@@ -62,12 +85,14 @@ public class ModularSlot extends SlotItemHandler {
     }
 
     @Override
-    public void onSlotChanged() {
-    }
+    public void onSlotChanged() {}
 
     public void onSlotChangedReal(ItemStack itemStack, boolean onlyChangedAmount, boolean client, boolean init) {
         this.changeListener.onChange(itemStack, onlyChangedAmount, client, init);
+        if (!init && isInitialized()) getSyncHandler().getSyncManager().getContainer().onSlotChanged(this, itemStack, onlyChangedAmount);
     }
+
+    public void onCraftShiftClick(EntityPlayer player, ItemStack stack) {}
 
     @Override
     public void putStack(@NotNull ItemStack stack) {
@@ -75,10 +100,9 @@ public class ModularSlot extends SlotItemHandler {
         super.putStack(stack);
     }
 
-    @Nullable
     @SideOnly(Side.CLIENT)
     @Override
-    public TextureAtlasSprite getBackgroundSprite() {
+    public @Nullable TextureAtlasSprite getBackgroundSprite() {
         return null;
     }
 
@@ -100,14 +124,23 @@ public class ModularSlot extends SlotItemHandler {
         return this.ignoreMaxStackSize;
     }
 
-    @Nullable
-    public String getSlotGroupName() {
+    public @Nullable String getSlotGroupName() {
         return this.slotGroupName;
     }
 
-    @Nullable
-    public SlotGroup getSlotGroup() {
+    public @Nullable SlotGroup getSlotGroup() {
         return this.slotGroup;
+    }
+
+    public @NotNull ItemSlotSH getSyncHandler() {
+        if (this.syncHandler == null) {
+            throw new IllegalStateException("ModularSlot is not yet initialized");
+        }
+        return this.syncHandler;
+    }
+
+    protected EntityPlayer getPlayer() {
+        return getSyncHandler().getSyncManager().getPlayer();
     }
 
     /**
@@ -198,5 +231,13 @@ public class ModularSlot extends SlotItemHandler {
      */
     public ModularSlot singletonSlotGroup() {
         return singletonSlotGroup(SlotGroup.STORAGE_SLOT_PRIO);
+    }
+
+    public static boolean isPlayerSlot(Slot slot) {
+        return slot.inventory instanceof InventoryPlayer;
+    }
+
+    public static boolean isPlayerSlot(SlotItemHandler slot) {
+        return slot.getItemHandler() instanceof PlayerInvWrapper || slot.getItemHandler() instanceof PlayerMainInvWrapper;
     }
 }

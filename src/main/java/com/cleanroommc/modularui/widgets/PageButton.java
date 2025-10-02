@@ -3,10 +3,11 @@ package com.cleanroommc.modularui.widgets;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.widget.Interactable;
-import com.cleanroommc.modularui.drawable.DrawableArray;
+import com.cleanroommc.modularui.drawable.DrawableStack;
 import com.cleanroommc.modularui.drawable.TabTexture;
+import com.cleanroommc.modularui.theme.SelectableTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.theme.WidgetThemeSelectable;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.widget.Widget;
 
 import org.jetbrains.annotations.NotNull;
@@ -25,9 +26,14 @@ public class PageButton extends Widget<PageButton> implements Interactable {
     }
 
     @Override
-    public WidgetTheme getWidgetThemeInternal(ITheme theme) {
-        WidgetThemeSelectable widgetTheme = theme.getToggleButtonTheme();
-        return isActive() ^ invertSelected() ? widgetTheme : widgetTheme.getSelected();
+    public WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
+        return theme.getToggleButtonTheme();
+    }
+
+    @Override
+    protected WidgetTheme getActiveWidgetTheme(WidgetThemeEntry<?> widgetTheme, boolean hover) {
+        SelectableTheme selectableTheme = widgetTheme.expectType(SelectableTheme.class).getTheme(hover);
+        return isActive() ^ invertSelected() ? selectableTheme.getSelected() : selectableTheme;
     }
 
     @Override
@@ -58,7 +64,7 @@ public class PageButton extends Widget<PageButton> implements Interactable {
         } else if (background.length == 1) {
             this.inactiveTexture = background[0];
         } else {
-            this.inactiveTexture = new DrawableArray(background);
+            this.inactiveTexture = new DrawableStack(background);
         }
         return this;
     }

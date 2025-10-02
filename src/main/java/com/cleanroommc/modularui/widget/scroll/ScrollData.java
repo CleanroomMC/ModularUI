@@ -1,11 +1,11 @@
 package com.cleanroommc.modularui.widget.scroll;
 
+import com.cleanroommc.modularui.animation.Animator;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.drawable.GuiDraw;
-import com.cleanroommc.modularui.utils.Animator;
 import com.cleanroommc.modularui.utils.Interpolation;
+import com.cleanroommc.modularui.utils.MathUtils;
 
-import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -17,7 +17,7 @@ public abstract class ScrollData {
      * Creates scroll data which handles scrolling and scroll bar. Scrollbar is 4 pixel thick
      * and will be at the end of the cross axis (bottom/right).
      *
-     * @param axis      axis on which to scroll
+     * @param axis axis on which to scroll
      * @return new scroll data
      */
     public static ScrollData of(GuiAxis axis) {
@@ -62,7 +62,9 @@ public abstract class ScrollData {
     protected int clickOffset;
 
     private int animatingTo = 0;
-    private final Animator scrollAnimator = new Animator(30, Interpolation.QUAD_OUT);
+    private final Animator scrollAnimator = new Animator()
+            .duration(500)
+            .curve(Interpolation.QUAD_OUT);
 
     protected ScrollData(GuiAxis axis, boolean axisStart, int thickness) {
         this.axis = axis;
@@ -130,7 +132,8 @@ public abstract class ScrollData {
     }
 
     protected final int getRawVisibleSize(ScrollArea area) {
-        return Math.max(0, getRawFullVisibleSize(area) - area.getPadding().getTotal(this.axis));
+        // the scroll area doesn't contribute to the visible size in this case
+        return Math.max(0, getRawFullVisibleSize(area) - area.getPadding().getTotal(this.axis) + area.getScrollPadding().getTotalScrollPadding(this.axis));
     }
 
     protected final int getRawFullVisibleSize(ScrollArea area) {
@@ -142,7 +145,7 @@ public abstract class ScrollData {
     }
 
     public final int getFullVisibleSize(ScrollArea area, boolean isOtherActive) {
-        int s = getRawVisibleSize(area);
+        int s = getRawFullVisibleSize(area);
         ScrollData data = getOtherScrollData(area);
         if (data != null && (isOtherActive || data.isScrollBarActive(area, true))) {
             s -= data.getThickness();
@@ -180,7 +183,7 @@ public abstract class ScrollData {
         if (this.scrollSize <= size) {
             this.scroll = 0;
         } else {
-            this.scroll = MathHelper.clamp(this.scroll, 0, this.scrollSize - size);
+            this.scroll = MathUtils.clamp(this.scroll, 0, this.scrollSize - size);
         }
         return old != this.scroll; // returns true if the area was clamped
     }
@@ -199,11 +202,13 @@ public abstract class ScrollData {
     }
 
     public void animateTo(ScrollArea area, int x) {
-        this.scrollAnimator.setCallback(value -> {
-            return scrollTo(area, (int) value); // stop animation once an edge is hit
+        this.scrollAnimator.bounds(this.scroll, x).onUpdate(value -> {
+            if (scrollTo(area, (int) value)) {
+                this.scrollAnimator.stop(false); // stop animation once an edge is hit
+            }
         });
-        this.scrollAnimator.setValueBounds(this.scroll, x);
-        this.scrollAnimator.forward();
+        this.scrollAnimator.reset();
+        this.scrollAnimator.animate();
         this.animatingTo = x;
     }
 
@@ -236,7 +241,7 @@ public abstract class ScrollData {
     public abstract boolean isInsideScrollbarArea(ScrollArea area, int x, int y);
 
     public boolean isAnimating() {
-        return this.scrollAnimator.isRunning();
+        return this.scrollAnimator.isAnimating();
     }
 
     public int getAnimationDirection() {

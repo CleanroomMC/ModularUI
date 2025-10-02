@@ -1,12 +1,17 @@
 package com.cleanroommc.modularui.factory;
 
 import com.cleanroommc.modularui.api.IMuiScreen;
-import com.cleanroommc.modularui.api.JeiSettings;
 import com.cleanroommc.modularui.api.MCHelper;
+import com.cleanroommc.modularui.api.RecipeViewerSettings;
 import com.cleanroommc.modularui.api.UIFactory;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.packets.OpenGuiPacket;
-import com.cleanroommc.modularui.screen.*;
+import com.cleanroommc.modularui.screen.GuiContainerWrapper;
+import com.cleanroommc.modularui.screen.GuiScreenWrapper;
+import com.cleanroommc.modularui.screen.ModularContainer;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widget.WidgetTree;
 
@@ -16,7 +21,6 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.player.PlayerContainerEvent;
@@ -28,6 +32,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -39,7 +44,6 @@ public class GuiManager {
 
     private static final Object2ObjectMap<String, UIFactory<?>> FACTORIES = new Object2ObjectOpenHashMap<>(16);
 
-    private static IMuiScreen lastMui;
     private static final List<EntityPlayer> openedContainers = new ArrayList<>(4);
 
     public static void registerFactory(UIFactory<?> factory) {
@@ -68,11 +72,13 @@ public class GuiManager {
         if (player instanceof FakePlayer || openedContainers.contains(player)) return;
         openedContainers.add(player);
         // create panel, collect sync handlers and create container
-        guiData.setJeiSettings(JeiSettings.DUMMY);
-        PanelSyncManager syncManager = new PanelSyncManager();
-        ModularPanel panel = factory.createPanel(guiData, syncManager);
+        UISettings settings = new UISettings(RecipeViewerSettings.DUMMY);
+        settings.defaultCanInteractWith(factory, guiData);
+        PanelSyncManager syncManager = new PanelSyncManager(false);
+        ModularPanel panel = factory.createPanel(guiData, syncManager, settings);
         WidgetTree.collectSyncValues(syncManager, panel);
-        ModularContainer container = new ModularContainer(player, syncManager, panel.getName(), guiData);
+        ModularContainer container = settings.hasContainer() ? settings.createContainer() : factory.createContainer();
+        container.construct(player, syncManager, settings, panel.getName(), guiData);
         // sync to client
         player.getNextWindowId();
         player.closeContainer();
@@ -88,17 +94,19 @@ public class GuiManager {
         MinecraftForge.EVENT_BUS.post(new PlayerContainerEvent.Open(player, container));
     }
 
+    @ApiStatus.Internal
     @SideOnly(Side.CLIENT)
-    public static <T extends GuiData> void open(int windowId, @NotNull UIFactory<T> factory, @NotNull PacketBuffer data, @NotNull EntityPlayerSP player) {
+    public static <T extends GuiData> void openFromClient(int windowId, @NotNull UIFactory<T> factory, @NotNull PacketBuffer data, @NotNull EntityPlayerSP player) {
         T guiData = factory.readGuiData(player, data);
-        JeiSettingsImpl jeiSettings = new JeiSettingsImpl();
-        guiData.setJeiSettings(jeiSettings);
-        PanelSyncManager syncManager = new PanelSyncManager();
-        ModularPanel panel = factory.createPanel(guiData, syncManager);
+        UISettings settings = new UISettings();
+        settings.defaultCanInteractWith(factory, guiData);
+        PanelSyncManager syncManager = new PanelSyncManager(true);
+        ModularPanel panel = factory.createPanel(guiData, syncManager, settings);
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularScreen screen = factory.createScreen(guiData, panel);
-        screen.getContext().setJeiSettings(jeiSettings);
-        ModularContainer container = new ModularContainer(player, syncManager, panel.getName(), guiData);
+        screen.getContext().setSettings(settings);
+        ModularContainer container = settings.hasContainer() ? settings.createContainer() : factory.createContainer();
+        container.construct(player, syncManager, settings, panel.getName(), guiData);
         IMuiScreen wrapper = factory.createScreenWrapper(container, screen);
         if (!(wrapper.getGuiScreen() instanceof GuiContainer guiContainer)) {
             throw new IllegalStateException("The wrapping screen must be a GuiContainer for synced GUIs!");
@@ -110,45 +118,30 @@ public class GuiManager {
     }
 
     @SideOnly(Side.CLIENT)
-    static void openScreen(ModularScreen screen, JeiSettingsImpl jeiSettings, ContainerCustomizer containerCustomizer) {
-        screen.getContext().setJeiSettings(jeiSettings);
+    public static <T extends GuiData> void openFromClient(@NotNull UIFactory<T> factory, @NotNull T guiData) {
+        PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
+        factory.writeGuiData(guiData, buffer);
+        NetworkHandler.sendToServer(new OpenGuiPacket<>(0, factory, buffer));
+    }
+
+    @SideOnly(Side.CLIENT)
+    static void openScreen(ModularScreen screen, UISettings settings) {
+        screen.getContext().setSettings(settings);
         GuiScreen guiScreen;
-        if (containerCustomizer == null) {
-            guiScreen = new GuiScreenWrapper(screen);
+        if (settings.hasContainer()) {
+            ModularContainer container = settings.createContainer();
+            container.constructClientOnly();
+            guiScreen = new GuiContainerWrapper(container, screen);
         } else {
-            guiScreen = new GuiContainerWrapper(new ModularContainer(containerCustomizer), screen);
+            guiScreen = new GuiScreenWrapper(screen);
         }
         MCHelper.displayScreen(guiScreen);
     }
 
     @SubscribeEvent
-    public static void onTick(TickEvent.ServerTickEvent event) {
+    public void onTick(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             openedContainers.clear();
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
-    @SubscribeEvent
-    public static void onGuiOpen(GuiOpenEvent event) {
-        if (lastMui != null && event.getGui() == null) {
-            if (lastMui.getScreen().getPanelManager().isOpen()) {
-                lastMui.getScreen().getPanelManager().closeAll();
-            }
-            lastMui.getScreen().getPanelManager().dispose();
-            lastMui = null;
-        } else if (event.getGui() instanceof IMuiScreen screenWrapper) {
-            if (lastMui == null) {
-                lastMui = screenWrapper;
-            } else if (lastMui == event.getGui()) {
-                lastMui.getScreen().getPanelManager().reopen();
-            } else {
-                if (lastMui.getScreen().getPanelManager().isOpen()) {
-                    lastMui.getScreen().getPanelManager().closeAll();
-                }
-                lastMui.getScreen().getPanelManager().dispose();
-                lastMui = screenWrapper;
-            }
         }
     }
 }

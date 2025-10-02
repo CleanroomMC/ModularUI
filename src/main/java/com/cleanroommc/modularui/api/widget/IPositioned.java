@@ -20,6 +20,10 @@ public interface IPositioned<W extends IPositioned<W>> {
 
     Area getArea();
 
+    boolean requiresResize();
+
+    void scheduleResize();
+
     @SuppressWarnings("unchecked")
     default W getThis() {
         return (W) this;
@@ -265,42 +269,62 @@ public interface IPositioned<W extends IPositioned<W>> {
 
 
     default W width(int val) {
-        flex().width(val, Unit.Measure.PIXEL);
+        flex().width(val, 0, Unit.Measure.PIXEL);
         return getThis();
     }
 
     default W widthRel(float val) {
-        flex().width(val, Unit.Measure.RELATIVE);
+        flex().width(val, 0, Unit.Measure.RELATIVE);
+        return getThis();
+    }
+
+    default W widthRelOffset(float val, int offset) {
+        flex().width(val, offset, Unit.Measure.RELATIVE);
         return getThis();
     }
 
     default W width(float val, Unit.Measure measure) {
-        flex().width(val, measure);
+        flex().width(val, 0, measure);
         return getThis();
     }
 
     default W width(DoubleSupplier val, Unit.Measure measure) {
-        flex().width(val, measure);
+        flex().width(val, 0, measure);
+        return getThis();
+    }
+
+    default W widthRelOffset(DoubleSupplier val, int offset) {
+        flex().width(val, offset, Unit.Measure.RELATIVE);
         return getThis();
     }
 
     default W height(int val) {
-        flex().height(val, Unit.Measure.PIXEL);
+        flex().height(val, 0, Unit.Measure.PIXEL);
         return getThis();
     }
 
     default W heightRel(float val) {
-        flex().height(val, Unit.Measure.RELATIVE);
+        flex().height(val, 0, Unit.Measure.RELATIVE);
+        return getThis();
+    }
+
+    default W heightRelOffset(float val, int offset) {
+        flex().height(val, offset, Unit.Measure.RELATIVE);
         return getThis();
     }
 
     default W height(float val, Unit.Measure measure) {
-        flex().height(val, measure);
+        flex().height(val, 0, measure);
         return getThis();
     }
 
     default W height(DoubleSupplier val, Unit.Measure measure) {
-        flex().height(val, measure);
+        flex().height(val, 0, measure);
+        return getThis();
+    }
+
+    default W heightRelOffset(DoubleSupplier val, int offset) {
+        flex().height(val, offset, Unit.Measure.RELATIVE);
         return getThis();
     }
 
@@ -366,14 +390,30 @@ public interface IPositioned<W extends IPositioned<W>> {
         return getThis();
     }
 
+    default W alignX(Alignment alignment) {
+        return alignX(alignment.x);
+    }
+
     default W alignY(float val) {
         topRel(val).anchorTop(val);
         return getThis();
     }
 
+    default W alignY(Alignment alignment) {
+        return alignY(alignment.y);
+    }
+
     default W align(Alignment alignment) {
-        return alignX(alignment.x).
-                alignY(alignment.y);
+        return alignX(alignment).
+                alignY(alignment);
+    }
+
+    default W horizontalCenter() {
+        return alignX(Alignment.CENTER);
+    }
+
+    default W verticalCenter() {
+        return alignY(Alignment.CENTER);
     }
 
     default W center() {
@@ -387,71 +427,85 @@ public interface IPositioned<W extends IPositioned<W>> {
 
     default W padding(int left, int right, int top, int bottom) {
         getArea().getPadding().all(left, right, top, bottom);
+        scheduleResize();
         return getThis();
     }
 
     default W padding(int horizontal, int vertical) {
         getArea().getPadding().all(horizontal, vertical);
+        scheduleResize();
         return getThis();
     }
 
     default W padding(int all) {
         getArea().getPadding().all(all);
+        scheduleResize();
         return getThis();
     }
 
     default W paddingLeft(int val) {
         getArea().getPadding().left(val);
+        scheduleResize();
         return getThis();
     }
 
     default W paddingRight(int val) {
         getArea().getPadding().right(val);
+        scheduleResize();
         return getThis();
     }
 
     default W paddingTop(int val) {
         getArea().getPadding().top(val);
+        scheduleResize();
         return getThis();
     }
 
     default W paddingBottom(int val) {
         getArea().getPadding().bottom(val);
+        scheduleResize();
         return getThis();
     }
 
     default W margin(int left, int right, int top, int bottom) {
         getArea().getMargin().all(left, right, top, bottom);
+        scheduleResize();
         return getThis();
     }
 
     default W margin(int horizontal, int vertical) {
         getArea().getMargin().all(horizontal, vertical);
+        scheduleResize();
         return getThis();
     }
 
     default W margin(int all) {
         getArea().getMargin().all(all);
+        scheduleResize();
         return getThis();
     }
 
     default W marginLeft(int val) {
         getArea().getMargin().left(val);
+        scheduleResize();
         return getThis();
     }
 
     default W marginRight(int val) {
         getArea().getMargin().right(val);
+        scheduleResize();
         return getThis();
     }
 
     default W marginTop(int val) {
         getArea().getMargin().top(val);
+        scheduleResize();
         return getThis();
     }
 
     default W marginBottom(int val) {
         getArea().getMargin().bottom(val);
+        scheduleResize();
         return getThis();
     }
 }

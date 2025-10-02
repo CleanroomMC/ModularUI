@@ -9,6 +9,8 @@ import java.util.List;
 
 public class LocatedWidget extends LocatedElement<IWidget> {
 
+    private static final GuiViewportStack STACK = new GuiViewportStack();
+
     public static LocatedWidget of(IWidget widget) {
         if (widget == null) {
             return EMPTY;
@@ -24,23 +26,35 @@ public class LocatedWidget extends LocatedElement<IWidget> {
             parent = parent.getParent();
         }
         // iterate through each parent starting at the root and apply each transformation
-        GuiViewportStack stack = new GuiViewportStack();
+        STACK.reset();
         for (IWidget widget1 : ancestors) {
             if (widget1 instanceof IViewport viewport) {
-                stack.pushViewport(viewport, widget1.getArea());
-                widget1.transform(stack);
-                viewport.transformChildren(stack);
+                STACK.pushViewport(viewport, widget1.getArea());
+                widget1.transform(STACK);
+                viewport.transformChildren(STACK);
             } else {
-                stack.pushMatrix();
-                widget1.transform(stack);
+                STACK.pushMatrix();
+                widget1.transform(STACK);
             }
         }
-        return new LocatedWidget(widget, stack.peek());
+        return new LocatedWidget(widget, STACK.peek(), null);
     }
 
-    public static final LocatedWidget EMPTY = new LocatedWidget(null, TransformationMatrix.EMPTY);
+    public static final LocatedWidget EMPTY = new LocatedWidget(null, TransformationMatrix.EMPTY, null);
 
-    public LocatedWidget(IWidget element, TransformationMatrix transformationMatrix) {
+    private final Object additionalHoverInfo;
+
+    public LocatedWidget(IWidget element, TransformationMatrix transformationMatrix, Object additionalHoverInfo) {
         super(element, transformationMatrix);
+        this.additionalHoverInfo = additionalHoverInfo;
+    }
+
+    public Object getAdditionalHoverInfo() {
+        return additionalHoverInfo;
+    }
+
+    @Override
+    public String toString() {
+        return "LocatedWidget[" + getElement() + " | " + additionalHoverInfo + "]";
     }
 }

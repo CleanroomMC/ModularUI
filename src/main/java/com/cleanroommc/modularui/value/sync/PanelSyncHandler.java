@@ -57,7 +57,7 @@ public final class PanelSyncHandler extends SyncHandler implements IPanelHandler
         if (this.syncManager != null && this.syncManager.getModularSyncManager() != getSyncManager().getModularSyncManager()) {
             throw new IllegalStateException("Can't reopen synced panel in another screen!");
         } else if (this.syncManager == null) {
-            this.syncManager = new PanelSyncManager();
+            this.syncManager = new PanelSyncManager(client);
             this.openedPanel = Objects.requireNonNull(createUI(this.syncManager));
             this.panelName = this.openedPanel.getName();
             this.openedPanel.setSyncHandler(this);
@@ -69,6 +69,7 @@ public final class PanelSyncHandler extends SyncHandler implements IPanelHandler
         if (client) {
             ModularScreen screen = getSyncManager().getContainer().getScreen();
             if (!screen.isPanelOpen(this.openedPanel.getName())) {
+                openInModularSyncManager();
                 screen.getPanelManager().openPanel(this.openedPanel, this);
             } else {
                 // this was not supposed to happen
@@ -76,16 +77,21 @@ public final class PanelSyncHandler extends SyncHandler implements IPanelHandler
                 closePanelInternal();
                 return;
             }
+        } else {
+            openInModularSyncManager();
         }
-        getSyncManager().getModularSyncManager().open(this.panelName, this.syncManager);
         this.open = true;
+    }
+
+    private void openInModularSyncManager() {
+        getSyncManager().getModularSyncManager().open(this.panelName, this.syncManager);
     }
 
     @Override
     public void closePanel() {
         if (getSyncManager().isClient()) {
             if (this.openedPanel != null) {
-                this.openedPanel.closeIfOpen(true);
+                this.openedPanel.closeIfOpen();
             }
         } else {
             syncToClient(2);

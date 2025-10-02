@@ -1,11 +1,11 @@
 package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
-import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.value.sync.InteractionSyncHandler;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.SingleChildWidget;
@@ -20,7 +20,7 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
                 .size(10).top(4).right(4)
                 .onMousePressed(mouseButton -> {
                     if (mouseButton == 0 || mouseButton == 1) {
-                        buttonWidget.getPanel().closeIfOpen(true);
+                        buttonWidget.getPanel().closeIfOpen();
                         return true;
                     }
                     return false;
@@ -46,7 +46,7 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
     }
 
     @Override
-    public WidgetTheme getWidgetThemeInternal(ITheme theme) {
+    public WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
         return theme.getButtonTheme();
     }
 
@@ -123,7 +123,7 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
     }
 
     @Override
-    public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
+    public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
         return (this.mouseScroll != null && this.mouseScroll.scroll(scrollDirection, amount)) ||
                 (this.syncHandler != null && this.syncHandler.onMouseScroll((int) Math.copySign(amount, scrollDirection.modifier)));
     }

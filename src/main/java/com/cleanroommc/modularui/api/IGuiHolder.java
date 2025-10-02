@@ -3,7 +3,7 @@ package com.cleanroommc.modularui.api;
 import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
-
+import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 
 import net.minecraftforge.fml.relauncher.Side;
@@ -19,7 +19,7 @@ public interface IGuiHolder<T extends GuiData> {
      * Only called on client side.
      *
      * @param data      information about the creation context
-     * @param mainPanel the panel created in {@link #buildUI(GuiData, PanelSyncManager)}
+     * @param mainPanel the panel created in {@link #buildUI(GuiData, PanelSyncManager, UISettings)}
      * @return a modular screen instance with the given panel
      */
     @SideOnly(Side.CLIENT)
@@ -34,6 +34,7 @@ public interface IGuiHolder<T extends GuiData> {
      *
      * @param data        information about the creation context
      * @param syncManager sync handler where widget sync handlers should be registered
+     * @param settings    settings which apply to the whole ui and not just this panel
      */
-    ModularPanel buildUI(T data, PanelSyncManager syncManager);
+    ModularPanel buildUI(T data, PanelSyncManager syncManager, UISettings settings);
 }

@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IPanelHandler;
+import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.GuiTextures;
@@ -48,10 +49,11 @@ public class TestGui extends CustomModularScreen {
         }
         final Map<String, SortableListWidget.Item<String>> items = new Object2ObjectOpenHashMap<>();
         for (String line : this.lines) {
-            items.put(line, new SortableListWidget.Item<>(line).child(item -> new Row()
+            items.put(line, new SortableListWidget.Item<>(line)
+                    .child(item -> new Row()
                     .child(new Widget<>()
                             .addTooltipLine(line)
-                            .background(GuiTextures.BUTTON_CLEAN)
+                            .widgetTheme(IThemeApi.BUTTON)
                             .overlay(IKey.str(line))
                             .expanded().heightRel(1f))
                     .child(new ButtonWidget<>()
@@ -64,7 +66,7 @@ public class TestGui extends CustomModularScreen {
                 .debugName("sortable list");
         List<List<AvailableElement>> availableMatrix = Grid.mapToMatrix(2, this.lines, (index, value) -> {
             AvailableElement availableElement = new AvailableElement().overlay(IKey.str(value))
-                    .size(60, 14)
+                    .widthRel(0.5f).height(14)
                     .addTooltipLine(value)
                     .onMousePressed(mouseButton1 -> {
                         if (this.availableElements.get(value).available) {
@@ -93,7 +95,7 @@ public class TestGui extends CustomModularScreen {
                     .child(new Grid()
                             .matrix(availableMatrix)
                             .scrollable()
-                            .pos(7, 7).right(14).bottom(7).debugName("available list"));
+                            .pos(7, 7).right(16).bottom(7).debugName("available list"));
         }, true);
         panel.child(new ButtonWidget<>()
                 .bottom(7).size(12, 12).leftRel(0.5f)

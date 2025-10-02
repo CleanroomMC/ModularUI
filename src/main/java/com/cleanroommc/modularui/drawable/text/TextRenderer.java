@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.api.drawable.ITextLine;
 import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
 import net.minecraft.client.Minecraft;
@@ -27,8 +28,12 @@ public class TextRenderer {
     protected boolean shadow = false;
     protected int color = 0;//Theme.INSTANCE.getText();
     protected boolean simulate;
-    protected float lastWidth = 0, lastHeight = 0;
+    protected float lastActualWidth = 0;
+    protected float lastTrimmedWidth = 0;
+    protected float lastActualHeight = 0;
+    protected float lastTrimmedHeight = 0;
     protected float lastX = 0, lastY = 0;
+    protected boolean hardWrapOnBorder = true;
     protected boolean scrollOnOverflow = false;
 
     public void setAlignment(Alignment alignment, float maxWidth) {
@@ -58,12 +63,16 @@ public class TextRenderer {
         this.color = color;
     }
 
+    public void setHardWrapOnBorder(boolean hardWrapOnBorder) {
+        this.hardWrapOnBorder = hardWrapOnBorder;
+    }
+
     public void setSimulate(boolean simulate) {
         this.simulate = simulate;
     }
 
     public void draw(String text) {
-        if (this.maxWidth <= 0 && !text.contains("\n'")) {
+        if ((this.maxWidth <= 0 || !this.hardWrapOnBorder) && !text.contains("\n'")) {
             drawSimple(text);
         } else {
             draw(Collections.singletonList(text));
@@ -83,27 +92,31 @@ public class TextRenderer {
             draw(measuredLine.text, x0, y0);
             y0 += (int) getFontHeight();
         }
-        this.lastWidth = this.maxWidth > 0 ? Math.min(maxW, this.maxWidth) : maxW;
-        this.lastHeight = measuredLines.size() * getFontHeight();
-        this.lastWidth = Math.max(0, this.lastWidth - this.scale);
-        this.lastHeight = Math.max(0, this.lastHeight - this.scale);
+        this.lastActualWidth = maxW;
+        this.lastActualHeight = measuredLines.size() * getFontHeight();
+        this.lastTrimmedWidth = Math.max(0, this.lastActualWidth - this.scale);
+        this.lastTrimmedHeight = Math.max(0, this.lastActualHeight - this.scale);
     }
 
     public void drawSimple(String text) {
         float w = getFontRenderer().getStringWidth(text) * this.scale;
         int y = getStartYOfLines(1), x = getStartX(w);
         draw(text, x, y);
-        this.lastWidth = w;
-        this.lastHeight = getFontHeight();
-        this.lastWidth = Math.max(0, this.lastWidth - this.scale);
-        this.lastHeight = Math.max(0, this.lastHeight - this.scale);
+        this.lastActualWidth = w;
+        this.lastActualHeight = getFontHeight();
+        this.lastTrimmedWidth = Math.max(0, this.lastActualWidth - this.scale);
+        this.lastTrimmedHeight = Math.max(0, this.lastActualHeight - this.scale);
     }
 
     public List<Line> measureLines(List<String> lines) {
         List<Line> measuredLines = new ArrayList<>();
         for (String line : lines) {
-            for (String subLine : wrapLine(line)) {
-                measuredLines.add(line(subLine));
+            if (this.hardWrapOnBorder) {
+                for (String subLine : wrapLine(line)) {
+                    measuredLines.add(line(subLine));
+                }
+            } else {
+                measuredLines.add(line(line));
             }
         }
         return measuredLines;
@@ -127,20 +140,22 @@ public class TextRenderer {
         }
         if (!this.simulate) {
             GlStateManager.pushMatrix();
+            GlStateManager.translate(this.x, this.y, 10);
             GlStateManager.scale(this.scale, this.scale, 1f);
+            GlStateManager.translate(-this.x, -this.y, 0);
         }
-        int y0 = getStartY(height * this.scale);
+        int y0 = getStartY(height, height);
         this.lastY = y0;
         for (ITextLine line : lines) {
-            int x0 = getStartX(line.getWidth() * this.scale);
-            if (!simulate) line.draw(context, getFontRenderer(), x0, y0, this.color, this.shadow);
+            int x0 = getStartX(width, line.getWidth());
+            if (!simulate) line.draw(context, getFontRenderer(), x0, y0, this.color, this.shadow, width, height);
             y0 += line.getHeight(getFontRenderer());
         }
         if (!this.simulate) GlStateManager.popMatrix();
-        this.lastWidth = this.maxWidth > 0 ? Math.min(width * this.scale, this.maxWidth) : width * this.scale;
-        this.lastHeight = height * this.scale;
-        this.lastWidth = Math.max(0, this.lastWidth - this.scale);
-        this.lastHeight = Math.max(0, this.lastHeight - this.scale);
+        this.lastActualWidth = this.maxWidth > 0 ? Math.min(width * this.scale, this.maxWidth) : width * this.scale;
+        this.lastActualHeight = height * this.scale;
+        this.lastTrimmedWidth = Math.max(0, this.lastActualWidth - this.scale);
+        this.lastTrimmedHeight = Math.max(0, this.lastActualHeight - this.scale);
     }
 
     public void drawCut(String text) {
@@ -159,18 +174,18 @@ public class TextRenderer {
         }
     }
 
-    public void drawScrolling(Line line, int scroll, Area area, GuiContext context) {
+    public void drawScrolling(Line line, float progress, Area area, GuiContext context) {
         if (line.getWidth() <= this.maxWidth) {
             drawMeasuredLines(Collections.singletonList(line));
             return;
         }
-        scroll = scroll % (int) (line.width + 1);
+        float scroll = (this.maxWidth - line.getWidth()) * progress;
+        //scroll = scroll % (int) (line.width + 1);
         String drawString = line.getText();//getFontRenderer().trimStringToWidth(line.getText(), (int) (this.maxWidth + scroll));
-        Area.SHARED.set(this.x, Integer.MIN_VALUE, this.x + (int) this.maxWidth, Integer.MAX_VALUE);
-        Stencil.apply(Area.SHARED, context);
-        GlStateManager.translate(-scroll, 0, 0);
-        drawMeasuredLines(Collections.singletonList(line(drawString)));
+        Stencil.apply(this.x, -500, (int) this.maxWidth, 1000, context);
         GlStateManager.translate(scroll, 0, 0);
+        drawMeasuredLines(Collections.singletonList(line(drawString)));
+        GlStateManager.translate(-scroll, 0, 0);
         Stencil.remove();
     }
 
@@ -178,11 +193,11 @@ public class TextRenderer {
         return this.maxWidth > 0 ? getFontRenderer().listFormattedStringToWidth(line, (int) (this.maxWidth / this.scale)) : Collections.singletonList(line);
     }
 
-    public boolean wouldFit(List<String> text) {
+    public boolean wouldFit(List<String> text, boolean shouldCheckWidth) {
         if (this.maxHeight > 0 && this.maxHeight < text.size() * getFontHeight() - this.scale) {
             return false;
         }
-        if (this.maxWidth > 0) {
+        if (this.maxWidth > 0 && shouldCheckWidth) {
             for (String line : text) {
                 if (this.maxWidth < getFontRenderer().getStringWidth(line)) {
                     return false;
@@ -209,39 +224,74 @@ public class TextRenderer {
     }
 
     protected int getStartY(float height) {
-        if (this.alignment.y > 0 && this.maxHeight > 0) {
-            return (int) (this.y + (this.maxHeight * this.alignment.y) - height * this.alignment.y);
+        return getStartY(this.maxHeight, height);
+    }
+
+    protected int getStartY(float maxHeight, float height) {
+        if (this.alignment.y > 0 && maxHeight > 0 && height != maxHeight) {
+            return (int) (this.y + (maxHeight * this.alignment.y) - height * this.alignment.y);
         }
         return this.y;
     }
 
     protected int getStartX(float lineWidth) {
-        if (this.alignment.x > 0 && this.maxWidth > 0) {
-            return (int) (this.x + (this.maxWidth * this.alignment.x) - lineWidth * this.alignment.x);
+        return getStartX(this.maxWidth, lineWidth);
+    }
+
+    protected int getStartX(float maxWidth, float lineWidth) {
+        if (this.alignment.x > 0 && maxWidth > 0) {
+            return Math.max(this.x, (int) (this.x + (maxWidth * this.alignment.x) - lineWidth * this.alignment.x));
         }
         return this.x;
     }
 
     protected void draw(String text, float x, float y) {
         if (this.simulate) return;
-        GlStateManager.disableBlend();
+        Platform.setupDrawFont();
         GlStateManager.pushMatrix();
         GlStateManager.scale(this.scale, this.scale, 0f);
         getFontRenderer().drawString(text, x / this.scale, y / this.scale, this.color, this.shadow);
         GlStateManager.popMatrix();
-        GlStateManager.enableBlend();
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public float getScale() {
+        return scale;
+    }
+
+    public Alignment getAlignment() {
+        return alignment;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
     }
 
     public float getFontHeight() {
         return getFontRenderer().FONT_HEIGHT * this.scale;
     }
 
-    public float getLastHeight() {
-        return this.lastHeight;
+    public float getLastActualHeight() {
+        return this.lastActualHeight;
     }
 
-    public float getLastWidth() {
-        return this.lastWidth;
+    public float getLastActualWidth() {
+        return this.lastActualWidth;
+    }
+
+    public float getLastTrimmedWidth() {
+        return lastTrimmedWidth;
+    }
+
+    public float getLastTrimmedHeight() {
+        return lastTrimmedHeight;
     }
 
     @SideOnly(Side.CLIENT)
@@ -276,7 +326,7 @@ public class TextRenderer {
         }
 
         public int lowerWidth() {
-            return (int) (this.width + 1);
+            return (int) this.width;
         }
     }
 }

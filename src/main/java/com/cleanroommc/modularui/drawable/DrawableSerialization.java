@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.IJsonSerializable;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.utils.JsonHelper;
@@ -19,42 +20,65 @@ import java.util.function.Function;
 
 public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDeserializer<IDrawable> {
 
-    private static final Map<String, Function<JsonObject, IDrawable>> DRAWABLE_TYPES = new Object2ObjectOpenHashMap<>();
+    private static final Map<String, Function<JsonObject, ? extends IDrawable>> DRAWABLE_TYPES = new Object2ObjectOpenHashMap<>();
+    private static final Map<Class<? extends IDrawable>, String> REVERSE_DRAWABLE_TYPES = new Object2ObjectOpenHashMap<>();
     private static final Map<String, UITexture> TEXTURES = new Object2ObjectOpenHashMap<>();
+    private static final Map<UITexture, String> REVERSE_TEXTURES = new Object2ObjectOpenHashMap<>();
 
     public static void registerTexture(String s, UITexture texture) {
         TEXTURES.put(s, texture);
+        REVERSE_TEXTURES.put(texture, s);
     }
 
     public static UITexture getTexture(String s) {
         return TEXTURES.get(s);
     }
 
-    public static void registerDrawableType(String id, Function<@NotNull JsonObject, @NotNull IDrawable> creator) {
+    public static String getTextureId(UITexture texture) {
+        return REVERSE_TEXTURES.get(texture);
+    }
+
+    public static <T extends IDrawable & IJsonSerializable> void registerDrawableType(String id, Class<T> type, Function<@NotNull JsonObject, @NotNull T> creator) {
         if (DRAWABLE_TYPES.containsKey(id)) {
             throw new IllegalArgumentException("Drawable type '" + id + "' already exists!");
         }
         DRAWABLE_TYPES.put(id, creator);
+        if (type != null) {
+            REVERSE_DRAWABLE_TYPES.put(type, id);
+        }
     }
 
     @ApiStatus.Internal
     public static void init() {
-        registerDrawableType("empty", json -> IDrawable.EMPTY);
-        registerDrawableType("null", json -> IDrawable.EMPTY);
-        registerDrawableType("none", json -> IDrawable.NONE);
-        registerDrawableType("texture", UITexture::parseFromJson);
-        registerDrawableType("color", json -> new Rectangle());
-        registerDrawableType("rectangle", json -> new Rectangle());
-        registerDrawableType("ellipse", json -> new Circle());
-        registerDrawableType("text", DrawableSerialization::parseText);
-        registerDrawableType("item", ItemDrawable::ofJson);
-        registerDrawableType("icon", Icon::ofJson);
+        // empty, none and text are special cases
+        registerDrawableType("texture", UITexture.class, UITexture::parseFromJson);
+        registerDrawableType("color", Rectangle.class, json -> new Rectangle());
+        registerDrawableType("rectangle", Rectangle.class, json -> new Rectangle());
+        registerDrawableType("ellipse", Circle.class, json -> new Circle());
+        registerDrawableType("item", ItemDrawable.class, ItemDrawable::ofJson);
+        registerDrawableType("icon", Icon.class, Icon::ofJson);
+    }
+
+    public static IDrawable deserialize(JsonElement json) {
+        return JsonHelper.deserialize(json, IDrawable.class);
+    }
+
+    public static JsonElement serialize(IDrawable drawable) {
+        return JsonHelper.serialize(drawable);
     }
 
     @Override
     public IDrawable deserialize(JsonElement element, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         if (element.isJsonNull()) {
             return IDrawable.EMPTY;
+        }
+        if (element.isJsonPrimitive()) {
+            if ("empty".equals(element.getAsString()) || "null".equals(element.getAsString())) {
+                return IDrawable.EMPTY;
+            }
+            if ("none".equals(element.getAsString())) {
+                return IDrawable.NONE;
+            }
         }
         if (element.isJsonArray()) {
             List<IDrawable> list = new ArrayList<>();
@@ -70,7 +94,7 @@ public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDes
             if (list.size() == 1) {
                 return list.get(0);
             }
-            return new DrawableArray(list.toArray(new IDrawable[0]));
+            return new DrawableStack(list.toArray(new IDrawable[0]));
         }
         if (!element.isJsonObject()) {
             ModularUI.LOGGER.throwing(new JsonParseException("Drawable json should be an object or an array."));
@@ -81,18 +105,55 @@ public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDes
             return IDrawable.EMPTY;
         }
         String type = JsonHelper.getString(json, "empty", "type");
+        if ("text".equals(type)) {
+            IKey key = parseText(json);
+            key.loadFromJson(json);
+            return key;
+        }
         if (!DRAWABLE_TYPES.containsKey(type)) {
-            ModularUI.LOGGER.throwing(new JsonParseException("Drawable type '" + type + "' is either not specified or invalid!"));
+            ModularUI.LOGGER.throwing(new JsonParseException("Drawable type '" + type + "' is either not json serializable!"));
             return IDrawable.EMPTY;
         }
         IDrawable drawable = DRAWABLE_TYPES.get(type).apply(json);
-        drawable.loadFromJson(json);
+        ((IJsonSerializable) drawable).loadFromJson(json);
         return drawable;
     }
 
     @Override
     public JsonElement serialize(IDrawable src, Type typeOfSrc, JsonSerializationContext context) {
-        throw new UnsupportedOperationException();
+        if (src == IDrawable.EMPTY) return JsonNull.INSTANCE;
+        if (src == IDrawable.NONE) return new JsonPrimitive("none");
+        if (src instanceof DrawableStack drawableStack) {
+            JsonArray jsonArray = new JsonArray();
+            for (IDrawable drawable : drawableStack.getDrawables()) {
+                jsonArray.add(JsonHelper.serialize(drawable));
+            }
+            return jsonArray;
+        }
+        JsonObject json = new JsonObject();
+        if (src instanceof IKey key) {
+            json.addProperty("type", "text");
+            // TODO serialize text properly
+            json.addProperty("text", key.getFormatted());
+        } else if (!(src instanceof IJsonSerializable)) {
+            throw new IllegalArgumentException("Can't serialize IDrawable which doesn't implement IJsonSerializable!");
+        } else {
+            Class<?> type = src.getClass();
+            String key = REVERSE_DRAWABLE_TYPES.get(type);
+            while (key == null && type != null && type != Object.class) {
+                type = type.getSuperclass();
+                key = REVERSE_DRAWABLE_TYPES.get(type);
+            }
+            if (key == null) {
+                ModularUI.LOGGER.error("Serialization of drawable {} failed, because a key for the type could not be found!", src.getClass().getSimpleName());
+                return JsonNull.INSTANCE;
+            }
+            json.addProperty("type", key);
+            if (!((IJsonSerializable) src).saveToJson(json)) {
+                ModularUI.LOGGER.error("Serialization of drawable {} failed!", src.getClass().getSimpleName());
+            }
+        }
+        return json;
     }
 
     private static IKey parseText(JsonObject json) throws JsonParseException {

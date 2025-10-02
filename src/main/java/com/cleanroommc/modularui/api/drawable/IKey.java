@@ -1,7 +1,16 @@
 package com.cleanroommc.modularui.api.drawable;
 
+import com.cleanroommc.modularui.api.IJsonSerializable;
 import com.cleanroommc.modularui.drawable.Icon;
-import com.cleanroommc.modularui.drawable.text.*;
+import com.cleanroommc.modularui.drawable.text.AnimatedText;
+import com.cleanroommc.modularui.drawable.text.CompoundKey;
+import com.cleanroommc.modularui.drawable.text.DynamicKey;
+import com.cleanroommc.modularui.drawable.text.FormattingState;
+import com.cleanroommc.modularui.drawable.text.KeyIcon;
+import com.cleanroommc.modularui.drawable.text.LangKey;
+import com.cleanroommc.modularui.drawable.text.StringKey;
+import com.cleanroommc.modularui.drawable.text.StyledText;
+import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
@@ -16,12 +25,13 @@ import com.google.gson.JsonObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 /**
  * This represents a piece of text in a GUI.
  */
-public interface IKey extends IDrawable {
+public interface IKey extends IDrawable, IJsonSerializable {
 
     int TEXT_COLOR = 0xFF404040;
 
@@ -190,8 +200,12 @@ public interface IKey extends IDrawable {
     }
 
     @Override
-    default TextWidget asWidget() {
-        return new TextWidget(this);
+    default boolean canApplyTheme() {
+        return true;
+    }
+
+    default TextWidget<?> asWidget() {
+        return new TextWidget<>(this);
     }
 
     default StyledText withStyle() {
@@ -233,7 +247,11 @@ public interface IKey extends IDrawable {
         return withStyle().alignment(alignment);
     }
 
-    default StyledText color(@Nullable Integer color) {
+    default StyledText color(int color) {
+        return withStyle().color(() -> color);
+    }
+
+    default StyledText color(@Nullable IntSupplier color) {
         return withStyle().color(color);
     }
 

@@ -1,12 +1,13 @@
 package com.cleanroommc.modularui;
 
-import com.cleanroommc.modularui.factory.*;
+import com.cleanroommc.modularui.factory.GuiFactories;
+import com.cleanroommc.modularui.factory.GuiManager;
+import com.cleanroommc.modularui.factory.inventory.InventoryTypes;
 import com.cleanroommc.modularui.holoui.HoloScreenEntity;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.test.ItemEditorGui;
 import com.cleanroommc.modularui.test.TestBlock;
-
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 
 import net.minecraft.util.Timer;
@@ -20,6 +21,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.relauncher.Side;
@@ -29,8 +31,8 @@ import net.minecraftforge.registries.IForgeRegistry;
 public class CommonProxy {
 
     void preInit(FMLPreInitializationEvent event) {
-        MinecraftForge.EVENT_BUS.register(CommonProxy.class);
-        MinecraftForge.EVENT_BUS.register(GuiManager.class);
+        MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(new GuiManager());
 
         if (ModularUIConfig.enableTestGuis) {
             MinecraftForge.EVENT_BUS.register(TestBlock.class);
@@ -38,12 +40,11 @@ public class CommonProxy {
         }
 
         NetworkHandler.init();
-
         GuiFactories.init();
+        InventoryTypes.init();
     }
 
-    void postInit(FMLPostInitializationEvent event) {
-    }
+    void postInit(FMLPostInitializationEvent event) {}
 
     void onServerLoad(FMLServerStartingEvent event) {
         event.registerServerCommand(new ItemEditorGui.Command());
@@ -55,7 +56,7 @@ public class CommonProxy {
     }
 
     @SubscribeEvent
-    public static void registerBlocks(RegistryEvent.Register<EntityEntry> event) {
+    public void registerBlocks(RegistryEvent.Register<EntityEntry> event) {
         IForgeRegistry<EntityEntry> registry = event.getRegistry();
         registry.register(EntityEntryBuilder.create()
                 .id("modular_screen", 0)
@@ -66,7 +67,7 @@ public class CommonProxy {
     }
 
     @SubscribeEvent
-    public static void onCloseContainer(PlayerContainerEvent.Open event) {
+    public void onCloseContainer(PlayerContainerEvent.Open event) {
         if (event.getContainer() instanceof ModularContainer container) {
             ModularSyncManager syncManager = container.getSyncManager();
             if (syncManager != null) {
@@ -76,9 +77,16 @@ public class CommonProxy {
     }
 
     @SubscribeEvent
-    public static void onConfigChange(ConfigChangedEvent.OnConfigChangedEvent event) {
+    public void onConfigChange(ConfigChangedEvent.OnConfigChangedEvent event) {
         if (event.getModID().equals(ModularUI.ID)) {
             ConfigManager.sync(ModularUI.ID, Config.Type.INSTANCE);
+        }
+    }
+
+    @SubscribeEvent
+    public void onTick(TickEvent.PlayerTickEvent event) {
+        if (event.player.openContainer instanceof ModularContainer container) {
+            container.onUpdate();
         }
     }
 }

@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.drawable.IHoverable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.drawable.ITextLine;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.utils.Platform;
 
 import net.minecraft.client.gui.FontRenderer;
 
@@ -35,21 +36,23 @@ public class ComposedLine implements ITextLine {
     }
 
     @Override
-    public void draw(GuiContext context, FontRenderer fr, float x, float y, int color, boolean shadow) {
+    public void draw(GuiContext context, FontRenderer fr, float x, float y, int color, boolean shadow, int availableWidth, int availableHeight) {
         this.lastX = x;
         this.lastY = y;
         for (Object o : this.elements) {
             if (o instanceof String s) {
                 float drawY = getHeight(fr) / 2f - fr.FONT_HEIGHT / 2f;
+                Platform.setupDrawFont();
                 fr.drawString(s, x, (int) (y + drawY), color, shadow);
                 x += fr.getStringWidth(s);
             } else if (o instanceof IIcon icon) {
                 float drawY = getHeight(fr) / 2f - icon.getHeight() / 2f;
-                icon.draw(context, (int) x, (int) (y + drawY), icon.getWidth(), icon.getHeight(), IThemeApi.get().getDefaultTheme().getFallback());
+                int w = icon.getWidth() > 0  ? icon.getWidth() : availableWidth;
+                icon.draw(context, (int) x, (int) (y + drawY), w, icon.getHeight(), IThemeApi.get().getDefaultTheme().getFallback().getTheme());
                 if (icon instanceof IHoverable hoverable) {
                     hoverable.setRenderedAt((int) x, (int) (y + drawY));
                 }
-                x += icon.getWidth();
+                x += w;
             }
         }
     }
@@ -84,5 +87,20 @@ public class ComposedLine implements ITextLine {
             x1 += w; // move to next element
         }
         return null;
+    }
+
+    @Override
+    public String toString() {
+        if (this.elements.isEmpty()) return "[empty]";
+        StringBuilder builder = new StringBuilder("[");
+        for (Object o : this.elements) {
+            if (o instanceof String s) {
+                builder.append('"').append(s).append('"').append(", ");
+            } else {
+                builder.append(o).append(", ");
+            }
+        }
+        builder.delete(builder.length() - 2, builder.length());
+        return builder.append("]").toString();
     }
 }

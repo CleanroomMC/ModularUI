@@ -30,6 +30,11 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
         return isFluidEmpty(fluidStack) ? null : fluidStack.copy();
     }
 
+    public static final int SYNC_FLUID = 0;
+    public static final int SYNC_CLICK = 1;
+    public static final int SYNC_SCROLL = 2;
+    public static final int SYNC_CONTROLS_AMOUNT = 3;
+
     @Nullable
     private FluidStack cache;
     private final IFluidTank fluidTank;
@@ -60,9 +65,9 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
         }
         if (sync) {
             if (NetworkUtils.isClient()) {
-                syncToServer(0, this::write);
+                syncToServer(SYNC_FLUID, this::write);
             } else {
-                syncToClient(0, this::write);
+                syncToClient(SYNC_FLUID, this::write);
             }
         }
         onValueChanged();
@@ -96,30 +101,30 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
 
     @Override
     public void readOnClient(int id, PacketBuffer buf) {
-        if (id == 0) {
+        if (id == SYNC_FLUID) {
             read(buf);
-        } else if (id == 3) {
+        } else if (id == SYNC_CONTROLS_AMOUNT) {
             this.controlsAmount = buf.readBoolean();
         }
     }
 
     @Override
     public void readOnServer(int id, PacketBuffer buf) {
-        if (id == 0) {
+        if (id == SYNC_FLUID) {
             if (this.phantom) {
                 read(buf);
             }
-        } else if (id == 1) {
+        } else if (id == SYNC_CLICK) {
             if (this.phantom) {
                 tryClickPhantom(MouseData.readPacket(buf));
             } else {
                 tryClickContainer(MouseData.readPacket(buf));
             }
-        } else if (id == 2) {
+        } else if (id == SYNC_SCROLL) {
             if (this.phantom) {
                 tryScrollPhantom(MouseData.readPacket(buf));
             }
-        } else if (id == 3) {
+        } else if (id == SYNC_CONTROLS_AMOUNT) {
             this.controlsAmount = buf.readBoolean();
         }
     }
@@ -297,7 +302,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
     public FluidSlotSyncHandler controlsAmount(boolean controlsAmount) {
         this.controlsAmount = controlsAmount;
         if (isValid()) {
-            sync(3, buffer -> buffer.writeBoolean(controlsAmount));
+            sync(SYNC_CONTROLS_AMOUNT, buffer -> buffer.writeBoolean(controlsAmount));
         }
         return this;
     }

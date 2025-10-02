@@ -23,4 +23,9 @@
  */
 dependencies {
     embed 'org.mariuszgromada.math:MathParser.org-mXparser:6.1.0'
+
+    implementation(rfg.deobf("curse.maven:baubles-227083:2518667"))
+    compileOnlyApi rfg.deobf("curse.maven:neverenoughanimation-1062347:6533650-sources-6533651")
+    testImplementation rfg.deobf("curse.maven:neverenoughanimation-1062347:6533650-sources-6533651")
+    //implementation("com.cleanroommc:neverenoughanimations:1.0.6") { transitive false }
 }

@@ -4,6 +4,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 
+import com.google.gson.JsonObject;
+
 public class AdaptableUITexture extends UITexture {
 
     private final int imageWidth, imageHeight, bl, bt, br, bb;
@@ -12,8 +14,8 @@ public class AdaptableUITexture extends UITexture {
     /**
      * Use {@link UITexture#builder()} with {@link Builder#adaptable(int, int)}
      */
-    AdaptableUITexture(ResourceLocation location, float u0, float v0, float u1, float v1, boolean background, int imageWidth, int imageHeight, int bl, int bt, int br, int bb, boolean tiled) {
-        super(location, u0, v0, u1, v1, background);
+    AdaptableUITexture(ResourceLocation location, float u0, float v0, float u1, float v1, ColorType colorType, int imageWidth, int imageHeight, int bl, int bt, int br, int bb, boolean tiled) {
+        super(location, u0, v0, u1, v1, colorType);
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;
         this.bl = bl;
@@ -25,7 +27,7 @@ public class AdaptableUITexture extends UITexture {
 
     @Override
     public AdaptableUITexture getSubArea(float uStart, float vStart, float uEnd, float vEnd) {
-        return new AdaptableUITexture(this.location, lerpU(uStart), lerpV(vStart), lerpU(uEnd), lerpV(vEnd), this.canApplyTheme, this.imageWidth, this.imageHeight, this.bl, this.bt, this.br, this.bb, this.tiled);
+        return new AdaptableUITexture(this.location, lerpU(uStart), lerpV(vStart), lerpU(uEnd), lerpV(vEnd), this.colorType, this.imageWidth, this.imageHeight, this.bl, this.bt, this.br, this.bb, this.tiled);
     }
 
     @Override
@@ -152,5 +154,19 @@ public class AdaptableUITexture extends UITexture {
         }
         GlStateManager.disableBlend();
         GlStateManager.enableAlpha();
+    }
+
+    @Override
+    public boolean saveToJson(JsonObject json) {
+        super.saveToJson(json);
+        if (json.entrySet().size() == 1) return true;
+        json.addProperty("imageWidth", this.imageWidth);
+        json.addProperty("imageHeight", this.imageHeight);
+        json.addProperty("bl", this.bl);
+        json.addProperty("br", this.br);
+        json.addProperty("bt", this.bt);
+        json.addProperty("bb", this.bb);
+        json.addProperty("tiled", this.tiled);
+        return true;
     }
 }

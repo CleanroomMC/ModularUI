@@ -2,11 +2,9 @@ package com.cleanroommc.modularui.widgets.textfield;
 
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.Platform;
 
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -18,7 +16,8 @@ import java.util.List;
 public class TextFieldRenderer extends TextRenderer {
 
     protected final TextFieldHandler handler;
-    protected int markedColor = 0x2F72A8;
+    protected int markedColor = 0xFF2F72A8;
+    protected int cursorColor = 0xFFFFFFFF;
     protected boolean renderCursor = false;
 
     public TextFieldRenderer(TextFieldHandler handler) {
@@ -37,10 +36,23 @@ public class TextFieldRenderer extends TextRenderer {
         this.markedColor = markedColor;
     }
 
+    public void setCursorColor(int cursorColor) {
+        this.cursorColor = cursorColor;
+    }
+
     @Override
     protected void drawMeasuredLines(List<Line> measuredLines) {
-        drawCursors(measuredLines);
+        drawMarked(measuredLines);
         super.drawMeasuredLines(measuredLines);
+        // draw cursor
+        if (this.renderCursor) {
+            Point main = this.handler.getMainCursor();
+            Point2D.Float start = getPosOf(measuredLines, main);
+            if (this.handler.getText().get(main.y).isEmpty()) {
+                start.x += 0.7f;
+            }
+            drawCursor(start.x, start.y);
+        }
     }
 
     @Override
@@ -48,44 +60,32 @@ public class TextFieldRenderer extends TextRenderer {
         return Collections.singletonList(line);
     }
 
-    protected void drawCursors(List<Line> measuredLines) {
-        if (!this.simulate) {
-            Point2D.Float start;
-            if (this.handler.hasTextMarked()) {
-                start = getPosOf(measuredLines, this.handler.getStartCursor());
-                // render Marked
-                Point2D.Float end = getPosOf(measuredLines, this.handler.getEndCursor());
+    protected void drawMarked(List<Line> measuredLines) {
+        if (!this.simulate && this.handler.hasTextMarked()) {
+            Point2D.Float start = getPosOf(measuredLines, this.handler.getStartCursor());
+            // render Marked
+            Point2D.Float end = getPosOf(measuredLines, this.handler.getEndCursor());
 
-                if (start.y == end.y) {
-                    drawMarked(start.y, start.x, end.x);
-                } else {
-                    int min = this.handler.getStartCursor().y;
-                    int max = this.handler.getEndCursor().y;
-                    Line line = measuredLines.get(min);
-                    int startX = getStartX(line.getWidth());
-                    drawMarked(start.y, start.x, startX + line.getWidth());
-                    start.y += getFontHeight();
-                    if (max - min > 1) {
-                        for (int i = min + 1; i < max; i++) {
-                            line = measuredLines.get(i);
-                            startX = getStartX(line.getWidth());
-                            drawMarked(start.y, startX, startX + line.getWidth());
-                            start.y += getFontHeight();
-                        }
+            if (start.y == end.y) {
+                drawMarked(start.y, start.x, end.x);
+            } else {
+                int min = this.handler.getStartCursor().y;
+                int max = this.handler.getEndCursor().y;
+                Line line = measuredLines.get(min);
+                int startX = getStartX(line.getWidth());
+                drawMarked(start.y, start.x, startX + line.getWidth());
+                start.y += getFontHeight();
+                if (max - min > 1) {
+                    for (int i = min + 1; i < max; i++) {
+                        line = measuredLines.get(i);
+                        startX = getStartX(line.getWidth());
+                        drawMarked(start.y, startX, startX + line.getWidth());
+                        start.y += getFontHeight();
                     }
-                    line = measuredLines.get(max);
-                    startX = getStartX(line.getWidth());
-                    drawMarked(start.y, startX, end.x);
                 }
-            }
-            // draw cursor
-            Point main = this.handler.getMainCursor();
-            start = getPosOf(measuredLines, main);
-            if (this.renderCursor) {
-                if (this.handler.getText().get(main.y).isEmpty()) {
-                    start.x += 0.7f;
-                }
-                drawCursor(start.x, start.y);
+                line = measuredLines.get(max);
+                startX = getStartX(line.getWidth());
+                drawMarked(start.y, startX, end.x);
             }
         }
     }
@@ -95,20 +95,23 @@ public class TextFieldRenderer extends TextRenderer {
             return new Point();
         }
         List<Line> measuredLines = measureLines(lines);
-        y -= getStartY(measuredLines.size()) + this.y;
+        y -= getStartY(measuredLines.size());
         int index = (int) (y / (getFontHeight()));
         if (index < 0) return new Point();
         if (index >= measuredLines.size())
             return new Point(measuredLines.get(measuredLines.size() - 1).getText().length(), measuredLines.size() - 1);
         Line line = measuredLines.get(index);
-        x -= getStartX(line.getWidth()) + this.x;
+        x -= getStartX(line.getWidth());
         if (line.getWidth() <= 0) return new Point(0, index);
         if (line.getWidth() < x) return new Point(line.getText().length(), index);
         float currentX = 0;
         for (int i = 0; i < line.getText().length(); i++) {
             char c = line.getText().charAt(i);
-            currentX += getFontRenderer().getCharWidth(c) * this.scale;
+            float charWidth = getFontRenderer().getCharWidth(c) * this.scale;
+            currentX += charWidth;
             if (currentX >= x) {
+                // dist with current letter < dist without current letter -> next letter pos
+                if (Math.abs(currentX - x) < Math.abs(currentX - charWidth - x)) i++;
                 return new Point(i, index);
             }
         }
@@ -134,19 +137,10 @@ public class TextFieldRenderer extends TextRenderer {
         float alpha = Color.getAlphaF(this.markedColor);
         if (alpha == 0)
             alpha = 1f;
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
-        GlStateManager.color(red, green, blue, alpha);
-        GlStateManager.disableTexture2D();
-        bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
-        bufferbuilder.pos(x0, y1, 0.0D).endVertex();
-        bufferbuilder.pos(x1, y1, 0.0D).endVertex();
-        bufferbuilder.pos(x1, y0, 0.0D).endVertex();
-        bufferbuilder.pos(x0, y0, 0.0D).endVertex();
-        tessellator.draw();
-        GlStateManager.disableColorLogic();
-        GlStateManager.enableTexture2D();
-        GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(this.scale, this.scale, 0);
+        drawRect(x0, y0, x1, y1, red, green, blue, alpha);
+        GlStateManager.popMatrix();
     }
 
     @SideOnly(Side.CLIENT)
@@ -155,28 +149,27 @@ public class TextFieldRenderer extends TextRenderer {
         y0 = (y0 - 1) / this.scale;
         float x1 = x0 + 0.6f;
         float y1 = y0 + 9;
-        float red = Color.getRedF(this.color);
-        float green = Color.getGreenF(this.color);
-        float blue = Color.getBlueF(this.color);
-        float alpha = Color.getAlphaF(this.color);
+        float red = Color.getRedF(this.cursorColor);
+        float green = Color.getGreenF(this.cursorColor);
+        float blue = Color.getBlueF(this.cursorColor);
+        float alpha = Color.getAlphaF(this.cursorColor);
         if (alpha == 0)
             alpha = 1f;
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
-        GlStateManager.disableBlend();
         GlStateManager.pushMatrix();
         GlStateManager.scale(this.scale, this.scale, 0);
-        GlStateManager.color(red, green, blue, alpha);
-        GlStateManager.disableTexture2D();
-        bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
-        bufferbuilder.pos(x0, y1, 0.0D).endVertex();
-        bufferbuilder.pos(x1, y1, 0.0D).endVertex();
-        bufferbuilder.pos(x1, y0, 0.0D).endVertex();
-        bufferbuilder.pos(x0, y0, 0.0D).endVertex();
-        tessellator.draw();
-        GlStateManager.color(1, 1, 1, 1);
-        GlStateManager.enableTexture2D();
+        drawRect(x0, y0, x1, y1, red, green, blue, alpha);
         GlStateManager.popMatrix();
-        GlStateManager.enableBlend();
+    }
+
+    private static void drawRect(float x0, float y0, float x1, float y1, float red, float green, float blue, float alpha) {
+        Platform.setupDrawColor();
+        GlStateManager.color(red, green, blue, alpha);
+        Platform.startDrawing(Platform.DrawMode.QUADS, Platform.VertexFormat.POS, bufferBuilder -> {
+            bufferBuilder.pos(x0, y1, 0.0D).endVertex();
+            bufferBuilder.pos(x1, y1, 0.0D).endVertex();
+            bufferBuilder.pos(x1, y0, 0.0D).endVertex();
+            bufferBuilder.pos(x0, y0, 0.0D).endVertex();
+        });
+        GlStateManager.color(1, 1, 1, 1);
     }
 }

@@ -25,7 +25,6 @@ public class OverlayManager {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onGuiOpen(GuiOpenEvent event) {
         if (event.getGui() != Minecraft.getMinecraft().currentScreen) {
             OverlayStack.closeAll();

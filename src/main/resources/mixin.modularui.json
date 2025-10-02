@@ -1,20 +1,22 @@
 {
-  "package": "com.cleanroommc.modularui.core.mixin",
+  "package": "com.cleanroommc.modularui.core.mixins.early",
   "refmap": "mixins.modularui.refmap.json",
   "target": "@env(DEFAULT)",
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_8",
   "client": [
-    "GuiAccessor",
-    "GuiButtonMixin",
-    "GuiContainerAccessor",
-    "GuiContainerMixin",
-    "GuiScreenAccessor",
-    "KeyBindAccess",
-    "MinecraftMixin"
+    "minecraft.GuiAccessor",
+    "minecraft.GuiButtonMixin",
+    "minecraft.GuiContainerAccessor",
+    "minecraft.GuiContainerMixin",
+    "minecraft.GuiScreenAccessor",
+    "minecraft.GuiUtilsMixin",
+    "minecraft.KeyBindAccess",
+    "minecraft.MinecraftMixin"
   ],
   "mixins": [
-    "ContainerAccessor",
-    "FontRendererAccessor"
+    "minecraft.ContainerAccessor",
+    "minecraft.FontRendererAccessor",
+    "minecraft.InventoryCraftingAccessor"
   ]
 }

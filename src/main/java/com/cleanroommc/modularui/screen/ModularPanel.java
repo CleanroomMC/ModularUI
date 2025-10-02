@@ -1,32 +1,42 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.animation.Animator;
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.MCHelper;
+import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
+import com.cleanroommc.modularui.api.widget.IDragResizeable;
 import com.cleanroommc.modularui.api.widget.IFocusedWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
-import com.cleanroommc.modularui.integration.jei.JeiGhostIngredientSlot;
+import com.cleanroommc.modularui.api.widget.ResizeDragArea;
 import com.cleanroommc.modularui.integration.jei.ModularUIJeiPlugin;
-import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
+import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerGhostIngredientSlot;
 import com.cleanroommc.modularui.screen.viewport.GuiViewportStack;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
-import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.utils.*;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
+import com.cleanroommc.modularui.utils.HoveredWidgetList;
+import com.cleanroommc.modularui.utils.Interpolation;
+import com.cleanroommc.modularui.utils.Interpolations;
+import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.value.sync.PanelSyncHandler;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.ParentWidget;
+import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
-
-import mezz.jei.gui.ghost.GhostIngredientDrag;
+import com.cleanroommc.neverenoughanimations.NEAConfig;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 
+import mezz.jei.gui.ghost.GhostIngredientDrag;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
@@ -45,7 +55,7 @@ import java.util.function.Supplier;
  * To open another panel on top of the main panel you must use {@link IPanelHandler#simple(ModularPanel, SecondaryPanel.IPanelBuilder, boolean)}
  * or {@link PanelSyncManager#panel(String, PanelSyncHandler.IPanelBuilder, boolean)} if the panel should be synced.
  */
-public class ModularPanel extends ParentWidget<ModularPanel> implements IViewport {
+public class ModularPanel extends ParentWidget<ModularPanel> implements IViewport, IDragResizeable {
 
     public static ModularPanel defaultPanel(@NotNull String name) {
         return defaultPanel(name, 176, 166);
@@ -67,11 +77,18 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     private final Input keyboard = new Input();
     private final Input mouse = new Input();
 
+    // drag resizing
+    private IDragResizeable currentResizing = null;
+    private LocatedWidget currentResizingWidget = null;
+    private ResizeDragArea draggingDragArea = null;
+    private final Area startArea = new Area();
+    private int dragX, dragY;
+
     private final List<IPanelHandler> clientSubPanels = new ArrayList<>();
     private boolean invisible = false;
     private Animator animator;
-    private float scale = 1f;
-    private float alpha = 1f;
+
+    private boolean resizable = false;
 
     public ModularPanel(@NotNull String name) {
         this.name = Objects.requireNonNull(name, "A panels name must not be null and should be unique!");
@@ -108,13 +125,22 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     /**
      * If this panel is open it will be closed.
      * If animating is enabled and an animation is already playing this method will do nothing.
-     *
-     * @param animate true if the closing animation should play first.
      */
-    public void closeIfOpen(boolean animate) {
+    public void closeIfOpen() {
         if (!isOpen()) return;
         closeSubPanels();
-        if (!animate || !shouldAnimate()) {
+        if (isMainPanel()) {
+            // close screen and let NEA animation
+            EntityPlayer player = MCHelper.getPlayer();
+            if (player != null) {
+                player.closeScreen();
+            } else {
+                // we are currently not in a world and want to display the previous screen
+                Minecraft.getMinecraft().displayGuiScreen(getContext().getParentScreen());
+            }
+            return;
+        }
+        if (!shouldAnimate()) {
             this.screen.getPanelManager().closePanel(this);
             return;
         }
@@ -123,11 +149,13 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 // if this is the main panel, start closing animation for all panels
                 for (ModularPanel panel : getScreen().getPanelManager().getOpenPanels()) {
                     if (!panel.isMainPanel()) {
-                        panel.closeIfOpen(true);
+                        panel.closeIfOpen();
                     }
                 }
             }
-            getAnimator().setEndCallback(val -> this.screen.getPanelManager().closePanel(this)).backward();
+            getAnimator().onFinish(() -> this.screen.getPanelManager().closePanel(this));
+            getAnimator().reset(true);
+            getAnimator().animate(true);
         }
     }
 
@@ -138,7 +166,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     public void animateClose() {
-        closeIfOpen(true);
+        closeIfOpen();
     }
 
     void setPanelHandler(IPanelHandler panelHandler) {
@@ -151,7 +179,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     @Override
-    public WidgetTheme getWidgetThemeInternal(ITheme theme) {
+    public WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
         return theme.getPanelTheme();
     }
 
@@ -159,26 +187,13 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     public void transform(IViewportStack stack) {
         super.transform(stack);
         // apply scaling for animation
-        if (getScale() != 1f) {
+        float scale = getScale();
+        if (scale != 1f) {
             float x = getArea().w() / 2f;
             float y = getArea().h() / 2f;
             stack.translate(x, y);
-            stack.scale(getScale(), getScale());
+            stack.scale(scale, scale);
             stack.translate(-x, -y);
-        }
-    }
-
-    @Override
-    public void getWidgetsAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
-        if (hasChildren()) {
-            IViewport.getChildrenAt(this, stack, widgets, x, y);
-        }
-    }
-
-    @Override
-    public void getSelfAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
-        if (isInside(stack, x, y)) {
-            widgets.add(this, stack.peek());
         }
     }
 
@@ -199,6 +214,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         getWidgetsAt(stack, widgetList, getContext().getAbsMouseX(), getContext().getAbsMouseY());
         stack.popViewport(this);
         stack.popViewport(null);
+        stack.reset();
     }
 
     @Override
@@ -210,16 +226,13 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     public void onOpen(ModularScreen screen) {
         this.screen = screen;
         getArea().z(1);
-        this.scale = 1f;
-        this.alpha = 1f;
-        initialise(this);
-        if (shouldAnimate()) {
-            this.scale = 0.75f;
-            this.alpha = 0f;
-            getAnimator().setEndCallback(value -> {
-                this.scale = 1f;
-                this.alpha = 1f;
-            }).forward();
+        initialise(this, false);
+        // call first tick after everything is initialised
+        WidgetTree.onUpdate(this);
+        if (!isMainPanel() && shouldAnimate()) {
+            getAnimator().onFinish(() -> {});
+            getAnimator().reset();
+            getAnimator().animate();
         }
         this.state = State.OPEN;
     }
@@ -232,7 +245,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @MustBeInvokedByOverriders
     public void onClose() {
         if (!getScreen().isOverlay()) {
-            getContext().getJeiSettings().removeJeiExclusionArea(this);
+            getContext().getRecipeViewerSettings().removeRecipeViewerExclusionArea(this);
         }
         this.state = State.CLOSED;
         if (this.panelHandler != null) {
@@ -288,7 +301,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return Objects.requireNonNull(doSafe(runnable::getAsInt));
     }
 
-    @ApiStatus.OverrideOnly
     public boolean onMousePressed(int mouseButton) {
         return doSafeBool(() -> {
             LocatedWidget pressed = LocatedWidget.EMPTY;
@@ -300,49 +312,37 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                     animateClose();
                     result = true;
                 }
+            } else if (checkRecipeViewerGhostIngredient(mouseButton)) {
+                return true;
             } else {
-                loop:
                 for (LocatedWidget widget : this.hovering) {
                     widget.applyMatrix(getContext());
-                    // try inserting ghost ingredient
-                    if (widget.getElement() instanceof JeiGhostIngredientSlot<?> ghostSlot && ModularUI.isJeiLoaded()) {
-                        GhostIngredientDrag<?> drag = ModularUIJeiPlugin.getGhostDrag();
-                        if (drag != null && JeiGhostIngredientSlot.insertGhostIngredient(drag, ghostSlot)) {
-                            ModularUIJeiPlugin.getGhostDragManager().stopDrag();
-                            pressed = LocatedWidget.EMPTY;
-                            result = true;
-                            widget.unapplyMatrix(getContext());
-                            break;
-                        }
+                    IWidget w = widget.getElement();
+                    if (w instanceof IDragResizeable resizeable && widget.getAdditionalHoverInfo() instanceof ResizeDragArea dragArea) {
+                        this.currentResizing = resizeable;
+                        this.currentResizingWidget = widget;
+                        this.dragX = getContext().getMouseX();
+                        this.dragY = getContext().getMouseY();
+                        this.startArea.set(w.getArea());
+                        this.startArea.rx = w.getArea().rx;
+                        this.startArea.ry = w.getArea().ry;
+                        this.draggingDragArea = dragArea;
+                        widget.unapplyMatrix(getContext());
+                        break;
                     }
                     // click widget and see how it reacts
                     if (widget.getElement() instanceof Interactable interactable) {
-                        switch (interactable.onMousePressed(mouseButton)) {
-                            case IGNORE:
-                                break;
-                            case ACCEPT: {
-                                if (!this.mouse.held) {
-                                    this.mouse.addAcceptedInteractable(interactable);
-                                }
-                                pressed = widget;
-                                // result = false;
-                                break;
-                            }
-                            case STOP: {
-                                pressed = LocatedWidget.EMPTY;
-                                result = true;
-                                widget.unapplyMatrix(getContext());
-                                break loop;
-                            }
-                            case SUCCESS: {
-                                if (!this.mouse.held) {
-                                    this.mouse.addAcceptedInteractable(interactable);
-                                }
-                                pressed = widget;
-                                result = true;
-                                widget.unapplyMatrix(getContext());
-                                break loop;
-                            }
+                        Interactable.Result interactResult = interactable.onMousePressed(mouseButton);
+                        if (interactResult.accepts) {
+                            this.mouse.addAcceptedInteractable(interactable);
+                            pressed = widget;
+                        } else if (interactResult.stops) {
+                            pressed = LocatedWidget.EMPTY;
+                        }
+                        if (interactResult.stops) {
+                            result = true;
+                            widget.unapplyMatrix(getContext());
+                            break;
                         }
                     }
                     // see if widget can be dragged
@@ -355,7 +355,9 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                     widget.unapplyMatrix(getContext());
                     // see if widgets below this can be interacted with
                     if (!widget.getElement().canClickThrough()) {
+                        // act as if the widget was clicked and accepted
                         result = true;
+                        pressed = widget;
                         break;
                     }
                 }
@@ -366,147 +368,205 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             } else {
                 getContext().removeFocus();
             }
-            if (!this.mouse.held) {
-                this.mouse.lastPressed = pressed;
-                if (this.mouse.lastPressed.getElement() != null) {
-                    this.mouse.timeHeld = Minecraft.getSystemTime();
-                }
-                this.mouse.lastButton = mouseButton;
-                this.mouse.held = true;
-            }
+            this.mouse.pressed(pressed, mouseButton);
             return result;
         });
     }
 
-    @ApiStatus.OverrideOnly
+    private boolean checkRecipeViewerGhostIngredient(int mouseButton) {
+        if (ModularUI.Mods.JEI.isLoaded() && ModularUIJeiPlugin.getGhostDrag() != null) {
+            // try inserting ghost ingredient
+            GhostIngredientDrag<?> drag = ModularUIJeiPlugin.getGhostDrag();
+            for (LocatedWidget widget : this.hovering) {
+                if (widget.getElement() instanceof RecipeViewerGhostIngredientSlot<?> ghostSlot && RecipeViewerGhostIngredientSlot.insertGhostIngredient(drag, ghostSlot)) {
+                    ModularUIJeiPlugin.getGhostDragManager().stopDrag();
+                    this.mouse.pressed(widget, mouseButton);
+                    this.mouse.doRelease = false;
+                    getContext().removeFocus();
+                    return true;
+                }
+                // we can't really predict if the interactable would stop further interaction
+                // so we assume worst
+                if (widget.getElement() instanceof Interactable || !widget.getElement().canClickThrough()) {
+                    break;
+                }
+            }
+            // no target found -> tell jei to drop the ghost ingredient
+            // stop all further interaction since dropping the ingredient counts as an interaction
+            ModularUIJeiPlugin.getGhostDragManager().stopDrag();
+            this.mouse.pressed(LocatedWidget.EMPTY, mouseButton);
+            this.mouse.doRelease = false;
+            getContext().removeFocus();
+            return true;
+        }
+        return false;
+    }
+
     public boolean onMouseRelease(int mouseButton) {
         return isEnabled() && doSafeBool(() -> {
+            if (!this.mouse.doRelease) {
+                this.mouse.reset();
+                return false;
+            }
+            if (this.currentResizing != null) {
+                this.mouse.reset();
+                this.currentResizing = null;
+                this.currentResizingWidget = null;
+                return true;
+            }
             if (interactFocused(widget -> widget.onMouseRelease(mouseButton), false)) {
                 return true;
             }
-            boolean result = false;
+            boolean lastPressedIsHovered = false;
             boolean tryTap = this.mouse.tryTap(mouseButton);
+            // first see if the clicked widget is still hovered and try to interact with it
             for (LocatedWidget widget : this.hovering) {
-                if (widget.getElement() instanceof Interactable interactable) {
-                    widget.applyMatrix(getContext());
-                    if (interactable.onMouseRelease(mouseButton)) {
-                        result = true;
-                        widget.applyMatrix(getContext());
-                        break;
+                if (this.mouse.isWidget(widget)) {
+                    if (widget.getElement() instanceof Interactable interactable &&
+                            onMouseRelease(mouseButton, tryTap, widget, interactable)) {
+                        return true;
                     }
-                    if (tryTap && this.mouse.acceptedInteractions.remove(interactable)) {
-                        Interactable.Result tabResult = interactable.onMouseTapped(mouseButton);
-                        tryTap = switch (tabResult) {
-                            case SUCCESS, STOP -> false;
-                            default -> true;
-                        };
-                    }
-                    widget.unapplyMatrix(getContext());
+                    lastPressedIsHovered = true;
+                    break;
                 }
             }
+            // now try all other hovered
+            for (LocatedWidget widget : this.hovering) {
+                if (!this.mouse.isWidget(widget) && widget.getElement() instanceof Interactable interactable &&
+                        onMouseRelease(mouseButton, tryTap, widget, interactable)) {
+                    return true;
+                }
+            }
+            // nothing worked, but since the pressed widget is still hovered we assume success
+            // otherwise recipe viewer tries to pull some weird shit
+            if (lastPressedIsHovered) {
+                this.mouse.reset();
+                return true;
+            }
             this.mouse.reset();
-            return result;
+            return false;
         });
     }
 
-    @ApiStatus.OverrideOnly
+    private boolean onMouseRelease(int mouseButton, boolean tryTap, LocatedWidget widget, Interactable interactable) {
+        boolean stop = false;
+        widget.applyMatrix(getContext());
+        if (tryTap && this.mouse.acceptedInteractions.remove(interactable)) {
+            Interactable.Result tabResult = interactable.onMouseTapped(mouseButton);
+            if (tabResult.stops) {
+                stop = true;
+                // we will try to trigger onMouseRelease() even after tapping tells to stop
+            }
+        }
+        if (interactable.onMouseRelease(mouseButton)) {
+            stop = true;
+        }
+        widget.unapplyMatrix(getContext());
+        if (stop) {
+            this.mouse.reset();
+            return true;
+        }
+        return false;
+    }
+
     public boolean onKeyPressed(char typedChar, int keyCode) {
         return doSafeBool(() -> {
             switch (interactFocused(widget -> widget.onKeyPressed(typedChar, keyCode), Interactable.Result.IGNORE)) {
                 case STOP:
+                    this.keyboard.pressed(LocatedWidget.EMPTY, keyCode);
+                    return true;
                 case SUCCESS:
-                    if (!this.keyboard.held) {
-                        this.keyboard.lastPressed = getContext().getFocusedWidget();
-                        if (this.keyboard.lastPressed != null) {
-                            this.keyboard.timeHeld = Minecraft.getSystemTime();
-                        }
-                        this.keyboard.lastButton = keyCode;
-                        this.keyboard.held = true;
-                    }
+                    this.keyboard.pressed(getContext().getFocusedWidget(), keyCode);
                     return true;
             }
             LocatedWidget pressed = null;
             boolean result = false;
-            loop:
             for (LocatedWidget widget : this.hovering) {
                 if (widget.getElement() instanceof Interactable interactable) {
                     widget.applyMatrix(getContext());
-                    switch (interactable.onKeyPressed(typedChar, keyCode)) {
-                        case IGNORE:
-                            break;
-                        case ACCEPT: {
-                            if (!this.keyboard.held) {
-                                this.keyboard.acceptedInteractions.add(interactable);
-                            }
-                            pressed = widget;
-                            // result = false;
-                            break;
-                        }
-                        case STOP: {
-                            pressed = null;
-                            result = true;
-                            widget.unapplyMatrix(getContext());
-                            break loop;
-                        }
-                        case SUCCESS: {
-                            if (!this.keyboard.held) {
-                                this.keyboard.acceptedInteractions.add(interactable);
-                            }
-                            pressed = widget;
-                            result = true;
-                            widget.unapplyMatrix(getContext());
-                            break loop;
-                        }
+                    Interactable.Result interactResult = interactable.onKeyPressed(typedChar, keyCode);
+                    if (interactResult.accepts) {
+                        this.keyboard.addAcceptedInteractable(interactable);
+                        pressed = widget;
+                    } else if (interactResult.stops) {
+                        pressed = null;
+                    }
+                    if (interactResult.stops) {
+                        result = true;
+                        widget.unapplyMatrix(getContext());
+                        break;
                     }
                     widget.unapplyMatrix(getContext());
                 }
                 if (!widget.getElement().canClickThrough()) break;
             }
-            if (!this.keyboard.held) {
-                this.keyboard.lastPressed = pressed;
-                if (this.keyboard.lastPressed != null) {
-                    this.keyboard.timeHeld = Minecraft.getSystemTime();
-                }
-                this.keyboard.lastButton = keyCode;
-                this.keyboard.held = true;
-            }
+            this.keyboard.pressed(pressed, keyCode);
             return result;
         });
     }
 
-    @ApiStatus.OverrideOnly
     public boolean onKeyRelease(char typedChar, int keyCode) {
         return doSafeBool(() -> {
+            if (!this.keyboard.doRelease) {
+                this.keyboard.reset();
+                return false;
+            }
             if (interactFocused(widget -> widget.onKeyRelease(typedChar, keyCode), false)) {
                 return true;
             }
-            boolean result = false;
+            boolean lastPressedIsHovered = false;
             boolean tryTap = this.keyboard.tryTap(keyCode);
+            // first see if the clicked widget is still hovered and try to interact with it
             for (LocatedWidget widget : this.hovering) {
-                if (widget.getElement() instanceof Interactable interactable) {
-                    widget.applyMatrix(getContext());
-                    if (interactable.onKeyRelease(typedChar, keyCode)) {
-                        result = true;
-                        widget.unapplyMatrix(getContext());
-                        break;
+                if (this.keyboard.isWidget(widget)) {
+                    if (widget.getElement() instanceof Interactable interactable &&
+                            onKeyRelease(typedChar, keyCode, tryTap, widget, interactable)) {
+                        return true;
                     }
-                    if (tryTap && this.keyboard.acceptedInteractions.remove(interactable)) {
-                        Interactable.Result tabResult = interactable.onKeyTapped(typedChar, keyCode);
-                        tryTap = switch (tabResult) {
-                            case SUCCESS, STOP -> false;
-                            default -> true;
-                        };
-                    }
-                    widget.unapplyMatrix(getContext());
+                    lastPressedIsHovered = true;
+                    break;
                 }
             }
+            // now try all other hovered
+            for (LocatedWidget widget : this.hovering) {
+                if (!this.keyboard.isWidget(widget) && widget.getElement() instanceof Interactable interactable &&
+                        onKeyRelease(typedChar, keyCode, tryTap, widget, interactable)) {
+                    return true;
+                }
+            }
+            // nothing worked, but since the pressed widget is still hovered we assume success
+            // otherwise recipe viewer tries to pull some weird shit
+            if (lastPressedIsHovered) {
+                this.keyboard.reset();
+                return true;
+            }
             this.keyboard.reset();
-            return result;
+            return false;
         });
     }
 
-    @ApiStatus.OverrideOnly
-    public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
+    private boolean onKeyRelease(char typedChar, int keyCode, boolean tryTap, LocatedWidget widget, Interactable interactable) {
+        boolean stop = false;
+        widget.applyMatrix(getContext());
+        if (tryTap && this.mouse.acceptedInteractions.remove(interactable)) {
+            Interactable.Result tabResult = interactable.onKeyTapped(typedChar, keyCode);
+            if (tabResult.stops) {
+                stop = true;
+                // we will try to trigger onMouseRelease() even after tapping tells to stop
+            }
+        }
+        if (interactable.onKeyRelease(typedChar, keyCode)) {
+            stop = true;
+        }
+        widget.unapplyMatrix(getContext());
+        if (stop) {
+            this.mouse.reset();
+            return true;
+        }
+        return false;
+    }
+
+    public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
         return doSafeBool(() -> {
             if (interactFocused(widget -> widget.onMouseScroll(scrollDirection, amount), false)) {
                 return true;
@@ -524,9 +584,20 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         });
     }
 
-    @ApiStatus.OverrideOnly
     public boolean onMouseDrag(int mouseButton, long timeSinceClick) {
         return doSafeBool(() -> {
+            if (this.currentResizing != null) {
+                this.currentResizingWidget.applyMatrix(getContext());
+                int mx = getContext().getMouseX();
+                int my = getContext().getMouseY();
+                this.currentResizingWidget.unapplyMatrix(getContext());
+                int dx = mx - this.dragX;
+                int dy = my - this.dragY;
+                if (dx != 0 || dy != 0) {
+                    IDragResizeable.applyDrag(this.currentResizing, (IWidget) this.currentResizing, this.draggingDragArea, this.startArea, dx, dy);
+                }
+                return true;
+            }
             if (this.mouse.held &&
                     mouseButton == this.mouse.lastButton &&
                     this.mouse.lastPressed != null &&
@@ -573,6 +644,16 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return false;
     }
 
+    @Override
+    public boolean isCurrentlyResizable() {
+        return this.resizable;
+    }
+
+    @Override
+    public boolean keepPosOnDragResize() {
+        return !isDraggable();
+    }
+
     public @NotNull String getName() {
         return this.name;
     }
@@ -598,45 +679,44 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @Nullable
     public LocatedWidget getTopHoveringLocated(boolean debug) {
-        for (LocatedWidget widget : this.hovering) {
+        int i = 0;
+        while (i < this.hovering.size()) {
+            LocatedWidget widget = this.hovering.get(i);
+            if (!widget.getElement().isValid()) {
+                this.hovering.remove(i);
+                continue;
+            }
             if (debug || widget.getElement().canHover()) {
                 return widget;
             }
+            i++;
         }
         return null;
-    }
-
-    @Override
-    public int getDefaultHeight() {
-        return 166;
-    }
-
-    @Override
-    public int getDefaultWidth() {
-        return 176;
     }
 
     final void setPanelGuiContext(@NotNull ModularGuiContext context) {
         setContext(context);
         if (!context.getScreen().isOverlay()) {
-            context.getJeiSettings().addJeiExclusionArea(this);
+            context.getRecipeViewerSettings().addRecipeViewerExclusionArea(this);
         }
     }
 
     public boolean isOpening() {
-        return this.animator != null && this.animator.isRunningForwards();
+        return this.animator != null && this.animator.isAnimatingForward();
     }
 
     public boolean isClosing() {
-        return this.animator != null && this.animator.isRunningBackwards();
+        return this.animator != null && this.animator.isAnimatingReverse();
     }
 
     public float getScale() {
-        return this.scale;
+        if (!ModularUI.Mods.NEA.isLoaded() || NEAConfig.openingAnimationTime == 0) return 1f;
+        return Interpolations.lerp(NEAConfig.openingStartScale, 1f, getAnimator().getValue());
     }
 
     public float getAlpha() {
-        return this.alpha;
+        if (!ModularUI.Mods.NEA.isLoaded() || NEAConfig.openingAnimationTime == 0) return 1f;
+        return getAnimator().getValue();
     }
 
     public final boolean isMainPanel() {
@@ -656,18 +736,23 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @NotNull
     protected Animator getAnimator() {
         if (this.animator == null) {
-            this.animator = new Animator(getScreen().getCurrentTheme().getOpenCloseAnimationOverride(), Interpolation.QUINT_OUT)
-                    .setValueBounds(0.0f, 1.0f)
-                    .setCallback(val -> {
-                        this.alpha = (float) val;
-                        this.scale = (float) val * 0.25f + 0.75f;
-                    });
+            this.animator = new Animator()
+                    .bounds(0f, 1f)
+                    .duration(NEAConfig.openingAnimationTime)
+                    .curve(Interpolation.getForName(NEAConfig.openingAnimationCurve.getName()));
+            this.animator.reset(true);
         }
         return this.animator;
     }
 
+    /**
+     * This method determines if the panel should be animated.
+     * It is strongly discouraged to override this method. Users should have animations when they have NEA installed, and it's enabled in
+     * the config. Only override if the animation looks seriously wrong with your specific panel.
+     */
+    @ApiStatus.Internal
     public boolean shouldAnimate() {
-        return !getScreen().isOverlay() && getScreen().getCurrentTheme().getOpenCloseAnimationOverride() > 0;
+        return !getScreen().isOverlay() && ModularUI.Mods.NEA.isLoaded() && NEAConfig.openingAnimationTime > 0;
     }
 
     void registerSubPanel(IPanelHandler handler) {
@@ -685,16 +770,21 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     public ModularPanel bindPlayerInventory() {
-        return child(SlotGroupWidget.playerInventory());
+        return child(SlotGroupWidget.playerInventory(true));
     }
 
     public ModularPanel bindPlayerInventory(int bottom) {
-        return child(SlotGroupWidget.playerInventory(bottom));
+        return child(SlotGroupWidget.playerInventory(bottom, true));
     }
 
     public ModularPanel invisible() {
         this.invisible = true;
         return background(IDrawable.EMPTY);
+    }
+
+    public ModularPanel resizeableOnDrag(boolean resizeable) {
+        this.resizable = resizeable;
+        return this;
     }
 
     @Override
@@ -739,26 +829,57 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         @Nullable
         private LocatedWidget lastPressed;
         private boolean held;
-        private long timeHeld;
+        private long time;
         private int lastButton;
+        private boolean doRelease = true;
 
         private Input() {
             reset();
         }
 
         private void addAcceptedInteractable(Interactable interactable) {
-            this.acceptedInteractions.add(interactable);
+            if (!this.held) {
+                this.acceptedInteractions.add(interactable);
+            }
         }
 
         private void reset() {
             this.acceptedInteractions.clear();
             this.held = false;
-            this.timeHeld = -1;
+            this.time = -1;
             this.lastButton = -1;
+            this.doRelease = true;
+        }
+
+        private boolean isValid() {
+            return this.lastPressed != null && this.time > 0;
+        }
+
+        private int getTimeSinceEvent() {
+            return (int) Math.min(Minecraft.getSystemTime() - this.time, Integer.MAX_VALUE);
         }
 
         private boolean tryTap(int button) {
-            return this.lastButton == button && Minecraft.getSystemTime() - timeHeld <= tapTime;
+            return this.lastButton == button && getTimeSinceEvent() <= tapTime;
+        }
+
+        private boolean isWidget(IWidget widget) {
+            return this.lastPressed != null && this.lastPressed.getElement() == widget;
+        }
+
+        private boolean isWidget(LocatedWidget widget) {
+            return isWidget(widget.getElement());
+        }
+
+        private void pressed(LocatedWidget pressed, int button) {
+            if (!this.held) {
+                this.lastPressed = pressed;
+                if (this.lastPressed != null) {
+                    this.time = Minecraft.getSystemTime();
+                }
+                this.lastButton = button;
+                this.held = true;
+            }
         }
     }
 }

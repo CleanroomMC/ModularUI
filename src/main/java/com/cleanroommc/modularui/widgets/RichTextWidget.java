@@ -1,13 +1,13 @@
 package com.cleanroommc.modularui.widgets;
 
+import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.drawable.IHoverable;
 import com.cleanroommc.modularui.api.drawable.IRichTextBuilder;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.text.RichText;
-import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.widget.Widget;
 
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +27,7 @@ public class RichTextWidget extends Widget<RichTextWidget> implements IRichTextB
     }
 
     @Override
-    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
+    public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         super.draw(context, widgetTheme);
         if (this.autoUpdate || this.dirty) {
             if (this.builder != null) {
@@ -36,7 +36,7 @@ public class RichTextWidget extends Widget<RichTextWidget> implements IRichTextB
             }
             this.dirty = false;
         }
-        this.text.drawAtZero(context, getArea(), widgetTheme);
+        this.text.drawAtZero(context, getArea(), getActiveWidgetTheme(widgetTheme, isHovering()));
     }
 
     @Override
@@ -100,7 +100,7 @@ public class RichTextWidget extends Widget<RichTextWidget> implements IRichTextB
     }
 
     @Override
-    public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
+    public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
         if (getHoveredElement() instanceof Interactable interactable) {
             return interactable.onMouseScroll(scrollDirection, amount);
         }

@@ -1,18 +1,21 @@
 package com.cleanroommc.modularui.widget.sizer;
 
+import com.cleanroommc.modularui.animation.IAnimatable;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
+import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.MathUtils;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.util.Objects;
 
 /**
  * A rectangular widget area, composed of a position and a size.
  * Also has fields for a relative position, a layer and margin & padding.
  */
-public class Area extends Rectangle implements IUnResizeable {
+public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> {
 
     public static boolean isInside(int x, int y, int w, int h, int px, int py) {
         SHARED.set(x, y, w, h);
@@ -20,6 +23,8 @@ public class Area extends Rectangle implements IUnResizeable {
     }
 
     public static final Area SHARED = new Area();
+
+    public static final Area ZERO = new Area();
 
     /**
      * relative position (in most cases the direct parent)
@@ -36,8 +41,7 @@ public class Area extends Rectangle implements IUnResizeable {
     private final Box margin = new Box();
     private final Box padding = new Box();
 
-    public Area() {
-    }
+    public Area() {}
 
     public Area(int x, int y, int w, int h) {
         super(x, y, w, h);
@@ -45,6 +49,16 @@ public class Area extends Rectangle implements IUnResizeable {
 
     public Area(Rectangle rectangle) {
         super(rectangle);
+    }
+
+    public Area(Area area) {
+        super(area);
+        this.rx = area.rx;
+        this.ry = area.ry;
+        this.panelLayer = area.panelLayer;
+        this.z = area.z;
+        getMargin().set(area.getMargin());
+        getPadding().set(area.getPadding());
     }
 
     public int x() {
@@ -92,7 +106,7 @@ public class Area extends Rectangle implements IUnResizeable {
     }
 
     public void ey(int ey) {
-        this.y = ey - this.width;
+        this.y = ey - this.height;
     }
 
     public int mx() {
@@ -173,25 +187,49 @@ public class Area extends Rectangle implements IUnResizeable {
         }
     }
 
+    public void addPoint(GuiAxis axis, int v) {
+        if (axis.isHorizontal()) {
+            this.x += v;
+        } else {
+            this.y += v;
+        }
+    }
+
+    public void addSize(GuiAxis axis, int v) {
+        if (axis.isHorizontal()) {
+            this.width += v;
+        } else {
+            this.height += v;
+        }
+    }
+
+    public void addRelativePoint(GuiAxis axis, int v) {
+        if (axis.isHorizontal()) {
+            this.rx += v;
+        } else {
+            this.ry += v;
+        }
+    }
+
     void applyPos(int parentX, int parentY) {
         this.x = parentX + this.rx;
         this.y = parentY + this.ry;
     }
 
     public int requestedWidth() {
-        return this.width + this.margin.horizontal();
+        return this.width + getMargin().horizontal();
     }
 
     public int paddedWidth() {
-        return this.width - this.padding.horizontal();
+        return this.width - getPadding().horizontal();
     }
 
     public int requestedHeight() {
-        return this.height + this.margin.vertical();
+        return this.height + getMargin().vertical();
     }
 
     public int paddedHeight() {
-        return this.height - this.padding.vertical();
+        return this.height - getPadding().vertical();
     }
 
     public int requestedSize(GuiAxis axis) {
@@ -436,7 +474,7 @@ public class Area extends Rectangle implements IUnResizeable {
 
     /**
      * Transforms the four corners of this rectangle with the given pose stack. The new rectangle can be rotated.
-     * Then a min fit rectangle, which is not rotated and aligned with the screen, is put around the corner.
+     * Then a min fit rectangle, which is not rotated and aligned with the screen, is put around the corners.
      *
      * @param stack pose stack
      */
@@ -470,7 +508,7 @@ public class Area extends Rectangle implements IUnResizeable {
     }
 
     /**
-     * This creates a copy, but it only copies position and size.
+     * This creates a copy with size, pos, margin padding and z layer.
      *
      * @return copy
      */
@@ -486,5 +524,45 @@ public class Area extends Rectangle implements IUnResizeable {
                 ", width=" + this.width +
                 ", height=" + this.height +
                 '}';
+    }
+
+    @Override
+    public Area interpolate(Area start, Area end, float t) {
+        this.x = Interpolations.lerp(start.x, end.x, t);
+        this.y = Interpolations.lerp(start.y, end.y, t);
+        this.width = Interpolations.lerp(start.width, end.width, t);
+        this.height = Interpolations.lerp(start.height, end.height, t);
+        this.rx = Interpolations.lerp(start.rx, end.rx, t);
+        this.ry = Interpolations.lerp(start.ry, end.ry, t);
+        getMargin().interpolate(start.getMargin(), end.getPadding(), t);
+        getPadding().interpolate(start.getMargin(), end.getPadding(), t);
+        return this;
+    }
+
+    @Override
+    public Area copyOrImmutable() {
+        return createCopy();
+    }
+
+    @Override
+    public boolean shouldAnimate(Area target) {
+        return x != target.x || y != target.y || width != target.width || height != target.height ||
+                rx != target.rx || ry != target.ry || !margin.isEqual(target.margin) || !padding.isEqual(target.padding);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Area area = (Area) o;
+        return rx == area.rx && ry == area.ry && panelLayer == area.panelLayer && z == area.z && Objects.equals(getMargin(),
+                area.getMargin()) && Objects.equals(
+                getPadding(), area.getPadding());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), rx, ry, panelLayer, z, getMargin(), getPadding());
     }
 }

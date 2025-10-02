@@ -44,6 +44,7 @@ public class GuiContext extends GuiViewportStack {
     /* Render states */
     private float partialTicks;
     private long tick = 0;
+    private int currentDrawingZ = 0;
 
     public boolean isAbove(IGuiElement widget) {
         return isMouseAbove(widget.getArea());
@@ -83,6 +84,10 @@ public class GuiContext extends GuiViewportStack {
         this.screenArea.set(0, 0, w, h);
         this.screenArea.rx = 0;
         this.screenArea.ry = 0;
+    }
+
+    public void updateZ(int z) {
+        this.currentDrawingZ = z;
     }
 
     @SideOnly(Side.CLIENT)
@@ -159,6 +164,10 @@ public class GuiContext extends GuiViewportStack {
 
     public float getPartialTicks() {
         return this.partialTicks;
+    }
+
+    public int getCurrentDrawingZ() {
+        return currentDrawingZ;
     }
 
     public boolean isMuiContext() {

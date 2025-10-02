@@ -2,12 +2,10 @@ package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.Nullable;
@@ -15,6 +13,10 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.Rectangle;
 
+/**
+ * A util class for stencil stack used as a scissor stack. The reason for using stencils over scissors is that scissors can not have
+ * transformation applied and therefore don't work with 3D holo UI's.
+ */
 public class Stencil {
 
     // Stores a stack of areas that are transformed, so it represents the actual area
@@ -118,21 +120,14 @@ public class Stencil {
     }
 
     private static void drawRectangleStencilShape(int x, int y, int w, int h) {
-        GlStateManager.disableTexture2D();
-        GlStateManager.disableAlpha();
-        GlStateManager.enableBlend();
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
-        float x0 = x, x1 = x + w, y0 = y, y1 = y + h;
-        bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-        bufferbuilder.pos(x0, y0, 0.0f).endVertex();
-        bufferbuilder.pos(x0, y1, 0.0f).endVertex();
-        bufferbuilder.pos(x1, y1, 0.0f).endVertex();
-        bufferbuilder.pos(x1, y0, 0.0f).endVertex();
-        tessellator.draw();
-        GlStateManager.disableBlend();
-        GlStateManager.enableAlpha();
-        GlStateManager.enableTexture2D();
+        Platform.setupDrawColor();
+        Platform.startDrawing(Platform.DrawMode.QUADS, Platform.VertexFormat.POS, bufferBuilder -> {
+            float x0 = x, x1 = x + w, y0 = y, y1 = y + h;
+            bufferBuilder.pos(x0, y0, 0.0f).endVertex();
+            bufferBuilder.pos(x0, y1, 0.0f).endVertex();
+            bufferBuilder.pos(x1, y1, 0.0f).endVertex();
+            bufferBuilder.pos(x1, y0, 0.0f).endVertex();
+        });
     }
 
     /**

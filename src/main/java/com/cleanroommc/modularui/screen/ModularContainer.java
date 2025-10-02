@@ -1,10 +1,10 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.core.mixin.ContainerAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.ContainerAccessor;
 import com.cleanroommc.modularui.factory.GuiData;
-import com.cleanroommc.modularui.factory.PosGuiData;
 import com.cleanroommc.modularui.network.NetworkUtils;
+import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
@@ -13,27 +13,30 @@ import com.cleanroommc.bogosorter.api.IPosSetter;
 import com.cleanroommc.bogosorter.api.ISortableContainer;
 import com.cleanroommc.bogosorter.api.ISortingContextBuilder;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Optional.Interface;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.items.ItemHandlerHelper;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-import java.util.function.Predicate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 
-@Interface(modid = ModularUI.BOGO_SORT, iface = "com.cleanroommc.bogosorter.api.ISortableContainer")
+@Interface(modid = ModularUI.ModIds.BOGOSORTER, iface = "com.cleanroommc.bogosorter.api.ISortableContainer")
 public class ModularContainer extends Container implements ISortableContainer {
 
     public static ModularContainer getCurrent(EntityPlayer player) {
@@ -43,54 +46,48 @@ public class ModularContainer extends Container implements ISortableContainer {
         return null;
     }
 
-    private final EntityPlayer player;
-    private final ModularSyncManager syncManager;
+    private static final int DROP_TO_WORLD = -999;
+    private static final int LEFT_MOUSE = 0;
+    private static final int RIGHT_MOUSE = 1;
+
+    private EntityPlayer player;
+    private ModularSyncManager syncManager;
     private boolean init = true;
-    private final List<ModularSlot> slots = new ArrayList<>();
+    // all phantom slots (inventory don't contain phantom slots)
+    private final List<ModularSlot> phantomSlots = new ArrayList<>();
     private final List<ModularSlot> shiftClickSlots = new ArrayList<>();
-    private ContainerCustomizer containerCustomizer;
-    private Predicate<EntityPlayer> canInteractWith;
+    private GuiData guiData;
+    private UISettings settings;
 
     @SideOnly(Side.CLIENT)
     private ModularScreen optionalScreen;
 
-    public ModularContainer(EntityPlayer player, PanelSyncManager panelSyncManager, String mainPanelName, GuiData guiData) {
+    public ModularContainer() {}
+
+    @ApiStatus.Internal
+    public void construct(EntityPlayer player, PanelSyncManager panelSyncManager, UISettings settings, String mainPanelName, GuiData guiData) {
         this.player = player;
         this.syncManager = new ModularSyncManager(this);
         this.syncManager.construct(mainPanelName, panelSyncManager);
-        this.containerCustomizer = panelSyncManager.getContainerCustomizer();
-        if (this.containerCustomizer == null) {
-            this.containerCustomizer = new ContainerCustomizer();
-            panelSyncManager.setContainerCustomizer(this.containerCustomizer);
-        }
-        this.containerCustomizer.initialize(this);
-        if (this.containerCustomizer.getCanInteractWith() == null) {
-            if (guiData instanceof PosGuiData posGuiData) {
-                panelSyncManager.canInteractWithinDefaultRange(posGuiData);
-            } else {
-                // store current pos of player
-                // gui will close when the player somehow moves away while the gui is open
-                double x = guiData.getPlayer().posX;
-                double y = guiData.getPlayer().posY;
-                double z = guiData.getPlayer().posZ;
-                panelSyncManager.canInteractWithinDefaultRange(x, y, z);
-            }
-        }
-        this.canInteractWith = this.containerCustomizer.getCanInteractWith();
+        this.settings = settings;
+        this.guiData = guiData;
         sortShiftClickSlots();
     }
 
     @SideOnly(Side.CLIENT)
-    public ModularContainer(ContainerCustomizer containerCustomizer) {
-        this.player = Minecraft.getMinecraft().player;
-        this.syncManager = null;
-        this.containerCustomizer = containerCustomizer != null ? containerCustomizer : new ContainerCustomizer();
-        this.containerCustomizer.initialize(this);
+    void initializeClient(ModularScreen screen) {
+        this.optionalScreen = screen;
     }
 
+    @ApiStatus.Internal
     @SideOnly(Side.CLIENT)
-    void construct(ModularScreen screen) {
-        this.optionalScreen = screen;
+    public void constructClientOnly() {
+        this.player = Platform.getClientPlayer();
+        this.syncManager = null;
+    }
+
+    public boolean isInitialized() {
+        return this.player != null;
     }
 
     @SideOnly(Side.CLIENT)
@@ -103,15 +100,16 @@ public class ModularContainer extends Container implements ISortableContainer {
         return (ContainerAccessor) this;
     }
 
+    @MustBeInvokedByOverriders
     @Override
     public void onContainerClosed(@NotNull EntityPlayer playerIn) {
         super.onContainerClosed(playerIn);
         if (this.syncManager != null) {
             this.syncManager.onClose();
         }
-        this.containerCustomizer.onContainerClosed();
     }
 
+    @MustBeInvokedByOverriders
     @Override
     public void detectAndSendChanges() {
         super.detectAndSendChanges();
@@ -119,6 +117,14 @@ public class ModularContainer extends Container implements ISortableContainer {
             this.syncManager.detectAndSendChanges(this.init);
         }
         this.init = false;
+    }
+
+    @ApiStatus.Internal
+    public void onUpdate() {
+        // detectAndSendChanges is potentially called multiple times per tick, while this method is called exactly once per tick
+        if (this.syncManager != null) {
+            this.syncManager.onUpdate();
+        }
     }
 
     private void sortShiftClickSlots() {
@@ -137,11 +143,17 @@ public class ModularContainer extends Container implements ISortableContainer {
 
     @ApiStatus.Internal
     public void registerSlot(String panelName, ModularSlot slot) {
-        if (this.inventorySlots.contains(slot)) {
-            throw new IllegalArgumentException("Tried to register slot which already exists!");
+        if (slot.isPhantom()) {
+            if (this.phantomSlots.contains(slot)) {
+                throw new IllegalArgumentException("Tried to register slot which already exists!");
+            }
+            this.phantomSlots.add(slot);
+        } else {
+            if (this.inventorySlots.contains(slot)) {
+                throw new IllegalArgumentException("Tried to register slot which already exists!");
+            }
+            addSlotToContainer(slot);
         }
-        addSlotToContainer(slot);
-        this.slots.add(slot);
         if (slot.getSlotGroupName() != null) {
             SlotGroup slotGroup = getSyncManager().getSlotGroup(panelName, slot.getSlotGroupName());
             if (slotGroup == null) {
@@ -200,66 +212,236 @@ public class ModularContainer extends Container implements ISortableContainer {
         return player;
     }
 
+    public GuiData getGuiData() {
+        return guiData;
+    }
+
     public ModularSlot getModularSlot(int index) {
-        return this.slots.get(index);
+        Slot slot = this.inventorySlots.get(index);
+        if (slot instanceof ModularSlot modularSlot) {
+            return modularSlot;
+        }
+        throw new IllegalStateException("A non-ModularSlot was found, but all slots in a ModularContainer must extend ModularSlot.");
     }
 
     public List<ModularSlot> getShiftClickSlots() {
         return Collections.unmodifiableList(this.shiftClickSlots);
     }
 
-    public void setCanInteractWith(Predicate<EntityPlayer> canInteractWith) {
-        this.canInteractWith = canInteractWith;
-    }
+    public void onSlotChanged(ModularSlot slot, ItemStack stack, boolean onlyAmountChanged) {}
 
     @Override
     public boolean canInteractWith(@NotNull EntityPlayer playerIn) {
-        return this.canInteractWith.test(playerIn);
+        return this.settings.canPlayerInteractWithUI(playerIn);
     }
 
     @Override
     public @NotNull ItemStack slotClick(int slotId, int mouseButton, @NotNull ClickType clickTypeIn, @NotNull EntityPlayer player) {
-        return this.containerCustomizer.slotClick(slotId, mouseButton, clickTypeIn, player);
+        ItemStack returnable = Platform.EMPTY_STACK;
+        InventoryPlayer inventoryplayer = player.inventory;
+
+        if (clickTypeIn == ClickType.QUICK_CRAFT || acc().getDragEvent() != 0) {
+            return superSlotClick(slotId, mouseButton, clickTypeIn, player);
+        }
+
+        if ((clickTypeIn == ClickType.PICKUP || clickTypeIn == ClickType.QUICK_MOVE) &&
+                (mouseButton == LEFT_MOUSE || mouseButton == RIGHT_MOUSE)) {
+            if (slotId == DROP_TO_WORLD) {
+                return superSlotClick(slotId, mouseButton, clickTypeIn, player);
+            }
+
+            // early return
+            if (slotId < 0) return Platform.EMPTY_STACK;
+
+            if (clickTypeIn == ClickType.QUICK_MOVE) {
+                Slot fromSlot = getSlot(slotId);
+
+                if (!fromSlot.canTakeStack(player)) {
+                    return Platform.EMPTY_STACK;
+                }
+
+                if (NEAAnimationHandler.shouldHandleNEA(this)) {
+                    returnable = NEAAnimationHandler.injectQuickMove(this, player, slotId, fromSlot);
+                } else {
+                    returnable = handleQuickMove(player, slotId, fromSlot);
+                }
+            } else {
+                Slot clickedSlot = getSlot(slotId);
+
+                ItemStack slotStack = clickedSlot.getStack();
+                ItemStack heldStack = inventoryplayer.getItemStack();
+
+                if (slotStack.isEmpty()) {
+                    // no dif
+                    if (!heldStack.isEmpty() && clickedSlot.isItemValid(heldStack)) {
+                        int stackCount = mouseButton == LEFT_MOUSE ? heldStack.getCount() : 1;
+
+                        if (stackCount > clickedSlot.getItemStackLimit(heldStack)) {
+                            stackCount = clickedSlot.getItemStackLimit(heldStack);
+                        }
+
+                        clickedSlot.putStack(heldStack.splitStack(stackCount));
+                    }
+                } else if (clickedSlot.canTakeStack(player)) {
+                    if (heldStack.isEmpty() && !slotStack.isEmpty()) {
+                        int s = Math.min(slotStack.getCount(), slotStack.getMaxStackSize()); // checking max stack size here, probably for oversized slots
+                        int toRemove = mouseButton == LEFT_MOUSE ? s : (s + 1) / 2;
+                        inventoryplayer.setItemStack(slotStack.splitStack(toRemove));
+                        clickedSlot.putStack(slotStack);
+                        clickedSlot.onTake(player, inventoryplayer.getItemStack());
+                    } else if (clickedSlot.isItemValid(heldStack)) {
+                        if (slotStack.getItem() == heldStack.getItem() &&
+                                slotStack.getMetadata() == heldStack.getMetadata() &&
+                                ItemStack.areItemStackTagsEqual(slotStack, heldStack)) {
+                            int stackCount = mouseButton == LEFT_MOUSE ? heldStack.getCount() : 1;
+
+                            if (stackCount > clickedSlot.getItemStackLimit(heldStack) - slotStack.getCount()) {
+                                stackCount = clickedSlot.getItemStackLimit(heldStack) - slotStack.getCount();
+                            }
+
+                            heldStack.shrink(stackCount);
+                            slotStack.grow(stackCount);
+                            clickedSlot.putStack(slotStack);
+
+                        } else if (heldStack.getCount() <= clickedSlot.getItemStackLimit(heldStack)) {
+                            clickedSlot.putStack(heldStack);
+                            inventoryplayer.setItemStack(slotStack);
+                        }
+                    } else if (slotStack.getItem() == heldStack.getItem() &&
+                            heldStack.getMaxStackSize() > 1 &&
+                            (!slotStack.getHasSubtypes() || slotStack.getMetadata() == heldStack.getMetadata()) &&
+                            ItemStack.areItemStackTagsEqual(slotStack, heldStack) && !slotStack.isEmpty()) {
+                        int stackCount = slotStack.getCount();
+
+                        if (stackCount + heldStack.getCount() <= heldStack.getMaxStackSize()) {
+                            heldStack.grow(stackCount);
+                            slotStack = clickedSlot.decrStackSize(stackCount);
+
+                            if (slotStack.isEmpty()) {
+                                clickedSlot.putStack(Platform.EMPTY_STACK);
+                            }
+
+                            clickedSlot.onTake(player, inventoryplayer.getItemStack());
+                        }
+                    }
+                }
+                clickedSlot.onSlotChanged();
+            }
+            detectAndSendChanges();
+            return returnable;
+        }
+
+        return superSlotClick(slotId, mouseButton, clickTypeIn, player);
     }
 
-    public @NotNull ItemStack superSlotClick(int slotId, int mouseButton, @NotNull ClickType clickTypeIn, @NotNull EntityPlayer player) {
+    protected final @NotNull ItemStack superSlotClick(int slotId, int mouseButton, @NotNull ClickType clickTypeIn, @NotNull EntityPlayer player) {
         return super.slotClick(slotId, mouseButton, clickTypeIn, player);
+    }
+
+    public final ItemStack handleQuickMove(EntityPlayer player, int slotId, Slot fromSlot) {
+        // looping so that crafting works properly
+        ItemStack returnable;
+        ItemStack remainder;
+        do {
+            remainder = transferStackInSlot(player, slotId);
+            returnable = Platform.copyStack(remainder);
+        } while (!Platform.isStackEmpty(remainder) && ItemHandlerHelper.canItemStacksStack(fromSlot.getStack(), remainder));
+        return returnable;
     }
 
     @Override
     public @NotNull ItemStack transferStackInSlot(@NotNull EntityPlayer playerIn, int index) {
-        return this.containerCustomizer.transferStackInSlot(playerIn, index);
+        ModularSlot slot = getModularSlot(index);
+        if (!slot.isPhantom()) {
+            ItemStack stack = slot.getStack();
+            if (!stack.isEmpty()) {
+                ItemStack copy = stack.copy();
+                stack = stack.copy();
+                int base = 0;
+                if (stack.getCount() > stack.getMaxStackSize()) {
+                    base = stack.getCount() - stack.getMaxStackSize();
+                    stack.setCount(stack.getMaxStackSize());
+                }
+                ItemStack remainder = transferItem(slot, stack.copy());
+                if (ItemStack.areItemStacksEqual(remainder, stack)) return Platform.EMPTY_STACK;
+                if (base == 0 && remainder.isEmpty()) stack = Platform.EMPTY_STACK;
+                else stack.setCount(base + remainder.getCount());
+                slot.putStack(stack);
+                slot.onSlotChange(remainder, copy);
+                slot.onTake(playerIn, remainder);
+                slot.onCraftShiftClick(playerIn, remainder);
+                return copy; // return a non-empty stack if insertion was successful, this causes this function to be called again, important for crafting
+            }
+        }
+        return Platform.EMPTY_STACK;
     }
 
-    public @NotNull ItemStack superTransferStackInSlot(@NotNull EntityPlayer playerIn, int index) {
-        return super.transferStackInSlot(playerIn, index);
-    }
+    protected ItemStack transferItem(ModularSlot fromSlot, ItemStack fromStack) {
+        @Nullable SlotGroup fromSlotGroup = fromSlot.getSlotGroup();
+        // in first iteration only insert into non-empty, non-phantom slots
+        for (ModularSlot toSlot : getShiftClickSlots()) {
+            SlotGroup slotGroup = Objects.requireNonNull(toSlot.getSlotGroup());
+            if (slotGroup != fromSlotGroup && toSlot.isEnabled() && toSlot.isItemValid(fromStack)) {
+                ItemStack toStack = toSlot.getStack().copy();
+                if (!fromSlot.isPhantom() && ItemHandlerHelper.canItemStacksStack(fromStack, toStack)) {
+                    int j = toStack.getCount() + fromStack.getCount();
+                    int maxSize = toSlot.getItemStackLimit(fromStack);//Math.min(toSlot.getSlotStackLimit(), fromStack.getMaxStackSize());
 
-    @Override
-    public boolean canMergeSlot(@NotNull ItemStack stack, @NotNull Slot slotIn) {
-        return this.containerCustomizer.canMergeSlot(stack, slotIn);
-    }
+                    if (j <= maxSize) {
+                        fromStack.setCount(0);
+                        toStack.setCount(j);
+                        toSlot.putStack(toStack);
+                    } else if (toStack.getCount() < maxSize) {
+                        fromStack.shrink(maxSize - toStack.getCount());
+                        toStack.setCount(maxSize);
+                        toSlot.putStack(toStack);
+                    }
 
-    public boolean superCanMergeSlot(@NotNull ItemStack stack, @NotNull Slot slotIn) {
-        return super.canMergeSlot(stack, slotIn);
-    }
+                    if (fromStack.isEmpty()) {
+                        return fromStack;
+                    }
+                }
+            }
+        }
+        boolean hasNonEmptyPhantom = false;
+        // now insert into first empty slot (phantom or not) and check if we have any non-empty phantom slots
+        for (ModularSlot toSlot : getShiftClickSlots()) {
+            ItemStack itemstack = toSlot.getStack();
+            SlotGroup slotGroup = Objects.requireNonNull(toSlot.getSlotGroup());
+            if (slotGroup != fromSlotGroup && toSlot.isEnabled() && toSlot.isItemValid(fromStack)) {
+                if (toSlot.isPhantom()) {
+                    if (!itemstack.isEmpty()) {
+                        // skip non-empty phantom for now
+                        hasNonEmptyPhantom = true;
+                    } else {
+                        toSlot.putStack(fromStack.copy());
+                        return fromStack;
+                    }
+                } else if (itemstack.isEmpty()) {
+                    if (fromStack.getCount() > toSlot.getItemStackLimit(fromStack)) {
+                        toSlot.putStack(fromStack.splitStack(toSlot.getItemStackLimit(fromStack)));
+                    } else {
+                        toSlot.putStack(fromStack.splitStack(fromStack.getCount()));
+                    }
+                    if (fromStack.getCount() < 1) {
+                        break;
+                    }
+                }
+            }
+        }
+        if (!hasNonEmptyPhantom) return fromStack;
 
-    @Override
-    protected boolean mergeItemStack(@NotNull ItemStack stack, int startIndex, int endIndex, boolean reverseDirection) {
-        return this.containerCustomizer.mergeItemStack(stack, startIndex, endIndex, reverseDirection);
-    }
-
-    public boolean superMergeItemStack(@NotNull ItemStack stack, int startIndex, int endIndex, boolean reverseDirection) {
-        return super.mergeItemStack(stack, startIndex, endIndex, reverseDirection);
-    }
-
-    @Override
-    protected void clearContainer(@NotNull EntityPlayer playerIn, @NotNull World worldIn, @NotNull IInventory inventoryIn) {
-        this.containerCustomizer.clearContainer(playerIn, worldIn, inventoryIn);
-    }
-
-    public void superClearContainer(@NotNull EntityPlayer playerIn, @NotNull World worldIn, @NotNull IInventory inventoryIn) {
-        super.clearContainer(playerIn, worldIn, inventoryIn);
+        // now insert into the first phantom slot we can find (will be non-empty)
+        // unfortunately, when all phantom slots are used it will always overwrite the first one
+        for (ModularSlot toSlot : getShiftClickSlots()) {
+            SlotGroup slotGroup = Objects.requireNonNull(toSlot.getSlotGroup());
+            if (slotGroup != fromSlotGroup && toSlot.isPhantom() && toSlot.isEnabled() && toSlot.isItemValid(fromStack)) {
+                // don't check for stackable, just overwrite
+                toSlot.putStack(fromStack.copy());
+                return fromStack;
+            }
+        }
+        return fromStack;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.api.IJsonSerializable;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -7,6 +8,9 @@ import com.cleanroommc.modularui.utils.GameObjectHelper;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widget.Widget;
 
+import net.minecraft.block.Block;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
@@ -17,24 +21,57 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.NoSuchElementException;
 
-public class ItemDrawable implements IDrawable {
+public class ItemDrawable implements IDrawable, IJsonSerializable {
 
     private ItemStack item = ItemStack.EMPTY;
 
-    public ItemDrawable() {
-    }
+    public ItemDrawable() {}
 
     public ItemDrawable(@NotNull ItemStack item) {
-        this.item = item;
+        setItem(item);
+    }
+
+    public ItemDrawable(@NotNull Item item) {
+         setItem(item);
+    }
+
+    public ItemDrawable(@NotNull Item item, int meta) {
+         setItem(item, meta);
+    }
+
+    public ItemDrawable(@NotNull Item item, int meta, int amount) {
+         setItem(item, meta, amount);
+    }
+
+    public ItemDrawable(@NotNull Item item, int meta, int amount, @Nullable NBTTagCompound nbt) {
+        setItem(item, meta, amount, nbt);
+    }
+
+    public ItemDrawable(@NotNull Block item) {
+         setItem(item);
+    }
+
+    public ItemDrawable(@NotNull Block item, int meta) {
+         setItem(item, meta);
+    }
+
+    public ItemDrawable(@NotNull Block item, int meta, int amount) {
+        setItem(new ItemStack(item, amount, meta));
+    }
+
+    public ItemStack getItem() {
+        return item;
     }
 
     @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
-        GuiDraw.drawItem(this.item, x, y, width, height);
+        applyColor(widgetTheme.getColor());
+        GuiDraw.drawItem(this.item, x, y, width, height, context.getCurrentDrawingZ());
     }
 
     @Override
@@ -52,9 +89,40 @@ public class ItemDrawable implements IDrawable {
         return this;
     }
 
+    public ItemDrawable setItem(@NotNull Item item) {
+        return setItem(item, 0, 1, null);
+    }
+
+    public ItemDrawable setItem(@NotNull Item item, int meta) {
+        return setItem(item, meta, 1, null);
+    }
+
+    public ItemDrawable setItem(@NotNull Item item, int meta, int amount) {
+        return setItem(item, meta, amount, null);
+    }
+
+    public ItemDrawable setItem(@NotNull Item item, int meta, int amount, @Nullable NBTTagCompound nbt) {
+        ItemStack itemStack = new ItemStack(item, amount, meta);
+        itemStack.setTagCompound(nbt);
+        return setItem(itemStack);
+    }
+
+    public ItemDrawable setItem(@NotNull Block item) {
+        return setItem(item, 0, 1);
+    }
+
+    public ItemDrawable setItem(@NotNull Block item, int meta) {
+        return setItem(item, meta, 1);
+    }
+
+    public ItemDrawable setItem(@NotNull Block item, int meta, int amount) {
+        return setItem(new ItemStack(item, amount, meta));
+    }
+
     public static ItemDrawable ofJson(JsonObject json) {
         String itemS = JsonHelper.getString(json, null, "item");
         if (itemS == null) throw new JsonParseException("Item property not found!");
+        if (itemS.isEmpty()) return new ItemDrawable();
         String[] parts = itemS.split(":");
         if (parts.length < 2)
             throw new JsonParseException("Item property must have be in the format 'mod:item_name:meta'");
@@ -65,6 +133,8 @@ public class ItemDrawable implements IDrawable {
             } catch (NumberFormatException e) {
                 throw new JsonParseException(e);
             }
+        } else {
+            meta = JsonHelper.getInt(json, 0, "meta");
         }
         ItemStack item;
         try {
@@ -81,5 +151,20 @@ public class ItemDrawable implements IDrawable {
             }
         }
         return new ItemDrawable(item);
+    }
+
+    @Override
+    public boolean saveToJson(JsonObject json) {
+        if (this.item == null || this.item.isEmpty()) {
+            json.addProperty("item", "");
+            return true;
+        }
+        json.addProperty("item", this.item.getItem().getRegistryName().toString());
+        json.addProperty("meta", Items.DIAMOND.getDamage(this.item));
+        if (this.item.hasTagCompound()) {
+            // TODO
+            json.addProperty("nbt", this.item.getTagCompound().toString());
+        }
+        return true;
     }
 }

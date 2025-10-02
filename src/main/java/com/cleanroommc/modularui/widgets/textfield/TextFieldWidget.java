@@ -1,12 +1,9 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.value.IStringValue;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
-import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.utils.ParseResult;
 import com.cleanroommc.modularui.value.StringValue;
@@ -15,7 +12,6 @@ import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.text.ParsePosition;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -31,8 +27,6 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     private boolean numbers = false;
     private String mathFailMessage = null;
     private double defaultNumber = 0;
-
-    protected boolean changedMarkedColor = false;
 
     public double parse(String num) {
         ParseResult result = MathUtils.parseExpression(num, this.defaultNumber, true);
@@ -58,17 +52,6 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         if (!hasTooltip()) {
             tooltipBuilder(tooltip -> tooltip.addLine(IKey.str(getText())));
         }
-        if (!this.changedMarkedColor) {
-            this.renderer.setMarkedColor(getMarkedColor());
-        }
-    }
-
-    public int getMarkedColor() {
-        WidgetTheme theme = getWidgetTheme(getContext().getTheme());
-        if (theme instanceof WidgetTextFieldTheme textFieldTheme) {
-            return textFieldTheme.getMarkedColor();
-        }
-        return ITheme.getDefault().getTextFieldTheme().getMarkedColor();
     }
 
     @Override
@@ -96,16 +79,6 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     @Override
-    public void drawText(ModularGuiContext context) {
-        this.renderer.setSimulate(false);
-        this.renderer.setPos(getArea().getPadding().left, 0);
-        this.renderer.setScale(this.scale);
-        this.renderer.setAlignment(this.textAlignment, -1, getArea().height);
-        this.renderer.draw(this.handler.getText());
-        getScrollData().setScrollSize(Math.max(0, (int) this.renderer.getLastWidth()));
-    }
-
-    @Override
     public void drawForeground(ModularGuiContext context) {
         if (hasTooltip() && getScrollData().isScrollBarActive(getScrollArea()) && isHoveringFor(getTooltip().getShowUpTimer())) {
             getTooltip().draw(getContext());
@@ -128,15 +101,6 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             this.handler.getText().add(text);
         } else {
             this.handler.getText().set(0, text);
-        }
-    }
-
-    @Override
-    public void onFocus(ModularGuiContext context) {
-        super.onFocus(context);
-        Point main = this.handler.getMainCursor();
-        if (main.x == 0) {
-            this.handler.setCursor(main.y, getText().length(), true, true);
         }
     }
 
@@ -170,18 +134,6 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
     public TextFieldWidget setPattern(Pattern pattern) {
         this.handler.setPattern(pattern);
-        return this;
-    }
-
-    public TextFieldWidget setTextColor(int textColor) {
-        this.renderer.setColor(textColor);
-        this.changedTextColor = true;
-        return this;
-    }
-
-    public TextFieldWidget setMarkedColor(int color) {
-        this.renderer.setMarkedColor(color);
-        this.changedMarkedColor = true;
         return this;
     }
 
