@@ -1,10 +1,10 @@
 package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.Interactable;
-import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.value.sync.InteractionSyncHandler;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
@@ -16,8 +16,8 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
 
     public static ButtonWidget<?> panelCloseButton() {
         ButtonWidget<?> buttonWidget = new ButtonWidget<>();
-        return buttonWidget.overlay(GuiTextures.CROSS_TINY)
-                .size(10).top(4).right(4)
+        return buttonWidget.widgetTheme(IThemeApi.CLOSE_BUTTON)
+                .top(4).right(4)
                 .onMousePressed(mouseButton -> {
                     if (mouseButton == 0 || mouseButton == 1) {
                         buttonWidget.getPanel().closeIfOpen();

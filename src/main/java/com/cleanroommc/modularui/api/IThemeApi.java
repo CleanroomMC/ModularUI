@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.api;
 
+import com.cleanroommc.modularui.drawable.DrawableStack;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.theme.SelectableTheme;
@@ -39,6 +40,12 @@ public interface IThemeApi {
     WidgetThemeKey<WidgetTheme> BUTTON = get().widgetThemeKeyBuilder("button", WidgetTheme.class)
             .defaultTheme(WidgetTheme.whiteTextShadow(18, 18, GuiTextures.MC_BUTTON))
             .defaultHoverTheme(WidgetTheme.whiteTextShadow(18, 18, GuiTextures.MC_BUTTON_HOVERED))
+            .register();
+
+    // shouldn't inherit from button -> not a sub theme
+    WidgetThemeKey<WidgetTheme> CLOSE_BUTTON = get().widgetThemeKeyBuilder("close_button", WidgetTheme.class)
+            .defaultTheme(WidgetTheme.whiteTextShadow(10, 10, new DrawableStack(GuiTextures.MC_BUTTON, GuiTextures.CROSS_TINY)))
+            .defaultHoverTheme(WidgetTheme.whiteTextShadow(10, 10, new DrawableStack(GuiTextures.MC_BUTTON_HOVERED, GuiTextures.CROSS_TINY)))
             .register();
 
     WidgetThemeKey<SlotTheme> ITEM_SLOT = get().widgetThemeKeyBuilder("itemSlot", SlotTheme.class)
