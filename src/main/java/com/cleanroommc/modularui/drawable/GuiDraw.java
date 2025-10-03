@@ -43,7 +43,18 @@ public class GuiDraw {
     public static final double PI_2 = Math.PI / 2;
 
     public static void drawRect(float x0, float y0, float w, float h, int color) {
-        drawRect(x0, y0, w, h, color, color, color, color);
+        Platform.setupDrawColor();
+        float x1 = x0 + w, y1 = y0 + h;
+        float r = Color.getRedF(color);
+        float g = Color.getGreenF(color);
+        float b = Color.getBlueF(color);
+        float a = Color.getAlphaF(color);
+        Platform.startDrawing(Platform.DrawMode.QUADS, Platform.VertexFormat.POS_COLOR, bufferBuilder -> {
+            bufferBuilder.pos(x0, y0, 0.0f).color(r, g, b, a).endVertex();
+            bufferBuilder.pos(x0, y1, 0.0f).color(r, g, b, a).endVertex();
+            bufferBuilder.pos(x1, y1, 0.0f).color(r, g, b, a).endVertex();
+            bufferBuilder.pos(x1, y0, 0.0f).color(r, g, b, a).endVertex();
+        });
     }
 
     public static void drawHorizontalGradientRect(float x0, float y0, float w, float h, int colorLeft, int colorRight) {
