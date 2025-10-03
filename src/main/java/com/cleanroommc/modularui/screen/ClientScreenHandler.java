@@ -420,17 +420,14 @@ public class ClientScreenHandler {
         GlStateManager.disableDepth();
         // mainly for invtweaks compat
         drawVanillaElements(mcScreen, mouseX, mouseY, partialTicks);
-        GlStateManager.pushMatrix();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager.enableRescaleNormal();
         acc.setHoveredSlot(null);
+        GlStateManager.pushMatrix();
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
         GlStateManager.enableRescaleNormal();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         RenderHelper.disableStandardItemLighting();
         acc.invokeDrawGuiContainerForegroundLayer(mouseX, mouseY);
         muiScreen.drawForeground();
-        RenderHelper.enableGUIStandardItemLighting();
 
         acc.setHoveredSlot(null);
         IGuiElement hovered = muiScreen.getContext().getHovered();

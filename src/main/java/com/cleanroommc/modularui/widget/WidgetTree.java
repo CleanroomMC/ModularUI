@@ -139,11 +139,10 @@ public class WidgetTree {
         GlStateManager.pushMatrix();
         context.applyToOpenGl();
 
+        GlStateManager.colorMask(true, true, true, true);
         if (canBeSeen) {
             // draw widget
-            GlStateManager.colorMask(true, true, true, true);
             GlStateManager.color(1f, 1f, 1f, alpha);
-            GlStateManager.enableBlend();
             WidgetThemeEntry<?> widgetTheme = parent.getWidgetTheme(context.getTheme());
             if (drawBackground) parent.drawBackground(context, widgetTheme);
             parent.draw(context, widgetTheme);
@@ -154,7 +153,6 @@ public class WidgetTree {
             if (canBeSeen) {
                 // draw viewport without children transformation
                 GlStateManager.color(1f, 1f, 1f, alpha);
-                GlStateManager.enableBlend();
                 viewport.preDraw(context, false);
                 GlStateManager.popMatrix();
                 // apply children transformation of the viewport
@@ -191,7 +189,6 @@ public class WidgetTree {
             if (canBeSeen) {
                 // apply opengl transformations again and draw
                 GlStateManager.color(1f, 1f, 1f, alpha);
-                GlStateManager.enableBlend();
                 GlStateManager.pushMatrix();
                 context.applyToOpenGl();
                 viewport.postDraw(context, true);
@@ -234,7 +231,6 @@ public class WidgetTree {
         // draw widget
         GlStateManager.colorMask(true, true, true, true);
         GlStateManager.color(1f, 1f, 1f, alpha);
-        GlStateManager.enableBlend();
         WidgetThemeEntry<?> widgetTheme = parent.getWidgetTheme(context.getTheme());
         parent.drawBackground(context, widgetTheme);
 
