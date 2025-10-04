@@ -3,7 +3,6 @@ package com.cleanroommc.modularui.widgets;
 import com.cleanroommc.modularui.api.widget.ISynced;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.widget.ParentWidget;
-
 import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 
 import it.unimi.dsi.fastutil.chars.Char2IntMap;
@@ -33,11 +32,11 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
         return widget;
     }
 
-        /**
-         * Automatically creates and places the player inventory.
-         *
-         * @return player inventory group
-         */
+    /**
+     * Automatically creates and places the player inventory.
+     *
+     * @return player inventory group
+     */
     public static SlotGroupWidget playerInventory(SlotConsumer slotConsumer) {
         SlotGroupWidget slotGroupWidget = new SlotGroupWidget();
         slotGroupWidget.coverChildren();
@@ -59,7 +58,8 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
     }
 
     public interface SlotConsumer {
-        ItemSlot apply(int index, ItemSlot slot);
+
+        ItemSlot apply(int index, ItemSlot widgetSlot);
     }
 
     private String slotsKeyName;
