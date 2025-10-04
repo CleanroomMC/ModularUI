@@ -56,7 +56,7 @@ public class TestItem extends Item implements IGuiHolder<PlayerInventoryGuiData>
 
         // if the player slot is the slot with this item, then disallow any interaction
         // if the item is not in the player inventory (bauble for example), then this items slot is not on the screen, and we don't need to
-        // accessibility
+        // limit accessibility
         if (guiData.getInventoryType() == InventoryTypes.PLAYER) {
             guiSyncManager.bindPlayerInventory(guiData.getPlayer(), (inv, index) -> index == guiData.getSlotIndex() ?
                     new ModularSlot(inv, index).accessibility(false, false) :
