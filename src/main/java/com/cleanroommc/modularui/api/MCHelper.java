@@ -5,10 +5,10 @@ import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.drawable.IKey;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fluids.Fluid;
@@ -33,7 +33,7 @@ public class MCHelper {
         return Minecraft.getMinecraft();
     }
 
-    public static @Nullable EntityPlayerSP getPlayer() {
+    public static @Nullable EntityPlayer getPlayer() {
         if (hasMc()) {
             return getMc().player;
         }
@@ -42,7 +42,7 @@ public class MCHelper {
 
     public static boolean closeScreen() {
         if (!hasMc()) return false;
-        EntityPlayerSP player = getPlayer();
+        EntityPlayer player = getPlayer();
         if (player != null) {
             player.closeScreen();
             return true;

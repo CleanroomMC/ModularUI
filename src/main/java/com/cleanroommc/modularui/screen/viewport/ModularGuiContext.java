@@ -17,8 +17,8 @@ import com.cleanroommc.modularui.screen.RecipeViewerSettingsImpl;
 import com.cleanroommc.modularui.screen.UISettings;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.entity.player.EntityPlayer;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -255,7 +255,7 @@ public class ModularGuiContext extends GuiContext {
     }
 
     public boolean isMouseItemEmpty() {
-        EntityPlayerSP player = MCHelper.getPlayer();
+        EntityPlayer player = MCHelper.getPlayer();
         return player == null || player.inventory.getItemStack().isEmpty();
     }
 
