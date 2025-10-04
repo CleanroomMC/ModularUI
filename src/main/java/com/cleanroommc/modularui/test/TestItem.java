@@ -60,7 +60,8 @@ public class TestItem extends Item implements IGuiHolder<PlayerInventoryGuiData>
                                 .row("II")
                                 .key('I', index -> new ItemSlot().slot(SyncHandlers.itemSlot(itemHandler, index)
                                         .ignoreMaxStackSize(true)
-                                        .slotGroup("mixer_items")))
+                                        .slotGroup("mixer_items")
+                                        .filter(stack -> !stack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null))))
                                 .build()
                                 .align(Alignment.Center)))
                 .child(SlotGroupWidget.playerInventory(false)));
