@@ -43,9 +43,9 @@ public interface IThemeApi {
             .register();
 
     // shouldn't inherit from button -> not a sub theme
-    WidgetThemeKey<WidgetTheme> CLOSE_BUTTON = get().widgetThemeKeyBuilder("close_button", WidgetTheme.class)
-            .defaultTheme(WidgetTheme.whiteTextShadow(10, 10, new DrawableStack(GuiTextures.MC_BUTTON, GuiTextures.CROSS_TINY)))
-            .defaultHoverTheme(WidgetTheme.whiteTextShadow(10, 10, new DrawableStack(GuiTextures.MC_BUTTON_HOVERED, GuiTextures.CROSS_TINY)))
+    WidgetThemeKey<WidgetTheme> CLOSE_BUTTON = get().widgetThemeKeyBuilder("closeButton", WidgetTheme.class)
+            .defaultTheme(WidgetTheme.whiteTextShadow(10, 10, GuiTextures.MC_BUTTON))
+            .defaultHoverTheme(WidgetTheme.whiteTextShadow(10, 10, GuiTextures.MC_BUTTON_HOVERED))
             .register();
 
     WidgetThemeKey<SlotTheme> ITEM_SLOT = get().widgetThemeKeyBuilder("itemSlot", SlotTheme.class)
