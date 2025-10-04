@@ -23,7 +23,11 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -90,10 +94,8 @@ public class PanelSyncManager {
     @ApiStatus.Internal
     public void onClose() {
         this.closeListener.forEach(listener -> listener.accept(getPlayer()));
-        for (String name : this.subPanels.keySet()) {
-            SyncHandler sh = this.getModularSyncManager().getMainPSM().syncHandlers.remove(name);
-            this.getModularSyncManager().getMainPSM().reverseSyncHandlers.remove(sh);
-        }
+        // previously panel sync handlers were removed from the main psm, however this problematic if the screen will be reopened at some
+        // we can just not remove the sync handlers since mui has proper checks for re-registering panels
     }
 
     public boolean isInitialised() {

@@ -1,8 +1,6 @@
 package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.network.NetworkUtils;
-import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import com.cleanroommc.bogosorter.api.ISortingContextBuilder;
@@ -63,9 +61,7 @@ public class ModularSyncManager {
     }
 
     public void onClose() {
-        if (NetworkUtils.isClient() && ClientScreenHandler.guiIsClosing) {
-            this.panelSyncManagerMap.values().forEach(PanelSyncManager::onClose);
-        }
+        this.panelSyncManagerMap.values().forEach(PanelSyncManager::onClose);
     }
 
     public void onOpen() {
