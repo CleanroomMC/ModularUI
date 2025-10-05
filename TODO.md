@@ -21,6 +21,7 @@
 
 ## Low Priority
 
+- [ ]  SVG compiler and renderer (for no reason)
 - [ ]  Config lib
 - [ ]  Keybind api
 - [x]  properly add modularui elements to any gui screen (possible with overlays currently)
