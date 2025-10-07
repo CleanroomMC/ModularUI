@@ -427,7 +427,7 @@ public class ClientScreenHandler {
         muiScreen.drawForeground();
 
         acc.setHoveredSlot(null);
-        IGuiElement hovered = muiScreen.getContext().getHovered();
+        IGuiElement hovered = muiScreen.getContext().getTopHovered();
         if (hovered instanceof IVanillaSlot vanillaSlot && vanillaSlot.handleAsVanillaSlot()) {
             acc.setHoveredSlot(vanillaSlot.getVanillaSlot());
         }

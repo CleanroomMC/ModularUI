@@ -471,7 +471,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         page.child(IKey.str("schema").asWidget());
         if (world.isRemote)
             page.child(new SchemaWidget(new SchemaRenderer(ArraySchema.of(data.getPlayer(), 5))
-                    .highlightRenderer(new BlockHighlight(Color.withAlpha(Color.GREEN.brighter(1), 0.9f), 1/32f)))
+                    .highlightRenderer(new BlockHighlight(Color.withAlpha(Color.GREEN.brighter(1), 0.9f), 1 / 32f)))
                     .pos(20, 20)
                     .size(100, 100));
         return page;
@@ -598,11 +598,13 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
 
         @Override
         public void onMouseStartHover() {
+            super.onMouseStartHover();
             this.animatedKey.startAnimation().forward(true);
         }
 
         @Override
         public void onMouseEndHover() {
+            super.onMouseEndHover();
             this.animatedKey.forward(false);
         }
     }

@@ -108,6 +108,11 @@ public class TextWidget<W extends TextWidget<W>> extends Widget<W> {
         return Math.max(1, (int) Math.ceil(actualTextHeight + padding.vertical()));
     }
 
+    @Override
+    public boolean canHoverThrough() {
+        return true;
+    }
+
     /**
      * Makes sure the used text for {@link #getDefaultWidth()} and {@link #getDefaultHeight()} is always the same.
      * Also sets the last rendered text.

@@ -53,6 +53,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     // other
     @Nullable private String debugName;
     private boolean enabled = true;
+    private int timeHovered = -1;
     private boolean excludeAreaInRecipeViewer = false;
     // gui context
     private boolean valid = false;
@@ -93,6 +94,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @ApiStatus.Internal
     @Override
     public final void initialise(@NotNull IWidget parent, boolean late) {
+        this.timeHovered = -1;
         if (!(this instanceof ModularPanel)) {
             this.parent = parent;
             this.panel = parent.getPanel();
@@ -183,6 +185,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
             this.parent = null;
             this.context = null;
         }
+        this.timeHovered = -1;
         this.valid = false;
     }
 
@@ -526,6 +529,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @MustBeInvokedByOverriders
     @Override
     public void onUpdate() {
+        if (isHovering()) this.timeHovered++;
         if (this.onUpdateListener != null) {
             this.onUpdateListener.accept(getThis());
         }
@@ -890,6 +894,32 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     public W disabled() {
         setEnabled(false);
         return getThis();
+    }
+
+    @MustBeInvokedByOverriders
+    @Override
+    public void onMouseStartHover() {
+        this.timeHovered = 0;
+    }
+
+    @MustBeInvokedByOverriders
+    @Override
+    public void onMouseEndHover() {
+        this.timeHovered = -1;
+    }
+
+    @Override
+    public boolean isHovering() {
+        return timeHovered >= 0;
+    }
+
+    @Override
+    public boolean isHoveringFor(int ticks) {
+        return timeHovered >= ticks;
+    }
+
+    public int getTicksHovered() {
+        return timeHovered;
     }
 
     @Override

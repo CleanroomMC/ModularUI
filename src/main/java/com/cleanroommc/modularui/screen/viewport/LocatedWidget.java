@@ -4,10 +4,15 @@ import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
 
+import it.unimi.dsi.fastutil.Hash;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class LocatedWidget extends LocatedElement<IWidget> {
+
+    public static final Hash.Strategy<LocatedWidget> HASH_STRATEGY = new HashStrategy();
 
     private static final GuiViewportStack STACK = new GuiViewportStack();
 
@@ -56,5 +61,20 @@ public class LocatedWidget extends LocatedElement<IWidget> {
     @Override
     public String toString() {
         return "LocatedWidget[" + getElement() + " | " + additionalHoverInfo + "]";
+    }
+
+    public static class HashStrategy implements Hash.Strategy<LocatedWidget> {
+
+        @Override
+        public int hashCode(LocatedWidget o) {
+            return Objects.hashCode(o == null ? null : o.getElement());
+        }
+
+        @Override
+        public boolean equals(LocatedWidget a, LocatedWidget b) {
+            if (a == b) return true;
+            if (a == null || b == null) return false;
+            return Objects.equals(a.getElement(), b.getElement());
+        }
     }
 }

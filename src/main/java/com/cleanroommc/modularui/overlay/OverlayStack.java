@@ -60,7 +60,7 @@ public class OverlayStack {
             screen.drawScreen();
             GlStateManager.color(1f, 1f, 1f, 1f);
             screen.drawForeground();
-            if (screen.getContext().getHovered() != null) hovered = screen;
+            if (screen.getContext().isHovered()) hovered = screen;
             fallback = screen;
         }
         ClientScreenHandler.drawDebugScreen(hovered, fallback);
@@ -96,7 +96,7 @@ public class OverlayStack {
     public static IGuiElement getHoveredElement() {
         for (int i = overlay.size() - 1; i >= 0; i--) {
             ModularScreen screen = overlay.get(i);
-            IGuiElement hovered = screen.getContext().getHovered();
+            IGuiElement hovered = screen.getContext().getTopHovered();
             if (hovered == null) continue;
             return hovered;
         }

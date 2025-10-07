@@ -14,7 +14,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public class PanelManager {
@@ -138,6 +142,16 @@ public class PanelManager {
             }
         }
         return null;
+    }
+
+    public @NotNull List<LocatedWidget> getAllHoveredWidgetsList(boolean debug) {
+        for (ModularPanel panel : this.panels) {
+            List<LocatedWidget> widgets = panel.getAllHoveringList(debug);
+            if (widgets != null) {
+                return widgets;
+            }
+        }
+        return Collections.emptyList();
     }
 
     @ApiStatus.Internal

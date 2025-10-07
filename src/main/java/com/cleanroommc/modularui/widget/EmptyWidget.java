@@ -17,6 +17,7 @@ public class EmptyWidget implements IWidget {
     private final Area area = new Area();
     private final Flex flex = new Flex(this);
     private boolean requiresResize = false;
+    private boolean enabled = true;
     private IWidget parent;
 
     @Override
@@ -66,7 +67,7 @@ public class EmptyWidget implements IWidget {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 
     @Override
@@ -85,11 +86,23 @@ public class EmptyWidget implements IWidget {
     }
 
     @Override
-    public void setEnabled(boolean enabled) {}
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
     @Override
     public boolean canBeSeen(IViewportStack stack) {
         return false;
+    }
+
+    @Override
+    public boolean canHover() {
+        return false;
+    }
+
+    @Override
+    public boolean canHoverThrough() {
+        return true;
     }
 
     @Override

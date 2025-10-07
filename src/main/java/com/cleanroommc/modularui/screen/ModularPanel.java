@@ -36,6 +36,7 @@ import com.cleanroommc.neverenoughanimations.NEAConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 
+import it.unimi.dsi.fastutil.objects.ObjectListIterator;
 import mezz.jei.gui.ghost.GhostIngredientDrag;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -199,7 +200,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     private void findHoveredWidgets() {
         this.hovering.clear();
-        this.hovering.trim();
         if (!isEnabled()) {
             return;
         }
@@ -683,7 +683,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         while (i < this.hovering.size()) {
             LocatedWidget widget = this.hovering.get(i);
             if (!widget.getElement().isValid()) {
-                this.hovering.remove(i);
+                this.hovering.remove(i--);
                 continue;
             }
             if (debug || widget.getElement().canHover()) {
@@ -692,6 +692,26 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             i++;
         }
         return null;
+    }
+
+    public List<LocatedWidget> getAllHoveringList(boolean debug) {
+        List<LocatedWidget> hovering = new ArrayList<>();
+        for (ObjectListIterator<LocatedWidget> iterator = this.hovering.iterator(); iterator.hasNext(); ) {
+            LocatedWidget lw = iterator.next();
+            if (!lw.getElement().isValid()) {
+                iterator.remove();
+                continue;
+            }
+            if (debug) {
+                hovering.add(lw);
+                continue;
+            }
+            if (lw.getElement().canHover()) {
+                hovering.add(lw);
+                if (!lw.getElement().canHoverThrough()) break;
+            }
+        }
+        return hovering;
     }
 
     final void setPanelGuiContext(@NotNull ModularGuiContext context) {

@@ -83,7 +83,7 @@ public class ModularScreenJEIHandler<T extends GuiScreen & IMuiScreen> implement
         @Nullable
         @Override
         public Object getIngredientUnderMouse(@NotNull T guiContainer, int mouseX, int mouseY) {
-            IGuiElement hovered = guiContainer.getScreen().getContext().getHovered();
+            IGuiElement hovered = guiContainer.getScreen().getContext().getTopHovered();
             return hovered instanceof RecipeViewerIngredientProvider jip ? jip.getIngredient() : null;
         }
     }

@@ -190,7 +190,8 @@ public class SortableListWidget<T> extends ListValueWidget<T, SortableListWidget
         @Override
         public void onDrag(int mouseButton, long timeSinceLastClick) {
             super.onDrag(mouseButton, timeSinceLastClick);
-            IWidget hovered = getContext().getHovered();
+            // TODO this kind of assumes the hovered is in bounds of the parent Item, which may not be true.
+            IWidget hovered = getContext().getTopHovered();
             SortableListWidget.Item<?> item = WidgetTree.findParent(hovered, Item.class);
             if (item != null && item != this && item.listWidget == this.listWidget) {
                 this.listWidget.moveTo(this.index, item.index);
@@ -198,8 +199,7 @@ public class SortableListWidget<T> extends ListValueWidget<T, SortableListWidget
         }
 
         @Override
-        public void onDragEnd(boolean successful) {
-        }
+        public void onDragEnd(boolean successful) {}
 
         @Override
         public T getWidgetValue() {
