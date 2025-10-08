@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -317,6 +318,9 @@ public class WidgetTree {
         }
 
         if (!alreadyCalculated) {
+            // we need to keep track of which widgets are not yet fully calculated, so we can call onResized ont those which later are
+            // fully calculated
+            BitSet state = getCalculatedState(anotherResize);
             if (widget instanceof ILayoutWidget layoutWidget) {
                 layoutWidget.layoutWidgets();
             }
@@ -329,6 +333,7 @@ public class WidgetTree {
             if (widget instanceof ILayoutWidget layoutWidget) {
                 layoutWidget.postLayoutWidgets();
             }
+            checkFullyCalculated(anotherResize, state);
         }
 
         // now fully resize all children which needs it
@@ -339,6 +344,29 @@ public class WidgetTree {
         if (result && !alreadyCalculated) widget.onResized();
 
         return result && anotherResize.isEmpty();
+    }
+
+    private static BitSet getCalculatedState(List<IWidget> children) {
+        if (children.isEmpty()) return null;
+        BitSet state = new BitSet();
+        for (int i = 0; i < children.size(); i++) {
+            IWidget widget = children.get(i);
+            if (widget.resizer().isFullyCalculated()) {
+                state.set(i);
+            }
+        }
+        return state;
+    }
+
+    private static void checkFullyCalculated(List<IWidget> children, BitSet state) {
+        if (children.isEmpty() || state == null) return;
+        for (int i = 0; i < children.size(); i++) {
+            IWidget widget = children.get(i);
+            if (!state.get(i) && widget.resizer().isFullyCalculated()) {
+                widget.onResized();
+                state.set(i);
+            }
+        }
     }
 
     public static void applyPos(IWidget parent) {
