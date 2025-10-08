@@ -11,6 +11,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
+import java.util.Locale;
 import java.util.function.ToIntFunction;
 
 /**
@@ -745,6 +746,66 @@ public class Color {
     public static void resetGlColor() {
         GlStateManager.colorMask(true, true, true, true);
         setGlColorOpaque(WHITE.main);
+    }
+
+    /**
+     * Returns a six digit hex string representation of a color component with upper case letters. Alpha is ignored.
+     *
+     * @param rgb rgb color
+     * @return hex string representation
+     */
+    public static String rgbToFullHexString(int rgb) {
+        return toFullHexString(getRed(rgb), getGreen(rgb), getBlue(rgb));
+    }
+
+    /**
+     * Returns an eight digit hex string representation of a color component with upper case letters.
+     *
+     * @param argb argb color
+     * @return hex string representation
+     */
+    public static String argbToFullHexString(int argb) {
+        return toFullHexString(getRed(argb), getGreen(argb), getBlue(argb), getAlpha(argb));
+    }
+
+    /**
+     * Returns a six digit hex string representation of a color component with upper case letters.
+     *
+     * @param r red
+     * @param g green
+     * @param b blue
+     * @return hex string representation
+     */
+    public static String toFullHexString(int r, int g, int b) {
+        return componentToFullHexString(r) + componentToFullHexString(g) + componentToFullHexString(b);
+    }
+
+    /**
+     * Returns an eight digit hex string representation of a color component with upper case letters.
+     *
+     * @param r red
+     * @param g green
+     * @param b blue
+     * @param a alpha
+     * @return hex string representation
+     */
+    public static String toFullHexString(int r, int g, int b, int a) {
+        return componentToFullHexString(a) + toFullHexString(r, g, b);
+    }
+
+    /**
+     * Returns a double-digit hex string representation of a color component with upper case letters.
+     *
+     * @param component red, green, blue or alpha
+     * @return hex string representation
+     */
+    public static String componentToFullHexString(int component) {
+        component &= 0xFF;
+        if (component == 0) return "00";
+        if (component == 255) return "FF";
+        String s = Integer.toHexString(component).toUpperCase(Locale.ENGLISH);
+        if (s.length() == 1) s = "0" + s;
+        return s;
     }
 
     /**
