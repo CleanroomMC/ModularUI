@@ -76,7 +76,7 @@ public class ScrollArea extends Area {
 
     @SideOnly(Side.CLIENT)
     public boolean mouseClicked(GuiContext context) {
-        return this.mouseClicked(context.getAbsMouseX(), context.getAbsMouseY());
+        return this.mouseClicked(context.getMouseX(), context.getMouseY());
     }
 
     /**
@@ -94,7 +94,7 @@ public class ScrollArea extends Area {
 
     @SideOnly(Side.CLIENT)
     public boolean mouseScroll(GuiContext context) {
-        return this.mouseScroll(context.getAbsMouseX(), context.getAbsMouseY(), context.getMouseWheel(), GuiScreen.isShiftKeyDown());
+        return this.mouseScroll(context.getMouseX(), context.getMouseY(), context.getMouseWheel(), GuiScreen.isShiftKeyDown());
     }
 
     /**

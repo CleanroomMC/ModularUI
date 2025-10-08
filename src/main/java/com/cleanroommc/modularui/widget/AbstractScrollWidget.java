@@ -116,6 +116,7 @@ public abstract class AbstractScrollWidget<I extends IWidget, W extends Abstract
     public void onUpdate() {
         super.onUpdate();
         checkScrollbarActive(false);
+        // use abs mouse here since viewport stack is not transformed here // TODO will this cause issues in some cases
         this.scroll.drag(getContext().getAbsMouseX(), getContext().getAbsMouseY());
     }
 
