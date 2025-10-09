@@ -48,7 +48,8 @@ public class GLTestGui extends CustomModularScreen {
         this.ro1.lighting = Lighting.GUI_ITEM;
         this.ro1.texture = true;
         return new ModularPanel("gl_test")
-                .size(250)
+                .width(250)
+                .height(200)
                 .padding(7)
                 .child(Flow.column()
                         .debugName("main col")
@@ -87,6 +88,7 @@ public class GLTestGui extends CustomModularScreen {
                 .child(new SliderWidget()
                         .widthRel(1f)
                         .height(14)
+                        .overlay(IKey.str("Z-Layer"))
                         .bounds(140, 180)
                         .value(new DoubleValue.Dynamic(() -> ro.zLevel, val -> ro.zLevel = (float) val)))
                 .child(Flow.row()
@@ -125,7 +127,7 @@ public class GLTestGui extends CustomModularScreen {
         return ((IDrawable) (context, x, y, width, height, widgetTheme) -> {
             ro1.draw(context, x, y, width, height, widgetTheme);
             ro2.draw(context, x, y, width, height, widgetTheme);
-        }).asIcon().size(50).asWidget();
+        }).asIcon().size(100).asWidget();
     }
 
     private static void drawItem(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
