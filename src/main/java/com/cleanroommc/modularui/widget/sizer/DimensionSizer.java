@@ -309,7 +309,7 @@ public class DimensionSizer {
     }
 
     private int calcSize(Unit s, Box padding, int parentSize, boolean parentSizeCalculated) {
-        if (this.coverChildren) return 18; // placeholder value
+        if (this.coverChildren || this.expanded) return 18; // placeholder value, size is calculated externally
         float val = s.getValue();
         if (s.isRelative()) {
             if (!parentSizeCalculated) return (int) val;

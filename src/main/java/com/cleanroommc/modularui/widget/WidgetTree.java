@@ -310,7 +310,7 @@ public class WidgetTree {
         if (widget.hasChildren()) {
             anotherResize = new ArrayList<>();
             for (IWidget child : widget.getChildren()) {
-                if (init && expandAxis != null) child.flex().checkExpanded(expandAxis);
+                if (init) child.flex().checkExpanded(expandAxis);
                 if (!resizeWidget(child, init, onOpen)) {
                     anotherResize.add(child);
                 }

@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
-import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.Rectangle;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
@@ -45,27 +44,35 @@ public class GLTestGui extends CustomModularScreen {
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {
         this.ro1 = new RenderObject();
         this.ro2 = new RenderObject();
+        this.ro1.type = Type.ITEM;
+        this.ro1.lighting = Lighting.GUI_ITEM;
+        this.ro1.texture = true;
         return new ModularPanel("gl_test")
                 .size(250)
                 .padding(7)
                 .child(Flow.column()
+                        .debugName("main col")
                         .child(Flow.row()
+                                .debugName("config row")
                                 .fullWidth()
                                 .coverChildrenHeight()
                                 .child(buildRenderObjectConfig(this.ro1)
-                                        .marginRight(2))
+                                        .debugName("config left col"))
                                 .child(new Rectangle().setColor(Color.TEXT_COLOR_DARK).asWidget()
+                                        .debugName("separator")
                                         .width(1)
+                                        .margin(2, 0)
                                         .fullHeight())
                                 .child(buildRenderObjectConfig(this.ro2)
-                                        .marginLeft(2)))
-                        .child(createPreview().expanded()));
+                                        .debugName("config right col")))
+                        .child(createPreview().expanded().fullWidth().debugName("preview")));
 
     }
 
     private Flow buildRenderObjectConfig(RenderObject ro) {
         return Flow.column()
-                .widthRel(0.5f)
+                //.widthRel(0.5f)
+                .expanded()
                 .coverChildrenHeight()
                 .child(new CycleButtonWidget()
                         .value(new EnumValue.Dynamic<>(Type.class, () -> ro.type, val -> ro.type = val))
@@ -159,21 +166,24 @@ public class GLTestGui extends CustomModularScreen {
             GlStateManager.pushMatrix();
             GlStateManager.translate(0, 0, zLevel);
             if (depth) GlStateManager.enableDepth();
+            else GlStateManager.disableDepth();
             if (blend) GlStateManager.enableBlend();
+            else GlStateManager.disableBlend();
             if (texture) GlStateManager.enableTexture2D();
+            else GlStateManager.disableTexture2D();
             lighting.enable.run();
             type.render.draw(context, x, y, width, height, widgetTheme);
             lighting.disable.run();
-            if (texture) GlStateManager.disableTexture2D();
-            if (blend) GlStateManager.disableBlend();
-            if (depth) GlStateManager.disableDepth();
+            GlStateManager.disableTexture2D();
+            GlStateManager.disableBlend();
+            GlStateManager.disableDepth();
             GlStateManager.popMatrix();
         }
     }
 
     private enum Type {
-        NONE((ctx, x, y, w, h, wt) -> {}),
-        TEXTURE((ctx, x, y, w, h, wt) -> GuiDraw.drawTexture(x, y, w, h, 0f, 0f, 1f, 1f)),
+        NONE(IDrawable.EMPTY),
+        TEXTURE(GuiTextures.MUI_LOGO),
         ITEM(GLTestGui::drawItem),
         COLOR(GLTestGui::drawColor);
 
@@ -183,7 +193,7 @@ public class GLTestGui extends CustomModularScreen {
     }
 
     private enum Lighting {
-        NONE(() -> {}, () -> {}),
+        NONE(GlStateManager::disableLighting, GlStateManager::disableLighting),
         NORMAL(GlStateManager::enableLighting, GlStateManager::disableLighting),
         STANDARD(RenderHelper::enableStandardItemLighting, RenderHelper::disableStandardItemLighting),
         GUI_ITEM(RenderHelper::enableGUIStandardItemLighting, RenderHelper::disableStandardItemLighting);

@@ -13,6 +13,7 @@ import com.cleanroommc.modularui.utils.Alignment;
 import net.minecraft.inventory.Slot;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.DoubleSupplier;
@@ -326,9 +327,13 @@ public class Flex implements IResizeable, IPositioned<Flex> {
     }
 
     @ApiStatus.Internal
-    public void checkExpanded(GuiAxis axis) {
-        if (axis.isHorizontal()) this.x.setExpanded(this.expanded);
-        else this.y.setExpanded(this.expanded);
+    public void checkExpanded(@Nullable GuiAxis axis) {
+        this.x.setExpanded(false);
+        this.y.setExpanded(false);
+        if (this.expanded && axis != null) {
+            if (axis.isHorizontal()) this.x.setExpanded(true);
+            else this.y.setExpanded(true);
+        }
     }
 
     @Override
