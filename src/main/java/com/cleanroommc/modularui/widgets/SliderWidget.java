@@ -202,6 +202,9 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     public SliderWidget bounds(double min, double max) {
         this.max = Math.max(min, max);
         this.min = Math.min(min, max);
+        if (isValid()) {
+            setValue(getSliderValue(), true);
+        }
         return this;
     }
 
