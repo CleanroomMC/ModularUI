@@ -23,6 +23,7 @@ public class TextWidget<W extends TextWidget<W>> extends Widget<W> {
     private IntSupplier color = null;
     private Boolean shadow = null;
     private float scale = 1f;
+    private int maxWidth = -1;
 
     private String lastText = null;
     private String textForDefaultSize = null;
@@ -79,6 +80,8 @@ public class TextWidget<W extends TextWidget<W>> extends Widget<W> {
         float maxWidth;
         if (resizer().isWidthCalculated()) {
             maxWidth = getArea().width + this.scale;
+        } else if (this.maxWidth > 0) {
+            maxWidth = Math.max(this.maxWidth, 5);
         } else if (getParent().resizer().isWidthCalculated()) {
             maxWidth = getParent().getArea().width + this.scale;
         } else {
@@ -90,9 +93,13 @@ public class TextWidget<W extends TextWidget<W>> extends Widget<W> {
 
     @Override
     public int getDefaultWidth() {
-        float maxWidth = getScreen().getScreenArea().width;
-        if (getParent().resizer().isWidthCalculated()) {
+        float maxWidth;
+        if (this.maxWidth > 0) {
+            maxWidth = Math.max(this.maxWidth, 5);
+        } else if (getParent().resizer().isWidthCalculated()) {
             maxWidth = getParent().getArea().width;
+        } else {
+            maxWidth = getScreen().getScreenArea().width;
         }
         TextRenderer renderer = simulate(maxWidth);
         return getWidgetWidth(renderer.getLastActualWidth());
@@ -176,6 +183,11 @@ public class TextWidget<W extends TextWidget<W>> extends Widget<W> {
 
     public W style(TextFormatting formatting) {
         this.key.style(formatting);
+        return getThis();
+    }
+
+    public W maxWidth(int maxWidth) {
+        this.maxWidth = maxWidth;
         return getThis();
     }
 }
