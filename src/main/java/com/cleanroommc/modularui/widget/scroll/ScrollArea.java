@@ -101,11 +101,6 @@ public class ScrollArea extends Area {
      * This method should be invoked when mouse wheel is scrolling
      */
     public boolean mouseScroll(int x, int y, int scroll, boolean shift) {
-        if (!isInside(x, y)) {
-            // not hovering TODO: this shouldnt be required
-            return false;
-        }
-
         ScrollData data;
         if (this.scrollX != null) {
             data = this.scrollY == null || shift ? this.scrollX : this.scrollY;
@@ -138,7 +133,7 @@ public class ScrollArea extends Area {
 
     @SideOnly(Side.CLIENT)
     public void mouseReleased(GuiContext context) {
-        this.mouseReleased(context.getAbsMouseX(), context.getAbsMouseY());
+        this.mouseReleased(context.getMouseX(), context.getMouseY());
     }
 
     /**

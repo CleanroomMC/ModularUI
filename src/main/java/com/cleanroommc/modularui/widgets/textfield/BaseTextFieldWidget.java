@@ -204,6 +204,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
 
     @Override
     public void onMouseDrag(int mouseButton, long timeSinceClick) {
+        super.onMouseDrag(mouseButton, timeSinceClick);
         if (isFocused() && !getScrollArea().isDragging()) {
             int x = getContext().getMouseX() + getScrollX();
             int y = getContext().getMouseY() + getScrollY();

@@ -102,22 +102,25 @@ public abstract class AbstractScrollWidget<I extends IWidget, W extends Abstract
     }
 
     @Override
-    public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
-        return this.scroll.mouseScroll(getContext());
-    }
-
-    @Override
     public boolean onMouseRelease(int mouseButton) {
         this.scroll.mouseReleased(getContext());
         return false;
     }
 
     @Override
+    public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
+        return this.scroll.mouseScroll(getContext());
+    }
+
+    @Override
+    public void onMouseDrag(int mouseButton, long timeSinceClick) {
+        this.scroll.drag(getContext().getMouseX(), getContext().getMouseY());
+    }
+
+    @Override
     public void onUpdate() {
         super.onUpdate();
         checkScrollbarActive(false);
-        // use abs mouse here since viewport stack is not transformed here // TODO will this cause issues in some cases
-        this.scroll.drag(getContext().getAbsMouseX(), getContext().getAbsMouseY());
     }
 
     @Override
