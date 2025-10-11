@@ -479,6 +479,9 @@ public class ModularGuiContext extends GuiContext {
             throw new IllegalStateException("Tried to set settings twice");
         }
         this.settings = settings;
+        if (this.settings.getTheme() != null) {
+            this.screen.useTheme(this.settings.getTheme());
+        }
     }
 
     private static class HoveredIterable implements Iterable<IGuiElement> {
