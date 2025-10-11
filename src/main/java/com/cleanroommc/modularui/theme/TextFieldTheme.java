@@ -25,7 +25,7 @@ public class TextFieldTheme extends WidgetTheme {
         this.hintColor = hintColor;
     }
 
-    public TextFieldTheme(TextFieldTheme parent, JsonObject fallback, JsonObject json) {
+    public TextFieldTheme(TextFieldTheme parent, JsonObject json, JsonObject fallback) {
         super(parent, json, fallback);
         this.markedColor = JsonHelper.getColorWithFallback(json, fallback, parent.getMarkedColor(), IThemeApi.MARKED_COLOR);
         this.hintColor = JsonHelper.getColorWithFallback(json, fallback, parent.getHintColor(), IThemeApi.HINT_COLOR);
