@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiAccessor;
 import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiScreenAccessor;
@@ -539,13 +540,13 @@ public class ClientScreenHandler {
             drawSegmentLine(lineY -= 4, scale, color);
             lineY -= 10;
 
-            IGuiElement hovered = locatedHovered.getElement();
+            IWidget hovered = locatedHovered.getElement();
             locatedHovered.applyMatrix(context);
             GlStateManager.pushMatrix();
             context.applyToOpenGl();
 
             Area area = hovered.getArea();
-            IGuiElement parent = hovered.getParent();
+            IWidget parent = hovered.getParent();
 
             GuiDraw.drawBorder(0, 0, area.width, area.height, color, scale);
             if (hovered.hasParent()) {
@@ -553,14 +554,18 @@ public class ClientScreenHandler {
             }
             GlStateManager.popMatrix();
             locatedHovered.unapplyMatrix(context);
-            GuiDraw.drawText("Pos: " + area.x + ", " + area.y + "  Rel: " + area.rx + ", " + area.ry, 5, lineY, scale, color, true);
+            GuiDraw.drawText("Widget Theme: " + hovered.getWidgetTheme(muiScreen.getCurrentTheme()).getKey().getFullName(), 5, lineY, scale, color, true);
             lineY -= shift;
             GuiDraw.drawText("Size: " + area.width + ", " + area.height, 5, lineY, scale, color, true);
+            lineY -= shift;
+            GuiDraw.drawText("Pos: " + area.x + ", " + area.y + "  Rel: " + area.rx + ", " + area.ry, 5, lineY, scale, color, true);
             lineY -= shift;
             GuiDraw.drawText("Class: " + hovered, 5, lineY, scale, color, true);
             if (hovered.hasParent()) {
                 drawSegmentLine(lineY -= 4, scale, color);
                 lineY -= 10;
+                GuiDraw.drawText("Widget Theme: " + parent.getWidgetTheme(muiScreen.getCurrentTheme()).getKey().getFullName(), 5, lineY, scale, color, true);
+                lineY -= shift;
                 area = parent.getArea();
                 GuiDraw.drawText("Parent size: " + area.width + ", " + area.height, 5, lineY, scale, color, true);
                 lineY -= shift;
