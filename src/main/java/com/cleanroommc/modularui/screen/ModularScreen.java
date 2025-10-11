@@ -685,7 +685,7 @@ public class ModularScreen {
 
     public ITheme getCurrentTheme() {
         if (this.currentTheme == null) {
-            useTheme(null);
+            useTheme(this.context.getUISettings().getTheme());
         }
         return this.currentTheme;
     }
