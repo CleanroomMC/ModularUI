@@ -28,4 +28,10 @@ dependencies {
     compileOnlyApi rfg.deobf("curse.maven:neverenoughanimation-1062347:6533650-sources-6533651")
     testImplementation rfg.deobf("curse.maven:neverenoughanimation-1062347:6533650-sources-6533651")
     //implementation("com.cleanroommc:neverenoughanimations:1.0.6") { transitive false }
+
+    compileOnlyApi 'mezz.jei:jei_1.12.2:4.16.1.302' // JEI
+    runtimeOnly "mezz:jei:4.29.8" // HEI
+
+    compileOnlyApi rfg.deobf('curse.maven:top-245211:2667280') // TOP 1.4.28
+    runtimeOnly rfg.deobf('curse.maven:top-245211:2667280')
 }
