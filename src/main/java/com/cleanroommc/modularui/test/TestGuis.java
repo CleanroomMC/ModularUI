@@ -502,12 +502,13 @@ public class TestGuis extends CustomModularScreen {
                         .child(correctedGradient.asWidget().widthRel(1f).height(10)));
     }
 
-    public static @NotNull ModularPanel buildViewportTransformUI(ModularGuiContext context) {
+    public static @NotNull ModularPanel buildViewportTransformUI() {
         return new TestPanel("test")
                 .child(new Widget<>()
                         .align(Alignment.Center)
                         .size(50, 50)
-                        .background(GuiTextures.BUTTON_CLEAN));
+                        .background(GuiTextures.MC_BUTTON)
+                        .hoverBackground(GuiTextures.MC_BUTTON_HOVERED));
     }
 
     private static class TestPanel extends ModularPanel {
