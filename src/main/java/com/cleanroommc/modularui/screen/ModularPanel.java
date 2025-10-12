@@ -774,13 +774,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return getContext().getParentScreen() == null;
     }
 
-    /*@ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
-    @Deprecated
-    @ApiStatus.Internal
-    public boolean shouldAnimate() {
-        return shouldAnimate(false);
-    }*/
-
     void registerSubPanel(IPanelHandler handler) {
         if (!this.clientSubPanels.contains(handler)) {
             this.clientSubPanels.add(handler);
