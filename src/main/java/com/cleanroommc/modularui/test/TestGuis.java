@@ -14,8 +14,10 @@ import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.ItemDrawable;
 import com.cleanroommc.modularui.drawable.Rectangle;
 import com.cleanroommc.modularui.drawable.SpriteDrawable;
+import com.cleanroommc.modularui.factory.ClientGUI;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
 import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
@@ -37,7 +39,6 @@ import com.cleanroommc.modularui.widget.DraggableWidget;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.ColorPickerDialog;
-import com.cleanroommc.modularui.widgets.CycleButtonWidget;
 import com.cleanroommc.modularui.widgets.ListWidget;
 import com.cleanroommc.modularui.widgets.RichTextWidget;
 import com.cleanroommc.modularui.widgets.SchemaWidget;
@@ -65,8 +66,12 @@ import net.minecraft.util.text.TextFormatting;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
@@ -75,7 +80,46 @@ public class TestGuis extends CustomModularScreen {
 
     @Override
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {
-        return buildColorUI(context);
+
+        // collect all test from all build methods in this class via reflection
+        List<Method> uiMethods = new ArrayList<>();
+        for (Method method : TestGuis.class.getDeclaredMethods()) {
+            if (!"buildUI".equals(method.getName()) &&  // exclude this method
+                    !Modifier.isStatic(method.getModifiers()) &&
+                    Modifier.isPublic(method.getModifiers()) &&
+                    ModularPanel.class.isAssignableFrom(method.getReturnType()) &&
+                    method.getParameterCount() == 1 &&
+                    method.getParameterTypes()[0] == ModularGuiContext.class) {
+                uiMethods.add(method);
+            }
+        }
+        uiMethods.sort(Comparator.comparing(Method::getName));
+
+        return new ModularPanel("client_tests").height(200).width(170)
+                .padding(7)
+                .child(Flow.column()
+                        .child(IKey.str("Client Test UIs").asWidget().margin(1))
+                        .child(new ListWidget<>().widthRel(1f).expanded()
+                                .children(uiMethods.size(), i -> {
+                                    Method m = uiMethods.get(i);
+                                    String name = m.getName();
+                                    if (name.startsWith("build")) name = name.substring(5);
+                                    if (name.endsWith("UI")) name = name.substring(0, name.length() - 2);
+                                    name = name.replaceAll("([a-z])([A-Z])", "$1 $2");
+                                    return new ButtonWidget<>()
+                                            .height(16)
+                                            .widthRel(1f)
+                                            .margin(0, 1)
+                                            .overlay(IKey.str(name))
+                                            .onMousePressed(button -> {
+                                                try {
+                                                    ClientGUI.open(new ModularScreen((ModularPanel) m.invoke(TestGuis.this, context)).openParentOnClose(true));
+                                                } catch (IllegalAccessException | InvocationTargetException e) {
+                                                    ModularUI.LOGGER.throwing(e);
+                                                }
+                                                return true;
+                                            });
+                                })));
     }
 
     public @NotNull ModularPanel buildToggleGridListUI(ModularGuiContext context) {
@@ -323,7 +367,7 @@ public class TestGuis extends CustomModularScreen {
         return panel;
     }
 
-    public ModularPanel buildListUi(ModularGuiContext context) {
+    public ModularPanel buildListUI(ModularGuiContext context) {
         Random rnd = new Random();
         return ModularPanel.defaultPanel("list", 100, 150)
                 .padding(7)
@@ -435,7 +479,6 @@ public class TestGuis extends CustomModularScreen {
                                             colorPicker1.openPanel();
                                             return true;
                                         }))
-                                .child(new CycleButtonWidget())
                                 .child(new ButtonWidget<>()
                                         .debugName("color picker button 2")
                                         .background(color2)
