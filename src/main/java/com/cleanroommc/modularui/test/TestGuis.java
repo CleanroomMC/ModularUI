@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.GuiTextures;
@@ -42,7 +43,6 @@ import com.cleanroommc.modularui.widgets.ColorPickerDialog;
 import com.cleanroommc.modularui.widgets.ListWidget;
 import com.cleanroommc.modularui.widgets.RichTextWidget;
 import com.cleanroommc.modularui.widgets.SchemaWidget;
-import com.cleanroommc.modularui.widgets.SortableListWidget;
 import com.cleanroommc.modularui.widgets.TextWidget;
 import com.cleanroommc.modularui.widgets.ToggleButton;
 import com.cleanroommc.modularui.widgets.TransformWidget;
@@ -80,16 +80,13 @@ public class TestGuis extends CustomModularScreen {
 
     @Override
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {
-
         // collect all test from all build methods in this class via reflection
         List<Method> uiMethods = new ArrayList<>();
         for (Method method : TestGuis.class.getDeclaredMethods()) {
-            if (!"buildUI".equals(method.getName()) &&  // exclude this method
-                    !Modifier.isStatic(method.getModifiers()) &&
+            if (Modifier.isStatic(method.getModifiers()) &&
                     Modifier.isPublic(method.getModifiers()) &&
                     ModularPanel.class.isAssignableFrom(method.getReturnType()) &&
-                    method.getParameterCount() == 1 &&
-                    method.getParameterTypes()[0] == ModularGuiContext.class) {
+                    method.getParameterCount() == 0) {
                 uiMethods.add(method);
             }
         }
@@ -106,27 +103,50 @@ public class TestGuis extends CustomModularScreen {
                                     if (name.startsWith("build")) name = name.substring(5);
                                     if (name.endsWith("UI")) name = name.substring(0, name.length() - 2);
                                     name = name.replaceAll("([a-z])([A-Z])", "$1 $2");
-                                    return new ButtonWidget<>()
-                                            .height(16)
-                                            .widthRel(1f)
-                                            .margin(0, 1)
-                                            .overlay(IKey.str(name))
+                                    return button(name)
                                             .onMousePressed(button -> {
                                                 try {
-                                                    ClientGUI.open(new ModularScreen((ModularPanel) m.invoke(TestGuis.this, context)).openParentOnClose(true));
+                                                    ClientGUI.open(new ModularScreen((ModularPanel) m.invoke(null)).openParentOnClose(true));
                                                 } catch (IllegalAccessException | InvocationTargetException e) {
                                                     ModularUI.LOGGER.throwing(e);
                                                 }
                                                 return true;
                                             });
-                                })));
+                                })
+                                .child(button("OpenGL test")
+                                        .onMousePressed(button -> {
+                                            ClientGUI.open(new GLTestGui().openParentOnClose(true));
+                                            return true;
+                                        }))
+                                .child(button("Sortable List")
+                                        .onMousePressed(button -> {
+                                            ClientGUI.open(new TestGui().openParentOnClose(true));
+                                            return true;
+                                        }))
+                                .child(button("Test self")
+                                        .onMousePressed(button -> {
+                                            ClientGUI.open(this);
+                                            return true;
+                                        }))));
     }
 
-    public @NotNull ModularPanel buildToggleGridListUI(ModularGuiContext context) {
-        useTheme(EventHandler.TEST_THEME);
+    private static ButtonWidget<?> button(String text) {
+        return new ButtonWidget<>()
+                .height(16).widthRel(1f).margin(0, 1)
+                .overlay(IKey.str(text));
+    }
+
+    public static @NotNull ModularPanel buildToggleGridListUI() {
         boolean[][] states = new boolean[4][16];
-        return new ModularPanel("grid_list")
-                .height(100)
+        // we need to do this to attach the theme since we have no screen yet
+        // normally you have either UISettings or a ModularScreen at build to set it directly
+        return new ModularPanel("grid_list") {
+            @Override
+            public void onInit() {
+                super.onInit();
+                getScreen().useTheme(EventHandler.TEST_THEME);
+            }
+        }.height(100)
                 .coverChildrenWidth()
                 .padding(7)
                 .child(new ListWidget<>()
@@ -146,7 +166,7 @@ public class TestGuis extends CustomModularScreen {
 
     }
 
-    public @NotNull ModularPanel buildAnimationUI(ModularGuiContext context) {
+    public static @NotNull ModularPanel buildPendulumAnimationUI() {
         IWidget widget = GuiTextures.MUI_LOGO.asWidget().size(20).pos(65, 65);
         Animator animator = new Animator()
                 .bounds(0, 1)
@@ -161,13 +181,14 @@ public class TestGuis extends CustomModularScreen {
                 .child(new TransformWidget()
                         .child(widget)
                         .transform(stack -> {
-                            float x = (float) (55 * Math.cos(animator.getValue() * 2 * Math.PI - Math.PI / 2));
-                            float y = (float) (55 * Math.sin(animator.getValue() * 2 * Math.PI - Math.PI / 2));
+                            double angle = Math.PI;
+                            float x = (float) (55 * Math.cos(animator.getValue() * angle));
+                            float y = (float) (55 * Math.sin(animator.getValue() * angle));
                             stack.translate(x, y);
                         }));
     }
 
-    public @NotNull ModularPanel buildPostTheLogAnimationUI(ModularGuiContext context) {
+    public static @NotNull ModularPanel buildPostTheLogAnimationUI() {
         Animator post = new Animator().curve(Interpolation.SINE_IN).duration(300).bounds(-35, 0);
         Animator the = new Animator().curve(Interpolation.SINE_IN).duration(300).bounds(-20, 0);
         Animator fucking = new Animator().curve(Interpolation.SINE_IN).duration(300).bounds(53, 0);
@@ -216,7 +237,7 @@ public class TestGuis extends CustomModularScreen {
                                 })));
     }
 
-    public @NotNull ModularPanel buildSpriteAndEntityUI(ModularGuiContext context) {
+    public static @NotNull ModularPanel buildSpriteAndEntityUI() {
         TextureAtlasSprite sprite = SpriteHelper.getSpriteOfBlockState(GameObjectHelper.getBlockState("minecraft", "command_block"), EnumFacing.UP);
         // SpriteHelper.getSpriteOfItem(new ItemStack(Items.DIAMOND));
         Entity entity = FakeEntity.create(EntityDragon.class);
@@ -255,20 +276,7 @@ public class TestGuis extends CustomModularScreen {
                 }.asWidget().alignX(0.5f).bottom(10).size(100, 75));
     }
 
-
-    public @NotNull ModularPanel buildSortableListUI(ModularGuiContext context) {
-        List<String> things = new ArrayList<>();
-        for (int i = 0; i < 15; i++) {
-            things.add("Thing " + i);
-        }
-        return ModularPanel.defaultPanel("main")
-                .padding(7)
-                .child(new SortableListWidget<String>()
-                        .children(things, thing -> new SortableListWidget.Item<>(thing)
-                                .overlay(IKey.str(thing))));
-    }
-
-    public @NotNull ModularPanel buildRichTextUI(ModularGuiContext context) {
+    public static @NotNull ModularPanel buildRichTextUI() {
         return new ModularPanel("main")
                 .size(176, 166)
                 .child(new RichTextWidget()
@@ -320,7 +328,7 @@ public class TestGuis extends CustomModularScreen {
                         ));
     }
 
-    public @NotNull ModularPanel buildWorldSchemeUI(ModularGuiContext context) {
+    public static @NotNull ModularPanel buildWorldSchemaUI() {
         /*TrackedDummyWorld world = new TrackedDummyWorld();
         world.addBlock(new BlockPos(0, 0, 0), new BlockInfo(Blocks.DIAMOND_BLOCK.getDefaultState()));
         world.addBlock(new BlockPos(0, 1, 0), new BlockInfo(Blocks.BEDROCK.getDefaultState()));
@@ -367,7 +375,7 @@ public class TestGuis extends CustomModularScreen {
         return panel;
     }
 
-    public ModularPanel buildListUI(ModularGuiContext context) {
+    public static ModularPanel buildCollapseDisabledChildrenUI() {
         Random rnd = new Random();
         return ModularPanel.defaultPanel("list", 100, 150)
                 .padding(7)
@@ -386,7 +394,7 @@ public class TestGuis extends CustomModularScreen {
                                 })));
     }
 
-    public @NotNull ModularPanel buildSearchTest(ModularGuiContext context) {
+    public static @NotNull ModularPanel buildSearchTest() {
         List<String> items = Arrays.asList("Chicken", "Jockey", "Flint", "Steel", "Steve", "Diamond", "Ingot", "Iron", "Armor", "Greg");
         StringValue searchValue = new StringValue("");
         return ModularPanel.defaultPanel("search", 100, 150)
@@ -409,7 +417,7 @@ public class TestGuis extends CustomModularScreen {
                                         .setEnabledIf(w -> items.get(i).toLowerCase().contains(searchValue.getStringValue())))));
     }
 
-    public @NotNull ModularPanel buildColorUI(ModularGuiContext context) {
+    public static @NotNull ModularPanel buildColorTheoryUI() {
         List<Pair<Integer, Float>> colors = new ArrayList<>();
         for (ColorShade shade : ColorShade.getAll()) {
             for (int c : shade) {
@@ -479,6 +487,7 @@ public class TestGuis extends CustomModularScreen {
                                             colorPicker1.openPanel();
                                             return true;
                                         }))
+                                .child(IKey.str("<--  Select colors  -->").asWidget())
                                 .child(new ButtonWidget<>()
                                         .debugName("color picker button 2")
                                         .background(color2)
@@ -491,5 +500,42 @@ public class TestGuis extends CustomModularScreen {
                         .child(gradient.asWidget().widthRel(1f).height(10))
                         .child(IKey.str("Gamma corrected gradient").asWidget().margin(1))
                         .child(correctedGradient.asWidget().widthRel(1f).height(10)));
+    }
+
+    public static @NotNull ModularPanel buildViewportTransformUI(ModularGuiContext context) {
+        return new TestPanel("test")
+                .child(new Widget<>()
+                        .align(Alignment.Center)
+                        .size(50, 50)
+                        .background(GuiTextures.BUTTON_CLEAN));
+    }
+
+    private static class TestPanel extends ModularPanel {
+
+        public TestPanel(String name) {
+            super(name);
+            //background(GuiTextures.BACKGROUND);
+            align(Alignment.Center).size(100, 100);
+        }
+
+        @Override
+        public void transform(IViewportStack stack) {
+            super.transform(stack);
+            stack.translate(50, 50);
+            // rotate with constant speed CW
+            float angle = (float) ((Minecraft.getSystemTime() % 4000) / 4000f * 2 * Math.PI);
+            stack.rotateZ(angle);
+
+            // scale from 0.5 to 1 and back with curve
+            float scale;
+            long t = Minecraft.getSystemTime() % 4000;
+            if (t <= 2000) {
+                scale = Interpolation.BACK_INOUT.interpolate(0.5f, 1f, t / 2000f);
+            } else {
+                scale = Interpolation.BACK_INOUT.interpolate(0.5f, 1f, (2000 - t + 2000) / 2000f);
+            }
+            stack.scale(scale, scale);
+            stack.translate(-50, -50);
+        }
     }
 }
