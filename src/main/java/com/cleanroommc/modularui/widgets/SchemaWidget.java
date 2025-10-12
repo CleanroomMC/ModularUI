@@ -151,7 +151,6 @@ public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
         public LayerButton(ISchema schema, int minLayer, int maxLayer) {
             this.minLayer = minLayer;
             this.maxLayer = maxLayer;
-            background(GuiTextures.MC_BACKGROUND);
             overlay(IKey.dynamic(() -> currentLayer > Integer.MIN_VALUE ? Integer.toString(currentLayer) : "ALL").scale(0.5f));
 
             onMousePressed(mouseButton -> {
