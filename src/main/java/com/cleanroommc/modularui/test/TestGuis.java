@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.animation.Animator;
 import com.cleanroommc.modularui.animation.IAnimator;
 import com.cleanroommc.modularui.animation.Wait;
+import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
@@ -11,6 +12,7 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.ItemDrawable;
+import com.cleanroommc.modularui.drawable.Rectangle;
 import com.cleanroommc.modularui.drawable.SpriteDrawable;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
 import com.cleanroommc.modularui.screen.ModularPanel;
@@ -20,9 +22,11 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.ColorShade;
 import com.cleanroommc.modularui.utils.GameObjectHelper;
 import com.cleanroommc.modularui.utils.Interpolation;
 import com.cleanroommc.modularui.utils.Interpolations;
+import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.utils.SpriteHelper;
 import com.cleanroommc.modularui.utils.fakeworld.ArraySchema;
 import com.cleanroommc.modularui.utils.fakeworld.FakeEntity;
@@ -31,6 +35,9 @@ import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.value.StringValue;
 import com.cleanroommc.modularui.widget.DraggableWidget;
 import com.cleanroommc.modularui.widget.Widget;
+import com.cleanroommc.modularui.widgets.ButtonWidget;
+import com.cleanroommc.modularui.widgets.ColorPickerDialog;
+import com.cleanroommc.modularui.widgets.CycleButtonWidget;
 import com.cleanroommc.modularui.widgets.ListWidget;
 import com.cleanroommc.modularui.widgets.RichTextWidget;
 import com.cleanroommc.modularui.widgets.SchemaWidget;
@@ -55,6 +62,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.TextFormatting;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -67,7 +75,7 @@ public class TestGuis extends CustomModularScreen {
 
     @Override
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {
-        return buildRichTextUI(context);
+        return buildColorUI(context);
     }
 
     public @NotNull ModularPanel buildToggleGridListUI(ModularGuiContext context) {
@@ -355,5 +363,90 @@ public class TestGuis extends CustomModularScreen {
                                         .height(16)
                                         .background(GuiTextures.MC_BUTTON)
                                         .setEnabledIf(w -> items.get(i).toLowerCase().contains(searchValue.getStringValue())))));
+    }
+
+    public @NotNull ModularPanel buildColorUI(ModularGuiContext context) {
+        List<Pair<Integer, Float>> colors = new ArrayList<>();
+        for (ColorShade shade : ColorShade.getAll()) {
+            for (int c : shade) {
+                colors.add(Pair.of(c, Color.getLuminance(c)));
+            }
+        }
+        colors.sort((a, b) -> Float.compare(a.getRight(), b.getRight()));
+
+        IDrawable luminanceSortedColors = (context1, x, y, width, height, widgetTheme) -> {
+            float w = (float) width / colors.size();
+            float x0 = x;
+            for (Pair<Integer, Float> c : colors) {
+                GuiDraw.drawRect(x0, y, w, height, c.getLeft());
+                x0 += w;
+            }
+        };
+
+        Rectangle color1 = new Rectangle().setColor(Color.BLACK.main);
+        Rectangle color2 = new Rectangle().setColor(Color.WHITE.main);
+
+        IDrawable gradient = (context1, x, y, width, height, widgetTheme) -> GuiDraw.drawHorizontalGradientRect(x, y, width, height, color1.getColor(), color2.getColor());
+        IDrawable correctedGradient = (context1, x, y, width, height, widgetTheme) -> {
+            int points = 500;
+            Platform.setupDrawColor();
+            Platform.setupDrawGradient();
+            Platform.startDrawing(Platform.DrawMode.TRIANGLE_STRIP, Platform.VertexFormat.POS_COLOR, buffer -> {
+                float x0 = x;
+                float w = (float) width / points;
+                for (int i = 0; i < points; i++) {
+                    int color = Color.lerp(color1.getColor(), color2.getColor(), (float) i / points);
+                    int r = Color.getRed(color), g = Color.getGreen(color), b = Color.getBlue(color), a = 0xFF;
+                    buffer.pos(x0, y, 0).color(r, g, b, a).endVertex();
+                    buffer.pos(x0, y + height, 0).color(r, g, b, a).endVertex();
+                    x0 += w;
+                }
+            });
+            Platform.endDrawGradient();
+        };
+
+        ModularPanel panel = new ModularPanel("colors").width(300).coverChildrenHeight().padding(7);
+
+        IPanelHandler colorPicker1 = IPanelHandler.simple(panel, (mainPanel, player) -> new ColorPickerDialog("color_picker1", color1::setColor, color1.getColor(), true)
+                .setDraggable(true)
+                .relative(panel)
+                .top(0)
+                .rightRel(1f), true);
+        IPanelHandler colorPicker2 = IPanelHandler.simple(panel, (mainPanel, player) -> new ColorPickerDialog("color_picker2", color2::setColor, color2.getColor(), true)
+                .setDraggable(true)
+                .relative(panel)
+                .top(0)
+                .leftRel(1f), true);
+
+        return panel
+                .child(Flow.column()
+                        .coverChildrenHeight()
+                        .child(IKey.str("Colors sorted by luminance").asWidget().margin(1))
+                        .child(luminanceSortedColors.asWidget().widthRel(1f).height(10))
+                        .child(IKey.str("Blending color").asWidget().margin(1).marginTop(2))
+                        .child(Flow.row()
+                                .coverChildrenHeight()
+                                .mainAxisAlignment(Alignment.MainAxis.SPACE_BETWEEN)
+                                .child(new ButtonWidget<>()
+                                        .debugName("color picker button 1")
+                                        .background(color1)
+                                        .disableHoverBackground()
+                                        .onMousePressed(mouseButton -> {
+                                            colorPicker1.openPanel();
+                                            return true;
+                                        }))
+                                .child(new CycleButtonWidget())
+                                .child(new ButtonWidget<>()
+                                        .debugName("color picker button 2")
+                                        .background(color2)
+                                        .disableHoverBackground()
+                                        .onMousePressed(mouseButton -> {
+                                            colorPicker2.openPanel();
+                                            return true;
+                                        })))
+                        .child(IKey.str("OpenGL color gradient").asWidget().margin(1))
+                        .child(gradient.asWidget().widthRel(1f).height(10))
+                        .child(IKey.str("Gamma corrected gradient").asWidget().margin(1))
+                        .child(correctedGradient.asWidget().widthRel(1f).height(10)));
     }
 }

@@ -8,6 +8,8 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 public class ColorShade implements IntIterable {
@@ -20,6 +22,10 @@ public class ColorShade implements IntIterable {
 
     public static @Nullable ColorShade getFromName(String name) {
         return COLOR_SHADES.get(name);
+    }
+
+    public static Collection<ColorShade> getAll() {
+        return Collections.unmodifiableCollection(COLOR_SHADES.values());
     }
 
     public final String name;

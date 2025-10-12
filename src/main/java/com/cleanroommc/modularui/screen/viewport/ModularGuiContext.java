@@ -100,7 +100,7 @@ public class ModularGuiContext extends GuiContext {
     /**
      * @return true if the widget is directly below the mouse
      */
-    @ApiStatus.ScheduledForRemoval(inVersion = "2.7.0")
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
     @Deprecated
     public boolean isHovered(IGuiElement guiElement) {
         return guiElement.isHovering();
@@ -113,7 +113,7 @@ public class ModularGuiContext extends GuiContext {
      * @param ticks      time hovered
      * @return true if the widget is hovered for at least a certain number of ticks
      */
-    @ApiStatus.ScheduledForRemoval(inVersion = "2.7.0")
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
     @Deprecated
     public boolean isHoveredFor(IGuiElement guiElement, int ticks) {
         return guiElement.isHoveringFor(ticks);
@@ -122,7 +122,7 @@ public class ModularGuiContext extends GuiContext {
     /**
      * @return the hovered widget (widget directly below the mouse)
      */
-    @ApiStatus.ScheduledForRemoval(inVersion = "2.7.0")
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
     @Deprecated
     public @Nullable IWidget getHovered() {
         return getTopHovered();
