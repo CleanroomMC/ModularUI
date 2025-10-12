@@ -64,7 +64,6 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Predicate;
 
 @ApiStatus.Internal
@@ -80,51 +79,42 @@ public class ClientScreenHandler {
 
     private static IMuiScreen lastMui;
 
-    // we need to know the actual gui and not some fake bs some other mod overwrites
+    // we need to know the actual gui and not some fake screen some other mod overwrites
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onGuiOpen(GuiOpenEvent event) {
-        GuiScreen newGui = event.getGui();
+        onGuiChanged(getMCScreen(), event.getGui());
+    }
 
+    private static void onGuiChanged(GuiScreen oldScreen, GuiScreen newScreen) {
+        if (oldScreen == newScreen) return;
         defaultContext.reset();
-        if (lastMui != null && newGui == null) {
-            if (lastMui.getScreen().getPanelManager().isOpen()) {
-                lastMui.getScreen().getPanelManager().closeAll();
-            }
-            lastMui.getScreen().getPanelManager().dispose();
-            lastMui = null;
-        } else if (newGui instanceof IMuiScreen screenWrapper) {
-            if (lastMui == null) {
-                lastMui = screenWrapper;
-            } else if (lastMui == newGui) {
-                lastMui.getScreen().getPanelManager().reopen();
-            } else {
-                if (lastMui.getScreen().getPanelManager().isOpen()) {
-                    lastMui.getScreen().getPanelManager().closeAll();
-                }
-                lastMui.getScreen().getPanelManager().dispose();
-                lastMui = screenWrapper;
-            }
-        }
 
-        if (newGui instanceof IMuiScreen muiScreen) {
-            Objects.requireNonNull(muiScreen.getScreen(), "ModularScreen must not be null!");
-            if (currentScreen != muiScreen.getScreen()) {
-                if (hasScreen()) {
-                    currentScreen.onCloseParent();
-                    currentScreen = null;
-                    lastChar = null;
-                }
-                currentScreen = muiScreen.getScreen();
-                currentScreen.getContext().setParentScreen(Minecraft.getMinecraft().currentScreen);
-                fpsCounter.reset();
+        GuiScreen lastParent = null;
+        if (lastMui != null) {
+            if (newScreen == lastMui) {
+                // reopen
+                return;
             }
-        } else if (hasScreen() && getMCScreen() != null && newGui != getMCScreen()) {
-            currentScreen.onCloseParent();
+            lastParent = lastMui.getScreen().getContext().getParentScreen();
+            lastMui.getScreen().onCloseParent();
+            lastMui = null;
             currentScreen = null;
             lastChar = null;
         }
+
+        if (newScreen instanceof IMuiScreen muiScreen) {
+            lastMui = muiScreen;
+            currentScreen = muiScreen.getScreen();
+            GuiScreen parent = oldScreen;
+            if (lastParent == parent && parent instanceof IMuiScreen oldMuiScreen) {
+                parent = oldMuiScreen.getScreen().getContext().getParentScreen();
+            }
+            currentScreen.getContext().setParentScreen(parent);
+            fpsCounter.reset();
+        }
+
         GuiErrorHandler.INSTANCE.clear();
-        OverlayManager.onGuiOpen(event);
+        OverlayManager.onGuiOpen(newScreen);
     }
 
     @SubscribeEvent
