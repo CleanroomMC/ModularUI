@@ -183,17 +183,6 @@ public class ModularScreen {
     }
 
     /**
-     * Called when another screen opens, but this screen is still open or this screen an overlay is and the gui screen parent closes.
-     */
-    @ApiStatus.Internal
-    public final void onCloseParent() {
-        if (this.panelManager.isOpen()) {
-            this.panelManager.closeAll();
-        }
-        this.panelManager.dispose();
-    }
-
-    /**
      * Called after the screen is opened, but before the screen and all widgets are resized.
      */
     @ApiStatus.OverrideOnly
@@ -547,6 +536,11 @@ public class ModularScreen {
     @NotNull
     public String getName() {
         return this.name;
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "#" + getOwner() + ":" + getName();
     }
 
     /**

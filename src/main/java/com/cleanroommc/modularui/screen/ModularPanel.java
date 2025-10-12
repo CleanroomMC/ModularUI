@@ -34,12 +34,6 @@ import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import com.cleanroommc.neverenoughanimations.NEAConfig;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.client.CPacketCloseWindow;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import it.unimi.dsi.fastutil.objects.ObjectListIterator;
 import mezz.jei.gui.ghost.GhostIngredientDrag;
@@ -137,18 +131,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         closeSubPanels();
         if (isMainPanel()) {
             // close screen and let NEA animation
-            EntityPlayer player = MCHelper.getPlayer();
-            if (player != null) {
-                prepareCloseContainer(player);
-                if (getScreen().isOpenParentOnClose()) {
-                    Minecraft.getMinecraft().displayGuiScreen(getContext().getParentScreen());
-                } else {
-                    Minecraft.getMinecraft().displayGuiScreen(null);
-                }
-            } else {
-                // we are currently not in a world and want to display the previous screen
-                Minecraft.getMinecraft().displayGuiScreen(getContext().getParentScreen());
-            }
+            MCHelper.popScreen(getScreen().isOpenParentOnClose(), getContext().getParentScreen());
             return;
         }
         if (!shouldAnimate()) {
@@ -168,14 +151,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             getAnimator().reset(true);
             getAnimator().animate(true);
         }
-    }
-
-    @SideOnly(Side.CLIENT)
-    private static void prepareCloseContainer(EntityPlayer entityPlayer) {
-        EntityPlayerSP player = (EntityPlayerSP) entityPlayer;
-        player.connection.sendPacket(new CPacketCloseWindow(player.openContainer.windowId));
-        player.openContainer = player.inventoryContainer;
-        player.inventory.setItemStack(ItemStack.EMPTY);
     }
 
     protected void closeSubPanels() {

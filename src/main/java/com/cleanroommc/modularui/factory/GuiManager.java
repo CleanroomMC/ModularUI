@@ -126,6 +126,10 @@ public class GuiManager {
 
     @SideOnly(Side.CLIENT)
     static void openScreen(ModularScreen screen, UISettings settings) {
+        if (screen.getScreenWrapper() != null && MCHelper.getCurrentScreen() == screen.getScreenWrapper().getGuiScreen()) {
+            // already open
+            return;
+        }
         screen.getContext().setSettings(settings);
         GuiScreen guiScreen;
         if (settings.hasContainer()) {
