@@ -534,8 +534,8 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
         this.height = Interpolations.lerp(start.height, end.height, t);
         this.rx = Interpolations.lerp(start.rx, end.rx, t);
         this.ry = Interpolations.lerp(start.ry, end.ry, t);
-        getMargin().interpolate(start.getMargin(), end.getPadding(), t);
-        getPadding().interpolate(start.getMargin(), end.getPadding(), t);
+        getMargin().interpolate(start.getMargin(), end.getMargin(), t);
+        getPadding().interpolate(start.getPadding(), end.getPadding(), t);
         return this;
     }
 
