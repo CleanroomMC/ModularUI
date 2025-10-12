@@ -50,6 +50,8 @@ public interface ITheme {
 
     WidgetThemeEntry<WidgetTheme> getButtonTheme();
 
+    WidgetThemeEntry<WidgetTheme> getScrollbarTheme();
+
     WidgetThemeEntry<SlotTheme> getItemSlotTheme();
 
     WidgetThemeEntry<SlotTheme> getFluidSlotTheme();

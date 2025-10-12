@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.api;
 
-import com.cleanroommc.modularui.drawable.DrawableStack;
 import com.cleanroommc.modularui.drawable.GuiTextures;
+import com.cleanroommc.modularui.drawable.Scrollbar;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.theme.SelectableTheme;
 import com.cleanroommc.modularui.theme.SlotTheme;
@@ -46,6 +46,10 @@ public interface IThemeApi {
     WidgetThemeKey<WidgetTheme> CLOSE_BUTTON = get().widgetThemeKeyBuilder("closeButton", WidgetTheme.class)
             .defaultTheme(WidgetTheme.whiteTextShadow(10, 10, GuiTextures.MC_BUTTON))
             .defaultHoverTheme(WidgetTheme.whiteTextShadow(10, 10, GuiTextures.MC_BUTTON_HOVERED))
+            .register();
+
+    WidgetThemeKey<WidgetTheme> SCROLLBAR = get().widgetThemeKeyBuilder("scrollbar", WidgetTheme.class)
+            .defaultTheme(WidgetTheme.darkTextNoShadow(4, 4, Scrollbar.VANILLA))
             .register();
 
     WidgetThemeKey<SlotTheme> ITEM_SLOT = get().widgetThemeKeyBuilder("itemSlot", SlotTheme.class)

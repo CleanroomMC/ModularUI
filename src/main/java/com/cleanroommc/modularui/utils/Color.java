@@ -642,6 +642,17 @@ public class Color {
     }
 
     /**
+     * Multiplies each argb component of two colors and returns the result argb.
+     *
+     * @param argb1 color 1
+     * @param argb2 color 2
+     * @return mixed color
+     */
+    public static int mix(int argb1, int argb2) {
+        return argb(getRedF(argb1) * getRedF(argb2), getGreenF(argb1) * getGreenF(argb2), getBlueF(argb1) * getBlueF(argb2), getAlphaF(argb1) * getAlphaF(argb2));
+    }
+
+    /**
      * Calculates the average of each color byte in the array and puts it into a new ARGB color.
      *
      * @param colors ARGB colors

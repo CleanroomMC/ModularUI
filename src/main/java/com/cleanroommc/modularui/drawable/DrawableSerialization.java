@@ -7,7 +7,16 @@ import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.utils.ObjectList;
 
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -57,6 +66,7 @@ public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDes
         registerDrawableType("ellipse", Circle.class, json -> new Circle());
         registerDrawableType("item", ItemDrawable.class, ItemDrawable::ofJson);
         registerDrawableType("icon", Icon.class, Icon::ofJson);
+        registerDrawableType("scrollbar", Scrollbar.class, Scrollbar::ofJson);
     }
 
     public static IDrawable deserialize(JsonElement json) {

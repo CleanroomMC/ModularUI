@@ -11,6 +11,7 @@ public abstract class AbstractTheme implements ITheme {
     private WidgetThemeEntry<WidgetTheme> fallback;
     private WidgetThemeEntry<WidgetTheme> panel;
     private WidgetThemeEntry<WidgetTheme> button;
+    private WidgetThemeEntry<WidgetTheme> scrollbar;
     private WidgetThemeEntry<SlotTheme> itemSlot;
     private WidgetThemeEntry<SlotTheme> fluidSlot;
     private WidgetThemeEntry<TextFieldTheme> textField;
@@ -53,6 +54,14 @@ public abstract class AbstractTheme implements ITheme {
             this.button = getWidgetTheme(IThemeApi.BUTTON);
         }
         return this.button;
+    }
+
+    @Override
+    public WidgetThemeEntry<WidgetTheme> getScrollbarTheme() {
+        if (this.scrollbar == null) {
+            this.scrollbar = getWidgetTheme(IThemeApi.SCROLLBAR);
+        }
+        return this.scrollbar;
     }
 
     @Override

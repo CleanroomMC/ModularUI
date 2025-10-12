@@ -2,7 +2,10 @@ package com.cleanroommc.modularui.widget.scroll;
 
 import com.cleanroommc.modularui.animation.Animator;
 import com.cleanroommc.modularui.api.GuiAxis;
-import com.cleanroommc.modularui.drawable.GuiDraw;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.drawable.Scrollbar;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
+import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Interpolation;
 import com.cleanroommc.modularui.utils.MathUtils;
 
@@ -48,13 +51,15 @@ public abstract class ScrollData {
         return new VerticalScrollData(axisStart, thickness);
     }
 
-    public static final int DEFAULT_THICKNESS = 4;
+    public static final int DEFAULT_THICKNESS = -1;
 
     private final GuiAxis axis;
     private final boolean axisStart;
     private final int thickness;
+    private int fallbackThickness = -1;
     private int scrollSpeed = 30;
     private boolean cancelScrollEdge = true;
+    private IDrawable scrollbar;
 
     private int scrollSize;
     private int scroll;
@@ -69,7 +74,7 @@ public abstract class ScrollData {
     protected ScrollData(GuiAxis axis, boolean axisStart, int thickness) {
         this.axis = axis;
         this.axisStart = axisStart;
-        this.thickness = thickness <= 0 ? 4 : thickness;
+        this.thickness = thickness > 0 ? Math.max(2, thickness) : -1;
     }
 
     public GuiAxis getAxis() {
@@ -81,7 +86,7 @@ public abstract class ScrollData {
     }
 
     public int getThickness() {
-        return this.thickness;
+        return this.thickness > 0 ? this.thickness : this.fallbackThickness;
     }
 
     public int getScrollSpeed() {
@@ -114,6 +119,10 @@ public abstract class ScrollData {
 
     public boolean isHorizontal() {
         return this.axis.isHorizontal();
+    }
+
+    public final int getMinLength() {
+        return getThickness() + 1; // make sure bar is always longer than thicker
     }
 
     /**
@@ -235,7 +244,7 @@ public abstract class ScrollData {
     public int getScrollBarLength(ScrollArea area) {
         boolean isOtherActive = isOtherScrollBarActive(area, false);
         int length = (int) (getVisibleSize(area, isOtherActive) * getFullVisibleSize(area, isOtherActive) / (float) this.scrollSize);
-        return Math.max(length, 4); // min length of 4
+        return Math.max(length, getMinLength()); // min length of 4
     }
 
     public abstract boolean isInsideScrollbarArea(ScrollArea area, int x, int y);
@@ -261,14 +270,25 @@ public abstract class ScrollData {
         return getScrollBarStart(area, scrollBarLength, getFullVisibleSize(area, isOtherActive));
     }
 
-    @SideOnly(Side.CLIENT)
-    public abstract void drawScrollbar(ScrollArea area);
+    protected abstract int getFallbackThickness(WidgetTheme widgetTheme);
+
+    protected final void applyWidgetTheme(WidgetTheme widgetTheme) {
+        this.fallbackThickness = Math.max(2, getFallbackThickness(widgetTheme));
+    }
+
+    public ScrollData texture(IDrawable drawable) {
+        this.scrollbar = drawable;
+        return this;
+    }
 
     @SideOnly(Side.CLIENT)
-    protected void drawScrollBar(int x, int y, int w, int h) {
-        GuiDraw.drawRect(x, y, w, h, 0xffeeeeee);
-        GuiDraw.drawRect(x + 1, y + 1, w - 1, h - 1, 0xff666666);
-        GuiDraw.drawRect(x + 1, y + 1, w - 2, h - 2, 0xffaaaaaa);
+    public abstract void drawScrollbar(ScrollArea area, ModularGuiContext context, WidgetTheme widgetTheme);
+
+    @SideOnly(Side.CLIENT)
+    protected void drawScrollBar(ModularGuiContext context, int x, int y, int w, int h, WidgetTheme widgetTheme) {
+        IDrawable drawable = this.scrollbar != null ? this.scrollbar : widgetTheme.getBackground();
+        if (drawable == null) drawable = Scrollbar.DEFAULT;
+        drawable.draw(context, x, y, w, h, widgetTheme);
     }
 
     public boolean onMouseClicked(ScrollArea area, int mainAxisPos, int crossAxisPos, int button) {

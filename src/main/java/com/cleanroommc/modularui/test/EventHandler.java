@@ -53,6 +53,8 @@ public class EventHandler {
                 ClientGUI.open(new TestGuis());
             } else if (itemStack.getItem() == Items.EMERALD) {
                 ClientGUI.open(new GLTestGui());
+            } else if (itemStack.getItem() == Items.GOLD_INGOT) {
+                ClientGUI.open(new TestGui());
             }
             //GuiManager.openClientUI(Platform.getClientPlayer(), new TestGui());
             /*HoloUI.builder()
@@ -79,7 +81,7 @@ public class EventHandler {
     }
 
     @SubscribeEvent
-    public void onThemeTooltip(ReloadThemeEvent.Pre event) {
+    public void onThemeReload(ReloadThemeEvent.Pre event) {
         IThemeApi.get().registerTheme(testTheme);
     }
 }
