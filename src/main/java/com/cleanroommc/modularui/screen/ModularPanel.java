@@ -34,7 +34,12 @@ import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import com.cleanroommc.neverenoughanimations.NEAConfig;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.client.CPacketCloseWindow;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import it.unimi.dsi.fastutil.objects.ObjectListIterator;
 import mezz.jei.gui.ghost.GhostIngredientDrag;
@@ -134,7 +139,12 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             // close screen and let NEA animation
             EntityPlayer player = MCHelper.getPlayer();
             if (player != null) {
-                player.closeScreen();
+                prepareCloseContainer(player);
+                if (getScreen().isOpenParentOnClose()) {
+                    Minecraft.getMinecraft().displayGuiScreen(getContext().getParentScreen());
+                } else {
+                    Minecraft.getMinecraft().displayGuiScreen(null);
+                }
             } else {
                 // we are currently not in a world and want to display the previous screen
                 Minecraft.getMinecraft().displayGuiScreen(getContext().getParentScreen());
@@ -158,6 +168,14 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             getAnimator().reset(true);
             getAnimator().animate(true);
         }
+    }
+
+    @SideOnly(Side.CLIENT)
+    private static void prepareCloseContainer(EntityPlayer entityPlayer) {
+        EntityPlayerSP player = (EntityPlayerSP) entityPlayer;
+        player.connection.sendPacket(new CPacketCloseWindow(player.openContainer.windowId));
+        player.openContainer = player.inventoryContainer;
+        player.inventory.setItemStack(ItemStack.EMPTY);
     }
 
     protected void closeSubPanels() {
@@ -237,9 +255,13 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         this.state = State.OPEN;
     }
 
-    void reopen() {
-        if (this.state != State.CLOSED) throw new IllegalStateException();
+    boolean reopen(boolean strict) {
+        if (this.state != State.CLOSED) {
+            if (strict) throw new IllegalStateException();
+            return false;
+        }
         this.state = State.OPEN;
+        return true;
     }
 
     @MustBeInvokedByOverriders
@@ -772,8 +794,17 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
      */
     @ApiStatus.Internal
     public boolean shouldAnimate() {
-        return !getScreen().isOverlay() && ModularUI.Mods.NEA.isLoaded() && NEAConfig.openingAnimationTime > 0;
+        if (getScreen().isOverlay() || !ModularUI.Mods.NEA.isLoaded() || NEAConfig.openingAnimationTime <= 0) return false;
+        if (!isMainPanel() || !getScreen().isOpenParentOnClose()) return true;
+        return getContext().getParentScreen() == null;
     }
+
+    /*@ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
+    @ApiStatus.Internal
+    public boolean shouldAnimate() {
+        return shouldAnimate(false);
+    }*/
 
     void registerSubPanel(IPanelHandler handler) {
         if (!this.clientSubPanels.contains(handler)) {

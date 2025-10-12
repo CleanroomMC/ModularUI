@@ -71,6 +71,7 @@ public class ModularScreen {
     private final Map<Class<?>, List<IGuiAction>> guiActionListeners = new Object2ObjectOpenHashMap<>();
     private final Object2ObjectArrayMap<IWidget, Runnable> frameUpdates = new Object2ObjectArrayMap<>();
     private boolean pausesGame = false;
+    private boolean openParentOnClose = false;
 
     private ITheme currentTheme;
     private IMuiScreen screenWrapper;
@@ -186,7 +187,10 @@ public class ModularScreen {
      */
     @ApiStatus.Internal
     public final void onCloseParent() {
-        this.panelManager.closeAll();
+        if (this.panelManager.isOpen()) {
+            this.panelManager.closeAll();
+        }
+        this.panelManager.dispose();
     }
 
     /**
@@ -603,6 +607,10 @@ public class ModularScreen {
         return pausesGame;
     }
 
+    public boolean isOpenParentOnClose() {
+        return openParentOnClose;
+    }
+
     @SuppressWarnings("unchecked")
     private <T extends IGuiAction> List<T> getGuiActionListeners(Class<T> clazz) {
         return (List<T>) this.guiActionListeners.getOrDefault(clazz, Collections.emptyList());
@@ -711,6 +719,11 @@ public class ModularScreen {
      */
     public ModularScreen pausesGame(boolean pausesGame) {
         this.pausesGame = pausesGame;
+        return this;
+    }
+
+    public ModularScreen openParentOnClose(boolean openParentOnClose) {
+        this.openParentOnClose = openParentOnClose;
         return this;
     }
 

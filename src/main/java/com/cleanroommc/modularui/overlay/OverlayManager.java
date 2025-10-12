@@ -3,9 +3,7 @@ package com.cleanroommc.modularui.overlay;
 import com.cleanroommc.modularui.screen.ModularScreen;
 
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.client.event.GuiOpenEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.client.gui.GuiScreen;
 
 import org.jetbrains.annotations.ApiStatus;
 
@@ -25,14 +23,14 @@ public class OverlayManager {
         }
     }
 
-    public static void onGuiOpen(GuiOpenEvent event) {
-        if (event.getGui() != Minecraft.getMinecraft().currentScreen) {
+    public static void onGuiOpen(GuiScreen newScreen) {
+        if (newScreen != Minecraft.getMinecraft().currentScreen) {
             OverlayStack.closeAll();
-            if (event.getGui() == null) return;
+            if (newScreen == null) return;
             for (OverlayHandler handler : overlays) {
-                if (handler.isValidFor(event.getGui())) {
-                    ModularScreen overlay = Objects.requireNonNull(handler.createOverlay(event.getGui()), "Overlays must not be null!");
-                    overlay.constructOverlay(event.getGui());
+                if (handler.isValidFor(newScreen)) {
+                    ModularScreen overlay = Objects.requireNonNull(handler.createOverlay(newScreen), "Overlays must not be null!");
+                    overlay.constructOverlay(newScreen);
                     OverlayStack.open(overlay);
                 }
             }
