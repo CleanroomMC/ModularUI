@@ -30,7 +30,7 @@ public class Scrollbar implements IDrawable, IJsonSerializable {
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
         //applyColor(widgetTheme.getColor());
-        GuiDraw.drawRect(x, y, width, height, Color.average(0xffeeeeee, widgetTheme.getColor()));
+        GuiDraw.drawRect(x, y, width, height, Color.mix(0xffeeeeee, widgetTheme.getColor()));
         GuiDraw.drawRect(x + 1, y + 1, width - 1, height - 1, Color.mix(0xff666666, widgetTheme.getColor()));
         GuiDraw.drawRect(x + 1, y + 1, width - 2, height - 2, Color.mix(0xffaaaaaa, widgetTheme.getColor()));
 
