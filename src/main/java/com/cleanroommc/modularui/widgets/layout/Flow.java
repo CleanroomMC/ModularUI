@@ -117,7 +117,10 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
 
         for (IWidget widget : getChildren()) {
             // ignore disabled child if configured as such
-            if (shouldIgnoreChildSize(widget)) continue;
+            if (shouldIgnoreChildSize(widget)) {
+                widget.resizer().setMarginPaddingApplied(true);
+                continue;
+            }
             // exclude children whose position of main axis is fixed
             if (widget.flex().hasPos(this.axis)) continue;
             Box margin = widget.getArea().getMargin();

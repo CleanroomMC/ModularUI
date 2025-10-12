@@ -83,6 +83,7 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
             } else {
                 widget.resizer().setYResized(true);
             }
+            widget.resizer().setMarginPaddingApplied(true);
             this.separatorPositions.add(p);
             p += separatorSize;
             if (isValid()) {
