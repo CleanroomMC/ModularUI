@@ -114,7 +114,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
     @Override
     public IDrawable getCurrentOverlay(ITheme theme, WidgetThemeEntry<?> widgetTheme) {
         int state = getState();
-        if (isHovering() && this.hoverOverlay != null && this.hoverOverlay[state] != null && this.hoverBackground[state] != IDrawable.NONE) {
+        if (isHovering() && this.hoverOverlay != null && this.hoverOverlay[state] != null && this.hoverOverlay[state] != IDrawable.NONE) {
             return this.hoverOverlay[state];
         }
         return this.overlay != null && this.overlay[state] != null ? this.overlay[state] : super.getCurrentOverlay(theme, widgetTheme);
