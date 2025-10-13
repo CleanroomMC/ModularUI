@@ -14,7 +14,7 @@ on:
       release-type:
         description: 'Release type'
         type: choice
-        default: 'beta'
+        default: 'release'
         options:
           - 'release'
           - 'beta'
