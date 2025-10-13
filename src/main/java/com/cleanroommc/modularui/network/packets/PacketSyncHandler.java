@@ -29,6 +29,7 @@ public class PacketSyncHandler implements IPacket {
     public PacketSyncHandler(String panel, String key, boolean action, PacketBuffer packet) {
         this.panel = panel;
         this.key = key;
+        this.action = action;
         this.packet = packet;
     }
 
