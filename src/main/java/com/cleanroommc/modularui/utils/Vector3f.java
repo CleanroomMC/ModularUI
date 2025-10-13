@@ -3,20 +3,14 @@ package com.cleanroommc.modularui.utils;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import java.nio.FloatBuffer;
 import java.util.Objects;
 
+@ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+@Deprecated
 public class Vector3f {
-
-    public static final Vector3f UNIT_X = new Vector3f(1.0f, 0.0f, 0.0f);
-    public static final Vector3f UNIT_Y = new Vector3f(0.0f, 1.0f, 0.0f);
-    public static final Vector3f UNIT_Z = new Vector3f(0.0f, 0.0f, 1.0f);
-
-    public static void resetUnitVectors() {
-        UNIT_X.set(1.0f, 0.0f, 0.0f);
-        UNIT_Y.set(0.0f, 1.0f, 0.0f);
-        UNIT_Z.set(0.0f, 0.0f, 1.0f);
-    }
 
     public float x, y, z;
 
@@ -43,6 +37,15 @@ public class Vector3f {
      */
     public Vector3f(float x, float y, float z) {
         set(x, y, z);
+    }
+
+    public org.joml.Vector3f toJoml() {
+        return new org.joml.Vector3f(x, y, z);
+    }
+
+    public Vector3f set(org.joml.Vector3f v) {
+        set(v.x, v.y, v.z);
+        return this;
     }
 
     /* (non-Javadoc)

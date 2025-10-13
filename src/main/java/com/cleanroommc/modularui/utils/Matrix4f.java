@@ -1,9 +1,12 @@
 package com.cleanroommc.modularui.utils;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.lwjgl.util.vector.Vector4f;
 
 import java.nio.FloatBuffer;
 
+@ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+@Deprecated
 public class Matrix4f {
 
     public float m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33;
@@ -17,6 +20,27 @@ public class Matrix4f {
 
     public Matrix4f(final Matrix4f src) {
         load(src);
+    }
+
+    public org.joml.Matrix4f toJoml() {
+        org.joml.Matrix4f m = new org.joml.Matrix4f();
+        m.m00(m00);
+        m.m01(m01);
+        m.m02(m02);
+        m.m03(m03);
+        m.m10(m10);
+        m.m11(m11);
+        m.m12(m12);
+        m.m13(m13);
+        m.m20(m20);
+        m.m21(m21);
+        m.m22(m22);
+        m.m23(m23);
+        m.m30(m30);
+        m.m31(m31);
+        m.m32(m32);
+        m.m33(m33);
+        return m;
     }
 
     /**

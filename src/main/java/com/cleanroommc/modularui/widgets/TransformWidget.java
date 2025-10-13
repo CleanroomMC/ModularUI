@@ -2,9 +2,10 @@ package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.utils.Matrix4f;
-import com.cleanroommc.modularui.utils.Vector3f;
 import com.cleanroommc.modularui.widget.DelegatingSingleChildWidget;
+
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.util.function.Consumer;
 
@@ -36,7 +37,7 @@ public class TransformWidget extends DelegatingSingleChildWidget<TransformWidget
 
     public TransformWidget translate(float x, float y) {
         this.hasConstTransform = true;
-        this.constTransform.translate(x, y);
+        this.constTransform.translate(x, y, 0);
         return this;
     }
 

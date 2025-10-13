@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.utils;
 
+import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
@@ -26,20 +27,20 @@ public class GuiUtils {
     public static Matrix4f getTransformationMatrix(Matrix4f matrix4f) {
         floatBuffer.rewind();
         getTransformationBuffer(floatBuffer);
-        matrix4f.load(floatBuffer);
+        matrix4f.set(floatBuffer);
         return matrix4f;
     }
 
     public static void setTransformationMatrix(Matrix4f matrix) {
         floatBuffer.rewind();
-        matrix.store(floatBuffer);
+        matrix.get(floatBuffer);
         floatBuffer.rewind();
         GL11.glLoadMatrix(floatBuffer);
     }
 
     public static void applyTransformationMatrix(Matrix4f matrix) {
         floatBuffer.rewind();
-        matrix.store(floatBuffer);
+        matrix.get(floatBuffer);
         floatBuffer.rewind();
         GL11.glMultMatrix(floatBuffer);
     }

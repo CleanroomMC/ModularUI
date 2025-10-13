@@ -6,7 +6,7 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.Platform;
-import com.cleanroommc.modularui.utils.Vector3f;
+import com.cleanroommc.modularui.utils.VectorUtil;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.SchemaWidget;
 
@@ -33,6 +33,7 @@ import net.minecraftforge.client.MinecraftForgeClient;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 import org.lwjgl.opengl.EXTFramebufferObject;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
@@ -137,22 +138,23 @@ public class BaseSchemaRenderer implements IDrawable {
         float pitch = camera.getPitch();
 
         Vector3f mouseXShift = new Vector3f(1, 0, 0)
-                .rotatePitch(pitch)
-                .rotateYaw(-yaw + halfPI)
-                .scale(mouseX - width / 2f)
-                .scale(1 / 32f);
+                // TODO
+                //.rotatePitch(pitch)
+                //.rotateYaw(-yaw + halfPI)
+                .mul(mouseX - width / 2f)
+                .mul(1 / 32f);
         Vector3f mouseYShift = new Vector3f(0, -1, 0)
-                .rotatePitch(pitch)
-                .rotateYaw(-yaw + halfPI)
-                .scale(mouseY - height / 2f)
-                .scale(1 / 32f);
-        Vector3f mousePos = Vector3f.add(cameraPos, mouseXShift, mouseYShift, null);
+                //.rotatePitch(pitch)
+                //.rotateYaw(-yaw + halfPI)
+                .mul(mouseY - height / 2f)
+                .mul(1 / 32f);
+        Vector3f mousePos = cameraPos.add(mouseXShift, new Vector3f()).add(mouseYShift);
         Vector3f focus = camera.getLookAt();
-        float perspectiveCompensation = isIsometric() ? 1 : cameraPos.distanceTo(focus) / 3 * width / 100;
-        Vector3f underMousePos = focus.add(mouseXShift.scale(perspectiveCompensation), null).add(mouseYShift.scale(perspectiveCompensation));
-        Vector3f look = Vector3f.sub(underMousePos, mousePos, null).scale(10);
-        Vector3f.add(mousePos, look, underMousePos);
-        return schema.getWorld().rayTraceBlocks(mousePos.toVec3d(), underMousePos.toVec3d(), true);
+        float perspectiveCompensation = isIsometric() ? 1 : cameraPos.distance(focus) / 3 * width / 100;
+        Vector3f underMousePos = focus.add(mouseXShift.mul(perspectiveCompensation), new Vector3f()).add(mouseYShift.mul(perspectiveCompensation));
+        Vector3f look = underMousePos.sub(mousePos, new Vector3f()).mul(10);
+        mousePos.add(look, underMousePos);
+        return schema.getWorld().rayTraceBlocks(VectorUtil.toVec3d(mousePos), VectorUtil.toVec3d(underMousePos), true);
     }
 
     private void renderWorld() {

@@ -3,11 +3,9 @@ package com.cleanroommc.modularui.widgets;
 import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.Interactable;
-import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.MathUtils;
-import com.cleanroommc.modularui.utils.Vector3f;
 import com.cleanroommc.modularui.utils.fakeworld.BaseSchemaRenderer;
 import com.cleanroommc.modularui.utils.fakeworld.ISchema;
 import com.cleanroommc.modularui.widget.Widget;
@@ -16,6 +14,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3f;
 
 public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
 
@@ -78,11 +77,10 @@ public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
             pitch(this.pitch + dy * moveScale);
         } else if (mouseButton == 2 && this.enableTranslation) {
             float moveScale = 0.09f;
-            Vector3f.resetUnitVectors();
-            Vector3f look = this.schema.getCamera().getLookVec().normalise(); // direction camera is looking
-            Vector3f right = Vector3f.cross(look, Vector3f.UNIT_Y, null).normalise(); // right relative to screen
-            Vector3f up = Vector3f.cross(right, look, null); // up relative to screen
-            this.offset.add(right.scale(-dx * moveScale)).add(up.scale(dy * moveScale));
+            Vector3f look = this.schema.getCamera().getLookVec().normalize(); // direction camera is looking
+            Vector3f right = look.cross(0, 1, 0, new Vector3f()).normalize(); // right relative to screen
+            Vector3f up = right.cross(look, new Vector3f()); // up relative to screen
+            this.offset.add(right.mul(-dx * moveScale)).add(up.mul(dy * moveScale));
         }
         this.lastMouseX = mouseX;
         this.lastMouseY = mouseY;

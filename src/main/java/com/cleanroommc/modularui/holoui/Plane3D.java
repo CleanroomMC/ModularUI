@@ -2,11 +2,10 @@ package com.cleanroommc.modularui.holoui;
 
 import com.cleanroommc.modularui.utils.GuiUtils;
 
-import com.cleanroommc.modularui.utils.Matrix4f;
-
 import net.minecraft.client.renderer.GlStateManager;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.joml.Matrix4f;
 
 /**
  * Highly experimental
@@ -31,15 +30,15 @@ public class Plane3D {
         // apply facing direction
         if (this.nX != 0 || this.nY != 0 || this.nZ != 1) {
             Matrix4f rotation = new Matrix4f();
-            rotation.m00 = -this.nZ + (this.nY * this.nY * (1 + this.nZ)) / (this.nX * this.nX + this.nY * this.nY);
-            rotation.m10 = -(this.nX * this.nY * (1 + this.nZ)) / (this.nX * this.nX + this.nY * this.nY);
-            rotation.m20 = this.nX;
-            rotation.m01 = -(this.nX * this.nY * (1 + this.nZ)) / (this.nX * this.nX + this.nY * this.nY);
-            rotation.m11 = -this.nZ + (this.nX * this.nX * (1 + this.nZ)) / (this.nX * this.nX + this.nY * this.nY);
-            rotation.m21 = this.nY;
-            rotation.m02 = -this.nX;
-            rotation.m12 = -this.nY;
-            rotation.m22 = -this.nZ;
+            rotation.m00(-this.nZ + (this.nY * this.nY * (1 + this.nZ)) / (this.nX * this.nX + this.nY * this.nY));
+            rotation.m10(-(this.nX * this.nY * (1 + this.nZ)) / (this.nX * this.nX + this.nY * this.nY));
+            rotation.m20(this.nX);
+            rotation.m01(-(this.nX * this.nY * (1 + this.nZ)) / (this.nX * this.nX + this.nY * this.nY));
+            rotation.m11(-this.nZ + (this.nX * this.nX * (1 + this.nZ)) / (this.nX * this.nX + this.nY * this.nY));
+            rotation.m21(this.nY);
+            rotation.m02(-this.nX);
+            rotation.m12(-this.nY);
+            rotation.m22(-this.nZ);
             GuiUtils.applyTransformationMatrix(rotation);
         }
         // un-translate for scale and rotation

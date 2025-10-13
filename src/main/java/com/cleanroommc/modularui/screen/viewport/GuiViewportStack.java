@@ -3,16 +3,15 @@ package com.cleanroommc.modularui.screen.viewport;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.utils.GuiUtils;
-import com.cleanroommc.modularui.utils.Matrix4f;
-import com.cleanroommc.modularui.utils.Vector3f;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  * This class is a matrix stack aka pose stack. It keeps track of widget transformations (including position)
@@ -155,7 +154,7 @@ public class GuiViewportStack implements IViewportStack {
     @Override
     public void translate(float x, float y) {
         checkViewport();
-        this.top.getMatrix().translate(x, y);
+        this.top.getMatrix().translate(x, y, 0);
         this.top.markDirty();
     }
 
@@ -188,15 +187,18 @@ public class GuiViewportStack implements IViewportStack {
     @Override
     public void multiply(Matrix4f matrix) {
         checkViewport();
-        Matrix4f.mul(this.top.getMatrix(), matrix, this.top.getMatrix());
+        this.top.getMatrix().mul(matrix);
         this.top.markDirty();
     }
 
     @Override
     public void resetCurrent() {
         checkViewport();
-        Matrix4f belowTop = this.viewportStack.size() > 1 ? this.viewportStack.get(this.viewportStack.size() - 2).getMatrix() : new Matrix4f();
-        this.top.getMatrix().load(belowTop);
+        if (this.viewportStack.size() > 1) {
+            this.top.getMatrix().set(this.viewportStack.get(this.viewportStack.size() - 2).getMatrix());
+        } else {
+            this.top.getMatrix().identity();
+        }
         this.top.markDirty();
     }
 

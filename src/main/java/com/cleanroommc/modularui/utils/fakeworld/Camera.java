@@ -1,11 +1,12 @@
 package com.cleanroommc.modularui.utils.fakeworld;
 
 import com.cleanroommc.modularui.utils.MathUtils;
-import com.cleanroommc.modularui.utils.Vector3f;
+import com.cleanroommc.modularui.utils.VectorUtil;
 
 import net.minecraft.util.math.Vec3i;
 
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 public class Camera {
 
@@ -32,11 +33,10 @@ public class Camera {
         this.pos.set(xPos, yPos, zPos);
         this.lookAt.set(xLook, yLook, zLook);
         Vector3f look = getLookVec(this.temp);
-        Vector3f.resetUnitVectors();
-        this.pitch = Vector3f.angle(look, Vector3f.UNIT_Y) + MathUtils.PI_HALF;
-        look.setY(0);
-        this.yaw = Vector3f.angle(look, Vector3f.UNIT_X);
-        this.dist = this.pos.distanceTo(this.lookAt);
+        this.pitch = look.angle(VectorUtil.UNIT_Y) + MathUtils.PI_HALF;
+        look.y = 0;
+        this.yaw = look.angle(VectorUtil.UNIT_X);
+        this.dist = this.pos.distance(this.lookAt);
         return this;
     }
 
@@ -48,7 +48,7 @@ public class Camera {
     public Camera setLookAtKeepAngle(float x, float y, float z) {
         // just calculate the offset
         this.temp.set(x, y, z);
-        Vector3f.sub(this.temp, this.lookAt, this.temp);
+        this.temp.sub(this.lookAt);
         this.pos.add(this.temp);
         this.lookAt.set(this.temp);
         return this;
@@ -61,7 +61,7 @@ public class Camera {
     public Camera setPosKeepAngle(float x, float y, float z) {
         // just calculate the offset
         this.temp.set(x, y, z);
-        Vector3f.sub(this.temp, this.pos, this.temp);
+        this.temp.sub(this.pos);
         this.lookAt.add(this.temp);
         this.pos.set(this.temp);
         return this;
@@ -87,8 +87,8 @@ public class Camera {
         Vector3f v = this.temp;
         v.set(MathUtils.cos(yaw), 0, MathUtils.sin(yaw));
         v.y = MathUtils.tan(pitch) * v.length();
-        v.normalise().scale(dist);
-        this.pos.set(v.translate(lookAtX, lookAtY, lookAtZ));
+        v.normalize().mul(dist);
+        this.pos.set(v.add(lookAtX, lookAtY, lookAtZ));
         return this;
     }
 
@@ -100,7 +100,7 @@ public class Camera {
         Vector3f v = this.temp;
         v.set(MathUtils.cos(MathUtils.PI_HALF - yaw), 0, MathUtils.sin(MathUtils.PI_HALF - yaw));
         v.y = MathUtils.tan(MathUtils.PI_HALF - pitch) * v.length();
-        v.normalise().scale(dist);
+        v.normalize().mul(dist);
         this.lookAt.set(v).add(this.pos);
         return this;
     }
@@ -108,25 +108,25 @@ public class Camera {
     public void setDistanceKeepLookAt(float dist) {
         if (dist == this.dist) return;
         this.dist = dist;
-        Vector3f.sub(this.pos, this.lookAt, this.temp);
-        this.temp.normalise().scale(dist);
-        Vector3f.add(this.lookAt, this.temp, this.pos);
+        this.pos.sub(this.lookAt, this.temp);
+        this.temp.normalize().mul(dist);
+        this.lookAt.add(this.temp, this.pos);
     }
 
     public void scaleDistanceKeepLookAt(float dist) {
         if (dist == 1) return;
         this.dist *= dist;
-        Vector3f.sub(this.pos, this.lookAt, this.temp);
-        this.temp.scale(dist);
-        Vector3f.add(this.lookAt, this.temp, this.pos);
+        this.pos.sub(this.lookAt, this.temp);
+        this.temp.mul(dist);
+        this.lookAt.add(this.temp, this.pos);
     }
 
     public Vector3f getPos() {
-        return pos.copy();
+        return new Vector3f(pos);
     }
 
     public Vector3f getLookAt() {
-        return lookAt.copy();
+        return new Vector3f(lookAt);
     }
 
     public Vector3f getLookVec() {
@@ -134,7 +134,8 @@ public class Camera {
     }
 
     public Vector3f getLookVec(@Nullable Vector3f dest) {
-        return Vector3f.sub(lookAt, pos, dest);
+        if (dest == null) dest = new Vector3f();
+        return lookAt.sub(pos, dest);
     }
 
     public float getYaw() {

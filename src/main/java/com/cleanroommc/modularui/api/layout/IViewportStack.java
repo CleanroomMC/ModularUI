@@ -1,12 +1,12 @@
 package com.cleanroommc.modularui.api.layout;
 
 import com.cleanroommc.modularui.screen.viewport.TransformationMatrix;
-import com.cleanroommc.modularui.utils.Matrix4f;
-import com.cleanroommc.modularui.utils.Vector3f;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 /**
  * This handles all viewports in a GUI. Also keeps track of a matrix stack used for rendering and
@@ -116,6 +116,12 @@ public interface IViewportStack {
 
     void multiply(Matrix4f matrix);
 
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
+    default void multiply(com.cleanroommc.modularui.utils.Matrix4f matrix) {
+        multiply(matrix.toJoml());
+    }
+
     /**
      * Resets the top matrix to the matrix below.
      */
@@ -177,6 +183,19 @@ public interface IViewportStack {
      */
     Vector3f transform(Vector3f vec, Vector3f dest);
 
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
+    default com.cleanroommc.modularui.utils.Vector3f transform(com.cleanroommc.modularui.utils.Vector3f vec) {
+        return transform(vec, vec);
+    }
+
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
+    default com.cleanroommc.modularui.utils.Vector3f transform(com.cleanroommc.modularui.utils.Vector3f vec, com.cleanroommc.modularui.utils.Vector3f dest) {
+        Vector3f res = transform(vec.toJoml(), vec.toJoml());
+        return dest.set(res);
+    }
+
     /**
      * Transforms a vector with the current inverted matrix transformations.
      * This modifies the given vector.
@@ -197,6 +216,19 @@ public interface IViewportStack {
      * @return un-transformed vector
      */
     Vector3f unTransform(Vector3f vec, Vector3f dest);
+
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
+    default com.cleanroommc.modularui.utils.Vector3f unTransform(com.cleanroommc.modularui.utils.Vector3f vec) {
+        return unTransform(vec, vec);
+    }
+
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
+    default com.cleanroommc.modularui.utils.Vector3f unTransform(com.cleanroommc.modularui.utils.Vector3f vec, com.cleanroommc.modularui.utils.Vector3f dest) {
+        Vector3f res = unTransform(vec.toJoml(), vec.toJoml());
+        return dest.set(res);
+    }
 
     /**
      * Applies the current matrix transformations the current OpenGL matrix.

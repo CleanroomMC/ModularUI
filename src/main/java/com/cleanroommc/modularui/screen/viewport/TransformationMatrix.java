@@ -1,12 +1,12 @@
 package com.cleanroommc.modularui.screen.viewport;
 
 import com.cleanroommc.modularui.api.layout.IViewport;
-import com.cleanroommc.modularui.utils.Matrix4f;
-import com.cleanroommc.modularui.utils.Vector3f;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 /**
  * A single matrix in a matrix stack. Also has some other information.
@@ -42,9 +42,9 @@ public class TransformationMatrix {
         this.viewport = parent.viewport;
         this.area = parent.area;
         if (parentMatrix == null) {
-            this.matrix.load(parent.getMatrix());
+            this.matrix.set(parent.getMatrix());
         } else {
-            Matrix4f.mul(parentMatrix, parent.getMatrix(), this.matrix);
+            parentMatrix.mul(parent.getMatrix(), this.matrix);
         }
         this.viewportMatrix = parent.viewportMatrix;
         return this;
@@ -65,9 +65,9 @@ public class TransformationMatrix {
         this.area = area;
         this.viewportMatrix = isViewport;
         if (parent != null) {
-            this.matrix.load(parent);
+            this.matrix.set(parent);
         } else {
-            this.matrix.setIdentity();
+            this.matrix.identity();
         }
         return this;
     }
@@ -110,9 +110,7 @@ public class TransformationMatrix {
 
     public Matrix4f getInvertedMatrix() {
         if (this.dirty) {
-            if (Matrix4f.invert(this.matrix, this.invertedMatrix) == null) {
-                this.invertedMatrix.load(this.matrix);
-            }
+            this.matrix.invert(this.invertedMatrix);
             this.dirty = false;
         }
         return this.invertedMatrix;
@@ -132,22 +130,22 @@ public class TransformationMatrix {
 
     public int transformX(float x, float y) {
         Matrix4f m = getMatrix();
-        return (int) (x * m.m00 + y * m.m10 + m.m30);
+        return (int) (x * m.m00() + y * m.m10() + m.m30());
     }
 
     public int transformY(float x, float y) {
         Matrix4f m = getMatrix();
-        return (int) (x * m.m01 + y * m.m11 + m.m31);
+        return (int) (x * m.m01() + y * m.m11() + m.m31());
     }
 
     public int unTransformX(float x, float y) {
         Matrix4f m = getInvertedMatrix();
-        return (int) (x * m.m00 + y * m.m10 + m.m30);
+        return (int) (x * m.m00() + y * m.m10() + m.m30());
     }
 
     public int unTransformY(float x, float y) {
         Matrix4f m = getInvertedMatrix();
-        return (int) (x * m.m01 + y * m.m11 + m.m31);
+        return (int) (x * m.m01() + y * m.m11() + m.m31());
     }
 
     public Vector3f transform(Vector3f vec, Vector3f dest) {
@@ -159,9 +157,9 @@ public class TransformationMatrix {
     }
 
     public static Vector3f transform(Matrix4f m, Vector3f vec, Vector3f dest) {
-        float x = m.m00 * vec.x + m.m10 * vec.y + m.m20 * vec.z + m.m30;
-        float y = m.m01 * vec.x + m.m11 * vec.y + m.m21 * vec.z + m.m31;
-        float z = m.m02 * vec.x + m.m12 * vec.y + m.m22 * vec.z + m.m32;
+        float x = m.m00() * vec.x + m.m10() * vec.y + m.m20() * vec.z + m.m30();
+        float y = m.m01() * vec.x + m.m11() * vec.y + m.m21() * vec.z + m.m31();
+        float z = m.m02() * vec.x + m.m12() * vec.y + m.m22() * vec.z + m.m32();
         dest.set(x, y, z);
         return dest;
     }

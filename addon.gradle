@@ -1,0 +1,27 @@
+configurations {
+    embed2
+    implementation.extendsFrom(embed2)
+    embedSources
+}
+
+jar {
+    from provider {
+        configurations.embed2.collect {
+            println it
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }, {
+        exclude 'META-INF', 'META-INF/**', 'about*.html'
+        exclude 'module-info.class'
+    }
+}
+
+tasks.sourcesJar {
+    from provider {
+        configurations.embedSources.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    exclude("module-info.class")
+    exclude("module-info.java")
+}

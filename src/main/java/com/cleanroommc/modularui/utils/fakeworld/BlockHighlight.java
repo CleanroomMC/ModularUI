@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.utils.fakeworld;
 
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.Platform;
-import com.cleanroommc.modularui.utils.Vector3f;
 
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -11,6 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 public class BlockHighlight {
 
@@ -68,7 +68,7 @@ public class BlockHighlight {
         Color.setGlColor(this.color);
         GlStateManager.pushMatrix();
         GlStateManager.translate(pos.getX(), pos.getY(), pos.getZ());
-        float dist = camera.squareDistanceTo(pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f);
+        float dist = camera.distanceSquared(pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f);
         doRender(side, dist);
         GlStateManager.popMatrix();
     }

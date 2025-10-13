@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.core;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.common.ForgeVersion;
+import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
 import org.apache.logging.log4j.LogManager;
@@ -40,6 +41,10 @@ public class ModularUICore implements IFMLLoadingPlugin, IEarlyMixinLoader {
 
     @Override
     public void injectData(Map<String, Object> data) {
+        if (FMLLaunchHandler.isDeobfuscatedEnvironment()) {
+            // fixes error when forge tries to find a mod jar inside joml
+            Launch.classLoader.getSources().removeIf(url -> url.toString().contains("org.joml"));
+        }
         // this checks needs to happen this early
         // randompatches would otherwise crash shortly after this
         if (classExists("com.therandomlabs.randompatches.core.RPCore")) {

@@ -21,8 +21,11 @@
  *
  * For more details, see https://docs.gradle.org/8.0.1/userguide/java_library_plugin.html#sec:java_library_configurations_graph
  */
+
 dependencies {
-    embed 'org.mariuszgromada.math:MathParser.org-mXparser:6.1.0'
+    embed2 'org.mariuszgromada.math:MathParser.org-mXparser:6.1.0'
+    embed2('org.joml:joml:1.10.8') { transitive = false }
+    embedSources("org.joml:joml:1.10.8:sources") { transitive = false }
 
     implementation(rfg.deobf("curse.maven:baubles-227083:2518667"))
     compileOnlyApi rfg.deobf("curse.maven:neverenoughanimation-1062347:6533650-sources-6533651")

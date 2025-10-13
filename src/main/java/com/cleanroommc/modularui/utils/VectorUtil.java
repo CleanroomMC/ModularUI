@@ -5,9 +5,18 @@ import net.minecraft.util.math.Vec3i;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.util.vector.Vector3f;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 public class VectorUtil {
+
+    public static final Vector3fc UNIT_X = new Vector3f(1.0f, 0.0f, 0.0f);
+    public static final Vector3fc UNIT_Y = new Vector3f(0.0f, 1.0f, 0.0f);
+    public static final Vector3fc UNIT_Z = new Vector3f(0.0f, 0.0f, 1.0f);
+
+    public static Vec3d toVec3d(Vector3f vec) {
+        return new Vec3d(vec.x, vec.y, vec.z);
+    }
 
     public static Vector3f set(Vector3f target, float x, float y, float z) {
         if (target == null) target = new Vector3f();
@@ -37,7 +46,7 @@ public class VectorUtil {
         if (target == null) target = new Vector3f();
         if (source == null) return set(target, x, y, z);
         if (target != source) target.set(source);
-        return target.translate(x, y, z);
+        return target.add(x, y, z);
     }
 
     @NotNull

@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui;
 
-import com.cleanroommc.modularui.utils.Vector3f;
 import com.cleanroommc.modularui.utils.fakeworld.Camera;
 
+import org.joml.Vector3f;
 import org.junit.jupiter.api.AssertionFailureBuilder;
 import org.junit.jupiter.api.Test;
 
