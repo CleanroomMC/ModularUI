@@ -30,6 +30,7 @@ public class DimensionSizer {
 
     private boolean posCalculated = false, sizeCalculated = false;
     private boolean marginPaddingApplied = false;
+    private boolean canRelayout = false;
 
     public DimensionSizer(GuiAxis axis) {
         this.axis = axis;
@@ -113,6 +114,10 @@ public class DimensionSizer {
         return this.posCalculated;
     }
 
+    public boolean canRelayout() {
+        return canRelayout;
+    }
+
     public boolean dependsOnChildren() {
         return this.coverChildren;
     }
@@ -130,6 +135,7 @@ public class DimensionSizer {
     public void setResized(boolean pos, boolean size) {
         this.posCalculated = pos;
         this.sizeCalculated = size;
+        this.canRelayout &= !(pos && size);
     }
 
     public boolean isMarginPaddingApplied() {
@@ -166,7 +172,7 @@ public class DimensionSizer {
             // pos was calculated before
             p = area.getRelativePoint(this.axis);
             if (this.size != null) {
-                s = this.coverChildren ? 18 : calcSize(this.size, padding, parentSize, calcParent);
+                s = calcSize(this.size, padding, parentSize, calcParent);
             } else {
                 s = defaultSize.getAsInt();
                 this.sizeCalculated = s > 0;
@@ -177,11 +183,14 @@ public class DimensionSizer {
                 p = 0;
                 if (this.size == null) {
                     s = defaultSize.getAsInt();
-                    this.sizeCalculated = s > 0 && !this.expanded;
+                    this.sizeCalculated = s > 0 && !this.expanded && !this.coverChildren;
                 } else {
                     s = calcSize(this.size, padding, parentSize, calcParent);
                 }
                 this.posCalculated = true;
+                // children in layout widgets have no position, but if the size can only be calculated later than we need to tell the parent
+                // layout that this position is not final
+                this.canRelayout = true;
             } else {
                 if (this.size == null) {
                     if (this.start != null && this.end != null) {

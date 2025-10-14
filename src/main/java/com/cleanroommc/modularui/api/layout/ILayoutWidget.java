@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.api.layout;
 
+import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.widget.INotifyEnabled;
 import com.cleanroommc.modularui.api.widget.IWidget;
 
@@ -9,15 +10,20 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 public interface ILayoutWidget extends INotifyEnabled {
 
     /**
-     * Called after the children tried to calculate their size.
-     * Might be called multiple times.
+     * Called after the children tried to calculate their size. This method responsible for laying out its children
+     * in itself. This includes calling {@link IResizeable#setSizeResized(boolean, boolean)} or one of its variants after a size with
+     * {@link com.cleanroommc.modularui.widget.sizer.Area#setSize(GuiAxis, int)} or one of its variants on each child. The same goes for
+     * position. If this widget also applies margin and padding (this is usually the case), then {@link IResizeable#setMarginPaddingApplied(boolean)}
+     * or one of its variants needs to be called to.
+     * <p>
+     * Note that even if {@link #shouldIgnoreChildSize(IWidget)} returns false at least one of the {@code setResized} methods in
+     * {@link IResizeable} must be called. There is a no arg variant {@link IResizeable#updateResized()} which can also be used.
+     * Not doing so may result failure to resize the widget tree fully.
      */
     void layoutWidgets();
 
     /**
-     * Called after post calculation of this widget.
-     * Might be called multiple times.
-     * The last call guarantees, that this widget is fully calculated.
+     * Called after post calculation of this widget. The last call guarantees, that this widget is fully calculated.
      */
     default void postLayoutWidgets() {}
 

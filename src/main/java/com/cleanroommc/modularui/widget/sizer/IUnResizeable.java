@@ -10,7 +10,7 @@ public interface IUnResizeable extends IResizeable {
 
     IUnResizeable INSTANCE = new IUnResizeable() {
         @Override
-        public boolean resize(IGuiElement guiElement) {
+        public boolean resize(IGuiElement guiElement, boolean isParentLayout) {
             return true;
         }
 
@@ -22,8 +22,7 @@ public interface IUnResizeable extends IResizeable {
     };
 
     @Override
-    default void initResizing() {
-    }
+    default void initResizing() {}
 
     @Override
     default boolean postResize(IGuiElement guiElement) {
@@ -51,16 +50,26 @@ public interface IUnResizeable extends IResizeable {
     }
 
     @Override
-    default void setResized(boolean x, boolean y, boolean w, boolean h) {
+    default boolean areChildrenCalculated() {
+        return true;
     }
 
     @Override
-    default void setXMarginPaddingApplied(boolean b) {
+    default boolean canRelayout(boolean isParentLayout) {
+        return false;
     }
 
     @Override
-    default void setYMarginPaddingApplied(boolean b) {
-    }
+    default void setChildrenResized(boolean resized) {}
+
+    @Override
+    default void setResized(boolean x, boolean y, boolean w, boolean h) {}
+
+    @Override
+    default void setXMarginPaddingApplied(boolean b) {}
+
+    @Override
+    default void setYMarginPaddingApplied(boolean b) {}
 
     @Override
     default boolean isXMarginPaddingApplied() {

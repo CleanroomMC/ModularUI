@@ -291,7 +291,7 @@ public class WidgetTree {
         }, true);
     }
 
-    private static boolean resizeWidget(IWidget widget, boolean init, boolean onOpen) {
+    private static boolean resizeWidget(IWidget widget, boolean init, boolean onOpen, boolean isParentLayout) {
         boolean alreadyCalculated = false;
         // first try to resize this widget
         IResizeable resizer = widget.resizer();
@@ -300,72 +300,83 @@ public class WidgetTree {
             resizer.initResizing();
         } else {
             // if this is not the first time check if this widget is already resized
-            alreadyCalculated = resizer.isFullyCalculated();
+            alreadyCalculated = resizer.isFullyCalculated(isParentLayout);
         }
-        boolean result = alreadyCalculated || resizer.resize(widget);
+        boolean selfFullyCalculated = resizer.isSelfFullyCalculated() || resizer.resize(widget, isParentLayout);
 
+        ILayoutWidget layout = widget instanceof ILayoutWidget layoutWidget ? layoutWidget : null;
+        boolean isLayout = layout != null;
         GuiAxis expandAxis = widget instanceof IExpander expander ? expander.getExpandAxis() : null;
         // now resize all children and collect children which could not be fully calculated
         List<IWidget> anotherResize = Collections.emptyList();
-        if (widget.hasChildren()) {
+        if (!resizer.areChildrenCalculated() && widget.hasChildren()) {
             anotherResize = new ArrayList<>();
             for (IWidget child : widget.getChildren()) {
                 if (init) child.flex().checkExpanded(expandAxis);
-                if (!resizeWidget(child, init, onOpen)) {
+                if (!resizeWidget(child, init, onOpen, isLayout)) {
                     anotherResize.add(child);
                 }
             }
         }
 
-        if (!alreadyCalculated) {
+        if (init || !resizer.areChildrenCalculated()) {
             // we need to keep track of which widgets are not yet fully calculated, so we can call onResized ont those which later are
             // fully calculated
-            BitSet state = getCalculatedState(anotherResize);
-            if (widget instanceof ILayoutWidget layoutWidget) {
-                layoutWidget.layoutWidgets();
+            BitSet state = getCalculatedState(anotherResize, isLayout);
+            if (layout != null) {
+                layout.layoutWidgets();
             }
 
             // post resize this widget if possible
-            if (!result) {
-                result = resizer.postResize(widget);
+            if (!selfFullyCalculated) {
+                resizer.postResize(widget);
             }
 
-            if (widget instanceof ILayoutWidget layoutWidget) {
-                layoutWidget.postLayoutWidgets();
+            if (layout != null) {
+                layout.postLayoutWidgets();
             }
-            checkFullyCalculated(anotherResize, state);
+            checkFullyCalculated(anotherResize, state, isLayout);
         }
 
         // now fully resize all children which needs it
         if (!anotherResize.isEmpty()) {
-            anotherResize.removeIf(iWidget -> resizeWidget(iWidget, false, onOpen));
+            for (int i = 0; i < anotherResize.size(); i++) {
+                if (resizeWidget(anotherResize.get(i), false, onOpen, isLayout)) {
+                    anotherResize.remove(i--);
+                }
+            }
         }
+        resizer.setChildrenResized(anotherResize.isEmpty());
+        selfFullyCalculated = resizer.isFullyCalculated(isParentLayout);
 
-        if (result && !alreadyCalculated) widget.onResized();
+        if (selfFullyCalculated && !alreadyCalculated) widget.onResized();
 
-        return result && anotherResize.isEmpty();
+        return selfFullyCalculated;
     }
 
-    private static BitSet getCalculatedState(List<IWidget> children) {
+    private static BitSet getCalculatedState(List<IWidget> children, boolean isLayout) {
         if (children.isEmpty()) return null;
         BitSet state = new BitSet();
         for (int i = 0; i < children.size(); i++) {
             IWidget widget = children.get(i);
-            if (widget.resizer().isFullyCalculated()) {
+            if (widget.resizer().isFullyCalculated(isLayout)) {
                 state.set(i);
             }
         }
         return state;
     }
 
-    private static void checkFullyCalculated(List<IWidget> children, BitSet state) {
+    private static void checkFullyCalculated(List<IWidget> children, BitSet state, boolean isLayout) {
         if (children.isEmpty() || state == null) return;
+        int j = 0;
         for (int i = 0; i < children.size(); i++) {
             IWidget widget = children.get(i);
-            if (!state.get(i) && widget.resizer().isFullyCalculated()) {
+            if (!state.get(j) && widget.resizer().isFullyCalculated(isLayout)) {
                 widget.onResized();
-                state.set(i);
+                state.set(j);
+                children.remove(i--);
             }
+            j++;
         }
     }
 
