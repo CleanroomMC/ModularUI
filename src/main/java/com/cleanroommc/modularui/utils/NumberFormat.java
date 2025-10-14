@@ -19,6 +19,13 @@ public class NumberFormat {
             .considerSuffixForLength(true)
             .build();
 
+    public static final Params DECIMALS_3 = DEFAULT.copyToBuilder()
+            .considerOnlyDecimalsForLength(true)
+            .maxLength(3)
+            .build();
+
+    public static final Params DECIMALS_6 = DECIMALS_3.copyToBuilder().maxLength(6).build();
+
     public static final Params AMOUNT_TEXT = DEFAULT.copyToBuilder()
             .roundingMode(RoundingMode.DOWN)
             .build();
@@ -213,5 +220,13 @@ public class NumberFormat {
         params.format.setMaximumFractionDigits(m1);
         params.format.setMinimumFractionDigits(m2);
         return s;
+    }
+
+    public static String formatNanosToMillies(long nanos) {
+        return DECIMALS_6.format(nanos * 1e-6);
+    }
+
+    public static String formatNanosToMicros(long nanos) {
+        return DECIMALS_3.format(nanos * 1e-3);
     }
 }

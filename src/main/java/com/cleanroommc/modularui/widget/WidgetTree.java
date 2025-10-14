@@ -11,6 +11,7 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
+import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
@@ -34,8 +35,9 @@ import java.util.function.Predicate;
  */
 public class WidgetTree {
 
-    private WidgetTree() {
-    }
+    public static boolean logResizeTime = false;
+
+    private WidgetTree() {}
 
     public static List<IWidget> getAllChildrenByLayer(IWidget parent) {
         return getAllChildrenByLayer(parent, false);
@@ -275,20 +277,34 @@ public class WidgetTree {
 
     @ApiStatus.Internal
     public static void resizeInternal(IWidget parent, boolean onOpen) {
+        long fullTime = System.nanoTime();
         // check if updating this widget's pos and size can potentially update its parents
         while (!(parent instanceof ModularPanel) && (parent.getParent() instanceof ILayoutWidget || parent.getParent().flex().dependsOnChildren())) {
             parent = parent.getParent();
         }
+        long rawTime = System.nanoTime();
         // resize each widget and calculate their relative pos
-        if (!resizeWidget(parent, true, onOpen) && !resizeWidget(parent, false, onOpen)) {
+        if (!resizeWidget(parent, true, onOpen, false) && !resizeWidget(parent, false, onOpen, false)) {
+            if (WidgetTree.logResizeTime) {
+                rawTime = System.nanoTime() - rawTime;
+                ModularUI.LOGGER.error("Failed to resize widget tree in {} µs.", NumberFormat.formatNanosToMicros(rawTime));
+            }
             throw new IllegalStateException("Failed to resize widgets");
         }
+        rawTime = System.nanoTime() - rawTime;
         // now apply the calculated pos
         applyPos(parent);
         WidgetTree.foreachChildBFS(parent, child -> {
             child.postResize();
             return true;
         }, true);
+
+        if (WidgetTree.logResizeTime) {
+            fullTime = System.nanoTime() - fullTime;
+            ModularUI.LOGGER.info("Resized widget tree in {} µs and {} µs for full resize.",
+                    NumberFormat.formatNanosToMicros(rawTime),
+                    NumberFormat.formatNanosToMicros(fullTime));
+        }
     }
 
     private static boolean resizeWidget(IWidget widget, boolean init, boolean onOpen, boolean isParentLayout) {

@@ -45,7 +45,7 @@ public class TestTile2 extends TileEntity implements IGuiHolder<PosGuiData>, ITi
 
     @Override
     public ModularPanel buildUI(PosGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        ScrollWidget<?> sw = new ScrollWidget<>(new VerticalScrollData()).size(9 * 18).margin(7).top(20);
+        ScrollWidget<?> sw = new ScrollWidget<>(new VerticalScrollData()).size(9 * 18 + 4, 9 * 18).margin(7).top(20);
         sw.getScrollArea().getScrollY().setScrollSize(18 * (SLOT_COUNT / 9));
         for (int i = 0; i < SLOT_COUNT; i++) {
             int x = i % 9;
