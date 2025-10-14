@@ -101,6 +101,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
     private long time = 0;
     private int val, val2 = 0;
     private String value = "";
+    private int intValue = 1234567;
     private double doubleValue = 1;
     private final int duration = 80;
     private int progress = 0;
@@ -318,8 +319,17 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                 .child(new FluidSlot()
                                                                         .margin(2)
                                                                         .width(30)
-                                                                        .syncHandler(SyncHandlers.fluidSlot(this.fluidTankPhantom).phantom(true)))
-                                                        )))
+                                                                        .syncHandler(SyncHandlers.fluidSlot(this.fluidTankPhantom).phantom(true))))
+                                                        .child(new Column()
+                                                                .debugName("button and slots test 3")
+                                                                .coverChildren()
+                                                                .alignY(Alignment.START)
+                                                                .child(new TextFieldWidget()
+                                                                        .size(60, 20)
+                                                                        .value(SyncHandlers.intNumber(() -> this.intValue, val -> this.intValue = val))
+                                                                        .setNumbers(0, 9999999)
+                                                                        .setFormatAsInteger(true)
+                                                                        .hintText("integer")))))
                                         .addPage(new Column()
                                                         .debugName("Slots test page")
                                                         .coverChildren()
