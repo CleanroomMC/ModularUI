@@ -169,9 +169,9 @@ public class WidgetTree {
         }
         if (!parent.hasChildren()) return null;
         for (IWidget widget : parent.getChildren()) {
-            T t = consumer.apply(parent);
+            T t = consumer.apply(widget);
             if (t != null) return t;
-            if (!widget.getChildren().isEmpty()) {
+            if (widget.hasChildren()) {
                 t = foreachChildWithResult(widget, consumer, false);
                 if (t != null) return t;
             }
@@ -572,7 +572,7 @@ public class WidgetTree {
      * Prints the whole sub widget tree to the log as a human-readable tree graph with unicode characters. You may need to enabled unicode
      * characters in your IDE terminal to display them properly.
      *
-     * @param parent         starting point
+     * @param parent starting point
      */
     public static void printTree(IWidget parent) {
         printTree(parent, w -> true, null);
@@ -593,8 +593,8 @@ public class WidgetTree {
      * Prints the whole sub widget tree to the log as a human-readable tree graph with unicode characters. You may need to enabled unicode
      * characters in your IDE terminal to display them properly.
      *
-     * @param parent         starting point
-     * @param test           test widgets have to pass to be added to the string builder
+     * @param parent starting point
+     * @param test   test widgets have to pass to be added to the string builder
      */
     public static void printTree(IWidget parent, Predicate<IWidget> test) {
         printTree(parent, test, null);
