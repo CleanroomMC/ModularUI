@@ -51,19 +51,19 @@ public class TestGui extends CustomModularScreen {
         for (String line : this.lines) {
             items.put(line, new SortableListWidget.Item<>(line)
                     .child(item -> new Row()
-                    .child(new Widget<>()
-                            .addTooltipLine(line)
-                            .widgetTheme(IThemeApi.BUTTON)
-                            .overlay(IKey.str(line))
-                            .expanded().heightRel(1f))
-                    .child(new ButtonWidget<>()
-                            .onMousePressed(button -> item.removeSelfFromList())
-                            .overlay(GuiTextures.CROSS_TINY.asIcon().size(10))
-                            .width(10).heightRel(1f))));
+                            .child(new Widget<>()
+                                    .addTooltipLine(line)
+                                    .widgetTheme(IThemeApi.BUTTON)
+                                    .overlay(IKey.str(line))
+                                    .expanded().heightRel(1f))
+                            .child(new ButtonWidget<>()
+                                    .onMousePressed(button -> item.removeSelfFromList())
+                                    .overlay(GuiTextures.CROSS_TINY.asIcon().size(10))
+                                    .width(10).heightRel(1f))));
         }
         SortableListWidget<String> sortableListWidget = new SortableListWidget<String>()
                 .children(configuredOptions, items::get)
-                .debugName("sortable list");
+                .name("sortable list");
         List<List<AvailableElement>> availableMatrix = Grid.mapToMatrix(2, this.lines, (index, value) -> {
             AvailableElement availableElement = new AvailableElement().overlay(IKey.str(value))
                     .widthRel(0.5f).height(14)
@@ -95,7 +95,7 @@ public class TestGui extends CustomModularScreen {
                     .child(new Grid()
                             .matrix(availableMatrix)
                             .scrollable()
-                            .pos(7, 7).right(16).bottom(7).debugName("available list"));
+                            .pos(7, 7).right(16).bottom(7).name("available list"));
         }, true);
         panel.child(new ButtonWidget<>()
                 .bottom(7).size(12, 12).leftRel(0.5f)

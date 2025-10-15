@@ -161,7 +161,7 @@ public class TestGuis extends CustomModularScreen {
                                             .value(new BoolValue.Dynamic(() -> states[i][j], val -> states[i][j] = val))
                                             .size(10)
                                             .margin(1)
-                                            .debugName("G:" + i + ",W:" + j);
+                                            .name("G:" + i + ",W:" + j);
                                 })));
 
     }
@@ -480,7 +480,7 @@ public class TestGuis extends CustomModularScreen {
                                 .coverChildrenHeight()
                                 .mainAxisAlignment(Alignment.MainAxis.SPACE_BETWEEN)
                                 .child(new ButtonWidget<>()
-                                        .debugName("color picker button 1")
+                                        .name("color picker button 1")
                                         .background(color1)
                                         .disableHoverBackground()
                                         .onMousePressed(mouseButton -> {
@@ -489,7 +489,7 @@ public class TestGuis extends CustomModularScreen {
                                         }))
                                 .child(IKey.str("<--  Select colors  -->").asWidget())
                                 .child(new ButtonWidget<>()
-                                        .debugName("color picker button 2")
+                                        .name("color picker button 2")
                                         .background(color2)
                                         .disableHoverBackground()
                                         .onMousePressed(mouseButton -> {

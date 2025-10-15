@@ -52,21 +52,21 @@ public class GLTestGui extends CustomModularScreen {
                 .height(200)
                 .padding(7)
                 .child(Flow.column()
-                        .debugName("main col")
+                        .name("main col")
                         .child(Flow.row()
-                                .debugName("config row")
+                                .name("config row")
                                 .fullWidth()
                                 .coverChildrenHeight()
                                 .child(buildRenderObjectConfig(this.ro1)
-                                        .debugName("config left col"))
+                                        .name("config left col"))
                                 .child(new Rectangle().setColor(Color.TEXT_COLOR_DARK).asWidget()
-                                        .debugName("separator")
+                                        .name("separator")
                                         .width(1)
                                         .margin(2, 0)
                                         .fullHeight())
                                 .child(buildRenderObjectConfig(this.ro2)
-                                        .debugName("config right col")))
-                        .child(createPreview().expanded().fullWidth().debugName("preview")));
+                                        .name("config right col")))
+                        .child(createPreview().expanded().fullWidth().name("preview")));
 
     }
 

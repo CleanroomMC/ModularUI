@@ -11,6 +11,7 @@ import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Flex;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class EmptyWidget implements IWidget {
 
@@ -136,5 +137,10 @@ public class EmptyWidget implements IWidget {
     @Override
     public Flex getFlex() {
         return this.flex;
+    }
+
+    @Override
+    public @Nullable String getName() {
+        return null;
     }
 }

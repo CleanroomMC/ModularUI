@@ -651,6 +651,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return !isDraggable();
     }
 
+    @Override
     public @NotNull String getName() {
         return this.name;
     }

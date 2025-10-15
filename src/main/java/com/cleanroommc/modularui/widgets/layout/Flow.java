@@ -250,4 +250,9 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
     public GuiAxis getExpandAxis() {
         return this.axis;
     }
+
+    @Override
+    protected String getTypeName() {
+        return this.axis.isHorizontal() ? "Row" : "Column";
+    }
 }
