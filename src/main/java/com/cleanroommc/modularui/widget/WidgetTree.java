@@ -1,50 +1,47 @@
 package com.cleanroommc.modularui.widget;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
-import com.cleanroommc.modularui.api.layout.IResizeable;
-import com.cleanroommc.modularui.api.layout.IViewport;
-import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.ISynced;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
-import com.cleanroommc.modularui.widgets.layout.IExpander;
 
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.text.TextComponentString;
 
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Streams;
-import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
- * Helper class to apply actions to each widget in a tree.
+ * Helper class to perform operations on widget trees such as traversing, drawing, resizing, finding widgets and printing it.
  */
 public class WidgetTree {
 
-    public static boolean logResizeTime = true;
+    /**
+     * If this variable is true, the time it takes to resize a sub widget tree is logged each time.
+     * In production this should always be false.
+     */
+    public static boolean logResizeTime = false;
 
     public static final WidgetInfo INFO_AREA = (root, widget, builder) -> builder
             .append("Area xywh:")
@@ -127,6 +124,13 @@ public class WidgetTree {
     }
 
     /**
+     * @see #foreachChild(IWidget, Predicate, boolean)
+     */
+    public static boolean foreachChild(IWidget parent, Predicate<IWidget> consumer) {
+        return foreachChild(parent, consumer, false);
+    }
+
+    /**
      * Iterates through the whole sub widget tree recursively.
      * <p>
      * This method has the best performance in most cases, but can be outperformed on certain small widget trees.
@@ -138,14 +142,41 @@ public class WidgetTree {
      */
     public static boolean foreachChild(IWidget parent, Predicate<IWidget> consumer, boolean includeSelf) {
         if (includeSelf && !consumer.test(parent)) return false;
-        if (parent.getChildren().isEmpty()) return true;
+        if (!parent.hasChildren()) return true;
         for (IWidget widget : parent.getChildren()) {
             if (!consumer.test(widget)) return false;
-            if (!widget.getChildren().isEmpty() && foreachChild(widget, consumer, false)) {
+            if (widget.hasChildren() && foreachChild(widget, consumer, false)) {
                 return false;
             }
         }
         return true;
+    }
+
+    /**
+     * Iterates through the whole sub widget tree recursively. Unlike {@link #foreachChild(IWidget, Predicate, boolean)}, which can only
+     * return a boolean, this method can return any type. Once the consumer returns a non-null value, the iteration is terminated and the
+     * value will be returned.
+     *
+     * @param parent      starting point
+     * @param consumer    Operation on each child. Return a non-null value to terminate the iteration and to return the value.
+     * @param includeSelf true if the consumer should also consume the parent
+     * @return the first resulting value of the consumer or null of it always returned null
+     */
+    public static <T> @Nullable T foreachChildWithResult(IWidget parent, Function<IWidget, T> consumer, boolean includeSelf) {
+        if (includeSelf) {
+            T t = consumer.apply(parent);
+            if (t != null) return t;
+        }
+        if (!parent.hasChildren()) return null;
+        for (IWidget widget : parent.getChildren()) {
+            T t = consumer.apply(parent);
+            if (t != null) return t;
+            if (!widget.getChildren().isEmpty()) {
+                t = foreachChildWithResult(widget, consumer, false);
+                if (t != null) return t;
+            }
+        }
+        return null;
     }
 
     public static boolean foreachChildReverse(IWidget parent, Predicate<IWidget> consumer, boolean includeSelf) {
@@ -177,27 +208,31 @@ public class WidgetTree {
         return Streams.stream(iteratorBFS(parent));
     }
 
-    public static Iterable<IWidget> iterableBFS(IWidget parent) {
+    public static @UnmodifiableView Iterable<IWidget> iterableBFS(IWidget parent) {
         return () -> iteratorBFS(parent);
     }
 
     /**
-     * Creates an iterator of the whole sub widget tree.
+     * Creates an unmodifiable iterator of the whole sub widget tree.
      * <p>
      * This method of iterating has the worst performance in every case. It's roughly 4 times worse than
      * {@link #foreachChildBFS(IWidget, Predicate, boolean)}. If not used extensively the performance is still nothing to worry about.
      *
      * @param parent starting point
-     * @return an iterator of the sub widget tree
+     * @return an unmodifiable iterator of the sub widget tree
      */
-    public static Iterator<IWidget> iteratorBFS(IWidget parent) {
+    public static @UnmodifiableView Iterator<IWidget> iteratorBFS(IWidget parent) {
         return new AbstractIterator<>() {
 
             private final ObjectList<IWidget> queue = ObjectList.create();
-            private Iterator<IWidget> currentIt = parent.getChildren().iterator();
+            private Iterator<IWidget> currentIt;
 
             @Override
             protected IWidget computeNext() {
+                if (currentIt == null) {
+                    currentIt = parent.getChildren().iterator();
+                    return parent;
+                }
                 if (currentIt.hasNext()) return handleWidget(currentIt.next());
                 while (!queue.isEmpty()) {
                     currentIt = queue.removeFirst().getChildren().iterator();
@@ -215,12 +250,19 @@ public class WidgetTree {
         };
     }
 
+    /**
+     * Finds all widgets in the sub widget tree which match the test.
+     *
+     * @param parent starting point
+     * @param test   test which the target widgets have to pass
+     * @return a list of matching widgets
+     */
     public static List<IWidget> collectWidgets(IWidget parent, Predicate<IWidget> test) {
         List<IWidget> widgets = new ArrayList<>();
-        foreachChildBFS(parent, w -> {
+        foreachChild(parent, w -> {
             if (test.test(w)) widgets.add(w);
             return true;
-        });
+        }, true);
         return widgets;
     }
 
@@ -228,324 +270,187 @@ public class WidgetTree {
         return collectWidgetsByType(parent, type, null);
     }
 
+    /**
+     * Finds all widgets in the sub widget tree which match the given type and additional test.
+     *
+     * @param parent starting point
+     * @param type   type of the target widgets
+     * @param test   test which the target widgets have to pass
+     * @param <T>    type of the target widgets
+     * @return a list of matching widgets
+     */
+    @SuppressWarnings("unchecked")
     public static <T extends IWidget> List<T> collectWidgetsByType(IWidget parent, Class<T> type, @Nullable Predicate<T> test) {
         List<T> widgets = new ArrayList<>();
-        foreachChildBFS(parent, w -> {
-            if (type.isAssignableFrom(w.getClass())) {
+        foreachChild(parent, w -> {
+            if (w.isType(type)) {
                 T t = (T) w;
                 if (test == null || test.test(t)) widgets.add(t);
             }
             return true;
-        });
+        }, true);
         return widgets;
     }
 
-    public static IWidget findFirstBFS(IWidget parent, Predicate<IWidget> test) {
-        MutableObject<IWidget> found = new MutableObject<>();
-        foreachChildBFS(parent, w -> {
+    /**
+     * Finds the first widget in the sub widget tree, for which the test returns true.
+     *
+     * @param parent starting point
+     * @param test   test which the widget has to pass
+     * @return the first matching widget
+     */
+    public static IWidget findFirst(IWidget parent, @NotNull Predicate<IWidget> test) {
+        return foreachChildWithResult(parent, w -> {
             if (test.test(w)) {
-                found.setValue(w);
-                return false;
+                return w;
             }
-            return true;
-        });
-        return found.getValue();
+            return null;
+        }, true);
     }
 
-    public static <T extends IWidget> IWidget findFirstTypedBFS(IWidget parent, Class<T> type, @Nullable Predicate<T> test) {
-        MutableObject<T> found = new MutableObject<>();
-        foreachChildBFS(parent, w -> {
-            if (type.isAssignableFrom(w.getClass())) {
+    /**
+     * Finds the first widget in the sub widget tree with the given type, for which the test returns true.
+     *
+     * @param parent starting point
+     * @param type   type of the target widget
+     * @param test   test which the widget has to pass
+     * @return the first matching widget
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends IWidget> T findFirst(IWidget parent, Class<T> type, @Nullable Predicate<T> test) {
+        return foreachChildWithResult(parent, w -> {
+            if (w.isType(type)) {
                 T t = (T) w;
                 if (test == null || test.test(t)) {
-                    found.setValue(t);
-                    return false;
+                    return t;
                 }
             }
-            return true;
-        });
-        return found.getValue();
-    }
-
-    public static void drawTree(IWidget parent, ModularGuiContext context) {
-        drawTree(parent, context, false, true);
-    }
-
-    public static void drawTree(IWidget parent, ModularGuiContext context, boolean ignoreEnabled, boolean drawBackground) {
-        if (!parent.isEnabled() && !ignoreEnabled) return;
-        if (parent.requiresResize()) {
-            resizeInternal(parent, false);
-        }
-
-        float alpha = parent.getPanel().getAlpha();
-        IViewport viewport = parent instanceof IViewport ? (IViewport) parent : null;
-
-        // transform stack according to the widget
-        context.pushMatrix();
-        parent.transform(context);
-
-        boolean canBeSeen = parent.canBeSeen(context);
-
-        // apply transformations to opengl
-        GlStateManager.pushMatrix();
-        context.applyToOpenGl();
-
-        GlStateManager.colorMask(true, true, true, true);
-        if (canBeSeen) {
-            // draw widget
-            GlStateManager.color(1f, 1f, 1f, alpha);
-            WidgetThemeEntry<?> widgetTheme = parent.getWidgetTheme(context.getTheme());
-            if (drawBackground) parent.drawBackground(context, widgetTheme);
-            parent.draw(context, widgetTheme);
-            parent.drawOverlay(context, widgetTheme);
-        }
-
-        if (viewport != null) {
-            if (canBeSeen) {
-                // draw viewport without children transformation
-                GlStateManager.color(1f, 1f, 1f, alpha);
-                viewport.preDraw(context, false);
-                GlStateManager.popMatrix();
-                // apply children transformation of the viewport
-                context.pushViewport(viewport, parent.getArea());
-                viewport.transformChildren(context);
-                // apply to opengl and draw with transformation
-                GlStateManager.pushMatrix();
-                context.applyToOpenGl();
-                viewport.preDraw(context, true);
-            } else {
-                // only transform stack
-                context.pushViewport(viewport, parent.getArea());
-                viewport.transformChildren(context);
-            }
-        }
-        // remove all opengl transformations
-        GlStateManager.popMatrix();
-
-        // render all children if there are any
-        List<IWidget> children = parent.getChildren();
-        if (!children.isEmpty()) {
-            boolean backgroundSeparate = children.size() > 1;
-            // draw all backgrounds first if we have more than 1 child
-            // the whole reason this exists is because of the hover animation of items with NEA
-            // on hover the item scales up slightly, this causes the amount text to overlap nearby slots, but since the whole slot is drawn
-            // at once the backgrounds might draw on top of the text
-            // for now we'll apply this always without checking for NEA as it might be useful for other things
-            // maybe proper layer customization in the future?
-            if (backgroundSeparate) children.forEach(widget -> drawBackground(widget, context, ignoreEnabled));
-            children.forEach(widget -> drawTree(widget, context, false, !backgroundSeparate));
-        }
-
-        if (viewport != null) {
-            if (canBeSeen) {
-                // apply opengl transformations again and draw
-                GlStateManager.color(1f, 1f, 1f, alpha);
-                GlStateManager.pushMatrix();
-                context.applyToOpenGl();
-                viewport.postDraw(context, true);
-                // remove children transformation of this viewport
-                context.popViewport(viewport);
-                GlStateManager.popMatrix();
-                // apply transformation again to opengl and draw
-                GlStateManager.pushMatrix();
-                context.applyToOpenGl();
-                viewport.postDraw(context, false);
-                GlStateManager.popMatrix();
-            } else {
-                // only remove transformation
-                context.popViewport(viewport);
-            }
-        }
-        // remove all widget transformations
-        context.popMatrix();
-    }
-
-    public static void drawBackground(IWidget parent, ModularGuiContext context, boolean ignoreEnabled) {
-        if (!parent.isEnabled() && !ignoreEnabled) return;
-
-        float alpha = parent.getPanel().getAlpha();
-
-        // transform stack according to the widget
-        context.pushMatrix();
-        parent.transform(context);
-
-        boolean canBeSeen = parent.canBeSeen(context);
-        if (!canBeSeen) {
-            context.popMatrix();
-            return;
-        }
-
-        // apply transformations to opengl
-        GlStateManager.pushMatrix();
-        context.applyToOpenGl();
-
-        // draw widget
-        GlStateManager.colorMask(true, true, true, true);
-        GlStateManager.color(1f, 1f, 1f, alpha);
-        WidgetThemeEntry<?> widgetTheme = parent.getWidgetTheme(context.getTheme());
-        parent.drawBackground(context, widgetTheme);
-
-        GlStateManager.popMatrix();
-        context.popMatrix();
-    }
-
-    public static void drawTreeForeground(IWidget parent, ModularGuiContext context) {
-        IViewport viewport = parent instanceof IViewport viewport1 ? viewport1 : null;
-        context.pushMatrix();
-        parent.transform(context);
-
-        GlStateManager.color(1, 1, 1, 1);
-        GlStateManager.enableBlend();
-        parent.drawForeground(context);
-
-        List<IWidget> children = parent.getChildren();
-        if (!children.isEmpty()) {
-            if (viewport != null) {
-                context.pushViewport(viewport, parent.getArea());
-                viewport.transformChildren(context);
-            }
-            children.forEach(widget -> drawTreeForeground(widget, context));
-            if (viewport != null) context.popViewport(viewport);
-        }
-        context.popMatrix();
-    }
-
-    @ApiStatus.Internal
-    public static void onUpdate(IWidget parent) {
-        foreachChildBFS(parent, widget -> {
-            widget.onUpdate();
-            return true;
+            return null;
         }, true);
     }
 
-    @Deprecated
-    public static void resize(IWidget parent) {
-        parent.scheduleResize();
+    /**
+     * Finds the first widget in the sub widget tree that matches the given name.
+     *
+     * @param parent starting point
+     * @param name   name of the target widget
+     * @return the first widget with matching name or null if none was found
+     */
+    public static @Nullable IWidget findFirstWithNameNullable(IWidget parent, String name) {
+        return foreachChildWithResult(parent, w -> w.isName(name) ? w : null, true);
     }
 
-    @ApiStatus.Internal
-    public static void resizeInternal(IWidget parent, boolean onOpen) {
-        long fullTime = System.nanoTime();
-        // check if updating this widget's pos and size can potentially update its parents
-        while (!(parent instanceof ModularPanel) && (parent.getParent() instanceof ILayoutWidget || parent.getParent().flex().dependsOnChildren())) {
-            parent = parent.getParent();
+    /**
+     * Finds the first widget in the sub widget tree that matches the given name.
+     *
+     * @param parent starting point
+     * @param name   name of the target widget
+     * @return the first widget with matching name
+     * @throws NoSuchElementException if no widget with the given name and type was found
+     */
+    public static @NotNull IWidget findFirstWithName(IWidget parent, String name) {
+        IWidget w = findFirstWithNameNullable(parent, name);
+        if (w == null) {
+            throw new NoSuchElementException("Expected to find widget with name '" + name + "' in sub widget tree of '" + parent + "', but non was found.");
         }
-        long rawTime = System.nanoTime();
-        // resize each widget and calculate their relative pos
-        if (!resizeWidget(parent, true, onOpen, false) && !resizeWidget(parent, false, onOpen, false)) {
-            if (MCHelper.getPlayer() != null) {
-                MCHelper.getPlayer().sendMessage(new TextComponentString(IKey.RED + "ModularUI: Failed to resize sub tree of widget '"
-                        + parent + "' of screen '" + parent.getScreen().toString() + "'. See log for more info."));
-            }
-            ModularUI.LOGGER.error("Failed to resize widget. Affected widget tree:");
-            printTree(parent, INFO_RESIZED_COLLAPSED);
-        }
-        rawTime = System.nanoTime() - rawTime;
-        // now apply the calculated pos
-        applyPos(parent);
-        WidgetTree.foreachChildBFS(parent, child -> {
-            child.postResize();
-            return true;
-        }, true);
-
-        if (WidgetTree.logResizeTime) {
-            fullTime = System.nanoTime() - fullTime;
-            ModularUI.LOGGER.info("Resized widget tree in {}s and {}s for full resize.",
-                    NumberFormat.formatNanos(rawTime),
-                    NumberFormat.formatNanos(fullTime));
-        }
+        return w;
     }
 
-    private static boolean resizeWidget(IWidget widget, boolean init, boolean onOpen, boolean isParentLayout) {
-        boolean alreadyCalculated = false;
-        // first try to resize this widget
-        IResizeable resizer = widget.resizer();
-        ILayoutWidget layout = widget instanceof ILayoutWidget layoutWidget ? layoutWidget : null;
-        boolean isLayout = layout != null;
-        if (init) {
-            widget.beforeResize(onOpen);
-            resizer.initResizing();
-            if (!isLayout) resizer.setLayoutDone(true);
-        } else {
-            // if this is not the first time check if this widget is already resized
-            alreadyCalculated = resizer.isFullyCalculated(isParentLayout);
-        }
-        boolean selfFullyCalculated = resizer.isSelfFullyCalculated() || resizer.resize(widget, isParentLayout);
-
-        GuiAxis expandAxis = widget instanceof IExpander expander ? expander.getExpandAxis() : null;
-        // now resize all children and collect children which could not be fully calculated
-        List<IWidget> anotherResize = Collections.emptyList();
-        if (!resizer.areChildrenCalculated() && widget.hasChildren()) {
-            anotherResize = new ArrayList<>();
-            for (IWidget child : widget.getChildren()) {
-                if (init) child.flex().checkExpanded(expandAxis);
-                if (!resizeWidget(child, init, onOpen, isLayout)) {
-                    anotherResize.add(child);
-                }
-            }
-        }
-
-        if (init || !resizer.areChildrenCalculated() || !resizer.isLayoutDone()) {
-            boolean layoutSuccessful = true;
-            // we need to keep track of which widgets are not yet fully calculated, so we can call onResized ont those which later are
-            // fully calculated
-            BitSet state = getCalculatedState(anotherResize, isLayout);
-            if (layout != null) {
-                layoutSuccessful = layout.layoutWidgets();
-            }
-
-            // post resize this widget if possible
-            if (!selfFullyCalculated) {
-                resizer.postResize(widget);
-            }
-
-            if (layout != null) {
-                layoutSuccessful &= layout.postLayoutWidgets();
-            }
-            resizer.setLayoutDone(layoutSuccessful);
-            checkFullyCalculated(anotherResize, state, isLayout);
-        }
-
-        // now fully resize all children which needs it
-        if (!anotherResize.isEmpty()) {
-            for (int i = 0; i < anotherResize.size(); i++) {
-                if (resizeWidget(anotherResize.get(i), false, onOpen, isLayout)) {
-                    anotherResize.remove(i--);
-                }
-            }
-        }
-        resizer.setChildrenResized(anotherResize.isEmpty());
-        selfFullyCalculated = resizer.isFullyCalculated(isParentLayout);
-
-        if (selfFullyCalculated && !alreadyCalculated) widget.onResized();
-
-        return selfFullyCalculated;
+    /**
+     * Finds the first widget in the sub widget tree that matches the given name and type.
+     *
+     * @param parent starting point
+     * @param name   name of the target widget
+     * @param type   type of the target widget
+     * @param <T>    type of the target widget
+     * @return the first widget with matching name and class or null if none was found
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends IWidget> @Nullable T findFirstWithNameNullable(IWidget parent, String name, Class<T> type) {
+        return foreachChildWithResult(parent, w -> w.isNameAndType(name, type) ? (T) w : null, true);
     }
 
-    private static BitSet getCalculatedState(List<IWidget> children, boolean isLayout) {
-        if (children.isEmpty()) return null;
-        BitSet state = new BitSet();
-        for (int i = 0; i < children.size(); i++) {
-            IWidget widget = children.get(i);
-            if (widget.resizer().isFullyCalculated(isLayout)) {
-                state.set(i);
-            }
+    /**
+     * Finds the first widget in the sub widget tree that matches the given name and type.
+     *
+     * @param parent starting point
+     * @param name   name of the target widget
+     * @param type   type of the target widget
+     * @param <T>    type of the target widget
+     * @return the first widget with matching name and class
+     * @throws NoSuchElementException if no widget with the given name and type was found.
+     */
+    public static <T extends IWidget> @NotNull T findFirstWithName(IWidget parent, String name, Class<T> type) {
+        T w = findFirstWithNameNullable(parent, name, type);
+        if (w == null) {
+            throw new NoSuchElementException("Expected to find widget with name '" + name + "' and type '" + type.getName() +
+                    "' in sub widget tree of '" + parent + "', but non was found.");
         }
-        return state;
+        return w;
     }
 
-    private static void checkFullyCalculated(List<IWidget> children, BitSet state, boolean isLayout) {
-        if (children.isEmpty() || state == null) return;
-        int j = 0;
-        for (int i = 0; i < children.size(); i++) {
-            IWidget widget = children.get(i);
-            if (!state.get(j) && widget.resizer().isFullyCalculated(isLayout)) {
-                widget.onResized();
-                state.set(j);
-                children.remove(i--);
-            }
-            j++;
-        }
+    /**
+     * Finds a child of a parent at a given path. Each part of the path is name of a widget. That means every widget in the path to the
+     * target must be named and their names must be included in order.
+     *
+     * @param parent starting point
+     * @param path   path with each widget name in the path to the target
+     * @return the widget at the given path or null if none was found.
+     * @throws IllegalArgumentException if the path is empty
+     */
+    public static @Nullable IWidget findChildAtNullable(IWidget parent, String... path) {
+        if (path.length == 0) throw new IllegalArgumentException("Path to child must not be empty!");
+        return InternalWidgetTree.findChildAt(parent, IWidget.class, path, 0, true);
+    }
+
+    /**
+     * Finds a child of a parent at a given path. Each part of the path is name of a widget. That means every widget in the path to the
+     * target must be named and their names must be included in order.
+     *
+     * @param parent starting point
+     * @param path   path with each widget name in the path to the target
+     * @return the widget at the given path
+     * @throws IllegalArgumentException if the path is empty
+     * @throws NoSuchElementException   if a single widget in the path could not be found
+     */
+    public static @NotNull IWidget findChildAt(IWidget parent, String... path) {
+        if (path.length == 0) throw new IllegalArgumentException("Path to child must not be empty!");
+        return InternalWidgetTree.findChildAt(parent, IWidget.class, path, 0, false);
+    }
+
+    /**
+     * Finds a child of a parent at a given path. Each part of the path is name of a widget. That means every widget in the path to the
+     * target must be named and their names must be included in order.
+     *
+     * @param parent starting point
+     * @param type   type of the target
+     * @param path   path with each widget name in the path to the target
+     * @param <T>    the target widget type
+     * @return the widget at the given path or null if none was found.
+     * @throws IllegalArgumentException if the path is empty
+     * @throws ClassCastException       if a target widget was found, but the expected type doesn't match
+     */
+    public static <T extends IWidget> @Nullable T findChildAtNullable(IWidget parent, Class<T> type, String... path) {
+        if (path.length == 0) throw new IllegalArgumentException("Path to child must not be empty!");
+        return InternalWidgetTree.findChildAt(parent, type, path, 0, true);
+    }
+
+    /**
+     * Finds a child of a parent at a given path. Each part of the path is name of a widget. That means every widget in the path to the
+     * target must be named and their names must be included in order.
+     *
+     * @param parent starting point
+     * @param type   type of the target
+     * @param path   path with each widget name in the path to the target
+     * @param <T>    the target widget type
+     * @return the widget at the given path
+     * @throws IllegalArgumentException if the path is empty
+     * @throws ClassCastException       if a target widget was found, but the expected type doesn't match
+     * @throws NoSuchElementException   if a single widget in the path could not be found
+     */
+    public static <T extends IWidget> @NotNull T findChildAt(IWidget parent, Class<T> type, String... path) {
+        if (path.length == 0) throw new IllegalArgumentException("Path to child must not be empty!");
+        return InternalWidgetTree.findChildAt(parent, type, path, 0, false);
     }
 
     public static void applyPos(IWidget parent) {
@@ -553,17 +458,6 @@ public class WidgetTree {
             child.resizer().applyPos(child);
             return true;
         }, true);
-    }
-
-    public static IGuiElement findParent(IGuiElement parent, Predicate<IGuiElement> filter) {
-        if (parent == null) return null;
-        while (!(parent instanceof ModularPanel)) {
-            if (filter.test(parent)) {
-                return parent;
-            }
-            parent = parent.getParent();
-        }
-        return filter.test(parent) ? parent : null;
     }
 
     public static IWidget findParent(IWidget parent, Predicate<IWidget> filter) {
@@ -586,6 +480,10 @@ public class WidgetTree {
             parent = parent.getParent();
         }
         return type.isAssignableFrom(parent.getClass()) ? (T) parent : null;
+    }
+
+    public static boolean hasSyncedValues(ModularPanel panel) {
+        return !foreachChild(panel, widget -> !(widget instanceof ISynced<?> synced) || !synced.isSynced(), true);
     }
 
     @ApiStatus.Internal
@@ -612,22 +510,104 @@ public class WidgetTree {
         }, includePanel);
     }
 
-    public static boolean hasSyncedValues(ModularPanel panel) {
-        return !foreachChildBFS(panel, widget -> !(widget instanceof ISynced<?> synced) || !synced.isSynced(), true);
+    public static void drawTree(IWidget parent, ModularGuiContext context) {
+        drawTree(parent, context, false, true);
     }
 
+    public static void drawTree(IWidget parent, ModularGuiContext context, boolean ignoreEnabled, boolean drawBackground) {
+        InternalWidgetTree.drawTree(parent, context, ignoreEnabled, drawBackground);
+    }
+
+    public static void drawTreeForeground(IWidget parent, ModularGuiContext context) {
+        InternalWidgetTree.drawTreeForeground(parent, context);
+    }
+
+    @ApiStatus.Internal
+    public static void onUpdate(IWidget parent) {
+        foreachChildBFS(parent, widget -> {
+            widget.onUpdate();
+            return true;
+        }, true);
+    }
+
+    @Deprecated
+    public static void resize(IWidget parent) {
+        parent.scheduleResize();
+    }
+
+    @ApiStatus.Internal
+    public static void resizeInternal(IWidget parent, boolean onOpen) {
+        long fullTime = System.nanoTime();
+        // check if updating this widget's pos and size can potentially update its parents
+        while (!(parent instanceof ModularPanel) && (parent.getParent() instanceof ILayoutWidget || parent.getParent().flex().dependsOnChildren())) {
+            parent = parent.getParent();
+        }
+        long rawTime = System.nanoTime();
+        // resize each widget and calculate their relative pos
+        if (!InternalWidgetTree.resizeWidget(parent, true, onOpen, false) && !InternalWidgetTree.resizeWidget(parent, false, onOpen, false)) {
+            if (MCHelper.getPlayer() != null) {
+                MCHelper.getPlayer().sendMessage(new TextComponentString(IKey.RED + "ModularUI: Failed to resize sub tree of widget '"
+                        + parent + "' of screen '" + parent.getScreen().toString() + "'. See log for more info."));
+            }
+            ModularUI.LOGGER.error("Failed to resize widget. Affected widget tree:");
+            printTree(parent, INFO_RESIZED_COLLAPSED);
+        }
+        rawTime = System.nanoTime() - rawTime;
+        // now apply the calculated pos
+        applyPos(parent);
+        WidgetTree.foreachChildBFS(parent, child -> {
+            child.postResize();
+            return true;
+        }, true);
+
+        if (WidgetTree.logResizeTime) {
+            fullTime = System.nanoTime() - fullTime;
+            ModularUI.LOGGER.info("Resized widget tree in {}s and {}s for full resize.",
+                    NumberFormat.formatNanos(rawTime),
+                    NumberFormat.formatNanos(fullTime));
+        }
+    }
+
+    /**
+     * Prints the whole sub widget tree to the log as a human-readable tree graph with unicode characters. You may need to enabled unicode
+     * characters in your IDE terminal to display them properly.
+     *
+     * @param parent         starting point
+     */
     public static void printTree(IWidget parent) {
         printTree(parent, w -> true, null);
     }
 
+    /**
+     * Prints the whole sub widget tree to the log as a human-readable tree graph with unicode characters. You may need to enabled unicode
+     * characters in your IDE terminal to display them properly.
+     *
+     * @param parent         starting point
+     * @param additionalInfo additional info function which is executed for each widget
+     */
     public static void printTree(IWidget parent, WidgetInfo additionalInfo) {
         printTree(parent, w -> true, additionalInfo);
     }
 
+    /**
+     * Prints the whole sub widget tree to the log as a human-readable tree graph with unicode characters. You may need to enabled unicode
+     * characters in your IDE terminal to display them properly.
+     *
+     * @param parent         starting point
+     * @param test           test widgets have to pass to be added to the string builder
+     */
     public static void printTree(IWidget parent, Predicate<IWidget> test) {
         printTree(parent, test, null);
     }
 
+    /**
+     * Prints the whole sub widget tree to the log as a human-readable tree graph with unicode characters. You may need to enabled unicode
+     * characters in your IDE terminal to display them properly.
+     *
+     * @param parent         starting point
+     * @param test           test widgets have to pass to be added to the string builder
+     * @param additionalInfo additional info function which is executed for each widget
+     */
     public static void printTree(IWidget parent, Predicate<IWidget> test, WidgetInfo additionalInfo) {
         StringBuilder builder = new StringBuilder("Widget tree of ")
                 .append(parent)
@@ -635,33 +615,24 @@ public class WidgetTree {
         ModularUI.LOGGER.info(widgetTreeToString(builder, parent, test, additionalInfo));
     }
 
+    /**
+     * Writes the sub widget tree into a human-readable tree graph with unicode characters.
+     *
+     * @param builder        the string builder to add the tree to or null for a new builder
+     * @param parent         starting point
+     * @param test           test widgets have to pass to be added to the string builder
+     * @param additionalInfo additional info function which is executed for each widget
+     * @return the string builder which was used to build the graph
+     */
     public static StringBuilder widgetTreeToString(StringBuilder builder, IWidget parent, Predicate<IWidget> test, WidgetInfo additionalInfo) {
-        getTree(parent, parent, test, builder, additionalInfo, "", false);
+        if (builder == null) builder = new StringBuilder();
+        InternalWidgetTree.getTree(parent, parent, test, builder, additionalInfo, "", false);
         return builder;
     }
 
-    private static void getTree(IWidget root, IWidget parent, Predicate<IWidget> test, StringBuilder builder, WidgetInfo additionalInfo, String indent, boolean hasNextSibling) {
-        if (!indent.isEmpty()) {
-            builder.append(indent).append(hasNextSibling ? "├ " : "└ ");
-        }
-        builder.append(parent);
-        if (additionalInfo != null) {
-            builder.append(" {");
-            additionalInfo.addInfo(root, parent, builder);
-            builder.append("}");
-        }
-        builder.append('\n');
-        if (parent.hasChildren()) {
-            @NotNull List<IWidget> children = parent.getChildren();
-            for (int i = 0; i < children.size(); i++) {
-                IWidget child = children.get(i);
-                if (test.test(child)) {
-                    getTree(root, child, test, builder, additionalInfo, indent + (hasNextSibling ? "│ " : "  "), i < children.size() - 1);
-                }
-            }
-        }
-    }
-
+    /**
+     * An interface to add information of a widget to a string builder.
+     */
     public interface WidgetInfo {
 
         void addInfo(IWidget root, IWidget widget, StringBuilder builder);
@@ -675,7 +646,7 @@ public class WidgetTree {
         }
 
         default WidgetInfo combine(WidgetInfo other) {
-            return combine(other, " ");
+            return combine(other, " | ");
         }
 
         static WidgetInfo of(String joiner, WidgetInfo... infos) {
@@ -691,7 +662,7 @@ public class WidgetTree {
         }
 
         static WidgetInfo of(WidgetInfo... infos) {
-            return of(" ", infos);
+            return of(" | ", infos);
         }
     }
 }
