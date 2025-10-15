@@ -17,35 +17,23 @@ public class NumberFormat {
             .considerDecimalSeparatorForLength(false)
             .considerOnlyDecimalsForLength(false)
             .considerSuffixForLength(true)
+            .spaceAfterNumber(false)
             .build();
 
     public static final Params DECIMALS_3 = DEFAULT.copyToBuilder()
+            .considerSuffixForLength(false)
             .considerOnlyDecimalsForLength(true)
             .maxLength(3)
             .build();
-
-    public static final Params DECIMALS_6 = DECIMALS_3.copyToBuilder().maxLength(6).build();
 
     public static final Params AMOUNT_TEXT = DEFAULT.copyToBuilder()
             .roundingMode(RoundingMode.DOWN)
             .build();
 
-    private static final double[] FACTORS_HIGH = {1e3, 1e6, 1e9, 1e12, 1e15, 1e18, 1e21, 1e24};
-    private static final double[] FACTORS_LOW = {1e-3, 1e-6, 1e-9, 1e-12, 1e-15, 1e-18, 1e-21, 1e-24};
-    //private static final double[] ALL_FACTORS = new double[FACTORS_HIGH.length + FACTORS_LOW.length];
-    private static final String[] SUFFIX_HIGH = {"k", "M", "G", "T", "P", "E", "Z", "Y"};
-    private static final String[] SUFFIX_LOW = {"m", "µ", "n", "p", "f", "a", "z", "y"};
-    private static final String NO_SUFFIX = "";
-
-    /*static {
-        for (int i = 0; i < FACTORS_LOW.length; i++) {
-            ALL_FACTORS[i] = FACTORS_LOW[FACTORS_LOW.length - 1 - i];
-        }
-        System.arraycopy(FACTORS_HIGH, 0, ALL_FACTORS, FACTORS_LOW.length, FACTORS_HIGH.length);
-    }*/
-
-    public static Params params(DecimalFormat format, int maxLength, boolean considerOnlyDecimalsForLength, boolean considerDecimalSeparatorForLength, boolean considerMinusForLength, boolean considerSuffixForLength) {
-        return new Params(format, maxLength, considerOnlyDecimalsForLength, considerDecimalSeparatorForLength, considerMinusForLength, considerSuffixForLength);
+    public static Params params(DecimalFormat format, int maxLength, boolean considerOnlyDecimalsForLength,
+                                boolean considerDecimalSeparatorForLength, boolean considerMinusForLength, boolean considerSuffixForLength,
+                                boolean spaceAfterNumber) {
+        return new Params(format, maxLength, considerOnlyDecimalsForLength, considerDecimalSeparatorForLength, considerMinusForLength, considerSuffixForLength, spaceAfterNumber);
     }
 
     public static ParamsBuilder paramsBuilder() {
@@ -53,20 +41,24 @@ public class NumberFormat {
     }
 
     public static class Params {
+
         public final DecimalFormat format;
         public final int maxLength;
         public final boolean considerOnlyDecimalsForLength;
         public final boolean considerDecimalSeparatorForLength;
         public final boolean considerMinusForLength;
         public final boolean considerSuffixForLength;
+        public final boolean spaceAfterNumber;
 
-        public Params(DecimalFormat format, int maxLength, boolean considerOnlyDecimalsForLength, boolean considerDecimalSeparatorForLength, boolean considerMinusForLength, boolean considerSuffixForLength) {
+        public Params(DecimalFormat format, int maxLength, boolean considerOnlyDecimalsForLength, boolean considerDecimalSeparatorForLength,
+                      boolean considerMinusForLength, boolean considerSuffixForLength, boolean spaceAfterNumber) {
             this.format = format;
             this.maxLength = maxLength;
             this.considerOnlyDecimalsForLength = considerOnlyDecimalsForLength;
             this.considerDecimalSeparatorForLength = considerDecimalSeparatorForLength;
             this.considerMinusForLength = considerMinusForLength;
             this.considerSuffixForLength = considerSuffixForLength;
+            this.spaceAfterNumber = spaceAfterNumber;
             if (!this.considerOnlyDecimalsForLength && this.maxLength < 4) {
                 throw new IllegalArgumentException("Max length must be at least 4 characters");
             }
@@ -87,7 +79,8 @@ public class NumberFormat {
                     .considerOnlyDecimalsForLength(this.considerOnlyDecimalsForLength)
                     .considerDecimalSeparatorForLength(this.considerDecimalSeparatorForLength)
                     .considerMinusForLength(this.considerMinusForLength)
-                    .considerSuffixForLength(this.considerSuffixForLength);
+                    .considerSuffixForLength(this.considerSuffixForLength)
+                    .spaceAfterNumber(this.spaceAfterNumber);
         }
 
         public String format(double number) {
@@ -103,6 +96,7 @@ public class NumberFormat {
         private boolean considerDecimalSeparatorForLength;
         private boolean considerMinusForLength;
         private boolean considerSuffixForLength;
+        private boolean spaceAfterNumber;
 
         private DecimalFormat checkFormat() {
             if (this.format == null) {
@@ -128,7 +122,7 @@ public class NumberFormat {
 
         public ParamsBuilder decimalSeparator(char c) {
             DecimalFormatSymbols symbols = checkFormat().getDecimalFormatSymbols();
-            symbols.setDecimalSeparator('.');
+            symbols.setDecimalSeparator(c);
             checkFormat().setDecimalFormatSymbols(symbols);
             return this;
         }
@@ -158,8 +152,14 @@ public class NumberFormat {
             return this;
         }
 
+        public ParamsBuilder spaceAfterNumber(boolean spaceAfterNumber) {
+            this.spaceAfterNumber = spaceAfterNumber;
+            return this;
+        }
+
         public Params build() {
-            return new Params(checkFormat(), this.maxLength, this.considerOnlyDecimalsForLength, this.considerDecimalSeparatorForLength, this.considerMinusForLength, this.considerSuffixForLength);
+            return new Params(checkFormat(), this.maxLength, this.considerOnlyDecimalsForLength, this.considerDecimalSeparatorForLength,
+                    this.considerMinusForLength, this.considerSuffixForLength, spaceAfterNumber);
         }
     }
 
@@ -175,34 +175,45 @@ public class NumberFormat {
         return formattedNumber;
     }
 
-    private static String formatInternal(double number, int maxLength, Params params) {
-        int n = FACTORS_HIGH.length - 1;
-        String suffix = NO_SUFFIX;
-        if (number > 9999) {
-            int index;
-            for (index = 0; index < n; index++) {
-                if (number < FACTORS_HIGH[index + 1]) {
-                    break;
-                }
-            }
-            number /= FACTORS_HIGH[index];
-            suffix = SUFFIX_HIGH[index];
-        } else if (number < 1) {
-            int index;
-            for (index = 0; index < n; index++) {
-                if (number >= FACTORS_LOW[index]) {
-                    break;
-                }
-            }
-            number /= FACTORS_LOW[index];
-            suffix = SUFFIX_LOW[index];
-        }
-        return formatToString(number, suffix, maxLength, params);
+    public static String formatFromUnit(double number, SIPrefix unit, Params params) {
+        return format(number * unit.factor, params);
     }
 
-    private static String formatToString(double value, String suffix, int maxLength, Params params) {
-        if (params.considerSuffixForLength && !suffix.isEmpty()) {
-            maxLength -= suffix.length();
+    public static SIPrefix findBestPrefix(double number) {
+        if (number >= 1 && number < 10_000) return SIPrefix.One;
+        SIPrefix[] high = SIPrefix.HIGH;
+        SIPrefix[] low = SIPrefix.LOW;
+        int n = high.length - 1;
+        SIPrefix prefix;
+        if (number >= 10_000) {
+            int index;
+            for (index = 0; index < n; index++) {
+                if (number < high[index + 1].factor) {
+                    break;
+                }
+            }
+            prefix = high[index];
+        } else {
+            int index;
+            for (index = 0; index < n; index++) {
+                if (number >= low[index].factor) {
+                    break;
+                }
+            }
+            prefix = low[index];
+        }
+        return prefix;
+    }
+
+    private static String formatInternal(double number, int maxLength, Params params) {
+        SIPrefix prefix = findBestPrefix(number);
+        return formatToString(number * prefix.oneOverFactor, prefix.symbol, maxLength, params);
+    }
+
+    private static String formatToString(double value, char prefix, int maxLength, Params params) {
+        if (params.considerSuffixForLength && prefix != Character.MIN_VALUE) {
+            maxLength--;
+            if (params.spaceAfterNumber) maxLength--;
         }
         if (params.considerDecimalSeparatorForLength) {
             maxLength--;
@@ -216,17 +227,21 @@ public class NumberFormat {
         int m1 = params.format.getMaximumFractionDigits();
         int m2 = params.format.getMinimumFractionDigits();
         params.format.setMaximumFractionDigits(maxLength);
-        String s = params.format.format(value) + suffix;
+        String s = params.format.format(value);
         params.format.setMaximumFractionDigits(m1);
         params.format.setMinimumFractionDigits(m2);
+
+        if (prefix != Character.MIN_VALUE) {
+            if (params.spaceAfterNumber) {
+                s += ' ' + prefix;
+            } else {
+                s += prefix;
+            }
+        }
         return s;
     }
 
-    public static String formatNanosToMillies(long nanos) {
-        return DECIMALS_6.format(nanos * 1e-6);
-    }
-
-    public static String formatNanosToMicros(long nanos) {
-        return DECIMALS_3.format(nanos * 1e-3);
+    public static String formatNanos(long nanos) {
+        return DECIMALS_3.format(nanos * SIPrefix.Nano.factor);
     }
 }

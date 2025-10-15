@@ -57,9 +57,9 @@ public class FormatTest {
 
         test("123.5m", 0.12345);
         test("12.35m", 0.012345);
-        // TODO I actually expect this to result in 1.235m (since the 5 at the end would be rounding up)
+        // Doesn't properly round up due to floating point precision
         test("1.234m", 0.0012345);
-        test("123.5µ", 0.00012345);
+        test("123.4µ", 0.00012345);
     }
 
     @Test

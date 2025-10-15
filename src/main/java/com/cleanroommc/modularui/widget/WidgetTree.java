@@ -35,7 +35,7 @@ import java.util.function.Predicate;
  */
 public class WidgetTree {
 
-    public static boolean logResizeTime = false;
+    public static boolean logResizeTime = true;
 
     private WidgetTree() {}
 
@@ -287,7 +287,7 @@ public class WidgetTree {
         if (!resizeWidget(parent, true, onOpen, false) && !resizeWidget(parent, false, onOpen, false)) {
             if (WidgetTree.logResizeTime) {
                 rawTime = System.nanoTime() - rawTime;
-                ModularUI.LOGGER.error("Failed to resize widget tree in {} µs.", NumberFormat.formatNanosToMicros(rawTime));
+                ModularUI.LOGGER.error("Failed to resize widget tree in {}s.", NumberFormat.formatNanos(rawTime));
             }
             throw new IllegalStateException("Failed to resize widgets");
         }
@@ -301,9 +301,9 @@ public class WidgetTree {
 
         if (WidgetTree.logResizeTime) {
             fullTime = System.nanoTime() - fullTime;
-            ModularUI.LOGGER.info("Resized widget tree in {} µs and {} µs for full resize.",
-                    NumberFormat.formatNanosToMicros(rawTime),
-                    NumberFormat.formatNanosToMicros(fullTime));
+            ModularUI.LOGGER.info("Resized widget tree in {}s and {}s for full resize.",
+                    NumberFormat.formatNanos(rawTime),
+                    NumberFormat.formatNanos(fullTime));
         }
     }
 
