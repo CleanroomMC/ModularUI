@@ -22,15 +22,22 @@ import com.cleanroommc.modularui.widgets.layout.IExpander;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.text.TextComponentString;
 
+import com.google.common.collect.AbstractIterator;
+import com.google.common.collect.Streams;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * Helper class to apply actions to each widget in a tree.
@@ -93,6 +100,17 @@ public class WidgetTree {
         return foreachChildBFS(parent, consumer, false);
     }
 
+    /**
+     * Iterates through the whole sub widget tree by using breath-first-search.
+     * <p>
+     * This method delivers good performance and can outperform {@link #foreachChild(IWidget, Predicate, boolean)} in certain small widget
+     * trees.
+     *
+     * @param parent      starting point
+     * @param consumer    Operation on each child. Return false to terminate the iteration.
+     * @param includeSelf true if the consumer should also consume the parent
+     * @return true if the iteration was not terminated by the consumer
+     */
     public static boolean foreachChildBFS(IWidget parent, Predicate<IWidget> consumer, boolean includeSelf) {
         if (includeSelf && !consumer.test(parent)) return false;
         ObjectList<IWidget> parents = ObjectList.create();
@@ -108,22 +126,16 @@ public class WidgetTree {
         return true;
     }
 
-    public static boolean foreachChildByLayer2(IWidget parent, Predicate<IWidget> consumer, boolean includeSelf) {
-        if (includeSelf && !consumer.test(parent)) return false;
-        ObjectList<IWidget> parents = ObjectList.create();
-        parents.add(parent);
-        while (!parents.isEmpty()) {
-            for (IWidget child : parents.removeFirst().getChildren()) {
-                if (!consumer.test(child)) return false;
-
-                if (child.hasChildren()) {
-                    parents.addLast(child);
-                }
-            }
-        }
-        return true;
-    }
-
+    /**
+     * Iterates through the whole sub widget tree recursively.
+     * <p>
+     * This method has the best performance in most cases, but can be outperformed on certain small widget trees.
+     *
+     * @param parent      starting point
+     * @param consumer    Operation on each child. Return false to terminate the iteration.
+     * @param includeSelf true if the consumer should also consume the parent
+     * @return true if the iteration was not terminated by the consumer
+     */
     public static boolean foreachChild(IWidget parent, Predicate<IWidget> consumer, boolean includeSelf) {
         if (includeSelf && !consumer.test(parent)) return false;
         if (parent.getChildren().isEmpty()) return true;
@@ -147,6 +159,112 @@ public class WidgetTree {
             if (!consumer.test(widget)) return false;
         }
         return !includeSelf || consumer.test(parent);
+    }
+
+    /**
+     * Creates a stream of the whole sub widget tree.
+     * <p>
+     * {@link Stream#forEach(Consumer)} on this has slightly worse performance than {@link #foreachChildBFS(IWidget, Predicate, boolean)} on
+     * small widget trees and has similar performance on large widget trees. The performance is significantly better than
+     * {@link #iteratorBFS(IWidget)} even though this method uses it.
+     *
+     * @param parent starting point.
+     * @return stream of the sub widget tree
+     */
+    @SuppressWarnings("UnstableApiUsage")
+    public static Stream<IWidget> stream(IWidget parent) {
+        if (!parent.hasChildren()) return Stream.of(parent);
+        return Streams.stream(iteratorBFS(parent));
+    }
+
+    public static Iterable<IWidget> iterableBFS(IWidget parent) {
+        return () -> iteratorBFS(parent);
+    }
+
+    /**
+     * Creates an iterator of the whole sub widget tree.
+     * <p>
+     * This method of iterating has the worst performance in every case. It's roughly 4 times worse than
+     * {@link #foreachChildBFS(IWidget, Predicate, boolean)}. If not used extensively the performance is still nothing to worry about.
+     *
+     * @param parent starting point
+     * @return an iterator of the sub widget tree
+     */
+    public static Iterator<IWidget> iteratorBFS(IWidget parent) {
+        return new AbstractIterator<>() {
+
+            private final ObjectList<IWidget> queue = ObjectList.create();
+            private Iterator<IWidget> currentIt = parent.getChildren().iterator();
+
+            @Override
+            protected IWidget computeNext() {
+                if (currentIt.hasNext()) return handleWidget(currentIt.next());
+                while (!queue.isEmpty()) {
+                    currentIt = queue.removeFirst().getChildren().iterator();
+                    if (currentIt.hasNext()) return handleWidget(currentIt.next());
+                }
+                return endOfData();
+            }
+
+            private IWidget handleWidget(IWidget widget) {
+                if (widget.hasChildren()) {
+                    queue.addLast(widget);
+                }
+                return widget;
+            }
+        };
+    }
+
+    public static List<IWidget> collectWidgets(IWidget parent, Predicate<IWidget> test) {
+        List<IWidget> widgets = new ArrayList<>();
+        foreachChildBFS(parent, w -> {
+            if (test.test(w)) widgets.add(w);
+            return true;
+        });
+        return widgets;
+    }
+
+    public static <T extends IWidget> List<T> collectWidgetsByType(IWidget parent, Class<T> type) {
+        return collectWidgetsByType(parent, type, null);
+    }
+
+    public static <T extends IWidget> List<T> collectWidgetsByType(IWidget parent, Class<T> type, @Nullable Predicate<T> test) {
+        List<T> widgets = new ArrayList<>();
+        foreachChildBFS(parent, w -> {
+            if (type.isAssignableFrom(w.getClass())) {
+                T t = (T) w;
+                if (test == null || test.test(t)) widgets.add(t);
+            }
+            return true;
+        });
+        return widgets;
+    }
+
+    public static IWidget findFirstBFS(IWidget parent, Predicate<IWidget> test) {
+        MutableObject<IWidget> found = new MutableObject<>();
+        foreachChildBFS(parent, w -> {
+            if (test.test(w)) {
+                found.setValue(w);
+                return false;
+            }
+            return true;
+        });
+        return found.getValue();
+    }
+
+    public static <T extends IWidget> IWidget findFirstTypedBFS(IWidget parent, Class<T> type, @Nullable Predicate<T> test) {
+        MutableObject<T> found = new MutableObject<>();
+        foreachChildBFS(parent, w -> {
+            if (type.isAssignableFrom(w.getClass())) {
+                T t = (T) w;
+                if (test == null || test.test(t)) {
+                    found.setValue(t);
+                    return false;
+                }
+            }
+            return true;
+        });
+        return found.getValue();
     }
 
     public static void drawTree(IWidget parent, ModularGuiContext context) {
