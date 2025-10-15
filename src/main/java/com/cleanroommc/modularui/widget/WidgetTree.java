@@ -22,8 +22,8 @@ import com.cleanroommc.modularui.widgets.layout.IExpander;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.text.TextComponentString;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -40,14 +40,14 @@ public class WidgetTree {
     public static boolean logResizeTime = true;
 
     public static final WidgetInfo INFO_AREA = (root, widget, builder) -> builder
+            .append("Area xywh:")
             .append(widget.getArea().x - root.getArea().x)
             .append(", ")
             .append(widget.getArea().y - root.getArea().y)
-            .append(" | ")
+            .append(", ")
             .append(widget.getArea().width)
             .append(", ")
             .append(widget.getArea().height);
-
     public static final WidgetInfo INFO_ENABLED = (root, widget, builder) -> builder.append("Enabled: ").append(widget.isEnabled());
     public static final WidgetInfo INFO_FULLY_RESIZED = (root, widget, builder) -> builder
             .append("Fully resized: ")
@@ -64,6 +64,8 @@ public class WidgetTree {
             INFO_RESIZED_DETAILED.addInfo(root, widget, builder);
         }
     };
+    public static final WidgetInfo INFO_WIDGET_THEME = (root, widget, builder) -> builder.append("Widget theme: ")
+            .append(widget.getWidgetTheme(widget.getContext().getTheme()).getKey().getFullName());
 
     private WidgetTree() {}
 
@@ -318,7 +320,7 @@ public class WidgetTree {
                         + parent + "' of screen '" + parent.getScreen().toString() + "'. See log for more info."));
             }
             ModularUI.LOGGER.error("Failed to resize widget. Affected widget tree:");
-            printTree(parent, w -> true, INFO_RESIZED_COLLAPSED);
+            printTree(parent, INFO_RESIZED_COLLAPSED);
         }
         rawTime = System.nanoTime() - rawTime;
         // now apply the calculated pos
@@ -516,25 +518,27 @@ public class WidgetTree {
     }
 
     public static StringBuilder widgetTreeToString(StringBuilder builder, IWidget parent, Predicate<IWidget> test, WidgetInfo additionalInfo) {
-        getTree(parent, parent, test, builder, additionalInfo, 0);
+        getTree(parent, parent, test, builder, additionalInfo, "", false);
         return builder;
     }
 
-    private static void getTree(IWidget root, IWidget parent, Predicate<IWidget> test, StringBuilder builder, WidgetInfo additionalInfo, int indent) {
-        if (indent >= 2) {
-            builder.append(StringUtils.repeat(' ', indent - 2))
-                    .append("- ");
+    private static void getTree(IWidget root, IWidget parent, Predicate<IWidget> test, StringBuilder builder, WidgetInfo additionalInfo, String indent, boolean hasNextSibling) {
+        if (!indent.isEmpty()) {
+            builder.append(indent).append(hasNextSibling ? "├ " : "└ ");
         }
         builder.append(parent);
         if (additionalInfo != null) {
             builder.append(" {");
             additionalInfo.addInfo(root, parent, builder);
-            builder.append("}\n");
+            builder.append("}");
         }
+        builder.append('\n');
         if (parent.hasChildren()) {
-            for (IWidget child : parent.getChildren()) {
+            @NotNull List<IWidget> children = parent.getChildren();
+            for (int i = 0; i < children.size(); i++) {
+                IWidget child = children.get(i);
                 if (test.test(child)) {
-                    getTree(root, child, test, builder, additionalInfo, indent + 2);
+                    getTree(root, child, test, builder, additionalInfo, indent + (hasNextSibling ? "│ " : "  "), i < children.size() - 1);
                 }
             }
         }
