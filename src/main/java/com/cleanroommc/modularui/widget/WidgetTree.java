@@ -2,6 +2,8 @@ package com.cleanroommc.modularui.widget;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.GuiAxis;
+import com.cleanroommc.modularui.api.MCHelper;
+import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.api.layout.IViewport;
@@ -15,10 +17,10 @@ import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
-import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.layout.IExpander;
 
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.text.TextComponentString;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.ApiStatus;
@@ -36,6 +38,31 @@ import java.util.function.Predicate;
 public class WidgetTree {
 
     public static boolean logResizeTime = true;
+
+    public static final WidgetInfo INFO_AREA = (root, widget, builder) -> builder
+            .append(widget.getArea().x - root.getArea().x)
+            .append(", ")
+            .append(widget.getArea().y - root.getArea().y)
+            .append(" | ")
+            .append(widget.getArea().width)
+            .append(", ")
+            .append(widget.getArea().height);
+
+    public static final WidgetInfo INFO_ENABLED = (root, widget, builder) -> builder.append("Enabled: ").append(widget.isEnabled());
+    public static final WidgetInfo INFO_FULLY_RESIZED = (root, widget, builder) -> builder
+            .append("Fully resized: ")
+            .append(widget.resizer().isFullyCalculated(widget.hasParent() && widget.getParent() instanceof ILayoutWidget));
+    public static final WidgetInfo INFO_RESIZED_DETAILED = (root, widget, builder) -> builder
+            .append("Self resized: ").append(widget.resizer().isSelfFullyCalculated(widget.hasParent() && widget.getParent() instanceof ILayoutWidget))
+            .append(", Children resized: ").append(widget.resizer().areChildrenCalculated())
+            .append(", Layout done: ").append(widget.resizer().isLayoutDone());
+    public static final WidgetInfo INFO_RESIZED_COLLAPSED = (root, widget, builder) -> {
+        if (widget.resizer().isSelfFullyCalculated(widget.hasParent() && widget.getParent() instanceof ILayoutWidget)) {
+            INFO_FULLY_RESIZED.addInfo(root, widget, builder);
+        } else {
+            INFO_RESIZED_DETAILED.addInfo(root, widget, builder);
+        }
+    };
 
     private WidgetTree() {}
 
@@ -285,11 +312,12 @@ public class WidgetTree {
         long rawTime = System.nanoTime();
         // resize each widget and calculate their relative pos
         if (!resizeWidget(parent, true, onOpen, false) && !resizeWidget(parent, false, onOpen, false)) {
-            if (WidgetTree.logResizeTime) {
-                rawTime = System.nanoTime() - rawTime;
-                ModularUI.LOGGER.error("Failed to resize widget tree in {}s.", NumberFormat.formatNanos(rawTime));
+            if (MCHelper.getPlayer() != null) {
+                MCHelper.getPlayer().sendMessage(new TextComponentString(IKey.RED + "ModularUI: Failed to resize sub tree of widget '"
+                        + parent + "' of screen '" + parent.getScreen().toString() + "'. See log for more info."));
             }
-            throw new IllegalStateException("Failed to resize widgets");
+            ModularUI.LOGGER.error("Failed to resize widget. Affected widget tree:");
+            printTree(parent, w -> true, INFO_RESIZED_COLLAPSED);
         }
         rawTime = System.nanoTime() - rawTime;
         // now apply the calculated pos
@@ -467,34 +495,80 @@ public class WidgetTree {
         return !foreachChildBFS(panel, widget -> !(widget instanceof ISynced<?> synced) || !synced.isSynced(), true);
     }
 
-    public static void print(IWidget parent, Predicate<IWidget> test) {
+    public static void printTree(IWidget parent) {
+        printTree(parent, w -> true, null);
+    }
+
+    public static void printTree(IWidget parent, WidgetInfo additionalInfo) {
+        printTree(parent, w -> true, additionalInfo);
+    }
+
+    public static void printTree(IWidget parent, Predicate<IWidget> test) {
+        printTree(parent, test, null);
+    }
+
+    public static void printTree(IWidget parent, Predicate<IWidget> test, WidgetInfo additionalInfo) {
         StringBuilder builder = new StringBuilder("Widget tree of ")
                 .append(parent)
                 .append('\n');
-        getTree(parent.getArea(), parent, test, builder, 0);
-        ModularUI.LOGGER.info(builder.toString());
+        ModularUI.LOGGER.info(widgetTreeToString(builder, parent, test, additionalInfo));
     }
 
-    private static void getTree(Area root, IWidget parent, Predicate<IWidget> test, StringBuilder builder, int indent) {
+    public static StringBuilder widgetTreeToString(StringBuilder builder, IWidget parent, Predicate<IWidget> test, WidgetInfo additionalInfo) {
+        getTree(parent, parent, test, builder, additionalInfo, 0);
+        return builder;
+    }
+
+    private static void getTree(IWidget root, IWidget parent, Predicate<IWidget> test, StringBuilder builder, WidgetInfo additionalInfo, int indent) {
         if (indent >= 2) {
             builder.append(StringUtils.repeat(' ', indent - 2))
                     .append("- ");
         }
-        builder.append(parent).append(" {")
-                .append(parent.getArea().x - root.x)
-                .append(", ")
-                .append(parent.getArea().y - root.y)
-                .append(" | ")
-                .append(parent.getArea().width)
-                .append(", ")
-                .append(parent.getArea().height)
-                .append("}\n");
+        builder.append(parent);
+        if (additionalInfo != null) {
+            builder.append(" {");
+            additionalInfo.addInfo(root, parent, builder);
+            builder.append("}\n");
+        }
         if (parent.hasChildren()) {
             for (IWidget child : parent.getChildren()) {
                 if (test.test(child)) {
-                    getTree(root, child, test, builder, indent + 2);
+                    getTree(root, child, test, builder, additionalInfo, indent + 2);
                 }
             }
+        }
+    }
+
+    public interface WidgetInfo {
+
+        void addInfo(IWidget root, IWidget widget, StringBuilder builder);
+
+        default WidgetInfo combine(WidgetInfo other, String joiner) {
+            return (root, widget, builder) -> {
+                addInfo(root, widget, builder);
+                builder.append(joiner);
+                other.addInfo(root, widget, builder);
+            };
+        }
+
+        default WidgetInfo combine(WidgetInfo other) {
+            return combine(other, " ");
+        }
+
+        static WidgetInfo of(String joiner, WidgetInfo... infos) {
+            return (root, widget, builder) -> {
+                for (int i = 0; i < infos.length; i++) {
+                    WidgetInfo info = infos[i];
+                    info.addInfo(root, widget, builder);
+                    if (i < infos.length - 1) {
+                        builder.append(joiner);
+                    }
+                }
+            };
+        }
+
+        static WidgetInfo of(WidgetInfo... infos) {
+            return of(" ", infos);
         }
     }
 }
