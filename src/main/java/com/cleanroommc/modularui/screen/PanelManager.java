@@ -157,7 +157,7 @@ public class PanelManager {
     public @NotNull List<LocatedWidget> getAllHoveredWidgetsList(boolean debug) {
         for (ModularPanel panel : this.panels) {
             List<LocatedWidget> widgets = panel.getAllHoveringList(debug);
-            if (widgets != null) {
+            if (!widgets.isEmpty()) {
                 return widgets;
             }
         }

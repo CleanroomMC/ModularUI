@@ -43,6 +43,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
@@ -692,7 +693,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return null;
     }
 
-    public List<LocatedWidget> getAllHoveringList(boolean debug) {
+    public @NotNull List<LocatedWidget> getAllHoveringList(boolean debug) {
+        if (this.hovering.isEmpty()) return Collections.emptyList();
         List<LocatedWidget> hovering = new ArrayList<>();
         for (ObjectListIterator<LocatedWidget> iterator = this.hovering.iterator(); iterator.hasNext(); ) {
             LocatedWidget lw = iterator.next();
@@ -709,7 +711,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 if (!lw.getElement().canHoverThrough()) break;
             }
         }
-        return hovering;
+        return hovering.isEmpty() ? Collections.emptyList() : hovering;
     }
 
     final void setPanelGuiContext(@NotNull ModularGuiContext context) {
