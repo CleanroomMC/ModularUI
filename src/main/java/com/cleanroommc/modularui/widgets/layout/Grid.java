@@ -16,7 +16,10 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
@@ -56,7 +59,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
     }
 
     @Override
-    public void layoutWidgets() {
+    public boolean layoutWidgets() {
         IntList rowSizes = new IntArrayList();
         IntList colSizes = new IntArrayList();
 
@@ -69,6 +72,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
                     colSizes.add(this.minColWidth);
                 }
                 if (!shouldIgnoreChildSize(child)) {
+                    if (!child.resizer().isWidthCalculated() || !child.resizer().isHeightCalculated()) return false;
                     rowSizes.set(i, Math.max(rowSizes.getInt(i), getElementHeight(child.getArea())));
                     colSizes.set(j, Math.max(colSizes.getInt(j), getElementWidth(child.getArea())));
                 }
@@ -99,6 +103,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
         if (getScrollArea().getScrollY() != null) {
             getScrollArea().getScrollY().setScrollSize(y);
         }
+        return true;
     }
 
     @Override

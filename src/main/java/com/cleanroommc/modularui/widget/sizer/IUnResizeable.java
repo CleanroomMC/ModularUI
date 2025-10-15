@@ -55,12 +55,20 @@ public interface IUnResizeable extends IResizeable {
     }
 
     @Override
+    default boolean isLayoutDone() {
+        return true;
+    }
+
+    @Override
     default boolean canRelayout(boolean isParentLayout) {
         return false;
     }
 
     @Override
     default void setChildrenResized(boolean resized) {}
+
+    @Override
+    default void setLayoutDone(boolean done) {}
 
     @Override
     default void setResized(boolean x, boolean y, boolean w, boolean h) {}

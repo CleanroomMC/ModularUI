@@ -68,6 +68,8 @@ public interface IResizeable {
 
     boolean areChildrenCalculated();
 
+    boolean isLayoutDone();
+
     default boolean isSizeCalculated(GuiAxis axis) {
         return axis.isHorizontal() ? isWidthCalculated() : isHeightCalculated();
     }
@@ -88,16 +90,18 @@ public interface IResizeable {
     }
 
     default boolean isFullyCalculated() {
-        return isSelfFullyCalculated() && areChildrenCalculated();
+        return isSelfFullyCalculated() && areChildrenCalculated() && isLayoutDone();
     }
 
     default boolean isFullyCalculated(boolean isParentLayout) {
-        return isSelfFullyCalculated(isParentLayout) && areChildrenCalculated();
+        return isSelfFullyCalculated(isParentLayout) && areChildrenCalculated() && isLayoutDone();
     }
 
     boolean canRelayout(boolean isParentLayout);
 
     void setChildrenResized(boolean resized);
+
+    void setLayoutDone(boolean done);
 
     /**
      * Marks position and size as calculated.

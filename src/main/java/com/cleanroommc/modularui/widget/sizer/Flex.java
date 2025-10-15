@@ -31,6 +31,7 @@ public class Flex implements IResizeable, IPositioned<Flex> {
     private boolean relativeToParent = true;
 
     private boolean childrenCalculated = false;
+    private boolean layoutDone = true;
 
     public Flex(IGuiElement parent) {
         this.parent = parent;
@@ -92,6 +93,11 @@ public class Flex implements IResizeable, IPositioned<Flex> {
     }
 
     @Override
+    public boolean isLayoutDone() {
+        return this.layoutDone;
+    }
+
+    @Override
     public boolean canRelayout(boolean isParentLayout) {
         return isParentLayout && (this.x.canRelayout() || this.y.canRelayout());
     }
@@ -99,6 +105,11 @@ public class Flex implements IResizeable, IPositioned<Flex> {
     @Override
     public void setChildrenResized(boolean resized) {
         this.childrenCalculated = resized;
+    }
+
+    @Override
+    public void setLayoutDone(boolean done) {
+        this.layoutDone = done;
     }
 
     public Flex coverChildrenWidth() {
@@ -358,6 +369,7 @@ public class Flex implements IResizeable, IPositioned<Flex> {
         setMarginPaddingApplied(false);
         setResized(false);
         this.childrenCalculated = false;
+        this.layoutDone = false;
     }
 
     @Override

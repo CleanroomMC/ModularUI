@@ -311,17 +311,18 @@ public class WidgetTree {
         boolean alreadyCalculated = false;
         // first try to resize this widget
         IResizeable resizer = widget.resizer();
+        ILayoutWidget layout = widget instanceof ILayoutWidget layoutWidget ? layoutWidget : null;
+        boolean isLayout = layout != null;
         if (init) {
             widget.beforeResize(onOpen);
             resizer.initResizing();
+            if (!isLayout) resizer.setLayoutDone(true);
         } else {
             // if this is not the first time check if this widget is already resized
             alreadyCalculated = resizer.isFullyCalculated(isParentLayout);
         }
         boolean selfFullyCalculated = resizer.isSelfFullyCalculated() || resizer.resize(widget, isParentLayout);
 
-        ILayoutWidget layout = widget instanceof ILayoutWidget layoutWidget ? layoutWidget : null;
-        boolean isLayout = layout != null;
         GuiAxis expandAxis = widget instanceof IExpander expander ? expander.getExpandAxis() : null;
         // now resize all children and collect children which could not be fully calculated
         List<IWidget> anotherResize = Collections.emptyList();
@@ -335,12 +336,13 @@ public class WidgetTree {
             }
         }
 
-        if (init || !resizer.areChildrenCalculated()) {
+        if (init || !resizer.areChildrenCalculated() || !resizer.isLayoutDone()) {
+            boolean layoutSuccessful = true;
             // we need to keep track of which widgets are not yet fully calculated, so we can call onResized ont those which later are
             // fully calculated
             BitSet state = getCalculatedState(anotherResize, isLayout);
             if (layout != null) {
-                layout.layoutWidgets();
+                layoutSuccessful = layout.layoutWidgets();
             }
 
             // post resize this widget if possible
@@ -349,8 +351,9 @@ public class WidgetTree {
             }
 
             if (layout != null) {
-                layout.postLayoutWidgets();
+                layoutSuccessful &= layout.postLayoutWidgets();
             }
+            resizer.setLayoutDone(layoutSuccessful);
             checkFullyCalculated(anotherResize, state, isLayout);
         }
 

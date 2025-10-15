@@ -63,7 +63,7 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
     }
 
     @Override
-    public void layoutWidgets() {
+    public boolean layoutWidgets() {
         this.separatorPositions.clear();
         GuiAxis axis = this.scrollData.getAxis();
         int separatorSize = getSeparatorSize();
@@ -73,11 +73,9 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
                 widget.resizer().updateResized();
                 continue;
             }
-            if (axis.isVertical() ?
-                    widget.getFlex().hasYPos() || !widget.resizer().isHeightCalculated() :
-                    widget.getFlex().hasXPos() || !widget.resizer().isWidthCalculated()) {
-                continue;
-            }
+            if (widget.flex().hasPos(axis)) continue;
+            if (!widget.resizer().isSizeCalculated(axis)) return false;
+
             p += widget.getArea().getMargin().getStart(axis);
             widget.getArea().setRelativePoint(axis, p);
             p += widget.getArea().getSize(axis) + widget.getArea().getMargin().getEnd(axis);
@@ -94,6 +92,7 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
             }
         }
         getScrollData().setScrollSize(p + getArea().getPadding().getEnd(axis));
+        return true;
     }
 
     @Override

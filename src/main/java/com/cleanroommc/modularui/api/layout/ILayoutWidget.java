@@ -19,13 +19,19 @@ public interface ILayoutWidget extends INotifyEnabled {
      * Note that even if {@link #shouldIgnoreChildSize(IWidget)} returns false at least one of the {@code setResized} methods in
      * {@link IResizeable} must be called. There is a no arg variant {@link IResizeable#updateResized()} which can also be used.
      * Not doing so may result failure to resize the widget tree fully.
+     *
+     * @return true if the layout was successful and no further iteration is needed
      */
-    void layoutWidgets();
+    boolean layoutWidgets();
 
     /**
      * Called after post calculation of this widget. The last call guarantees, that this widget is fully calculated.
+     *
+     * @return true if the layout was successful and no further iteration is needed
      */
-    default void postLayoutWidgets() {}
+    default boolean postLayoutWidgets() {
+        return true;
+    }
 
     /**
      * Called when determining wrapping size of this widget.
