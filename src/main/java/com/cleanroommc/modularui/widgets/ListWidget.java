@@ -73,17 +73,16 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
                 widget.resizer().updateResized();
                 continue;
             }
-            if (widget.flex().hasPos(axis)) continue;
+            if (widget.flex().hasPos(axis)) {
+                widget.resizer().updateResized(); // this is required when the widget has a pos on the main axis, but not on the cross axis
+                continue;
+            }
             if (!widget.resizer().isSizeCalculated(axis)) return false;
 
             p += widget.getArea().getMargin().getStart(axis);
             widget.getArea().setRelativePoint(axis, p);
             p += widget.getArea().getSize(axis) + widget.getArea().getMargin().getEnd(axis);
-            if (axis.isHorizontal()) {
-                widget.resizer().setXResized(true);
-            } else {
-                widget.resizer().setYResized(true);
-            }
+            widget.resizer().setPosResized(axis, true);
             widget.resizer().setMarginPaddingApplied(true);
             this.separatorPositions.add(p);
             p += separatorSize;

@@ -126,7 +126,10 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
                 continue;
             }
             // exclude children whose position of main axis is fixed
-            if (widget.flex().hasPos(this.axis)) continue;
+            if (widget.flex().hasPos(this.axis)) {
+                widget.resizer().updateResized(); // this is required when the widget has a pos on the main axis, but not on the cross axis
+                continue;
+            }
             Box margin = widget.getArea().getMargin();
 
             // set calculated relative main axis pos and set end margin for next widget
