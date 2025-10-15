@@ -54,10 +54,11 @@ public class WidgetTree {
             .append(widget.resizer().isFullyCalculated(widget.hasParent() && widget.getParent() instanceof ILayoutWidget));
     public static final WidgetInfo INFO_RESIZED_DETAILED = (root, widget, builder) -> builder
             .append("Self resized: ").append(widget.resizer().isSelfFullyCalculated(widget.hasParent() && widget.getParent() instanceof ILayoutWidget))
+            .append(", Is pos final: ").append(!widget.resizer().canRelayout(widget.hasParent() && widget.getParent() instanceof ILayoutWidget))
             .append(", Children resized: ").append(widget.resizer().areChildrenCalculated())
             .append(", Layout done: ").append(widget.resizer().isLayoutDone());
     public static final WidgetInfo INFO_RESIZED_COLLAPSED = (root, widget, builder) -> {
-        if (widget.resizer().isSelfFullyCalculated(widget.hasParent() && widget.getParent() instanceof ILayoutWidget)) {
+        if (widget.resizer().isFullyCalculated(widget.hasParent() && widget.getParent() instanceof ILayoutWidget)) {
             INFO_FULLY_RESIZED.addInfo(root, widget, builder);
         } else {
             INFO_RESIZED_DETAILED.addInfo(root, widget, builder);
