@@ -44,6 +44,9 @@ public class DynamicSyncedWidget<W extends DynamicSyncedWidget<W>> extends Widge
     }
 
     private void updateChild(IWidget widget) {
+        if (this.child != null) {
+            this.child.dispose();
+        }
         this.child = widget;
         if (isValid()) {
             this.child.initialise(this, true);

@@ -97,7 +97,6 @@ public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
 
     public SchemaWidget pitch(float pitch) {
         this.pitch = MathUtils.clamp(pitch, -PI_HALF + 0.001f, PI_HALF - 0.001f);
-        ;
         return this;
     }
 
