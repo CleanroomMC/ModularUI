@@ -15,8 +15,9 @@ public class GuiUtils {
     }
 
     public static FloatBuffer getTransformationBuffer(FloatBuffer floatBuffer) {
+        int pos = floatBuffer.position();
         GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, floatBuffer);
-        floatBuffer.position(0);
+        floatBuffer.position(pos);
         return floatBuffer;
     }
 
@@ -27,6 +28,28 @@ public class GuiUtils {
     public static Matrix4f getTransformationMatrix(Matrix4f matrix4f) {
         floatBuffer.rewind();
         getTransformationBuffer(floatBuffer);
+        matrix4f.set(floatBuffer);
+        return matrix4f;
+    }
+
+    public static FloatBuffer getProjectionBuffer() {
+        return getProjectionBuffer(BufferUtils.createFloatBuffer(16));
+    }
+
+    public static FloatBuffer getProjectionBuffer(FloatBuffer floatBuffer) {
+        int pos = floatBuffer.position();
+        GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, floatBuffer);
+        floatBuffer.position(pos);
+        return floatBuffer;
+    }
+
+    public static Matrix4f getProjectionMatrix() {
+        return getProjectionMatrix(new Matrix4f());
+    }
+
+    public static Matrix4f getProjectionMatrix(Matrix4f matrix4f) {
+        floatBuffer.rewind();
+        getProjectionBuffer(floatBuffer);
         matrix4f.set(floatBuffer);
         return matrix4f;
     }

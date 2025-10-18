@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.drawable.Icon;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.GuiUtils;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.utils.VectorUtil;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -33,16 +34,22 @@ import net.minecraftforge.client.MinecraftForgeClient;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.EXTFramebufferObject;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class BaseSchemaRenderer implements IDrawable {
+
+    protected static final FloatBuffer PIXEL_DEPTH_BUFFER = ByteBuffer.allocateDirect(4).order(ByteOrder.nativeOrder()).asFloatBuffer();
 
     private static final Framebuffer FBO = new Framebuffer(1080, 1080, true);
 
@@ -51,6 +58,7 @@ public class BaseSchemaRenderer implements IDrawable {
     private final Framebuffer framebuffer;
     private final Camera camera = new Camera();
     private RayTraceResult lastRayTrace = null;
+    private final int[] viewport = new int[4];
 
     public BaseSchemaRenderer(ISchema schema, Framebuffer framebuffer) {
         this.schema = schema;
@@ -87,18 +95,20 @@ public class BaseSchemaRenderer implements IDrawable {
 
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
-        render(x, y, width, height, context.getMouseX(), context.getMouseY());
+        render(context, x, y, width, height);
     }
 
-    protected void render(int x, int y, int width, int height, int mouseX, int mouseY) {
+    protected void render(GuiContext context, int x, int y, int width, int height) {
+        int mx = context.getMouseX();
+        int my = context.getMouseY();
         onSetupCamera();
         int lastFbo = bindFBO();
         setupCamera(this.framebuffer.framebufferWidth, this.framebuffer.framebufferHeight);
         renderWorld();
         if (doRayTrace()) {
             RayTraceResult result = null;
-            if (Area.isInside(x, y, width, height, mouseX, mouseY)) {
-                result = rayTrace(mouseX, mouseY, width, height);
+            if (Area.isInside(x, y, width, height, mx, my)) {
+                result = rayTrace(mx, my, width, height);
             }
             if (result == null) {
                 if (this.lastRayTrace != null) {
@@ -131,30 +141,41 @@ public class BaseSchemaRenderer implements IDrawable {
         GlStateManager.bindTexture(lastFbo);
     }
 
+    /**
+     * Raytraces at the given mouse pos.
+     *
+     * @param mouseX A mouse x pos from 0 to width
+     * @param mouseY A mouse y pos from 0 to height
+     * @param width  Height of the drawn framebuffer
+     * @param height Width of the drawn framebuffer
+     * @return raytrace result
+     */
     protected RayTraceResult rayTrace(int mouseX, int mouseY, int width, int height) {
-        final float halfPI = (float) (Math.PI / 2);
-        Vector3f cameraPos = camera.getPos();
-        float yaw = camera.getYaw();
-        float pitch = camera.getPitch();
+        // transform mouse pos into relative mouse pos from 0 - 1
+        Vector3f levelMouse = screenToWorldPos((float) mouseX / width, (float) mouseY / height);
+        Vector3f target = this.camera.getLookVec().mul(20).add(levelMouse);
+        return schema.getWorld().rayTraceBlocks(VectorUtil.toVec3d(levelMouse), VectorUtil.toVec3d(target), true);
+    }
 
-        Vector3f mouseXShift = new Vector3f(1, 0, 0)
-                // TODO
-                //.rotatePitch(pitch)
-                //.rotateYaw(-yaw + halfPI)
-                .mul(mouseX - width / 2f)
-                .mul(1 / 32f);
-        Vector3f mouseYShift = new Vector3f(0, -1, 0)
-                //.rotatePitch(pitch)
-                //.rotateYaw(-yaw + halfPI)
-                .mul(mouseY - height / 2f)
-                .mul(1 / 32f);
-        Vector3f mousePos = cameraPos.add(mouseXShift, new Vector3f()).add(mouseYShift);
-        Vector3f focus = camera.getLookAt();
-        float perspectiveCompensation = isIsometric() ? 1 : cameraPos.distance(focus) / 3 * width / 100;
-        Vector3f underMousePos = focus.add(mouseXShift.mul(perspectiveCompensation), new Vector3f()).add(mouseYShift.mul(perspectiveCompensation));
-        Vector3f look = underMousePos.sub(mousePos, new Vector3f()).mul(10);
-        mousePos.add(look, underMousePos);
-        return schema.getWorld().rayTraceBlocks(VectorUtil.toVec3d(mousePos), VectorUtil.toVec3d(underMousePos), true);
+    /**
+     * Converts a relative screen pos to a world pos.
+     *
+     * @param x X pos from 0 to 1
+     * @param y Y pos from 0 to 1
+     * @return world pos
+     */
+    protected Vector3f screenToWorldPos(float x, float y) {
+        // read projection and modelview matrix
+        Matrix4f transform = GuiUtils.getProjectionMatrix().mul(GuiUtils.getTransformationMatrix());
+        // convert pos to framebuffer pos
+        int wx = (int) (x * this.viewport[2]);
+        int wy = (int) (y * this.viewport[3]);
+        wy = viewport[3] - wy; // invert y
+        GL11.glReadPixels(wx, wy, 1, 1, GL11.GL_DEPTH_COMPONENT, GL11.GL_FLOAT, PIXEL_DEPTH_BUFFER); // read depth under mouse
+        PIXEL_DEPTH_BUFFER.rewind();
+        float depth = PIXEL_DEPTH_BUFFER.get();
+        PIXEL_DEPTH_BUFFER.rewind();
+        return transform.unproject(wx, wy, depth, this.viewport, new Vector3f());
     }
 
     private void renderWorld() {
@@ -330,6 +351,10 @@ public class BaseSchemaRenderer implements IDrawable {
         this.framebuffer.setFramebufferColor(0.0F, 0.0F, 0.0F, 0.0F);
         this.framebuffer.framebufferClear();
         this.framebuffer.bindFramebuffer(true);
+        this.viewport[0] = 0;
+        this.viewport[1] = 0;
+        this.viewport[2] = this.framebuffer.framebufferWidth;
+        this.viewport[3] = this.framebuffer.framebufferHeight;
         GlStateManager.pushMatrix();
         return lastID;
     }
