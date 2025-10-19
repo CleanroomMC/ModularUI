@@ -164,7 +164,7 @@ public class PanelSyncManager {
             // registration of sync handlers forbidden
             if (this.allowSyncHandlerRegistration) {
                 // lock can be bypassed currently, but it wasn't used
-                throw new IllegalStateException("SyncHandlers must be registered during panel building. Please use getOrCreateSyncHandler()!");
+                throw new IllegalStateException("SyncHandlers must be registered during panel building. Please use getOrCreateSyncHandler() inside DynamicSyncHandler!");
             } else {
                 throw new IllegalStateException("SyncHandlers must be registered during panel building. The only exceptions is via a DynamicSyncHandler and sync functions!");
             }
