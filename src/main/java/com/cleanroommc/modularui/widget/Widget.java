@@ -115,7 +115,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
             initialiseSyncHandler(getScreen().getSyncManager(), late);
         }
         if (isExcludeAreaInRecipeViewer()) {
-            getContext().getRecipeViewerSettings().addRecipeViewerExclusionArea(this);
+            getContext().getRecipeViewerSettings().addExclusionArea(this);
         }
         onInit();
         if (hasChildren()) {
@@ -172,7 +172,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
                 }
             }
             if (isExcludeAreaInRecipeViewer()) {
-                getContext().getRecipeViewerSettings().removeRecipeViewerExclusionArea(this);
+                getContext().getRecipeViewerSettings().removeExclusionArea(this);
             }
         }
         if (hasChildren()) {
@@ -941,7 +941,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     public W excludeAreaInRecipeViewer(boolean val) {
         this.excludeAreaInRecipeViewer = val;
         if (isValid()) {
-            getContext().getRecipeViewerSettings().addRecipeViewerExclusionArea(this);
+            getContext().getRecipeViewerSettings().addExclusionArea(this);
         }
         return getThis();
     }

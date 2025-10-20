@@ -16,7 +16,7 @@ import java.awt.*;
  * An interface for compat with recipe viewer ghost slots.
  * Implement this on any {@link IWidget}.
  * This slot must then be manually registered in something like {@link Widget#onInit()}
- * with {@link RecipeViewerSettings#addRecipeViewerGhostIngredientSlot(IWidget) JeiSettings.addJeiGhostIngredientSlot(IWidget)}
+ * with {@link RecipeViewerSettings#addGhostIngredientSlot(IWidget) JeiSettings.addJeiGhostIngredientSlot(IWidget)}
  *
  * @param <I> type of the ingredient
  */

@@ -59,7 +59,7 @@ public class ModularScreenJEIHandler<T extends GuiScreen & IMuiScreen> implement
     @Nullable
     @Override
     public IGuiProperties apply(@NotNull T guiScreen) {
-        return guiScreen.getScreen().getContext().getRecipeViewerSettings().isRecipeViewerEnabled(guiScreen.getScreen()) ? new ModularUIProperties(guiScreen) : null;
+        return guiScreen.getScreen().getContext().getRecipeViewerSettings().isEnabled(guiScreen.getScreen()) ? new ModularUIProperties(guiScreen) : null;
     }
 
     public static class ContainerScreen<T extends GuiContainer & IMuiScreen> extends ModularScreenJEIHandler<T> implements IAdvancedGuiHandler<T> {

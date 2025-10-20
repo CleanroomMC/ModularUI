@@ -22,7 +22,7 @@ public class PhantomItemSlot extends ItemSlot implements RecipeViewerGhostIngred
     @Override
     public void onInit() {
         super.onInit();
-        getContext().getRecipeViewerSettings().addRecipeViewerGhostIngredientSlot(this);
+        getContext().getRecipeViewerSettings().addGhostIngredientSlot(this);
     }
 
     @Override

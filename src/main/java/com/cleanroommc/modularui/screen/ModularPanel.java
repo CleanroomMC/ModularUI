@@ -243,7 +243,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @MustBeInvokedByOverriders
     public void onClose() {
         if (!getScreen().isOverlay()) {
-            getContext().getRecipeViewerSettings().removeRecipeViewerExclusionArea(this);
+            getContext().getRecipeViewerSettings().removeExclusionArea(this);
         }
         this.state = State.CLOSED;
         if (this.panelHandler != null) {
@@ -717,7 +717,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     final void setPanelGuiContext(@NotNull ModularGuiContext context) {
         setContext(context);
         if (!context.getScreen().isOverlay()) {
-            context.getRecipeViewerSettings().addRecipeViewerExclusionArea(this);
+            context.getRecipeViewerSettings().addExclusionArea(this);
         }
     }
 
