@@ -94,7 +94,7 @@ public class AbstractParentWidget<I extends IWidget, W extends AbstractParentWid
 
     protected boolean remove(I child) {
         if (this.children.remove(child)) {
-            child.dispose();
+            if (isValid()) child.dispose();
             onChildRemove(child);
             return true;
         }
@@ -106,8 +106,18 @@ public class AbstractParentWidget<I extends IWidget, W extends AbstractParentWid
             index = getChildren().size() + index + 1;
         }
         I child = this.children.remove(index);
-        child.dispose();
+        if (isValid()) child.dispose();
         onChildRemove(child);
+        return true;
+    }
+
+    protected boolean removeAll() {
+        if (this.children.isEmpty()) return false;
+        for (I i : this.children) {
+            if (isValid()) i.dispose();
+            onChildRemove(i);
+        }
+        this.children.clear();
         return true;
     }
 

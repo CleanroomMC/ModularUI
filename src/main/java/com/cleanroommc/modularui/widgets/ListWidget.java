@@ -122,6 +122,11 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
     }
 
     @Override
+    public boolean removeAll() {
+        return super.removeAll();
+    }
+
+    @Override
     public void onChildAdd(I child) {
         super.onChildAdd(child);
         if (isValid()) {

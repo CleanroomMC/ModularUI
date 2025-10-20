@@ -24,4 +24,8 @@ public class ParentWidget<W extends ParentWidget<W>> extends AbstractParentWidge
         return super.remove(index);
     }
 
+    @Override
+    public boolean removeAll() {
+        return super.removeAll();
+    }
 }
