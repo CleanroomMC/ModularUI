@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.test;
 
-import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.overlay.OverlayHandler;
@@ -29,9 +28,8 @@ public class OverlayTest {
             TextWidget<?> title = new TextWidget<>(IKey.str("ModularUI"));
             int[] colors = {Color.WHITE.main, Color.AMBER.main, Color.BLUE.main, Color.GREEN.main, Color.DEEP_PURPLE.main, Color.RED.main};
             AtomicInteger k = new AtomicInteger();
-            return new ModularScreen(ModularPanel.defaultPanel("overlay").sizeRel(1f)
-                    .background(IDrawable.EMPTY)
-                    .disableHoverBackground()
+            return new ModularScreen(ModularPanel.defaultPanel("overlay")
+                    .fullScreenInvisible()
                     .child(title.scale(5f)
                             .shadow(true)
                             .color(colors[k.get()])
@@ -56,7 +54,7 @@ public class OverlayTest {
                 public @NotNull ModularPanel buildUI(ModularGuiContext context) {
                     return ModularPanel.defaultPanel("watermark_overlay", gui.getXSize(), gui.getYSize())
                             .pos(gui.getGuiLeft(), gui.getGuiTop())
-                            .background(IDrawable.EMPTY)
+                            .invisible()
                             .child(GuiTextures.MUI_LOGO.asIcon().asWidget()
                                     .top(5).right(5)
                                     .size(18));

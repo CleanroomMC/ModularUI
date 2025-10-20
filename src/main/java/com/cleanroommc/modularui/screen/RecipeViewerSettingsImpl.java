@@ -164,7 +164,7 @@ public class RecipeViewerSettingsImpl implements RecipeViewerSettings {
                 iterator.remove();
                 continue;
             }
-            if (widget.isEnabled()) {
+            if (widget.isEnabled() && widget.getPanel().isOpen()) {
                 areas.add(widget.getArea());
             }
         }
