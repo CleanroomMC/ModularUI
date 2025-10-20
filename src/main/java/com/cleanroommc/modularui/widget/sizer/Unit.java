@@ -80,6 +80,10 @@ public class Unit {
         return this.offset;
     }
 
+    public int getAbsOffset() {
+        return Math.abs(this.offset);
+    }
+
     public Measure getMeasure() {
         return this.measure;
     }
@@ -98,6 +102,13 @@ public class Unit {
 
     public void setMeasure(Measure measure) {
         this.measure = measure;
+    }
+
+    public boolean isCloseToZero() {
+        if (isRelative()) {
+            return Math.abs(getValue()) <= 0.01f && Math.abs(getOffset()) < 5;
+        }
+        return Math.abs(getValue() + getOffset()) < 5;
     }
 
     public boolean isRelative() {

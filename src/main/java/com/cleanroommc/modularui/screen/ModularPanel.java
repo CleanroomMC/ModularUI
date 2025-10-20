@@ -6,7 +6,6 @@ import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.UpOrDown;
-import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IDragResizeable;
@@ -242,9 +241,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @MustBeInvokedByOverriders
     public void onClose() {
-        if (!getScreen().isOverlay()) {
-            getContext().getRecipeViewerSettings().removeExclusionArea(this);
-        }
+        onPanelClose();
         this.state = State.CLOSED;
         if (this.panelHandler != null) {
             this.panelHandler.closePanelInternal();
@@ -791,6 +788,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         }
     }
 
+    @Override
+    public boolean isExcludeAreaInRecipeViewer() {
+        return super.isExcludeAreaInRecipeViewer() || (!getScreen().isOverlay() && !this.invisible && !flex().isFullSize());
+    }
+
     public ModularPanel bindPlayerInventory() {
         return child(SlotGroupWidget.playerInventory(true));
     }
@@ -799,9 +801,14 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return child(SlotGroupWidget.playerInventory(bottom, true));
     }
 
+    @Override
     public ModularPanel invisible() {
         this.invisible = true;
-        return background(IDrawable.EMPTY);
+        return super.invisible();
+    }
+
+    public ModularPanel fullScreenInvisible() {
+        return invisible().full();
     }
 
     public ModularPanel resizeableOnDrag(boolean resizeable) {

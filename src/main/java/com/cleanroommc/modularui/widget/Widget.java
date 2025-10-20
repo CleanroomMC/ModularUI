@@ -159,12 +159,10 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     /**
-     * Called when this widget is removed from the widget tree or after the panel is closed.
-     * Overriding this is fine, but super must be called.
+     * Called when the panel this widget belongs to closes. In this state the panel can still be reopened.
      */
     @MustBeInvokedByOverriders
-    @Override
-    public void dispose() {
+    public void onPanelClose() {
         if (isValid()) {
             if (this.guiActionListeners != null) {
                 for (IGuiAction action : this.guiActionListeners) {
@@ -180,12 +178,26 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
                 child.dispose();
             }
         }
+        this.timeHovered = -1;
+    }
+
+    /**
+     * Called when this widget is removed from the widget tree or after the panel is closed.
+     * Overriding this is fine, but super must be called.
+     */
+    @MustBeInvokedByOverriders
+    @Override
+    public void dispose() {
+        if (hasChildren()) {
+            for (IWidget child : getChildren()) {
+                child.dispose();
+            }
+        }
         if (!(this instanceof ModularPanel)) {
             this.panel = null;
             this.parent = null;
             this.context = null;
         }
-        this.timeHovered = -1;
         this.valid = false;
     }
 
@@ -515,6 +527,11 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     public W widgetTheme(WidgetThemeKey<?> s) {
         this.widgetThemeOverride = s;
         return getThis();
+    }
+
+    public W invisible() {
+        return background(IDrawable.EMPTY)
+                .disableHoverBackground();
     }
 
     // --------------
