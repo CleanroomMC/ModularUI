@@ -29,6 +29,10 @@ public class SecondaryPanel implements IPanelHandler {
         parent.registerSubPanel(this);
     }
 
+    public ModularPanel getParent() {
+        return parent;
+    }
+
     @Override
     public void closePanel() {
         if (!this.open) return;

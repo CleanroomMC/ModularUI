@@ -18,6 +18,7 @@ import org.jetbrains.annotations.ApiStatus;
  * If the panel does not contain any synced widgets, a simple panel handler using {@link #simple(ModularPanel, SecondaryPanel.IPanelBuilder, boolean)}
  * is likely what you need.
  */
+@ApiStatus.NonExtendable
 public interface IPanelHandler {
 
     /**
