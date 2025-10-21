@@ -222,7 +222,7 @@ class InternalWidgetTree {
 
         if (init || !resizer.areChildrenCalculated() || !resizer.isLayoutDone()) {
             boolean layoutSuccessful = true;
-            // we need to keep track of which widgets are not yet fully calculated, so we can call onResized ont those which later are
+            // we need to keep track of which widgets are not yet fully calculated, so we can call onResized on those which later are
             // fully calculated
             BitSet state = getCalculatedState(anotherResize, isLayout);
             if (layout != null) {

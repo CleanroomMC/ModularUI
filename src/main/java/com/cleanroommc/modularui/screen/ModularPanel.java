@@ -130,7 +130,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         if (!isOpen()) return;
         closeSubPanels();
         if (isMainPanel()) {
-            // close screen and let NEA animation
+            // close screen and let NEA handle animation
             MCHelper.popScreen(getScreen().isOpenParentOnClose(), getContext().getParentScreen());
             return;
         }
@@ -159,6 +159,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         }
     }
 
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
     public void animateClose() {
         closeIfOpen();
     }
@@ -303,7 +305,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             if (this.hovering.isEmpty()) {
                 // no element is hovered -> try close panel
                 if (closeOnOutOfBoundsClick()) {
-                    animateClose();
+                    closeIfOpen();
                     result = true;
                 }
             } else if (checkRecipeViewerGhostIngredient(mouseButton)) {

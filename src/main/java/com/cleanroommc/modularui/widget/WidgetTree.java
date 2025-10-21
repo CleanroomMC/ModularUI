@@ -145,7 +145,7 @@ public class WidgetTree {
         if (!parent.hasChildren()) return true;
         for (IWidget widget : parent.getChildren()) {
             if (!consumer.test(widget)) return false;
-            if (widget.hasChildren() && foreachChild(widget, consumer, false)) {
+            if (widget.hasChildren() && !foreachChild(widget, consumer, false)) {
                 return false;
             }
         }

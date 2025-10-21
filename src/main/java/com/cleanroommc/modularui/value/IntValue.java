@@ -1,12 +1,13 @@
 package com.cleanroommc.modularui.value;
 
+import com.cleanroommc.modularui.api.value.IDoubleValue;
 import com.cleanroommc.modularui.api.value.IIntValue;
 import com.cleanroommc.modularui.api.value.IStringValue;
 
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 
-public class IntValue implements IIntValue<Integer>, IStringValue<Integer> {
+public class IntValue implements IIntValue<Integer>, IDoubleValue<Integer>, IStringValue<Integer> {
 
     private int value;
 
@@ -35,8 +36,18 @@ public class IntValue implements IIntValue<Integer>, IStringValue<Integer> {
     }
 
     @Override
+    public double getDoubleValue() {
+        return getIntValue();
+    }
+
+    @Override
+    public void setDoubleValue(double val) {
+        setIntValue((int) val);
+    }
+
+    @Override
     public String getStringValue() {
-        return String.valueOf(this.value);
+        return Integer.toString(getIntValue());
     }
 
     @Override
