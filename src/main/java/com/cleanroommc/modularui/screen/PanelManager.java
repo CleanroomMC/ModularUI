@@ -51,22 +51,27 @@ public class PanelManager {
     }
 
     boolean tryInit() {
-        if (this.state == State.CLOSED) {
-            if (this.panels.isEmpty()) {
-                throw new IllegalStateException("Tried to reopen closed screen, but all panels are disposed!");
+        return switch (this.state) {
+            case WAIT_DISPOSAL ->
+                    throw new IllegalStateException("Tried to open panel while its waiting to be disposed. This shouldn't happen.");
+            case OPEN, REOPENED -> false;
+            case CLOSED -> {
+                if (this.panels.isEmpty()) {
+                    throw new IllegalStateException("Tried to reopen closed screen, but all panels are disposed!");
+                }
+                // set all stored panels to be open
+                this.panels.forEach(p -> p.reopen(true));
+                this.disposal.removeIf(this.panels::contains);
+                setState(State.REOPENED);
+                yield true;
             }
-            this.panels.forEach(p -> p.reopen(true));
-            this.disposal.removeIf(this.panels::contains);
-            setState(State.REOPENED);
-            return true;
-        }
-        if (this.state == State.INIT || this.state == State.DISPOSED) {
-            setState(State.OPEN);
-            openPanel(this.mainPanel, false);
-            checkDirty();
-            return true;
-        }
-        return false;
+            case INIT, DISPOSED -> {
+                setState(State.OPEN);
+                openPanel(this.mainPanel, false);
+                checkDirty();
+                yield true;
+            }
+        };
     }
 
     public boolean isMainPanel(ModularPanel panel) {
@@ -156,12 +161,27 @@ public class PanelManager {
 
     public @NotNull List<LocatedWidget> getAllHoveredWidgetsList(boolean debug) {
         for (ModularPanel panel : this.panels) {
-            List<LocatedWidget> widgets = panel.getAllHoveringList(debug);
-            if (!widgets.isEmpty()) {
-                return widgets;
+            if (panel.isAnyHovered()) {
+                return panel.getAllHoveringList(debug);
             }
         }
         return Collections.emptyList();
+    }
+
+    public @Nullable ModularPanel getTopHoveredPanel() {
+        for (ModularPanel panel : this.panels) {
+            if (panel.isAnyHovered()) return panel;
+        }
+        return null;
+    }
+
+    public boolean isBelowMouseInTopPanel(IWidget widget) {
+        for (ModularPanel panel : this.panels) {
+            if (panel.isAnyHovered()) {
+                return panel.isBelowMouse(widget);
+            }
+        }
+        return false;
     }
 
     @ApiStatus.Internal
@@ -391,7 +411,7 @@ public class PanelManager {
     }
 
     private void setState(State state) {
-        this.state = state;
+        this.state = Objects.requireNonNull(state);
     }
 
     public boolean isClosed() {

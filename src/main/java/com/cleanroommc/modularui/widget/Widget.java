@@ -54,6 +54,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @Nullable private String name;
     private boolean enabled = true;
     private int timeHovered = -1;
+    private int timeBelowMouse = -1;
     private boolean excludeAreaInRecipeViewer = false;
     // gui context
     private boolean valid = false;
@@ -95,6 +96,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @Override
     public final void initialise(@NotNull IWidget parent, boolean late) {
         this.timeHovered = -1;
+        this.timeBelowMouse = -1;
         if (!(this instanceof ModularPanel)) {
             this.parent = parent;
             this.panel = parent.getPanel();
@@ -186,6 +188,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
             this.context = null;
         }
         this.timeHovered = -1;
+        this.timeBelowMouse = -1;
         this.valid = false;
     }
 
@@ -535,6 +538,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @Override
     public void onUpdate() {
         if (isHovering()) this.timeHovered++;
+        if (isBelowMouse()) this.timeBelowMouse++;
         if (this.onUpdateListener != null) {
             this.onUpdateListener.accept(getThis());
         }
@@ -698,6 +702,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
      *
      * @param resizer resizer
      */
+    @ApiStatus.Experimental
     @Override
     public void resizer(IResizeable resizer) {
         this.resizer = resizer != null ? resizer : IUnResizeable.INSTANCE;
@@ -913,9 +918,16 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         this.timeHovered = -1;
     }
 
+    @MustBeInvokedByOverriders
     @Override
-    public boolean isHovering() {
-        return timeHovered >= 0;
+    public void onMouseEnterArea() {
+        this.timeBelowMouse = 0;
+    }
+
+    @MustBeInvokedByOverriders
+    @Override
+    public void onMouseLeaveArea() {
+        this.timeBelowMouse = -1;
     }
 
     @Override
@@ -923,8 +935,17 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         return timeHovered >= ticks;
     }
 
+    @Override
+    public boolean isBelowMouseFor(int ticks) {
+        return timeBelowMouse >= ticks;
+    }
+
     public int getTicksHovered() {
         return timeHovered;
+    }
+
+    public int getTicksBelowMouse() {
+        return timeBelowMouse;
     }
 
     @Override

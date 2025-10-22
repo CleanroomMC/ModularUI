@@ -33,6 +33,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -295,6 +296,8 @@ public class ModularScreen {
                 GuiDraw.drawRect(0, 0, this.context.getScreenArea().w(), this.context.getScreenArea().h(), Color.argb(16, 16, 16, (int) (125 * panel.getAlpha())));
             }
             WidgetTree.drawTree(panel, this.context);
+            GlStateManager.clearDepth(1);
+            GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
         }
         this.context.updateZ(0);
         this.context.popViewport(null);
@@ -623,6 +626,7 @@ public class ModularScreen {
      * @param action action listener
      */
     public void registerGuiActionListener(IGuiAction action) {
+        // TODO these should be linked to a IWidget, which can be checked for isValid() and is panel open on use -> proper event system
         List<IGuiAction> list = this.guiActionListeners.computeIfAbsent(getGuiActionClass(action), key -> new ArrayList<>());
         if (!list.contains(action)) list.add(action);
     }

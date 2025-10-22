@@ -34,7 +34,6 @@ import com.cleanroommc.neverenoughanimations.NEAConfig;
 
 import net.minecraft.client.Minecraft;
 
-import it.unimi.dsi.fastutil.objects.ObjectListIterator;
 import mezz.jei.gui.ghost.GhostIngredientDrag;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -693,23 +692,23 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     public @NotNull List<LocatedWidget> getAllHoveringList(boolean debug) {
         if (this.hovering.isEmpty()) return Collections.emptyList();
-        List<LocatedWidget> hovering = new ArrayList<>();
-        for (ObjectListIterator<LocatedWidget> iterator = this.hovering.iterator(); iterator.hasNext(); ) {
-            LocatedWidget lw = iterator.next();
-            if (!lw.getElement().isValid()) {
-                iterator.remove();
-                continue;
-            }
-            if (debug) {
-                hovering.add(lw);
-                continue;
-            }
-            if (lw.getElement().canHover()) {
-                hovering.add(lw);
-                if (!lw.getElement().canHoverThrough()) break;
-            }
+        return new ArrayList<>(this.hovering);
+    }
+
+    public boolean isBelowMouse(IWidget widget) {
+        if (!widget.isValid() || widget.getPanel() != this) return false;
+        for (LocatedWidget lw : this.hovering) {
+            if (lw.getElement() == widget) return true;
         }
-        return hovering.isEmpty() ? Collections.emptyList() : hovering;
+        return false;
+    }
+
+    public boolean isAnyHovered() {
+        if (this.hovering.isEmpty()) return false;
+        if (this.hovering.size() == 1 && this.hovering.get(0).getElement() instanceof ModularPanel panel) {
+            return panel.canHover();
+        }
+        return true;
     }
 
     final void setPanelGuiContext(@NotNull ModularGuiContext context) {
