@@ -86,6 +86,14 @@ public class DimensionSizer {
         this.cancelAutoMovement = cancelAutoMovement;
     }
 
+    public void setUnit(Unit unit, Unit.State pos) {
+        switch (pos) {
+            case START -> getStart(null).setFrom(unit);
+            case END -> getEnd(null).setFrom(unit);
+            case SIZE -> getSize(null).setFrom(unit);
+        };
+    }
+
     public boolean hasStart() {
         return this.start != null;
     }

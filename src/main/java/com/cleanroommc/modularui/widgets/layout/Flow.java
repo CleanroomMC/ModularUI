@@ -147,32 +147,36 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
 
     @Override
     public boolean postLayoutWidgets() {
-        if (!hasChildren()) return true;
-        GuiAxis other = this.axis.getOther();
-        int width = getArea().getSize(other);
-        Box padding = getArea().getPadding();
-        boolean hasWidth = resizer().isSizeCalculated(other);
-        if (!hasWidth && this.caa != Alignment.CrossAxis.START) return false;
-        for (IWidget widget : getChildren()) {
+        return Flow.layoutCrossAxisListLike(this, this.axis, this.caa);
+    }
+
+    public static boolean layoutCrossAxisListLike(IWidget parent, GuiAxis axis, Alignment.CrossAxis caa) {
+        if (!parent.hasChildren()) return true;
+        GuiAxis other = axis.getOther();
+        int width = parent.getArea().getSize(other);
+        Box padding = parent.getArea().getPadding();
+        boolean hasWidth = parent.resizer().isSizeCalculated(other);
+        if (!hasWidth && caa != Alignment.CrossAxis.START) return false;
+        for (IWidget widget : parent.getChildren()) {
             // exclude children whose position of main axis is fixed
-            if (widget.flex().hasPos(this.axis)) continue;
+            if (widget.flex().hasPos(axis)) continue;
             Box margin = widget.getArea().getMargin();
             // don't align auto positioned children in cross axis
             if (!widget.flex().hasPos(other) && widget.resizer().isSizeCalculated(other)) {
                 int crossAxisPos = margin.getStart(other) + padding.getStart(other);
                 if (hasWidth) {
-                    if (this.caa == Alignment.CrossAxis.CENTER) {
+                    if (caa == Alignment.CrossAxis.CENTER) {
                         crossAxisPos = (int) (width / 2f - widget.getArea().getSize(other) / 2f);
-                    } else if (this.caa == Alignment.CrossAxis.END) {
+                    } else if (caa == Alignment.CrossAxis.END) {
                         crossAxisPos = width - widget.getArea().getSize(other) - margin.getEnd(other) - padding.getStart(other);
                     }
                 }
                 widget.getArea().setRelativePoint(other, crossAxisPos);
-                widget.getArea().setPoint(other, getArea().getPoint(other) + crossAxisPos);
+                widget.getArea().setPoint(other, parent.getArea().getPoint(other) + crossAxisPos);
                 widget.resizer().setPosResized(other, true);
                 widget.resizer().setMarginPaddingApplied(other, true);
             }
-            if (isValid()) {
+            if (parent.isValid()) {
                 // we changed rel pos, but we need to calculate the new absolute pos and other stuff
                 widget.flex().applyPos(widget);
             }

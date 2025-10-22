@@ -175,7 +175,7 @@ public class ScrollArea extends Area {
             return;
         }
         progress = MathUtils.clamp(progress, 0f, 1f);
-        data.scrollTo(this, (int) (progress * (data.getScrollSize() - data.getVisibleSize(this) + data.getThickness())));
+        data.scrollTo(this, (int) (progress * (data.getScrollSize() - data.getFullVisibleSize(this) + data.getThickness())));
     }
 
     public boolean isInsideScrollbarArea(int x, int y) {

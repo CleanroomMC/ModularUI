@@ -190,7 +190,12 @@ public class TextRenderer {
     }
 
     public List<String> wrapLine(String line) {
-        return this.maxWidth > 0 ? getFontRenderer().listFormattedStringToWidth(line, (int) (this.maxWidth / this.scale)) : Collections.singletonList(line);
+        if (this.maxWidth > 0) {
+            // min size of 10 to prevent stackoverflow on render
+            int wrapWidth = Math.max(10, (int) (this.maxWidth / this.scale));
+            return getFontRenderer().listFormattedStringToWidth(line, wrapWidth);
+        }
+        return Collections.singletonList(line);
     }
 
     public boolean wouldFit(List<String> text, boolean shouldCheckWidth) {

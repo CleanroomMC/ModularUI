@@ -54,6 +54,15 @@ public class Unit {
         this.offset = 0;
     }
 
+    public void setFrom(Unit other) {
+        this.autoAnchor = other.autoAnchor;
+        this.value = other.value;
+        this.valueSupplier = other.valueSupplier;
+        this.measure = other.measure;
+        this.anchor = other.anchor;
+        this.offset = other.offset;
+    }
+
     public void setValue(float value) {
         this.value = value;
         this.valueSupplier = null;

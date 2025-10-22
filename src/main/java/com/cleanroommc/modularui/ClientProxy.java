@@ -128,11 +128,11 @@ public class ClientProxy extends CommonProxy {
 
     public static void setCursorResizeIcon(ResizeDragArea dragArea) {
         if (resizeCursorV == null) return; // cursors failed to initialized
+        if (dragArea == null) {
+            resetCursorIcon();
+            return;
+        }
         try {
-            if (dragArea == null) {
-                resetCursorIcon();
-                return;
-            }
             Cursor cursor = switch (dragArea) {
                 case TOP_LEFT, BOTTOM_RIGHT -> resizeCursorDiagInverse;
                 case TOP_RIGHT, BOTTOM_LEFT -> resizeCursorDiag;
