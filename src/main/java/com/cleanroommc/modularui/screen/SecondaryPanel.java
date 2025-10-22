@@ -36,7 +36,7 @@ public class SecondaryPanel implements IPanelHandler {
     @Override
     public void closePanel() {
         if (!this.open) return;
-        this.panel.animateClose();
+        this.panel.closeIfOpen();
     }
 
     @Override

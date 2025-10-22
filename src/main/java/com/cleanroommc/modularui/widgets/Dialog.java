@@ -24,7 +24,7 @@ public class Dialog<T> extends ModularPanel {
         if (this.resultConsumer != null) {
             this.resultConsumer.accept(result);
         }
-        animateClose();
+        closeIfOpen();
     }
 
     @Override

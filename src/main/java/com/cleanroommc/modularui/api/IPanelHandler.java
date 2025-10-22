@@ -12,8 +12,7 @@ import org.jetbrains.annotations.ApiStatus;
  * This class can handle opening and closing of a {@link ModularPanel}. It makes sure, that the same panel is not created multiple
  * times and instead reused.
  * <p>Using {@link #openPanel()} is the only way to open multiple panels. </p>
- * <p>Panels can be closed with {@link #closePanel()}, but also with {@link ModularPanel#closeIfOpen()} and
- * {@link ModularPanel#animateClose()}. With the difference, that the method from this interface also works on server side. </p>
+ * <p>Panels can be closed with {@link #closePanel()}, but also with {@link ModularPanel#closeIfOpen()}. With the difference, that the method from this interface also works on server side. </p>
  * Synced panels must be created with {@link PanelSyncManager#panel(String, PanelSyncHandler.IPanelBuilder, boolean)}.
  * If the panel does not contain any synced widgets, a simple panel handler using {@link #simple(ModularPanel, SecondaryPanel.IPanelBuilder, boolean)}
  * is likely what you need.

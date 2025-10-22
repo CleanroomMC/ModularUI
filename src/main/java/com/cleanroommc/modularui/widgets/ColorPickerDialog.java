@@ -94,7 +94,7 @@ public class ColorPickerDialog extends Dialog<Integer> {
                                 .heightRel(1f).width(50)
                                 .overlay(IKey.str("Cancel"))
                                 .onMousePressed(button -> {
-                                    animateClose();
+                                    closeIfOpen();
                                     return true;
                                 }))
                         .child(new ButtonWidget<>()
