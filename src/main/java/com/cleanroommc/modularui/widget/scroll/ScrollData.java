@@ -282,11 +282,18 @@ public abstract class ScrollData {
     }
 
     @SideOnly(Side.CLIENT)
-    public abstract void drawScrollbar(ScrollArea area, ModularGuiContext context, WidgetTheme widgetTheme);
+    public abstract void drawScrollbar(ScrollArea area, ModularGuiContext context, WidgetTheme widgetTheme, IDrawable texture);
 
     @SideOnly(Side.CLIENT)
-    protected void drawScrollBar(ModularGuiContext context, int x, int y, int w, int h, WidgetTheme widgetTheme) {
-        IDrawable drawable = this.scrollbar != null ? this.scrollbar : widgetTheme.getBackground();
+    protected void drawScrollBar(ModularGuiContext context, int x, int y, int w, int h, WidgetTheme widgetTheme, IDrawable texture) {
+        IDrawable drawable;
+        if (this.scrollbar != null) {
+            drawable = this.scrollbar;
+        } else if (widgetTheme.getBackground() != null && widgetTheme.getBackground() != IDrawable.NONE) {
+            drawable = widgetTheme.getBackground();
+        } else {
+            drawable = texture;
+        }
         if (drawable == null) drawable = Scrollbar.DEFAULT;
         drawable.draw(context, x, y, w, h, widgetTheme);
     }

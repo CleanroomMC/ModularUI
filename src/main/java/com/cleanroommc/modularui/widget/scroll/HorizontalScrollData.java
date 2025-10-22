@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.widget.scroll;
 
 import com.cleanroommc.modularui.api.GuiAxis;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -67,7 +68,7 @@ public class HorizontalScrollData extends ScrollData {
     }
 
     @Override
-    public void drawScrollbar(ScrollArea area, ModularGuiContext context, WidgetTheme widgetTheme) {
+    public void drawScrollbar(ScrollArea area, ModularGuiContext context, WidgetTheme widgetTheme, IDrawable texture) {
         boolean isOtherActive = isOtherScrollBarActive(area, true);
         int l = getScrollBarLength(area);
         int x = 0;
@@ -83,6 +84,6 @@ public class HorizontalScrollData extends ScrollData {
         }
 
         w = l;
-        drawScrollBar(context, x, y, w, h, widgetTheme);
+        drawScrollBar(context, x, y, w, h, widgetTheme, texture);
     }
 }

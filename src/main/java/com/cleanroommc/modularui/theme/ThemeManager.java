@@ -302,15 +302,13 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
 
         private <T extends WidgetTheme> void parse(WidgetThemeMap map, ITheme parent, WidgetThemeKey<T> key, JsonBuilder json) {
             WidgetThemeParser<T> parser = key.getParser();
-            boolean definedInTheme = true;
             JsonObject widgetThemeJson = getJson(json.getJson(), key.getFullName());
-            if (widgetThemeJson == null) {
-                definedInTheme = false;
-            }
+            boolean definedStandard = widgetThemeJson != null;
 
             JsonObject widgetThemeHoverJson = getJson(json.getJson(), key.getFullName() + IThemeApi.HOVER_SUFFIX);
-            if (widgetThemeHoverJson == null) {
-                if (!definedInTheme) {
+            boolean definedHover = widgetThemeHoverJson != null;
+            if (!definedHover) {
+                if (!definedStandard) {
                     // widget theme undefined -> copy from parent
                     if (key.isSubWidgetTheme()) {
                         // if it is a sub widget theme, we use the parent widget theme from this theme
@@ -325,29 +323,25 @@ public class ThemeManager implements ISelectiveResourceReloadListener {
             }
 
             JsonObject fallback = key.isSubWidgetTheme() ? null : json.getJson();
-            T widgetTheme = null;
+            T widgetTheme;
             if (widgetThemeJson != null) {
                 T parentWidgetTheme = key.isSubWidgetTheme() ? map.getTheme(key.getParent()).getTheme() : parent.getWidgetTheme(key).getTheme();
                 // sub widget themes strictly only inherit from their parent widget theme and not the parent theme
                 widgetTheme = parser.parse(parentWidgetTheme, widgetThemeJson, fallback);
-            }
-
-            T widgetThemeHover = null;
-            if (widgetThemeHoverJson != null) {
-                // only inherit from the widget theme if it was actually defined, otherwise use parent
-                T parentWidgetTheme = definedInTheme ? widgetTheme : parent.getWidgetTheme(key).getHoverTheme();
-                widgetThemeHover = parser.parse(parentWidgetTheme, widgetThemeHoverJson, fallback);
-            }
-
-            if (widgetTheme != null) {
-                if (widgetThemeHover != null) {
-                    map.putTheme(key, new WidgetThemeEntry<>(key, widgetTheme, widgetThemeHover));
-                } else {
-                    map.putTheme(key, new WidgetThemeEntry<>(key, widgetTheme));
-                }
             } else {
-                map.putTheme(key, new WidgetThemeEntry<>(key, parent.getWidgetTheme(key).getTheme(), widgetThemeHover));
+                widgetTheme = parent.getWidgetTheme(key).getTheme();
             }
+
+            if (!definedHover && definedStandard) {
+                // marker to use the standard theme background on hover
+                widgetThemeJson.addProperty(IThemeApi.BACKGROUND, "none");
+                widgetThemeHoverJson = widgetThemeJson;
+            }
+            // only inherit from the widget theme if it was actually defined, otherwise use parent
+            T parentWidgetTheme = widgetThemeJson != emptyJson ? widgetTheme : parent.getWidgetTheme(key).getHoverTheme();
+            T widgetThemeHover = parser.parse(parentWidgetTheme, widgetThemeHoverJson, fallback);
+
+            map.putTheme(key, new WidgetThemeEntry<>(key, widgetTheme, widgetThemeHover));
         }
 
         private JsonObject getJson(JsonObject json, String key) {

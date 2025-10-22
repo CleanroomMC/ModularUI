@@ -46,6 +46,12 @@ public class SelectableTheme extends WidgetTheme {
         return selected;
     }
 
+    @Override
+    public SelectableTheme withNoHoverBackground() {
+        return new SelectableTheme(getDefaultWidth(), getDefaultHeight(), IDrawable.NONE, getColor(), getTextColor(), getTextShadow(), getIconColor(),
+                IDrawable.NONE, this.selected.getColor(), this.selected.getTextColor(), this.selected.getTextShadow(), this.selected.getIconColor());
+    }
+
     public static class Builder<T extends SelectableTheme, B extends SelectableTheme.Builder<T, B>> extends WidgetThemeBuilder<T, B> {
 
         public B selectedColor(int color) {

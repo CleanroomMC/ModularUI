@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.widget.scroll;
 
 import com.cleanroommc.modularui.api.GuiAxis;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -216,14 +217,14 @@ public class ScrollArea extends Area {
      * This method is responsible for drawing a scroll bar
      */
     @SideOnly(Side.CLIENT)
-    public void drawScrollbar(ModularGuiContext context, WidgetTheme widgetTheme) {
+    public void drawScrollbar(ModularGuiContext context, WidgetTheme widgetTheme, IDrawable texture) {
         boolean isXActive = false; // micro optimisation
         if (this.scrollX != null && this.scrollX.isScrollBarActive(this, false)) {
             isXActive = true;
-            this.scrollX.drawScrollbar(this, context, widgetTheme);
+            this.scrollX.drawScrollbar(this, context, widgetTheme, texture);
         }
         if (this.scrollY != null && this.scrollY.isScrollBarActive(this, isXActive)) {
-            this.scrollY.drawScrollbar(this, context, widgetTheme);
+            this.scrollY.drawScrollbar(this, context, widgetTheme, texture);
         }
     }
 }

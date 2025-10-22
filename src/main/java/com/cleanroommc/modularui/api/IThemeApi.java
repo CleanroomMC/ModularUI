@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.api;
 
+import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.Scrollbar;
 import com.cleanroommc.modularui.screen.ModularScreen;
@@ -66,7 +67,7 @@ public interface IThemeApi {
 
     WidgetThemeKey<SelectableTheme> TOGGLE_BUTTON = get().widgetThemeKeyBuilder("toggleButton", SelectableTheme.class)
             .defaultTheme(SelectableTheme.whiteTextShadow(18, 18, GuiTextures.MC_BUTTON, GuiTextures.MC_BUTTON_DISABLED))
-            .defaultHoverTheme(SelectableTheme.whiteTextShadow(18, 18, GuiTextures.MC_BUTTON_HOVERED, GuiTextures.MC_BUTTON_DISABLED))
+            .defaultHoverTheme(SelectableTheme.whiteTextShadow(18, 18, GuiTextures.MC_BUTTON_HOVERED, IDrawable.NONE))
             .register();
 
     // sub widget themes

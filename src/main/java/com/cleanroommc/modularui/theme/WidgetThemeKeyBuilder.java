@@ -35,14 +35,23 @@ public class WidgetThemeKeyBuilder<T extends WidgetTheme> {
         return this;
     }
 
+    @SuppressWarnings("unchecked")
     public WidgetThemeKey<T> register() {
         Objects.requireNonNull(this.id, "Id for widget theme must not be null");
         Objects.requireNonNull(this.defaultTheme, "Default widget theme must not be null, but is null for id '" + this.id + "'.");
         if (this.parser == null) parser = createParserWithReflection();
-        if (this.defaultHoverTheme == null) defaultHoverTheme = defaultTheme;
+        if (this.defaultHoverTheme == null) {
+            // not ideal, but it's the best I can do without too much breaking changes
+            WidgetTheme hover = this.defaultTheme.withNoHoverBackground();
+            if (hover.getClass() != this.defaultTheme.getClass()) {
+                throw new IllegalArgumentException("Tried to create a default hover theme, but method withNoHoverBackground() is not override to create its type.");
+            }
+            this.defaultHoverTheme = (T) hover;
+        }
         return IThemeApi.get().registerWidgetTheme(this.id, this.defaultTheme, this.defaultHoverTheme, this.parser);
     }
 
+    @SuppressWarnings("unchecked")
     private WidgetThemeParser<T> createParserWithReflection() {
         Class<T> type = (Class<T>) this.defaultTheme.getClass();
         try {
