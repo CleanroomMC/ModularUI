@@ -179,13 +179,11 @@ public class TextRenderer {
             drawMeasuredLines(Collections.singletonList(line));
             return;
         }
-        float scroll = (this.maxWidth - line.getWidth()) * progress;
-        //scroll = scroll % (int) (line.width + 1);
-        String drawString = line.getText();//getFontRenderer().trimStringToWidth(line.getText(), (int) (this.maxWidth + scroll));
+        float scroll = (line.getWidth() - this.maxWidth) * progress;
         Stencil.apply(this.x, -500, (int) this.maxWidth, 1000, context);
-        GlStateManager.translate(scroll, 0, 0);
-        drawMeasuredLines(Collections.singletonList(line(drawString)));
         GlStateManager.translate(-scroll, 0, 0);
+        drawMeasuredLines(Collections.singletonList(line));
+        GlStateManager.translate(scroll, 0, 0);
         Stencil.remove();
     }
 

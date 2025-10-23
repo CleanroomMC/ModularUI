@@ -39,7 +39,7 @@ public class TextWidget<W extends TextWidget<W>> extends Widget<W> {
     @Override
     public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         TextRenderer renderer = TextRenderer.SHARED;
-        this.lastText = checkString();
+        String text = checkString();
         WidgetTheme theme = getActiveWidgetTheme(widgetTheme, isHovering());
         renderer.setColor(this.color != null ? this.color.getAsInt() : theme.getTextColor());
         renderer.setAlignment(this.alignment, getArea().paddedWidth() + this.scale, getArea().paddedHeight());
@@ -47,13 +47,14 @@ public class TextWidget<W extends TextWidget<W>> extends Widget<W> {
         renderer.setPos(getArea().getPadding().getLeft(), getArea().getPadding().getTop());
         renderer.setScale(this.scale);
         renderer.setSimulate(false);
-        renderer.draw(this.key.getFormatted());
+        renderer.draw(text);
     }
 
     protected String checkString() {
         String text = this.key.getFormatted();
         if (this.lastText != null && !this.lastText.equals(text)) {
             onTextChanged(text);
+            this.lastText = text;
         }
         return text;
     }
