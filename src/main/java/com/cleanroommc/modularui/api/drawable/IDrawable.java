@@ -107,6 +107,14 @@ public interface IDrawable {
         }
     }
 
+    default int getDefaultWidth() {
+        return 0;
+    }
+
+    default int getDefaultHeight() {
+        return 0;
+    }
+
     /**
      * @return a widget with this drawable as a background
      */
@@ -118,7 +126,7 @@ public interface IDrawable {
      * @return this drawable as an icon
      */
     default Icon asIcon() {
-        return new Icon(this);
+        return new Icon(this).size(getDefaultWidth(), getDefaultHeight());
     }
 
     /**

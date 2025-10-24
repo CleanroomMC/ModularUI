@@ -6,6 +6,10 @@ import net.minecraft.util.ResourceLocation;
 
 import com.google.gson.JsonObject;
 
+/**
+ * This class is a <a href="https://en.wikipedia.org/wiki/9-slice_scaling">9-slice texture</a>. It can be created using
+ * {@link UITexture.Builder#adaptable(int, int, int, int)}.
+ */
 public class AdaptableUITexture extends UITexture {
 
     private final int imageWidth, imageHeight, bl, bt, br, bb;

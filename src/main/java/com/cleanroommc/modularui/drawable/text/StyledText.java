@@ -55,6 +55,7 @@ public class StyledText extends BaseKey {
         return this.color;
     }
 
+    @Override
     public float getScale() {
         return this.scale;
     }

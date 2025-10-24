@@ -31,6 +31,16 @@ public interface IIcon extends IDrawable {
         return axis.isHorizontal() ? getWidth() : getHeight();
     }
 
+    @Override
+    default int getDefaultWidth() {
+        return getWrappedDrawable() != null ? getWrappedDrawable().getDefaultWidth() : 0;
+    }
+
+    @Override
+    default int getDefaultHeight() {
+        return getWrappedDrawable() != null ? getWrappedDrawable().getDefaultHeight() : 0;
+    }
+
     /**
      * @return the margin of this icon. Only used if width or height is 0
      */

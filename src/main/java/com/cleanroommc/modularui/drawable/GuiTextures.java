@@ -72,6 +72,7 @@ public interface GuiTextures {
     UITexture BOOKMARK = icon("bookmark", 128, 48);
     UITexture SOUND = icon("sound", 144, 48);
     UITexture SEARCH = icon("search", 160, 48);
+    UITexture CHECKMARK = icon("checkmark", 176, 48);
 
     UITexture CHECKBOARD = icon("checkboard", 0, 240);
     UITexture DISABLED = icon("disabled", 16, 240);
@@ -91,10 +92,18 @@ public interface GuiTextures {
             .defaultColorType()
             .build();
 
+    UITexture MENU_BACKGROUND = UITexture.builder()
+            .location(ModularUI.ID, "gui/background/menu")
+            .imageSize(18, 18)
+            .adaptable(1)
+            .name("menu")
+            .defaultColorType()
+            .build();
+
     UITexture MC_BUTTON = UITexture.builder()
             .location(ModularUI.ID, "gui/widgets/mc_button")
             .imageSize(16, 32) // texture is 32x64, but this looks nicer
-            .uv(0f, 0f, 1f, 0.5f)
+            .subAreaUV(0f, 0f, 1f, 0.5f)
             .adaptable(2).tiled()
             .name("mc_button")
             .defaultColorType()
@@ -103,7 +112,7 @@ public interface GuiTextures {
     UITexture MC_BUTTON_PRESSED = UITexture.builder()
             .location(ModularUI.ID, "gui/widgets/mc_button")
             .imageSize(16, 32)
-            .uv(0f, 0.5f, 1f, 1f)
+            .subAreaUV(0f, 0.5f, 1f, 1f)
             .adaptable(2).tiled()
             .name("mc_button_pressed")
             .defaultColorType()
@@ -112,7 +121,7 @@ public interface GuiTextures {
     UITexture MC_BUTTON_HOVERED = UITexture.builder()
             .location(ModularUI.ID, "gui/widgets/mc_button_hovered")
             .imageSize(16, 32)
-            .uv(0f, 0f, 1f, 0.5f)
+            .subAreaUV(0f, 0f, 1f, 0.5f)
             .adaptable(2).tiled()
             .name("mc_button_hovered")
             .build();
@@ -120,7 +129,7 @@ public interface GuiTextures {
     UITexture MC_BUTTON_HOVERED_PRESSED = UITexture.builder()
             .location(ModularUI.ID, "gui/widgets/mc_button_hovered")
             .imageSize(16, 32)
-            .uv(0f, 0.5f, 1f, 1f)
+            .subAreaUV(0f, 0.5f, 1f, 1f)
             .adaptable(2).tiled()
             .name("mc_button_hovered_pressed")
             .build();
@@ -191,6 +200,8 @@ public interface GuiTextures {
     UITexture CHECK_BOX = UITexture.fullImage(ModularUI.ID, "gui/widgets/toggle_config");
     UITexture CROSS = UITexture.fullImage(ModularUI.ID, "gui/icons/cross");
     UITexture CROSS_TINY = UITexture.fullImage(ModularUI.ID, "gui/icons/cross_tiny");
+    UITexture CHECK_BOX_EMPTY = CHECK_BOX.getSubArea(0, 0, 1f, 0.5f);
+    UITexture CHECK_BOX_FULL = CHECK_BOX.getSubArea(0, 0.5f, 1f, 1f);
 
     TabTexture TAB_TOP = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_top", ColorType.DEFAULT), GuiAxis.Y, false, 28, 32, 4);
     TabTexture TAB_BOTTOM = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_bottom", ColorType.DEFAULT), GuiAxis.Y, true, 28, 32, 4);

@@ -70,6 +70,14 @@ public class Icon implements IIcon, IJsonSerializable {
         return this.alignment;
     }
 
+    public Icon expandWidth() {
+        return width(0);
+    }
+
+    public Icon expandHeight() {
+        return height(0);
+    }
+
     public Icon width(int width) {
         this.width = Math.max(0, width);
         return this;
