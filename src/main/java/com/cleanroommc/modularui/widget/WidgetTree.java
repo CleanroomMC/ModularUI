@@ -627,6 +627,22 @@ public class WidgetTree {
         ModularUI.LOGGER.info(widgetTreeToString(builder, parent, test, additionalInfo));
     }
 
+    public static String widgetTreeToString(IWidget parent) {
+        return widgetTreeToString(parent, w -> true, null);
+    }
+
+    public static String widgetTreeToString(IWidget parent, WidgetInfo additionalInfo) {
+        return widgetTreeToString(parent, w -> true, additionalInfo);
+    }
+
+    public static String widgetTreeToString(IWidget parent, Predicate<IWidget> test) {
+        return widgetTreeToString(parent, test, null);
+    }
+
+    public static String widgetTreeToString(IWidget parent, Predicate<IWidget> test, WidgetInfo additionalInfo) {
+        return widgetTreeToString(null, parent, test, additionalInfo).toString();
+    }
+
     /**
      * Writes the sub widget tree into a human-readable tree graph with unicode characters.
      *
