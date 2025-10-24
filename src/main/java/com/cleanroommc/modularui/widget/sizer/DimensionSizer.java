@@ -91,7 +91,7 @@ public class DimensionSizer {
             case START -> getStart(null).setFrom(unit);
             case END -> getEnd(null).setFrom(unit);
             case SIZE -> getSize(null).setFrom(unit);
-        };
+        }
     }
 
     public boolean hasStart() {
@@ -141,9 +141,9 @@ public class DimensionSizer {
     }
 
     public boolean dependsOnParent() {
-        return this.end != null ||
+        return !this.coverChildren && (this.end != null ||
                 (this.start != null && this.start.isRelative()) ||
-                (this.size != null && this.size.isRelative());
+                (this.size != null && this.size.isRelative()));
     }
 
     public void setResized(boolean all) {

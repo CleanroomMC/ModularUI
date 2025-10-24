@@ -112,9 +112,15 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
         }
         int size = p + getArea().getPadding().getEnd(axis);
         getScrollData().setScrollSize(size);
-        if (this.wrapTight && size < getArea().getSize(getAxis())) {
+        int widgetSize = getArea().getSize(axis);
+        if (this.wrapTight && size < widgetSize) {
             getArea().setSize(getAxis(), size);
-            resizer().setSizeResized(getAxis(), true);
+            resizer().setSizeResized(axis, true);
+            if (resizer().isPosCalculated(axis)) {
+                // if the position is defined with right(), bottom() or is relative, then the position is very likely invalid now
+                // let mui recalculate position
+                resizer().setPosResized(axis, false);
+            }
         }
         return true;
     }
@@ -122,6 +128,11 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
     @Override
     public boolean postLayoutWidgets() {
         return Flow.layoutCrossAxisListLike(this, getAxis(), this.caa);
+    }
+
+    @Override
+    public boolean canCoverByDefaultSize(GuiAxis axis) {
+        return axis.getOther() == getAxis();
     }
 
     @Override
@@ -157,7 +168,7 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
     }
 
     @Override
-    public void onChildAdd(I child) {
+    protected void onChildAdd(I child) {
         super.onChildAdd(child);
         if (isValid()) {
             scheduleResize();
@@ -166,7 +177,7 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
     }
 
     @Override
-    public void onChildRemove(I child) {
+    protected void onChildRemove(I child) {
         super.onChildRemove(child);
         if (isValid()) {
             scheduleResize();
@@ -187,12 +198,8 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
         return this.scrollData.getAxis();
     }
 
-    private Unit maxSizeUnit() {
-        if (this.mainAxisMaxSize == null) this.mainAxisMaxSize = new Unit();
-        return this.mainAxisMaxSize;
-    }
-
     private W maxSize(float v, int offset, Unit.Measure measure) {
+        if (this.mainAxisMaxSize == null) this.mainAxisMaxSize = new Unit();
         this.mainAxisMaxSize.setValue(v);
         this.mainAxisMaxSize.setOffset(offset);
         this.mainAxisMaxSize.setMeasure(measure);
@@ -200,6 +207,7 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
     }
 
     private W maxSize(DoubleSupplier v, int offset, Unit.Measure measure) {
+        if (this.mainAxisMaxSize == null) this.mainAxisMaxSize = new Unit();
         this.mainAxisMaxSize.setValue(v);
         this.mainAxisMaxSize.setOffset(offset);
         this.mainAxisMaxSize.setMeasure(measure);

@@ -47,6 +47,49 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
     }
 
     @Override
+    public int getDefaultHeight() {
+        return this.axis.isHorizontal() ? getDefaultCrossAxisSize() : getDefaultMainAxisSize();
+    }
+
+    @Override
+    public int getDefaultWidth() {
+        return this.axis.isHorizontal() ? getDefaultMainAxisSize() : getDefaultCrossAxisSize();
+    }
+
+    public int getDefaultMainAxisSize() {
+        if (!hasChildren()) return 18;
+        GuiAxis axis = this.axis;
+        int total = getArea().getPadding().getTotal(axis);
+        for (IWidget widget : getChildren()) {
+            if (shouldIgnoreChildSize(widget) || widget.flex().hasPos(axis)) continue;
+            if (widget.flex().isExpanded() || !widget.resizer().isSizeCalculated(axis)) {
+                total += axis.isHorizontal() ? widget.getDefaultWidth() : widget.getDefaultHeight();
+            } else {
+                total += widget.getArea().getSize(axis);
+            }
+            total += widget.getArea().getMargin().getTotal(axis);
+        }
+        return total;
+    }
+
+    public int getDefaultCrossAxisSize() {
+        if (!hasChildren()) return 18;
+        GuiAxis axis = this.axis.getOther();
+        int max = 0;
+        for (IWidget widget : getChildren()) {
+            if (shouldIgnoreChildSize(widget)) continue;
+            int s = widget.getArea().getMargin().getTotal(axis);
+            if (!widget.resizer().isSizeCalculated(axis)) {
+                s += axis.isHorizontal() ? widget.getDefaultWidth() : widget.getDefaultHeight();
+            } else {
+                s += widget.getArea().getSize(axis);
+            }
+            max = Math.max(max, s);
+        }
+        return max + getArea().getPadding().getTotal(axis);
+    }
+
+    @Override
     public boolean layoutWidgets() {
         if (!hasChildren()) return true;
         final boolean hasSize = resizer().isSizeCalculated(this.axis);
@@ -182,6 +225,11 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
             }
         }
         return true;
+    }
+
+    @Override
+    public boolean canCoverByDefaultSize(GuiAxis axis) {
+        return axis.getOther() == this.axis;
     }
 
     @Override
