@@ -157,7 +157,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, Recipe
             GuiDraw.drawFluidTexture(content, this.contentOffsetX, y, getArea().width - this.contentOffsetX * 2, height, 0);
         }
         if (this.overlayTexture != null) {
-            this.overlayTexture.drawAtZero(context, getArea(), getActiveWidgetTheme(widgetTheme, isHovering()));
+            this.overlayTexture.drawAtZeroPadded(context, getArea(), getActiveWidgetTheme(widgetTheme, isHovering()));
         }
         if (content != null && this.syncHandler.controlsAmount()) {
             String s = NumberFormat.format(getBaseUnitAmount(content.amount), NumberFormat.AMOUNT_TEXT) + getBaseUnit();

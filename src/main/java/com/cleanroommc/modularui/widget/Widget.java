@@ -237,7 +237,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     public void drawOverlay(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         IDrawable bg = getCurrentOverlay(context.getTheme(), widgetTheme);
         if (bg != null) {
-            bg.drawAtZero(context, getArea(), getActiveWidgetTheme(widgetTheme, isHovering()));
+            bg.drawAtZeroPadded(context, getArea(), getActiveWidgetTheme(widgetTheme, isHovering()));
         }
     }
 

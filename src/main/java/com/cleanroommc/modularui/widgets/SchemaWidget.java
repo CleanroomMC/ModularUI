@@ -46,7 +46,7 @@ public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
     public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         Vec3d f = this.schema.getSchema().getFocus();
         this.schema.getCamera().setLookAtAndAngle((float) (f.x + this.offset.x), (float) (f.y + this.offset.y), (float) (f.z + this.offset.z), scale, yaw, pitch);
-        this.schema.drawAtZero(context, getArea(), widgetTheme.getTheme());
+        this.schema.drawAtZeroPadded(context, getArea(), widgetTheme.getTheme());
     }
 
     @Override
