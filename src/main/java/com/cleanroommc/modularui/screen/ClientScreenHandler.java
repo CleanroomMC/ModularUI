@@ -14,6 +14,7 @@ import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccesso
 import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.Stencil;
+import com.cleanroommc.modularui.overlay.DebugOptions;
 import com.cleanroommc.modularui.overlay.OverlayManager;
 import com.cleanroommc.modularui.overlay.OverlayStack;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -296,7 +297,7 @@ public class ClientScreenHandler {
         } else {
             // releasing a key
             // for some reason when you press E after joining a world the button will not trigger the press event,
-            // but ony the release event, causing this to be null
+            // but only the release event, causing this to be null
             if (lastChar == null) return false;
             // when the key is released, the event char is empty
             if (inputPhase.isEarly() && doAction(muiScreen, ms -> ms.onKeyRelease(lastChar, key))) {
@@ -570,8 +571,10 @@ public class ClientScreenHandler {
             locatedHovered.unapplyMatrix(context);
             GuiDraw.drawText("Widget Theme: " + hovered.getWidgetTheme(muiScreen.getCurrentTheme()).getKey().getFullName(), 5, lineY, scale, color, true);
             lineY -= shift;
-            GuiDraw.drawText("Size: " + area.width + ", " + area.height, 5, lineY, scale, color, true);
-            lineY -= shift;
+            if (DebugOptions.INSTANCE.showSize) {
+                GuiDraw.drawText("Size: " + area.width + ", " + area.height, 5, lineY, scale, color, true);
+                lineY -= shift;
+            }
             GuiDraw.drawText("Pos: " + area.x + ", " + area.y + "  Rel: " + area.rx + ", " + area.ry, 5, lineY, scale, color, true);
             lineY -= shift;
             GuiDraw.drawText("Class: " + hovered, 5, lineY, scale, color, true);

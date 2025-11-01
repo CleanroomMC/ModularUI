@@ -50,6 +50,8 @@ import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Flow;
 import com.cleanroommc.modularui.widgets.layout.Grid;
 import com.cleanroommc.modularui.widgets.layout.Row;
+import com.cleanroommc.modularui.widgets.menu.ContextMenuButton;
+import com.cleanroommc.modularui.widgets.menu.ContextMenuList;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
 import net.minecraft.client.Minecraft;
@@ -74,6 +76,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class TestGuis extends CustomModularScreen {
@@ -503,12 +506,58 @@ public class TestGuis extends CustomModularScreen {
     }
 
     public static @NotNull ModularPanel buildViewportTransformUI() {
-        return new TestPanel("test")
+        return new TestPanel("viewport_transform")
                 .child(new Widget<>()
                         .align(Alignment.Center)
                         .size(50, 50)
                         .background(GuiTextures.MC_BUTTON)
                         .hoverBackground(GuiTextures.MC_BUTTON_HOVERED));
+    }
+
+    public static ModularPanel buildContextMenu() {
+        List<String> options1 = IntStream.range(0, 5).mapToObj(i -> "Option " + (i + 1)).collect(Collectors.toList());
+        List<String> options2 = IntStream.range(0, 5).mapToObj(i -> "Sub Option " + (i + 1)).collect(Collectors.toList());
+        return new ModularPanel("context_menu_test")
+                .size(150)
+                .child(new ListWidget<>()
+                        .height(100)
+                        .left(25)
+                        .coverChildrenWidth()
+                        //.right(25)
+                        .top(40)
+                        .child(new ToggleButton()
+                                .coverChildrenHeight()
+                                .widthRel(1f)
+                                .child(true, new Row()
+                                        .coverChildrenHeight()
+                                        .widthRel(1f)
+                                        .mainAxisAlignment(Alignment.MainAxis.SPACE_BETWEEN)
+                                        .child(IKey.str("Text1").asWidget())
+                                        .child(new ItemDrawable(Items.PORKCHOP).asWidget()))
+                                .child(false, new Row()
+                                        .coverChildrenHeight()
+                                        .widthRel(1f)
+                                        .mainAxisAlignment(Alignment.MainAxis.SPACE_BETWEEN)
+                                        .child(IKey.str("Text2").asWidget())
+                                        .child(new ItemDrawable(Items.MAGMA_CREAM).asWidget()))))
+                .child(new ContextMenuButton<>()
+                        .top(7)
+                        .width(100)
+                        .horizontalCenter()
+                        .height(16)
+                        .overlay(IKey.str("Menu"))
+                        .menuList(new ContextMenuList<>("menu1")
+                                .widthRel(1f)
+                                .maxSize(80)
+                                .children(options1, s -> IKey.str(s).asWidget())
+                                .child(new ContextMenuButton<>()
+                                        .overlay(IKey.str("Sub Menu"))
+                                        .openRightDown()
+                                        .menuList(new ContextMenuList<>("menu2")
+                                                .coverChildrenWidth()
+                                                //.width(90)
+                                                .maxSize(80)
+                                                .children(options2, s -> IKey.str(s).asWidget())))));
     }
 
     private static class TestPanel extends ModularPanel {

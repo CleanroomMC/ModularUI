@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.widgets;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.value.IBoolValue;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.theme.SelectableTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -99,6 +100,10 @@ public class ToggleButton extends AbstractCycleButtonWidget<ToggleButton> {
     public ToggleButton invertSelected(boolean invert) {
         this.invert = invert;
         return getThis();
+    }
+
+    public ToggleButton child(boolean selected, IWidget widget) {
+        return stateChild(selected ? 1 : 0, widget);
     }
 
     public boolean invertSelected() {

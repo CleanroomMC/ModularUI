@@ -70,6 +70,14 @@ public interface IThemeApi {
             .defaultHoverTheme(SelectableTheme.whiteTextShadow(18, 18, GuiTextures.MC_BUTTON_HOVERED, IDrawable.NONE))
             .register();
 
+    WidgetThemeKey<WidgetTheme> CONTEXT_MENU = get().widgetThemeKeyBuilder("menu", WidgetTheme.class)
+            .defaultTheme(WidgetTheme.darkTextNoShadow(80, 100, GuiTextures.MENU_BACKGROUND))
+            .register();
+
+    WidgetThemeKey<WidgetTheme> MENU_OPTION = get().widgetThemeKeyBuilder("menuOption", WidgetTheme.class)
+            .defaultTheme(WidgetTheme.darkTextNoShadow(80, 12, IDrawable.EMPTY))
+            .register();
+
     // sub widget themes
     WidgetThemeKey<SlotTheme> ITEM_SLOT_PLAYER = ITEM_SLOT.createSubKey("player");
     WidgetThemeKey<SlotTheme> ITEM_SLOT_PLAYER_HOTBAR = ITEM_SLOT_PLAYER.createSubKey("playerHotbar");

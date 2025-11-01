@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.factory.inventory.InventoryTypes;
 import com.cleanroommc.modularui.holoui.HoloScreenEntity;
 import com.cleanroommc.modularui.holoui.ScreenEntityRender;
 import com.cleanroommc.modularui.keybind.KeyBindHandler;
+import com.cleanroommc.modularui.overlay.DebugOverlay;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.test.EventHandler;
 import com.cleanroommc.modularui.test.OverlayTest;
@@ -68,6 +69,7 @@ public class ClientProxy extends CommonProxy {
             testKey = new KeyBinding("key.test", KeyConflictContext.IN_GAME, Keyboard.KEY_NUMPAD4, "key.categories.modularui");
             ClientRegistry.registerKeyBinding(testKey);
         }
+        DebugOverlay.register();
         if (ModularUIConfig.enableTestOverlays) {
             OverlayTest.init();
         }

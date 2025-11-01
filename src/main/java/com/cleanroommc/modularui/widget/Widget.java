@@ -24,6 +24,7 @@ import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import com.cleanroommc.modularui.widget.sizer.Bounds;
 import com.cleanroommc.modularui.widget.sizer.Flex;
 import com.cleanroommc.modularui.widget.sizer.IUnResizeable;
 
@@ -72,6 +73,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     @Nullable private String syncKey;
     @Nullable private SyncHandler syncHandler;
     // rendering
+    @Nullable private IDrawable shadow = null;
     @Nullable private IDrawable background = null;
     @Nullable private IDrawable overlay = null;
     @Nullable private IDrawable hoverBackground = null;
@@ -207,6 +209,9 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
      */
     @Override
     public void drawBackground(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
+        if (this.shadow != null) {
+            this.shadow.drawAtZero(context, getArea().width, getArea().height, getActiveWidgetTheme(widgetTheme, isHovering()));
+        }
         IDrawable bg = getCurrentBackground(context.getTheme(), widgetTheme);
         if (bg != null) {
             bg.drawAtZero(context, getArea().width, getArea().height, getActiveWidgetTheme(widgetTheme, isHovering()));
@@ -389,6 +394,10 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
             return theme.getWidgetTheme(this.widgetThemeOverride);
         }
         return getWidgetThemeInternal(theme);
+    }
+
+    public final @Nullable WidgetThemeKey<?> getWidgetThemeOverride() {
+        return widgetThemeOverride;
     }
 
     /**
@@ -620,6 +629,10 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     // ----------------
     // === Resizing ===
     // ----------------
+
+    public void estimateSize(Bounds bounds) {
+
+    }
 
     @Override
     public int getDefaultWidth() {

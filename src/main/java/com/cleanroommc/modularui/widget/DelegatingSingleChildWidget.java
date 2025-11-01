@@ -43,15 +43,17 @@ public class DelegatingSingleChildWidget<W extends SingleChildWidget<W>> extends
         super.postResize();
         if (getDelegate() != null) getDelegate().postResize();
         this.currentlyResizing = false;
-        Area childArea = getChild().getArea();
-        Area area = super.getArea();
-        area.set(childArea);
-        area.rx = childArea.rx;
-        area.ry = childArea.ry;
-        childArea.x = 0;
-        childArea.y = 0;
-        childArea.rx = 0;
-        childArea.ry = 0;
+        if (getDelegate() != null) {
+            Area childArea = getChild().getArea();
+            Area area = super.getArea();
+            area.set(childArea);
+            area.rx = childArea.rx;
+            area.ry = childArea.ry;
+            childArea.x = 0;
+            childArea.y = 0;
+            childArea.rx = 0;
+            childArea.ry = 0;
+        }
     }
 
     @Override

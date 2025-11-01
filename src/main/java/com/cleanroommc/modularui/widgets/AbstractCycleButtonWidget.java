@@ -7,6 +7,7 @@ import com.cleanroommc.modularui.api.drawable.ITextLine;
 import com.cleanroommc.modularui.api.value.IBoolValue;
 import com.cleanroommc.modularui.api.value.IEnumValue;
 import com.cleanroommc.modularui.api.value.IIntValue;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.UITexture;
 import com.cleanroommc.modularui.screen.RichTooltip;
@@ -14,7 +15,7 @@ import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.value.IntValue;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
-import com.cleanroommc.modularui.widget.Widget;
+import com.cleanroommc.modularui.widget.SingleChildWidget;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> extends Widget<W> implements Interactable {
+public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> extends SingleChildWidget<W> implements Interactable {
 
     private int stateCount = 1;
     private IIntValue<?> intValue;
@@ -33,6 +34,8 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
     protected IDrawable[] hoverBackground = null;
     protected IDrawable[] overlay = null;
     protected IDrawable[] hoverOverlay = null;
+    protected IWidget[] stateChildren = null;
+    protected IWidget fallbackChild = null;
     private final List<RichTooltip> stateTooltip = new ArrayList<>();
 
     @Override
@@ -40,6 +43,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
         if (this.intValue == null) {
             this.intValue = new IntValue(0);
         }
+        updateChild(getState());
     }
 
     @Override
@@ -74,11 +78,21 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
         if (state < 0 || state >= this.stateCount) {
             throw new IndexOutOfBoundsException("CycleButton state out of bounds");
         }
+        updateChild(state);
         if (setSource) {
             this.intValue.setIntValue(state);
         }
         this.lastValue = state;
         markTooltipDirty();
+    }
+
+    private void updateChild(int state) {
+        IWidget child = this.stateChildren != null && this.stateChildren.length > state ? this.stateChildren[state] : null;
+        if (child != null) {
+            child(child);
+        } else if (getChild() != this.fallbackChild) {
+            child(this.fallbackChild);
+        }
     }
 
     @Override
@@ -166,6 +180,17 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
         return getThis();
     }
 
+    @Override
+    public W invisible() {
+        if (this.background != null) {
+            Arrays.fill(this.background, IDrawable.EMPTY);
+        }
+        if (getBackground() == null) {
+            super.background(IDrawable.EMPTY);
+        }
+        return disableHoverBackground();
+    }
+
     protected W value(IIntValue<?> value) {
         this.intValue = value;
         setValue(value);
@@ -174,6 +199,22 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
         } else if (value instanceof IBoolValue) {
             stateCount(2);
         }
+        return getThis();
+    }
+
+    @Override
+    public W child(IWidget child) {
+        this.fallbackChild = child;
+        return super.child(child);
+    }
+
+    public W stateChild(int state, IWidget child) {
+        if (this.stateChildren == null) {
+            this.stateChildren = new IWidget[state + 1];
+        } else if (this.stateChildren.length < state + 1) {
+            this.stateChildren = Arrays.copyOf(this.stateChildren, state + 1);
+        }
+        this.stateChildren[state] = child;
         return getThis();
     }
 
@@ -467,6 +508,8 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
         this.overlay = checkArray(this.overlay, stateCount);
         this.hoverBackground = checkArray(this.hoverBackground, stateCount);
         this.hoverOverlay = checkArray(this.hoverOverlay, stateCount);
+        if (this.stateChildren == null) this.stateChildren = new IWidget[stateCount];
+        else if (this.stateChildren.length < stateCount) this.stateChildren = Arrays.copyOf(this.stateChildren, stateCount);
         return getThis();
     }
 
