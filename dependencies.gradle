@@ -27,6 +27,11 @@ dependencies {
     embed2('org.joml:joml:1.10.8') { transitive = false }
     embedSources("org.joml:joml:1.10.8:sources") { transitive = false }
 
+    compileOnly("org.projectlombok:lombok:1.18.42")
+    annotationProcessor("org.projectlombok:lombok:1.18.42")
+    testCompileOnly("org.projectlombok:lombok:1.18.42")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.42")
+
     implementation(rfg.deobf("curse.maven:baubles-227083:2518667"))
     compileOnlyApi rfg.deobf("curse.maven:neverenoughanimation-1062347:6533650-sources-6533651")
     testImplementation rfg.deobf("curse.maven:neverenoughanimation-1062347:6533650-sources-6533651")

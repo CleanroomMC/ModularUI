@@ -1,5 +1,7 @@
 package com.cleanroommc.modularui.utils;
 
+import com.ezylang.evalex.Expression;
+
 public enum SIPrefix {
 
     Quetta('Q', 30),
@@ -39,6 +41,11 @@ public enum SIPrefix {
         return this == One;
     }
 
+    public void addToExpression(Expression e) {
+        e.with(String.valueOf(this.symbol), this.factor);
+    }
+
+    public static final SIPrefix[] VALUES = values();
     public static final SIPrefix[] HIGH = new SIPrefix[values().length / 2];
     public static final SIPrefix[] LOW = new SIPrefix[values().length / 2];
 
@@ -47,6 +54,12 @@ public enum SIPrefix {
         for (int i = 0; i < HIGH.length; i++) {
             HIGH[i] = values[HIGH.length - 1 - i];
             LOW[i] = values[HIGH.length + 1 + i];
+        }
+    }
+
+    public static void addAllToExpression(Expression e) {
+        for (SIPrefix siPrefix : VALUES) {
+            siPrefix.addToExpression(e);
         }
     }
 }
