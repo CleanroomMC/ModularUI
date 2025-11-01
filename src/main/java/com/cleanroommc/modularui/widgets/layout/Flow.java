@@ -97,8 +97,13 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         final int size = getArea().getSize(axis) - padding.getTotal(this.axis);
         Alignment.MainAxis maa = this.maa;
         if (!hasSize && maa != Alignment.MainAxis.START) {
-            // for anything else than start we need the size to be known
-            return false;
+            if (flex().dependsOnChildren(this.axis)) {
+                // if this flow covers the children, we can assume start
+                maa = Alignment.MainAxis.START;
+            } else {
+                // for anything else than start we need the size to be known
+                return false;
+            }
         }
         int space = this.spaceBetween;
 
