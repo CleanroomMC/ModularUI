@@ -23,7 +23,6 @@
  */
 
 dependencies {
-    embed2 'org.mariuszgromada.math:MathParser.org-mXparser:6.1.0'
     embed2('org.joml:joml:1.10.8') { transitive = false }
     embedSources("org.joml:joml:1.10.8:sources") { transitive = false }
 
