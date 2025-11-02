@@ -30,6 +30,7 @@ import static com.ezylang.evalex.parser.Token.TokenType.BRACE_OPEN;
 import static com.ezylang.evalex.parser.Token.TokenType.FUNCTION;
 import static com.ezylang.evalex.parser.Token.TokenType.INFIX_OPERATOR;
 import static com.ezylang.evalex.parser.Token.TokenType.NUMBER_LITERAL;
+import static com.ezylang.evalex.parser.Token.TokenType.POSTFIX_OPERATOR;
 import static com.ezylang.evalex.parser.Token.TokenType.STRUCTURE_SEPARATOR;
 import static com.ezylang.evalex.parser.Token.TokenType.VARIABLE_OR_CONSTANT;
 
@@ -86,6 +87,7 @@ public class Tokenizer {
                     throw new ParseException(currentToken, "Missing operator");
                 }
             }
+            isInfixInsteadOfPostfix(currentToken);
             validateToken(currentToken);
             tokens.add(currentToken);
             currentToken = getNextToken();
@@ -116,6 +118,17 @@ public class Tokenizer {
                 || (previousToken.getType() == NUMBER_LITERAL && currentToken.getType() == BRACE_OPEN));
     }
 
+    private void isInfixInsteadOfPostfix(Token currentToken) {
+        if (currentToken == null || invalidTokenAfterInfixOperator(currentToken)) return;
+        Token previousToken = getPreviousToken();
+        if (previousToken == null || previousToken.getType() != POSTFIX_OPERATOR) return;
+        String opString = previousToken.getValue();
+        if (operatorDictionary.hasInfixOperator(opString)) {
+            OperatorIfc op = operatorDictionary.getInfixOperator(opString);
+            setPreviousToken(new Token(previousToken.getStartPosition(), opString, INFIX_OPERATOR, op));
+        }
+    }
+
     private void validateToken(Token currentToken) throws ParseException {
 
         if (currentToken.getType() == STRUCTURE_SEPARATOR && getPreviousToken() == null) {
@@ -133,7 +146,9 @@ public class Tokenizer {
     private boolean invalidTokenAfterInfixOperator(Token token) {
         switch (token.getType()) {
             case INFIX_OPERATOR:
+            case POSTFIX_OPERATOR:
             case BRACE_CLOSE:
+            case ARRAY_CLOSE:
             case COMMA:
                 return true;
             default:
@@ -232,18 +247,27 @@ public class Tokenizer {
         return tokens.isEmpty() ? null : tokens.get(tokens.size() - 1);
     }
 
+    private void setPreviousToken(Token token) {
+        if (!tokens.isEmpty()) {
+            tokens.set(tokens.size() - 1, token);
+        }
+    }
+
     private Token parseOperator() throws ParseException {
         int tokenStartIndex = currentColumnIndex;
         StringBuilder tokenValue = new StringBuilder();
+        boolean prefixAllowed = prefixOperatorAllowed();
+        boolean postfixAllowed = postfixOperatorAllowed();
+        boolean infixAllowed = infixOperatorAllowed();
         while (true) {
             tokenValue.append((char) currentChar);
             String tokenString = tokenValue.toString();
             String possibleNextOperator = tokenString + (char) peekNextChar();
             boolean possibleNextOperatorFound =
-                    (prefixOperatorAllowed() && operatorDictionary.hasPrefixOperator(possibleNextOperator))
-                            || (postfixOperatorAllowed()
+                    (prefixAllowed && operatorDictionary.hasPrefixOperator(possibleNextOperator))
+                            || (postfixAllowed
                             && operatorDictionary.hasPostfixOperator(possibleNextOperator))
-                            || (infixOperatorAllowed()
+                            || (infixAllowed
                             && operatorDictionary.hasInfixOperator(possibleNextOperator));
             consumeChar();
             if (!possibleNextOperatorFound) {
@@ -251,10 +275,10 @@ public class Tokenizer {
             }
         }
         String tokenString = tokenValue.toString();
-        if (prefixOperatorAllowed() && operatorDictionary.hasPrefixOperator(tokenString)) {
+        if (prefixAllowed && operatorDictionary.hasPrefixOperator(tokenString)) {
             OperatorIfc operator = operatorDictionary.getPrefixOperator(tokenString);
             return new Token(tokenStartIndex, tokenString, TokenType.PREFIX_OPERATOR, operator);
-        } else if (postfixOperatorAllowed() && operatorDictionary.hasPostfixOperator(tokenString)) {
+        } else if (postfixAllowed && operatorDictionary.hasPostfixOperator(tokenString)) {
             OperatorIfc operator = operatorDictionary.getPostfixOperator(tokenString);
             return new Token(tokenStartIndex, tokenString, TokenType.POSTFIX_OPERATOR, operator);
         } else if (operatorDictionary.hasInfixOperator(tokenString)) {
