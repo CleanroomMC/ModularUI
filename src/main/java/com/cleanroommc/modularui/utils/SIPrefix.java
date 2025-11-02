@@ -2,6 +2,8 @@ package com.cleanroommc.modularui.utils;
 
 import com.ezylang.evalex.Expression;
 
+import java.math.BigDecimal;
+
 public enum SIPrefix {
 
     Quetta('Q', 30),
@@ -27,14 +29,22 @@ public enum SIPrefix {
     Quecto('q', -30);
 
 
-    public final char symbol;
+    public final String symbol;
     public final double factor;
     public final double oneOverFactor;
+    public final BigDecimal bigFactor;
+    public final BigDecimal bigOneOverFactor;
 
     SIPrefix(char symbol, int powerOfTen) {
-        this.symbol = symbol;
+        this.symbol = String.valueOf(symbol);
         this.factor = Math.pow(10, powerOfTen);
         this.oneOverFactor = 1 / this.factor;
+        this.bigFactor = new BigDecimal(this.factor);
+        this.bigOneOverFactor = new BigDecimal(this.oneOverFactor);
+    }
+
+    public char getCharSymbol() {
+        return symbol.charAt(0);
     }
 
     public boolean isOne() {
