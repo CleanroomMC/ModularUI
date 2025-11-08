@@ -560,10 +560,12 @@ public class UITexture implements IDrawable, IJsonSerializable {
                 if (this.u0 < 0 || this.v0 < 0 || this.u1 > 1 || this.v1 > 1)
                     throw new IllegalArgumentException("UV values must be 0 - 1");
                 if (this.bl > 0 || this.bt > 0 || this.br > 0 || this.bb > 0) {
-                    return new AdaptableUITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.colorType, this.iw, this.ih, this.bl, this.bt, this.br, this.bb, this.tiled);
+                    return new AdaptableUITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.colorType, this.nonOpaque,
+                            this.iw, this.ih, this.bl, this.bt, this.br, this.bb, this.tiled);
                 }
                 if (this.tiled) {
-                    return new TiledUITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.iw, this.ih, this.colorType);
+                    return new TiledUITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.iw, this.ih, this.colorType,
+                            this.nonOpaque);
                 }
                 return new UITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.colorType, this.nonOpaque);
             }

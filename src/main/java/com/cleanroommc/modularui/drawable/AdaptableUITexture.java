@@ -1,5 +1,7 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.utils.Platform;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
@@ -18,8 +20,9 @@ public class AdaptableUITexture extends UITexture {
     /**
      * Use {@link UITexture#builder()} with {@link Builder#adaptable(int, int)}
      */
-    AdaptableUITexture(ResourceLocation location, float u0, float v0, float u1, float v1, ColorType colorType, int imageWidth, int imageHeight, int bl, int bt, int br, int bb, boolean tiled) {
-        super(location, u0, v0, u1, v1, colorType);
+    AdaptableUITexture(ResourceLocation location, float u0, float v0, float u1, float v1, ColorType colorType, boolean nonOpaque,
+                       int imageWidth, int imageHeight, int bl, int bt, int br, int bb, boolean tiled) {
+        super(location, u0, v0, u1, v1, colorType, nonOpaque);
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;
         this.bl = bl;
@@ -31,7 +34,8 @@ public class AdaptableUITexture extends UITexture {
 
     @Override
     public AdaptableUITexture getSubArea(float uStart, float vStart, float uEnd, float vEnd) {
-        return new AdaptableUITexture(this.location, lerpU(uStart), lerpV(vStart), lerpU(uEnd), lerpV(vEnd), this.colorType, this.imageWidth, this.imageHeight, this.bl, this.bt, this.br, this.bb, this.tiled);
+        return new AdaptableUITexture(this.location, lerpU(uStart), lerpV(vStart), lerpU(uEnd), lerpV(vEnd), this.colorType, this.nonOpaque,
+                this.imageWidth, this.imageHeight, this.bl, this.bt, this.br, this.bb, this.tiled);
     }
 
     @Override
@@ -52,9 +56,7 @@ public class AdaptableUITexture extends UITexture {
             super.draw(x, y, width, height);
             return;
         }
-        GlStateManager.disableAlpha();
-        GlStateManager.enableBlend();
-        GlStateManager.enableTexture2D();
+        Platform.setupDrawTex(this.nonOpaque);
         Minecraft.getMinecraft().renderEngine.bindTexture(this.location);
 
         float uBl = this.bl * 1f / this.imageWidth, uBr = this.br * 1f / this.imageWidth;
@@ -107,9 +109,7 @@ public class AdaptableUITexture extends UITexture {
             GuiDraw.drawTiledTexture(this.location, x, y, width, height, this.u0, this.v0, this.u1, this.v1, this.imageWidth, this.imageHeight, 0);
             return;
         }
-        GlStateManager.disableAlpha();
-        GlStateManager.enableBlend();
-        GlStateManager.enableTexture2D();
+        Platform.setupDrawTex(this.nonOpaque);
         Minecraft.getMinecraft().renderEngine.bindTexture(this.location);
 
         float uBl = this.bl * 1f / this.imageWidth, uBr = this.br * 1f / this.imageWidth;
