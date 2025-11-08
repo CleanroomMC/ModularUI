@@ -297,7 +297,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                         .texture(GuiTextures.PROGRESS_CYCLE, 20)
                                                                         .direction(ProgressWidget.Direction.CIRCULAR_CW))
                                                                 .child(new Row().coverChildrenWidth().height(18)
-                                                                        .shouldReverseChildren(false)
+                                                                        .reverseLayout(false)
                                                                         .child(new ToggleButton()
                                                                                 .value(new BoolValue.Dynamic(() -> cycleStateValue.getIntValue() == 0, val -> cycleStateValue.setIntValue(0)))
                                                                                 .overlay(GuiTextures.CYCLE_BUTTON_DEMO.getSubArea(0, 0, 1, 1 / 3f)))

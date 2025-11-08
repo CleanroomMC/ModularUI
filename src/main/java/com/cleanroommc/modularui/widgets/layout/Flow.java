@@ -7,7 +7,6 @@ import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.ReversedList;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.sizer.Box;
-import com.cleanroommc.modularui.widgets.ListWidget;
 
 import java.util.List;
 import java.util.function.IntFunction;
@@ -68,8 +67,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         if (!hasChildren()) return 18;
         GuiAxis axis = this.axis;
         int total = getArea().getPadding().getTotal(axis);
-        List<IWidget> childrenList = reverseChildren ? new ReversedList<>(getChildren()) : getChildren();
-        for (IWidget widget : childrenList) {
+        for (IWidget widget : getChildren()) {
             if (shouldIgnoreChildSize(widget) || widget.flex().hasPos(axis)) continue;
             if (widget.flex().isExpanded() || !widget.resizer().isSizeCalculated(axis)) {
                 total += axis.isHorizontal() ? widget.getDefaultWidth() : widget.getDefaultHeight();
@@ -85,8 +83,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         if (!hasChildren()) return 18;
         GuiAxis axis = this.axis.getOther();
         int max = 0;
-        List<IWidget> childrenList = reverseChildren ? new ReversedList<>(getChildren()) : getChildren();
-        for (IWidget widget : childrenList) {
+        for (IWidget widget : getChildren()) {
             if (shouldIgnoreChildSize(widget)) continue;
             int s = widget.getArea().getMargin().getTotal(axis);
             if (!widget.resizer().isSizeCalculated(axis)) {
@@ -321,7 +318,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
      * @param doReverse true if the children list should be read in reverse
      * @return this
      */
-    public Flow shouldReverseChildren(boolean doReverse) {
+    public Flow reverseLayout(boolean doReverse) {
         this.reverseChildren = doReverse;
         return this;
     }
