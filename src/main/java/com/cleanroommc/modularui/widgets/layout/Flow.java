@@ -42,11 +42,10 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
      * Whether disabled child widgets should be collapsed for display.
      */
     private boolean collapseDisabledChild = false;
-
     /**
-     *  Whether the children list should be read in reverse or not
+     * Whether the children list should be layout in reverse.
      */
-    private boolean reverseChildren = false;
+    private boolean reverseLayout = false;
 
     public Flow(GuiAxis axis) {
         this.axis = axis;
@@ -112,7 +111,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
                 return false;
             }
         }
-        List<IWidget> childrenList = reverseChildren ? new ReversedList<>(getChildren()) : getChildren();
+        List<IWidget> childrenList = this.reverseLayout ? new ReversedList<>(getChildren()) : getChildren();
         int space = this.spaceBetween;
 
         int childrenSize = 0;
@@ -214,7 +213,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         boolean hasWidth = parent.resizer().isSizeCalculated(other);
         if (!hasWidth && caa != Alignment.CrossAxis.START) return false;
         List<IWidget> childrenList = parent.getChildren();
-        if(parent instanceof Flow flow && flow.reverseChildren) {
+        if (parent instanceof Flow flow && flow.reverseLayout) {
             childrenList = new ReversedList<>(parent.getChildren());
         }
 
@@ -304,22 +303,22 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
      * re-layouts its children. Children which are disabled will not be considered during layout, so that the flow will not appear to have
      * empty spots. This is disabled by default on Flow.
      *
-     * @param doCollapse true if disabled children should be collapsed.
+     * @param collapse true if disabled children should be collapsed
      * @return this
      */
-    public Flow collapseDisabledChild(boolean doCollapse) {
-        this.collapseDisabledChild = doCollapse;
+    public Flow collapseDisabledChild(boolean collapse) {
+        this.collapseDisabledChild = collapse;
         return this;
     }
 
     /**
-     * Sets if the children list should be reversed or not.
-     * This is useful when using a MainAxisAlignment of END and want the children to be added in the same order they are read in.
-     * @param doReverse true if the children list should be read in reverse
+     * Sets if the children list should be layout in reversed or not (Default is false).
+     *
+     * @param reverseLayout true if the children list should be layout in reverse
      * @return this
      */
-    public Flow reverseLayout(boolean doReverse) {
-        this.reverseChildren = doReverse;
+    public Flow reverseLayout(boolean reverseLayout) {
+        this.reverseLayout = reverseLayout;
         return this;
     }
 

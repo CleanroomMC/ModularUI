@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.utils;
 
 import java.util.AbstractList;
+import java.util.Collection;
 import java.util.List;
 
 public class ReversedList<T> extends AbstractList<T> {
@@ -38,5 +39,10 @@ public class ReversedList<T> extends AbstractList<T> {
     @Override
     public void add(int index, T element) {
         this.delegate.add(inverseIndex(index), element);
+    }
+
+    @Override
+    public boolean addAll(int index, Collection<? extends T> c) {
+        return this.delegate.addAll(inverseIndex(index), c);
     }
 }
