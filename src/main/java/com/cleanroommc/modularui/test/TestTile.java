@@ -269,6 +269,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                                 //.flex(flex -> flex.left(3)) // ?
                                                                                 .overlay(IKey.str("Button 2")))
                                                                         .child(new TextFieldWidget()
+                                                                                .addTooltipLine("this tooltip is overridden")
                                                                                 .size(60, 18)
                                                                                 .setTextAlignment(Alignment.Center)
                                                                                 .value(SyncHandlers.string(() -> this.value, val -> this.value = val))
