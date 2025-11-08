@@ -217,8 +217,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         boolean hasWidth = parent.resizer().isSizeCalculated(other);
         if (!hasWidth && caa != Alignment.CrossAxis.START) return false;
         List<IWidget> childrenList = parent.getChildren();
-        if(parent instanceof Flow flow && flow.reverseChildren)
-        {
+        if(parent instanceof Flow flow && flow.reverseChildren) {
             childrenList = new ReversedList<>(parent.getChildren());
         }
 
