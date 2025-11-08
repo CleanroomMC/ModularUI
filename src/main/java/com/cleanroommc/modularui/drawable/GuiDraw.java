@@ -219,7 +219,11 @@ public class GuiDraw {
     }
 
     public static void drawTexture(ResourceLocation location, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1) {
-        Platform.setupDrawTex(location);
+        drawTexture(location, x0, y0, x1, y1, u0, v0, u1, v1, false);
+    }
+
+    public static void drawTexture(ResourceLocation location, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1, boolean withBlend) {
+        Platform.setupDrawTex(location, withBlend);
         drawTexture(x0, y0, x1, y1, u0, v0, u1, v1, 0);
     }
 
