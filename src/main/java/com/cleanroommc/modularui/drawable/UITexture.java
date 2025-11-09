@@ -6,7 +6,6 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
-import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -157,7 +156,6 @@ public class UITexture implements IDrawable, IJsonSerializable {
 
     public void draw(float x, float y, float width, float height) {
         GuiDraw.drawTexture(this.location, x, y, x + width, y + height, this.u0, this.v0, this.u1, this.v1, this.nonOpaque);
-        GlStateManager.disableBlend();
     }
 
     @Deprecated
@@ -172,7 +170,6 @@ public class UITexture implements IDrawable, IJsonSerializable {
             Color.setGlColorOpaque(Color.WHITE.main);
         }
         GuiDraw.drawTexture(this.location, x, y, x + width, y + height, lerpU(uStart), lerpV(vStart), lerpU(uEnd), lerpV(vEnd), this.nonOpaque);
-        GlStateManager.disableBlend();
     }
 
     @Override
