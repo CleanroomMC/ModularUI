@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.ReversedList;
 import com.cleanroommc.modularui.widget.AbstractScrollWidget;
 import com.cleanroommc.modularui.widget.scroll.ScrollData;
 import com.cleanroommc.modularui.widget.scroll.VerticalScrollData;
@@ -17,6 +18,7 @@ import com.cleanroommc.modularui.widgets.layout.Flow;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 
+import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 import java.util.function.IntFunction;
@@ -36,6 +38,10 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
     private boolean wrapTight = false;
     private Alignment.CrossAxis caa = Alignment.CrossAxis.CENTER;
     private Unit mainAxisMaxSize;
+    /**
+     * Whether the children list should be layout in reverse.
+     */
+    private boolean reverseLayout = false;
 
     public ListWidget() {
         super(null, null);
@@ -88,7 +94,7 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
         GuiAxis axis = getAxis();
         int separatorSize = getSeparatorSize();
         int p = getArea().getPadding().getStart(axis);
-        for (IWidget widget : getChildren()) {
+        for (IWidget widget : getOrderedChildren()) {
             if (shouldIgnoreChildSize(widget)) {
                 widget.resizer().updateResized();
                 continue;
@@ -198,6 +204,10 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
         return this.scrollData.getAxis();
     }
 
+    public List<IWidget> getOrderedChildren() {
+        return this.reverseLayout ? new ReversedList<>(getChildren()) : getChildren();
+    }
+
     private W maxSize(float v, int offset, Unit.Measure measure) {
         if (this.mainAxisMaxSize == null) this.mainAxisMaxSize = new Unit();
         this.mainAxisMaxSize.setValue(v);
@@ -302,6 +312,17 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
 
     public W crossAxisAlignment(Alignment.CrossAxis caa) {
         this.caa = caa;
+        return getThis();
+    }
+
+    /**
+     * Sets if the children list should be layout in reversed or not (Default is false).
+     *
+     * @param reverseLayout true if the children list should be layout in reverse
+     * @return this
+     */
+    public W reverseLayout(boolean reverseLayout) {
+        this.reverseLayout = reverseLayout;
         return getThis();
     }
 }

@@ -2,10 +2,21 @@ package com.cleanroommc.modularui.value;
 
 import com.cleanroommc.modularui.api.value.IValue;
 
+import com.google.common.util.concurrent.AtomicDouble;
+
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class ObjectValue<T> implements IValue<T> {
+
+    public static <T> Dynamic<T> wrap(IValue<T> val) {
+        return new Dynamic<>(val::getValue, val::setValue);
+    }
+
+    public static <T> Dynamic<T> wrapAtomic(AtomicReference<T> val) {
+        return new Dynamic<>(val::get, val::set);
+    }
 
     private T value;
 

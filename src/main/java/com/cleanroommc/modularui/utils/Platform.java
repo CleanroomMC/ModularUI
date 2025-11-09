@@ -73,7 +73,11 @@ public class Platform {
     }
 
     public static void setupDrawTex(ResourceLocation texture) {
-        setupDrawTex();
+        setupDrawTex(texture, false);
+    }
+
+    public static void setupDrawTex(ResourceLocation texture, boolean withBlend) {
+        setupDrawTex(withBlend);
         Minecraft.getMinecraft().renderEngine.bindTexture(texture);
     }
 
@@ -83,9 +87,17 @@ public class Platform {
     }
 
     public static void setupDrawTex() {
+        setupDrawTex(false);
+    }
+
+    public static void setupDrawTex(boolean withBlend) {
         GlStateManager.enableTexture2D();
         GlStateManager.enableAlpha();
-        GlStateManager.disableBlend();
+        if (withBlend) {
+            GlStateManager.enableBlend();
+        } else {
+            GlStateManager.disableBlend();
+        }
     }
 
     public static void setupDrawGradient() {

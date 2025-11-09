@@ -4,10 +4,19 @@ import com.cleanroommc.modularui.api.value.IDoubleValue;
 import com.cleanroommc.modularui.api.value.IIntValue;
 import com.cleanroommc.modularui.api.value.IStringValue;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 
 public class IntValue implements IIntValue<Integer>, IDoubleValue<Integer>, IStringValue<Integer> {
+
+    public static Dynamic wrap(IIntValue<?> val) {
+        return new Dynamic(val::getIntValue, val::setIntValue);
+    }
+
+    public static Dynamic wrapAtomic(AtomicInteger val) {
+        return new Dynamic(val::get, val::set);
+    }
 
     private int value;
 

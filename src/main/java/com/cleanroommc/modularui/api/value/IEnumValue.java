@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.api.value;
 
-public interface IEnumValue<T extends Enum<T>> {
+public interface IEnumValue<T extends Enum<T>> extends IValue<T> {
 
     Class<T> getEnumClass();
 }

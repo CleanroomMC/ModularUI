@@ -4,9 +4,11 @@ import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.ReversedList;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.sizer.Box;
 
+import java.util.List;
 import java.util.function.IntFunction;
 
 public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander {
@@ -40,6 +42,10 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
      * Whether disabled child widgets should be collapsed for display.
      */
     private boolean collapseDisabledChild = false;
+    /**
+     * Whether the children list should be layout in reverse.
+     */
+    private boolean reverseLayout = false;
 
     public Flow(GuiAxis axis) {
         this.axis = axis;
@@ -105,6 +111,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
                 return false;
             }
         }
+        List<IWidget> childrenList = this.reverseLayout ? new ReversedList<>(getChildren()) : getChildren();
         int space = this.spaceBetween;
 
         int childrenSize = 0;
@@ -112,7 +119,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         int amount = 0;
 
         // calculate total size
-        for (IWidget widget : getChildren()) {
+        for (IWidget widget : childrenList) {
             // ignore disabled child if configured as such
             if (shouldIgnoreChildSize(widget)) continue;
             // exclude children whose position of main axis is fixed
@@ -144,7 +151,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
 
         if (expandedAmount > 0 && hasSize) {
             int newSize = (size - childrenSize) / expandedAmount;
-            for (IWidget widget : getChildren()) {
+            for (IWidget widget : childrenList) {
                 // ignore disabled child if configured as such
                 if (shouldIgnoreChildSize(widget)) continue;
                 // exclude children whose position of main axis is fixed
@@ -166,7 +173,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
             }
         }
 
-        for (IWidget widget : getChildren()) {
+        for (IWidget widget : childrenList) {
             // ignore disabled child if configured as such
             if (shouldIgnoreChildSize(widget)) {
                 widget.resizer().updateResized();
@@ -205,7 +212,12 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         Box padding = parent.getArea().getPadding();
         boolean hasWidth = parent.resizer().isSizeCalculated(other);
         if (!hasWidth && caa != Alignment.CrossAxis.START) return false;
-        for (IWidget widget : parent.getChildren()) {
+        List<IWidget> childrenList = parent.getChildren();
+        if (parent instanceof Flow flow && flow.reverseLayout) {
+            childrenList = new ReversedList<>(parent.getChildren());
+        }
+
+        for (IWidget widget : childrenList) {
             // exclude children whose position of main axis is fixed
             if (widget.flex().hasPos(axis)) continue;
             Box margin = widget.getArea().getMargin();
@@ -291,11 +303,22 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
      * re-layouts its children. Children which are disabled will not be considered during layout, so that the flow will not appear to have
      * empty spots. This is disabled by default on Flow.
      *
-     * @param doCollapse true if disabled children should be collapsed.
+     * @param collapse true if disabled children should be collapsed
      * @return this
      */
-    public Flow collapseDisabledChild(boolean doCollapse) {
-        this.collapseDisabledChild = doCollapse;
+    public Flow collapseDisabledChild(boolean collapse) {
+        this.collapseDisabledChild = collapse;
+        return this;
+    }
+
+    /**
+     * Sets if the children list should be layout in reversed or not (Default is false).
+     *
+     * @param reverseLayout true if the children list should be layout in reverse
+     * @return this
+     */
+    public Flow reverseLayout(boolean reverseLayout) {
+        this.reverseLayout = reverseLayout;
         return this;
     }
 
