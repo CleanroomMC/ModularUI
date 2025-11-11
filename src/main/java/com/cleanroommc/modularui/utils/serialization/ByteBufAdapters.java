@@ -93,12 +93,12 @@ public class ByteBufAdapters {
     public static final IByteBufAdapter<BigDecimal> BIG_DECIMAL = new IByteBufAdapter<>() {
         @Override
         public BigDecimal deserialize(PacketBuffer buffer) throws IOException {
-            return new BigDecimal(new BigInteger(buffer.readByteArray()), buffer.readVarInt());
+            return new BigDecimal(BIG_INT.deserialize(buffer), buffer.readVarInt());
         }
 
         @Override
         public void serialize(PacketBuffer buffer, BigDecimal u) throws IOException {
-            buffer.writeBytes(u.unscaledValue().toByteArray());
+            BIG_INT.serialize(buffer, u.unscaledValue());
             buffer.writeVarInt(u.scale());
         }
 
