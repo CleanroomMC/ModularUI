@@ -133,7 +133,7 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
 
     @Override
     public boolean postLayoutWidgets() {
-        return Flow.layoutCrossAxisListLike(this, getAxis(), this.caa);
+        return Flow.layoutCrossAxisListLike(this, getAxis(), this.caa, this.reverseLayout);
     }
 
     @Override
