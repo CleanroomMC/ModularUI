@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.utils.ICopy;
 import com.cleanroommc.modularui.utils.ObjectList;
-
 import com.cleanroommc.modularui.utils.serialization.IByteBufDeserializer;
 import com.cleanroommc.modularui.utils.serialization.IByteBufSerializer;
 import com.cleanroommc.modularui.utils.serialization.IEquals;

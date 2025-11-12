@@ -99,6 +99,11 @@ public class IntSyncValue extends ValueSyncHandler<Integer> implements IIntSyncV
     }
 
     @Override
+    public void notifyUpdate() {
+        setIntValue(this.getter.getAsInt(), false, true);
+    }
+
+    @Override
     public void write(PacketBuffer buffer) {
         buffer.writeVarInt(this.cache);
     }

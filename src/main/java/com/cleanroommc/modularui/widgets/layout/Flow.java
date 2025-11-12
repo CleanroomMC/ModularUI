@@ -202,21 +202,17 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
 
     @Override
     public boolean postLayoutWidgets() {
-        return Flow.layoutCrossAxisListLike(this, this.axis, this.caa);
+        return Flow.layoutCrossAxisListLike(this, this.axis, this.caa, this.reverseLayout);
     }
 
-    public static boolean layoutCrossAxisListLike(IWidget parent, GuiAxis axis, Alignment.CrossAxis caa) {
+    public static boolean layoutCrossAxisListLike(IWidget parent, GuiAxis axis, Alignment.CrossAxis caa, boolean reverseLayout) {
         if (!parent.hasChildren()) return true;
         GuiAxis other = axis.getOther();
         int width = parent.getArea().getSize(other);
         Box padding = parent.getArea().getPadding();
         boolean hasWidth = parent.resizer().isSizeCalculated(other);
         if (!hasWidth && caa != Alignment.CrossAxis.START) return false;
-        List<IWidget> childrenList = parent.getChildren();
-        if (parent instanceof Flow flow && flow.reverseLayout) {
-            childrenList = new ReversedList<>(parent.getChildren());
-        }
-
+        List<IWidget> childrenList = reverseLayout ? new ReversedList<>(parent.getChildren()) : parent.getChildren();
         for (IWidget widget : childrenList) {
             // exclude children whose position of main axis is fixed
             if (widget.flex().hasPos(axis)) continue;

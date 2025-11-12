@@ -1,16 +1,15 @@
 package com.cleanroommc.modularui.value;
 
 import com.cleanroommc.modularui.api.value.IDoubleValue;
+import com.cleanroommc.modularui.api.value.IFloatValue;
 import com.cleanroommc.modularui.api.value.IStringValue;
-import com.cleanroommc.modularui.utils.FloatConsumer;
-import com.cleanroommc.modularui.utils.FloatSupplier;
 
 import com.google.common.util.concurrent.AtomicDouble;
 
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
-public class DoubleValue implements IDoubleValue<Double> {
+public class DoubleValue implements IDoubleValue<Double>, IFloatValue<Double>, IStringValue<Double> {
 
     public static Dynamic wrap(IDoubleValue<?> val) {
         return new Dynamic(val::getDoubleValue, val::setDoubleValue);
@@ -46,11 +45,27 @@ public class DoubleValue implements IDoubleValue<Double> {
         this.value = val;
     }
 
-    public static class Dynamic implements IDoubleValue<Double>, IStringValue<Double> {
+    @Override
+    public String getStringValue() {
+        return String.valueOf(this.value);
+    }
 
-        public static Dynamic ofFloat(FloatSupplier getter, FloatConsumer setter) {
-            return new Dynamic(getter, setter);
-        }
+    @Override
+    public void setStringValue(String val) {
+        setDoubleValue(Double.parseDouble(val));
+    }
+
+    @Override
+    public float getFloatValue() {
+        return (float) getDoubleValue();
+    }
+
+    @Override
+    public void setFloatValue(float val) {
+        setDoubleValue(val);
+    }
+
+    public static class Dynamic implements IDoubleValue<Double>, IStringValue<Double> {
 
         private final DoubleSupplier getter;
         private final DoubleConsumer setter;

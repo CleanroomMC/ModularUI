@@ -3,17 +3,21 @@
 ## High Priority
 
 - [ ]  create JEI UIs (?)
-- [ ]  properly figure out z layer
 - [ ]  floating widgets
     - [ ]  Context Menu
     - [ ]  Dropdown menu
-- [ ]  ignorable characters in text field (group number separator for example)
+- [ ]  Rework TextFieldWidget
+  - proper separation of text and number input
+  - consistent setter naming
+  - ignorable characters (like decimal group separator)
+  - optional expression parsing for number input
+  - option to instantly update text and not just on unfocus
+  - multiline text field
 
 ## Medium Priority
 
-- [ ]  Generate WidgetTheme parser via annotation
+- [ ]  Generate WidgetTheme parser via annotation (and/or codec?)
     - [ ] Ability to export theme
-- [ ]  Rework TextFieldWidget
 - [ ]  Text editor
 - [ ]  Trackpad
 - [ ]  Pie menu

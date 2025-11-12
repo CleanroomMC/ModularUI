@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.utils.ICopy;
-import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.utils.serialization.IByteBufAdapter;
 import com.cleanroommc.modularui.utils.serialization.IByteBufDeserializer;
 import com.cleanroommc.modularui.utils.serialization.IByteBufSerializer;
@@ -13,7 +12,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -27,11 +27,11 @@ public abstract class GenericCollectionSyncHandler<T, C extends Collection<T>> e
     private final ICopy<T> copy;
 
     protected GenericCollectionSyncHandler(@NotNull Supplier<C> getter,
-                                        @Nullable Consumer<C> setter,
-                                        @NotNull IByteBufDeserializer<T> deserializer,
-                                        @NotNull IByteBufSerializer<T> serializer,
-                                        @Nullable IEquals<T> equals,
-                                        @Nullable ICopy<T> copy) {
+                                           @Nullable Consumer<C> setter,
+                                           @NotNull IByteBufDeserializer<T> deserializer,
+                                           @NotNull IByteBufSerializer<T> serializer,
+                                           @Nullable IEquals<T> equals,
+                                           @Nullable ICopy<T> copy) {
         this.getter = Objects.requireNonNull(getter);
         this.setter = setter;
         this.deserializer = deserializer;
@@ -65,6 +65,11 @@ public abstract class GenericCollectionSyncHandler<T, C extends Collection<T>> e
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void notifyUpdate() {
+        setValue(this.getter.get(), false, true);
     }
 
     protected abstract boolean didValuesChange(C newValues);
