@@ -14,6 +14,7 @@ import net.minecraft.util.text.TextFormatting;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.function.IntSupplier;
 
 public class TextWidget<W extends TextWidget<W>> extends Widget<W> {
@@ -52,7 +53,7 @@ public class TextWidget<W extends TextWidget<W>> extends Widget<W> {
 
     protected String checkString() {
         String text = this.key.getFormatted();
-        if ((this.lastText == null && !text.isEmpty()) || this.lastText != null && !this.lastText.equals(text)) {
+        if (!Objects.equals(this.lastText, text)) {
             onTextChanged(text);
             this.lastText = text;
         }
