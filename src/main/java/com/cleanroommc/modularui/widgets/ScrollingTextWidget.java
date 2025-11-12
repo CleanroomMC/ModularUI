@@ -33,7 +33,9 @@ public class ScrollingTextWidget extends TextWidget<ScrollingTextWidget> {
     @Override
     public void dispose() {
         super.dispose();
-        this.animator.stop(true);
+        if (this.isEnabled()) {
+            this.animator.stop(true);
+        }
     }
 
     @Override
