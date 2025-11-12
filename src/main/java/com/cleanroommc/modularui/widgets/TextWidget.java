@@ -52,7 +52,7 @@ public class TextWidget<W extends TextWidget<W>> extends Widget<W> {
 
     protected String checkString() {
         String text = this.key.getFormatted();
-        if (this.lastText != null && !this.lastText.equals(text)) {
+        if ((this.lastText == null && !text.isEmpty()) || this.lastText != null && !this.lastText.equals(text)) {
             onTextChanged(text);
             this.lastText = text;
         }
