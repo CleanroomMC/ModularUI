@@ -67,6 +67,11 @@ public class ByteSyncValue extends ValueSyncHandler<Byte> implements IByteSyncVa
     }
 
     @Override
+    public void notifyUpdate() {
+        setByteValue(this.getter.getByte(), false, true);
+    }
+
+    @Override
     public void write(PacketBuffer buffer) {
         buffer.writeByte(getByteValue());
     }

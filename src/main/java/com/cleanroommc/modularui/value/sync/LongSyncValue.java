@@ -89,6 +89,11 @@ public class LongSyncValue extends ValueSyncHandler<Long> implements ILongSyncVa
     }
 
     @Override
+    public void notifyUpdate() {
+        setLongValue(this.getter.getAsLong(), false, true);
+    }
+
+    @Override
     public void write(PacketBuffer buffer) {
         buffer.writeVarLong(getLongValue());
     }

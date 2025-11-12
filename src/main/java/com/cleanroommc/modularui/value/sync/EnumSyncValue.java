@@ -87,6 +87,11 @@ public class EnumSyncValue<T extends Enum<T>> extends ValueSyncHandler<T> implem
     }
 
     @Override
+    public void notifyUpdate() {
+        setValue(this.getter.get(), false, true);
+    }
+
+    @Override
     public void write(PacketBuffer buffer) {
         buffer.writeEnumValue(getValue());
     }

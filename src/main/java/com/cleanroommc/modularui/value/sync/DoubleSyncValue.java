@@ -88,6 +88,11 @@ public class DoubleSyncValue extends ValueSyncHandler<Double> implements IDouble
     }
 
     @Override
+    public void notifyUpdate() {
+        setDoubleValue(this.getter.getAsDouble(), false, true);
+    }
+
+    @Override
     public void write(PacketBuffer buffer) {
         buffer.writeDouble(getDoubleValue());
     }

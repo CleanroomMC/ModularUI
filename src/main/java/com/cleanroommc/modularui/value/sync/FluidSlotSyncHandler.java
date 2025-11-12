@@ -90,6 +90,11 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
     }
 
     @Override
+    public void notifyUpdate() {
+        setValue(this.fluidTank.getFluid(), false, true);
+    }
+
+    @Override
     public void write(PacketBuffer buffer) {
         NetworkUtils.writeFluidStack(buffer, this.cache);
     }

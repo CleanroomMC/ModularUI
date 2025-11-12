@@ -88,6 +88,11 @@ public class BooleanSyncValue extends ValueSyncHandler<Boolean> implements IBool
     }
 
     @Override
+    public void notifyUpdate() {
+        setBoolValue(this.getter.getAsBoolean(), false, true);
+    }
+
+    @Override
     public void write(PacketBuffer buffer) {
         buffer.writeBoolean(getBoolValue());
     }
