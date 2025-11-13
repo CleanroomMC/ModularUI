@@ -32,7 +32,7 @@ public class ByteBufAdapters {
 
         @Override
         public void serialize(PacketBuffer buffer, byte[] u) throws IOException {
-            buffer.writeBytes(u);
+            buffer.writeByteArray(u);
         }
 
         @Override
@@ -81,7 +81,7 @@ public class ByteBufAdapters {
 
         @Override
         public void serialize(PacketBuffer buffer, BigInteger u) throws IOException {
-            buffer.writeBytes(u.toByteArray());
+            buffer.writeByteArray(u.toByteArray());
         }
 
         @Override
