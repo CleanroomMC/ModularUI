@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.animation.Animator;
-import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IValueWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.GuiTextures;
@@ -157,7 +156,7 @@ public class SortableListWidget<T> extends ListValueWidget<T, SortableListWidget
 
         private final T value;
         private List<IWidget> children;
-        private Predicate<IGuiElement> dropPredicate;
+        private Predicate<IWidget> dropPredicate;
         private SortableListWidget<T> listWidget;
         private int index = -1;
         private int movingFrom = -1;
@@ -183,7 +182,7 @@ public class SortableListWidget<T> extends ListValueWidget<T, SortableListWidget
         }
 
         @Override
-        public boolean canDropHere(int x, int y, @Nullable IGuiElement widget) {
+        public boolean canDropHere(int x, int y, @Nullable IWidget widget) {
             return this.dropPredicate == null || this.dropPredicate.test(widget);
         }
 
@@ -225,7 +224,7 @@ public class SortableListWidget<T> extends ListValueWidget<T, SortableListWidget
             return child(widgetCreator.apply(this));
         }
 
-        public Item<T> dropPredicate(Predicate<IGuiElement> dropPredicate) {
+        public Item<T> dropPredicate(Predicate<IWidget> dropPredicate) {
             this.dropPredicate = dropPredicate;
             return this;
         }

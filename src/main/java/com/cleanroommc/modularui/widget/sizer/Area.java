@@ -3,7 +3,6 @@ package com.cleanroommc.modularui.widget.sizer;
 import com.cleanroommc.modularui.animation.IAnimatable;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
-import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.MathUtils;
 
@@ -494,12 +493,6 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
 
     public Box getPadding() {
         return this.padding;
-    }
-
-    @Override
-    public boolean resize(IGuiElement guiElement, boolean isParentLayout) {
-        guiElement.getArea().set(this);
-        return true;
     }
 
     @Override

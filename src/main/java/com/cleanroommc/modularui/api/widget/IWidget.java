@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.api.ITheme;
-import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.ModularPanel;
@@ -9,6 +8,8 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Flex;
+
+import com.cleanroommc.modularui.widget.sizer.ResizeNode;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -163,12 +164,6 @@ public interface IWidget extends IGuiElement {
     }
 
     /**
-     * @return the panel this widget is in
-     */
-    @NotNull
-    ModularPanel getPanel();
-
-    /**
      * Returns if this element is enabled. Disabled elements are not drawn and can not be interacted with. If this is disabled, the children
      * will be considered disabled to without actually being disabled.
      *
@@ -249,9 +244,15 @@ public interface IWidget extends IGuiElement {
     ModularGuiContext getContext();
 
     /**
+     * @return the panel this widget is in
+     */
+    @NotNull
+    ModularPanel getPanel();
+
+    /**
      * @return flex of this widget. Creates a new one if it doesn't already have one.
      */
-    Flex flex();
+    //Flex flex();
 
     /**
      * Does the same as {@link IPositioned#flex(Consumer)}
@@ -259,24 +260,17 @@ public interface IWidget extends IGuiElement {
      * @param builder function to build flex
      * @return this
      */
-    default IWidget flexBuilder(Consumer<Flex> builder) {
+    /*default IWidget flexBuilder(Consumer<Flex> builder) {
         builder.accept(flex());
         return this;
-    }
+    }*/
 
     /**
      * @return resizer of this widget
      */
     @NotNull
     @Override
-    IResizeable resizer();
-
-    /**
-     * Sets the resizer of this widget.
-     *
-     * @param resizer resizer
-     */
-    void resizer(IResizeable resizer);
+    ResizeNode resizer();
 
     /**
      * Called before a widget is resized.
@@ -296,12 +290,11 @@ public interface IWidget extends IGuiElement {
     /**
      * @return flex of this widget
      */
-    Flex getFlex();
-
-    default boolean isExpanded() {
+    //Flex getFlex();
+    /*default boolean isExpanded() {
         Flex flex = getFlex();
         return flex != null && flex.isExpanded();
-    }
+    }*/
 
     @Nullable String getName();
 

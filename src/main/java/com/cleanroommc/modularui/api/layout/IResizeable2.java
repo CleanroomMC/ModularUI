@@ -1,14 +1,12 @@
 package com.cleanroommc.modularui.api.layout;
 
 import com.cleanroommc.modularui.api.GuiAxis;
-import com.cleanroommc.modularui.api.widget.IGuiElement;
-import com.cleanroommc.modularui.widget.sizer.Area;
 
 /**
  * An interface that handles resizing of widgets.
  * Usually this interface is not implemented by the users of this library or will even interact with it.
  */
-public interface IResizeable extends IResizeParent {
+public interface IResizeable2 extends IResizeParent {
 
     /**
      * Called once before resizing
@@ -18,27 +16,23 @@ public interface IResizeable extends IResizeParent {
     /**
      * Resizes the given element
      *
-     * @param guiElement     element to resize
      * @param isParentLayout if the parent is a layout widget
      * @return true if element is fully resized
      */
-    boolean resize(IGuiElement guiElement, boolean isParentLayout);
+    boolean resize(boolean isParentLayout);
 
     /**
-     * Called if {@link #resize(IGuiElement, boolean)} returned false after children have been resized.
+     * Called if {@link #resize(boolean)} returned false after children have been resized.
      *
-     * @param guiElement element to resize
      * @return if element is fully resized
      */
-    boolean postResize(IGuiElement guiElement);
+    boolean postResize();
 
     /**
      * Called after all elements in the tree are resized and the absolute positions needs to be calculated from the
      * relative postion.
-     *
-     * @param guiElement element that was resized
      */
-    default void applyPos(IGuiElement guiElement) {}
+    default void applyPos() {}
 
     void setChildrenResized(boolean resized);
 

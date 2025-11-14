@@ -4,8 +4,7 @@ import com.cleanroommc.modularui.GuiError;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.GuiAxis;
-import com.cleanroommc.modularui.api.layout.IResizeable;
-import com.cleanroommc.modularui.api.widget.IGuiElement;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.network.NetworkUtils;
 
 import org.jetbrains.annotations.ApiStatus;
@@ -19,6 +18,7 @@ import java.util.function.IntSupplier;
 @ApiStatus.Internal
 public class DimensionSizer {
 
+    private final ResizeNode resizer;
     private final GuiAxis axis;
 
     private final Unit p1 = new Unit(), p2 = new Unit();
@@ -32,7 +32,8 @@ public class DimensionSizer {
     private boolean marginPaddingApplied = false;
     private boolean canRelayout = false;
 
-    public DimensionSizer(GuiAxis axis) {
+    public DimensionSizer(ResizeNode resizer, GuiAxis axis) {
+        this.resizer = resizer;
         this.axis = axis;
     }
 
@@ -73,7 +74,7 @@ public class DimensionSizer {
         }
     }
 
-    public void setCoverChildren(boolean coverChildren, IGuiElement widget) {
+    public void setCoverChildren(boolean coverChildren, IWidget widget) {
         getSize(widget);
         this.coverChildren = coverChildren;
     }
@@ -132,6 +133,10 @@ public class DimensionSizer {
         return this.posCalculated;
     }
 
+    public void setSizeCalculated(boolean b) {
+        this.resizer.setSizeResized(this.axis, b);
+    }
+
     public boolean canRelayout() {
         return canRelayout;
     }
@@ -157,7 +162,7 @@ public class DimensionSizer {
     }
 
     public boolean isMarginPaddingApplied() {
-        return marginPaddingApplied;
+        return this.marginPaddingApplied;
     }
 
     public void setMarginPaddingApplied(boolean marginPaddingApplied) {
@@ -168,15 +173,17 @@ public class DimensionSizer {
         return unit.isRelative() && unit.getAnchor() != 0;
     }
 
-    public void apply(Area area, IResizeable relativeTo, IntSupplier defaultSize) {
+    public void apply(Area area, ResizeNode relativeTo, IntSupplier defaultSize) {
         // is already calculated
-        if (this.sizeCalculated && this.posCalculated) return;
+        boolean sizeCalculated = isSizeCalculated();
+        boolean posCalculated = isPosCalculated();
+        if (sizeCalculated && posCalculated) return;
         int p, s;
         int parentSize = relativeTo.getArea().getSize(this.axis);
         boolean calcParent = relativeTo.isSizeCalculated(this.axis);
         Box padding = relativeTo.getArea().getPadding();
 
-        if (this.sizeCalculated && !this.posCalculated) {
+        if (sizeCalculated) { // pos not calculated
             // size was calculated before
             s = area.getSize(this.axis);
             if (this.start != null) {
@@ -186,7 +193,7 @@ public class DimensionSizer {
             } else {
                 throw new IllegalStateException();
             }
-        } else if (!this.sizeCalculated && this.posCalculated) {
+        } else if (posCalculated) { // size not calculated
             // pos was calculated before
             p = area.getRelativePoint(this.axis);
             if (this.size != null) {
@@ -195,7 +202,7 @@ public class DimensionSizer {
                 s = defaultSize.getAsInt();
                 this.sizeCalculated = s > 0;
             }
-        } else {
+        } else { // pos and size not calculated
             // calc start, end and size
             if (this.start == null && this.end == null) {
                 p = 0;
@@ -213,11 +220,10 @@ public class DimensionSizer {
                 if (this.size == null) {
                     if (this.start != null && this.end != null) {
                         p = calcPoint(this.start, padding, -1, parentSize, calcParent);
-                        boolean b = this.posCalculated;
                         this.posCalculated = false;
                         int p2 = calcPoint(this.end, padding, -1, parentSize, calcParent);
                         s = Math.abs(p2 - p);
-                        this.posCalculated &= b;
+                        this.posCalculated &= posCalculated;
                         this.sizeCalculated |= this.posCalculated;
                     } else {
                         s = defaultSize.getAsInt();
@@ -298,7 +304,7 @@ public class DimensionSizer {
         }
     }
 
-    public void applyMarginAndPaddingToPos(IGuiElement parent, Area area, Area relativeTo) {
+    public void applyMarginAndPaddingToPos(IWidget parent, Area area, Area relativeTo) {
         // apply self margin and parent padding if not done yet
         if (isMarginPaddingApplied()) return;
         setMarginPaddingApplied(true);
@@ -343,7 +349,7 @@ public class DimensionSizer {
             val *= parentSize - padding.getTotal(this.axis);
         }
         val += s.getOffset();
-        this.sizeCalculated = true;
+        this.resizer.setSizeResized(this.axis, true);
         return (int) val;
     }
 
@@ -361,7 +367,7 @@ public class DimensionSizer {
         if (p == this.end) {
             val = parentSize - val;
         }
-        this.posCalculated = true;
+        this.resizer.setPosResized(this.axis, true);
         return (int) val;
     }
 
@@ -372,7 +378,7 @@ public class DimensionSizer {
      * @param newState the new unit type for the found unit
      * @return a used or unused unit.
      */
-    private Unit getNext(IGuiElement widget, Unit.State newState) {
+    private Unit getNext(IWidget widget, Unit.State newState) {
         Unit ret = this.next;
         Unit other = ret == this.p1 ? this.p2 : this.p1;
         if (ret.state != Unit.State.UNUSED) {
@@ -392,21 +398,21 @@ public class DimensionSizer {
         return ret;
     }
 
-    protected Unit getStart(IGuiElement widget) {
+    protected Unit getStart(IWidget widget) {
         if (this.start == null) {
             this.start = getNext(widget, Unit.State.START);
         }
         return this.start;
     }
 
-    protected Unit getEnd(IGuiElement widget) {
+    protected Unit getEnd(IWidget widget) {
         if (this.end == null) {
             this.end = getNext(widget, Unit.State.END);
         }
         return this.end;
     }
 
-    protected Unit getSize(IGuiElement widget) {
+    protected Unit getSize(IWidget widget) {
         if (this.size == null) {
             this.size = getNext(widget, Unit.State.SIZE);
         }

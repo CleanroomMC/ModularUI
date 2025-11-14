@@ -1,13 +1,17 @@
 package com.cleanroommc.modularui.api.widget;
 
-import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import com.cleanroommc.modularui.widget.sizer.ResizeNode;
+
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Base interface for gui elements. For example widgets.
  */
+@ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+@Deprecated
 public interface IGuiElement {
 
     /**
@@ -27,7 +31,7 @@ public interface IGuiElement {
      */
     boolean hasParent();
 
-    IResizeable resizer();
+    ResizeNode resizer();
 
     /**
      * @return the area this element occupies

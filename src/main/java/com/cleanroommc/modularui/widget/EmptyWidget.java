@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Flex;
+import com.cleanroommc.modularui.widget.sizer.ResizeNode;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -127,7 +128,7 @@ public class EmptyWidget implements IWidget {
     }
 
     @Override
-    public @NotNull IResizeable resizer() {
+    public @NotNull ResizeNode resizer() {
         return this.flex;
     }
 

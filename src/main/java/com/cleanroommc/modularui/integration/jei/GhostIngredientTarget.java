@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.integration.jei;
 
-import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerGhostIngredientSlot;
 
@@ -14,11 +13,11 @@ import java.awt.*;
 @Optional.Interface(iface = "mezz.jei.api.gui.IGhostIngredientHandler$Target", modid = "jei")
 public class GhostIngredientTarget<I> implements IGhostIngredientHandler.Target<I> {
 
-    private final IGuiElement guiElement;
+    private final IWidget widget;
     private final RecipeViewerGhostIngredientSlot<I> ghostSlot;
 
     public static <I> GhostIngredientTarget<I> of(RecipeViewerGhostIngredientSlot<I> slot) {
-        if (slot instanceof IGuiElement guiElement) {
+        if (slot instanceof IWidget guiElement) {
             return new GhostIngredientTarget<>(guiElement, slot);
         }
         throw new IllegalArgumentException();
@@ -28,14 +27,14 @@ public class GhostIngredientTarget<I> implements IGhostIngredientHandler.Target<
         return new GhostIngredientTarget<>(slot, slot);
     }
 
-    public GhostIngredientTarget(IGuiElement guiElement, RecipeViewerGhostIngredientSlot<I> ghostSlot) {
-        this.guiElement = guiElement;
+    public GhostIngredientTarget(IWidget widget, RecipeViewerGhostIngredientSlot<I> ghostSlot) {
+        this.widget = widget;
         this.ghostSlot = ghostSlot;
     }
 
     @Override
     public @NotNull Rectangle getArea() {
-        return this.guiElement.getArea();
+        return this.widget.getArea();
     }
 
     @Override

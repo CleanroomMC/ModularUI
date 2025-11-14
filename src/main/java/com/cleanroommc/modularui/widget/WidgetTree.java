@@ -551,7 +551,7 @@ public class WidgetTree {
     public static void resizeInternal(IWidget parent, boolean onOpen) {
         long fullTime = System.nanoTime();
         // check if updating this widget's pos and size can potentially update its parents
-        while (!(parent instanceof ModularPanel) && (parent.getParent() instanceof ILayoutWidget || parent.getParent().flex().dependsOnChildren())) {
+        while (!(parent instanceof ModularPanel) && (parent.getParent() instanceof ILayoutWidget || parent.getParent().resizer().dependsOnChildren())) {
             parent = parent.getParent();
         }
         long rawTime = System.nanoTime();

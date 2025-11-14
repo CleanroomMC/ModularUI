@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui;
 
-import com.cleanroommc.modularui.api.widget.IGuiElement;
+import com.cleanroommc.modularui.api.widget.IWidget;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -25,7 +25,7 @@ public class GuiErrorHandler {
         this.errors.clear();
     }
 
-    void pushError(IGuiElement reference, GuiError.Type type, String msg) {
+    void pushError(IWidget reference, GuiError.Type type, String msg) {
         GuiError error = new GuiError(msg, reference, type);
         if (this.errorSet.add(error)) {
             ModularUI.LOGGER.log(error.getLevel(), error);

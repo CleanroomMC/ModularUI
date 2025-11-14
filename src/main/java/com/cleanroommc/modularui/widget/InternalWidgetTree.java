@@ -2,11 +2,11 @@ package com.cleanroommc.modularui.widget;
 
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
-import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
+import com.cleanroommc.modularui.widget.sizer.ResizeNode;
 import com.cleanroommc.modularui.widgets.layout.IExpander;
 
 import net.minecraft.client.renderer.GlStateManager;
@@ -194,7 +194,7 @@ class InternalWidgetTree {
     static boolean resizeWidget(IWidget widget, boolean init, boolean onOpen, boolean isParentLayout) {
         boolean alreadyCalculated = false;
         // first try to resize this widget
-        IResizeable resizer = widget.resizer();
+        ResizeNode resizer = widget.resizer();
         ILayoutWidget layout = widget instanceof ILayoutWidget layoutWidget ? layoutWidget : null;
         boolean isLayout = layout != null;
         if (init) {
@@ -205,7 +205,7 @@ class InternalWidgetTree {
             // if this is not the first time check if this widget is already resized
             alreadyCalculated = resizer.isFullyCalculated(isParentLayout);
         }
-        boolean selfFullyCalculated = resizer.isSelfFullyCalculated() || resizer.resize(widget, isParentLayout);
+        boolean selfFullyCalculated = resizer.isSelfFullyCalculated() || resizer.resize(isParentLayout);
 
         GuiAxis expandAxis = widget instanceof IExpander expander ? expander.getExpandAxis() : null;
         // now resize all children and collect children which could not be fully calculated
@@ -213,7 +213,7 @@ class InternalWidgetTree {
         if (!resizer.areChildrenCalculated() && widget.hasChildren()) {
             anotherResize = new ArrayList<>();
             for (IWidget child : widget.getChildren()) {
-                if (init) child.flex().checkExpanded(expandAxis);
+                if (init) child.resizer().checkExpanded(expandAxis);
                 if (!resizeWidget(child, init, onOpen, isLayout)) {
                     anotherResize.add(child);
                 }
@@ -232,7 +232,7 @@ class InternalWidgetTree {
             }
 
             // post resize this widget if possible
-            resizer.postResize(widget);
+            resizer.postResize();
 
             if (layout != null && shouldLayout) {
                 layoutSuccessful &= layout.postLayoutWidgets();

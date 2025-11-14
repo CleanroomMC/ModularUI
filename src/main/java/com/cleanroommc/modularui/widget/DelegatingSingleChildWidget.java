@@ -1,10 +1,10 @@
 package com.cleanroommc.modularui.widget;
 
-import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.api.widget.IDelegatingWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Flex;
+import com.cleanroommc.modularui.widget.sizer.ResizeNode;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -62,7 +62,7 @@ public class DelegatingSingleChildWidget<W extends SingleChildWidget<W>> extends
     }
 
     @Override
-    public @NotNull IResizeable resizer() {
+    public @NotNull ResizeNode resizer() {
         return getDelegate() != null ? getDelegate().resizer() : super.resizer();
     }
 

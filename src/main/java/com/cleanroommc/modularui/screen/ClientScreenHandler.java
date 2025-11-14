@@ -6,7 +6,6 @@ import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.UpOrDown;
-import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiAccessor;
@@ -443,7 +442,7 @@ public class ClientScreenHandler {
         muiScreen.drawForeground();
 
         acc.setHoveredSlot(null);
-        IGuiElement hovered = muiScreen.getContext().getTopHovered();
+        IWidget hovered = muiScreen.getContext().getTopHovered();
         if (hovered instanceof IVanillaSlot vanillaSlot && vanillaSlot.handleAsVanillaSlot()) {
             acc.setHoveredSlot(vanillaSlot.getVanillaSlot());
         }

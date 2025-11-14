@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.api.widget;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Flex;
+import com.cleanroommc.modularui.widget.sizer.StandardResizer;
 import com.cleanroommc.modularui.widget.sizer.Unit;
 
 import java.util.function.Consumer;
@@ -16,7 +17,7 @@ import java.util.function.DoubleSupplier;
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public interface IPositioned<W extends IPositioned<W>> {
 
-    Flex flex();
+    StandardResizer flex();
 
     Area getArea();
 

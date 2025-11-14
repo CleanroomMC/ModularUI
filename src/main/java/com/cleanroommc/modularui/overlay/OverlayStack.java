@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.overlay;
 
-import com.cleanroommc.modularui.api.widget.IGuiElement;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.ModularScreen;
 
@@ -96,10 +96,10 @@ public class OverlayStack {
     }
 
     @Nullable
-    public static IGuiElement getHoveredElement() {
+    public static IWidget getHoveredElement() {
         for (int i = overlay.size() - 1; i >= 0; i--) {
             ModularScreen screen = overlay.get(i);
-            IGuiElement hovered = screen.getContext().getTopHovered();
+            IWidget hovered = screen.getContext().getTopHovered();
             if (hovered == null) continue;
             return hovered;
         }
