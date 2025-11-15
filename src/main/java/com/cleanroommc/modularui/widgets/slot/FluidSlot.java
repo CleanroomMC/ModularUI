@@ -21,6 +21,7 @@ import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.Platform;
+import com.cleanroommc.modularui.utils.SIPrefix;
 import com.cleanroommc.modularui.value.sync.FluidSlotSyncHandler;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
@@ -64,68 +65,75 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, Recipe
     public FluidSlot() {
         size(DEFAULT_SIZE);
         tooltip().setAutoUpdate(true);//.setHasTitleMargin(true);
-        tooltipBuilder(tooltip -> {
-            IFluidTank fluidTank = getFluidTank();
-            FluidStack fluid = this.syncHandler.getValue();
+        tooltipBuilder(this::addToolTip);
+    }
+
+    protected void addToolTip(RichTooltip tooltip) {
+        IFluidTank fluidTank = getFluidTank();
+        FluidStack fluid = this.syncHandler.getValue();
+        if (fluid != null) {
+            tooltip.addLine(IKey.str(fluid.getLocalizedName())).spaceLine(2);
+        }
+        if (this.syncHandler.isPhantom()) {
             if (fluid != null) {
-                tooltip.addLine(IKey.str(fluid.getLocalizedName())).spaceLine(2);
-            }
-            if (this.syncHandler.isPhantom()) {
-                if (fluid != null) {
-                    if (this.syncHandler.controlsAmount()) {
-                        tooltip.addLine(IKey.lang("modularui.fluid.phantom.amount", formatFluidTooltipAmount(fluid.amount), getBaseUnit()));
-                    }
-                } else {
-                    tooltip.addLine(IKey.lang("modularui.fluid.empty"));
-                }
                 if (this.syncHandler.controlsAmount()) {
-                    tooltip.addLine(IKey.lang("modularui.fluid.phantom.control"));
+                    tooltip.addLine(IKey.lang("modularui.fluid.phantom.amount", formatFluidTooltipAmount(fluid.amount), getUnit()));
                 }
             } else {
-                if (fluid != null) {
-                    tooltip.addLine(IKey.lang("modularui.fluid.amount", formatFluidTooltipAmount(fluid.amount), formatFluidTooltipAmount(fluidTank.getCapacity()), getBaseUnit()));
-                    addAdditionalFluidInfo(tooltip, fluid);
-                } else {
-                    tooltip.addLine(IKey.lang("modularui.fluid.empty"));
-                }
-                if (this.syncHandler.canFillSlot() || this.syncHandler.canDrainSlot()) {
-                    tooltip.addLine(IKey.EMPTY); // Add an empty line to separate from the bottom material tooltips
-                    if (Interactable.hasShiftDown()) {
-                        if (this.syncHandler.canFillSlot() && this.syncHandler.canDrainSlot()) {
-                            tooltip.addLine(IKey.lang("modularui.fluid.click_combined"));
-                        } else if (this.syncHandler.canDrainSlot()) {
-                            tooltip.addLine(IKey.lang("modularui.fluid.click_to_fill"));
-                        } else if (this.syncHandler.canFillSlot()) {
-                            tooltip.addLine(IKey.lang("modularui.fluid.click_to_empty"));
-                        }
-                    } else {
-                        tooltip.addLine(IKey.lang("modularui.tooltip.shift"));
-                    }
-                }
+                tooltip.addLine(IKey.lang("modularui.fluid.empty"));
             }
+            if (this.syncHandler.controlsAmount()) {
+                tooltip.addLine(IKey.lang("modularui.fluid.phantom.control"));
+            }
+        } else {
             if (fluid != null) {
-                tooltip.addLine(MCHelper.getFluidModName(fluid));
+                tooltip.addLine(IKey.lang("modularui.fluid.amount", formatFluidTooltipAmount(fluid.amount), formatFluidTooltipAmount(fluidTank.getCapacity()), getUnit()));
+                addAdditionalFluidInfo(tooltip, fluid);
+            } else {
+                tooltip.addLine(IKey.lang("modularui.fluid.empty"));
+                tooltip.addLine(IKey.lang("modularui.fluid.capacity", formatFluidTooltipAmount(fluidTank.getCapacity()), getUnit()));
             }
-        });
+            if (this.syncHandler.canFillSlot() || this.syncHandler.canDrainSlot()) {
+                tooltip.addLine(IKey.EMPTY); // Add an empty line to separate from the bottom material tooltips
+                if (Interactable.hasShiftDown()) {
+                    if (this.syncHandler.canFillSlot() && this.syncHandler.canDrainSlot()) {
+                        tooltip.addLine(IKey.lang("modularui.fluid.click_combined"));
+                    } else if (this.syncHandler.canDrainSlot()) {
+                        tooltip.addLine(IKey.lang("modularui.fluid.click_to_fill"));
+                    } else if (this.syncHandler.canFillSlot()) {
+                        tooltip.addLine(IKey.lang("modularui.fluid.click_to_empty"));
+                    }
+                } else {
+                    tooltip.addLine(IKey.lang("modularui.tooltip.shift"));
+                }
+            }
+        }
+        if (fluid != null) {
+            tooltip.addLine(MCHelper.getFluidModName(fluid));
+        }
     }
 
     public void addAdditionalFluidInfo(RichTooltip tooltip, FluidStack fluidStack) {}
 
     public String formatFluidTooltipAmount(double amount) {
         // the tooltip show the full number
-        return TOOLTIP_FORMAT.format(amount) + " " + getBaseUnitBaseSuffix();
+        return TOOLTIP_FORMAT.format(amount);
     }
 
     protected double getBaseUnitAmount(double amount) {
-        return amount / 1000;
+        return amount * getBaseUnitSiPrefix().factor;
+    }
+
+    protected final String getUnit() {
+        return getBaseUnitSiPrefix().stringSymbol + getBaseUnit();
     }
 
     protected String getBaseUnit() {
         return UNIT_BUCKET;
     }
 
-    protected String getBaseUnitBaseSuffix() {
-        return "m";
+    protected SIPrefix getBaseUnitSiPrefix() {
+        return SIPrefix.Milli;
     }
 
     @Override
