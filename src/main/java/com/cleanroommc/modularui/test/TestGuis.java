@@ -327,12 +327,13 @@ public class TestGuis extends CustomModularScreen {
                                 .newLine()
                                 .add("A long line which should wrap around")
                                 .newLine()
-                                .addLine(IKey.dynamicKey(() -> {
-                                    int i = integer.getIntValue();
-                                    integer.setIntValue(i++);
-                                    return IKey.str("Dynamic key: %s", IKey.str("%,d", i)
-                                            .style(i % 30 > 5 ? TextFormatting.RED : TextFormatting.DARK_BLUE));
-                                }))
+                                .addLine(IKey.comp(IKey.str("Dynamic ").style(IKey.GOLD), IKey.dynamicKey(() -> {
+                                    int i = integer.getIntValue() + 1;
+                                    integer.setIntValue(i);
+                                    return IKey.str("key [%s]", IKey.str("arg")
+                                                    .style(IKey.UNDERLINE, IKey.BLACK))
+                                            .style(i % 30 > 5 ? IKey.RED : IKey.DARK_BLUE);
+                                }).style(IKey.BOLD), IKey.str(" Test")))
                                 .textShadow(false)
                         ));
     }
