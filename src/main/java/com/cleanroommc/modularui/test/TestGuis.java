@@ -35,6 +35,7 @@ import com.cleanroommc.modularui.utils.fakeworld.ArraySchema;
 import com.cleanroommc.modularui.utils.fakeworld.FakeEntity;
 import com.cleanroommc.modularui.utils.fakeworld.ISchema;
 import com.cleanroommc.modularui.value.BoolValue;
+import com.cleanroommc.modularui.value.IntValue;
 import com.cleanroommc.modularui.value.StringValue;
 import com.cleanroommc.modularui.widget.DraggableWidget;
 import com.cleanroommc.modularui.widget.Widget;
@@ -277,6 +278,7 @@ public class TestGuis extends CustomModularScreen {
     }
 
     public static @NotNull ModularPanel buildRichTextUI() {
+        IntValue integer = new IntValue(0);
         return new ModularPanel("main")
                 .size(176, 166)
                 .child(new RichTextWidget()
@@ -324,6 +326,14 @@ public class TestGuis extends CustomModularScreen {
                                 .add(TextFormatting.RESET + "" + TextFormatting.UNDERLINE + "Underlined" + TextFormatting.RESET)
                                 .newLine()
                                 .add("A long line which should wrap around")
+                                .newLine()
+                                .addLine(IKey.comp(IKey.str("Dynamic ").style(IKey.GOLD), IKey.dynamicKey(() -> {
+                                    int i = integer.getIntValue() + 1;
+                                    integer.setIntValue(i);
+                                    return IKey.str("key [%s]", IKey.str("arg")
+                                                    .style(IKey.UNDERLINE, IKey.BLACK))
+                                            .style(i % 30 > 5 ? IKey.RED : IKey.DARK_BLUE);
+                                }).style(IKey.BOLD), IKey.str(" Test")))
                                 .textShadow(false)
                         ));
     }
