@@ -142,19 +142,21 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     public void afterInit() {}
 
     /**
-     * Retrieves, initialises and verifies a linked sync handler.
+     * Retrieves, verifies, and initialises a linked sync handler.
      * Custom logic should be handled in {@link #isValidSyncHandler(SyncHandler)}.
      */
     @Override
     public void initialiseSyncHandler(ModularSyncManager syncManager, boolean late) {
-        if (this.syncKey != null) {
-            this.syncHandler = syncManager.getSyncHandler(getPanel().getName(), this.syncKey);
+        SyncHandler handler = this.syncHandler;
+        if (handler == null && this.syncKey != null) {
+            handler = syncManager.getSyncHandler(getPanel().getName(), this.syncKey);
         }
-        if ((this.syncKey != null || this.syncHandler != null) && !isValidSyncHandler(this.syncHandler)) {
-            String type = this.syncHandler == null ? null : this.syncHandler.getClass().getName();
-            this.syncHandler = null;
+        if (handler != null && !isValidSyncHandler(handler)) {
+            String type = handler.getClass().getName();
+            setSyncHandler(null);
             throw new IllegalStateException("SyncHandler of type " + type + " is not valid for " + getClass().getName() + ", with key " + this.syncKey);
         }
+        setSyncHandler(handler);
         if (this.syncHandler instanceof ValueSyncHandler<?> valueSyncHandler && valueSyncHandler.getChangeListener() == null) {
             valueSyncHandler.setChangeListener(this::markTooltipDirty);
         }

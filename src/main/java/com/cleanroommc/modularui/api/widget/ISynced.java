@@ -4,6 +4,8 @@ import com.cleanroommc.modularui.value.sync.GenericSyncValue;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 
+import com.cleanroommc.modularui.widget.Widget;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,7 +35,8 @@ public interface ISynced<W extends IWidget> {
     void initialiseSyncHandler(ModularSyncManager syncManager, boolean late);
 
     /**
-     * Checks if the received sync handler is valid for this widget.
+     * Checks if the received sync handler is valid for this widget. <br />
+     * Called before {@link Widget#setSyncHandler(SyncHandler)} <br />
      * <b>Synced widgets must override this!</b>
      *
      * @param syncHandler received sync handler
