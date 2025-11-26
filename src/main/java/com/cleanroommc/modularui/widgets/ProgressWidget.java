@@ -39,8 +39,7 @@ public class ProgressWidget extends Widget<ProgressWidget> {
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        this.doubleValue = castIfTypeElseNull(syncHandler, IDoubleValue.class);
-        return this.doubleValue != null;
+        return syncHandler instanceof IDoubleValue<?>;
     }
 
     @Override

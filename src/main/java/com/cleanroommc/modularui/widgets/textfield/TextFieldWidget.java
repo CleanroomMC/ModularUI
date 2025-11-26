@@ -14,6 +14,7 @@ import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.ParsePosition;
 import java.util.function.Consumer;
@@ -63,15 +64,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof IStringValue<?> iStringValue && syncHandler instanceof ValueSyncHandler<?> valueSyncHandler) {
-            this.stringValue = iStringValue;
-            valueSyncHandler.setChangeListener(() -> {
-                markTooltipDirty();
-                setText(this.stringValue.getValue().toString());
-            });
-            return true;
-        }
-        return false;
+        return syncHandler instanceof IStringValue<?> && syncHandler instanceof ValueSyncHandler<?>;
     }
 
     @Override
@@ -214,6 +207,17 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         this.stringValue = stringValue;
         setValue(stringValue);
         return this;
+    }
+
+    @Override
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        if (syncHandler instanceof ValueSyncHandler<?> valueSyncHandler) {
+            valueSyncHandler.setChangeListener(() -> {
+                markTooltipDirty();
+                setText(this.stringValue.getValue().toString());
+            });
+        }
+        super.setSyncHandler(syncHandler);
     }
 
     /**

@@ -853,12 +853,13 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     /**
-     * Used for widgets to set a value handler. Can also be a sync handler
+     * Used for widgets to set a value handler. <br />
+     * Will also call {@link #setSyncHandler(SyncHandler)} if it is a SyncHandler
      */
     protected void setValue(IValue<?> value) {
         this.value = value;
-        if (value instanceof SyncHandler syncHandler1) {
-            setSyncHandler(syncHandler1);
+        if (value instanceof SyncHandler handler && isValidSyncHandler(handler)) {
+            setSyncHandler(handler);
         }
     }
 
