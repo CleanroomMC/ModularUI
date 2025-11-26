@@ -5,6 +5,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
+
 /**
  * See {@link GuiData} for an explanation for what this is for.
  */
@@ -14,7 +18,7 @@ public class PosGuiData extends GuiData {
 
     private final int x, y, z;
 
-    public PosGuiData(EntityPlayer player, int x, int y, int z) {
+    public PosGuiData(@NotNull EntityPlayer player, int x, int y, int z) {
         super(player);
         this.x = x;
         this.y = y;
