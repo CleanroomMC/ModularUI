@@ -21,6 +21,14 @@ public class PosGuiData extends GuiData {
         this.z = z;
     }
 
+    public PosGuiData(@NotNull EntityPlayer player, @NotNull BlockPos pos) {
+        super(player);
+        Objects.requireNonNull(pos);
+        this.x = pos.getX();
+        this.y = pos.getY();
+        this.z = pos.getZ();
+    }
+
     public int getX() {
         return this.x;
     }
