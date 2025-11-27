@@ -101,7 +101,6 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
             this.parent = parent;
             this.panel = parent.getPanel();
             this.context = parent.getContext();
-            getArea().setPanelLayer(this.panel.getArea().getPanelLayer());
             getArea().z(parent.getArea().z() + 1);
             if (this.guiActionListeners != null) {
                 for (IGuiAction action : this.guiActionListeners) {

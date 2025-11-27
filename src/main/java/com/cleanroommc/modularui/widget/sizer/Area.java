@@ -7,6 +7,8 @@ import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.MathUtils;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.Objects;
@@ -31,10 +33,6 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
      */
     public int rx, ry;
     /**
-     * each panel has its own layer
-     */
-    private byte panelLayer = 0;
-    /**
      * the widget layer within this panel
      */
     private int z;
@@ -55,7 +53,6 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
         super(area);
         this.rx = area.rx;
         this.ry = area.ry;
-        this.panelLayer = area.panelLayer;
         this.z = area.z;
         getMargin().set(area.getMargin());
         getPadding().set(area.getPadding());
@@ -125,13 +122,15 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
         this.z = z;
     }
 
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
     public byte getPanelLayer() {
-        return this.panelLayer;
+        return 0;
     }
 
-    public void setPanelLayer(byte panelLayer) {
-        this.panelLayer = panelLayer;
-    }
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
+    public void setPanelLayer(byte panelLayer) {}
 
     /**
      * Calculate X based on anchor value
@@ -557,13 +556,13 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Area area = (Area) o;
-        return rx == area.rx && ry == area.ry && panelLayer == area.panelLayer && z == area.z && Objects.equals(getMargin(),
+        return rx == area.rx && ry == area.ry && z == area.z && Objects.equals(getMargin(),
                 area.getMargin()) && Objects.equals(
                 getPadding(), area.getPadding());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), rx, ry, panelLayer, z, getMargin(), getPadding());
+        return Objects.hash(super.hashCode(), rx, ry, z, getMargin(), getPadding());
     }
 }

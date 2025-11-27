@@ -97,7 +97,6 @@ public class PanelManager {
         panel.setPanelGuiContext(this.screen.getContext());
         this.panels.addFirst(panel);
         this.dirty = true;
-        panel.getArea().setPanelLayer((byte) this.panels.size());
         panel.onOpen(this.screen);
         if (resize) {
             WidgetTree.resizeInternal(panel, true);

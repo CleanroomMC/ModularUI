@@ -29,7 +29,6 @@ public class EmptyWidget implements IWidget {
     @Override
     public void initialise(@NotNull IWidget parent, boolean late) {
         this.parent = parent;
-        getArea().setPanelLayer(getParent().getArea().getPanelLayer());
         getArea().z(parent.getArea().z() + 1);
     }
 
