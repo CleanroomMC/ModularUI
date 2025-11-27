@@ -4,7 +4,6 @@ import com.cleanroommc.modularui.api.drawable.IKey;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import java.util.function.Supplier;
 
 public class DynamicKey extends BaseKey {
@@ -12,7 +11,6 @@ public class DynamicKey extends BaseKey {
     private final Supplier<IKey> supplier;
 
     public DynamicKey(Supplier<IKey> supplier) {
-        Objects.requireNonNull(supplier.get(), "IKey returns a null key!");
         this.supplier = supplier;
     }
 
@@ -29,6 +27,7 @@ public class DynamicKey extends BaseKey {
 
     private String toString(boolean formatted, @Nullable FormattingState parentFormatting) {
         IKey key = this.supplier.get();
+        if (key == null) key = IKey.EMPTY;
         if (formatted) {
             // merge parent formatting and this formatting to no lose info
             return key.getFormatted(FormattingState.merge(parentFormatting, getFormatting()));
