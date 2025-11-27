@@ -29,8 +29,7 @@ public class ItemDisplayWidget extends Widget<ItemDisplayWidget> {
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        this.value = castIfTypeGenericElseNull(syncHandler, ItemStack.class);
-        return this.value != null;
+        return syncHandler instanceof GenericSyncValue<?> gsv && gsv.isOfType(ItemStack.class);
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,8 +27,7 @@ public class DynamicSyncedWidget<W extends DynamicSyncedWidget<W>> extends Widge
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        this.syncHandler = castIfTypeElseNull(syncHandler, DynamicSyncHandler.class, t -> t.attachDynamicWidgetListener(this::updateChild));
-        return this.syncHandler != null;
+        return syncHandler instanceof DynamicSyncHandler;
     }
 
     @Override
@@ -53,10 +53,14 @@ public class DynamicSyncedWidget<W extends DynamicSyncedWidget<W>> extends Widge
     }
 
     public W syncHandler(DynamicSyncHandler syncHandler) {
-        this.syncHandler = syncHandler;
         setSyncHandler(syncHandler);
-        syncHandler.attachDynamicWidgetListener(this::updateChild);
         return getThis();
+    }
+
+    @Override
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        this.syncHandler = castIfTypeElseNull(syncHandler, DynamicSyncHandler.class, t -> t.attachDynamicWidgetListener(this::updateChild));
+        super.setSyncHandler(syncHandler);
     }
 
     /**

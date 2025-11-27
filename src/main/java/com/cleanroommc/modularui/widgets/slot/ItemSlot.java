@@ -68,8 +68,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        this.syncHandler = castIfTypeElseNull(syncHandler, ItemSlotSH.class);
-        return this.syncHandler != null;
+        return syncHandler instanceof ItemSlotSH;
     }
 
     @Override
@@ -207,9 +206,14 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     public ItemSlot syncHandler(ItemSlotSH syncHandler) {
-        this.syncHandler = syncHandler;
-        setSyncHandler(this.syncHandler);
+        setSyncHandler(syncHandler);
         return this;
+    }
+
+    @Override
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        this.syncHandler = castIfTypeElseNull(syncHandler, ItemSlotSH.class);
+        super.setSyncHandler(syncHandler);
     }
 
     @SideOnly(Side.CLIENT)

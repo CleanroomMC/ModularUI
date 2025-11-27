@@ -12,6 +12,7 @@ import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.SingleChildWidget;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W> implements Interactable {
 
@@ -43,8 +44,7 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        this.syncHandler = castIfTypeElseNull(syncHandler, InteractionSyncHandler.class);
-        return this.syncHandler != null;
+        return syncHandler instanceof InteractionSyncHandler;
     }
 
     @Override
@@ -166,9 +166,14 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
     }
 
     public W syncHandler(InteractionSyncHandler interactionSyncHandler) {
-        this.syncHandler = interactionSyncHandler;
         setSyncHandler(interactionSyncHandler);
         return getThis();
+    }
+
+    @Override
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        this.syncHandler = castIfTypeElseNull(syncHandler, InteractionSyncHandler.class);
+        super.setSyncHandler(syncHandler);
     }
 
     public W playClickSound(boolean play) {

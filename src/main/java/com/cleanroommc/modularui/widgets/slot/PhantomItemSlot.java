@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.integration.jei.ModularUIJeiPlugin;
 import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerGhostIngredientSlot;
 import com.cleanroommc.modularui.utils.MouseData;
+import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 import com.cleanroommc.modularui.value.sync.PhantomItemSlotSH;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 
@@ -27,8 +28,7 @@ public class PhantomItemSlot extends ItemSlot implements RecipeViewerGhostIngred
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        this.syncHandler = castIfTypeElseNull(syncHandler, PhantomItemSlotSH.class);
-        return this.syncHandler != null && super.isValidSyncHandler(syncHandler);
+        return syncHandler instanceof PhantomItemSlotSH;
     }
 
     @Override
@@ -89,11 +89,19 @@ public class PhantomItemSlot extends ItemSlot implements RecipeViewerGhostIngred
 
     @Override
     public PhantomItemSlot slot(ModularSlot slot) {
-        slot.slotNumber = -1;
-        this.syncHandler = new PhantomItemSlotSH(slot);
-        super.isValidSyncHandler(this.syncHandler);
-        setSyncHandler(this.syncHandler);
+        return syncHandler(new PhantomItemSlotSH(slot));
+    }
+
+    @Override
+    public PhantomItemSlot syncHandler(ItemSlotSH syncHandler) {
+        setSyncHandler(syncHandler);
         return this;
+    }
+
+    @Override
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        this.syncHandler = castIfTypeElseNull(syncHandler, PhantomItemSlotSH.class);
+        super.setSyncHandler(syncHandler);
     }
 
     @Override
