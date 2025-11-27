@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.drawable.ITextLine;
 import com.cleanroommc.modularui.api.value.IStringValue;
+import com.cleanroommc.modularui.api.value.IValue;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.MathUtils;
@@ -75,6 +76,14 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
                 markTooltipDirty();
                 setText(this.stringValue.getValue().toString());
             });
+        }
+    }
+
+    @Override
+    protected void setValue(IValue<?> value) {
+        super.setValue(value);
+        if (value instanceof IStringValue<?> stringValue1) {
+            this.stringValue = stringValue1;
         }
     }
 

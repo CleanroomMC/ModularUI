@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.widgets;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.value.IDoubleValue;
+import com.cleanroommc.modularui.api.value.IValue;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
@@ -70,7 +71,17 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     @Override
     protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
         super.setSyncHandler(syncHandler);
-        this.doubleValue = castIfTypeElseNull(syncHandler, IDoubleValue.class);
+        if (syncHandler != null) {
+            this.doubleValue = castIfTypeElseNull(syncHandler, IDoubleValue.class);
+        }
+    }
+
+    @Override
+    protected void setValue(IValue<?> value) {
+        super.setValue(value);
+        if (value instanceof IDoubleValue<?> doubleValue1) {
+            this.doubleValue = doubleValue1;
+        }
     }
 
     @Override

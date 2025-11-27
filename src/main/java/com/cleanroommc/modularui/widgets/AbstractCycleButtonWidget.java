@@ -7,6 +7,7 @@ import com.cleanroommc.modularui.api.drawable.ITextLine;
 import com.cleanroommc.modularui.api.value.IBoolValue;
 import com.cleanroommc.modularui.api.value.IEnumValue;
 import com.cleanroommc.modularui.api.value.IIntValue;
+import com.cleanroommc.modularui.api.value.IValue;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.UITexture;
 import com.cleanroommc.modularui.screen.RichTooltip;
@@ -50,7 +51,17 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
     @Override
     protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
         super.setSyncHandler(syncHandler);
-        this.intValue = castIfTypeElseNull(syncHandler, IIntValue.class);
+        if (syncHandler != null) {
+            this.intValue = castIfTypeElseNull(syncHandler, IIntValue.class);
+        }
+    }
+
+    @Override
+    protected void setValue(IValue<?> value) {
+        super.setValue(value);
+        if (value instanceof IIntValue<?> intValue1) {
+            this.intValue = intValue1;
+        }
     }
 
     protected int getState() {
