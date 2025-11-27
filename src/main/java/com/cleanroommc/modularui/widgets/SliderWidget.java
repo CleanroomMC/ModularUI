@@ -21,6 +21,7 @@ import com.cleanroommc.modularui.widget.sizer.Unit;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class SliderWidget extends Widget<SliderWidget> implements Interactable {
 
@@ -64,6 +65,12 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
         return syncHandler instanceof IDoubleValue<?>;
+    }
+
+    @Override
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        super.setSyncHandler(syncHandler);
+        this.doubleValue = castIfTypeElseNull(syncHandler, IDoubleValue.class);
     }
 
     @Override

@@ -172,8 +172,8 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
 
     @Override
     protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
-        this.syncHandler = castIfTypeElseNull(syncHandler, InteractionSyncHandler.class);
         super.setSyncHandler(syncHandler);
+        this.syncHandler = castIfTypeElseNull(syncHandler, InteractionSyncHandler.class);
     }
 
     public W playClickSound(boolean play) {

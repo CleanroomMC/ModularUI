@@ -4,8 +4,7 @@ import com.cleanroommc.modularui.value.sync.GenericSyncValue;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 
-import com.cleanroommc.modularui.widget.Widget;
-
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,8 +34,7 @@ public interface ISynced<W extends IWidget> {
     void initialiseSyncHandler(ModularSyncManager syncManager, boolean late);
 
     /**
-     * Checks if the received sync handler is valid for this widget. <br />
-     * Called before {@link Widget#setSyncHandler(SyncHandler)} <br />
+     * Checks and return if the received sync handler is valid for this widget This is usually an instanceof check. <br />
      * <b>Synced widgets must override this!</b>
      *
      * @param syncHandler received sync handler
@@ -44,6 +42,21 @@ public interface ISynced<W extends IWidget> {
      */
     default boolean isValidSyncHandler(SyncHandler syncHandler) {
         return false;
+    }
+
+    /**
+     * Checks if the given sync handler is valid for this widget and throws an exception if not.
+     * Override {@link #isValidSyncHandler(SyncHandler)}
+     *
+     * @param syncHandler given sync handler
+     * @throws IllegalStateException if the given sync handler is invalid for this widget.
+     */
+    @ApiStatus.NonExtendable
+    default void checkValidSyncHandler(SyncHandler syncHandler) {
+        if (!isValidSyncHandler(syncHandler)) {
+            throw new IllegalStateException("SyncHandler of type '" + syncHandler.getClass().getSimpleName() + "' is not valid " +
+                    "for widget '" + this + "'.");
+        }
     }
 
     default <T> T castIfTypeElseNull(SyncHandler syncHandler, Class<T> clazz) {

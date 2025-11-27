@@ -150,11 +150,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         if (handler == null && this.syncKey != null) {
             handler = syncManager.getSyncHandler(getPanel().getName(), this.syncKey);
         }
-        if (handler != null && !isValidSyncHandler(handler)) {
-            String type = handler.getClass().getName();
-            setSyncHandler(null);
-            throw new IllegalStateException("SyncHandler of type " + type + " is not valid for " + getClass().getName() + ", with key " + this.syncKey);
-        }
+        if (handler != null) checkValidSyncHandler(handler);
         setSyncHandler(handler);
         if (this.syncHandler instanceof ValueSyncHandler<?> valueSyncHandler && valueSyncHandler.getChangeListener() == null) {
             valueSyncHandler.setChangeListener(this::markTooltipDirty);
@@ -857,7 +853,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
      */
     protected void setValue(IValue<?> value) {
         this.value = value;
-        if (value instanceof SyncHandler handler && isValidSyncHandler(handler)) {
+        if (value instanceof SyncHandler handler) {
             setSyncHandler(handler);
         }
     }
@@ -866,6 +862,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
      * Used for widgets to set a sync handler.
      */
     protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        if (syncHandler != null) checkValidSyncHandler(syncHandler);
         this.syncHandler = syncHandler;
     }
 

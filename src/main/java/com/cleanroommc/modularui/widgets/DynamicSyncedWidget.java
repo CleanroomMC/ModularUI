@@ -31,6 +31,12 @@ public class DynamicSyncedWidget<W extends DynamicSyncedWidget<W>> extends Widge
     }
 
     @Override
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        super.setSyncHandler(syncHandler);
+        this.syncHandler = castIfTypeElseNull(syncHandler, DynamicSyncHandler.class, t -> t.attachDynamicWidgetListener(this::updateChild));
+    }
+
+    @Override
     public @NotNull List<IWidget> getChildren() {
         if (this.child == null) {
             return Collections.emptyList();
@@ -55,12 +61,6 @@ public class DynamicSyncedWidget<W extends DynamicSyncedWidget<W>> extends Widge
     public W syncHandler(DynamicSyncHandler syncHandler) {
         setSyncHandler(syncHandler);
         return getThis();
-    }
-
-    @Override
-    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
-        this.syncHandler = castIfTypeElseNull(syncHandler, DynamicSyncHandler.class, t -> t.attachDynamicWidgetListener(this::updateChild));
-        super.setSyncHandler(syncHandler);
     }
 
     /**

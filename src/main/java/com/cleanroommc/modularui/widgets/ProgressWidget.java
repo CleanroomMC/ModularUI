@@ -12,6 +12,8 @@ import com.cleanroommc.modularui.value.DoubleValue;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.function.DoubleSupplier;
 
 public class ProgressWidget extends Widget<ProgressWidget> {
@@ -40,6 +42,12 @@ public class ProgressWidget extends Widget<ProgressWidget> {
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
         return syncHandler instanceof IDoubleValue<?>;
+    }
+
+    @Override
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        super.setSyncHandler(syncHandler);
+        this.doubleValue = castIfTypeElseNull(syncHandler, IDoubleValue.class);
     }
 
     @Override

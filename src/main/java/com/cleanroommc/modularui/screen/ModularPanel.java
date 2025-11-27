@@ -114,6 +114,13 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return syncHandler instanceof IPanelHandler;
     }
 
+    @ApiStatus.Internal
+    @Override
+    public void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        super.setSyncHandler(syncHandler);
+        setPanelHandler((IPanelHandler) syncHandler);
+    }
+
     /**
      * @return true if this panel is currently open on a screen
      */
@@ -735,16 +742,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     public final boolean isMainPanel() {
         return getScreen().getMainPanel() == this;
-    }
-
-    @ApiStatus.Internal
-    @Override
-    public void setSyncHandler(@Nullable SyncHandler syncHandler) {
-        if (syncHandler != null && !isValidSyncHandler(syncHandler))
-            throw new IllegalStateException("Panel SyncHandler's must implement IPanelHandler!");
-
-        super.setSyncHandler(syncHandler);
-        setPanelHandler((IPanelHandler) syncHandler);
     }
 
     @NotNull

@@ -150,6 +150,12 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, Recipe
     }
 
     @Override
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        super.setSyncHandler(syncHandler);
+        this.syncHandler = castIfTypeElseNull(syncHandler, FluidSlotSyncHandler.class);
+    }
+
+    @Override
     public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         IFluidTank fluidTank = getFluidTank();
         FluidStack content = this.syncHandler.getValue();
@@ -285,12 +291,6 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, Recipe
     public FluidSlot syncHandler(FluidSlotSyncHandler syncHandler) {
         setSyncHandler(syncHandler);
         return this;
-    }
-
-    @Override
-    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
-        this.syncHandler = castIfTypeElseNull(syncHandler, FluidSlotSyncHandler.class);
-        super.setSyncHandler(syncHandler);
     }
 
     /* === Recipe viewer ghost slot === */

@@ -47,6 +47,12 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
         return syncHandler instanceof IIntValue<?>;
     }
 
+    @Override
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        super.setSyncHandler(syncHandler);
+        this.intValue = castIfTypeElseNull(syncHandler, IIntValue.class);
+    }
+
     protected int getState() {
         int val = this.intValue.getIntValue();
         if (val != this.lastValue) {

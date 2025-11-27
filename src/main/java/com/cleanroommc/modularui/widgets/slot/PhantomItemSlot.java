@@ -32,6 +32,12 @@ public class PhantomItemSlot extends ItemSlot implements RecipeViewerGhostIngred
     }
 
     @Override
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        super.setSyncHandler(syncHandler);
+        this.syncHandler = castIfTypeElseNull(syncHandler, PhantomItemSlotSH.class);
+    }
+
+    @Override
     protected void drawOverlay() {
         if (ModularUI.Mods.JEI.isLoaded() && (ModularUIJeiPlugin.draggingValidIngredient(this) || ModularUIJeiPlugin.hoveringOverIngredient(this))) {
             GlStateManager.colorMask(true, true, true, false);
@@ -96,12 +102,6 @@ public class PhantomItemSlot extends ItemSlot implements RecipeViewerGhostIngred
     public PhantomItemSlot syncHandler(ItemSlotSH syncHandler) {
         setSyncHandler(syncHandler);
         return this;
-    }
-
-    @Override
-    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
-        this.syncHandler = castIfTypeElseNull(syncHandler, PhantomItemSlotSH.class);
-        super.setSyncHandler(syncHandler);
     }
 
     @Override
