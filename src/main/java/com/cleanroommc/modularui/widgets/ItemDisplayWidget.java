@@ -63,7 +63,6 @@ public class ItemDisplayWidget extends Widget<ItemDisplayWidget> {
     }
 
     public ItemDisplayWidget item(ItemStack itemStack) {
-        ;
         return item(new ObjectValue<>(itemStack));
     }
 
