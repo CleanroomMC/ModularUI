@@ -249,23 +249,10 @@ public class GuiDraw {
         drawTiledTexture(x, y, w, h, u, v, tileW, tileH, tw, th, z);
     }
 
-    public static void drawTiledTexture(float x, float y, float w, float h, int u, int v, int tileW, int tileH, int tw, int th, float z) {
-        int countX = (((int) w - 1) / tileW) + 1;
-        int countY = (((int) h - 1) / tileH) + 1;
-        float fillerX = w - (countX - 1) * tileW;
-        float fillerY = h - (countY - 1) * tileH;
-        Platform.startDrawing(Platform.DrawMode.QUADS, Platform.VertexFormat.POS_TEX, bufferBuilder -> {
-            for (int i = 0, c = countX * countY; i < c; i++) {
-                int ix = i % countX;
-                int iy = i / countX;
-                float xx = x + ix * tileW;
-                float yy = y + iy * tileH;
-                float xw = ix == countX - 1 ? fillerX : tileW;
-                float yh = iy == countY - 1 ? fillerY : tileH;
-
-                drawTexture(bufferBuilder, xx, yy, u, v, xw, yh, tw, th, z);
-            }
-        });
+    public static void drawTiledTexture(float x, float y, float w, float h, int u, int v, int tileW, int tileH, int textureW, int textureH, float z) {
+        float tw = 1f / textureW;
+        float th = 1f / textureH;
+        drawTiledTexture(x, y, w, h, u * tw, v * th, (u + w) * tw, (v + h) * th, textureW, textureH, z);
     }
 
     public static void drawTiledTexture(ResourceLocation location, float x, float y, float w, float h, float u0, float v0, float u1, float v1, int textureWidth, int textureHeight, float z) {
@@ -274,31 +261,36 @@ public class GuiDraw {
     }
 
     public static void drawTiledTexture(float x, float y, float w, float h, float u0, float v0, float u1, float v1, int tileWidth, int tileHeight, float z) {
+        Platform.startDrawing(Platform.DrawMode.QUADS, Platform.VertexFormat.POS_TEX, bufferBuilder -> {
+            drawTiledTexture(bufferBuilder, x, y, w, h, u0, v0, u1, v1, tileWidth, tileHeight, z);
+        });
+    }
+
+    public static void drawTiledTexture(BufferBuilder bufferBuilder, float x, float y, float w, float h, float u0, float v0, float u1, float v1, int tileWidth, int tileHeight, float z) {
         int countX = (((int) w - 1) / tileWidth) + 1;
         int countY = (((int) h - 1) / tileHeight) + 1;
         float fillerX = w - (countX - 1) * tileWidth;
         float fillerY = h - (countY - 1) * tileHeight;
         float fillerU = u0 + (u1 - u0) * fillerX / tileWidth;
         float fillerV = v0 + (v1 - v0) * fillerY / tileHeight;
-        Platform.startDrawing(Platform.DrawMode.QUADS, Platform.VertexFormat.POS_TEX, bufferBuilder -> {
-            for (int i = 0, c = countX * countY; i < c; i++) {
-                int ix = i % countX;
-                int iy = i / countX;
-                float xx = x + ix * tileWidth;
-                float yy = y + iy * tileHeight;
-                float xw = tileWidth, yh = tileHeight, uEnd = u1, vEnd = v1;
-                if (ix == countX - 1) {
-                    xw = fillerX;
-                    uEnd = fillerU;
-                }
-                if (iy == countY - 1) {
-                    yh = fillerY;
-                    vEnd = fillerV;
-                }
 
-                drawTexture(bufferBuilder, xx, yy, xx + xw, yy + yh, u0, v0, uEnd, vEnd, z);
+        for (int i = 0, c = countX * countY; i < c; i++) {
+            int ix = i % countX;
+            int iy = i / countX;
+            float xx = x + ix * tileWidth;
+            float yy = y + iy * tileHeight;
+            float xw = tileWidth, yh = tileHeight, uEnd = u1, vEnd = v1;
+            if (ix == countX - 1) {
+                xw = fillerX;
+                uEnd = fillerU;
             }
-        });
+            if (iy == countY - 1) {
+                yh = fillerY;
+                vEnd = fillerV;
+            }
+
+            drawTexture(bufferBuilder, xx, yy, xx + xw, yy + yh, u0, v0, uEnd, vEnd, z);
+        }
     }
 
     public static void drawItem(ItemStack item, int x, int y, float width, float height, int z) {
