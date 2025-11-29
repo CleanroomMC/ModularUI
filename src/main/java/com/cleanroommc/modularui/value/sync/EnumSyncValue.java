@@ -69,10 +69,10 @@ public class EnumSyncValue<T extends Enum<T>> extends ValueSyncHandler<T> implem
     @Override
     public void setValue(T value, boolean setSource, boolean sync) {
         this.cache = value;
-        onValueChanged();
         if (setSource && this.setter != null) {
             this.setter.accept(value);
         }
+        onValueChanged();
         if (sync) sync();
     }
 

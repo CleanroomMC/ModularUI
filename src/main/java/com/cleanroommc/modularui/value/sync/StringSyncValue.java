@@ -69,10 +69,10 @@ public class StringSyncValue extends ValueSyncHandler<String> implements IString
     @Override
     public void setStringValue(String value, boolean setSource, boolean sync) {
         this.cache = value;
-        onValueChanged();
         if (setSource && this.setter != null) {
             this.setter.accept(value);
         }
+        onValueChanged();
         if (sync) sync();
     }
 

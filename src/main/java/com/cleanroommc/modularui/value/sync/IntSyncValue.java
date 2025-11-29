@@ -71,10 +71,10 @@ public class IntSyncValue extends ValueSyncHandler<Integer> implements IIntSyncV
     @Override
     public void setIntValue(int value, boolean setSource, boolean sync) {
         this.cache = value;
-        onValueChanged();
         if (setSource && this.setter != null) {
             this.setter.accept(value);
         }
+        onValueChanged();
         if (sync) sync();
     }
 

@@ -62,8 +62,8 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
                 this.fluidTank.fill(value.copy(), true);
             }
         }
-        if (sync) sync();
         onValueChanged();
+        if (sync) sync();
     }
 
     public boolean needsSync() {

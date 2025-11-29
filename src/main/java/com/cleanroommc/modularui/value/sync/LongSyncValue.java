@@ -71,10 +71,10 @@ public class LongSyncValue extends ValueSyncHandler<Long> implements ILongSyncVa
     @Override
     public void setLongValue(long value, boolean setSource, boolean sync) {
         this.cache = value;
-        onValueChanged();
         if (setSource && this.setter != null) {
             this.setter.accept(value);
         }
+        onValueChanged();
         if (sync) sync();
     }
 

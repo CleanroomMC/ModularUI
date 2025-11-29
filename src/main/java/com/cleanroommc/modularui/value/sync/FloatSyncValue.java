@@ -71,10 +71,10 @@ public class FloatSyncValue extends ValueSyncHandler<Float> implements IFloatSyn
     @Override
     public void setFloatValue(float value, boolean setSource, boolean sync) {
         this.cache = value;
-        onValueChanged();
         if (setSource && this.setter != null) {
             this.setter.accept(value);
         }
+        onValueChanged();
         if (sync) sync();
     }
 

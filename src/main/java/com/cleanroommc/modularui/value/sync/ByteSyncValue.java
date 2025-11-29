@@ -86,10 +86,10 @@ public class ByteSyncValue extends ValueSyncHandler<Byte> implements IByteSyncVa
     @Override
     public void setByteValue(byte value, boolean setSource, boolean sync) {
         this.cache = value;
-        onValueChanged();
         if (setSource && this.setter != null) {
             this.setter.setByte(value);
         }
+        onValueChanged();
         if (sync) sync();
     }
 
