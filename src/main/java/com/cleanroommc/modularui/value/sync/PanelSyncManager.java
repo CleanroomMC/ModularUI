@@ -40,7 +40,7 @@ public class PanelSyncManager {
     private final Map<String, SlotGroup> slotGroups = new Object2ObjectOpenHashMap<>();
     private final Map<SyncHandler, String> reverseSyncHandlers = new Object2ObjectOpenHashMap<>();
     private final Map<String, SyncedAction> syncedActions = new Object2ObjectOpenHashMap<>();
-    private final Map<String, SyncHandler> subPanels = new Object2ObjectArrayMap<>();
+    private final Map<String, PanelSyncHandler> subPanels = new Object2ObjectArrayMap<>();
     private ModularSyncManager modularSyncManager;
     private String panelName;
     private boolean init = true;
@@ -69,9 +69,15 @@ public class PanelSyncManager {
     private void registerPanelSyncHandler(String name, SyncHandler syncHandler) {
         // only called on main psm
         SyncHandler currentSh = this.syncHandlers.get(name);
-        if (currentSh != null && currentSh != syncHandler) throw new IllegalStateException();
+        if (currentSh != null && currentSh != syncHandler) {
+            throw new IllegalStateException("Failed to register panel sync handler during initialization. " +
+                    "There already exists a sync handler for the name '" + name + "'.");
+        }
         String currentName = this.reverseSyncHandlers.get(syncHandler);
-        if (currentName != null && !name.equals(currentName)) throw new IllegalStateException();
+        if (currentName != null && !name.equals(currentName)) {
+            throw new IllegalStateException("Failed to register panel sync handler for name '" + name + "' during initialization. " +
+                    "The panel sync handler is already registered under the name '" + currentName + "'.");
+        }
         this.syncHandlers.put(name, syncHandler);
         this.reverseSyncHandlers.put(syncHandler, name);
         syncHandler.init(name, this);
@@ -79,12 +85,8 @@ public class PanelSyncManager {
 
     void closeSubPanels() {
         this.subPanels.values().forEach(syncHandler -> {
-            if (syncHandler instanceof IPanelHandler panelHandler) {
-                if (panelHandler.isSubPanel()) {
-                    panelHandler.closePanel();
-                }
-            } else {
-                throw new IllegalStateException();
+            if (syncHandler.isSubPanel()) {
+                syncHandler.closePanel();
             }
         });
     }
@@ -142,7 +144,7 @@ public class PanelSyncManager {
             ModularUI.LOGGER.warn("SyncAction '{}' does not exist for panel '{}'!.", mapKey, panelName);
             return false;
         }
-        if (this.allowSyncHandlerRegistration || !syncedAction.isExecuteClient() || !syncedAction.isExecuteServer()) {
+        if (!isLocked() || this.allowSyncHandlerRegistration || !syncedAction.isExecuteClient() || !syncedAction.isExecuteServer()) {
             syncedAction.invoke(this.client, buf);
         } else {
             // only allow sync handler registration if it is executed on client and server
@@ -235,25 +237,62 @@ public class PanelSyncManager {
     }
 
     /**
-     * Creates a synced panel handler. This can be used to automatically handle syncing for synced panels.
-     * Synced panels do not need to be synced themselves, but contain at least one widget which is synced.
-     * <p>NOTE</p>
-     * A panel sync handler is only created once. If one was already registered, that one will be returned.
-     * (This is only relevant for nested sub panels.)
-     *
-     * @param key          the key used for syncing
-     * @param panelBuilder the panel builder, that will create the new panel. It must not return null or any existing panels.
-     * @param subPanel     true if this panel should close when its parent closes (the parent is defined by <i>this</i> {@link PanelSyncManager})
-     * @return a synced panel handler.
-     * @throws NullPointerException     if the build panel of the builder is null
-     * @throws IllegalArgumentException if the build panel of the builder is the main panel
+     * @deprecated replaced by {@link #syncedPanel(String, boolean, PanelSyncHandler.IPanelBuilder)}
      */
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.3.0")
+    @Deprecated
     public IPanelHandler panel(String key, PanelSyncHandler.IPanelBuilder panelBuilder, boolean subPanel) {
         SyncHandler sh = this.subPanels.get(key);
         if (sh != null) return (IPanelHandler) sh;
         PanelSyncHandler syncHandler = new PanelSyncHandler(panelBuilder, subPanel);
         this.subPanels.put(key, syncHandler);
         return syncHandler;
+    }
+
+    /**
+     * Creates a synced panel handler. This can be used to automatically handle syncing for synced panels.
+     * Synced panels do not need to be synced themselves, but contain at least one widget which is synced.
+     * <p><b>NOTE</b></p>
+     * A panel sync handler is only created once. If one was already registered, that one will be returned.
+     * (This is only relevant for nested sub panels.) Furthermore, the panel handler has to be created on client and server with the same
+     * key. Like any other sync handler, the panel sync handler has to be created before the panel opened. The only exception is inside
+     * dynamic sync handlers.
+     *
+     * @param key          the key used for syncing
+     * @param subPanel     true if this panel should close when its parent closes (the parent is defined by <i>this</i> {@link PanelSyncManager})
+     * @param panelBuilder the panel builder, that will create the new panel. It must not return null or any existing panels.
+     * @return a synced panel handler.
+     * @throws NullPointerException     if the build panel of the builder is null
+     * @throws IllegalArgumentException if the build panel of the builder is the main panel
+     * @throws IllegalStateException    if this method was called too late
+     */
+    public IPanelHandler syncedPanel(String key, boolean subPanel, PanelSyncHandler.IPanelBuilder panelBuilder) {
+        IPanelHandler ph = findPanelHandlerNullable(key);
+        if (ph != null) return ph;
+        if (isLocked() && !this.allowSyncHandlerRegistration) {
+            // registration of sync handlers forbidden
+            throw new IllegalStateException("Synced panels must be registered during panel building. The only exceptions is via a DynamicSyncHandler and sync functions!");
+        }
+        PanelSyncHandler syncHandler = new PanelSyncHandler(panelBuilder, subPanel);
+        this.subPanels.put(key, syncHandler);
+        if (isInitialised() && (this == this.modularSyncManager.getMainPSM() ||
+                this.modularSyncManager.getMainPSM().findSyncHandlerNullable(this.panelName, PanelSyncHandler.class) == null)) {
+            // current panel is open
+            this.modularSyncManager.getMainPSM().registerPanelSyncHandler(key, syncHandler);
+        }
+        return syncHandler;
+    }
+
+    public @Nullable IPanelHandler findPanelHandlerNullable(String key) {
+        return this.subPanels.get(key);
+    }
+
+    public @NotNull IPanelHandler findPanelHandler(String key) {
+        IPanelHandler panelHandler = findPanelHandlerNullable(key);
+        if (panelHandler == null) {
+            throw new NoSuchElementException("Expected to find panel sync handler with key '" + key + "', but none was found.");
+        }
+        return panelHandler;
     }
 
     public PanelSyncManager registerSlotGroup(SlotGroup slotGroup) {
