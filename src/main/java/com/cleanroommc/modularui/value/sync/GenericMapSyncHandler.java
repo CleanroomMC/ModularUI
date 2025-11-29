@@ -56,6 +56,7 @@ public class GenericMapSyncHandler<K, V> extends ValueSyncHandler<Map<K, V>> {
         for (Map.Entry<K, V> entry : value.entrySet()) {
             this.cache.put(this.keyCopy.createDeepCopy(entry.getKey()), this.valueCopy.createDeepCopy(entry.getValue()));
         }
+        onValueChanged();
         if (setSource && this.setter != null) {
             this.setter.accept(value);
         }

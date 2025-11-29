@@ -71,6 +71,7 @@ public class DoubleSyncValue extends ValueSyncHandler<Double> implements IDouble
     @Override
     public void setDoubleValue(double value, boolean setSource, boolean sync) {
         this.cache = value;
+        onValueChanged();
         if (setSource && this.setter != null) {
             this.setter.accept(value);
         }

@@ -112,6 +112,7 @@ public class GenericSyncValue<T> extends ValueSyncHandler<T> {
     @Override
     public void setValue(T value, boolean setSource, boolean sync) {
         this.cache = this.copy.createDeepCopy(value);
+        onValueChanged();
         if (setSource && this.setter != null) {
             this.setter.accept(value);
         }

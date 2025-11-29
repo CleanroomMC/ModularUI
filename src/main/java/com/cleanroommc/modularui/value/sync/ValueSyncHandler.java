@@ -13,13 +13,11 @@ public abstract class ValueSyncHandler<T> extends SyncHandler implements IValueS
     @Override
     public void readOnClient(int id, PacketBuffer buf) throws IOException {
         read(buf);
-        onValueChanged();
     }
 
     @Override
     public void readOnServer(int id, PacketBuffer buf) throws IOException {
         read(buf);
-        onValueChanged();
     }
 
     @Override
@@ -29,6 +27,10 @@ public abstract class ValueSyncHandler<T> extends SyncHandler implements IValueS
         }
     }
 
+    /**
+     * Called when the cached value of this sync handler updates. Implementations need to call this inside
+     * {@link #setValue(Object, boolean, boolean)}.
+     */
     protected void onValueChanged() {
         if (this.changeListener != null) {
             this.changeListener.run();

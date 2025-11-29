@@ -49,6 +49,7 @@ public abstract class GenericCollectionSyncHandler<T, C extends Collection<T>> e
     protected abstract void setCache(C value);
 
     protected void onSetCache(C value, boolean setSource, boolean sync) {
+        onValueChanged();
         if (setSource && this.setter != null) {
             this.setter.accept(value);
         }

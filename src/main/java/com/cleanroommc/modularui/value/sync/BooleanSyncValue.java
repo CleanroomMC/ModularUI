@@ -70,6 +70,7 @@ public class BooleanSyncValue extends ValueSyncHandler<Boolean> implements IBool
     @Override
     public void setBoolValue(boolean value, boolean setSource, boolean sync) {
         this.cache = value;
+        onValueChanged();
         if (setSource && this.setter != null) {
             this.setter.accept(value);
         }
