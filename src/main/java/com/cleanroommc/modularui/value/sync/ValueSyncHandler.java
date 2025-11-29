@@ -8,23 +8,27 @@ import java.io.IOException;
 
 public abstract class ValueSyncHandler<T> extends SyncHandler implements IValueSyncHandler<T> {
 
+    public static final int SYNC_VALUE = 0;
+
     private Runnable changeListener;
 
     @Override
     public void readOnClient(int id, PacketBuffer buf) throws IOException {
-        read(buf);
+        if (id == SYNC_VALUE) read(buf);
     }
 
     @Override
     public void readOnServer(int id, PacketBuffer buf) throws IOException {
-        read(buf);
+        if (id == SYNC_VALUE) read(buf);
+    }
+
+    protected void sync() {
+        sync(SYNC_VALUE, this::write);
     }
 
     @Override
     public void detectAndSendChanges(boolean init) {
-        if (updateCacheFromSource(init)) {
-            syncToClient(0, this::write);
-        }
+        if (updateCacheFromSource(init)) sync();
     }
 
     /**

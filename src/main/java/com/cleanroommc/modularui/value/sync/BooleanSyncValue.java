@@ -74,9 +74,7 @@ public class BooleanSyncValue extends ValueSyncHandler<Boolean> implements IBool
         if (setSource && this.setter != null) {
             this.setter.accept(value);
         }
-        if (sync) {
-            sync(0, this::write);
-        }
+        if (sync) sync();
     }
 
     @Override

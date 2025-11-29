@@ -118,7 +118,7 @@ public final class PanelSyncHandler extends SyncHandler implements IPanelHandler
         if (openedPanel == null || isPanelOpen()) return;
         boolean canDispose = WidgetTree.foreachChild(openedPanel, iWidget -> {
             if (!iWidget.isValid()) return false;
-            if (iWidget instanceof ISynced<?>synced && synced.isSynced()) {
+            if (iWidget instanceof ISynced<?> synced && synced.isSynced()) {
                 return !(synced.getSyncHandler() instanceof ItemSlotSH);
             }
             return true;

@@ -73,9 +73,7 @@ public class StringSyncValue extends ValueSyncHandler<String> implements IString
         if (setSource && this.setter != null) {
             this.setter.accept(value);
         }
-        if (sync) {
-            sync(0, this::write);
-        }
+        if (sync) sync();
     }
 
     @Override

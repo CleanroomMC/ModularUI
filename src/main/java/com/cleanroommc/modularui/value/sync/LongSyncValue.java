@@ -75,9 +75,7 @@ public class LongSyncValue extends ValueSyncHandler<Long> implements ILongSyncVa
         if (setSource && this.setter != null) {
             this.setter.accept(value);
         }
-        if (sync) {
-            sync(0, this::write);
-        }
+        if (sync) sync();
     }
 
     @Override

@@ -116,13 +116,12 @@ public class GenericSyncValue<T> extends ValueSyncHandler<T> {
         if (setSource && this.setter != null) {
             this.setter.accept(value);
         }
-        if (sync) {
-            sync(0, this::write);
-        }
+        if (sync) sync();
     }
 
     @Override
     public boolean updateCacheFromSource(boolean isFirstSync) {
+        if (this.getter == null) return false;
         T t = this.getter.get();
         if (isFirstSync || !this.equals.areEqual(this.cache, t)) {
             setValue(t, false, false);
@@ -133,6 +132,7 @@ public class GenericSyncValue<T> extends ValueSyncHandler<T> {
 
     @Override
     public void notifyUpdate() {
+        if (this.getter == null) throw new NullPointerException("Can't notify sync handler with null getter.");
         setValue(this.getter.get(), false, true);
     }
 

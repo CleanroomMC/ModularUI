@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.value.sync;
 
-import com.cleanroommc.modularui.api.value.IDoubleValue;
 import com.cleanroommc.modularui.api.value.sync.IDoubleSyncValue;
 import com.cleanroommc.modularui.api.value.sync.IFloatSyncValue;
 import com.cleanroommc.modularui.api.value.sync.IStringSyncValue;
@@ -76,9 +75,7 @@ public class FloatSyncValue extends ValueSyncHandler<Float> implements IFloatSyn
         if (setSource && this.setter != null) {
             this.setter.accept(value);
         }
-        if (sync) {
-            sync(0, this::write);
-        }
+        if (sync) sync();
     }
 
     @Override
