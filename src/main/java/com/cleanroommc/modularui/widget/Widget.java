@@ -151,7 +151,11 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
             handler = syncManager.getSyncHandler(getPanel().getName(), this.syncKey);
         }
         if (handler != null) checkValidSyncHandler(handler);
-        setSyncHandler(handler);
+        if (handler instanceof IValue<?> value1) {
+            setValue(value1); // this also calls setSyncHandler when a sync handler is passed in
+        } else {
+            setSyncHandler(handler);
+        }
         if (this.syncHandler instanceof ValueSyncHandler<?> valueSyncHandler && valueSyncHandler.getChangeListener() == null) {
             valueSyncHandler.setChangeListener(this::markTooltipDirty);
         }
