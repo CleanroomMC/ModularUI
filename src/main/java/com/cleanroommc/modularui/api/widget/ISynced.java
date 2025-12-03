@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.api.widget;
 
+import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.value.sync.GenericSyncValue;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
@@ -40,8 +41,13 @@ public interface ISynced<W extends IWidget> {
      * @param syncHandler received sync handler
      * @return true if sync handler is valid
      */
+    @Deprecated
     default boolean isValidSyncHandler(SyncHandler syncHandler) {
         return false;
+    }
+
+    default boolean isValidSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        return !(syncOrValue instanceof SyncHandler syncHandler) || isValidSyncHandler(syncHandler);
     }
 
     /**
@@ -52,8 +58,8 @@ public interface ISynced<W extends IWidget> {
      * @throws IllegalStateException if the given sync handler is invalid for this widget.
      */
     @ApiStatus.NonExtendable
-    default void checkValidSyncHandler(SyncHandler syncHandler) {
-        if (!isValidSyncHandler(syncHandler)) {
+    default void checkValidSyncOrValue(ISyncOrValue syncHandler) {
+        if (!isValidSyncOrValue(syncHandler)) {
             throw new IllegalStateException("SyncHandler of type '" + syncHandler.getClass().getSimpleName() + "' is not valid " +
                     "for widget '" + this + "'.");
         }

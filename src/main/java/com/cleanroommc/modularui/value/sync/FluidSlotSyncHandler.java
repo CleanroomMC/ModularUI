@@ -83,6 +83,11 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
     }
 
     @Override
+    public Class<FluidStack> getValueType() {
+        return FluidStack.class;
+    }
+
+    @Override
     public void notifyUpdate() {
         setValue(this.fluidTank.getFluid(), false, true);
     }

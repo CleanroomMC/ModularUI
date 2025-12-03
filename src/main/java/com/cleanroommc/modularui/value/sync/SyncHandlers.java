@@ -18,8 +18,7 @@ import java.util.function.Supplier;
 
 public class SyncHandlers {
 
-    private SyncHandlers() {
-    }
+    private SyncHandlers() {}
 
     public static IntSyncValue intNumber(IntSupplier getter, IntConsumer setter) {
         return new IntSyncValue(getter, setter);
@@ -51,5 +50,9 @@ public class SyncHandlers {
 
     public static <T extends Enum<T>> EnumSyncValue<T> enumValue(Class<T> clazz, Supplier<T> getter, Consumer<T> setter) {
         return new EnumSyncValue<>(clazz, getter, setter);
+    }
+
+    public static <T> GenericSyncValue.Builder<T> generic(Class<T> type) {
+        return new GenericSyncValue.Builder<>(type);
     }
 }

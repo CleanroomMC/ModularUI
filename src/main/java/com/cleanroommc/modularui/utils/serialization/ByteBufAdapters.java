@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Objects;
 
 public class ByteBufAdapters {
 
@@ -108,8 +109,7 @@ public class ByteBufAdapters {
         }
     };
 
-    public static <T> IByteBufAdapter<T> makeAdapter(@NotNull IByteBufDeserializer<T> deserializer, @NotNull IByteBufSerializer<T> serializer, @Nullable IEquals<T> comparator) {
-        final IEquals<T> tester = comparator != null ? comparator : IEquals.defaultTester();
+    public static <T> IByteBufAdapter<T> makeAdapter(@NotNull IByteBufDeserializer<T> deserializer, @NotNull IByteBufSerializer<T> serializer, @Nullable IEquals<T> tester) {
         return new IByteBufAdapter<>() {
             @Override
             public T deserialize(PacketBuffer buffer) throws IOException {
@@ -123,7 +123,7 @@ public class ByteBufAdapters {
 
             @Override
             public boolean areEqual(@NotNull T t1, @NotNull T t2) {
-                return tester.areEqual(t1, t2);
+                return tester != null ? tester.areEqual(t1, t2) : Objects.equals(t1, t2);
             }
         };
     }

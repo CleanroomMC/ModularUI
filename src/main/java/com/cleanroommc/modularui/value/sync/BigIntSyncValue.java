@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 public class BigIntSyncValue extends GenericSyncValue<BigInteger> implements IStringValue<BigInteger> {
 
     public BigIntSyncValue(@NotNull Supplier<BigInteger> getter, @Nullable Consumer<BigInteger> setter) {
-        super(getter, setter, ByteBufAdapters.BIG_INT, ICopy.immutable());
+        super(BigInteger.class, getter, setter, ByteBufAdapters.BIG_INT, ICopy.immutable());
     }
 
     @Override

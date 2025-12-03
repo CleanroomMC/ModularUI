@@ -121,4 +121,9 @@ public class LongSyncValue extends ValueSyncHandler<Long> implements ILongSyncVa
     public String getStringValue() {
         return String.valueOf(this.cache);
     }
+
+    @Override
+    public Class<Long> getValueType() {
+        return Long.class;
+    }
 }
