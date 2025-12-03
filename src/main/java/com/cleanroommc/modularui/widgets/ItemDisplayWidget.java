@@ -57,13 +57,12 @@ public class ItemDisplayWidget extends Widget<ItemDisplayWidget> {
     }
 
     public ItemDisplayWidget item(IValue<ItemStack> itemSupplier) {
-        this.value = itemSupplier;
-        setValue(itemSupplier);
+        setSyncOrValue(ISyncOrValue.orEmpty(itemSupplier));
         return this;
     }
 
     public ItemDisplayWidget item(ItemStack itemStack) {
-        return item(new ObjectValue<>(itemStack));
+        return item(new ObjectValue<>(ItemStack.class, itemStack));
     }
 
     public ItemDisplayWidget displayAmount(boolean displayAmount) {

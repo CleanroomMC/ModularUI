@@ -122,6 +122,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         setPanelHandler(syncOrValue.castNullable(IPanelHandler.class));
     }
 
+    @ApiStatus.Internal
+    public void setPanelSyncHandler(PanelSyncHandler syncHandler) {
+        setSyncOrValue(ISyncOrValue.orEmpty(syncHandler));
+    }
+
     /**
      * @return true if this panel is currently open on a screen
      */

@@ -51,6 +51,11 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
     protected void setSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
         super.setSyncOrValue(syncOrValue);
         this.intValue = syncOrValue.castNullable(IIntValue.class);
+        if (syncOrValue instanceof IEnumValue<?> enumValue) {
+            stateCount(enumValue.getEnumClass().getEnumConstants().length);
+        } else if (syncOrValue instanceof IBoolValue) {
+            stateCount(2);
+        }
     }
 
     protected int getState() {
@@ -172,13 +177,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
     }
 
     protected W value(IIntValue<?> value) {
-        this.intValue = value;
-        setValue(value);
-        if (value instanceof IEnumValue<?> enumValue) {
-            stateCount(enumValue.getEnumClass().getEnumConstants().length);
-        } else if (value instanceof IBoolValue) {
-            stateCount(2);
-        }
+        setSyncOrValue(ISyncOrValue.orEmpty(value));
         return getThis();
     }
 

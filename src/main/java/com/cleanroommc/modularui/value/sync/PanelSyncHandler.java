@@ -65,7 +65,7 @@ public final class PanelSyncHandler extends SyncHandler implements IPanelHandler
             this.syncManager = new PanelSyncManager(client);
             this.openedPanel = Objects.requireNonNull(createUI(this.syncManager));
             this.panelName = this.openedPanel.getName();
-            this.openedPanel.setSyncHandler(this);
+            this.openedPanel.setPanelSyncHandler(this);
             WidgetTree.collectSyncValues(this.syncManager, this.openedPanel, false);
             if (!client) {
                 this.openedPanel = null;

@@ -8,7 +8,6 @@ import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerGhostIngre
 import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 import com.cleanroommc.modularui.value.sync.PhantomItemSlotSH;
-import com.cleanroommc.modularui.value.sync.SyncHandler;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
@@ -101,7 +100,7 @@ public class PhantomItemSlot extends ItemSlot implements RecipeViewerGhostIngred
 
     @Override
     public PhantomItemSlot syncHandler(ItemSlotSH syncHandler) {
-        setSyncHandler(syncHandler);
+        setSyncOrValue(ISyncOrValue.orEmpty(syncHandler));
         return this;
     }
 

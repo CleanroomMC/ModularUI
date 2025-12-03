@@ -171,7 +171,7 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
     }
 
     public W syncHandler(InteractionSyncHandler interactionSyncHandler) {
-        setSyncHandler(interactionSyncHandler);
+        setSyncOrValue(ISyncOrValue.orEmpty(interactionSyncHandler));
         return getThis();
     }
 

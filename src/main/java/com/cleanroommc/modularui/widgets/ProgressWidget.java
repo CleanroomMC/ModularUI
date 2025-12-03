@@ -159,8 +159,7 @@ public class ProgressWidget extends Widget<ProgressWidget> {
     }
 
     public ProgressWidget value(IDoubleValue<?> value) {
-        this.doubleValue = value;
-        setValue(value);
+        setSyncOrValue(ISyncOrValue.orEmpty(value));
         return this;
     }
 

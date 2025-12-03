@@ -289,7 +289,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, Recipe
     }
 
     public FluidSlot syncHandler(FluidSlotSyncHandler syncHandler) {
-        setSyncHandler(syncHandler);
+        setSyncOrValue(ISyncOrValue.orEmpty(syncHandler));
         return this;
     }
 
