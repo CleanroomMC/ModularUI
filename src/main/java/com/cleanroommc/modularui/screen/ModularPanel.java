@@ -582,7 +582,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             }
             if (this.hovering.isEmpty()) return false;
             for (LocatedWidget widget : this.hovering) {
-                if (widget.getElement() instanceof Interactable interactable) {
+                if (widget.getElement() instanceof Interactable interactable && widget.getElement().isValid()) {
                     widget.applyMatrix(getContext());
                     boolean result = interactable.onMouseScroll(scrollDirection, amount);
                     widget.unapplyMatrix(getContext());
