@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
+import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.api.widget.IDragResizeable;
 import com.cleanroommc.modularui.api.widget.IFocusedWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
@@ -25,7 +26,6 @@ import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.value.sync.PanelSyncHandler;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
-import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -112,15 +112,19 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     @Override
-    public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        return syncHandler instanceof IPanelHandler;
+    public boolean isValidSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        return syncOrValue.isTypeOrEmpty(IPanelHandler.class);
+    }
+
+    @Override
+    protected void setSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        super.setSyncOrValue(syncOrValue);
+        setPanelHandler(syncOrValue.castNullable(IPanelHandler.class));
     }
 
     @ApiStatus.Internal
-    @Override
-    public void setSyncHandler(@Nullable SyncHandler syncHandler) {
-        super.setSyncHandler(syncHandler);
-        setPanelHandler((IPanelHandler) syncHandler);
+    public void setPanelSyncHandler(PanelSyncHandler syncHandler) {
+        setSyncOrValue(ISyncOrValue.orEmpty(syncHandler));
     }
 
     /**
@@ -612,7 +616,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                     mouseButton == this.mouse.lastButton &&
                     this.mouse.lastPressed != null &&
                     this.mouse.lastPressed.getElement() instanceof Interactable interactable &&
-            this.mouse.lastPressed.getElement().isValid()) {
+                    this.mouse.lastPressed.getElement().isValid()) {
                 this.mouse.lastPressed.applyMatrix(getContext());
                 interactable.onMouseDrag(mouseButton, timeSinceClick);
                 this.mouse.lastPressed.unapplyMatrix(getContext());

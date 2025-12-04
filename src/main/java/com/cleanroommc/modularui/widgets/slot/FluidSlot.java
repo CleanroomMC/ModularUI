@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
@@ -23,7 +24,6 @@ import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.utils.SIPrefix;
 import com.cleanroommc.modularui.value.sync.FluidSlotSyncHandler;
-import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 
 import net.minecraft.client.renderer.GlStateManager;
@@ -145,14 +145,14 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, Recipe
     }
 
     @Override
-    public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        return syncHandler instanceof FluidSlotSyncHandler;
+    public boolean isValidSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        return syncOrValue.isTypeOrEmpty(FluidSlotSyncHandler.class);
     }
 
     @Override
-    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
-        super.setSyncHandler(syncHandler);
-        this.syncHandler = castIfTypeElseNull(syncHandler, FluidSlotSyncHandler.class);
+    protected void setSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        super.setSyncOrValue(syncOrValue);
+        this.syncHandler = syncOrValue.castNullable(FluidSlotSyncHandler.class);
     }
 
     @Override
@@ -289,7 +289,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, Recipe
     }
 
     public FluidSlot syncHandler(FluidSlotSyncHandler syncHandler) {
-        setSyncHandler(syncHandler);
+        setSyncOrValue(ISyncOrValue.orEmpty(syncHandler));
         return this;
     }
 

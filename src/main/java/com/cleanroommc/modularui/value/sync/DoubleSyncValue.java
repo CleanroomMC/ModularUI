@@ -121,4 +121,9 @@ public class DoubleSyncValue extends ValueSyncHandler<Double> implements IDouble
     public void setFloatValue(float value, boolean setSource, boolean sync) {
         setDoubleValue(value, setSource, sync);
     }
+
+    @Override
+    public Class<Double> getValueType() {
+        return Double.class;
+    }
 }

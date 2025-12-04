@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.api.IPacketWriter;
+import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.packets.PacketSyncHandler;
 
@@ -22,7 +23,7 @@ import java.util.Objects;
  * A sync handler must exist on client and server.
  * It must be configured exactly the same to avoid issues.
  */
-public abstract class SyncHandler {
+public abstract class SyncHandler implements ISyncOrValue {
 
     private PanelSyncManager syncManager;
     private String key;
@@ -151,8 +152,7 @@ public abstract class SyncHandler {
      *
      * @param init if this method is being called the first time.
      */
-    public void detectAndSendChanges(boolean init) {
-    }
+    public void detectAndSendChanges(boolean init) {}
 
     /**
      * @return the key that belongs to this sync handler
@@ -176,6 +176,11 @@ public abstract class SyncHandler {
             throw new IllegalStateException("Sync handler is not yet initialised!");
         }
         return this.syncManager;
+    }
+
+    @Override
+    public boolean isSyncHandler() {
+        return true;
     }
 
     public static void sendToClient(String panel, PacketBuffer buffer, SyncHandler syncHandler) {

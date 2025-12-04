@@ -121,4 +121,9 @@ public class IntSyncValue extends ValueSyncHandler<Integer> implements IIntSyncV
     public String getStringValue() {
         return String.valueOf(this.cache);
     }
+
+    @Override
+    public Class<Integer> getValueType() {
+        return Integer.class;
+    }
 }

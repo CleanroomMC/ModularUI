@@ -121,4 +121,9 @@ public class FloatSyncValue extends ValueSyncHandler<Float> implements IFloatSyn
     public void setDoubleValue(double value, boolean setSource, boolean sync) {
         setFloatValue((float) value, setSource, sync);
     }
+
+    @Override
+    public Class<Float> getValueType() {
+        return Float.class;
+    }
 }

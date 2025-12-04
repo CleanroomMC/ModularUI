@@ -110,4 +110,9 @@ public class BooleanSyncValue extends ValueSyncHandler<Boolean> implements IBool
     public String getStringValue() {
         return String.valueOf(this.cache);
     }
+
+    @Override
+    public Class<Boolean> getValueType() {
+        return Boolean.class;
+    }
 }

@@ -97,4 +97,9 @@ public class ByteSyncValue extends ValueSyncHandler<Byte> implements IByteSyncVa
     public byte getByteValue() {
         return this.cache;
     }
+
+    @Override
+    public Class<Byte> getValueType() {
+        return Byte.class;
+    }
 }

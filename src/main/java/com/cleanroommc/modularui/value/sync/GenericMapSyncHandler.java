@@ -112,6 +112,11 @@ public class GenericMapSyncHandler<K, V> extends ValueSyncHandler<Map<K, V>> {
         return Collections.unmodifiableMap(this.cache);
     }
 
+    @Override
+    public Class<Map<K, V>> getValueType() {
+        return (Class<Map<K,V>>) (Object) Map.class;
+    }
+
     public static class Builder<K, V> {
 
         private Supplier<Map<K, V>> getter;

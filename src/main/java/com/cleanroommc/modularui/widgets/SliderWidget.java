@@ -3,7 +3,7 @@ package com.cleanroommc.modularui.widgets;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.value.IDoubleValue;
-import com.cleanroommc.modularui.api.value.IValue;
+import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
@@ -14,7 +14,6 @@ import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.value.DoubleValue;
-import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Unit;
@@ -22,7 +21,6 @@ import com.cleanroommc.modularui.widget.sizer.Unit;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class SliderWidget extends Widget<SliderWidget> implements Interactable {
 
@@ -64,24 +62,14 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     }
 
     @Override
-    public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        return syncHandler instanceof IDoubleValue<?>;
+    public boolean isValidSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        return syncOrValue.isTypeOrEmpty(IDoubleValue.class);
     }
 
     @Override
-    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
-        super.setSyncHandler(syncHandler);
-        if (syncHandler != null) {
-            this.doubleValue = castIfTypeElseNull(syncHandler, IDoubleValue.class);
-        }
-    }
-
-    @Override
-    protected void setValue(IValue<?> value) {
-        super.setValue(value);
-        if (value instanceof IDoubleValue<?> doubleValue1) {
-            this.doubleValue = doubleValue1;
-        }
+    protected void setSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        super.setSyncOrValue(syncOrValue);
+        this.doubleValue = syncOrValue.castNullable(IDoubleValue.class);
     }
 
     @Override
@@ -211,8 +199,7 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     }
 
     public SliderWidget value(IDoubleValue<?> value) {
-        this.doubleValue = value;
-        setValue(value);
+        setSyncOrValue(ISyncOrValue.orEmpty(value));
         return this;
     }
 

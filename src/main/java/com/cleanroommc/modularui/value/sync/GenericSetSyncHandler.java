@@ -54,6 +54,11 @@ public class GenericSetSyncHandler<T> extends GenericCollectionSyncHandler<T, Se
         onSetCache(getValue(), true, false);
     }
 
+    @Override
+    public Class<Set<T>> getValueType() {
+        return (Class<Set<T>>) (Object) Set.class;
+    }
+
     public static <T> Builder<T> builder() {
         return new Builder<>();
     }

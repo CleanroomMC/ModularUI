@@ -109,4 +109,9 @@ public class EnumSyncValue<T extends Enum<T>> extends ValueSyncHandler<T> implem
     public int getIntValue() {
         return this.cache.ordinal();
     }
+
+    @Override
+    public Class<T> getValueType() {
+        return this.enumClass;
+    }
 }

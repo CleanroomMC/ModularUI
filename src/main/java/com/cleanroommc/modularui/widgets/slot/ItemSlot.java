@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.widgets.slot;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.IThemeApi;
+import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiAccessor;
@@ -18,7 +19,6 @@ import com.cleanroommc.modularui.theme.SlotTheme;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
-import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.neverenoughanimations.NEAConfig;
 
@@ -67,14 +67,15 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     @Override
-    public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        return syncHandler instanceof ItemSlotSH;
+    public boolean isValidSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        // disallow null
+        return syncOrValue instanceof ItemSlotSH;
     }
 
     @Override
-    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
-        super.setSyncHandler(syncHandler);
-        this.syncHandler = castIfTypeElseNull(syncHandler, ItemSlotSH.class);
+    protected void setSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        super.setSyncOrValue(syncOrValue);
+        this.syncHandler = syncOrValue.castOrThrow(ItemSlotSH.class);
     }
 
     @Override
@@ -212,7 +213,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     public ItemSlot syncHandler(ItemSlotSH syncHandler) {
-        setSyncHandler(syncHandler);
+        setSyncOrValue(ISyncOrValue.orEmpty(syncHandler));
         return this;
     }
 

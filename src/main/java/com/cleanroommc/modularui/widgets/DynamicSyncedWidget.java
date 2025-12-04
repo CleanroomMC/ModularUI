@@ -1,12 +1,12 @@
 package com.cleanroommc.modularui.widgets;
 
+import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.value.sync.DynamicSyncHandler;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,14 +26,15 @@ public class DynamicSyncedWidget<W extends DynamicSyncedWidget<W>> extends Widge
     private IWidget child;
 
     @Override
-    public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        return syncHandler instanceof DynamicSyncHandler;
+    public boolean isValidSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        return syncOrValue.isTypeOrEmpty(DynamicSyncHandler.class);
     }
 
     @Override
-    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
-        super.setSyncHandler(syncHandler);
-        this.syncHandler = castIfTypeElseNull(syncHandler, DynamicSyncHandler.class, t -> t.attachDynamicWidgetListener(this::updateChild));
+    protected void setSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        super.setSyncOrValue(syncOrValue);
+        this.syncHandler = syncOrValue.castNullable(DynamicSyncHandler.class);
+        if (this.syncHandler != null) this.syncHandler.attachDynamicWidgetListener(this::updateChild);
     }
 
     @Override
@@ -59,7 +60,7 @@ public class DynamicSyncedWidget<W extends DynamicSyncedWidget<W>> extends Widge
     }
 
     public W syncHandler(DynamicSyncHandler syncHandler) {
-        setSyncHandler(syncHandler);
+        setSyncOrValue(ISyncOrValue.orEmpty(syncHandler));
         return getThis();
     }
 

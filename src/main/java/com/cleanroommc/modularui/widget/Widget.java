@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
+import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.api.value.IValue;
 import com.cleanroommc.modularui.api.widget.IDragResizeable;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
@@ -150,8 +151,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         if (handler == null && this.syncKey != null) {
             handler = syncManager.getSyncHandler(getPanel().getName(), this.syncKey);
         }
-        if (handler != null) checkValidSyncHandler(handler);
-        setSyncHandler(handler);
+        if (handler != null) setSyncOrValue(handler);
         if (this.syncHandler instanceof ValueSyncHandler<?> valueSyncHandler && valueSyncHandler.getChangeListener() == null) {
             valueSyncHandler.setChangeListener(this::markTooltipDirty);
         }
@@ -851,6 +851,8 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
      * Used for widgets to set a value handler. <br />
      * Will also call {@link #setSyncHandler(SyncHandler)} if it is a SyncHandler
      */
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
     protected void setValue(IValue<?> value) {
         this.value = value;
         if (value instanceof SyncHandler handler) {
@@ -861,9 +863,19 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     /**
      * Used for widgets to set a sync handler.
      */
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
     protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
-        if (syncHandler != null) checkValidSyncHandler(syncHandler);
+        if (syncHandler != null) checkValidSyncOrValue(syncHandler);
         this.syncHandler = syncHandler;
+    }
+
+    @MustBeInvokedByOverriders
+    protected void setSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        if (!syncOrValue.isSyncHandler() && !syncOrValue.isValueHandler()) return;
+        checkValidSyncOrValue(syncOrValue);
+        if (syncOrValue instanceof SyncHandler syncHandler1) setSyncHandler(syncHandler1);
+        if (syncOrValue instanceof IValue<?> value1) setValue(value1);
     }
 
     // -------------
