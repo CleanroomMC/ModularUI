@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.api.value;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -7,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
  * An interface that is implemented on {@link IValue} and {@link com.cleanroommc.modularui.value.sync.SyncHandler SyncHandler} for easier
  * validation and setters.
  */
+@ApiStatus.NonExtendable
 public interface ISyncOrValue {
 
     /**
