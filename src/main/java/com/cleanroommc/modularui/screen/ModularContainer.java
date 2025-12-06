@@ -6,7 +6,6 @@ import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
-import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import com.cleanroommc.bogosorter.api.IPosSetter;
@@ -66,10 +65,10 @@ public class ModularContainer extends Container implements ISortableContainer {
     public ModularContainer() {}
 
     @ApiStatus.Internal
-    public void construct(EntityPlayer player, PanelSyncManager panelSyncManager, UISettings settings, String mainPanelName, GuiData guiData) {
+    public void construct(EntityPlayer player, ModularSyncManager msm, UISettings settings, String mainPanelName, GuiData guiData) {
         this.player = player;
-        this.syncManager = new ModularSyncManager(this);
-        this.syncManager.construct(mainPanelName, panelSyncManager);
+        this.syncManager = msm;
+        this.syncManager.construct(this, mainPanelName);
         this.settings = settings;
         this.guiData = guiData;
         sortShiftClickSlots();

@@ -136,7 +136,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         syncManager.syncValue("mixer_fluids", 0, SyncHandlers.fluidSlot(this.mixerFluids1));
         syncManager.syncValue("mixer_fluids", 1, SyncHandlers.fluidSlot(this.mixerFluids2));
         IntSyncValue cycleStateValue = new IntSyncValue(() -> this.cycleState, val -> this.cycleState = val);
-        syncManager.syncValue("cycle_state", cycleStateValue);
+        syncManager.getHyperVisor().syncValue("cycle_state", cycleStateValue);
         syncManager.syncValue("display_item", GenericSyncValue.forItem(() -> this.displayItem, null));
         syncManager.bindPlayerInventory(guiData.getPlayer());
 
@@ -504,6 +504,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         syncManager.syncValue("int_value", new IntSyncValue(number::get, number::set));
         IPanelHandler panelSyncHandler = syncManager.syncedPanel("other_panel_2", true, (syncManager1, syncHandler1) ->
                 openThirdWindow(syncManager1, syncHandler1, number));
+        IntSyncValue num = syncManager.getHyperVisor().findSyncHandler("cycle_state", IntSyncValue.class);
         panel.child(ButtonWidget.panelCloseButton())
                 .child(new ButtonWidget<>()
                         .size(10).top(14).right(4)
@@ -521,6 +522,13 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                         .key('I', i -> new ItemSlot().slot(new ModularSlot(smallInv, i).slotGroup(slotGroup)))
                         .build()
                         .center())
+                .child(new CycleButtonWidget()
+                        .size(16).pos(5, 5 + 11)
+                        .value(num)
+                        .stateOverlay(0, IKey.str("1"))
+                        .stateOverlay(1, IKey.str("2"))
+                        .stateOverlay(2, IKey.str("3"))
+                        .addTooltipLine(IKey.str("Hyper Visor test")))
                 .child(new ButtonWidget<>()
                         .bottom(5)
                         .right(5)

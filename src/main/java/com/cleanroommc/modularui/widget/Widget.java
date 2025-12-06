@@ -21,6 +21,7 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.theme.WidgetThemeKey;
+import com.cleanroommc.modularui.value.sync.ISyncRegistrar;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
@@ -843,7 +844,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
      */
     @Override
     public W syncHandler(String name, int id) {
-        this.syncKey = ModularSyncManager.makeSyncKey(name, id);
+        this.syncKey = ISyncRegistrar.makeSyncKey(name, id);
         return getThis();
     }
 
