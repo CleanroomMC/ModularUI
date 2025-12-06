@@ -286,8 +286,9 @@ public class ModularContainer extends Container implements ISortableContainer {
                     if (!heldStack.isEmpty() && clickedSlot.isItemValid(heldStack)) {
                         int stackCount = mouseButton == LEFT_MOUSE ? heldStack.getCount() : 1;
 
-                        if (stackCount > clickedSlot.getItemStackLimit(heldStack)) {
-                            stackCount = clickedSlot.getItemStackLimit(heldStack);
+                        int lim = clickedSlot.getItemStackLimit(heldStack);
+                        if (stackCount > lim) {
+                            stackCount = lim;
                         }
 
                         clickedSlot.putStack(heldStack.splitStack(stackCount));
@@ -305,8 +306,9 @@ public class ModularContainer extends Container implements ISortableContainer {
                                 ItemStack.areItemStackTagsEqual(slotStack, heldStack)) {
                             int stackCount = mouseButton == LEFT_MOUSE ? heldStack.getCount() : 1;
 
-                            if (stackCount > clickedSlot.getItemStackLimit(heldStack) - slotStack.getCount()) {
-                                stackCount = clickedSlot.getItemStackLimit(heldStack) - slotStack.getCount();
+                            int lim = clickedSlot.getItemStackLimit(heldStack);
+                            if (stackCount > lim - slotStack.getCount()) {
+                                stackCount = lim - slotStack.getCount();
                             }
 
                             heldStack.shrink(stackCount);
