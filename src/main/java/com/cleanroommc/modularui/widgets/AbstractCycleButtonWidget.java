@@ -149,7 +149,10 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
     public @Nullable RichTooltip getTooltip() {
         RichTooltip tooltip = super.getTooltip();
         if (tooltip == null || tooltip.isEmpty()) {
-            return this.stateTooltip.get(getState());
+            int state = getState();
+            if (!this.stateTooltip.isEmpty() && this.stateTooltip.size() - 1 <= state) {
+                return this.stateTooltip.get(getState());
+            }
         }
         return tooltip;
     }
