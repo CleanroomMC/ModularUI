@@ -226,7 +226,7 @@ public class ClientScreenHandler {
         if (lastMui != null) {
             ((GuiScreenAccessor) lastMui.getGuiScreen()).setEventButton(-1);
             ((GuiScreenAccessor) lastMui.getGuiScreen()).setLastMouseEvent(-1);
-            lastMui.getScreen().getPanelManager().closeAll();
+            lastMui.getScreen().getPanelManager().closeScreen();
             lastMui = null;
         }
         currentScreen = null;

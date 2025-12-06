@@ -60,7 +60,7 @@ public class PanelManager {
                     throw new IllegalStateException("Tried to reopen closed screen, but all panels are disposed!");
                 }
                 // set all stored panels to be open
-                this.panels.forEach(p -> p.reopen(true));
+                this.panels.forEach(ModularPanel::reopen);
                 this.disposal.removeIf(this.panels::contains);
                 setState(State.REOPENED);
                 yield true;
@@ -226,8 +226,17 @@ public class PanelManager {
         return false;
     }
 
+    void closeScreen() {
+        // only close the screen without closing the panels
+        // this is useful when we expect the screen to reopen at some point and the sync managers are still available
+        if (this.state.isOpen) {
+            setState(State.CLOSED);
+            this.screen.onClose();
+        }
+    }
+
     private void finalizePanel(ModularPanel panel) {
-        panel.onClose();
+        if (panel.isOpen()) panel.onClose();
         if (!this.disposal.contains(panel)) {
             if (this.disposal.size() == DISPOSAL_CAPACITY) {
                 this.disposal.removeFirst().dispose();
@@ -258,6 +267,8 @@ public class PanelManager {
             setState(State.WAIT_DISPOSAL);
             return;
         }
+        // make sure every panel gets closed before disposing
+        this.panels.forEach(this::finalizePanel);
         setState(State.CLOSED);
         this.disposal.forEach(ModularPanel::dispose);
         this.disposal.clear();
@@ -449,7 +460,7 @@ public class PanelManager {
          */
         REOPENED(true),
         /**
-         * Screen is closed after it was open.
+         * Screen is closed after it was open. Panels may still be considered open in some cases.
          */
         CLOSED(false),
         /**

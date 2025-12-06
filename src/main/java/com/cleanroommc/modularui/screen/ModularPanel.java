@@ -244,13 +244,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         this.state = State.OPEN;
     }
 
-    boolean reopen(boolean strict) {
-        if (this.state != State.CLOSED) {
-            if (strict) throw new IllegalStateException();
-            return false;
-        }
+    void reopen() {
         this.state = State.OPEN;
-        return true;
     }
 
     @MustBeInvokedByOverriders
