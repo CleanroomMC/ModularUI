@@ -362,12 +362,20 @@ public class GuiDraw {
         drawTiledSprite(Minecraft.getMinecraft().getTextureMapBlocks(), sprite, x0, y0, w, h);
     }
 
+    public static void drawTiledSprite(TextureAtlasSprite sprite, float x0, float y0, float w, float h, int tileWidth, int tileHeight) {
+        drawTiledSprite(Minecraft.getMinecraft().getTextureMapBlocks(), sprite, x0, y0, w, h, tileWidth, tileHeight);
+    }
+
     public static void drawTiledSprite(TextureMap textureMap, TextureAtlasSprite sprite, float x0, float y0, float w, float h) {
+        drawTiledSprite(textureMap, sprite, x0, y0, w, h, sprite.getIconWidth(), sprite.getIconHeight());
+    }
+
+    public static void drawTiledSprite(TextureMap textureMap, TextureAtlasSprite sprite, float x0, float y0, float w, float h, int tileWidth, int tileHeight) {
         GlStateManager.disableAlpha();
         GlStateManager.enableBlend();
         GlStateManager.enableTexture2D();
         GlStateManager.bindTexture(textureMap.getGlTextureId());
-        drawTiledTexture(x0, y0, x0 + w, y0 + h, sprite.getMinU(), sprite.getMinV(), sprite.getMaxU(), sprite.getMaxV(), sprite.getIconWidth(), sprite.getIconHeight(), 0);
+        drawTiledTexture(x0, y0, x0 + w, y0 + h, sprite.getMinU(), sprite.getMinV(), sprite.getMaxU(), sprite.getMaxV(), tileWidth, tileHeight, 0);
         GlStateManager.disableBlend();
         GlStateManager.enableAlpha();
     }

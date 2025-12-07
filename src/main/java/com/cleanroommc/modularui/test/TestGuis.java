@@ -75,7 +75,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.IntStream;
 
 public class TestGuis extends CustomModularScreen {
 
@@ -192,28 +191,21 @@ public class TestGuis extends CustomModularScreen {
     public static @NotNull ModularPanel buildPostTheLogAnimationUI() {
         Animator post = new Animator().curve(Interpolation.SINE_IN).duration(300).bounds(-35, 0);
         Animator the = new Animator().curve(Interpolation.SINE_IN).duration(300).bounds(-20, 0);
-        Animator fucking = new Animator().curve(Interpolation.SINE_IN).duration(300).bounds(53, 0);
+        Animator extraordinary = new Animator().curve(Interpolation.SINE_IN).duration(500).bounds(53, 0);
         Animator log = new Animator().curve(Interpolation.SINE_IN).duration(300).bounds(20, 0);
         Animator logGrow = new Animator().curve(Interpolation.LINEAR).duration(2500).bounds(0f, 1f);
         IAnimator animator = new Wait(300)
                 .followedBy(post)
                 .followedBy(the)
-                .followedBy(fucking)
+                .followedBy(extraordinary)
                 .followedBy(log)
                 .followedBy(logGrow);
         animator.animate();
         Random rnd = new Random();
-        TextureAtlasSprite[] sprites = IntStream.range(0, 10).mapToObj(SpriteHelper::getDestroyBlockSprite).toArray(TextureAtlasSprite[]::new);
-        IDrawable broken = ((context1, x, y, width, height, widgetTheme) -> {
-            if (logGrow.getValue() < 0.1f) return;
-            GlStateManager.color(1f, 1f, 1f, 0.75f);
-            GuiDraw.drawTiledSprite(sprites[(int) Math.min(9, logGrow.getValue() * 10)], x, y, width + 24, height + 24);
-        });
         return new ModularPanel("main")
                 .coverChildren()
-                .padding(12)
-                .overlay(broken) // TODO fix padding
                 .child(new Column()
+                        .margin(12)
                         .coverChildren()
                         .child(new Row()
                                 .coverChildren()
@@ -221,9 +213,9 @@ public class TestGuis extends CustomModularScreen {
                                         .transform((widget, stack) -> stack.translate(post.getValue(), 0)))
                                 .child(IKey.str("the ").asWidget()
                                         .transform((widget, stack) -> stack.translate(0, the.getValue())))
-                                .child(IKey.str("fucking ").asWidget()
-                                        .transform((widget, stack) -> stack.translate(fucking.getValue(), 0))))
-                        .child(IKey.str("LOOOOGG!!!! ").asWidget()
+                                .child(IKey.str("fucking ").style(TextFormatting.OBFUSCATED).asWidget()
+                                        .transform((widget, stack) -> stack.translate(extraordinary.getValue(), 0))))
+                        .child(IKey.str("LOOOOGG!!!!").asWidget()
                                 .paddingTop(4)
                                 .transform((widget, stack) -> {
                                     float logVal = log.getValue();
@@ -234,7 +226,7 @@ public class TestGuis extends CustomModularScreen {
                                     stack.translate(x0, y0);
                                     stack.scale(scale, scale);
                                     stack.translate(-x0, -y0);
-                                    widget.color(Color.interpolate(0xFF040404, Color.RED.main, Math.min(1f, 1.2f * logGrowVal)));
+                                    widget.color(Color.lerp(0xFF040404, Color.RED.main, Math.min(1f, 1.2f * logGrowVal)));
                                 })));
     }
 
