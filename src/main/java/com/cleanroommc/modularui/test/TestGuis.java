@@ -191,7 +191,7 @@ public class TestGuis extends CustomModularScreen {
     public static @NotNull ModularPanel buildPostTheLogAnimationUI() {
         Animator post = new Animator().curve(Interpolation.SINE_IN).duration(300).bounds(-35, 0);
         Animator the = new Animator().curve(Interpolation.SINE_IN).duration(300).bounds(-20, 0);
-        Animator extraordinary = new Animator().curve(Interpolation.SINE_IN).duration(500).bounds(53, 0);
+        Animator extraordinary = new Animator().curve(Interpolation.SINE_IN).duration(300).bounds(53, 0);
         Animator log = new Animator().curve(Interpolation.SINE_IN).duration(300).bounds(20, 0);
         Animator logGrow = new Animator().curve(Interpolation.LINEAR).duration(2500).bounds(0f, 1f);
         IAnimator animator = new Wait(300)
@@ -237,6 +237,10 @@ public class TestGuis extends CustomModularScreen {
         float period = 3000f;
         return ModularPanel.defaultPanel("main")
                 .size(150)
+                .overlay(new Rectangle()
+                        .color(Color.GREEN.main)
+                        .hollow(2)
+                        .asIcon().margin(5))
                 .child(new TextWidget<>(IKey.str("Test String")).scale(0.6f).horizontalCenter().top(7))
                 .child(new DraggableWidget<>()
                         .background(new SpriteDrawable(sprite))
@@ -437,8 +441,8 @@ public class TestGuis extends CustomModularScreen {
             }
         };
 
-        Rectangle color1 = new Rectangle().setColor(Color.BLACK.main);
-        Rectangle color2 = new Rectangle().setColor(Color.WHITE.main);
+        Rectangle color1 = new Rectangle().color(Color.BLACK.main);
+        Rectangle color2 = new Rectangle().color(Color.WHITE.main);
 
         IDrawable gradient = (context1, x, y, width, height, widgetTheme) -> GuiDraw.drawHorizontalGradientRect(x, y, width, height, color1.getColor(), color2.getColor());
         IDrawable correctedGradient = (context1, x, y, width, height, widgetTheme) -> {
@@ -461,12 +465,12 @@ public class TestGuis extends CustomModularScreen {
 
         ModularPanel panel = new ModularPanel("colors").width(300).coverChildrenHeight().padding(7);
 
-        IPanelHandler colorPicker1 = IPanelHandler.simple(panel, (mainPanel, player) -> new ColorPickerDialog("color_picker1", color1::setColor, color1.getColor(), true)
+        IPanelHandler colorPicker1 = IPanelHandler.simple(panel, (mainPanel, player) -> new ColorPickerDialog("color_picker1", color1::color, color1.getColor(), true)
                 .setDraggable(true)
                 .relative(panel)
                 .top(0)
                 .rightRel(1f), true);
-        IPanelHandler colorPicker2 = IPanelHandler.simple(panel, (mainPanel, player) -> new ColorPickerDialog("color_picker2", color2::setColor, color2.getColor(), true)
+        IPanelHandler colorPicker2 = IPanelHandler.simple(panel, (mainPanel, player) -> new ColorPickerDialog("color_picker2", color2::color, color2.getColor(), true)
                 .setDraggable(true)
                 .relative(panel)
                 .top(0)
