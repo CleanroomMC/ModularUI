@@ -329,6 +329,10 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
         callSyncedAction(mapKey, packet);
     }
 
+    public void callSyncedAction(String mapKey) {
+        callSyncedAction(mapKey, new PacketBuffer(Unpooled.buffer(0)));
+    }
+
     @Override
     public <T extends SyncHandler> T getOrCreateSyncHandler(String name, int id, Class<T> clazz, Supplier<T> supplier) {
         SyncHandler syncHandler = findSyncHandlerNullable(name, id);
