@@ -562,9 +562,9 @@ public class ClientScreenHandler {
             Area area = hovered.getArea();
             IWidget parent = hovered.getParent();
 
-            GuiDraw.drawBorder(0, 0, area.width, area.height, color, scale);
+            GuiDraw.drawBorderOutsideXYWH(0, 0, area.width, area.height, scale, color);
             if (hovered.hasParent()) {
-                GuiDraw.drawBorder(-area.rx, -area.ry, parent.getArea().width, parent.getArea().height, Color.withAlpha(color, 0.3f), scale);
+                GuiDraw.drawBorderOutsideXYWH(-area.rx, -area.ry, parent.getArea().width, parent.getArea().height, scale, Color.withAlpha(color, 0.3f));
             }
             GlStateManager.popMatrix();
             locatedHovered.unapplyMatrix(context);

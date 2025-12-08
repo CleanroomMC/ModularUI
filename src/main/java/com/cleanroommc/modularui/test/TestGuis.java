@@ -15,6 +15,8 @@ import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.ItemDrawable;
 import com.cleanroommc.modularui.drawable.Rectangle;
 import com.cleanroommc.modularui.drawable.SpriteDrawable;
+import com.cleanroommc.modularui.drawable.UITexture;
+import com.cleanroommc.modularui.drawable.graph.GraphDrawable;
 import com.cleanroommc.modularui.factory.ClientGUI;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
 import com.cleanroommc.modularui.screen.ModularPanel;
@@ -26,9 +28,11 @@ import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.ColorShade;
+import com.cleanroommc.modularui.utils.FloatArrayMath;
 import com.cleanroommc.modularui.utils.GameObjectHelper;
 import com.cleanroommc.modularui.utils.Interpolation;
 import com.cleanroommc.modularui.utils.Interpolations;
+import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.utils.SpriteHelper;
 import com.cleanroommc.modularui.utils.fakeworld.ArraySchema;
@@ -64,6 +68,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.TextFormatting;
 
+import com.google.common.base.CaseFormat;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -77,6 +82,8 @@ import java.util.List;
 import java.util.Random;
 
 public class TestGuis extends CustomModularScreen {
+
+    public static boolean withCode = false;
 
     @Override
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {
@@ -102,11 +109,21 @@ public class TestGuis extends CustomModularScreen {
                                     String name = m.getName();
                                     if (name.startsWith("build")) name = name.substring(5);
                                     if (name.endsWith("UI")) name = name.substring(0, name.length() - 2);
+                                    String codeTextureName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name);
                                     name = name.replaceAll("([a-z])([A-Z])", "$1 $2");
                                     return button(name)
                                             .onMousePressed(button -> {
                                                 try {
-                                                    ClientGUI.open(new ModularScreen((ModularPanel) m.invoke(null)).openParentOnClose(true));
+                                                    ModularPanel panel = (ModularPanel) m.invoke(null);
+                                                    if (TestGuis.withCode) {
+                                                        panel.child(UITexture.builder()
+                                                                .location("gui/code/" + codeTextureName)
+                                                                .build()
+                                                                .asWidget()
+                                                                .leftRel(1f)
+                                                                .heightRel(1f));
+                                                    }
+                                                    ClientGUI.open(new ModularScreen(panel).openParentOnClose(true));
                                                 } catch (IllegalAccessException | InvocationTargetException e) {
                                                     ModularUI.LOGGER.throwing(e);
                                                 }
@@ -515,6 +532,20 @@ public class TestGuis extends CustomModularScreen {
                         .size(50, 50)
                         .background(GuiTextures.MC_BUTTON)
                         .hoverBackground(GuiTextures.MC_BUTTON_HOVERED));
+    }
+
+    public static @NotNull ModularPanel buildGraphUI() {
+        float[] x = FloatArrayMath.linspace(-5, 5, 100);
+        float[] y = FloatArrayMath.sin(x, null);
+        return new ModularPanel("graph")
+                .size(200, 150)
+                .padding(5)
+                .overlay(new GraphDrawable()
+                        .yLim(-1.2f, 1.2f)
+                        .autoXLim()
+                        .xTickFinder(MathUtils.PI_HALF, 1)
+                        .yTickFinder(0.2f, 1)
+                        .data(x, y));
     }
 
     private static class TestPanel extends ModularPanel {
