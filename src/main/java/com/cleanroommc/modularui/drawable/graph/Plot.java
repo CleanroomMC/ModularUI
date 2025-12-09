@@ -10,10 +10,22 @@ import com.cleanroommc.modularui.utils.Platform;
 
 public class Plot {
 
+    public static final int[] DEFAULT_PLOT_COLORS = {
+            Color.BLUE_ACCENT.main,
+            Color.ORANGE_ACCENT.darker(0),
+            Color.GREEN.main,
+            Color.RED.main,
+            Color.DEEP_PURPLE_ACCENT.main,
+            Color.BROWN.main,
+            Color.TEAL.main,
+            Color.LIME.main
+    };
+
     float[] xs = FloatArrayMath.EMPTY;
     float[] ys = FloatArrayMath.EMPTY;
     float thickness = 1f;
-    int color = Color.BLUE_ACCENT.main;
+    boolean defaultColor = true;
+    int color;
 
     private float[] vertexBuffer;
     private boolean dirty = true;
@@ -192,6 +204,7 @@ public class Plot {
 
     public Plot color(int color) {
         this.color = color;
+        this.defaultColor = color == 0;
         return this;
     }
 }

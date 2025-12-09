@@ -106,4 +106,52 @@ public class GraphView {
     public float getAspectRatio() {
         return aspectRatio;
     }
+
+    public float getGraphX0() {
+        return gx0;
+    }
+
+    public float getGraphX1() {
+        return gx1;
+    }
+
+    public float getGraphY0() {
+        return gy0;
+    }
+
+    public float getGraphY1() {
+        return gy1;
+    }
+
+    public float getScreenX0() {
+        return sx0;
+    }
+
+    public float getScreenX1() {
+        return sx1;
+    }
+
+    public float getScreenY0() {
+        return sy0;
+    }
+
+    public float getScreenY1() {
+        return sy1;
+    }
+
+    public float getScreenWidth() {
+        return sx1 - sx0;
+    }
+
+    public float getScreenHeight() {
+        return sy1 - sy0;
+    }
+
+    public float getGraphWidth() {
+        return gx1 - gx0;
+    }
+
+    public float getGraphHeight() {
+        return gy1 - gy0;
+    }
 }

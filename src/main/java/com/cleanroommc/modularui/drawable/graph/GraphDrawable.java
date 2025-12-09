@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.drawable.graph;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.drawable.GuiDraw;
+import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
@@ -46,13 +47,15 @@ public class GraphDrawable implements IDrawable {
             this.view.postResize();
         }
         if (this.backgroundColor != 0) {
-            GuiDraw.drawRect(this.view.sx0, this.view.sy0, this.view.sx1 - this.view.sx0, this.view.sy1 - this.view.sy0, this.backgroundColor);
+            GuiDraw.drawRect(this.view.sx0, this.view.sy0, this.view.getScreenWidth(), this.view.getScreenHeight(), this.backgroundColor);
         }
         Platform.setupDrawColor();
         drawGrid(context);
+        Stencil.applyTransformed((int) this.view.sx0, (int) this.view.sy0, (int) (this.view.getScreenWidth() + 1), (int) (this.view.getScreenHeight() + 1));
         for (Plot plot : this.plots) {
             plot.draw(this.view);
         }
+        Stencil.remove();
         drawTicks(context);
         GuiDraw.drawBorderOutsideLTRB(this.view.sx0, this.view.sy0, this.view.sx1, this.view.sy1, 0.5f, Color.BLACK.main);
         this.x.drawLabels(this.view, this.y);
@@ -95,6 +98,15 @@ public class GraphDrawable implements IDrawable {
         this.dirty = false;
         this.x.compute(this.plots);
         this.y.compute(this.plots);
+        int colorIndex = 0;
+        for (Plot plot : this.plots) {
+            if (plot.defaultColor) {
+                plot.color = Plot.DEFAULT_PLOT_COLORS[colorIndex];
+                if (++colorIndex == Plot.DEFAULT_PLOT_COLORS.length) {
+                    colorIndex = 0;
+                }
+            }
+        }
         return true;
     }
 
