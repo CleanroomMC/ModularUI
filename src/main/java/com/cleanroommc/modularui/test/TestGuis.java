@@ -538,14 +538,13 @@ public class TestGuis extends CustomModularScreen {
         float[] x = FloatArrayMath.linspace(-5, 5, 100);
         float[] y = FloatArrayMath.sin(x, null);
         return new ModularPanel("graph")
-                .size(200, 150)
+                .size(200, 200)
                 .padding(5)
                 .overlay(new GraphDrawable()
                         .yLim(-1.2f, 1.2f)
-                        .autoXLim()
                         .xTickFinder(MathUtils.PI_HALF, 1)
                         .yTickFinder(0.2f, 1)
-                        .data(x, y));
+                        .plot(x, y));
     }
 
     private static class TestPanel extends ModularPanel {
