@@ -7,6 +7,7 @@ import org.jetbrains.annotations.ApiStatus;
 @ApiStatus.Experimental
 public class GraphView {
 
+    float aspectRatio = 0;
     // screen rectangle
     float sx0, sy0, sx1, sy1;
     // graph rectangle
@@ -15,15 +16,19 @@ public class GraphView {
     float zeroX, zeroY;
 
     void postResize() {
-        float w = sx1 - sx0, h = sy1 - sy0;
-        if (w > h) {
-            float d = w - h;
-            sx0 += d / 2;
-            sx1 -= d / 2;
-        } else if (h > w) {
-            float d = h - w;
-            sy0 += d / 2;
-            sy1 -= d / 2;
+        if (this.aspectRatio > 0) {
+            float w = sx1 - sx0, h = sy1 - sy0;
+            float properW = this.aspectRatio * h;
+            if (w > properW) {
+                float d = w - properW;
+                sx0 += d / 2;
+                sx1 -= d / 2;
+            } else if (w < properW) {
+                float properH = w / this.aspectRatio;
+                float d = h - properH;
+                sy0 += d / 2;
+                sy1 -= d / 2;
+            }
         }
         this.zeroX = g2sX(0);
         this.zeroY = g2sY(0);
@@ -92,5 +97,13 @@ public class GraphView {
 
     public float getZeroY() {
         return zeroY;
+    }
+
+    public void setAspectRatio(float aspectRatio) {
+        this.aspectRatio = aspectRatio;
+    }
+
+    public float getAspectRatio() {
+        return aspectRatio;
     }
 }

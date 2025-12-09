@@ -102,7 +102,6 @@ public class GraphAxis {
                 off += textRenderer.getFontHeight() + AXIS_LABEL_OFFSET;
             }
             graphView.sx0 += off;
-            graphView.sx1 -= off;
         }
     }
 

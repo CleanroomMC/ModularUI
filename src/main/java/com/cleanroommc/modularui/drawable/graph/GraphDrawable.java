@@ -252,4 +252,9 @@ public class GraphDrawable implements IDrawable {
         this.minorGridLineColor = color;
         return this;
     }
+
+    public GraphDrawable graphAspectRatio(float aspectRatio) {
+        this.view.setAspectRatio(aspectRatio);
+        return this;
+    }
 }
