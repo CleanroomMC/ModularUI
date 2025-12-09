@@ -544,7 +544,30 @@ public class TestGuis extends CustomModularScreen {
                         .yLim(-1.2f, 1.2f)
                         .xTickFinder(MathUtils.PI_HALF, 1)
                         .yTickFinder(0.2f, 1)
+                        .graphAspectRatio(16 / 9f)
                         .plot(x, y));
+    }
+
+    public static @NotNull ModularPanel buildAspectRatioUI() {
+        return new ModularPanel("aspect_ratio")
+                .coverChildren()
+                .padding(10)
+                .child(new Row()
+                        .childPadding(10)
+                        .coverChildren()
+                        .child(new Rectangle().color(Color.BLUE_ACCENT.main)
+                                .asIcon().aspectRatio(4f / 3)
+                                .asWidget().size(80)
+                                .overlay(IKey.str("4:3 Free")))
+                        .child(new Rectangle().color(Color.RED_ACCENT.main)
+                                .asIcon().aspectRatio(4f / 3).width(70)
+                                .asWidget().size(80)
+                                .overlay(IKey.str("4:3 | width = 70")))
+                        .child(new Rectangle().color(Color.LIGHT_GREEN.main)
+                                .asIcon().aspectRatio(4f / 3).height(45).alignment(Alignment.BottomRight)
+                                .asWidget().size(80)
+                                .overlay(IKey.str("4:3 | height = 45\nBottom Right"))))
+                .overlay();
     }
 
     private static class TestPanel extends ModularPanel {
