@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IJsonSerializable;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
@@ -9,6 +10,7 @@ import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widget.sizer.Box;
 
+import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -79,6 +81,10 @@ public class Icon implements IIcon, IJsonSerializable {
             } else if (this.height <= 0) {
                 // width is set, so adjust height to width
                 height = (int) (width / this.aspectRatio);
+            } else if (FMLLaunchHandler.isDeobfuscatedEnvironment()) {
+                ModularUI.LOGGER.error("Aspect ration in Icon can't be applied when width and height are specified");
+                // remove aspect ratio to avoid log spamming, it does nothing in the current state anyway
+                this.aspectRatio = 0;
             }
         }
         // apply alignment
