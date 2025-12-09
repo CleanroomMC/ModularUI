@@ -32,7 +32,6 @@ import com.cleanroommc.modularui.utils.FloatArrayMath;
 import com.cleanroommc.modularui.utils.GameObjectHelper;
 import com.cleanroommc.modularui.utils.Interpolation;
 import com.cleanroommc.modularui.utils.Interpolations;
-import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.utils.SpriteHelper;
 import com.cleanroommc.modularui.utils.fakeworld.ArraySchema;
@@ -535,17 +534,15 @@ public class TestGuis extends CustomModularScreen {
     }
 
     public static @NotNull ModularPanel buildGraphUI() {
-        float[] x = FloatArrayMath.linspace(-5, 5, 100);
-        float[] y = FloatArrayMath.sin(x, null);
+        float[] x = FloatArrayMath.linspace(-25, 25, 200);
+        // sin(x) / x
+        float[] y1 = FloatArrayMath.div(FloatArrayMath.sin(x, null), x, null);
         return new ModularPanel("graph")
-                .size(200, 200)
+                .size(200, 160)
                 .padding(5)
                 .overlay(new GraphDrawable()
-                        .yLim(-1.2f, 1.2f)
-                        .xTickFinder(MathUtils.PI_HALF, 1)
-                        .yTickFinder(0.2f, 1)
                         .graphAspectRatio(16 / 9f)
-                        .plot(x, y));
+                        .plot(x, y1));
     }
 
     public static @NotNull ModularPanel buildAspectRatioUI() {

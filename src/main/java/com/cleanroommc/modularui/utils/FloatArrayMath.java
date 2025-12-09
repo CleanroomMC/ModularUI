@@ -171,10 +171,7 @@ public class FloatArrayMath {
      * @return result array
      */
     public static float[] plus(float[] src, float op, float @Nullable [] res) {
-        if (res == null) res = new float[src.length];
-        int n = Math.min(src.length, res.length);
-        for (int i = 0; i < n; i++) res[i] = src[i] + op;
-        return res;
+        return applyEach(src, v -> v + op, res);
     }
 
     /**
@@ -186,11 +183,7 @@ public class FloatArrayMath {
      * @return result array
      */
     public static float[] plus(float[] src, float[] op, float @Nullable [] res) {
-        if (src.length != op.length) throw new IllegalArgumentException("Can't add arrays of different size.");
-        if (res == null) res = new float[src.length];
-        int n = Math.min(src.length, res.length);
-        for (int i = 0; i < n; i++) res[i] = src[i] + op[i];
-        return res;
+        return applyEach(src, op, Float::sum, res);
     }
 
     /**
@@ -202,14 +195,19 @@ public class FloatArrayMath {
      * @return result array
      */
     public static float[] mult(float[] src, float op, float @Nullable [] res) {
-        if (res == null) res = new float[src.length];
-        int n = Math.min(src.length, res.length);
-        for (int i = 0; i < n; i++) res[i] = src[i] * op;
-        return res;
+        return applyEach(src, v -> v * op, res);
+    }
+
+    public static float[] mult(float[] src, float[] op, float @Nullable [] res) {
+        return applyEach(src, op, (v, op1) -> v * op1, res);
     }
 
     public static float[] div(float[] src, float op, float @Nullable [] res) {
         return mult(src, 1 / op, res);
+    }
+
+    public static float[] div(float[] src, float[] op, float @Nullable [] res) {
+        return applyEach(src, op, (v, op1) -> v / op1, res);
     }
 
     public static float[] diff(float[] src) {
@@ -247,6 +245,16 @@ public class FloatArrayMath {
         return res;
     }
 
+    public static float[] applyEach(float[] src, float[][] operands, NFloatOperator op, float @Nullable [] res) {
+        if (src.length != operands.length) {
+            throw new IllegalArgumentException("Can't apply operator to operands of different size.");
+        }
+        if (res == null) res = new float[src.length];
+        int n = Math.min(src.length, res.length);
+        for (int i = 0; i < n; i++) res[i] = op.apply(src[i], operands[i]);
+        return res;
+    }
+
     public static float[] abs(float[] src, float @Nullable [] res) {
         return applyEach(src, Math::abs, res);
     }
@@ -257,6 +265,10 @@ public class FloatArrayMath {
 
     public static float[] cos(float[] src, float @Nullable [] res) {
         return applyEach(src, MathUtils::cos, res);
+    }
+
+    public static float[] tan(float[] src, float @Nullable [] res) {
+        return applyEach(src, MathUtils::tan, res);
     }
 
     public static float[] clamp(float[] src, float min, float max, float @Nullable [] res) {
@@ -290,5 +302,10 @@ public class FloatArrayMath {
     public interface TernaryFloatOperator {
 
         float apply(float v, float op1, float op2);
+    }
+
+    public interface NFloatOperator {
+
+        float apply(float v, float[] op);
     }
 }
