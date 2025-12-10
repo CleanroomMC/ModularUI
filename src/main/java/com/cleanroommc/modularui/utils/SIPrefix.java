@@ -26,11 +26,13 @@ public enum SIPrefix {
 
 
     public final char symbol;
+    public final String stringSymbol;
     public final double factor;
     public final double oneOverFactor;
 
     SIPrefix(char symbol, int powerOfTen) {
         this.symbol = symbol;
+        this.stringSymbol = symbol != Character.MIN_VALUE ? Character.toString(symbol) : "";
         this.factor = Math.pow(10, powerOfTen);
         this.oneOverFactor = 1 / this.factor;
     }

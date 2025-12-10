@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.api.drawable;
 
+import com.cleanroommc.modularui.drawable.text.RichText;
 import com.cleanroommc.modularui.drawable.text.Spacer;
 import com.cleanroommc.modularui.utils.Alignment;
 

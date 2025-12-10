@@ -74,9 +74,8 @@ public class DoubleSyncValue extends ValueSyncHandler<Double> implements IDouble
         if (setSource && this.setter != null) {
             this.setter.accept(value);
         }
-        if (sync) {
-            sync(0, this::write);
-        }
+        onValueChanged();
+        if (sync) sync();
     }
 
     @Override
@@ -121,5 +120,10 @@ public class DoubleSyncValue extends ValueSyncHandler<Double> implements IDouble
     @Override
     public void setFloatValue(float value, boolean setSource, boolean sync) {
         setDoubleValue(value, setSource, sync);
+    }
+
+    @Override
+    public Class<Double> getValueType() {
+        return Double.class;
     }
 }

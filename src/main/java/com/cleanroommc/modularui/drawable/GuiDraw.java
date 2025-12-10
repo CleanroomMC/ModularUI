@@ -12,7 +12,6 @@ import com.cleanroommc.modularui.widget.sizer.Area;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderItem;
@@ -27,9 +26,8 @@ import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -44,16 +42,8 @@ public class GuiDraw {
 
     public static void drawRect(float x0, float y0, float w, float h, int color) {
         Platform.setupDrawColor();
-        float x1 = x0 + w, y1 = y0 + h;
-        float r = Color.getRedF(color);
-        float g = Color.getGreenF(color);
-        float b = Color.getBlueF(color);
-        float a = Color.getAlphaF(color);
         Platform.startDrawing(Platform.DrawMode.QUADS, Platform.VertexFormat.POS_COLOR, bufferBuilder -> {
-            bufferBuilder.pos(x0, y0, 0.0f).color(r, g, b, a).endVertex();
-            bufferBuilder.pos(x0, y1, 0.0f).color(r, g, b, a).endVertex();
-            bufferBuilder.pos(x1, y1, 0.0f).color(r, g, b, a).endVertex();
-            bufferBuilder.pos(x1, y0, 0.0f).color(r, g, b, a).endVertex();
+            drawRectRaw(bufferBuilder, x0, y0, x0 + w, y0 + h, color);
         });
     }
 
@@ -76,6 +66,21 @@ public class GuiDraw {
             bufferBuilder.pos(x1, y0, 0.0f).color(Color.getRed(colorTR), Color.getGreen(colorTR), Color.getBlue(colorTR), Color.getAlpha(colorTR)).endVertex();
         });
         Platform.endDrawGradient();
+    }
+
+    public static void drawRectRaw(BufferBuilder buffer, float x0, float y0, float x1, float y1, int color) {
+        int r = Color.getRed(color);
+        int g = Color.getGreen(color);
+        int b = Color.getBlue(color);
+        int a = Color.getAlpha(color);
+        drawRectRaw(buffer, x0, y0, x1, y1, r, g, b, a);
+    }
+
+    public static void drawRectRaw(BufferBuilder buffer, float x0, float y0, float x1, float y1, int r, int g, int b, int a) {
+        buffer.pos(x0, y0, 0.0f).color(r, g, b, a).endVertex();
+        buffer.pos(x0, y1, 0.0f).color(r, g, b, a).endVertex();
+        buffer.pos(x1, y1, 0.0f).color(r, g, b, a).endVertex();
+        buffer.pos(x1, y0, 0.0f).color(r, g, b, a).endVertex();
     }
 
     public static void drawCircle(float x0, float y0, float diameter, int color, int segments) {
@@ -249,23 +254,10 @@ public class GuiDraw {
         drawTiledTexture(x, y, w, h, u, v, tileW, tileH, tw, th, z);
     }
 
-    public static void drawTiledTexture(float x, float y, float w, float h, int u, int v, int tileW, int tileH, int tw, int th, float z) {
-        int countX = (((int) w - 1) / tileW) + 1;
-        int countY = (((int) h - 1) / tileH) + 1;
-        float fillerX = w - (countX - 1) * tileW;
-        float fillerY = h - (countY - 1) * tileH;
-        Platform.startDrawing(Platform.DrawMode.QUADS, Platform.VertexFormat.POS_TEX, bufferBuilder -> {
-            for (int i = 0, c = countX * countY; i < c; i++) {
-                int ix = i % countX;
-                int iy = i / countX;
-                float xx = x + ix * tileW;
-                float yy = y + iy * tileH;
-                float xw = ix == countX - 1 ? fillerX : tileW;
-                float yh = iy == countY - 1 ? fillerY : tileH;
-
-                drawTexture(bufferBuilder, xx, yy, u, v, xw, yh, tw, th, z);
-            }
-        });
+    public static void drawTiledTexture(float x, float y, float w, float h, int u, int v, int tileW, int tileH, int textureW, int textureH, float z) {
+        float tw = 1f / textureW;
+        float th = 1f / textureH;
+        drawTiledTexture(x, y, w, h, u * tw, v * th, (u + w) * tw, (v + h) * th, textureW, textureH, z);
     }
 
     public static void drawTiledTexture(ResourceLocation location, float x, float y, float w, float h, float u0, float v0, float u1, float v1, int textureWidth, int textureHeight, float z) {
@@ -274,31 +266,36 @@ public class GuiDraw {
     }
 
     public static void drawTiledTexture(float x, float y, float w, float h, float u0, float v0, float u1, float v1, int tileWidth, int tileHeight, float z) {
+        Platform.startDrawing(Platform.DrawMode.QUADS, Platform.VertexFormat.POS_TEX, bufferBuilder -> {
+            drawTiledTexture(bufferBuilder, x, y, w, h, u0, v0, u1, v1, tileWidth, tileHeight, z);
+        });
+    }
+
+    public static void drawTiledTexture(BufferBuilder bufferBuilder, float x, float y, float w, float h, float u0, float v0, float u1, float v1, int tileWidth, int tileHeight, float z) {
         int countX = (((int) w - 1) / tileWidth) + 1;
         int countY = (((int) h - 1) / tileHeight) + 1;
         float fillerX = w - (countX - 1) * tileWidth;
         float fillerY = h - (countY - 1) * tileHeight;
         float fillerU = u0 + (u1 - u0) * fillerX / tileWidth;
         float fillerV = v0 + (v1 - v0) * fillerY / tileHeight;
-        Platform.startDrawing(Platform.DrawMode.QUADS, Platform.VertexFormat.POS_TEX, bufferBuilder -> {
-            for (int i = 0, c = countX * countY; i < c; i++) {
-                int ix = i % countX;
-                int iy = i / countX;
-                float xx = x + ix * tileWidth;
-                float yy = y + iy * tileHeight;
-                float xw = tileWidth, yh = tileHeight, uEnd = u1, vEnd = v1;
-                if (ix == countX - 1) {
-                    xw = fillerX;
-                    uEnd = fillerU;
-                }
-                if (iy == countY - 1) {
-                    yh = fillerY;
-                    vEnd = fillerV;
-                }
 
-                drawTexture(bufferBuilder, xx, yy, xx + xw, yy + yh, u0, v0, uEnd, vEnd, z);
+        for (int i = 0, c = countX * countY; i < c; i++) {
+            int ix = i % countX;
+            int iy = i / countX;
+            float xx = x + ix * tileWidth;
+            float yy = y + iy * tileHeight;
+            float xw = tileWidth, yh = tileHeight, uEnd = u1, vEnd = v1;
+            if (ix == countX - 1) {
+                xw = fillerX;
+                uEnd = fillerU;
             }
-        });
+            if (iy == countY - 1) {
+                yh = fillerY;
+                vEnd = fillerV;
+            }
+
+            drawTexture(bufferBuilder, xx, yy, xx + xw, yy + yh, u0, v0, uEnd, vEnd, z);
+        }
     }
 
     public static void drawItem(ItemStack item, int x, int y, float width, float height, int z) {
@@ -370,36 +367,120 @@ public class GuiDraw {
         drawTiledSprite(Minecraft.getMinecraft().getTextureMapBlocks(), sprite, x0, y0, w, h);
     }
 
+    public static void drawTiledSprite(TextureAtlasSprite sprite, float x0, float y0, float w, float h, int tileWidth, int tileHeight) {
+        drawTiledSprite(Minecraft.getMinecraft().getTextureMapBlocks(), sprite, x0, y0, w, h, tileWidth, tileHeight);
+    }
+
     public static void drawTiledSprite(TextureMap textureMap, TextureAtlasSprite sprite, float x0, float y0, float w, float h) {
+        drawTiledSprite(textureMap, sprite, x0, y0, w, h, sprite.getIconWidth(), sprite.getIconHeight());
+    }
+
+    public static void drawTiledSprite(TextureMap textureMap, TextureAtlasSprite sprite, float x0, float y0, float w, float h, int tileWidth, int tileHeight) {
         GlStateManager.disableAlpha();
         GlStateManager.enableBlend();
         GlStateManager.enableTexture2D();
         GlStateManager.bindTexture(textureMap.getGlTextureId());
-        drawTiledTexture(x0, y0, x0 + w, y0 + h, sprite.getMinU(), sprite.getMinV(), sprite.getMaxU(), sprite.getMaxV(), sprite.getIconWidth(), sprite.getIconHeight(), 0);
+        drawTiledTexture(x0, y0, x0 + w, y0 + h, sprite.getMinU(), sprite.getMinV(), sprite.getMaxU(), sprite.getMaxV(), tileWidth, tileHeight, 0);
         GlStateManager.disableBlend();
         GlStateManager.enableAlpha();
     }
 
+    /**
+     * @deprecated no replacement
+     */
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
     public static void drawOutlineCenter(int x, int y, int offset, int color) {
         drawOutlineCenter(x, y, offset, color, 1);
     }
 
+    /**
+     * @deprecated no replacement
+     */
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
     public static void drawOutlineCenter(int x, int y, int offset, int color, int border) {
         drawOutline(x - offset, y - offset, x + offset, y + offset, color, border);
     }
 
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
     public static void drawOutline(int left, int top, int right, int bottom, int color) {
         drawOutline(left, top, right, bottom, color, 1);
     }
 
     /**
      * Draw rectangle outline with given border
+     *
+     * @deprecated use {@link #drawBorderInsideLTRB(float, float, float, float, float, int)} or {@link #drawBorderInsideLTRB(float, float, float, float, float, int)}
      */
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
     public static void drawOutline(int left, int top, int right, int bottom, int color, int border) {
-        Gui.drawRect(left, top, left + border, bottom, color);
-        Gui.drawRect(right - border, top, right, bottom, color);
-        Gui.drawRect(left + border, top, right - border, top + border, color);
-        Gui.drawRect(left + border, bottom - border, right - border, bottom, color);
+        drawBorderInsideLTRB(left, top, right, bottom, border, color);
+    }
+
+    private static void drawBorderLTRB(float left, float top, float right, float bottom, float border, int color, boolean outside) {
+        if (outside) {
+            left -= border;
+            top -= border;
+            right += border;
+            bottom += border;
+        }
+        float x0 = left, y0 = top, x1 = right, y1 = bottom, d = border;
+        Platform.setupDrawColor();
+        Platform.startDrawing(Platform.DrawMode.TRIANGLE_STRIP, Platform.VertexFormat.POS_COLOR, buffer -> {
+            pc(buffer, x0, y0, color);
+            pc(buffer, x1 - d, y0 + d, color);
+            pc(buffer, x1, y0, color);
+            pc(buffer, x1 - d, y1 - d, color);
+            pc(buffer, x1, y1, color);
+            pc(buffer, x0 + d, y1 - d, color);
+            pc(buffer, x0, y1, color);
+            pc(buffer, x0 + d, y0 + d, color);
+            pc(buffer, x0, y0, color);
+            pc(buffer, x1 - d, y0 + d, color);
+        });
+    }
+
+    public static void drawBorderOutsideLTRB(float left, float top, float right, float bottom, int color) {
+        drawBorderLTRB(left, top, right, bottom, 1, color, true);
+    }
+
+    public static void drawBorderOutsideLTRB(float left, float top, float right, float bottom, float border, int color) {
+        drawBorderLTRB(left, top, right, bottom, border, color, true);
+    }
+
+    public static void drawBorderInsideLTRB(float left, float top, float right, float bottom, int color) {
+        drawBorderLTRB(left, top, right, bottom, 1, color, false);
+    }
+
+    public static void drawBorderInsideLTRB(float left, float top, float right, float bottom, float border, int color) {
+        drawBorderLTRB(left, top, right, bottom, border, color, false);
+    }
+
+    private static void drawBorderXYWH(float x, float y, float w, float h, float border, int color, boolean outside) {
+        drawBorderLTRB(x, y, x + w, y + h, border, color, outside);
+    }
+
+    public static void drawBorderOutsideXYWH(float x, float y, float w, float h, float border, int color) {
+        drawBorderXYWH(x, y, w, h, border, color, true);
+    }
+
+    public static void drawBorderOutsideXYWH(float x, float y, float w, float h, int color) {
+        drawBorderXYWH(x, y, w, h, 1, color, true);
+    }
+
+    public static void drawBorderInsideXYWH(float x, float y, float w, float h, float border, int color) {
+        drawBorderXYWH(x, y, w, h, border, color, false);
+    }
+
+    public static void drawBorderInsideXYWH(float x, float y, float w, float h, int color) {
+        drawBorderXYWH(x, y, w, h, 1, color, false);
+    }
+
+    private static void pc(BufferBuilder buffer, float x, float y, int c) {
+        buffer.pos(x, y, 0).color(Color.getRed(c), Color.getGreen(c), Color.getBlue(c), Color.getAlpha(c)).endVertex();
     }
 
     /**
@@ -524,15 +605,12 @@ public class GuiDraw {
         Platform.endDrawGradient();
     }
 
-    @SideOnly(Side.CLIENT)
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
     public static void drawBorder(float x, float y, float width, float height, int color, float border) {
-        drawRect(x - border, y - border, width + 2 * border, border, color);
-        drawRect(x - border, y + height, width + 2 * border, border, color);
-        drawRect(x - border, y, border, height, color);
-        drawRect(x + width, y, border, height, color);
+        drawBorderLTRB(x, y, x + width, y + height, border, color, false);
     }
 
-    @SideOnly(Side.CLIENT)
     public static void drawText(String text, float x, float y, float scale, int color, boolean shadow) {
         FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
         Platform.setupDrawFont();

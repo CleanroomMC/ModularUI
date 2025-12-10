@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
-
 import com.cleanroommc.modularui.widgets.slot.PlayerSlotType;
 
 import net.minecraft.item.ItemStack;
@@ -19,8 +18,8 @@ import java.io.IOException;
  */
 public class ItemSlotSH extends SyncHandler {
 
-    public static final int SYNC_ITEM = 1;
-    public static final int SYNC_ENABLED = 2;
+    public static final int SYNC_ITEM = 0;
+    public static final int SYNC_ENABLED = 1;
 
     private final ModularSlot slot;
     private final PlayerSlotType playerSlotType;

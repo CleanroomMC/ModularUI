@@ -54,7 +54,7 @@ public class TestTile2 extends TileEntity implements IGuiHolder<PosGuiData>, ITi
                     .slot(new ModularSlot(this.itemHandler, i)));
         }
         ModularPanel panel = ModularPanel.defaultPanel("test_tile_2", 176, 13 * 18 + 14 + 10 + 20);
-        IPanelHandler otherPanel = syncManager.panel("2nd panel", (syncManager1, syncHandler) -> {
+        IPanelHandler otherPanel = syncManager.syncedPanel("2nd panel", true, (syncManager1, syncHandler) -> {
             ModularPanel panel1 = new Dialog<>("Option Selection").setDisablePanelsBelow(false).setDraggable(true).size(4 * 18 + 8, 4 * 18 + 8);
             return panel1
                     .child(SlotGroupWidget.builder()
@@ -66,7 +66,7 @@ public class TestTile2 extends TileEntity implements IGuiHolder<PosGuiData>, ITi
                             .build()
                             .pos(4, 4)
                     );
-        }, true);
+        });
         return panel
                 .bindPlayerInventory()
                 .child(sw)

@@ -12,6 +12,7 @@ import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widget.WidgetTree;
 
@@ -74,11 +75,12 @@ public class GuiManager {
         // create panel, collect sync handlers and create container
         UISettings settings = new UISettings(RecipeViewerSettings.DUMMY);
         settings.defaultCanInteractWith(factory, guiData);
-        PanelSyncManager syncManager = new PanelSyncManager(false);
+        ModularSyncManager msm = new ModularSyncManager(false);
+        PanelSyncManager syncManager = new PanelSyncManager(msm, true);
         ModularPanel panel = factory.createPanel(guiData, syncManager, settings);
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularContainer container = settings.hasContainer() ? settings.createContainer() : factory.createContainer();
-        container.construct(player, syncManager, settings, panel.getName(), guiData);
+        container.construct(player, msm, settings, panel.getName(), guiData);
         // sync to client
         player.getNextWindowId();
         player.closeContainer();
@@ -100,13 +102,14 @@ public class GuiManager {
         T guiData = factory.readGuiData(player, data);
         UISettings settings = new UISettings();
         settings.defaultCanInteractWith(factory, guiData);
-        PanelSyncManager syncManager = new PanelSyncManager(true);
+        ModularSyncManager msm = new ModularSyncManager(true);
+        PanelSyncManager syncManager = new PanelSyncManager(msm, true);
         ModularPanel panel = factory.createPanel(guiData, syncManager, settings);
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularScreen screen = factory.createScreen(guiData, panel);
         screen.getContext().setSettings(settings);
         ModularContainer container = settings.hasContainer() ? settings.createContainer() : factory.createContainer();
-        container.construct(player, syncManager, settings, panel.getName(), guiData);
+        container.construct(player, msm, settings, panel.getName(), guiData);
         IMuiScreen wrapper = factory.createScreenWrapper(container, screen);
         if (!(wrapper.getGuiScreen() instanceof GuiContainer guiContainer)) {
             throw new IllegalStateException("The wrapping screen must be a GuiContainer for synced GUIs!");

@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.value.IDoubleValue;
+import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.drawable.UITexture;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -9,8 +10,9 @@ import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.value.DoubleValue;
-import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.DoubleSupplier;
 
@@ -38,9 +40,14 @@ public class ProgressWidget extends Widget<ProgressWidget> {
     }
 
     @Override
-    public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        this.doubleValue = castIfTypeElseNull(syncHandler, IDoubleValue.class);
-        return this.doubleValue != null;
+    public boolean isValidSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        return syncOrValue.isTypeOrEmpty(IDoubleValue.class);
+    }
+
+    @Override
+    protected void setSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        super.setSyncOrValue(syncOrValue);
+        this.doubleValue = syncOrValue.castNullable(IDoubleValue.class);
     }
 
     @Override
@@ -152,8 +159,7 @@ public class ProgressWidget extends Widget<ProgressWidget> {
     }
 
     public ProgressWidget value(IDoubleValue<?> value) {
-        this.doubleValue = value;
-        setValue(value);
+        setSyncOrValue(ISyncOrValue.orEmpty(value));
         return this;
     }
 

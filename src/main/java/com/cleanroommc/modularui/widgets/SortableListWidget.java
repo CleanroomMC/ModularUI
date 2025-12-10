@@ -159,7 +159,7 @@ public class SortableListWidget<T> extends ListValueWidget<T, SortableListWidget
         private Predicate<IWidget> dropPredicate;
         private SortableListWidget<T> listWidget;
         private int index = -1;
-        private int movingFrom = -1;
+        private final int movingFrom = -1;
 
         public Item(T value) {
             this.value = value;

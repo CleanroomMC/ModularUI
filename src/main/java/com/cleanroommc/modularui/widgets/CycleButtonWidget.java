@@ -11,6 +11,7 @@ import java.util.function.Consumer;
  * <p>Note that you need to set the amount of states before setting any state backgrounds etc. The state count is automatically set, if the
  * passed {@link IIntValue} is a {@link com.cleanroommc.modularui.api.value.IEnumValue IEnumValue} or a
  * {@link com.cleanroommc.modularui.api.value.IBoolValue IBoolValue}.</p>
+ *
  * @see ToggleButton
  */
 public class CycleButtonWidget extends AbstractCycleButtonWidget<CycleButtonWidget> {

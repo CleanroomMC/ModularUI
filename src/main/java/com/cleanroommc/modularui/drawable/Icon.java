@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IJsonSerializable;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
@@ -9,6 +10,7 @@ import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widget.sizer.Box;
 
+import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -21,6 +23,7 @@ public class Icon implements IIcon, IJsonSerializable {
 
     private final IDrawable drawable;
     private int width = 0, height = 0;
+    private float aspectRatio = 0;
     private Alignment alignment = Alignment.Center;
     private final Box margin = new Box();
 
@@ -55,13 +58,41 @@ public class Icon implements IIcon, IJsonSerializable {
         y += this.margin.getTop();
         width -= this.margin.horizontal();
         height -= this.margin.vertical();
-        if (this.width > 0) {
-            x += (int) (width * this.alignment.x - this.width * this.alignment.x);
-            width = this.width;
+        int frameWidth = width;
+        int frameHeight = height;
+        if (this.width > 0) width = this.width;
+        if (this.height > 0) height = this.height;
+        if (this.aspectRatio > 0) {
+            if (this.width <= 0) {
+                if (this.height <= 0) {
+                    // width and height is unset, so adjust width or height so that one of them takes the full space
+                    float w = width, h = height;
+                    float properW = this.aspectRatio * h;
+                    if (w > properW) {
+                        width = (int) properW;
+                    } else if (w < properW) {
+                        height = (int) (w / this.aspectRatio);
+                    }
+                } else {
+                    // height is set, so adjust width to height
+                    float properW = this.aspectRatio * height;
+                    width = (int) properW;
+                }
+            } else if (this.height <= 0) {
+                // width is set, so adjust height to width
+                height = (int) (width / this.aspectRatio);
+            } else if (FMLLaunchHandler.isDeobfuscatedEnvironment()) {
+                ModularUI.LOGGER.error("Aspect ration in Icon can't be applied when width and height are specified");
+                // remove aspect ratio to avoid log spamming, it does nothing in the current state anyway
+                this.aspectRatio = 0;
+            }
         }
-        if (this.height > 0) {
-            y += (int) (height * this.alignment.y - this.height * this.alignment.y);
-            height = this.height;
+        // apply alignment
+        if (width != frameWidth) {
+            x += (int) (frameWidth * this.alignment.x - width * this.alignment.x);
+        }
+        if (height != frameHeight) {
+            y += (int) (frameHeight * this.alignment.y - height * this.alignment.y);
         }
         this.drawable.draw(context, x, y, width, height, widgetTheme);
     }
@@ -94,6 +125,11 @@ public class Icon implements IIcon, IJsonSerializable {
 
     public Icon size(int size) {
         return width(size).height(size);
+    }
+
+    public Icon aspectRatio(float aspectRatio) {
+        this.aspectRatio = aspectRatio;
+        return this;
     }
 
     public Icon alignment(Alignment alignment) {
@@ -148,6 +184,7 @@ public class Icon implements IIcon, IJsonSerializable {
         this.height = (json.has("autoHeight") || json.has("autoSize")) &&
                 JsonHelper.getBoolean(json, true, "autoHeight", "autoSize") ? 0 :
                 JsonHelper.getInt(json, 0, "height", "h", "size");
+        this.aspectRatio = JsonHelper.getFloat(json, 0, "aspectRatio");
         this.alignment = JsonHelper.deserialize(json, Alignment.class, Alignment.Center, "alignment", "align");
         this.margin.fromJson(json);
     }
@@ -161,6 +198,7 @@ public class Icon implements IIcon, IJsonSerializable {
         json.add("drawable", JsonHelper.serialize(this.drawable));
         json.addProperty("width", this.width);
         json.addProperty("height", this.height);
+        json.addProperty("aspectRatio", this.aspectRatio);
         json.add("alignment", JsonHelper.serialize(this.alignment));
         this.margin.toJson(json);
         return true;

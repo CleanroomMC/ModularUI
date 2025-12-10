@@ -11,9 +11,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
-
 import net.minecraftforge.items.wrapper.PlayerInvWrapper;
-
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 
 import org.jetbrains.annotations.ApiStatus;

@@ -433,10 +433,8 @@ public class Flex implements IResizeable, IPositioned<Flex> {
     public boolean resize(IGuiElement guiElement, boolean isParentLayout) {
         IResizeable relativeTo = getRelativeTo();
         Area relativeArea = relativeTo.getArea();
-        byte panelLayer = this.parent.getArea().getPanelLayer();
 
-        if (!this.bypassLayerRestriction && (relativeArea.getPanelLayer() > panelLayer ||
-                (relativeArea.getPanelLayer() == panelLayer && relativeArea.z() >= this.parent.getArea().z()))) {
+        /*if (!this.bypassLayerRestriction && (relativeArea.z() >= this.parent.getArea().z())) {
             Area area = guiElement.getArea();
             area.setSize(18, 18);
             area.rx = 0;
@@ -444,7 +442,7 @@ public class Flex implements IResizeable, IPositioned<Flex> {
             guiElement.resizer().setResized(true);
             GuiError.throwNew(this.parent, GuiError.Type.SIZING, "Widget can't be relative to a widget at the same level or above");
             return true;
-        }
+        }*/
 
         // calculate x, y, width and height if possible
         this.x.apply(guiElement.getArea(), relativeTo, guiElement::getDefaultWidth);

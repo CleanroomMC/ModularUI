@@ -123,6 +123,16 @@ public class RichText implements IDrawable, IRichTextBuilder<RichText> {
         return this;
     }
 
+    public RichText addAll(RichText other) {
+        newLine();
+        this.elements.addAll(this.cursor, other.elements);
+        if (!this.cursorLocked) {
+            this.cursor += other.elements.size();
+        }
+        clearStrings();
+        return this;
+    }
+
     @Override
     public RichText alignment(Alignment alignment) {
         this.alignment = alignment;

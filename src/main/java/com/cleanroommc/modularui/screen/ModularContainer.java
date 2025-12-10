@@ -6,13 +6,13 @@ import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
-import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import com.cleanroommc.bogosorter.api.IPosSetter;
 import com.cleanroommc.bogosorter.api.ISortableContainer;
 import com.cleanroommc.bogosorter.api.ISortingContextBuilder;
 
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
@@ -65,10 +65,10 @@ public class ModularContainer extends Container implements ISortableContainer {
     public ModularContainer() {}
 
     @ApiStatus.Internal
-    public void construct(EntityPlayer player, PanelSyncManager panelSyncManager, UISettings settings, String mainPanelName, GuiData guiData) {
+    public void construct(EntityPlayer player, ModularSyncManager msm, UISettings settings, String mainPanelName, GuiData guiData) {
         this.player = player;
-        this.syncManager = new ModularSyncManager(this);
-        this.syncManager.construct(mainPanelName, panelSyncManager);
+        this.syncManager = msm;
+        this.syncManager.construct(this, mainPanelName);
         this.settings = settings;
         this.guiData = guiData;
         sortShiftClickSlots();
@@ -101,11 +101,21 @@ public class ModularContainer extends Container implements ISortableContainer {
     }
 
     @MustBeInvokedByOverriders
-    @Override
-    public void onContainerClosed(@NotNull EntityPlayer playerIn) {
-        super.onContainerClosed(playerIn);
+    public void onModularContainerOpened() {
         if (this.syncManager != null) {
-            this.syncManager.onClose();
+            this.syncManager.onOpen();
+        }
+    }
+
+    /**
+     * Called when this container closes. This is different to {@link Container#onContainerClosed(EntityPlayer)}, since that one is also
+     * called from {@link GuiContainer#onGuiClosed()}, which means it is called even when the container may still exist.
+     * This happens when a temporary client screen takes over (like JEI,NEI,etc.). This is only called when the container actually closes.
+     */
+    @MustBeInvokedByOverriders
+    public void onModularContainerClosed() {
+        if (this.syncManager != null) {
+            this.syncManager.dispose();
         }
     }
 
@@ -119,7 +129,7 @@ public class ModularContainer extends Container implements ISortableContainer {
         this.init = false;
     }
 
-    @ApiStatus.Internal
+    @MustBeInvokedByOverriders
     public void onUpdate() {
         // detectAndSendChanges is potentially called multiple times per tick, while this method is called exactly once per tick
         if (this.syncManager != null) {
@@ -276,8 +286,9 @@ public class ModularContainer extends Container implements ISortableContainer {
                     if (!heldStack.isEmpty() && clickedSlot.isItemValid(heldStack)) {
                         int stackCount = mouseButton == LEFT_MOUSE ? heldStack.getCount() : 1;
 
-                        if (stackCount > clickedSlot.getItemStackLimit(heldStack)) {
-                            stackCount = clickedSlot.getItemStackLimit(heldStack);
+                        int lim = clickedSlot.getItemStackLimit(heldStack);
+                        if (stackCount > lim) {
+                            stackCount = lim;
                         }
 
                         clickedSlot.putStack(heldStack.splitStack(stackCount));
@@ -295,8 +306,9 @@ public class ModularContainer extends Container implements ISortableContainer {
                                 ItemStack.areItemStackTagsEqual(slotStack, heldStack)) {
                             int stackCount = mouseButton == LEFT_MOUSE ? heldStack.getCount() : 1;
 
-                            if (stackCount > clickedSlot.getItemStackLimit(heldStack) - slotStack.getCount()) {
-                                stackCount = clickedSlot.getItemStackLimit(heldStack) - slotStack.getCount();
+                            int lim = clickedSlot.getItemStackLimit(heldStack);
+                            if (stackCount > lim - slotStack.getCount()) {
+                                stackCount = lim - slotStack.getCount();
                             }
 
                             heldStack.shrink(stackCount);

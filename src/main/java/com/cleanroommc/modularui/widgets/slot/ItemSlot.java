@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.widgets.slot;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.IThemeApi;
+import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiAccessor;
@@ -18,7 +19,6 @@ import com.cleanroommc.modularui.theme.SlotTheme;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
-import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.neverenoughanimations.NEAConfig;
 
@@ -47,10 +47,11 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     private ItemSlotSH syncHandler;
+    private RichTooltip tooltip;
 
     public ItemSlot() {
-        tooltip().setAutoUpdate(true);//.setHasTitleMargin(true);
-        tooltipBuilder(tooltip -> {
+        itemTooltip().setAutoUpdate(true);//.setHasTitleMargin(true);
+        itemTooltip().tooltipBuilder(tooltip -> {
             if (!isSynced()) return;
             ItemStack stack = getSlot().getStack();
             buildTooltip(stack, tooltip);
@@ -66,9 +67,15 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     @Override
-    public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        this.syncHandler = castIfTypeElseNull(syncHandler, ItemSlotSH.class);
-        return this.syncHandler != null;
+    public boolean isValidSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        // disallow null
+        return syncOrValue instanceof ItemSlotSH;
+    }
+
+    @Override
+    protected void setSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        super.setSyncOrValue(syncOrValue);
+        this.syncHandler = syncOrValue.castOrThrow(ItemSlotSH.class);
     }
 
     @Override
@@ -167,6 +174,36 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         return this.syncHandler;
     }
 
+    public RichTooltip getItemTooltip() {
+        return super.getTooltip();
+    }
+
+    public RichTooltip itemTooltip() {
+        return super.tooltip();
+    }
+
+    @Override
+    public @Nullable RichTooltip getTooltip() {
+        if (isSynced() && !getSlot().getStack().isEmpty()) {
+            return getItemTooltip();
+        }
+        return tooltip;
+    }
+
+    @Override
+    public ItemSlot tooltip(RichTooltip tooltip) {
+        this.tooltip = tooltip;
+        return this;
+    }
+
+    @Override
+    public @NotNull RichTooltip tooltip() {
+        if (this.tooltip == null) {
+            this.tooltip = new RichTooltip().parent(this);
+        }
+        return this.tooltip;
+    }
+
     public ItemSlot slot(ModularSlot slot) {
         return syncHandler(new ItemSlotSH(slot));
     }
@@ -176,8 +213,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     public ItemSlot syncHandler(ItemSlotSH syncHandler) {
-        this.syncHandler = syncHandler;
-        setSyncHandler(this.syncHandler);
+        setSyncOrValue(ISyncOrValue.orEmpty(syncHandler));
         return this;
     }
 

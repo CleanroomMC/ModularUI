@@ -14,11 +14,17 @@ With ModularUI you simply call `.child(new FluidSlot().syncHandler(new FluidTank
 - panel system similar to windows
 - widgets are placed in a tree like structure
 - widget rendering and interactions are automatically handled
+- no need to create GUI texture sheets, each widget is rendered dynamically
 - easy and dynamic widget sizing and positioning
-- syncing widget values
+- build in APIs for various UI things like color, stencil (fancy scissor) and animations
+- easy syncing between client and server without
 - good for client only GUIs and client-server synced GUIs
 - GUI themes are loaded via JSON and can be added and modified by resourcepacks
-- JEI compat for things like exclusion zones
+- JEI compat for things like exclusion zones and ghost ingredients
+
+## Planned Features
+- Create JEI recipe handlers with MUI
+- Improved text rendering
 
 ### History
 - First appearance of ModularUI in GTCE by Archengius

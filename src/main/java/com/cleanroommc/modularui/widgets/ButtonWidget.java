@@ -3,12 +3,12 @@ package com.cleanroommc.modularui.widgets;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.UpOrDown;
+import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.value.sync.InteractionSyncHandler;
-import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.SingleChildWidget;
 
 import org.jetbrains.annotations.NotNull;
@@ -42,14 +42,19 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
     private InteractionSyncHandler syncHandler;
 
     @Override
-    public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        this.syncHandler = castIfTypeElseNull(syncHandler, InteractionSyncHandler.class);
-        return this.syncHandler != null;
+    public WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
+        return theme.getButtonTheme();
     }
 
     @Override
-    public WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
-        return theme.getButtonTheme();
+    public boolean isValidSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        return syncOrValue.isTypeOrEmpty(InteractionSyncHandler.class);
+    }
+
+    @Override
+    protected void setSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        super.setSyncOrValue(syncOrValue);
+        this.syncHandler = syncOrValue.castNullable(InteractionSyncHandler.class);
     }
 
     public void playClickSound() {
@@ -166,8 +171,7 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
     }
 
     public W syncHandler(InteractionSyncHandler interactionSyncHandler) {
-        this.syncHandler = interactionSyncHandler;
-        setSyncHandler(interactionSyncHandler);
+        setSyncOrValue(ISyncOrValue.orEmpty(interactionSyncHandler));
         return getThis();
     }
 

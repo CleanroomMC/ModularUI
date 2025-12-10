@@ -59,7 +59,7 @@ public class GLTestGui extends CustomModularScreen {
                                 .coverChildrenHeight()
                                 .child(buildRenderObjectConfig(this.ro1)
                                         .name("config left col"))
-                                .child(new Rectangle().setColor(Color.TEXT_COLOR_DARK).asWidget()
+                                .child(new Rectangle().color(Color.TEXT_COLOR_DARK).asWidget()
                                         .name("separator")
                                         .width(1)
                                         .margin(2, 0)
