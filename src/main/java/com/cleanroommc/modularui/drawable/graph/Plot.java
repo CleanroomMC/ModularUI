@@ -1,11 +1,13 @@
 package com.cleanroommc.modularui.drawable.graph;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.utils.Color;
-import com.cleanroommc.modularui.utils.FloatArrayMath;
+import com.cleanroommc.modularui.utils.DAM;
 import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.MathUtils;
+import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.Platform;
 
 public class Plot {
@@ -21,13 +23,13 @@ public class Plot {
             Color.LIME.main
     };
 
-    float[] xs = FloatArrayMath.EMPTY;
-    float[] ys = FloatArrayMath.EMPTY;
+    double[] xs = DAM.EMPTY;
+    double[] ys = DAM.EMPTY;
     float thickness = 1f;
     boolean defaultColor = true;
     int color;
 
-    private float[] vertexBuffer;
+    private float[] vertexBuffer; // screen coords need to be way less accurate than graph coords, so float is fine
     private boolean dirty = true;
 
     public void redraw() {
@@ -35,6 +37,7 @@ public class Plot {
     }
 
     private void redraw(GraphView view) {
+        long time = System.nanoTime();
         float dHalf = thickness * 0.5f;
 
         int n = xs.length * 4; // each point has 2 offset vertices and each vertex has an x and y component
@@ -136,6 +139,8 @@ public class Plot {
         lpoy = py * dHalf;
 
         storePoints(vertexIndex, view, x1, y1, lpox, lpoy);
+        time = System.nanoTime() - time;
+        ModularUI.LOGGER.error("Calculating vertices from {} data points took {}s", xs.length, NumberFormat.formatNanos(time));
     }
 
     private int storePoints(int index, GraphView view, float sx, float sy, float ox, float oy) {
@@ -149,7 +154,7 @@ public class Plot {
     public void draw(GraphView view) {
         if (xs.length == 0) return;
         if (xs.length == 1) {
-            GuiDraw.drawRect(xs[0] - thickness / 2, ys[0] - thickness / 2, thickness, thickness, color);
+            GuiDraw.drawRect(view.g2sX(xs[0]) - thickness / 2, view.g2sY(ys[0]) - thickness / 2, thickness, thickness, color);
             return;
         }
         if (this.dirty) {
@@ -162,9 +167,12 @@ public class Plot {
         int a = Color.getAlpha(color);
         Platform.setupDrawColor();
         Platform.startDrawing(Platform.DrawMode.TRIANGLE_STRIP, Platform.VertexFormat.POS_COLOR, buffer -> {
+            long time = System.nanoTime();
             for (int i = 0; i < this.vertexBuffer.length; i += 2) {
                 buffer.pos(this.vertexBuffer[i], this.vertexBuffer[i + 1], 0).color(r, g, b, a).endVertex();
             }
+            time = System.nanoTime() - time;
+            ModularUI.LOGGER.error("Drawing plot with {} points took {}s", xs.length, NumberFormat.formatNanos(time));
         });
     }
 
@@ -176,19 +184,19 @@ public class Plot {
         return color;
     }
 
-    public float[] getX() {
+    public double[] getX() {
         return xs;
     }
 
-    public float[] getY() {
+    public double[] getY() {
         return ys;
     }
 
-    public float[] getData(GuiAxis axis) {
+    public double[] getData(GuiAxis axis) {
         return axis.isHorizontal() ? this.xs : this.ys;
     }
 
-    public Plot data(float[] x, float[] y) {
+    public Plot data(double[] x, double[] y) {
         if (x.length != y.length) throw new IllegalArgumentException("X and Y must have the same length!");
         this.xs = x;
         this.ys = y;

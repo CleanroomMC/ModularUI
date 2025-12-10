@@ -6,7 +6,7 @@ import org.jetbrains.annotations.ApiStatus;
 public class AutoMajorTickFinder implements MajorTickFinder {
 
     private final boolean autoAdjust;
-    private float multiple = 10;
+    private double multiple = 10;
 
     public AutoMajorTickFinder(boolean autoAdjust) {
         this.autoAdjust = autoAdjust;
@@ -18,10 +18,10 @@ public class AutoMajorTickFinder implements MajorTickFinder {
     }
 
     @Override
-    public float[] find(float min, float max, float[] ticks) {
+    public double[] find(double min, double max, double[] ticks) {
         int s = (int) Math.ceil((max - min) / multiple) + 2;
-        if (s > ticks.length) ticks = new float[s];
-        float next = (float) (Math.floor(min / multiple) * multiple);
+        if (s > ticks.length) ticks = new double[s];
+        double next = Math.floor(min / multiple) * multiple;
         for (int i = 0; i < s; i++) {
             ticks[i] = next;
             if (next > max) {
@@ -34,17 +34,17 @@ public class AutoMajorTickFinder implements MajorTickFinder {
         return ticks;
     }
 
-    void calculateAutoTickMultiple(float min, float max) {
-        float step = (max - min) / 5;
+    void calculateAutoTickMultiple(double min, double max) {
+        double step = (max - min) / 5;
         if (step < 1) {
             int significantPlaces = (int) Math.abs(Math.log10(step)) + 2;
-            float ten = (float) Math.pow(10, significantPlaces);
+            double ten = Math.pow(10, significantPlaces);
             step = (int) (step * ten + 0.2f) / ten;
         } else if (step == 1) {
             step = 0.2f;
         } else {
             int significantPlaces = (int) Math.log10(step) - 1;
-            float ten = (float) Math.pow(10, significantPlaces);
+            double ten = Math.pow(10, significantPlaces);
             step = (int) (step / ten + 0.2f) * ten;
         }
         setMultiple(step);
@@ -54,7 +54,7 @@ public class AutoMajorTickFinder implements MajorTickFinder {
         return autoAdjust;
     }
 
-    public void setMultiple(float multiple) {
+    public void setMultiple(double multiple) {
         this.multiple = multiple;
     }
 }

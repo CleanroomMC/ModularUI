@@ -21,7 +21,6 @@ public class GraphDrawable implements IDrawable {
     //private IDrawable background;
     private int backgroundColor = Color.WHITE.main;
 
-    private boolean borderTop = true, borderLeft = true, borderBottom = false, borderRight = false;
     private float majorTickThickness = 1f, majorTickLength = 3f, minorTickThickness = 0.5f, minorTickLength = 1.5f;
     private float gridLineWidth = 0.5f;
     private int gridLineColor = Color.withAlpha(Color.BLACK.main, 0.4f);
@@ -188,23 +187,23 @@ public class GraphDrawable implements IDrawable {
         return this;
     }
 
-    public GraphDrawable plot(float[] x, float[] y) {
+    public GraphDrawable plot(double[] x, double[] y) {
         return plot(new Plot().data(x, y));
     }
 
-    public GraphDrawable plot(float[] x, float[] y, int color) {
+    public GraphDrawable plot(double[] x, double[] y, int color) {
         return plot(new Plot()
                 .data(x, y)
                 .color(color));
     }
 
-    public GraphDrawable plot(float[] x, float[] y, float thickness) {
+    public GraphDrawable plot(double[] x, double[] y, float thickness) {
         return plot(new Plot()
                 .data(x, y)
                 .thickness(thickness));
     }
 
-    public GraphDrawable plot(float[] x, float[] y, float thickness, int color) {
+    public GraphDrawable plot(double[] x, double[] y, float thickness, int color) {
         return plot(new Plot()
                 .data(x, y)
                 .thickness(thickness)
@@ -213,6 +212,7 @@ public class GraphDrawable implements IDrawable {
 
     public GraphDrawable plot(Plot plot) {
         this.plots.add(plot);
+        plot.redraw();
         return this;
     }
 

@@ -28,7 +28,7 @@ import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.ColorShade;
-import com.cleanroommc.modularui.utils.FloatArrayMath;
+import com.cleanroommc.modularui.utils.DAM;
 import com.cleanroommc.modularui.utils.GameObjectHelper;
 import com.cleanroommc.modularui.utils.Interpolation;
 import com.cleanroommc.modularui.utils.Interpolations;
@@ -534,9 +534,9 @@ public class TestGuis extends CustomModularScreen {
     }
 
     public static @NotNull ModularPanel buildGraphUI() {
-        float[] x = FloatArrayMath.linspace(-25, 25, 200);
+        double[] x = DAM.linspace(-25, 25, 200);
         // sin(x) / x
-        float[] y1 = FloatArrayMath.div(FloatArrayMath.sin(x, null), x, null);
+        double[] y1 = DAM.div(DAM.sin(x, null), x, null);
         return new ModularPanel("graph")
                 .size(200, 160)
                 .padding(5)

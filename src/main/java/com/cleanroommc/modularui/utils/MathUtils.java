@@ -187,4 +187,15 @@ public class MathUtils {
     public static float sqrt(float v) {
         return (float) Math.sqrt(v);
     }
+
+    public static float arithmeticGeometricMean(float a, float b) {
+        return arithmeticGeometricMean(a, b, 5);
+    }
+
+    public static float arithmeticGeometricMean(float a, float b, int iterations) {
+        a = (a + b) / 2;
+        b = sqrt(a * b);
+        if (--iterations == 0) return a;
+        return arithmeticGeometricMean(a, b, iterations);
+    }
 }

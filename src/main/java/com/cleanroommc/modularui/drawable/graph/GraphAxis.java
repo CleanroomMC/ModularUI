@@ -4,7 +4,7 @@ import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.utils.Alignment;
-import com.cleanroommc.modularui.utils.FloatArrayMath;
+import com.cleanroommc.modularui.utils.DAM;
 
 import net.minecraft.client.renderer.BufferBuilder;
 
@@ -24,14 +24,14 @@ public class GraphAxis {
 
     public final GuiAxis axis;
 
-    public float[] majorTicks = new float[8];
-    public float[] minorTicks = new float[16];
+    public double[] majorTicks = new double[8];
+    public double[] minorTicks = new double[16];
     public TextRenderer.Line[] tickLabels = new TextRenderer.Line[8];
     private float maxLabelWidth = 0;
     public MajorTickFinder majorTickFinder = new AutoMajorTickFinder(true);
     public MinorTickFinder minorTickFinder = new AutoMinorTickFinder(2);
     public String label;
-    public float min, max;
+    public double min, max;
     public boolean autoLimits = true;
 
     public GraphAxis(GuiAxis axis) {
@@ -44,21 +44,21 @@ public class GraphAxis {
                 this.min = 0;
                 this.max = 0;
             } else if (plots.size() == 1) {
-                this.min = FloatArrayMath.min(plots.get(0).getData(this.axis));
-                this.max = FloatArrayMath.max(plots.get(0).getData(this.axis));
+                this.min = DAM.min(plots.get(0).getData(this.axis));
+                this.max = DAM.max(plots.get(0).getData(this.axis));
             } else {
-                float min = Float.MAX_VALUE, max = Float.MIN_VALUE;
+                double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
                 for (Plot plot : plots) {
-                    float m = FloatArrayMath.min(plot.getData(this.axis));
+                    double m = DAM.min(plot.getData(this.axis));
                     if (m < min) min = m;
-                    m = FloatArrayMath.max(plot.getData(this.axis));
+                    m = DAM.max(plot.getData(this.axis));
                     if (m > max) max = m;
                 }
                 this.min = min;
                 this.max = max;
             }
             if (this.axis.isVertical()) {
-                float padding = (this.max - this.min) * 0.05f;
+                double padding = (this.max - this.min) * 0.05f;
                 this.max += padding;
                 this.min -= padding;
             }
@@ -74,12 +74,12 @@ public class GraphAxis {
         }
         textRenderer.setScale(TICK_LABEL_SCALE);
         this.maxLabelWidth = 0;
-        float maxDiff = FloatArrayMath.max(FloatArrayMath.diff(this.majorTicks));
+        double maxDiff = DAM.max(DAM.diff(this.majorTicks));
         int significantPlaces = (int) Math.abs(Math.log10(maxDiff)) + 2;
         DecimalFormat format = new DecimalFormat();
         format.setMaximumFractionDigits(significantPlaces);
         for (int i = 0; i < this.tickLabels.length; i++) {
-            if (Float.isNaN(this.majorTicks[i])) break;
+            if (Double.isNaN(this.majorTicks[i])) break;
             this.tickLabels[i] = textRenderer.line(format.format(this.majorTicks[i]));
             if (this.tickLabels[i].getWidth() > this.maxLabelWidth) {
                 this.maxLabelWidth = this.tickLabels[i].getWidth();
@@ -106,7 +106,7 @@ public class GraphAxis {
     }
 
     void drawGridLines(BufferBuilder buffer, GraphView view, GraphAxis other, boolean major, float d, int r, int g, int b, int a) {
-        float[] pos = major ? this.majorTicks : this.minorTicks;
+        double[] pos = major ? this.majorTicks : this.minorTicks;
         float dHalf = d / 2;
         if (axis.isHorizontal()) {
             float otherMin = view.g2sY(other.max);
@@ -120,7 +120,7 @@ public class GraphAxis {
     }
 
     void drawTicks(BufferBuilder buffer, GraphView view, GraphAxis other, boolean major, float thickness, float length, int r, int g, int b, int a) {
-        float[] pos = major ? this.majorTicks : this.minorTicks;
+        double[] pos = major ? this.majorTicks : this.minorTicks;
         float dHalf = thickness / 2;
         if (axis.isHorizontal()) {
             float otherMin = view.g2sY(other.min);
@@ -131,30 +131,30 @@ public class GraphAxis {
         }
     }
 
-    private void drawLinesOnHorizontal(BufferBuilder buffer, GraphView view, float[] pos, float dHalf,
+    private void drawLinesOnHorizontal(BufferBuilder buffer, GraphView view, double[] pos, float dHalf,
                                        float crossLow, float crossHigh, int r, int g, int b, int a) {
-        for (float p : pos) {
-            if (Float.isNaN(p)) break;
+        for (double p : pos) {
+            if (Double.isNaN(p)) break;
             if (p < min || p > max) continue;
 
-            p = view.g2sX(p);
+            float fp = view.g2sX(p);
 
-            float x0 = p - dHalf;
-            float x1 = p + dHalf;
+            float x0 = fp - dHalf;
+            float x1 = fp + dHalf;
             GuiDraw.drawRectRaw(buffer, x0, crossLow, x1, crossHigh, r, g, b, a);
         }
     }
 
-    private void drawLinesOnVertical(BufferBuilder buffer, GraphView view, float[] pos, float dHalf,
+    private void drawLinesOnVertical(BufferBuilder buffer, GraphView view, double[] pos, float dHalf,
                                      float crossLow, float crossHigh, int r, int g, int b, int a) {
-        for (float p : pos) {
-            if (Float.isNaN(p)) break;
+        for (double p : pos) {
+            if (Double.isNaN(p)) break;
             if (p < min || p > max) continue;
 
-            p = view.g2sY(p);
+            float fp = view.g2sY(p);
 
-            float y0 = p - dHalf;
-            float y1 = p + dHalf;
+            float y0 = fp - dHalf;
+            float y1 = fp + dHalf;
             GuiDraw.drawRectRaw(buffer, crossLow, y0, crossHigh, y1, r, g, b, a);
         }
     }
@@ -166,8 +166,8 @@ public class GraphAxis {
             textRenderer.setAlignment(Alignment.TopCenter, 100);
             float y = view.g2sY(other.min) + TICK_LABEL_OFFSET;
             for (int i = 0; i < this.majorTicks.length; i++) {
-                float pos = this.majorTicks[i];
-                if (Float.isNaN(pos)) break;
+                double pos = this.majorTicks[i];
+                if (Double.isNaN(pos)) break;
                 if (pos < min || pos > max) continue;
                 textRenderer.setPos((int) (view.g2sX(pos) - 50), (int) y);
                 textRenderer.draw(this.tickLabels[i].getText());
@@ -177,8 +177,8 @@ public class GraphAxis {
             textRenderer.setAlignment(Alignment.CenterRight, this.maxLabelWidth, 20);
             float x = view.g2sX(other.min) - TICK_LABEL_OFFSET - this.maxLabelWidth;
             for (int i = 0; i < this.majorTicks.length; i++) {
-                float pos = this.majorTicks[i];
-                if (Float.isNaN(pos)) break;
+                double pos = this.majorTicks[i];
+                if (Double.isNaN(pos)) break;
                 if (pos < min || pos > max) continue;
                 textRenderer.setPos((int) x, (int) (view.g2sY(pos) - 10));
                 textRenderer.draw(this.tickLabels[i].getText());
@@ -190,11 +190,11 @@ public class GraphAxis {
         return axis;
     }
 
-    public float getMax() {
+    public double getMax() {
         return max;
     }
 
-    public float getMin() {
+    public double getMin() {
         return min;
     }
 

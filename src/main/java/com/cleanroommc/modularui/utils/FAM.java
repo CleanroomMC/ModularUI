@@ -6,8 +6,9 @@ import java.util.Arrays;
 
 /**
  * A helper class providing math operations on 1D float arrays similar to numpy.
+ * FAM stands for FloatArrayMath.
  */
-public class FloatArrayMath {
+public class FAM {
 
     public static final float[] EMPTY = new float[0];
 
@@ -56,6 +57,24 @@ public class FloatArrayMath {
     public static float[] subArray(float[] src, int start, int length) {
         float[] res = new float[length];
         System.arraycopy(src, start, res, 0, length);
+        return res;
+    }
+
+    public static float[] ofDoubles(double[] src) {
+        float[] res = new float[src.length];
+        for (int i = 0; i < src.length; i++) res[i] = (float) src[i];
+        return res;
+    }
+
+    public static float[] ofInts(int[] src) {
+        float[] res = new float[src.length];
+        for (int i = 0; i < src.length; i++) res[i] = src[i];
+        return res;
+    }
+
+    public static float[] ofLongs(long[] src) {
+        float[] res = new float[src.length];
+        for (int i = 0; i < src.length; i++) res[i] = src[i];
         return res;
     }
 
@@ -174,6 +193,10 @@ public class FloatArrayMath {
         return applyEach(src, v -> v + op, res);
     }
 
+    public static float[] plusMut(float[] src, float op) {
+        return plus(src, op, src);
+    }
+
     /**
      * Adds each element of the operand to the element at the corresponding index of the source array.
      *
@@ -184,6 +207,10 @@ public class FloatArrayMath {
      */
     public static float[] plus(float[] src, float[] op, float @Nullable [] res) {
         return applyEach(src, op, Float::sum, res);
+    }
+
+    public static float[] plusMut(float[] src, float[] op) {
+        return plus(src, op, src);
     }
 
     /**
@@ -198,16 +225,48 @@ public class FloatArrayMath {
         return applyEach(src, v -> v * op, res);
     }
 
+    public static float[] multMut(float[] src, float op) {
+        return mult(src, op, src);
+    }
+
     public static float[] mult(float[] src, float[] op, float @Nullable [] res) {
         return applyEach(src, op, (v, op1) -> v * op1, res);
+    }
+
+    public static float[] multMut(float[] src, float[] op) {
+        return mult(src, op, src);
     }
 
     public static float[] div(float[] src, float op, float @Nullable [] res) {
         return mult(src, 1 / op, res);
     }
 
+    public static float[] divMut(float[] src, float op) {
+        return div(src, op, src);
+    }
+
     public static float[] div(float[] src, float[] op, float @Nullable [] res) {
         return applyEach(src, op, (v, op1) -> v / op1, res);
+    }
+
+    public static float[] divMut(float[] src, float[] op) {
+        return div(src, op, src);
+    }
+
+    public static float[] reciprocal(float a, float[] b, float @Nullable [] res) {
+        return applyEach(b, v -> a / v, res);
+    }
+
+    public static float[] square(float[] src, float @Nullable [] res) {
+        return applyEach(src, v -> v * v, res);
+    }
+
+    public static float[] cube(float[] src, float @Nullable [] res) {
+        return applyEach(src, v -> v * v * v, res);
+    }
+
+    public static float[] pow(float[] src, float op, float @Nullable [] res) {
+        return applyEach(src, v -> (float) Math.pow(v, op), res);
     }
 
     public static float[] diff(float[] src) {
@@ -287,6 +346,64 @@ public class FloatArrayMath {
             }
             return y;
         }, res);
+    }
+
+    public static float reduce(float[] src, BinaryFloatOperator op) {
+        if (src.length == 0) return 0;
+        if (src.length == 1) return src[0];
+        float res = op.apply(src[0], src[1]);
+        if (src.length == 2) return res;
+        for (int i = 2; i < src.length; i++) {
+            res = op.apply(res, src[i]);
+        }
+        return res;
+    }
+
+    public static float[] reverse(float[] src, float @Nullable [] res) {
+        if (res == null) res = new float[src.length];
+        for (int i = 0; i < src.length; i++) {
+            res[i] = src[src.length - i - 1];
+        }
+        return res;
+    }
+
+    public static float sum(float[] src) {
+        return reduce(src, Float::sum);
+    }
+
+    public static float product(float[] src) {
+        return reduce(src, (f1, f2) -> f1 * f2);
+    }
+
+    public static float arithmeticMean(float[] src) {
+        return sum(src) / src.length;
+    }
+
+    public static float geometricMean(float[] src) {
+        return (float) Math.pow(product(src), 1f / src.length);
+    }
+
+    public static float[] concat(float[] a, float[] b) {
+        float[] res = new float[a.length + b.length];
+        System.arraycopy(a, 0, res, 0, a.length);
+        System.arraycopy(b, 0, res, a.length, b.length);
+        return res;
+    }
+
+    public static float[] flatten(float[]... src) {
+        if (src.length == 0) return EMPTY;
+        if (src.length == 1) return src[0];
+        if (src.length == 2) return concat(src[0], src[1]);
+        int n = 0;
+        for (float[] floats : src) n += floats.length;
+        if (n == 0) return EMPTY;
+        float[] res = new float[n];
+        n = 0;
+        for (float[] floats : src) {
+            System.arraycopy(floats, 0, res, n, floats.length);
+            n += floats.length;
+        }
+        return res;
     }
 
     public interface UnaryFloatOperator {

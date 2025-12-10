@@ -1,17 +1,15 @@
 package com.cleanroommc.modularui.drawable.graph;
 
-import com.cleanroommc.modularui.utils.Interpolations;
-
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Experimental
 public class GraphView {
 
     float aspectRatio = 0;
-    // screen rectangle
+    // screen rectangle (float since range is usually in order 1e3)
     float sx0, sy0, sx1, sy1;
-    // graph rectangle
-    float gx0, gy0, gx1, gy1;
+    // graph rectangle (double since range and accuracy can be anything)
+    double gx0, gy0, gx1, gy1;
 
     float zeroX, zeroY;
 
@@ -45,7 +43,7 @@ public class GraphView {
         return false;
     }
 
-    void setGraph(float x0, float y0, float x1, float y1) {
+    void setGraph(double x0, double y0, double x1, double y1) {
         this.gx0 = x0;
         this.gy0 = y0;
         this.gx1 = x1;
@@ -54,40 +52,40 @@ public class GraphView {
         this.zeroY = g2sY(0);
     }
 
-    public float g2sX(float v) {
-        return transform(v, gx0, gx1, sx0, sx1);
+    public float g2sX(double v) {
+        return (float) transform(v, gx0, gx1, sx0, sx1);
     }
 
-    public float g2sY(float v) {
+    public float g2sY(double v) {
         // gy0 and gy1 inverted on purpose
         // screen y0 is top, graph y0 is bottom
-        return transform(v, gy1, gy0, sy0, sy1);
+        return (float) transform(v, gy1, gy0, sy0, sy1);
     }
 
-    public float g2sScaleX() {
+    public double g2sScaleX() {
         return scale(gx0, gx1, sx0, sx1);
     }
 
-    public float g2sScaleY() {
+    public double g2sScaleY() {
         return scale(gy1, gy0, sy0, sy1);
     }
 
-    public float s2gX(float v) {
+    public double s2gX(float v) {
         return transform(v, sx0, sx1, gx0, gx1);
     }
 
-    public float s2gY(float v) {
+    public double s2gY(float v) {
         // gy0 and gy1 inverted on purpose
         // screen y0 is top, graph y0 is bottom
         return transform(v, sy0, sy1, gy1, gy0);
     }
 
-    private float transform(float v, float fromMin, float fromMax, float toMin, float toMax) {
+    private double transform(double v, double fromMin, double fromMax, double toMin, double toMax) {
         v = (v - fromMin) / (fromMax - fromMin); // reverse lerp
-        return Interpolations.lerp(toMin, toMax, v);
+        return toMin + (toMax - toMin) * v;
     }
 
-    private float scale(float fromMin, float fromMax, float toMin, float toMax) {
+    private double scale(double fromMin, double fromMax, double toMin, double toMax) {
         return (toMax - toMin) / (fromMax - fromMin);
     }
 
@@ -107,19 +105,19 @@ public class GraphView {
         return aspectRatio;
     }
 
-    public float getGraphX0() {
+    public double getGraphX0() {
         return gx0;
     }
 
-    public float getGraphX1() {
+    public double getGraphX1() {
         return gx1;
     }
 
-    public float getGraphY0() {
+    public double getGraphY0() {
         return gy0;
     }
 
-    public float getGraphY1() {
+    public double getGraphY1() {
         return gy1;
     }
 
@@ -147,11 +145,11 @@ public class GraphView {
         return sy1 - sy0;
     }
 
-    public float getGraphWidth() {
+    public double getGraphWidth() {
         return gx1 - gx0;
     }
 
-    public float getGraphHeight() {
+    public double getGraphHeight() {
         return gy1 - gy0;
     }
 }
