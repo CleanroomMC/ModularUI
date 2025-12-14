@@ -171,6 +171,11 @@ public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
     }
 
     @Override
+    public boolean hasSyncHandler(SyncHandler syncHandler) {
+        return this.mainPSM.hasSyncHandler(syncHandler);
+    }
+
+    @Override
     public ModularSyncManager syncValue(String name, int id, SyncHandler syncHandler) {
         this.mainPSM.syncValue(name, id, syncHandler);
         return this;

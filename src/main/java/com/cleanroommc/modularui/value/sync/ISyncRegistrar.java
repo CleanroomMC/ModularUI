@@ -17,6 +17,8 @@ import java.util.function.Supplier;
 
 public interface ISyncRegistrar<S extends ISyncRegistrar<S>> {
 
+    boolean hasSyncHandler(SyncHandler syncHandler);
+
     default S syncValue(String name, SyncHandler syncHandler) {
         return syncValue(name, 0, syncHandler);
     }

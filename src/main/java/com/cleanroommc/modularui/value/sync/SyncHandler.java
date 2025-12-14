@@ -178,6 +178,10 @@ public abstract class SyncHandler implements ISyncOrValue {
         return this.syncManager;
     }
 
+    public final boolean isRegistered() {
+        return isValid() && this.syncManager.hasSyncHandler(this);
+    }
+
     @Override
     public boolean isSyncHandler() {
         return true;
