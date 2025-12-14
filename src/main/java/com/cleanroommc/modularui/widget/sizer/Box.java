@@ -17,6 +17,7 @@ public class Box implements IAnimatable<Box> {
 
     public static final Box SHARED = new Box();
     public static final Box ZERO = new Box();
+    public static final Box ONE = new Box().all(1);
 
     protected int left;
     protected int top;
