@@ -129,6 +129,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
     @Override
     public ModularPanel buildUI(PosGuiData guiData, PanelSyncManager syncManager, UISettings settings) {
         settings.customContainer(() -> new CraftingModularContainer(3, 3, this.craftingInventory));
+        settings.customGui(() -> TestGuiContainer::new);
 
         syncManager.registerSlotGroup("item_inv", 3);
         syncManager.registerSlotGroup("mixer_items", 2);

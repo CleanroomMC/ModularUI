@@ -20,8 +20,7 @@ import java.util.function.Consumer;
 
 public class NetworkUtils {
 
-    public static final Consumer<PacketBuffer> EMPTY_PACKET = buffer -> {
-    };
+    public static final Consumer<PacketBuffer> EMPTY_PACKET = buffer -> {};
 
     public static final boolean DEDICATED_CLIENT = FMLCommonHandler.instance().getSide().isClient();
 
@@ -34,7 +33,7 @@ public class NetworkUtils {
     }
 
     public static boolean isClient(EntityPlayer player) {
-        if (player == null) throw new NullPointerException("Can't get side of null player!");
+        if (player == null) return isClient();
         return player.world == null ? player instanceof EntityPlayerSP : player.world.isRemote;
     }
 
