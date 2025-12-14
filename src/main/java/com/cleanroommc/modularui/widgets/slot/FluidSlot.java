@@ -132,13 +132,9 @@ public class FluidSlot extends AbstractFluidDisplayWidget<FluidSlot> implements 
     public void drawOverlay(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         super.drawOverlay(context, widgetTheme);
         if (ModularUI.Mods.JEI.isLoaded() && (ModularUIJeiPlugin.draggingValidIngredient(this) || ModularUIJeiPlugin.hoveringOverIngredient(this))) {
-            GlStateManager.colorMask(true, true, true, false);
             drawHighlight(getArea(), isHovering());
-            GlStateManager.colorMask(true, true, true, true);
         } else if (isHovering()) {
-            GlStateManager.colorMask(true, true, true, false);
             GuiDraw.drawRect(1, 1, getArea().w() - 2, getArea().h() - 2, getSlotHoverColor());
-            GlStateManager.colorMask(true, true, true, true);
         }
     }
 

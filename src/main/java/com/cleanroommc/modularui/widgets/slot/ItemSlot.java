@@ -92,16 +92,18 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         if (this.syncHandler == null) return;
         RenderHelper.enableGUIStandardItemLighting();
         drawSlot(getSlot());
-        RenderHelper.enableStandardItemLighting();
         GlStateManager.disableLighting();
+    }
+
+    @Override
+    public void drawOverlay(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
+        super.drawOverlay(context, widgetTheme);
         drawOverlay();
     }
 
     protected void drawOverlay() {
         if (isHovering() && (!ModularUI.Mods.NEA.isLoaded() || NEAConfig.itemHoverOverlay)) {
-            GlStateManager.colorMask(true, true, true, false);
             GuiDraw.drawRect(1, 1, 16, 16, getSlotHoverColor());
-            GlStateManager.colorMask(true, true, true, true);
         }
     }
 
@@ -226,7 +228,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         RenderItem renderItem = ((GuiScreenAccessor) guiScreen).getItemRender();
         ItemStack itemstack = slotIn.getStack();
         boolean isDragPreview = false;
-        boolean flag1 = slotIn == acc.getClickedSlot() && !acc.getDraggedStack().isEmpty() && !acc.getIsRightMouseClick();
+        boolean doDrawItem = slotIn == acc.getClickedSlot() && !acc.getDraggedStack().isEmpty() && !acc.getIsRightMouseClick();
         ItemStack itemstack1 = guiScreen.mc.player.inventory.getItemStack();
         int amount = -1;
         String format = null;
@@ -263,9 +265,9 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         ((GuiAccessor) guiScreen).setZLevel(z);
         renderItem.zLevel = z;
 
-        if (!flag1) {
+        if (!doDrawItem) {
             if (isDragPreview) {
-                GuiDraw.drawRect(1, 1, 16, 16, -2130706433);
+                GuiDraw.drawRect(1, 1, 16, 16, 0x80FFFFFF);
             }
 
             itemstack = NEAAnimationHandler.injectVirtualStack(itemstack, guiContainer, slotIn);

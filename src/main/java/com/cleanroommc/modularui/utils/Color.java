@@ -822,7 +822,6 @@ public class Color {
      */
     @SideOnly(Side.CLIENT)
     public static void resetGlColor() {
-        GlStateManager.colorMask(true, true, true, true);
         setGlColorOpaque(WHITE.main);
     }
 
