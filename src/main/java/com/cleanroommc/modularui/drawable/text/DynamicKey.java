@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
-public class DynamicKey extends BaseKey {
+public class DynamicKey extends BaseKey<DynamicKey> {
 
     private final Supplier<IKey> supplier;
 

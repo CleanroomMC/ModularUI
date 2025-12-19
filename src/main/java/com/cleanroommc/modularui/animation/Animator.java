@@ -150,7 +150,7 @@ public class Animator extends BaseAnimator<Animator> implements IAnimator {
 
     /**
      * The duration of this animation in milliseconds. Note this is not 100% accurate.
-     * Usually it's plus minus 2ms, but can rarely be more.
+     * Usually it's ±2ms, but can rarely be more.
      *
      * @param duration duration in milliseconds
      * @return this

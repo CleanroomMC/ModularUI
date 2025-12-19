@@ -7,7 +7,7 @@ import net.minecraft.util.text.TextFormatting;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class BaseKey implements IKey {
+public abstract class BaseKey<K extends BaseKey<K>> implements IKey {
 
     private FormattingState formatting;
 
@@ -17,26 +17,31 @@ public abstract class BaseKey implements IKey {
     }
 
     @Override
-    public BaseKey style(@Nullable TextFormatting formatting) {
+    public K style(@Nullable TextFormatting formatting) {
         if (this.formatting == null) {
             this.formatting = new FormattingState();
         }
         if (formatting == null) this.formatting.forceDefaultColor();
         else this.formatting.add(formatting, false);
-        return this;
+        return getThis();
     }
 
     @Override
-    public IKey removeStyle() {
+    public K removeStyle() {
         if (this.formatting != null) {
             this.formatting.reset();
         }
-        return this;
+        return getThis();
     }
 
     @Override
     public @Nullable FormattingState getFormatting() {
         return formatting;
+    }
+
+    @SuppressWarnings("unchecked")
+    public K getThis() {
+        return (K) this;
     }
 
     @Override

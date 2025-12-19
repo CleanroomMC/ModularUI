@@ -4,7 +4,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public class StringKey extends BaseKey {
+public class StringKey extends BaseKey<StringKey> {
 
     private final String string;
     private final Object[] args;

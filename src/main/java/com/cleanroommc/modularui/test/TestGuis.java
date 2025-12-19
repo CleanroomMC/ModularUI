@@ -17,6 +17,7 @@ import com.cleanroommc.modularui.drawable.Rectangle;
 import com.cleanroommc.modularui.drawable.SpriteDrawable;
 import com.cleanroommc.modularui.drawable.UITexture;
 import com.cleanroommc.modularui.drawable.graph.GraphDrawable;
+import com.cleanroommc.modularui.drawable.text.StyledText;
 import com.cleanroommc.modularui.factory.ClientGUI;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
 import com.cleanroommc.modularui.screen.ModularPanel;
@@ -79,6 +80,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Supplier;
 
 public class TestGuis extends CustomModularScreen {
 
@@ -565,6 +567,79 @@ public class TestGuis extends CustomModularScreen {
                                 .asWidget().size(80)
                                 .overlay(IKey.str("4:3 | height = 45\nBottom Right"))))
                 .overlay();
+    }
+
+    public static @NotNull ModularPanel buildStyledTextUI() {
+        Animator alignmentAnimator = new Animator()
+                .bounds(0.0f, 8.0f)
+                .curve(Interpolation.LINEAR)
+                .repeatsOnFinish(-1)
+                .duration(8000);
+
+        Supplier<Alignment> alignmentSupplier = () -> {
+            float val = alignmentAnimator.getValue();
+            if (val > 7) {
+                return Alignment.BottomLeft;
+            } else if (val > 6) {
+                return Alignment.BottomCenter;
+            } else if (val > 5) {
+                return Alignment.BottomRight;
+            } else if (val > 4) {
+                return Alignment.CenterRight;
+            } else if (val > 3) {
+                return Alignment.TopRight;
+            } else if (val > 2) {
+                return Alignment.TopCenter;
+            } else if (val > 1) {
+                return Alignment.TopLeft;
+            }
+
+            return Alignment.CenterLeft;
+        };
+
+        alignmentAnimator.reset();
+        alignmentAnimator.animate();
+
+        Animator colorAnimator = new Animator()
+                .bounds(0.0f, 360.0f)
+                .curve(Interpolation.LINEAR)
+                .repeatsOnFinish(-1)
+                .duration(360 * 5);
+
+        colorAnimator.reset();
+        colorAnimator.animate();
+
+        Animator scaleAnimator = new Animator()
+                .bounds(1.0f, 2.0f)
+                .curve(Interpolation.SINE_INOUT)
+                .reverseOnFinish(true)
+                .repeatsOnFinish(-1)
+                .duration(1500);
+
+        scaleAnimator.reset();
+        scaleAnimator.animate();
+
+        Animator shadowAnimator = new Animator()
+                .bounds(0.0f, 1.0f)
+                .curve(Interpolation.LINEAR)
+                .repeatsOnFinish(-1)
+                .duration(750);
+
+        shadowAnimator.reset();
+        shadowAnimator.animate();
+
+        StyledText<?> key = IKey.str("Hello, World!")
+                .alignment(alignmentSupplier)
+                .color(() -> Color.ofHSV(colorAnimator.getValue(), 1.0f, 1.0f))
+                .scale(scaleAnimator::getValue)
+                .shadow(() -> shadowAnimator.getValue() > 0.5f);
+
+        return new ModularPanel("StyledText")
+                .size(150)
+                .child(key.asWidget()
+                        .margin(4)
+                        .align(Alignment.CENTER)
+                        .full());
     }
 
     private static class TestPanel extends ModularPanel {

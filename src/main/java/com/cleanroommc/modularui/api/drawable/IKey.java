@@ -14,6 +14,7 @@ import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.FloatSupplier;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widgets.TextWidget;
 
@@ -25,6 +26,7 @@ import com.google.gson.JsonObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
@@ -242,15 +244,15 @@ public interface IKey extends IDrawable, IJsonSerializable {
     }
 
     default float getScale() {
-        return 1f;
+        return 1.0f;
     }
 
     default TextWidget<?> asWidget() {
         return new TextWidget<>(this);
     }
 
-    default StyledText withStyle() {
-        return new StyledText(this);
+    default StyledText<?> withStyle() {
+        return new StyledText<>(this);
     }
 
     default AnimatedText withAnimation() {
@@ -284,23 +286,35 @@ public interface IKey extends IDrawable, IJsonSerializable {
 
     IKey removeStyle();
 
-    default StyledText alignment(Alignment alignment) {
+    default StyledText<?> alignment(@Nullable Alignment alignment) {
         return withStyle().alignment(alignment);
     }
 
-    default StyledText color(int color) {
+    default StyledText<?> alignment(@Nullable Supplier<@NotNull Alignment> alignment) {
+        return withStyle().alignment(alignment);
+    }
+
+    default StyledText<?> color(int color) {
         return withStyle().color(() -> color);
     }
 
-    default StyledText color(@Nullable IntSupplier color) {
+    default StyledText<?> color(@Nullable IntSupplier color) {
         return withStyle().color(color);
     }
 
-    default StyledText scale(float scale) {
+    default StyledText<?> scale(float scale) {
         return withStyle().scale(scale);
     }
 
-    default StyledText shadow(@Nullable Boolean shadow) {
+    default StyledText<?> scale(@Nullable FloatSupplier scale) {
+        return withStyle().scale(scale);
+    }
+
+    default StyledText<?> shadow(@Nullable Boolean shadow) {
+        return withStyle().shadow(shadow);
+    }
+
+    default StyledText<?> shadow(@Nullable BooleanSupplier shadow) {
         return withStyle().shadow(shadow);
     }
 
@@ -316,7 +330,7 @@ public interface IKey extends IDrawable, IJsonSerializable {
     @Override
     default void loadFromJson(JsonObject json) {
         if (json.has("color") || json.has("shadow") || json.has("align") || json.has("alignment") || json.has("scale")) {
-            StyledText styledText = this instanceof StyledText styledText1 ? styledText1 : withStyle();
+            StyledText<?> styledText = this instanceof StyledText<?> styledText1 ? styledText1 : withStyle();
             if (json.has("color")) {
                 styledText.color(JsonHelper.getInt(json, 0, "color"));
             }

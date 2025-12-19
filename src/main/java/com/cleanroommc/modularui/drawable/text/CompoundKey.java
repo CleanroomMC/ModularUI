@@ -2,11 +2,9 @@ package com.cleanroommc.modularui.drawable.text;
 
 import com.cleanroommc.modularui.api.drawable.IKey;
 
-import net.minecraft.util.text.TextFormatting;
-
 import org.jetbrains.annotations.Nullable;
 
-public class CompoundKey extends BaseKey {
+public class CompoundKey extends BaseKey<CompoundKey> {
 
     private static final IKey[] EMPTY = new IKey[0];
 

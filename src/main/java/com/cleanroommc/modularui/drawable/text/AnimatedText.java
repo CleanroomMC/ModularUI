@@ -3,18 +3,12 @@ package com.cleanroommc.modularui.drawable.text;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.utils.Alignment;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.IntSupplier;
-
-public class AnimatedText extends StyledText {
+public class AnimatedText extends StyledText<AnimatedText> {
 
     private String fullString;
     private String currentString = "";
@@ -102,36 +96,6 @@ public class AnimatedText extends StyledText {
     public AnimatedText forward(boolean forward) {
         this.forward = forward;
         return this;
-    }
-
-    @Override
-    public AnimatedText style(TextFormatting formatting) {
-        return (AnimatedText) super.style(formatting);
-    }
-
-    @Override
-    public AnimatedText alignment(Alignment alignment) {
-        return (AnimatedText) super.alignment(alignment);
-    }
-
-    @Override
-    public AnimatedText color(int color) {
-        return color(() -> color);
-    }
-
-    @Override
-    public AnimatedText color(@Nullable IntSupplier color) {
-        return (AnimatedText) super.color(color);
-    }
-
-    @Override
-    public AnimatedText scale(float scale) {
-        return (AnimatedText) super.scale(scale);
-    }
-
-    @Override
-    public AnimatedText shadow(@Nullable Boolean shadow) {
-        return (AnimatedText) super.shadow(shadow);
     }
 
     /**
