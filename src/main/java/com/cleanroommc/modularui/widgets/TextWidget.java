@@ -6,24 +6,32 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.FloatSupplier;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Box;
 
 import net.minecraft.util.text.TextFormatting;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.function.BooleanSupplier;
 import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 
 public class TextWidget<W extends TextWidget<W>> extends Widget<W> {
 
     private final IKey key;
-    private Alignment alignment = Alignment.CenterLeft;
+    @NotNull
+    private Supplier<@NotNull Alignment> alignment = () -> Alignment.Center;
+    @Nullable
     private IntSupplier color = null;
-    private Boolean shadow = null;
-    private float scale = 1f;
+    @Nullable
+    private BooleanSupplier shadow = null;
+    @Nullable
+    private FloatSupplier scale = null;
     private int maxWidth = -1;
 
     private String lastText = null;
@@ -43,10 +51,10 @@ public class TextWidget<W extends TextWidget<W>> extends Widget<W> {
         String text = checkString();
         WidgetTheme theme = getActiveWidgetTheme(widgetTheme, isHovering());
         renderer.setColor(this.color != null ? this.color.getAsInt() : theme.getTextColor());
-        renderer.setAlignment(this.alignment, getArea().paddedWidth() + this.scale, getArea().paddedHeight());
-        renderer.setShadow(this.shadow != null ? this.shadow : theme.getTextShadow());
+        renderer.setAlignment(getAlignment(), getArea().paddedWidth() + getScale(), getArea().paddedHeight());
+        renderer.setShadow(this.shadow != null ? this.shadow.getAsBoolean() : theme.getTextShadow());
         renderer.setPos(getArea().getPadding().getLeft(), getArea().getPadding().getTop());
-        renderer.setScale(this.scale);
+        renderer.setScale(getScale());
         renderer.setSimulate(false);
         renderer.draw(text);
     }
@@ -70,7 +78,7 @@ public class TextWidget<W extends TextWidget<W>> extends Widget<W> {
         TextRenderer renderer = TextRenderer.SHARED;
         renderer.setAlignment(Alignment.TopLeft, maxWidth);
         renderer.setPos(padding.getLeft(), padding.getTop());
-        renderer.setScale(this.scale);
+        renderer.setScale(getScale());
         renderer.setSimulate(true);
         renderer.draw(getTextForDefaultSize());
         renderer.setSimulate(false);
@@ -81,11 +89,11 @@ public class TextWidget<W extends TextWidget<W>> extends Widget<W> {
     public int getDefaultHeight() {
         float maxWidth;
         if (resizer().isWidthCalculated()) {
-            maxWidth = getArea().width + this.scale;
+            maxWidth = getArea().width + getScale();
         } else if (this.maxWidth > 0) {
             maxWidth = Math.max(this.maxWidth, 5);
         } else if (getParent().resizer().isWidthCalculated()) {
-            maxWidth = getParent().getArea().width + this.scale;
+            maxWidth = getParent().getArea().width + getScale();
         } else {
             maxWidth = getScreen().getScreenArea().width;
         }
@@ -143,12 +151,16 @@ public class TextWidget<W extends TextWidget<W>> extends Widget<W> {
         return this.key;
     }
 
-    public Alignment getAlignment() {
-        return this.alignment;
+    public @NotNull Alignment getAlignment() {
+        return this.alignment.get();
+    }
+
+    public @Nullable FloatSupplier getScaleSupplier() {
+        return this.scale;
     }
 
     public float getScale() {
-        return this.scale;
+        return this.scale == null ? 1.0f : this.scale.getAsFloat();
     }
 
     public @Nullable IntSupplier getColor() {
@@ -156,11 +168,15 @@ public class TextWidget<W extends TextWidget<W>> extends Widget<W> {
     }
 
     public @Nullable Boolean isShadow() {
-        return this.shadow;
+        return this.shadow == null ? null : this.shadow.getAsBoolean();
     }
 
-    public W alignment(Alignment alignment) {
-        this.alignment = alignment;
+    public W alignment(@Nullable Alignment alignment) {
+        return alignment(alignment == null ? null : () -> alignment);
+    }
+
+    public W alignment(@Nullable Supplier<@NotNull Alignment> alignment) {
+        this.alignment = alignment == null ? () -> Alignment.Center : alignment;
         return getThis();
     }
 
@@ -174,11 +190,24 @@ public class TextWidget<W extends TextWidget<W>> extends Widget<W> {
     }
 
     public W scale(float scale) {
+        return scale(() -> scale);
+    }
+
+    public W scale(@Nullable FloatSupplier scale) {
         this.scale = scale;
         return getThis();
     }
 
     public W shadow(@Nullable Boolean shadow) {
+        if (shadow == null) {
+            return shadow((BooleanSupplier) null);
+        } else {
+            boolean hasShadow = shadow;
+            return shadow(() -> hasShadow);
+        }
+    }
+
+    public W shadow(@Nullable BooleanSupplier shadow) {
         this.shadow = shadow;
         return getThis();
     }

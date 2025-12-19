@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-public class LangKey extends BaseKey {
+public class LangKey extends BaseKey<LangKey> {
 
     private final Supplier<String> keySupplier;
     private final Supplier<Object[]> argsSupplier;
