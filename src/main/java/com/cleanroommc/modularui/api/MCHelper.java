@@ -58,8 +58,8 @@ public class MCHelper {
     public static void popScreen(boolean openParentOnClose, GuiScreen parent) {
         EntityPlayer player = MCHelper.getPlayer();
         if (player != null) {
-            // TODO: should we really close container here?
-            prepareCloseContainer(player);
+            // container should not just be closed here, however this means the gui stack only works with client only screens (except the root)
+            // TODO: figure out the necessity of a Container stack
             if (openParentOnClose) {
                 Minecraft.getMinecraft().displayGuiScreen(parent);
             } else {
