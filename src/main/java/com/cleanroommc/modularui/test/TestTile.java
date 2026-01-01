@@ -359,7 +359,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                 //.marginBottom(2)
                                                                 .child(new SortButtons()
                                                                         .slotGroup("item_inv")
-                                                                        .right(0).top(-11)))
+                                                                        .right(0).bottomRelOffset(1f, 1)))
                                                         .child(SlotGroupWidget.builder()
                                                                 .row("FII")
                                                                 .row("FII")

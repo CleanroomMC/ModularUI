@@ -1,11 +1,12 @@
 package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import com.cleanroommc.bogosorter.api.IBogoSortAPI;
+import com.cleanroommc.bogosorter.common.sort.ButtonHandler;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -22,6 +23,27 @@ public class SortButtons extends Widget<SortButtons> {
     private final ButtonWidget<?> settingsButton = new ButtonWidget<>();
     private final List<IWidget> children = Arrays.asList(sortButton, settingsButton);
 
+    public SortButtons() {
+        if (NetworkUtils.isDedicatedClient() && ModularUI.Mods.BOGOSORTER.isLoaded()) {
+            this.sortButton.size(10).pos(0, 0)
+                    .background(ButtonHandler.BUTTON_BACKGROUND)
+                    .overlay(ButtonHandler.BUTTON_SORT)
+                    .disableHoverBackground()
+                    .onMousePressed(mouseButton -> {
+                        IBogoSortAPI.getInstance().sortSlotGroup(this.slotGroup.getSlots().get(0));
+                        return true;
+                    });
+            this.settingsButton.size(10)
+                    .background(ButtonHandler.BUTTON_BACKGROUND)
+                    .overlay(ButtonHandler.BUTTON_SETTINGS)
+                    .disableHoverBackground()
+                    .onMousePressed(mouseButton -> {
+                        IBogoSortAPI.getInstance().openConfigGui();
+                        return true;
+                    });
+        }
+    }
+
     @Override
     public void onInit() {
         super.onInit();
@@ -29,18 +51,6 @@ public class SortButtons extends Widget<SortButtons> {
         if (!this.slotGroup.isAllowSorting()) {
             throw new IllegalStateException("Slot group can't be sorted!");
         }
-        this.sortButton.size(10).pos(0, 0)
-                .overlay(IKey.str("z"))
-                .onMousePressed(mouseButton -> {
-                    IBogoSortAPI.getInstance().sortSlotGroup(this.slotGroup.getSlots().get(0));
-                    return true;
-                });
-        this.settingsButton.size(10)
-                .overlay(IKey.str("..."))
-                .onMousePressed(mouseButton -> {
-                    IBogoSortAPI.getInstance().openConfigGui();
-                    return true;
-                });
         if (this.horizontal) {
             size(20, 10);
             this.settingsButton.pos(10, 0);
