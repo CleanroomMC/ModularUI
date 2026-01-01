@@ -27,6 +27,9 @@ dependencies {
     embed2('org.joml:joml:1.10.8') { transitive = false }
     embedSources("org.joml:joml:1.10.8:sources") { transitive = false }
 
+    compileOnlyApi rfg.deobf("curse.maven:inventory-bogosorter-632327:7403680-sources-7403683")
+    //runtimeOnly rfg.deobf('curse.maven:key_binding_patch-928895:5951859')
+
     implementation(rfg.deobf("curse.maven:baubles-227083:2518667"))
     compileOnlyApi rfg.deobf("curse.maven:neverenoughanimation-1062347:6533650-sources-6533651")
     testImplementation rfg.deobf("curse.maven:neverenoughanimation-1062347:6533650-sources-6533651")

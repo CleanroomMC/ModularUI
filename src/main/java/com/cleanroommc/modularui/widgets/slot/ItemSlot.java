@@ -20,6 +20,7 @@ import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 import com.cleanroommc.modularui.widget.Widget;
+import com.cleanroommc.bogosorter.common.lock.SlotLock;
 import com.cleanroommc.neverenoughanimations.NEAConfig;
 
 import net.minecraft.client.gui.GuiScreen;
@@ -139,19 +140,25 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @Override
     public @NotNull Result onMousePressed(int mouseButton) {
-        ClientScreenHandler.clickSlot(getScreen(), getSlot());
+        if (!isLockedByBogosorter()) {
+            ClientScreenHandler.clickSlot(getScreen(), getSlot());
+        }
         return Result.SUCCESS;
     }
 
     @Override
     public boolean onMouseRelease(int mouseButton) {
-        ClientScreenHandler.releaseSlot();
+        if (!isLockedByBogosorter()) {
+            ClientScreenHandler.releaseSlot();
+        }
         return true;
     }
 
     @Override
     public void onMouseDrag(int mouseButton, long timeSinceClick) {
-        ClientScreenHandler.dragSlot(timeSinceClick);
+        if (!isLockedByBogosorter()) {
+            ClientScreenHandler.dragSlot(timeSinceClick);
+        }
     }
 
     public ModularSlot getSlot() {
@@ -297,6 +304,14 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
         ((GuiAccessor) guiScreen).setZLevel(0f);
         renderItem.zLevel = 0f;
+
+        if (isLockedByBogosorter()) {
+            SlotLock.drawLock(1, 1, 16, 16);
+        }
+    }
+
+    public boolean isLockedByBogosorter() {
+        return ModularUI.Mods.BOGOSORTER.isLoaded() && ModularSlot.isPlayerSlot(getSlot()) && SlotLock.getClientCap().isSlotLocked(getSlot().getSlotIndex());
     }
 
     @Override
