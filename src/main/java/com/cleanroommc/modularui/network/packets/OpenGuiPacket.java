@@ -19,28 +19,28 @@ import java.io.IOException;
 
 public class OpenGuiPacket<T extends GuiData> implements IPacket {
 
-    private int windowId;
+    private int networkId;
     private UIFactory<T> factory;
     private PacketBuffer data;
 
     public OpenGuiPacket() {}
 
-    public OpenGuiPacket(int windowId, UIFactory<T> factory, PacketBuffer data) {
-        this.windowId = windowId;
+    public OpenGuiPacket(int networkId, UIFactory<T> factory, PacketBuffer data) {
+        this.networkId = networkId;
         this.factory = factory;
         this.data = data;
     }
 
     @Override
     public void write(PacketBuffer buf) throws IOException {
-        buf.writeVarInt(this.windowId);
+        buf.writeVarInt(this.networkId);
         buf.writeString(this.factory.getFactoryName());
         NetworkUtils.writeByteBuf(buf, this.data);
     }
 
     @Override
     public void read(PacketBuffer buf) {
-        this.windowId = buf.readVarInt();
+        this.networkId = buf.readVarInt();
         this.factory = (UIFactory<T>) GuiManager.getFactory(buf.readString(32));
         this.data = NetworkUtils.readPacketBuffer(buf);
     }
@@ -48,7 +48,7 @@ public class OpenGuiPacket<T extends GuiData> implements IPacket {
     @SideOnly(Side.CLIENT)
     @Override
     public @Nullable IPacket executeClient(NetHandlerPlayClient handler) {
-        GuiManager.openFromClient(this.windowId, this.factory, this.data, Platform.getClientPlayer());
+        GuiManager.openFromClient(this.networkId, this.factory, this.data, Platform.getClientPlayer());
         return null;
     }
 

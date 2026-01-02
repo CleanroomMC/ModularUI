@@ -3,14 +3,12 @@ package com.cleanroommc.modularui.value.sync;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.ISyncedAction;
-import com.cleanroommc.modularui.network.NetworkHandler;
-import com.cleanroommc.modularui.network.packets.PacketSyncHandler;
+import com.cleanroommc.modularui.network.ModularNetwork;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
@@ -316,12 +314,7 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
 
     public void callSyncedAction(String mapKey, PacketBuffer packet) {
         if (invokeSyncedAction(mapKey, packet)) {
-            PacketSyncHandler packetSyncHandler = new PacketSyncHandler(this.panelName, mapKey, true, packet);
-            if (isClient()) {
-                NetworkHandler.sendToServer(packetSyncHandler);
-            } else {
-                NetworkHandler.sendToPlayer(packetSyncHandler, (EntityPlayerMP) getPlayer());
-            }
+            ModularNetwork.get(isClient()).sendActionPacket(getModularSyncManager(), this.panelName, mapKey, packet, getPlayer());
         }
     }
 

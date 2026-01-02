@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.RecipeViewerSettings;
 import com.cleanroommc.modularui.api.UIFactory;
+import com.cleanroommc.modularui.network.ModularNetwork;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.packets.OpenGuiPacket;
 import com.cleanroommc.modularui.screen.GuiContainerWrapper;
@@ -87,6 +88,7 @@ public class GuiManager {
         int windowId = player.currentWindowId;
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         factory.writeGuiData(guiData, buffer);
+        ModularNetwork.SERVER.activate(windowId, msm);
         NetworkHandler.sendToPlayer(new OpenGuiPacket<>(windowId, factory, buffer), player);
         // open container // this mimics forge behaviour
         player.openContainer = container;
@@ -116,6 +118,7 @@ public class GuiManager {
         }
         if (guiContainer.inventorySlots != container) throw new IllegalStateException("Custom Containers are not yet allowed!");
         guiContainer.inventorySlots.windowId = windowId;
+        ModularNetwork.CLIENT.activate(windowId, msm);
         MCHelper.displayScreen(wrapper.getGuiScreen());
         player.openContainer = guiContainer.inventorySlots;
     }

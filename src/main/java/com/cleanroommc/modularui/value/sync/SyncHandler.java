@@ -2,10 +2,8 @@ package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.api.IPacketWriter;
 import com.cleanroommc.modularui.api.value.ISyncOrValue;
-import com.cleanroommc.modularui.network.NetworkHandler;
-import com.cleanroommc.modularui.network.packets.PacketSyncHandler;
+import com.cleanroommc.modularui.network.ModularNetwork;
 
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -91,11 +89,7 @@ public abstract class SyncHandler implements ISyncOrValue {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        if (getSyncManager().isClient()) {
-            sendToServer(getSyncManager().getPanelName(), buffer, this);
-        } else {
-            sendToClient(getSyncManager().getPanelName(), buffer, this);
-        }
+        send(ModularNetwork.get(getSyncManager().isClient()), getSyncManager().getPanelName(), buffer, this);
     }
 
     /**
@@ -162,7 +156,7 @@ public abstract class SyncHandler implements ISyncOrValue {
     }
 
     /**
-     * @return is this sync handler has been initialised yet
+     * @return is this sync handler has been initialized yet
      */
     public final boolean isValid() {
         return this.key != null && this.syncManager != null;
@@ -187,21 +181,21 @@ public abstract class SyncHandler implements ISyncOrValue {
         return true;
     }
 
-    public static void sendToClient(String panel, PacketBuffer buffer, SyncHandler syncHandler) {
+    private static void send(ModularNetwork network, String panel, PacketBuffer buffer, SyncHandler syncHandler) {
         Objects.requireNonNull(buffer);
         Objects.requireNonNull(syncHandler);
         if (!syncHandler.isValid()) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Not initialized sync handlers can't send packets!");
         }
-        NetworkHandler.sendToPlayer(new PacketSyncHandler(panel, syncHandler.getKey(), false, buffer), (EntityPlayerMP) syncHandler.syncManager.getPlayer());
+        network.sendSyncHandlerPacket(panel, syncHandler, buffer, syncHandler.syncManager.getPlayer());
     }
 
+    public static void sendToClient(String panel, PacketBuffer buffer, SyncHandler syncHandler) {
+        send(ModularNetwork.SERVER, panel, buffer, syncHandler);
+    }
+
+    @SideOnly(Side.CLIENT)
     public static void sendToServer(String panel, PacketBuffer buffer, SyncHandler syncHandler) {
-        Objects.requireNonNull(buffer);
-        Objects.requireNonNull(syncHandler);
-        if (!syncHandler.isValid()) {
-            throw new IllegalStateException();
-        }
-        NetworkHandler.sendToServer(new PacketSyncHandler(panel, syncHandler.getKey(), false, buffer));
+        send(ModularNetwork.CLIENT, panel, buffer, syncHandler);
     }
 }

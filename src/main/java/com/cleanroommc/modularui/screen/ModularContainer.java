@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.screen;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.core.mixins.early.minecraft.ContainerAccessor;
 import com.cleanroommc.modularui.factory.GuiData;
+import com.cleanroommc.modularui.network.ModularNetwork;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
@@ -113,6 +114,7 @@ public class ModularContainer extends Container {
     public void onModularContainerClosed() {
         if (this.syncManager != null) {
             this.syncManager.dispose();
+            ModularNetwork.get(this.player).deactivate(this.syncManager);
         }
     }
 
