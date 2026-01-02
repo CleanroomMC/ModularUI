@@ -2,11 +2,17 @@ package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.drawable.GuiTextures;
+import com.cleanroommc.modularui.drawable.UITexture;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.widget.Widget;
+import com.cleanroommc.modularui.widget.WidgetTree;
+import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import com.cleanroommc.bogosorter.api.IBogoSortAPI;
 import com.cleanroommc.bogosorter.common.sort.ButtonHandler;
+
+import net.minecraft.inventory.Slot;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -14,6 +20,20 @@ import java.util.Arrays;
 import java.util.List;
 
 public class SortButtons extends Widget<SortButtons> {
+
+    public static final UITexture HOVER_SORT_OVERLAY;
+    public static final UITexture HOVER_SETTINGS_OVERLAY;
+
+    static {
+        if (NetworkUtils.isDedicatedClient() && ModularUI.Mods.BOGOSORTER.isLoaded()) {
+            HOVER_SORT_OVERLAY = ButtonHandler.BUTTON_SORT.withColorOverride(16777120);
+            HOVER_SETTINGS_OVERLAY = ButtonHandler.BUTTON_SETTINGS.withColorOverride(16777120);
+        } else {
+            // any non null value
+            HOVER_SORT_OVERLAY = GuiTextures.BLOCK;
+            HOVER_SETTINGS_OVERLAY = GuiTextures.BLOCK;
+        }
+    }
 
     private String slotGroupName;
     private SlotGroup slotGroup;
@@ -28,14 +48,16 @@ public class SortButtons extends Widget<SortButtons> {
             this.sortButton.size(10).pos(0, 0)
                     .background(ButtonHandler.BUTTON_BACKGROUND)
                     .overlay(ButtonHandler.BUTTON_SORT)
+                    .hoverOverlay(HOVER_SORT_OVERLAY)
                     .disableHoverBackground()
                     .onMousePressed(mouseButton -> {
-                        IBogoSortAPI.getInstance().sortSlotGroup(this.slotGroup.getSlots().get(0));
+                        sort();
                         return true;
                     });
             this.settingsButton.size(10)
                     .background(ButtonHandler.BUTTON_BACKGROUND)
                     .overlay(ButtonHandler.BUTTON_SETTINGS)
+                    .hoverOverlay(HOVER_SETTINGS_OVERLAY)
                     .disableHoverBackground()
                     .onMousePressed(mouseButton -> {
                         IBogoSortAPI.getInstance().openConfigGui();
@@ -44,12 +66,42 @@ public class SortButtons extends Widget<SortButtons> {
         }
     }
 
+    public void sort() {
+        SlotGroup slotGroup = findFirstSlotGroup();
+        if (slotGroup != null) {
+            Slot slot = slotGroup.getFirstSlotForSorting();
+            if (slot != null) {
+                IBogoSortAPI.getInstance().sortSlotGroup(slot);
+            }
+        }
+    }
+
+    public SlotGroup findFirstSlotGroup() {
+        if (!isValid()) return null;
+        if (this.slotGroup != null) return this.slotGroup;
+        SlotGroupWidget sgw = findSlotGroupParent();
+        for (IWidget child : sgw.getChildren()) {
+            if (child instanceof ItemSlot itemSlot) {
+                SlotGroup sg = itemSlot.getSlot().getSlotGroup();
+                if (sg != null && sg.isAllowSorting()) return sg;
+            }
+        }
+        return null;
+    }
+
+    public SlotGroupWidget findSlotGroupParent() {
+        SlotGroupWidget sgw = WidgetTree.findParent(this, SlotGroupWidget.class);
+        if (sgw == null) {
+            throw new IllegalArgumentException("If the sort buttons don't have a SlotGroupWidget above itself in the widget tree, then it needs a slot group or name specified. Both were not found.");
+        }
+        return sgw;
+    }
+
     @Override
     public void onInit() {
         super.onInit();
-        this.slotGroup = getScreen().getContainer().validateSlotGroup(getPanel().getName(), this.slotGroupName, this.slotGroup);
-        if (!this.slotGroup.isAllowSorting()) {
-            throw new IllegalStateException("Slot group can't be sorted!");
+        if (this.slotGroup != null || this.slotGroupName != null) {
+            this.slotGroup = getScreen().getContainer().validateSlotGroup(getPanel().getName(), this.slotGroupName, this.slotGroup);
         }
         if (this.horizontal) {
             size(20, 10);
@@ -57,6 +109,16 @@ public class SortButtons extends Widget<SortButtons> {
         } else {
             size(10, 20);
             this.settingsButton.pos(0, 10);
+        }
+    }
+
+    @Override
+    public void beforeResize(boolean onOpen) {
+        super.beforeResize(onOpen);
+        // we need to do this after init to make sure the slots are also initialized
+        if (findFirstSlotGroup() == null) {
+            // silently hide buttons if no slot group is found
+            setEnabled(false);
         }
     }
 

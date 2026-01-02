@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.value.sync;
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.ISyncedAction;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
+import com.cleanroommc.modularui.widgets.slot.PlayerSlotGroup;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -82,16 +83,15 @@ public interface ISyncRegistrar<S extends ISyncRegistrar<S>> {
     }
 
     default S bindPlayerInventory(EntityPlayer player, @NotNull PanelSyncManager.SlotFunction slotFunction) {
-        if (getSlotGroup(ModularSyncManager.PLAYER_INVENTORY) != null) {
+        if (getSlotGroup(PlayerSlotGroup.NAME) != null) {
             throw new IllegalStateException("The player slot group is already registered!");
         }
         PlayerMainInvWrapper playerInventory = new PlayerMainInvWrapper(player.inventory);
         String key = "player";
         for (int i = 0; i < 36; i++) {
-            itemSlot(key, i, slotFunction.apply(playerInventory, i).slotGroup(ModularSyncManager.PLAYER_INVENTORY));
+            itemSlot(key, i, slotFunction.apply(playerInventory, i).slotGroup(PlayerSlotGroup.NAME));
         }
-        // player inv sorting is handled by bogosorter
-        registerSlotGroup(new SlotGroup(ModularSyncManager.PLAYER_INVENTORY, 9, SlotGroup.PLAYER_INVENTORY_PRIO, true).setAllowSorting(false));
+        registerSlotGroup(new PlayerSlotGroup(PlayerSlotGroup.NAME));
         return (S) this;
     }
 
