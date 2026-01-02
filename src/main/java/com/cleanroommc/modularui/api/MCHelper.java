@@ -3,15 +3,14 @@ package com.cleanroommc.modularui.api;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.network.NetworkUtils;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.client.CPacketCloseWindow;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -30,13 +29,15 @@ import java.util.List;
 public class MCHelper {
 
     public static boolean hasMc() {
-        return getMc() != null;
+        return NetworkUtils.isDedicatedClient() && getMc() != null;
     }
 
+    @SideOnly(Side.CLIENT)
     public static @Nullable Minecraft getMc() {
         return Minecraft.getMinecraft();
     }
 
+    @SideOnly(Side.CLIENT)
     public static @Nullable EntityPlayer getPlayer() {
         if (hasMc()) {
             return getMc().player;
@@ -44,22 +45,19 @@ public class MCHelper {
         return null;
     }
 
+    @SideOnly(Side.CLIENT)
     public static boolean closeScreen() {
         if (!hasMc()) return false;
-        EntityPlayer player = getPlayer();
-        if (player != null) {
-            player.closeScreen();
-            return true;
-        }
         Minecraft.getMinecraft().displayGuiScreen(null);
         return false;
     }
 
+    @SideOnly(Side.CLIENT)
     public static void popScreen(boolean openParentOnClose, GuiScreen parent) {
         EntityPlayer player = MCHelper.getPlayer();
         if (player != null) {
-            // container should not just be closed here, however this means the gui stack only works with client only screens (except the root)
-            // TODO: figure out the necessity of a Container stack
+            // container should not just be closed here
+            // instead they are kept in a stack until all screens are closed
             if (openParentOnClose) {
                 Minecraft.getMinecraft().displayGuiScreen(parent);
             } else {
@@ -72,13 +70,6 @@ public class MCHelper {
     }
 
     @SideOnly(Side.CLIENT)
-    private static void prepareCloseContainer(EntityPlayer entityPlayer) {
-        EntityPlayerSP player = (EntityPlayerSP) entityPlayer;
-        player.connection.sendPacket(new CPacketCloseWindow(player.openContainer.windowId));
-        player.openContainer = player.inventoryContainer;
-        player.inventory.setItemStack(ItemStack.EMPTY);
-    }
-
     public static boolean displayScreen(GuiScreen screen) {
         Minecraft mc = getMc();
         if (mc != null) {
@@ -88,11 +79,13 @@ public class MCHelper {
         return false;
     }
 
+    @SideOnly(Side.CLIENT)
     public static GuiScreen getCurrentScreen() {
         Minecraft mc = getMc();
         return mc != null ? mc.currentScreen : null;
     }
 
+    @SideOnly(Side.CLIENT)
     public static FontRenderer getFontRenderer() {
         if (hasMc()) return getMc().fontRenderer;
         return null;

@@ -14,6 +14,7 @@ import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccesso
 import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.Stencil;
+import com.cleanroommc.modularui.network.ModularNetwork;
 import com.cleanroommc.modularui.overlay.OverlayManager;
 import com.cleanroommc.modularui.overlay.OverlayStack;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -216,6 +217,8 @@ public class ClientScreenHandler {
         } else if (newScreen == null) {
             // closing -> clear stack and dispose every screen
             invalidateMuiStack();
+            // only when all screens are closed dispose all containers in the stack
+            ModularNetwork.CLIENT.closeAll();
         }
 
         OverlayManager.onGuiOpen(newScreen);

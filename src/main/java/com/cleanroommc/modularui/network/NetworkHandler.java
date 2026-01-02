@@ -1,6 +1,8 @@
 package com.cleanroommc.modularui.network;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.network.packets.CloseAllGuiPacket;
+import com.cleanroommc.modularui.network.packets.CloseGuiPacket;
 import com.cleanroommc.modularui.network.packets.OpenGuiPacket;
 import com.cleanroommc.modularui.network.packets.PacketSyncHandler;
 import com.cleanroommc.modularui.network.packets.SClipboard;
@@ -24,11 +26,13 @@ public class NetworkHandler {
 
     public static void init() {
         registerS2C(SClipboard.class);
-        registerS2C(PacketSyncHandler.class);
-        registerC2S(PacketSyncHandler.class);
+
         registerC2S(SyncConfig.class);
-        registerS2C(OpenGuiPacket.class);
-        registerC2S(OpenGuiPacket.class);
+
+        registerBoth(OpenGuiPacket.class);
+        registerBoth(CloseGuiPacket.class);
+        registerBoth(CloseAllGuiPacket.class);
+        registerBoth(PacketSyncHandler.class);
     }
 
     private static void registerC2S(Class<? extends IPacket> clazz) {
@@ -37,6 +41,11 @@ public class NetworkHandler {
 
     private static void registerS2C(Class<? extends IPacket> clazz) {
         CHANNEL.registerMessage(S2CHandler, clazz, packetId++, Side.CLIENT);
+    }
+
+    private static void registerBoth(Class<? extends IPacket> clazz) {
+        registerS2C(clazz);
+        registerC2S(clazz);
     }
 
     public static void sendToServer(IPacket packet) {

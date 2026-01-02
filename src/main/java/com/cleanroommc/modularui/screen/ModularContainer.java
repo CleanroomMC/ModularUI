@@ -3,7 +3,6 @@ package com.cleanroommc.modularui.screen;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.core.mixins.early.minecraft.ContainerAccessor;
 import com.cleanroommc.modularui.factory.GuiData;
-import com.cleanroommc.modularui.network.ModularNetwork;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
@@ -98,25 +97,16 @@ public class ModularContainer extends Container {
         return (ContainerAccessor) this;
     }
 
-    @MustBeInvokedByOverriders
-    public void onModularContainerOpened() {
-        if (this.syncManager != null) {
-            this.syncManager.onOpen();
-        }
-    }
+    public void onModularContainerOpened() {}
 
     /**
      * Called when this container closes. This is different to {@link Container#onContainerClosed(EntityPlayer)}, since that one is also
      * called from {@link GuiContainer#onGuiClosed()}, which means it is called even when the container may still exist.
      * This happens when a temporary client screen takes over (like JEI,NEI,etc.). This is only called when the container actually closes.
      */
-    @MustBeInvokedByOverriders
-    public void onModularContainerClosed() {
-        if (this.syncManager != null) {
-            this.syncManager.dispose();
-            ModularNetwork.get(this.player).deactivate(this.syncManager);
-        }
-    }
+    public void onModularContainerClosed() {}
+
+    public void onModularContainerDisposed() {}
 
     @MustBeInvokedByOverriders
     @Override

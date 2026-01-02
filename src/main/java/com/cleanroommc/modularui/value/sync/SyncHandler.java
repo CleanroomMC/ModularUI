@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.value.sync;
 import com.cleanroommc.modularui.api.IPacketWriter;
 import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.network.ModularNetwork;
+import com.cleanroommc.modularui.network.ModularNetworkSide;
 
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.relauncher.Side;
@@ -181,7 +182,7 @@ public abstract class SyncHandler implements ISyncOrValue {
         return true;
     }
 
-    private static void send(ModularNetwork network, String panel, PacketBuffer buffer, SyncHandler syncHandler) {
+    private static void send(ModularNetworkSide network, String panel, PacketBuffer buffer, SyncHandler syncHandler) {
         Objects.requireNonNull(buffer);
         Objects.requireNonNull(syncHandler);
         if (!syncHandler.isValid()) {

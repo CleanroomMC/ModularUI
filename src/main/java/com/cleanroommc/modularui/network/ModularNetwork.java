@@ -1,98 +1,97 @@
 package com.cleanroommc.modularui.network;
 
-import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.network.packets.PacketSyncHandler;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
-import com.cleanroommc.modularui.value.sync.SyncHandler;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
+import org.jetbrains.annotations.ApiStatus;
 
-import java.io.IOException;
-
+@ApiStatus.Experimental
 public abstract class ModularNetwork {
 
     // These need to be separate instances, otherwise they would access the same maps in singleplayer.
-    @SideOnly(Side.CLIENT)
-    public static final ModularNetwork CLIENT = new ModularNetwork(true) {
+    // You have to make sure you are choosing the logical side you are currently on otherwise you can mess things badly, since
+    // there is no validation.
+    public static final Client CLIENT = new Client();
+    public static final Server SERVER = new Server();
+
+    public static ModularNetworkSide get(boolean client) {
+        return client ? CLIENT : SERVER;
+    }
+
+    public static ModularNetworkSide get(Side side) {
+        return side.isClient() ? CLIENT : SERVER;
+    }
+
+    public static ModularNetworkSide get(EntityPlayer player) {
+        return get(NetworkUtils.isClient(player));
+    }
+
+    public static final class Client extends ModularNetworkSide {
+
+        private Client() {
+            super(true);
+        }
+
+        public void activate(int nid, ModularSyncManager msm) {
+            activateInternal(nid, msm);
+        }
+
         @Override
-        protected void sendPacket(IPacket packet, EntityPlayer player) {
+        void sendPacket(IPacket packet, EntityPlayer player) {
             NetworkHandler.sendToServer(packet);
         }
-    };
-    public static final ModularNetwork SERVER = new ModularNetwork(false) {
+
+        @Override
+        void closeContainer(EntityPlayer player) {
+            // mimics EntityPlayerSP.closeScreenAndDropStack() but without closing the screen
+            player.inventory.setItemStack(ItemStack.EMPTY);
+            player.openContainer = player.inventoryContainer;
+        }
+
+        @SideOnly(Side.CLIENT)
+        public void closeContainer(int networkId, boolean dispose, EntityPlayerSP player) {
+            closeContainer(networkId, dispose, player, true);
+        }
+
+        @SideOnly(Side.CLIENT)
+        public void closeAll() {
+            closeAll(Minecraft.getMinecraft().player);
+        }
+    }
+
+    public static final class Server extends ModularNetworkSide {
+
+        private int nextId = -1;
+
+        private Server() {
+            super(false);
+        }
+
+        public int activate(ModularSyncManager msm) {
+            if (++nextId > 100_000) nextId = 0;
+            activateInternal(nextId, msm);
+            return nextId;
+        }
+
         @Override
         protected void sendPacket(IPacket packet, EntityPlayer player) {
             NetworkHandler.sendToPlayer(packet, (EntityPlayerMP) player);
         }
-    };
 
-    public static ModularNetwork get(boolean client) {
-        return client ? CLIENT : SERVER;
-    }
-
-    public static ModularNetwork get(Side side) {
-        return side.isClient() ? CLIENT : SERVER;
-    }
-
-    public static ModularNetwork get(EntityPlayer player) {
-        return get(NetworkUtils.isClient(player));
-    }
-
-    private final boolean client;
-    private final Int2ReferenceOpenHashMap<ModularSyncManager> activeScreens = new Int2ReferenceOpenHashMap<>();
-    private final Reference2IntOpenHashMap<ModularSyncManager> inverseActiveScreens = new Reference2IntOpenHashMap<>();
-
-    private ModularNetwork(boolean client) {
-        this.client = client;
-    }
-
-    public boolean isClient() {
-        return client;
-    }
-
-    protected abstract void sendPacket(IPacket packet, EntityPlayer player);
-
-    public void activate(int networkId, ModularSyncManager manager) {
-        if (activeScreens.containsKey(networkId)) throw new IllegalStateException("Network ID " + networkId + " is already active.");
-        activeScreens.put(networkId, manager);
-        inverseActiveScreens.put(manager, networkId);
-    }
-
-    public void deactivate(ModularSyncManager manager) {
-        int id = inverseActiveScreens.removeInt(manager);
-        activeScreens.remove(id);
-    }
-
-    public void receivePacket(PacketSyncHandler packet) {
-        ModularSyncManager msm = activeScreens.get(packet.networkId);
-        if (msm == null) return; // silently discard packets for inactive screens
-        try {
-            int id = packet.action ? 0 : packet.packet.readVarInt();
-            msm.receiveWidgetUpdate(packet.panel, packet.key, packet.action, id, packet.packet);
-        } catch (IndexOutOfBoundsException e) {
-            ModularUI.LOGGER.error("Failed to read packet for sync handler {} in panel {}", packet.key, packet.panel);
-        } catch (IOException e) {
-            ModularUI.LOGGER.throwing(e);
+        @Override
+        void closeContainer(EntityPlayer player) {
+            ((EntityPlayerMP) player).closeContainer();
         }
-    }
 
-    public void sendSyncHandlerPacket(String panel, SyncHandler syncHandler, PacketBuffer buffer, EntityPlayer player) {
-        ModularSyncManager msm = syncHandler.getSyncManager().getModularSyncManager();
-        if (!inverseActiveScreens.containsKey(msm)) return;
-        int id = inverseActiveScreens.getInt(msm);
-        sendPacket(new PacketSyncHandler(id, panel, syncHandler.getKey(), false, buffer), player);
-    }
-
-    public void sendActionPacket(ModularSyncManager msm, String panel, String key, PacketBuffer buffer, EntityPlayer player) {
-        if (!inverseActiveScreens.containsKey(msm)) return;
-        int id = inverseActiveScreens.getInt(msm);
-        sendPacket(new PacketSyncHandler(id, panel, key, true, buffer), player);
+        public void closeContainer(int networkId, boolean dispose, EntityPlayerMP player) {
+            closeContainer(networkId, dispose, player, true);
+        }
     }
 }
