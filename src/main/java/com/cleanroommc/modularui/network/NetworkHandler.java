@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.network.packets.CloseAllGuiPacket;
 import com.cleanroommc.modularui.network.packets.CloseGuiPacket;
 import com.cleanroommc.modularui.network.packets.OpenGuiPacket;
 import com.cleanroommc.modularui.network.packets.PacketSyncHandler;
+import com.cleanroommc.modularui.network.packets.ReopenGuiPacket;
 import com.cleanroommc.modularui.network.packets.SClipboard;
 import com.cleanroommc.modularui.network.packets.SyncConfig;
 
@@ -30,6 +31,7 @@ public class NetworkHandler {
         registerC2S(SyncConfig.class);
 
         registerBoth(OpenGuiPacket.class);
+        registerBoth(ReopenGuiPacket.class);
         registerBoth(CloseGuiPacket.class);
         registerBoth(CloseAllGuiPacket.class);
         registerBoth(PacketSyncHandler.class);

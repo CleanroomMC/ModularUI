@@ -4,12 +4,15 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.network.packets.CloseAllGuiPacket;
 import com.cleanroommc.modularui.network.packets.CloseGuiPacket;
 import com.cleanroommc.modularui.network.packets.PacketSyncHandler;
+import com.cleanroommc.modularui.network.packets.ReopenGuiPacket;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 
 import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
@@ -114,5 +117,21 @@ public abstract class ModularNetworkSide {
             inverseActiveScreens.removeInt(msm);
             msm.dispose();
         }
+    }
+
+    @ApiStatus.Internal
+    public void reopen(EntityPlayer player, ModularSyncManager msm, boolean sync) {
+        if (player.openContainer != msm.getContainer()) {
+            closeContainer(player);
+            player.openContainer = msm.getContainer();
+            msm.onOpen();
+            MinecraftForge.EVENT_BUS.post(new PlayerContainerEvent.Open(player, msm.getContainer()));
+        }
+        if (sync) sendPacket(new ReopenGuiPacket(inverseActiveScreens.getInt(msm)), player);
+    }
+
+    @ApiStatus.Internal
+    public void reopen(EntityPlayer player, int networkId, boolean sync) {
+        reopen(player, activeScreens.get(networkId), sync);
     }
 }

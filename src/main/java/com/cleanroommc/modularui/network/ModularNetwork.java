@@ -1,9 +1,11 @@
 package com.cleanroommc.modularui.network;
 
+import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -63,6 +65,14 @@ public abstract class ModularNetwork {
         @SideOnly(Side.CLIENT)
         public void closeAll() {
             closeAll(Minecraft.getMinecraft().player);
+        }
+
+        @SideOnly(Side.CLIENT)
+        public void reopenSyncerOf(GuiScreen guiScreen) {
+            if (guiScreen instanceof IMuiScreen ms && !ms.getScreen().isClientOnly()) {
+                ModularSyncManager msm = ms.getScreen().getSyncManager();
+                reopen(Minecraft.getMinecraft().player, msm, true);
+            }
         }
     }
 

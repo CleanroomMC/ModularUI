@@ -90,7 +90,7 @@ public class GuiManager {
         factory.writeGuiData(guiData, buffer);
         int nid = ModularNetwork.SERVER.activate(msm);
         NetworkHandler.sendToPlayer(new OpenGuiPacket<>(windowId, nid, factory, buffer), player);
-        // open container // this mimics forge behaviour
+        // open container // this mimics forge behavior
         player.openContainer = container;
         player.openContainer.windowId = windowId;
         player.openContainer.addListener(player);
