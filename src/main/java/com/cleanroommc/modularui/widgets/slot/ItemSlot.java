@@ -20,6 +20,7 @@ import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 import com.cleanroommc.modularui.widget.Widget;
+import com.cleanroommc.bogosorter.common.config.PlayerConfig;
 import com.cleanroommc.bogosorter.common.lock.SlotLock;
 import com.cleanroommc.neverenoughanimations.NEAConfig;
 
@@ -249,7 +250,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                     return;
                 }
 
-                if (Container.canAddItemToSlot(slotIn, itemstack1, true) && getScreen().getContainer().canDragIntoSlot(slotIn)) {
+                if (Container.canAddItemToSlot(slotIn, itemstack1, true) && getScreen().getContainer().canDragIntoSlot(slotIn) &&
+                        (!ModularUI.Mods.BOGOSORTER.isLoaded() || PlayerConfig.getClient().onlyBlockSorting || !SlotLock.getClientCap().isSlotLocked(slotIn))) {
                     itemstack = itemstack1.copy();
                     isDragPreview = true;
                     Container.computeStackSize(acc.getDragSplittingSlots(), acc.getDragSplittingLimit(), itemstack, slotIn.getStack().isEmpty() ? 0 : slotIn.getStack().getCount());

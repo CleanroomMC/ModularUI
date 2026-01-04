@@ -32,9 +32,9 @@ dependencies {
     testCompileOnly("org.projectlombok:lombok:1.18.42")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.42")
 
-    compileOnlyApi rfg.deobf("curse.maven:inventory-bogosorter-632327:7403680-sources-7403683")
+    compileOnlyApi rfg.deobf("curse.maven:inventory-bogosorter-632327:7412409-sources-7412411")
     if (project.debug_bogo.toBoolean()) {
-        runtimeOnly rfg.deobf("curse.maven:inventory-bogosorter-632327:7403680-sources-7403683")
+        runtimeOnly rfg.deobf("curse.maven:inventory-bogosorter-632327:7412409-sources-7412411")
         runtimeOnly rfg.deobf('curse.maven:key_binding_patch-928895:5951859')
     }
 
