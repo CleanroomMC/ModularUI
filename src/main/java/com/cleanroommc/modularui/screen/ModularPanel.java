@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
+import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.api.widget.IDragResizeable;
 import com.cleanroommc.modularui.api.widget.IFocusedWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
@@ -25,7 +26,6 @@ import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.value.sync.PanelSyncHandler;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
-import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -89,6 +89,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     private boolean resizable = false;
 
+    private Runnable onCloseAction;
+
     public ModularPanel(@NotNull String name) {
         this.name = Objects.requireNonNull(name, "A panels name must not be null and should be unique!");
         center();
@@ -110,8 +112,19 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     @Override
-    public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        return syncHandler instanceof IPanelHandler;
+    public boolean isValidSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        return syncOrValue.isTypeOrEmpty(IPanelHandler.class);
+    }
+
+    @Override
+    protected void setSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        super.setSyncOrValue(syncOrValue);
+        setPanelHandler(syncOrValue.castNullable(IPanelHandler.class));
+    }
+
+    @ApiStatus.Internal
+    public void setPanelSyncHandler(PanelSyncHandler syncHandler) {
+        setSyncOrValue(ISyncOrValue.orEmpty(syncHandler));
     }
 
     /**
@@ -231,17 +244,15 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         this.state = State.OPEN;
     }
 
-    boolean reopen(boolean strict) {
-        if (this.state != State.CLOSED) {
-            if (strict) throw new IllegalStateException();
-            return false;
-        }
+    void reopen() {
         this.state = State.OPEN;
-        return true;
     }
 
     @MustBeInvokedByOverriders
     public void onClose() {
+        if (this.onCloseAction != null) {
+            this.onCloseAction.run();
+        }
         this.state = State.CLOSED;
         if (this.panelHandler != null) {
             this.panelHandler.closePanelInternal();
@@ -311,6 +322,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 return true;
             } else {
                 for (LocatedWidget widget : this.hovering) {
+                    if (widget.getElement() == null || !widget.getElement().isValid()) continue;
                     widget.applyMatrix(getContext());
                     IWidget w = widget.getElement();
                     if (w instanceof IDragResizeable resizeable && widget.getAdditionalHoverInfo() instanceof ResizeDragArea dragArea) {
@@ -416,6 +428,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             boolean tryTap = this.mouse.tryTap(mouseButton);
             // first see if the clicked widget is still hovered and try to interact with it
             for (LocatedWidget widget : this.hovering) {
+                if (widget.getElement() == null || !widget.getElement().isValid()) continue;
                 if (this.mouse.isWidget(widget)) {
                     if (widget.getElement() instanceof Interactable interactable &&
                             onMouseRelease(mouseButton, tryTap, widget, interactable)) {
@@ -427,8 +440,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             }
             // now try all other hovered
             for (LocatedWidget widget : this.hovering) {
-                if (!this.mouse.isWidget(widget) && widget.getElement() instanceof Interactable interactable &&
-                        onMouseRelease(mouseButton, tryTap, widget, interactable)) {
+                if (widget.getElement() == null || !widget.getElement().isValid()) continue;
+                if (!this.mouse.isWidget(widget) && widget.getElement() instanceof Interactable interactable && onMouseRelease(mouseButton, tryTap, widget, interactable)) {
                     return true;
                 }
             }
@@ -477,6 +490,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             LocatedWidget pressed = null;
             boolean result = false;
             for (LocatedWidget widget : this.hovering) {
+                if (widget.getElement() == null || !widget.getElement().isValid()) continue;
                 if (widget.getElement() instanceof Interactable interactable) {
                     widget.applyMatrix(getContext());
                     Interactable.Result interactResult = interactable.onKeyPressed(typedChar, keyCode);
@@ -568,7 +582,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             }
             if (this.hovering.isEmpty()) return false;
             for (LocatedWidget widget : this.hovering) {
-                if (widget.getElement() instanceof Interactable interactable) {
+                if (widget.getElement() instanceof Interactable interactable && widget.getElement().isValid()) {
                     widget.applyMatrix(getContext());
                     boolean result = interactable.onMouseScroll(scrollDirection, amount);
                     widget.unapplyMatrix(getContext());
@@ -596,7 +610,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             if (this.mouse.held &&
                     mouseButton == this.mouse.lastButton &&
                     this.mouse.lastPressed != null &&
-                    this.mouse.lastPressed.getElement() instanceof Interactable interactable) {
+                    this.mouse.lastPressed.getElement() instanceof Interactable interactable &&
+                    this.mouse.lastPressed.getElement().isValid()) {
                 this.mouse.lastPressed.applyMatrix(getContext());
                 interactable.onMouseDrag(mouseButton, timeSinceClick);
                 this.mouse.lastPressed.unapplyMatrix(getContext());
@@ -610,7 +625,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     private <T, W extends IWidget & IFocusedWidget & Interactable> T interactFocused(Function<W, T> function, T defaultValue) {
         LocatedWidget focused = this.getContext().getFocusedWidget();
         T result = defaultValue;
-        if (focused.getElement() instanceof Interactable interactable) {
+        if (focused.getElement() instanceof Interactable interactable && focused.getElement().isValid()) {
             focused.applyMatrix(getContext());
             result = function.apply((W) interactable);
             focused.unapplyMatrix(getContext());
@@ -737,16 +752,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return getScreen().getMainPanel() == this;
     }
 
-    @ApiStatus.Internal
-    @Override
-    public void setSyncHandler(@Nullable SyncHandler syncHandler) {
-        if (!isValidSyncHandler(syncHandler))
-            throw new IllegalStateException("Panel SyncHandler's must implement IPanelHandler!");
-
-        super.setSyncHandler(syncHandler);
-        setPanelHandler((IPanelHandler) syncHandler);
-    }
-
     @NotNull
     protected Animator getAnimator() {
         if (this.animator == null) {
@@ -815,9 +820,15 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return this;
     }
 
+    public ModularPanel onCloseAction(Runnable onCloseAction) {
+        this.onCloseAction = onCloseAction;
+        return this;
+    }
+
+    @Deprecated
     @Override
-    public String toString() {
-        return super.toString() + "#" + getName();
+    public ModularPanel name(String name) {
+        throw new IllegalStateException("Name for ModularPanels are final!");
     }
 
     public State getState() {

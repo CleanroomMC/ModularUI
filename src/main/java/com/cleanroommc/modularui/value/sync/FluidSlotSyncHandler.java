@@ -30,7 +30,6 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
         return isFluidEmpty(fluidStack) ? null : fluidStack.copy();
     }
 
-    public static final int SYNC_FLUID = 0;
     public static final int SYNC_CLICK = 1;
     public static final int SYNC_SCROLL = 2;
     public static final int SYNC_CONTROLS_AMOUNT = 3;
@@ -63,14 +62,8 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
                 this.fluidTank.fill(value.copy(), true);
             }
         }
-        if (sync) {
-            if (NetworkUtils.isClient()) {
-                syncToServer(SYNC_FLUID, this::write);
-            } else {
-                syncToClient(SYNC_FLUID, this::write);
-            }
-        }
         onValueChanged();
+        if (sync) sync();
     }
 
     public boolean needsSync() {
@@ -90,6 +83,16 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
     }
 
     @Override
+    public Class<FluidStack> getValueType() {
+        return FluidStack.class;
+    }
+
+    @Override
+    public void notifyUpdate() {
+        setValue(this.fluidTank.getFluid(), false, true);
+    }
+
+    @Override
     public void write(PacketBuffer buffer) {
         NetworkUtils.writeFluidStack(buffer, this.cache);
     }
@@ -101,7 +104,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
 
     @Override
     public void readOnClient(int id, PacketBuffer buf) {
-        if (id == SYNC_FLUID) {
+        if (id == SYNC_VALUE) {
             read(buf);
         } else if (id == SYNC_CONTROLS_AMOUNT) {
             this.controlsAmount = buf.readBoolean();
@@ -110,7 +113,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
 
     @Override
     public void readOnServer(int id, PacketBuffer buf) {
-        if (id == SYNC_FLUID) {
+        if (id == SYNC_VALUE) {
             if (this.phantom) {
                 read(buf);
             }

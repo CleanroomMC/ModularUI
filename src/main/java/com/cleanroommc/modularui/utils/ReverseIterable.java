@@ -22,7 +22,7 @@ public class ReverseIterable<T> implements Iterable<T> {
     @Override
     public Iterator<T> iterator() {
         ListIterator<T> iterator = this.list.listIterator(this.list.size());
-        return new ListIterator<T>() {
+        return new ListIterator<>() {
             @Override
             public boolean hasNext() {
                 return iterator.hasPrevious();

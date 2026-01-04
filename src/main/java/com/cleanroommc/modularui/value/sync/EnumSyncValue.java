@@ -72,9 +72,8 @@ public class EnumSyncValue<T extends Enum<T>> extends ValueSyncHandler<T> implem
         if (setSource && this.setter != null) {
             this.setter.accept(value);
         }
-        if (sync) {
-            sync(0, this::write);
-        }
+        onValueChanged();
+        if (sync) sync();
     }
 
     @Override
@@ -84,6 +83,11 @@ public class EnumSyncValue<T extends Enum<T>> extends ValueSyncHandler<T> implem
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void notifyUpdate() {
+        setValue(this.getter.get(), false, true);
     }
 
     @Override
@@ -104,5 +108,10 @@ public class EnumSyncValue<T extends Enum<T>> extends ValueSyncHandler<T> implem
     @Override
     public int getIntValue() {
         return this.cache.ordinal();
+    }
+
+    @Override
+    public Class<T> getValueType() {
+        return this.enumClass;
     }
 }

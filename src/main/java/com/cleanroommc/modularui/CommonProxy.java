@@ -8,14 +8,12 @@ import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.test.ItemEditorGui;
 import com.cleanroommc.modularui.test.TestBlock;
-import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 
 import net.minecraft.util.Timer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -64,16 +62,6 @@ public class CommonProxy {
                 .entity(HoloScreenEntity.class)
                 .factory(HoloScreenEntity::new)
                 .build());
-    }
-
-    @SubscribeEvent
-    public void onCloseContainer(PlayerContainerEvent.Open event) {
-        if (event.getContainer() instanceof ModularContainer container) {
-            ModularSyncManager syncManager = container.getSyncManager();
-            if (syncManager != null) {
-                syncManager.onOpen();
-            }
-        }
     }
 
     @SubscribeEvent

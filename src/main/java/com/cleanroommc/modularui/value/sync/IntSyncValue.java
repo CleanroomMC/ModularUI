@@ -74,9 +74,8 @@ public class IntSyncValue extends ValueSyncHandler<Integer> implements IIntSyncV
         if (setSource && this.setter != null) {
             this.setter.accept(value);
         }
-        if (sync) {
-            sync(0, this::write);
-        }
+        onValueChanged();
+        if (sync) sync();
     }
 
     @Override
@@ -99,6 +98,11 @@ public class IntSyncValue extends ValueSyncHandler<Integer> implements IIntSyncV
     }
 
     @Override
+    public void notifyUpdate() {
+        setIntValue(this.getter.getAsInt(), false, true);
+    }
+
+    @Override
     public void write(PacketBuffer buffer) {
         buffer.writeVarInt(this.cache);
     }
@@ -116,5 +120,10 @@ public class IntSyncValue extends ValueSyncHandler<Integer> implements IIntSyncV
     @Override
     public String getStringValue() {
         return String.valueOf(this.cache);
+    }
+
+    @Override
+    public Class<Integer> getValueType() {
+        return Integer.class;
     }
 }

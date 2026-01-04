@@ -6,20 +6,18 @@ import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
-import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
-import com.cleanroommc.bogosorter.api.IPosSetter;
-import com.cleanroommc.bogosorter.api.ISortableContainer;
 import com.cleanroommc.bogosorter.api.ISortingContextBuilder;
 
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.Optional.Interface;
+import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -36,8 +34,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-@Interface(modid = ModularUI.ModIds.BOGOSORTER, iface = "com.cleanroommc.bogosorter.api.ISortableContainer")
-public class ModularContainer extends Container implements ISortableContainer {
+public class ModularContainer extends Container {
 
     public static ModularContainer getCurrent(EntityPlayer player) {
         if (player.openContainer instanceof ModularContainer container) {
@@ -65,10 +62,10 @@ public class ModularContainer extends Container implements ISortableContainer {
     public ModularContainer() {}
 
     @ApiStatus.Internal
-    public void construct(EntityPlayer player, PanelSyncManager panelSyncManager, UISettings settings, String mainPanelName, GuiData guiData) {
+    public void construct(EntityPlayer player, ModularSyncManager msm, UISettings settings, String mainPanelName, GuiData guiData) {
         this.player = player;
-        this.syncManager = new ModularSyncManager(this);
-        this.syncManager.construct(mainPanelName, panelSyncManager);
+        this.syncManager = msm;
+        this.syncManager.construct(this, mainPanelName);
         this.settings = settings;
         this.guiData = guiData;
         sortShiftClickSlots();
@@ -100,14 +97,16 @@ public class ModularContainer extends Container implements ISortableContainer {
         return (ContainerAccessor) this;
     }
 
-    @MustBeInvokedByOverriders
-    @Override
-    public void onContainerClosed(@NotNull EntityPlayer playerIn) {
-        super.onContainerClosed(playerIn);
-        if (this.syncManager != null) {
-            this.syncManager.onClose();
-        }
-    }
+    public void onModularContainerOpened() {}
+
+    /**
+     * Called when this container closes. This is different to {@link Container#onContainerClosed(EntityPlayer)}, since that one is also
+     * called from {@link GuiContainer#onGuiClosed()}, which means it is called even when the container may still exist.
+     * This happens when a temporary client screen takes over (like JEI,NEI,etc.). This is only called when the container actually closes.
+     */
+    public void onModularContainerClosed() {}
+
+    public void onModularContainerDisposed() {}
 
     @MustBeInvokedByOverriders
     @Override
@@ -119,7 +118,7 @@ public class ModularContainer extends Container implements ISortableContainer {
         this.init = false;
     }
 
-    @ApiStatus.Internal
+    @MustBeInvokedByOverriders
     public void onUpdate() {
         // detectAndSendChanges is potentially called multiple times per tick, while this method is called exactly once per tick
         if (this.syncManager != null) {
@@ -276,8 +275,9 @@ public class ModularContainer extends Container implements ISortableContainer {
                     if (!heldStack.isEmpty() && clickedSlot.isItemValid(heldStack)) {
                         int stackCount = mouseButton == LEFT_MOUSE ? heldStack.getCount() : 1;
 
-                        if (stackCount > clickedSlot.getItemStackLimit(heldStack)) {
-                            stackCount = clickedSlot.getItemStackLimit(heldStack);
+                        int lim = clickedSlot.getItemStackLimit(heldStack);
+                        if (stackCount > lim) {
+                            stackCount = lim;
                         }
 
                         clickedSlot.putStack(heldStack.splitStack(stackCount));
@@ -295,8 +295,9 @@ public class ModularContainer extends Container implements ISortableContainer {
                                 ItemStack.areItemStackTagsEqual(slotStack, heldStack)) {
                             int stackCount = mouseButton == LEFT_MOUSE ? heldStack.getCount() : 1;
 
-                            if (stackCount > clickedSlot.getItemStackLimit(heldStack) - slotStack.getCount()) {
-                                stackCount = clickedSlot.getItemStackLimit(heldStack) - slotStack.getCount();
+                            int lim = clickedSlot.getItemStackLimit(heldStack);
+                            if (stackCount > lim - slotStack.getCount()) {
+                                stackCount = lim - slotStack.getCount();
                             }
 
                             heldStack.shrink(stackCount);
@@ -444,15 +445,10 @@ public class ModularContainer extends Container implements ISortableContainer {
         return fromStack;
     }
 
-    @Override
+    @Optional.Method(modid = ModularUI.BOGO_SORT)
     public void buildSortingContext(ISortingContextBuilder builder) {
         if (this.syncManager != null) {
             this.syncManager.buildSortingContext(builder);
         }
-    }
-
-    @Override
-    public IPosSetter getPlayerButtonPosSetter() {
-        return null;
     }
 }

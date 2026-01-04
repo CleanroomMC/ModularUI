@@ -28,23 +28,20 @@ public enum SIPrefix {
     Ronto('r', -27),
     Quecto('q', -30);
 
-
-    public final String symbol;
+    public final char symbol;
+    public final String stringSymbol;
     public final double factor;
     public final double oneOverFactor;
     public final BigDecimal bigFactor;
     public final BigDecimal bigOneOverFactor;
 
     SIPrefix(char symbol, int powerOfTen) {
-        this.symbol = String.valueOf(symbol);
+        this.symbol = symbol;
+        this.stringSymbol = symbol != Character.MIN_VALUE ? Character.toString(symbol) : "";
         this.factor = Math.pow(10, powerOfTen);
         this.oneOverFactor = 1 / this.factor;
         this.bigFactor = new BigDecimal(this.factor);
         this.bigOneOverFactor = new BigDecimal(this.oneOverFactor);
-    }
-
-    public char getCharSymbol() {
-        return symbol.charAt(0);
     }
 
     public boolean isOne() {

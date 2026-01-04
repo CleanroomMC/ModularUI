@@ -4,10 +4,19 @@ import com.cleanroommc.modularui.api.value.IIntValue;
 import com.cleanroommc.modularui.api.value.ILongValue;
 import com.cleanroommc.modularui.api.value.IStringValue;
 
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.LongConsumer;
 import java.util.function.LongSupplier;
 
 public class LongValue implements ILongValue<Long>, IIntValue<Long>, IStringValue<Long> {
+
+    public static Dynamic wrap(ILongValue<?> val) {
+        return new Dynamic(val::getLongValue, val::setLongValue);
+    }
+
+    public static Dynamic wrapAtomic(AtomicLong val) {
+        return new Dynamic(val::get, val::set);
+    }
 
     private long value;
 
@@ -53,6 +62,11 @@ public class LongValue implements ILongValue<Long>, IIntValue<Long>, IStringValu
     @Override
     public void setIntValue(int val) {
         setLongValue(val);
+    }
+
+    @Override
+    public Class<Long> getValueType() {
+        return Long.class;
     }
 
     public static class Dynamic implements ILongValue<Long>, IIntValue<Long>, IStringValue<Long> {
@@ -103,6 +117,11 @@ public class LongValue implements ILongValue<Long>, IIntValue<Long>, IStringValu
         @Override
         public void setIntValue(int val) {
             setLongValue(val);
+        }
+
+        @Override
+        public Class<Long> getValueType() {
+            return Long.class;
         }
     }
 }

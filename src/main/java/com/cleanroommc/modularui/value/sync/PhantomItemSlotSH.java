@@ -27,6 +27,7 @@ public class PhantomItemSlotSH extends ItemSlotSH {
     @ApiStatus.Internal
     public PhantomItemSlotSH(ModularSlot slot) {
         super(slot);
+        slot.slotNumber = -1;
     }
 
     @Override

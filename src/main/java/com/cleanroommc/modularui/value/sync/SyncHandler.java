@@ -1,10 +1,10 @@
 package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.api.IPacketWriter;
-import com.cleanroommc.modularui.network.NetworkHandler;
-import com.cleanroommc.modularui.network.packets.PacketSyncHandler;
+import com.cleanroommc.modularui.api.value.ISyncOrValue;
+import com.cleanroommc.modularui.network.ModularNetwork;
+import com.cleanroommc.modularui.network.ModularNetworkSide;
 
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -22,7 +22,7 @@ import java.util.Objects;
  * A sync handler must exist on client and server.
  * It must be configured exactly the same to avoid issues.
  */
-public abstract class SyncHandler {
+public abstract class SyncHandler implements ISyncOrValue {
 
     private PanelSyncManager syncManager;
     private String key;
@@ -90,11 +90,7 @@ public abstract class SyncHandler {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        if (getSyncManager().isClient()) {
-            sendToServer(getSyncManager().getPanelName(), buffer, this);
-        } else {
-            sendToClient(getSyncManager().getPanelName(), buffer, this);
-        }
+        send(ModularNetwork.get(getSyncManager().isClient()), getSyncManager().getPanelName(), buffer, this);
     }
 
     /**
@@ -151,8 +147,7 @@ public abstract class SyncHandler {
      *
      * @param init if this method is being called the first time.
      */
-    public void detectAndSendChanges(boolean init) {
-    }
+    public void detectAndSendChanges(boolean init) {}
 
     /**
      * @return the key that belongs to this sync handler
@@ -162,7 +157,7 @@ public abstract class SyncHandler {
     }
 
     /**
-     * @return is this sync handler has been initialised yet
+     * @return is this sync handler has been initialized yet
      */
     public final boolean isValid() {
         return this.key != null && this.syncManager != null;
@@ -178,21 +173,30 @@ public abstract class SyncHandler {
         return this.syncManager;
     }
 
-    public static void sendToClient(String panel, PacketBuffer buffer, SyncHandler syncHandler) {
-        Objects.requireNonNull(buffer);
-        Objects.requireNonNull(syncHandler);
-        if (!syncHandler.isValid()) {
-            throw new IllegalStateException();
-        }
-        NetworkHandler.sendToPlayer(new PacketSyncHandler(panel, syncHandler.getKey(), false, buffer), (EntityPlayerMP) syncHandler.syncManager.getPlayer());
+    public final boolean isRegistered() {
+        return isValid() && this.syncManager.hasSyncHandler(this);
     }
 
-    public static void sendToServer(String panel, PacketBuffer buffer, SyncHandler syncHandler) {
+    @Override
+    public boolean isSyncHandler() {
+        return true;
+    }
+
+    private static void send(ModularNetworkSide network, String panel, PacketBuffer buffer, SyncHandler syncHandler) {
         Objects.requireNonNull(buffer);
         Objects.requireNonNull(syncHandler);
         if (!syncHandler.isValid()) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Not initialized sync handlers can't send packets!");
         }
-        NetworkHandler.sendToServer(new PacketSyncHandler(panel, syncHandler.getKey(), false, buffer));
+        network.sendSyncHandlerPacket(panel, syncHandler, buffer, syncHandler.syncManager.getPlayer());
+    }
+
+    public static void sendToClient(String panel, PacketBuffer buffer, SyncHandler syncHandler) {
+        send(ModularNetwork.SERVER, panel, buffer, syncHandler);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static void sendToServer(String panel, PacketBuffer buffer, SyncHandler syncHandler) {
+        send(ModularNetwork.CLIENT, panel, buffer, syncHandler);
     }
 }

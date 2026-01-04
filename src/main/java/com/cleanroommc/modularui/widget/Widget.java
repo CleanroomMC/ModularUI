@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
+import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.api.value.IValue;
 import com.cleanroommc.modularui.api.widget.IDragResizeable;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
@@ -20,6 +21,7 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.theme.WidgetThemeKey;
+import com.cleanroommc.modularui.value.sync.ISyncRegistrar;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
@@ -101,7 +103,6 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
             this.parent = parent;
             this.panel = parent.getPanel();
             this.context = parent.getContext();
-            getArea().setPanelLayer(this.panel.getArea().getPanelLayer());
             getArea().z(parent.getArea().z() + 1);
             if (this.guiActionListeners != null) {
                 for (IGuiAction action : this.guiActionListeners) {
@@ -142,19 +143,19 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     public void afterInit() {}
 
     /**
-     * Retrieves, initialises and verifies a linked sync handler.
-     * Custom logic should be handled in {@link #isValidSyncHandler(SyncHandler)}.
+     * Retrieves, verifies, and initialises a linked sync handler.
+     * Custom logic should be handled in {@link #setSyncOrValue(ISyncOrValue)}.
      */
     @Override
     public void initialiseSyncHandler(ModularSyncManager syncManager, boolean late) {
-        if (this.syncKey != null) {
-            this.syncHandler = syncManager.getSyncHandler(getPanel().getName(), this.syncKey);
+        SyncHandler handler = this.syncHandler;
+        if (handler == null && this.syncKey != null) {
+            handler = syncManager.getSyncHandler(getPanel().getName(), this.syncKey);
+            if (handler == null && !syncManager.getMainPSM().getPanelName().equals(getPanel().getName())) {
+                handler = syncManager.getMainPSM().getSyncHandlerFromMapKey(this.syncKey);
+            }
         }
-        if ((this.syncKey != null || this.syncHandler != null) && !isValidSyncHandler(this.syncHandler)) {
-            String type = this.syncHandler == null ? null : this.syncHandler.getClass().getName();
-            this.syncHandler = null;
-            throw new IllegalStateException("SyncHandler of type " + type + " is not valid for " + getClass().getName() + ", with key " + this.syncKey);
-        }
+        if (handler != null) setSyncOrValue(handler);
         if (this.syncHandler instanceof ValueSyncHandler<?> valueSyncHandler && valueSyncHandler.getChangeListener() == null) {
             valueSyncHandler.setChangeListener(this::markTooltipDirty);
         }
@@ -846,25 +847,39 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
      */
     @Override
     public W syncHandler(String name, int id) {
-        this.syncKey = ModularSyncManager.makeSyncKey(name, id);
+        this.syncKey = ISyncRegistrar.makeSyncKey(name, id);
         return getThis();
     }
 
     /**
-     * Used for widgets to set a value handler. Can also be a sync handler
+     * Used for widgets to set a value handler. <br />
+     * Will also call {@link #setSyncHandler(SyncHandler)} if it is a SyncHandler
      */
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
     protected void setValue(IValue<?> value) {
         this.value = value;
-        if (value instanceof SyncHandler syncHandler1) {
-            setSyncHandler(syncHandler1);
+        if (value instanceof SyncHandler handler) {
+            setSyncHandler(handler);
         }
     }
 
     /**
      * Used for widgets to set a sync handler.
      */
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
     protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        if (syncHandler != null) checkValidSyncOrValue(syncHandler);
         this.syncHandler = syncHandler;
+    }
+
+    @MustBeInvokedByOverriders
+    protected void setSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        if (!syncOrValue.isSyncHandler() && !syncOrValue.isValueHandler()) return;
+        checkValidSyncOrValue(syncOrValue);
+        if (syncOrValue instanceof SyncHandler syncHandler1) setSyncHandler(syncHandler1);
+        if (syncOrValue instanceof IValue<?> value1) setValue(value1);
     }
 
     // -------------

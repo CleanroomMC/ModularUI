@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.utils.ICopy;
 import com.cleanroommc.modularui.utils.ObjectList;
-
 import com.cleanroommc.modularui.utils.serialization.IByteBufDeserializer;
 import com.cleanroommc.modularui.utils.serialization.IByteBufSerializer;
 import com.cleanroommc.modularui.utils.serialization.IEquals;
@@ -59,6 +58,11 @@ public class GenericListSyncHandler<T> extends GenericCollectionSyncHandler<T, L
             this.cache.add(deserializeValue(buffer));
         }
         onSetCache(getValue(), true, false);
+    }
+
+    @Override
+    public Class<List<T>> getValueType() {
+        return (Class<List<T>>) (Object) List.class;
     }
 
     public static <T> Builder<T> builder() {

@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.api.value.sync.IDoubleSyncValue;
+import com.cleanroommc.modularui.api.value.sync.IFloatSyncValue;
 import com.cleanroommc.modularui.api.value.sync.IStringSyncValue;
 import com.cleanroommc.modularui.network.NetworkUtils;
 
@@ -14,7 +15,7 @@ import java.util.Objects;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
-public class DoubleSyncValue extends ValueSyncHandler<Double> implements IDoubleSyncValue<Double>, IStringSyncValue<Double> {
+public class DoubleSyncValue extends ValueSyncHandler<Double> implements IDoubleSyncValue<Double>, IFloatSyncValue<Double>, IStringSyncValue<Double> {
 
     private final DoubleSupplier getter;
     private final DoubleConsumer setter;
@@ -73,9 +74,8 @@ public class DoubleSyncValue extends ValueSyncHandler<Double> implements IDouble
         if (setSource && this.setter != null) {
             this.setter.accept(value);
         }
-        if (sync) {
-            sync(0, this::write);
-        }
+        onValueChanged();
+        if (sync) sync();
     }
 
     @Override
@@ -85,6 +85,11 @@ public class DoubleSyncValue extends ValueSyncHandler<Double> implements IDouble
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void notifyUpdate() {
+        setDoubleValue(this.getter.getAsDouble(), false, true);
     }
 
     @Override
@@ -105,5 +110,20 @@ public class DoubleSyncValue extends ValueSyncHandler<Double> implements IDouble
     @Override
     public String getStringValue() {
         return String.valueOf(this.cache);
+    }
+
+    @Override
+    public float getFloatValue() {
+        return (float) getDoubleValue();
+    }
+
+    @Override
+    public void setFloatValue(float value, boolean setSource, boolean sync) {
+        setDoubleValue(value, setSource, sync);
+    }
+
+    @Override
+    public Class<Double> getValueType() {
+        return Double.class;
     }
 }

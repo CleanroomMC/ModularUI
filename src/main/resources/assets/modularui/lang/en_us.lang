@@ -5,6 +5,7 @@ modularui.decrement.tooltip=§7Click to decrease the number by §6%d§7\nHold sh
 modularui.amount=§9Amount: %,d
 modularui.fluid.empty=Empty
 modularui.fluid.amount=§9Amount: %s/%s %s
+modularui.fluid.capacity=§9Capacity: %s %s
 modularui.fluid.phantom.amount=§9Amount: %s%s
 modularui.fluid.phantom.control=§7Scroll wheel up increases amount, down decreases.\n§7Shift[§6x10§7],Ctrl[§ex100§7],Alt[§ax1000§7]\n§7Right click increases amount, left click decreases.\n§7Shift + left click to clear.
 modularui.item.phantom.control=§7Scroll wheel up increases amount, down decreases.\n§7Shift[§6x4§7],Ctrl[§ex16§7],Alt[§ax64§7]\n§7Right click increases amount, left click decreases.\n§7Shift + left click to clear.

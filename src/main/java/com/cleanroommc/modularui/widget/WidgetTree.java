@@ -193,7 +193,7 @@ public class WidgetTree {
     }
 
     /**
-     * Creates a stream of the whole sub widget tree.
+     * Creates a flat stream of the whole sub widget tree.
      * <p>
      * {@link Stream#forEach(Consumer)} on this has slightly worse performance than {@link #foreachChildBFS(IWidget, Predicate, boolean)} on
      * small widget trees and has similar performance on large widget trees. The performance is significantly better than
@@ -203,7 +203,7 @@ public class WidgetTree {
      * @return stream of the sub widget tree
      */
     @SuppressWarnings("UnstableApiUsage")
-    public static Stream<IWidget> stream(IWidget parent) {
+    public static Stream<IWidget> flatStream(IWidget parent) {
         if (!parent.hasChildren()) return Stream.of(parent);
         return Streams.stream(iteratorBFS(parent));
     }
@@ -503,7 +503,7 @@ public class WidgetTree {
         String syncKey = ModularSyncManager.AUTO_SYNC_PREFIX + panelName;
         foreachChildBFS(panel, widget -> {
             if (widget instanceof ISynced<?> synced) {
-                if (synced.isSynced() && !syncManager.hasSyncHandler(synced.getSyncHandler())) {
+                if (synced.isSynced() && !synced.getSyncHandler().isRegistered()) {
                     syncManager.syncValue(syncKey, id.getAndIncrement(), synced.getSyncHandler());
                 }
             }
@@ -511,10 +511,10 @@ public class WidgetTree {
         }, includePanel);
     }
 
-    public static int countUnregisteredSyncHandlers(PanelSyncManager syncManager, IWidget parent) {
+    public static int countUnregisteredSyncHandlers(IWidget parent) {
         MutableInt count = new MutableInt();
         foreachChildBFS(parent, widget -> {
-            if (widget instanceof ISynced<?> synced && synced.isSynced() && !syncManager.hasSyncHandler(synced.getSyncHandler())) {
+            if (widget instanceof ISynced<?> synced && synced.isSynced() && !synced.getSyncHandler().isRegistered()) {
                 count.increment();
             }
             return true;
