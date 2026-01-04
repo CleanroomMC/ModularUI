@@ -236,7 +236,7 @@ public class NumberFormat {
 
     private static String formatInternal(double number, int maxLength, Params params) {
         SIPrefix prefix = findBestPrefix(number);
-        return formatToString(number * prefix.oneOverFactor, prefix.getCharSymbol(), maxLength, params);
+        return formatToString(number * prefix.oneOverFactor, prefix.symbol, maxLength, params);
     }
 
     private static String formatToString(double value, char prefix, int maxLength, Params params) {
