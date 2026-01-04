@@ -23,9 +23,13 @@
  */
 
 dependencies {
-    embed2 'org.mariuszgromada.math:MathParser.org-mXparser:6.1.0'
     embed2('org.joml:joml:1.10.8') { transitive = false }
     embedSources("org.joml:joml:1.10.8:sources") { transitive = false }
+
+    compileOnly("org.projectlombok:lombok:1.18.42")
+    annotationProcessor("org.projectlombok:lombok:1.18.42")
+    testCompileOnly("org.projectlombok:lombok:1.18.42")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.42")
 
     compileOnlyApi rfg.deobf("curse.maven:inventory-bogosorter-632327:7403680-sources-7403683")
     if (project.debug_bogo.toBoolean()) {

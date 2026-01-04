@@ -111,7 +111,6 @@ public interface IDrawable {
         draw(context, area.getPadding().getLeft(), area.getPadding().getTop(), area.paddedWidth(), area.paddedHeight(), widgetTheme);
     }
 
-
     /**
      * @return if theme color can be applied on this drawable
      */
