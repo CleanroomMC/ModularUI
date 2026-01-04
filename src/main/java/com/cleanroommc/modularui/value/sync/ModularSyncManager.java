@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.ISyncedAction;
 import com.cleanroommc.modularui.screen.ModularContainer;
+import com.cleanroommc.modularui.widgets.slot.PlayerSlotGroup;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import com.cleanroommc.bogosorter.api.ISortingContextBuilder;
 
@@ -31,7 +32,7 @@ import java.util.function.Supplier;
 public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
 
     public static final String AUTO_SYNC_PREFIX = "auto_sync:";
-    protected static final String PLAYER_INVENTORY = "player_inventory";
+
     private static final String CURSOR_KEY = ISyncRegistrar.makeSyncKey("cursor_slot", 255255);
 
     private final Map<String, PanelSyncManager> panelSyncManagerMap = new Object2ObjectOpenHashMap<>();
@@ -42,6 +43,7 @@ public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
     private ModularContainer container;
     private final CursorSlotSyncHandler cursorSlotSyncHandler = new CursorSlotSyncHandler();
     private final boolean client;
+    private State state = State.INIT;
 
     public ModularSyncManager(boolean client) {
         this.client = client;
@@ -54,7 +56,7 @@ public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
     @ApiStatus.Internal
     public void construct(ModularContainer container, String mainPanelName) {
         this.container = container;
-        if (this.mainPSM.getSlotGroup(PLAYER_INVENTORY) == null) {
+        if (this.mainPSM.getSlotGroup(PlayerSlotGroup.NAME) == null) {
             this.mainPSM.bindPlayerInventory(getPlayer());
         }
         this.mainPSM.syncValue(CURSOR_KEY, this.cursorSlotSyncHandler);
@@ -69,17 +71,38 @@ public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
         return this.client;
     }
 
+    @ApiStatus.Internal
     public void detectAndSendChanges(boolean init) {
         this.panelSyncManagerMap.values().forEach(psm -> psm.detectAndSendChanges(init));
     }
 
+    @ApiStatus.Internal
     public void dispose() {
+        if (isDisposed()) return;
+        if (!isClosed()) throw new IllegalStateException("Sync manager must be closed before disposing!");
         this.panelSyncManagerMap.values().forEach(PanelSyncManager::onClose);
         this.panelSyncManagerMap.clear();
+        this.container.onModularContainerDisposed();
+        setState(State.DISPOSED);
     }
 
+    @ApiStatus.Internal
     public void onOpen() {
+        if (isOpen()) return;
+        if (isDisposed()) throw new IllegalStateException("Can't open sync manager after it has been disposed!");
+        if (this.container == null) {
+            throw new IllegalStateException("Sync Manager can't be opened when its not yet constructed. ModularContainer is null.");
+        }
+        setState(State.OPEN);
         this.panelSyncManagerMap.values().forEach(PanelSyncManager::onOpen);
+        this.container.onModularContainerOpened();
+    }
+
+    @ApiStatus.Internal
+    public void onClose() {
+        if (!isOpen()) throw new IllegalStateException();
+        this.container.onModularContainerClosed();
+        setState(State.CLOSED);
     }
 
     public void onUpdate() {
@@ -109,12 +132,14 @@ public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
         this.cursorSlotSyncHandler.sync();
     }
 
+    @ApiStatus.Internal
     public void open(String name, PanelSyncManager syncManager) {
         this.panelSyncManagerMap.put(name, syncManager);
         this.panelHistory.add(name);
         syncManager.initialize(name);
     }
 
+    @ApiStatus.Internal
     public void close(String name) {
         PanelSyncManager psm = this.panelSyncManagerMap.remove(name);
         if (psm != null) psm.onClose();
@@ -124,6 +149,7 @@ public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
         return this.panelSyncManagerMap.containsKey(panelName);
     }
 
+    @ApiStatus.Internal
     public void receiveWidgetUpdate(String panelName, String mapKey, boolean action, int id, PacketBuffer buf) throws IOException {
         PanelSyncManager psm = this.panelSyncManagerMap.get(panelName);
         if (psm != null) {
@@ -147,7 +173,7 @@ public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
     public void buildSortingContext(ISortingContextBuilder builder) {
         for (PanelSyncManager psm : this.panelSyncManagerMap.values()) {
             for (SlotGroup slotGroup : psm.getSlotGroups()) {
-                if (slotGroup.isAllowSorting() && !isPlayerSlot(slotGroup.getSlots().get(0))) {
+                if (slotGroup.isAllowSorting() && !(slotGroup instanceof PlayerSlotGroup)) {
                     builder.addSlotGroupOf(slotGroup.getSlots(), slotGroup.getRowSize())
                             .buttonPosSetter(null)
                             .priority(slotGroup.getShiftClickPriority());
@@ -168,6 +194,11 @@ public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean hasSyncHandler(SyncHandler syncHandler) {
+        return this.mainPSM.hasSyncHandler(syncHandler);
     }
 
     @Override
@@ -217,5 +248,25 @@ public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
     @Deprecated
     public static String makeSyncKey(String name, int id) {
         return ISyncRegistrar.makeSyncKey(name, id);
+    }
+
+    public boolean isOpen() {
+        return this.state == State.OPEN;
+    }
+
+    public boolean isClosed() {
+        return this.state == State.CLOSED || this.state == State.DISPOSED;
+    }
+
+    public boolean isDisposed() {
+        return this.state == State.DISPOSED;
+    }
+
+    private void setState(State state) {
+        this.state = state;
+    }
+
+    enum State {
+        INIT, OPEN, CLOSED, DISPOSED;
     }
 }

@@ -14,7 +14,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -63,20 +62,6 @@ public class CommonProxy {
                 .entity(HoloScreenEntity.class)
                 .factory(HoloScreenEntity::new)
                 .build());
-    }
-
-    @SubscribeEvent
-    public void onOpenContainer(PlayerContainerEvent.Open event) {
-        if (event.getContainer() instanceof ModularContainer container) {
-            container.onModularContainerOpened();
-        }
-    }
-
-    @SubscribeEvent
-    public void onCloseContainer(PlayerContainerEvent.Close event) {
-        if (event.getContainer() instanceof ModularContainer container) {
-            container.onModularContainerClosed();
-        }
     }
 
     @SubscribeEvent

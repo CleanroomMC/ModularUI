@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.Circle;
+import com.cleanroommc.modularui.drawable.FluidDrawable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.ItemDrawable;
 import com.cleanroommc.modularui.drawable.Rectangle;
@@ -49,7 +50,6 @@ import com.cleanroommc.modularui.widgets.SchemaWidget;
 import com.cleanroommc.modularui.widgets.ScrollingTextWidget;
 import com.cleanroommc.modularui.widgets.SliderWidget;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
-import com.cleanroommc.modularui.widgets.SortButtons;
 import com.cleanroommc.modularui.widgets.ToggleButton;
 import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Flow;
@@ -68,6 +68,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -97,7 +99,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
     }};
 
     private final FluidTank fluidTank = new FluidTank(10000);
-    private final FluidTank fluidTankPhantom = new FluidTank(Integer.MAX_VALUE);
+    private final FluidTank fluidTankPhantom = new FluidTank(500000);
     private long time = 0;
     private int val, val2 = 0;
     private String value = "";
@@ -129,6 +131,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
     @Override
     public ModularPanel buildUI(PosGuiData guiData, PanelSyncManager syncManager, UISettings settings) {
         settings.customContainer(() -> new CraftingModularContainer(3, 3, this.craftingInventory));
+        settings.customGui(() -> TestGuiContainer::new);
 
         syncManager.registerSlotGroup("item_inv", 3);
         syncManager.registerSlotGroup("mixer_items", 2);
@@ -322,6 +325,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                 .child(new FluidSlot()
                                                                         .margin(2)
                                                                         .width(30)
+                                                                        .alwaysShowFull(false)
                                                                         .syncHandler(SyncHandlers.fluidSlot(this.fluidTankPhantom).phantom(true)))
                                                                 .child(new Column()
                                                                         .name("button and slots test 3")
@@ -342,25 +346,25 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                         .childPadding(2)
                                                         //.child(SlotGroupWidget.playerInventory().left(0))
                                                         .child(SlotGroupWidget.builder()
-                                                                .matrix("III", "III", "III")
-                                                                .key('I', index -> {
-                                                                    // 4 is the middle slot with a negative priority -> shift click prioritises middle slot
-                                                                    if (index == 4) {
-                                                                        return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).singletonSlotGroup(-100));
-                                                                    }
-                                                                    return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).slotGroup("item_inv"));
-                                                                })
-                                                                .build().name("9 slot inv")
+                                                                        .matrix("III", "III", "III")
+                                                                        .key('I', index -> {
+                                                                            // 4 is the middle slot with a negative priority -> shift click prioritises middle slot
+                                                                            if (index == 4) {
+                                                                                return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).singletonSlotGroup(-100));
+                                                                            }
+                                                                            return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).slotGroup("item_inv"));
+                                                                        })
+                                                                        .build().name("9 slot inv")
+                                                                        .placeSortButtonsTopRightVertical()
                                                                 //.marginBottom(2)
-                                                                .child(new SortButtons()
-                                                                        .slotGroup("item_inv")
-                                                                        .right(0).top(-11)))
+                                                        )
                                                         .child(SlotGroupWidget.builder()
                                                                 .row("FII")
                                                                 .row("FII")
                                                                 .key('F', index -> new FluidSlot().syncHandler("mixer_fluids", index))
                                                                 .key('I', index -> ItemSlot.create(index >= 2).slot(new ModularSlot(this.mixerItems, index).slotGroup("mixer_items")))
-                                                                .build().name("mixer inv"))
+                                                                .build().name("mixer inv")
+                                                                .disableSortButtons())
                                                         .child(new Row()
                                                                 .coverChildrenHeight()
                                                                 .child(new CycleButtonWidget()
@@ -508,7 +512,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         panel.child(ButtonWidget.panelCloseButton())
                 .child(new ButtonWidget<>()
                         .size(10).top(14).right(4)
-                        .overlay(IKey.str("3"))
+                        .overlay((new FluidDrawable().setFluid(new FluidStack(FluidRegistry.WATER, 100))), IKey.str("3"))
                         .onMousePressed(mouseButton -> {
                             panelSyncHandler.openPanel();
                             return true;

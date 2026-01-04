@@ -1,32 +1,31 @@
 package com.cleanroommc.modularui.network.packets;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.network.IPacket;
+import com.cleanroommc.modularui.network.ModularNetwork;
 import com.cleanroommc.modularui.network.NetworkUtils;
-import com.cleanroommc.modularui.screen.ModularContainer;
-import com.cleanroommc.modularui.screen.ModularScreen;
-
-import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 
 import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.inventory.Container;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
-
+@ApiStatus.Internal
 public class PacketSyncHandler implements IPacket {
 
-    private String panel;
-    private String key;
-    private boolean action;
-    private PacketBuffer packet;
+    public int networkId;
+    public String panel;
+    public String key;
+    public boolean action;
+    public PacketBuffer packet;
 
     public PacketSyncHandler() {}
 
-    public PacketSyncHandler(String panel, String key, boolean action, PacketBuffer packet) {
+    public PacketSyncHandler(int networkId, String panel, String key, boolean action, PacketBuffer packet) {
+        this.networkId = networkId;
         this.panel = panel;
         this.key = key;
         this.action = action;
@@ -35,46 +34,32 @@ public class PacketSyncHandler implements IPacket {
 
     @Override
     public void write(PacketBuffer buf) {
-        NetworkUtils.writeStringSafe(buf, this.panel);
-        NetworkUtils.writeStringSafe(buf, this.key, 64, true);
+        buf.writeVarInt(this.networkId);
+        NetworkUtils.writeStringSafe(buf, this.panel, 256, true);
+        NetworkUtils.writeStringSafe(buf, this.key, 256, true);
         buf.writeBoolean(this.action);
         NetworkUtils.writeByteBuf(buf, this.packet);
     }
 
     @Override
     public void read(PacketBuffer buf) {
+        this.networkId = buf.readVarInt();
         this.panel = NetworkUtils.readStringSafe(buf);
         this.key = NetworkUtils.readStringSafe(buf);
         this.action = buf.readBoolean();
         this.packet = NetworkUtils.readPacketBuffer(buf);
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
     public @Nullable IPacket executeClient(NetHandlerPlayClient handler) {
-        ModularScreen screen = ModularScreen.getCurrent();
-        if (screen != null) {
-            execute(screen.getSyncManager());
-        }
+        ModularNetwork.CLIENT.receivePacket(this);
         return null;
     }
 
     @Override
     public @Nullable IPacket executeServer(NetHandlerPlayServer handler) {
-        Container container = handler.player.openContainer;
-        if (container instanceof ModularContainer modularContainer) {
-            execute(modularContainer.getSyncManager());
-        }
+        ModularNetwork.SERVER.receivePacket(this);
         return null;
-    }
-
-    private void execute(ModularSyncManager syncManager) {
-        try {
-            int id = this.action ? 0 : this.packet.readVarInt();
-            syncManager.receiveWidgetUpdate(this.panel, this.key, this.action, id, this.packet);
-        } catch (IndexOutOfBoundsException e) {
-            ModularUI.LOGGER.error("Failed to read packet for sync handler {} in panel {}", this.key, this.panel);
-        } catch (IOException e) {
-            ModularUI.LOGGER.throwing(e);
-        }
     }
 }

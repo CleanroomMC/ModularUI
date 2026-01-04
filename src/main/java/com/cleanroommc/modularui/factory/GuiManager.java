@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.RecipeViewerSettings;
 import com.cleanroommc.modularui.api.UIFactory;
+import com.cleanroommc.modularui.network.ModularNetwork;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.packets.OpenGuiPacket;
 import com.cleanroommc.modularui.screen.GuiContainerWrapper;
@@ -79,7 +80,7 @@ public class GuiManager {
         PanelSyncManager syncManager = new PanelSyncManager(msm, true);
         ModularPanel panel = factory.createPanel(guiData, syncManager, settings);
         WidgetTree.collectSyncValues(syncManager, panel);
-        ModularContainer container = settings.hasContainer() ? settings.createContainer() : factory.createContainer();
+        ModularContainer container = settings.hasCustomContainer() ? settings.createContainer() : factory.createContainer();
         container.construct(player, msm, settings, panel.getName(), guiData);
         // sync to client
         player.getNextWindowId();
@@ -87,18 +88,21 @@ public class GuiManager {
         int windowId = player.currentWindowId;
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         factory.writeGuiData(guiData, buffer);
-        NetworkHandler.sendToPlayer(new OpenGuiPacket<>(windowId, factory, buffer), player);
-        // open container // this mimics forge behaviour
+        int nid = ModularNetwork.SERVER.activate(msm);
+        NetworkHandler.sendToPlayer(new OpenGuiPacket<>(windowId, nid, factory, buffer), player);
+        // open container // this mimics forge behavior
         player.openContainer = container;
         player.openContainer.windowId = windowId;
         player.openContainer.addListener(player);
+        // init mui syncer
+        msm.onOpen();
         // finally invoke event
         MinecraftForge.EVENT_BUS.post(new PlayerContainerEvent.Open(player, container));
     }
 
     @ApiStatus.Internal
     @SideOnly(Side.CLIENT)
-    public static <T extends GuiData> void openFromClient(int windowId, @NotNull UIFactory<T> factory, @NotNull PacketBuffer data, @NotNull EntityPlayerSP player) {
+    public static <T extends GuiData> void openFromClient(int windowId, int networkId, @NotNull UIFactory<T> factory, @NotNull PacketBuffer data, @NotNull EntityPlayerSP player) {
         T guiData = factory.readGuiData(player, data);
         UISettings settings = new UISettings();
         settings.defaultCanInteractWith(factory, guiData);
@@ -108,23 +112,27 @@ public class GuiManager {
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularScreen screen = factory.createScreen(guiData, panel);
         screen.getContext().setSettings(settings);
-        ModularContainer container = settings.hasContainer() ? settings.createContainer() : factory.createContainer();
+        ModularContainer container = settings.hasCustomContainer() ? settings.createContainer() : factory.createContainer();
         container.construct(player, msm, settings, panel.getName(), guiData);
-        IMuiScreen wrapper = factory.createScreenWrapper(container, screen);
+        IMuiScreen wrapper = settings.hasCustomGui() ? settings.createGui(container, screen) : factory.createScreenWrapper(container, screen);
         if (!(wrapper.getGuiScreen() instanceof GuiContainer guiContainer)) {
             throw new IllegalStateException("The wrapping screen must be a GuiContainer for synced GUIs!");
         }
         if (guiContainer.inventorySlots != container) throw new IllegalStateException("Custom Containers are not yet allowed!");
         guiContainer.inventorySlots.windowId = windowId;
+        ModularNetwork.CLIENT.activate(networkId, msm);
         MCHelper.displayScreen(wrapper.getGuiScreen());
         player.openContainer = guiContainer.inventorySlots;
+        msm.onOpen();
     }
 
     @SideOnly(Side.CLIENT)
     public static <T extends GuiData> void openFromClient(@NotNull UIFactory<T> factory, @NotNull T guiData) {
+        // notify server to open the gui
+        // server will send packet back to actually open the gui
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         factory.writeGuiData(guiData, buffer);
-        NetworkHandler.sendToServer(new OpenGuiPacket<>(0, factory, buffer));
+        NetworkHandler.sendToServer(new OpenGuiPacket<>(0, 0, factory, buffer));
     }
 
     @SideOnly(Side.CLIENT)
@@ -135,7 +143,7 @@ public class GuiManager {
         }
         screen.getContext().setSettings(settings);
         GuiScreen guiScreen;
-        if (settings.hasContainer()) {
+        if (settings.hasCustomContainer()) {
             ModularContainer container = settings.createContainer();
             container.constructClientOnly();
             guiScreen = new GuiContainerWrapper(container, screen);

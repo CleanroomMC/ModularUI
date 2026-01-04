@@ -2,12 +2,19 @@ package com.cleanroommc.modularui.keybind;
 
 import net.minecraft.client.settings.KeyBinding;
 
-import java.util.*;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 public class KeyBindAPI {
 
-    private static final Set<KeyBinding> forceCheckKey = new HashSet<>();
-    private static final Map<KeyBinding, Set<KeyBinding>> compatibiliyMap = new HashMap<>();
+    private static final Set<KeyBinding> forceCheckKey = new ReferenceOpenHashSet<>();
+    private static final Map<KeyBinding, Set<KeyBinding>> compatibiliyMap = new Reference2ObjectOpenHashMap<>();
 
     /**
      * By default, key binds can only be used in specific GUIs. This forces the key bind to trigger regardless of that restriction.
@@ -15,10 +22,7 @@ public class KeyBindAPI {
      * @param keyBinding key bind to force always to trigger
      */
     public static void forceCheckKeyBind(KeyBinding keyBinding) {
-        if (keyBinding == null) {
-            throw new NullPointerException();
-        }
-        forceCheckKey.add(keyBinding);
+        forceCheckKey.add(Objects.requireNonNull(keyBinding));
     }
 
     /**
@@ -36,18 +40,18 @@ public class KeyBindAPI {
      * Conflicts must be handled manually!
      */
     public static void setCompatible(KeyBinding keyBinding1, KeyBinding keyBinding2) {
-        if (keyBinding1 == keyBinding2 || keyBinding1 == null || keyBinding2 == null) {
-            throw new IllegalArgumentException();
-        }
-        compatibiliyMap.computeIfAbsent(keyBinding1, key -> new HashSet<>()).add(keyBinding2);
-        compatibiliyMap.computeIfAbsent(keyBinding2, key -> new HashSet<>()).add(keyBinding1);
+        if (keyBinding1 == keyBinding2) return;
+        Objects.requireNonNull(keyBinding1);
+        Objects.requireNonNull(keyBinding2);
+        compatibiliyMap.computeIfAbsent(keyBinding1, key -> new ReferenceOpenHashSet<>()).add(keyBinding2);
+        compatibiliyMap.computeIfAbsent(keyBinding2, key -> new ReferenceOpenHashSet<>()).add(keyBinding1);
     }
 
     /**
      * @return if the given key binds are forced to be compatible
      */
     public static boolean areCompatible(KeyBinding keyBinding1, KeyBinding keyBinding2) {
-        return compatibiliyMap.getOrDefault(keyBinding1, Collections.emptySet()).contains(keyBinding2);
+        return getCompatibles(keyBinding1).contains(keyBinding2);
     }
 
     /**

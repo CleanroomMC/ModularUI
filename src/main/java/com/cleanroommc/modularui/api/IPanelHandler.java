@@ -62,6 +62,21 @@ public interface IPanelHandler {
     void closePanelInternal();
 
     /**
+     * Toggles this panel open or closed. Delegates to {@link #openPanel()} and {@link #closePanel()}.
+     *
+     * @return {@code true} if the panel was opened, {@code false} if it was closed
+     */
+    default boolean togglePanel() {
+        if (isPanelOpen()) {
+            closePanel();
+            return false;
+        } else {
+            openPanel();
+            return true;
+        }
+    }
+
+    /**
      * Deletes the current cached panel. Should not be used frequently.
      * This only works on panels which don't have {@link ItemSlotSH} sync handlers.
      *

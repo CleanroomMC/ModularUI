@@ -3,22 +3,21 @@ package com.cleanroommc.modularui.value.sync;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.ISyncedAction;
-import com.cleanroommc.modularui.network.NetworkHandler;
-import com.cleanroommc.modularui.network.packets.PacketSyncHandler;
+import com.cleanroommc.modularui.network.ModularNetwork;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 
 import io.netty.buffer.Unpooled;
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ReferenceArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2ReferenceLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,11 +33,11 @@ import java.util.function.Supplier;
 
 public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
 
-    private final Map<String, SyncHandler> syncHandlers = new Object2ObjectLinkedOpenHashMap<>();
-    private final Map<String, SlotGroup> slotGroups = new Object2ObjectOpenHashMap<>();
-    private final Map<SyncHandler, String> reverseSyncHandlers = new Object2ObjectOpenHashMap<>();
-    private final Map<String, SyncedAction> syncedActions = new Object2ObjectOpenHashMap<>();
-    private final Map<String, PanelSyncHandler> subPanels = new Object2ObjectArrayMap<>();
+    private final Map<String, SyncHandler> syncHandlers = new Object2ReferenceLinkedOpenHashMap<>();
+    private final Map<String, SlotGroup> slotGroups = new Object2ReferenceOpenHashMap<>();
+    private final Map<SyncHandler, String> reverseSyncHandlers = new Reference2ObjectOpenHashMap<>();
+    private final Map<String, SyncedAction> syncedActions = new Object2ReferenceOpenHashMap<>();
+    private final Map<String, PanelSyncHandler> subPanels = new Object2ReferenceArrayMap<>();
     private final ModularSyncManager modularSyncManager;
     private String panelName;
     private boolean init = true;
@@ -165,6 +164,7 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
         getModularSyncManager().setCursorItem(stack);
     }
 
+    @Override
     public boolean hasSyncHandler(SyncHandler syncHandler) {
         return syncHandler.isValid() && syncHandler.getSyncManager() == this && this.reverseSyncHandlers.containsKey(syncHandler);
     }
@@ -314,12 +314,7 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
 
     public void callSyncedAction(String mapKey, PacketBuffer packet) {
         if (invokeSyncedAction(mapKey, packet)) {
-            PacketSyncHandler packetSyncHandler = new PacketSyncHandler(this.panelName, mapKey, true, packet);
-            if (isClient()) {
-                NetworkHandler.sendToServer(packetSyncHandler);
-            } else {
-                NetworkHandler.sendToPlayer(packetSyncHandler, (EntityPlayerMP) getPlayer());
-            }
+            ModularNetwork.get(isClient()).sendActionPacket(getModularSyncManager(), this.panelName, mapKey, packet, getPlayer());
         }
     }
 

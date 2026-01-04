@@ -11,7 +11,6 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
-import org.mariuszgromada.math.mxparser.License;
 
 import java.util.function.Predicate;
 
@@ -20,7 +19,7 @@ import java.util.function.Predicate;
         version = ModularUI.VERSION,
         acceptedMinecraftVersions = "[1.12,)",
         dependencies = "required-after:mixinbooter@[8.0,);" +
-                "after:bogorter@[1.4.0,);" +
+                "after:bogorter@[1.6.0,);" +
                 "after-client:neverenoughanimations@[1.0.6,)")
 public class ModularUI {
 
@@ -39,11 +38,6 @@ public class ModularUI {
 
     @Mod.Instance
     public static ModularUI INSTANCE;
-
-    static {
-        // confirm mXparser license
-        License.iConfirmNonCommercialUse("CleanroomMC");
-    }
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {

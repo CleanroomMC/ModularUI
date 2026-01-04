@@ -326,32 +326,39 @@ public class GuiDraw {
     }
 
     public static void drawStandardSlotAmountText(int amount, String format, Area area) {
-        drawAmountText(amount, format, 1, 1, area.width - 1, area.height - 1, Alignment.BottomRight);
+        if (amount != 1 || format != null) {
+            drawAmountText(amount, format, 0, 0, area.width, area.height, Alignment.BottomRight);
+        }
     }
 
     public static void drawAmountText(int amount, String format, int x, int y, int width, int height, Alignment alignment) {
-        if (amount > 1 || format != null) {
-            String amountText = NumberFormat.AMOUNT_TEXT.format(amount);
-            if (format != null) {
-                amountText = format + amountText;
-            }
-            float scale = 1f;
-            if (amountText.length() == 3) {
-                scale = 0.8f;
-            } else if (amountText.length() == 4) {
-                scale = 0.6f;
-            } else if (amountText.length() > 4) {
-                scale = 0.5f;
-            }
-            textRenderer.setShadow(true);
-            textRenderer.setScale(scale);
-            textRenderer.setColor(Color.WHITE.main);
-            textRenderer.setAlignment(alignment, width, height);
-            textRenderer.setPos(x, y);
-            textRenderer.setHardWrapOnBorder(false);
+        String s = NumberFormat.AMOUNT_TEXT.format(amount);
+        if (format != null) s = format + s;
+        drawScaledAlignedTextInBox(s, x, y, width, height, alignment);
+    }
+
+    public static void drawScaledAlignedTextInBox(String amountText, int x, int y, int width, int height, Alignment alignment) {
+        drawScaledAlignedTextInBox(amountText, x, y, width, height, alignment, 1f);
+    }
+
+    public static void drawScaledAlignedTextInBox(String amountText, int x, int y, int width, int height, Alignment alignment, float maxScale) {
+        if (amountText == null || amountText.isEmpty()) return;
+        // setup text renderer
+        textRenderer.setShadow(true);
+        textRenderer.setScale(1f);
+        textRenderer.setColor(Color.WHITE.main);
+        textRenderer.setAlignment(alignment, width, height);
+        textRenderer.setPos(x, y);
+        textRenderer.setHardWrapOnBorder(false);
+        if (amountText.length() > 2 && width > 16) { // we know that numbers below 100 will always fit in standard slots
+            // simulate and calculate scale with width
+            textRenderer.setSimulate(true);
             textRenderer.draw(amountText);
-            textRenderer.setHardWrapOnBorder(true);
+            textRenderer.setSimulate(false);
+            textRenderer.setScale(Math.min(maxScale, width / textRenderer.getLastActualWidth()));
         }
+        textRenderer.draw(amountText);
+        textRenderer.setHardWrapOnBorder(true);
     }
 
     public static void drawSprite(TextureAtlasSprite sprite, float x0, float y0, float w, float h) {

@@ -20,6 +20,8 @@ import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 import com.cleanroommc.modularui.widget.Widget;
+import com.cleanroommc.bogosorter.common.config.PlayerConfig;
+import com.cleanroommc.bogosorter.common.lock.SlotLock;
 import com.cleanroommc.neverenoughanimations.NEAConfig;
 
 import net.minecraft.client.gui.GuiScreen;
@@ -92,16 +94,18 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         if (this.syncHandler == null) return;
         RenderHelper.enableGUIStandardItemLighting();
         drawSlot(getSlot());
-        RenderHelper.enableStandardItemLighting();
         GlStateManager.disableLighting();
+    }
+
+    @Override
+    public void drawOverlay(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
+        super.drawOverlay(context, widgetTheme);
         drawOverlay();
     }
 
     protected void drawOverlay() {
         if (isHovering() && (!ModularUI.Mods.NEA.isLoaded() || NEAConfig.itemHoverOverlay)) {
-            GlStateManager.colorMask(true, true, true, false);
             GuiDraw.drawRect(1, 1, 16, 16, getSlotHoverColor());
-            GlStateManager.colorMask(true, true, true, true);
         }
     }
 
@@ -137,19 +141,25 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @Override
     public @NotNull Result onMousePressed(int mouseButton) {
-        ClientScreenHandler.clickSlot(getScreen(), getSlot());
+        if (!isLockedByBogosorter()) {
+            ClientScreenHandler.clickSlot(getScreen(), getSlot());
+        }
         return Result.SUCCESS;
     }
 
     @Override
     public boolean onMouseRelease(int mouseButton) {
-        ClientScreenHandler.releaseSlot();
+        if (!isLockedByBogosorter()) {
+            ClientScreenHandler.releaseSlot();
+        }
         return true;
     }
 
     @Override
     public void onMouseDrag(int mouseButton, long timeSinceClick) {
-        ClientScreenHandler.dragSlot(timeSinceClick);
+        if (!isLockedByBogosorter()) {
+            ClientScreenHandler.dragSlot(timeSinceClick);
+        }
     }
 
     public ModularSlot getSlot() {
@@ -226,7 +236,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         RenderItem renderItem = ((GuiScreenAccessor) guiScreen).getItemRender();
         ItemStack itemstack = slotIn.getStack();
         boolean isDragPreview = false;
-        boolean flag1 = slotIn == acc.getClickedSlot() && !acc.getDraggedStack().isEmpty() && !acc.getIsRightMouseClick();
+        boolean doDrawItem = slotIn == acc.getClickedSlot() && !acc.getDraggedStack().isEmpty() && !acc.getIsRightMouseClick();
         ItemStack itemstack1 = guiScreen.mc.player.inventory.getItemStack();
         int amount = -1;
         String format = null;
@@ -240,7 +250,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                     return;
                 }
 
-                if (Container.canAddItemToSlot(slotIn, itemstack1, true) && getScreen().getContainer().canDragIntoSlot(slotIn)) {
+                if (Container.canAddItemToSlot(slotIn, itemstack1, true) && getScreen().getContainer().canDragIntoSlot(slotIn) &&
+                        (!ModularUI.Mods.BOGOSORTER.isLoaded() || PlayerConfig.getClient().onlyBlockSorting || !SlotLock.getClientCap().isSlotLocked(slotIn))) {
                     itemstack = itemstack1.copy();
                     isDragPreview = true;
                     Container.computeStackSize(acc.getDragSplittingSlots(), acc.getDragSplittingLimit(), itemstack, slotIn.getStack().isEmpty() ? 0 : slotIn.getStack().getCount());
@@ -263,9 +274,9 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         ((GuiAccessor) guiScreen).setZLevel(z);
         renderItem.zLevel = z;
 
-        if (!flag1) {
+        if (!doDrawItem) {
             if (isDragPreview) {
-                GuiDraw.drawRect(1, 1, 16, 16, -2130706433);
+                GuiDraw.drawRect(1, 1, 16, 16, 0x80FFFFFF);
             }
 
             itemstack = NEAAnimationHandler.injectVirtualStack(itemstack, guiContainer, slotIn);
@@ -295,6 +306,14 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
         ((GuiAccessor) guiScreen).setZLevel(0f);
         renderItem.zLevel = 0f;
+
+        if (isLockedByBogosorter()) {
+            SlotLock.drawLock(1, 1, 16, 16);
+        }
+    }
+
+    public boolean isLockedByBogosorter() {
+        return ModularUI.Mods.BOGOSORTER.isLoaded() && ModularSlot.isPlayerSlot(getSlot()) && SlotLock.getClientCap().isSlotLocked(getSlot().getSlotIndex());
     }
 
     @Override

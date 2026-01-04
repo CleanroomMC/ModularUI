@@ -9,7 +9,6 @@ import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 import com.cleanroommc.modularui.value.sync.PhantomItemSlotSH;
 
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 
 import mezz.jei.Internal;
@@ -40,9 +39,7 @@ public class PhantomItemSlot extends ItemSlot implements RecipeViewerGhostIngred
     @Override
     protected void drawOverlay() {
         if (ModularUI.Mods.JEI.isLoaded() && (ModularUIJeiPlugin.draggingValidIngredient(this) || ModularUIJeiPlugin.hoveringOverIngredient(this))) {
-            GlStateManager.colorMask(true, true, true, false);
             drawHighlight(getArea(), isHovering());
-            GlStateManager.colorMask(true, true, true, true);
         } else {
             super.drawOverlay();
         }

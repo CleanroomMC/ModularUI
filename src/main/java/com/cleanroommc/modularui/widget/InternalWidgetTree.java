@@ -71,7 +71,6 @@ class InternalWidgetTree {
         GlStateManager.pushMatrix();
         context.applyToOpenGl();
 
-        GlStateManager.colorMask(true, true, true, true);
         if (canBeSeen) {
             // draw widget
             GlStateManager.color(1f, 1f, 1f, alpha);
@@ -161,7 +160,6 @@ class InternalWidgetTree {
         context.applyToOpenGl();
 
         // draw widget
-        GlStateManager.colorMask(true, true, true, true);
         GlStateManager.color(1f, 1f, 1f, alpha);
         WidgetThemeEntry<?> widgetTheme = parent.getWidgetTheme(context.getTheme());
         parent.drawBackground(context, widgetTheme);

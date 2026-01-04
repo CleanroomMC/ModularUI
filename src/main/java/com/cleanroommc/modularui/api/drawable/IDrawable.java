@@ -94,7 +94,7 @@ public interface IDrawable {
      */
     @SideOnly(Side.CLIENT)
     default void drawAtZero(GuiContext context, Area area, WidgetTheme widgetTheme) {
-        draw(context, 0, 0, area.paddedWidth(), area.paddedHeight(), widgetTheme);
+        draw(context, 0, 0, area.width, area.height, widgetTheme);
     }
 
     /**
@@ -110,7 +110,6 @@ public interface IDrawable {
     default void drawAtZeroPadded(GuiContext context, Area area, WidgetTheme widgetTheme) {
         draw(context, area.getPadding().getLeft(), area.getPadding().getTop(), area.paddedWidth(), area.paddedHeight(), widgetTheme);
     }
-
 
     /**
      * @return if theme color can be applied on this drawable

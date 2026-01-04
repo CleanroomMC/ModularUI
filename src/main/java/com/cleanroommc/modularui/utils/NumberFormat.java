@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.utils;
 
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -9,6 +10,8 @@ import java.text.DecimalFormatSymbols;
  * Test results can be seen at test/java/com.cleanroommc.modularui.FormatTest.
  */
 public class NumberFormat {
+
+    public static final BigDecimal TEN_THOUSAND = new BigDecimal(10_000);
 
     public static final Params DEFAULT = paramsBuilder()
             .roundingMode(RoundingMode.HALF_UP)
@@ -197,6 +200,32 @@ public class NumberFormat {
             int index;
             for (index = 0; index < n; index++) {
                 if (number >= low[index].factor) {
+                    break;
+                }
+            }
+            prefix = low[index];
+        }
+        return prefix;
+    }
+
+    public static SIPrefix findBestPrefix(BigDecimal number) {
+        if (number.compareTo(BigDecimal.ONE) >= 0 && number.compareTo(TEN_THOUSAND) < 0) return SIPrefix.One;
+        SIPrefix[] high = SIPrefix.HIGH;
+        SIPrefix[] low = SIPrefix.LOW;
+        int n = high.length - 1;
+        SIPrefix prefix;
+        if (number.compareTo(TEN_THOUSAND) >= 0) {
+            int index;
+            for (index = 0; index < n; index++) {
+                if (number.compareTo(high[index + 1].bigFactor) < 0) {
+                    break;
+                }
+            }
+            prefix = high[index];
+        } else {
+            int index;
+            for (index = 0; index < n; index++) {
+                if (number.compareTo(low[index].bigFactor) >= 0) {
                     break;
                 }
             }

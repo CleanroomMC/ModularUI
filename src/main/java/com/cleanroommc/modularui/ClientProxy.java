@@ -96,9 +96,8 @@ public class ClientProxy extends CommonProxy {
         } catch (IOException | LWJGLException e) {
             throw new RuntimeException(e);
         } catch (Throwable e) {
-            ModularUI.LOGGER.info("Custom Cursors failed to load. This is likely because an incompatible LWJGL version was used like with CleanroomLoader.");
-            // TODO: proper lwjgl 3 support
-            // currently it seems this is not even triggered and the cursors are created correctly, but when the cursors are set nothing happens
+            ModularUI.LOGGER.info("Custom Cursors failed to load.");
+            // lwjgl3: currently it seems this is not even triggered and the cursors are created correctly, but when the cursors are set nothing happens
         }
     }
 
