@@ -22,6 +22,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -29,6 +30,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
+import mezz.jei.gui.ghost.GhostIngredientDrag;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
@@ -378,6 +380,17 @@ public class ModularScreen {
                 break;
             }
         }
+        return false;
+    }
+
+    @Optional.Method(modid = ModularUI.ModIds.JEI)
+    boolean checkRecipeViewerGhostDrag(int mouseButton, GhostIngredientDrag<?> drag) {
+        for (ModularPanel panel : this.panelManager.getOpenPanels()) {
+            if (panel.checkRecipeViewerGhostIngredient(mouseButton, drag)) {
+                return true;
+            }
+        }
+        getContext().removeFocus();
         return false;
     }
 

@@ -14,6 +14,7 @@ import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccesso
 import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.Stencil;
+import com.cleanroommc.modularui.integration.jei.ModularUIJeiPlugin;
 import com.cleanroommc.modularui.network.ModularNetwork;
 import com.cleanroommc.modularui.overlay.OverlayManager;
 import com.cleanroommc.modularui.overlay.OverlayStack;
@@ -49,6 +50,7 @@ import net.minecraftforge.client.event.GuiContainerEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -56,6 +58,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import mezz.jei.gui.ghost.GhostIngredientDrag;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
@@ -67,6 +70,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 @ApiStatus.Internal
@@ -245,6 +249,11 @@ public class ClientScreenHandler {
         return OverlayStack.interact(action, true) || (muiScreen != null && action.test(muiScreen));
     }
 
+    private static void foreach(@Nullable ModularScreen muiScreen, Consumer<ModularScreen> action) {
+        OverlayStack.foreach(action, true);
+        if (muiScreen != null) action.accept(muiScreen);
+    }
+
     private static boolean handleMouseInput(int button, @Nullable ModularScreen muiScreen, GuiScreen mcScreen) throws IOException {
         GameSettings gameSettings = Minecraft.getMinecraft().gameSettings;
         GuiScreenAccessor acc = (GuiScreenAccessor) mcScreen;
@@ -261,6 +270,18 @@ public class ClientScreenHandler {
             acc.setEventButton(button);
             acc.setLastMouseEvent(Minecraft.getSystemTime());
             if (muiScreen != null && muiScreen.onMouseInputPre(button, true)) return true;
+            if (ModularUI.Mods.JEI.isLoaded()) {
+                GhostIngredientDrag<?> drag = ModularUIJeiPlugin.getGhostDrag();
+                if (drag != null) {
+                    if (!RecipeViewerGhostHandler.checkRecipeViewerGhostDrag(muiScreen, button, drag)) {
+                        // no target found -> tell jei to drop the ghost ingredient
+                        // stop all further interaction since dropping the ingredient counts as an interaction
+                        ModularUIJeiPlugin.getGhostDragManager().stopDrag();
+                    }
+                    // in both cases we want to stop further click processing
+                    return true;
+                }
+            }
             return doAction(muiScreen, ms -> ms.onMousePressed(button));
         }
         if (button != -1) {
@@ -282,6 +303,17 @@ public class ClientScreenHandler {
             return doAction(muiScreen, ms -> ms.onMouseDrag(acc.getEventButton(), l));
         }
         return false;
+    }
+
+    /**
+     * We need to have a separate class for this since {@link Optional.Method} does not remove its contained lambdas.
+     * So we have this class which must only be loaded when recipe viewer mod is loaded.
+     */
+    private static class RecipeViewerGhostHandler {
+
+        private static boolean checkRecipeViewerGhostDrag(ModularScreen muiScreen, int button, GhostIngredientDrag<?> drag) {
+            return doAction(muiScreen, ms -> ms.checkRecipeViewerGhostDrag(button, drag));
+        }
     }
 
     /**

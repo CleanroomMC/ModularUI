@@ -33,6 +33,7 @@ import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import com.cleanroommc.neverenoughanimations.NEAConfig;
 
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.common.Optional;
 
 import mezz.jei.gui.ghost.GhostIngredientDrag;
 import org.jetbrains.annotations.ApiStatus;
@@ -318,8 +319,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                     closeIfOpen();
                     result = true;
                 }
-            } else if (checkRecipeViewerGhostIngredient(mouseButton)) {
-                return true;
             } else {
                 for (LocatedWidget widget : this.hovering) {
                     if (widget.getElement() == null || !widget.getElement().isValid()) continue;
@@ -380,32 +379,26 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         });
     }
 
-    private boolean checkRecipeViewerGhostIngredient(int mouseButton) {
-        if (ModularUI.Mods.JEI.isLoaded() && ModularUIJeiPlugin.getGhostDrag() != null) {
-            // try inserting ghost ingredient
-            GhostIngredientDrag<?> drag = ModularUIJeiPlugin.getGhostDrag();
-            for (LocatedWidget widget : this.hovering) {
-                if (widget.getElement() instanceof RecipeViewerGhostIngredientSlot<?> ghostSlot && RecipeViewerGhostIngredientSlot.insertGhostIngredient(drag, ghostSlot)) {
-                    ModularUIJeiPlugin.getGhostDragManager().stopDrag();
-                    this.mouse.pressed(widget, mouseButton);
-                    this.mouse.doRelease = false;
-                    getContext().removeFocus();
-                    return true;
-                }
-                // we can't really predict if the interactable would stop further interaction
-                // so we assume worst
-                if (widget.getElement() instanceof Interactable || !widget.getElement().canClickThrough()) {
-                    break;
-                }
+    @Optional.Method(modid = ModularUI.ModIds.JEI)
+    boolean checkRecipeViewerGhostIngredient(int mouseButton, GhostIngredientDrag<?> drag) {
+        if (this.hovering.isEmpty()) return false;
+        // try inserting ghost ingredient
+        for (LocatedWidget widget : this.hovering) {
+            if (widget.getElement() instanceof RecipeViewerGhostIngredientSlot<?> ghostSlot && RecipeViewerGhostIngredientSlot.insertGhostIngredient(drag, ghostSlot)) {
+                ModularUIJeiPlugin.getGhostDragManager().stopDrag();
+                this.mouse.pressed(widget, mouseButton);
+                this.mouse.doRelease = false;
+                getContext().removeFocus();
+                return true;
             }
-            // no target found -> tell jei to drop the ghost ingredient
-            // stop all further interaction since dropping the ingredient counts as an interaction
-            ModularUIJeiPlugin.getGhostDragManager().stopDrag();
-            this.mouse.pressed(LocatedWidget.EMPTY, mouseButton);
-            this.mouse.doRelease = false;
-            getContext().removeFocus();
-            return true;
+            // we can't really predict if the interactable would stop further interaction
+            // so we assume worst
+            if (widget.getElement() instanceof Interactable || !widget.getElement().canClickThrough()) {
+                break;
+            }
         }
+        this.mouse.pressed(LocatedWidget.EMPTY, mouseButton);
+        this.mouse.doRelease = false;
         return false;
     }
 
