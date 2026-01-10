@@ -227,7 +227,7 @@ public class UITexture implements IDrawable, IJsonSerializable {
         }
         UITexture uiTexture = builder.build();
         uiTexture.colorOverride = JsonHelper.getColor(json, 0, "colorOverride");
-        return builder.build();
+        return uiTexture;
     }
 
     @Override
