@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.api.drawable;
 
-import com.cleanroommc.modularui.drawable.text.RichText;
 import com.cleanroommc.modularui.drawable.text.Spacer;
 import com.cleanroommc.modularui.utils.Alignment;
 
@@ -12,6 +11,16 @@ public interface IRichTextBuilder<T extends IRichTextBuilder<T>> {
     T getThis();
 
     IRichTextBuilder<?> getRichText();
+
+    /**
+     * Removes all text and style.
+     *
+     * @return this
+     */
+    default T reset() {
+        getRichText().reset();
+        return getThis();
+    }
 
     /**
      * Adds a string to the current line

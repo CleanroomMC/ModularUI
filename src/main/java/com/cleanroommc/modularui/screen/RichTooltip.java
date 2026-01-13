@@ -56,8 +56,9 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
         parent(Area.ZERO);
     }
 
-    public void reset() {
-        clearText();
+    @Override
+    public RichTooltip reset() {
+        this.text.reset();
         this.pos = null;
         this.tooltipBuilder = null;
         this.showUpTimer = 0;
@@ -67,6 +68,7 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
         this.x = 0;
         this.y = 0;
         this.maxWidth = Integer.MAX_VALUE;
+        return this;
     }
 
     public RichTooltip parent(Consumer<Area> parent) {
@@ -338,7 +340,7 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
 
     public RichTooltip tooltipBuilder(Consumer<RichTooltip> tooltipBuilder) {
         Consumer<RichTooltip> existingBuilder = this.tooltipBuilder;
-        if (existingBuilder != null) {
+        if (existingBuilder != null && tooltipBuilder != null) {
             this.tooltipBuilder = tooltip -> {
                 existingBuilder.accept(this);
                 tooltipBuilder.accept(this);
