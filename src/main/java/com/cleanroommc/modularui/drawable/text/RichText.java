@@ -93,6 +93,20 @@ public class RichText implements IDrawable, IRichTextBuilder<RichText> {
         return this;
     }
 
+    @Override
+    public RichText reset() {
+        this.elements.clear();
+        this.stringList = null;
+        this.alignment = Alignment.CenterLeft;
+        this.scale = 1f;
+        this.color = null;
+        this.shadow = null;
+        this.cursor = 0;
+        this.cursorLocked = false;
+        this.cachedText = null;
+        return this;
+    }
+
     public RichText add(String s) {
         addElement(s);
         clearStrings();
