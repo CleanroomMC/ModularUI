@@ -34,6 +34,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.lwjgl.LWJGLException;
+import org.lwjgl.Sys;
 import org.lwjgl.input.Cursor;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -50,6 +51,7 @@ public class ClientProxy extends CommonProxy {
     private final Timer timer60Fps = new Timer(60f);
     public static KeyBinding testKey;
 
+    public static int majorLwjgl = -1;
     public static Cursor resizeCursorDiag;
     public static Cursor resizeCursorDiagInverse;
     public static Cursor resizeCursorH;
@@ -84,6 +86,14 @@ public class ClientProxy extends CommonProxy {
 
         // Create resize window cursors
         try {
+            String ver = Sys.getVersion();
+            ClientProxy.majorLwjgl = Integer.parseInt(ver.split("\\.")[0]);
+
+            if (ClientProxy.majorLwjgl > 2) {
+                ModularUI.LOGGER.warn("Custom cursors are currently not compatible with lwjgl 3. They will be disabled.");
+                return;
+            }
+
             BufferedImage img = ImageIO.read(getClass().getClassLoader().getResourceAsStream("assets/modularui/textures/gui/icons/cursor_resize_diag.png"));
             int size = img.getHeight();
             resizeCursorDiagInverse = new Cursor(size, size, size / 2, size / 2, 1, readPixel(img, true, false), null);
