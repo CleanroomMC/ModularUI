@@ -35,6 +35,11 @@ public abstract class WidgetResizeNode extends ResizeNode {
     }
 
     @Override
+    public void postFullResize() {
+        this.widget.postResize();
+    }
+
+    @Override
     public boolean isLayout() {
         return this.widget instanceof ILayoutWidget;
     }
@@ -58,5 +63,10 @@ public abstract class WidgetResizeNode extends ResizeNode {
     @Override
     public String getDebugDisplayName() {
         return "widget '" + this.widget + "' of screen '" + this.widget.getScreen() + "'";
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" + this.widget + ")";
     }
 }

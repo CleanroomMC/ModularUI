@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.ITreeNode;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.ModularPanel;
@@ -20,7 +21,7 @@ import java.util.function.Consumer;
 /**
  * A widget in a Gui
  */
-public interface IWidget extends IGuiElement {
+public interface IWidget extends IGuiElement, ITreeNode<IWidget> {
 
     /**
      * Validates and initialises this element.
@@ -150,6 +151,7 @@ public interface IWidget extends IGuiElement {
      * @return all children of this widget
      */
     @NotNull
+    @Override
     default List<IWidget> getChildren() {
         return Collections.emptyList();
     }
@@ -157,6 +159,7 @@ public interface IWidget extends IGuiElement {
     /**
      * @return if this widget has any children
      */
+    @Override
     default boolean hasChildren() {
         return !getChildren().isEmpty();
     }
@@ -229,6 +232,7 @@ public interface IWidget extends IGuiElement {
      * @return the parent of this widget
      */
     @NotNull
+    @Override
     IWidget getParent();
 
     @Override

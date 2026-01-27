@@ -8,6 +8,8 @@ import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.factory.ClientGUI;
 import com.cleanroommc.modularui.holoui.HoloUI;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.RichTooltipEvent;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.ReloadThemeEvent;
@@ -16,6 +18,7 @@ import com.cleanroommc.modularui.theme.ThemeBuilder;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.Platform;
+import com.cleanroommc.modularui.widgets.ButtonWidget;
 
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -52,7 +55,15 @@ public class EventHandler {
         if (event.getEntityPlayer().getEntityWorld().isRemote) {
             ItemStack itemStack = event.getItemStack();
             if (itemStack.getItem() == Items.DIAMOND) {
-                ClientGUI.open(new TestGuis());
+                //ClientGUI.open(new TestGuis());
+                ClientGUI.open(new ModularScreen(
+                        new ModularPanel("test")
+                                .size(150)
+                                .child(new ButtonWidget<>()
+                                        .size(50)
+                                        .center()
+                                        .overlay(IKey.str("Button")))
+                ));
             } else if (itemStack.getItem() == Items.EMERALD) {
                 HoloUI.builder()
                         .inFrontOf(Platform.getClientPlayer(), 5, false)

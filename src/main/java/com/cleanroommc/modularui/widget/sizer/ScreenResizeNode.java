@@ -23,4 +23,9 @@ public class ScreenResizeNode extends StaticResizer {
     public String getDebugDisplayName() {
         return "screen '" + this.screen + "'";
     }
+
+    @Override
+    public String toString() {
+        return "ScreenResizeNode(" + this.screen + ")";
+    }
 }

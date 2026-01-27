@@ -17,4 +17,9 @@ public class AreaResizer extends StaticResizer {
     public String getDebugDisplayName() {
         return "";
     }
+
+    @Override
+    public String toString() {
+        return "AreaResizer(" + this.area + ")";
+    }
 }

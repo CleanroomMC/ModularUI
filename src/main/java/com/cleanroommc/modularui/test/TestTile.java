@@ -179,7 +179,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                     return new Column()
                             .widthRel(1f)
                             .coverChildrenHeight()
-                            .children(vals.size(), i -> IKey.str(String.valueOf(vals.get(i))).asWidget().padding(2));
+                            .children(vals.size(), i -> IKey.str(String.valueOf(vals.get(i))).asWidget().padding(2))
+                            .name("synced number col");
                 });
 
         Rectangle colorPickerBackground = new Rectangle().color(Color.RED.main);
@@ -239,6 +240,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                         .build()
                                         .margin(5, 5, 20, 5).name("crafting"))))
                 .child(Flow.column()
+                        .name("main col")
                         .sizeRel(1f)
                         .paddingBottom(7)
                         .child(new ParentWidget<>()
@@ -476,6 +478,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                 .name("page 4 storage")
                                                 .sizeRel(1f)
                                                 .child(new Column()
+                                                        .name("page 4 col, dynamic widgets")
                                                         .padding(7)
                                                         .child(new ItemSlot()
                                                                 .slot(new ModularSlot(this.storageInventory0, 0)

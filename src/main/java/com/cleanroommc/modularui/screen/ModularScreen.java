@@ -32,6 +32,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import mezz.jei.gui.ghost.GhostIngredientDrag;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -182,6 +183,7 @@ public class ModularScreen {
         }
 
         this.context.pushViewport(null, this.context.getScreenArea());
+        WidgetTree.verifyTree(this.resizeNode, new ReferenceOpenHashSet<>());
         WidgetTree.resizeInternal(this.resizeNode, true);
 
         this.context.popViewport(null);

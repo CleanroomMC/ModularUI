@@ -6,15 +6,12 @@ public abstract class StaticResizer extends ResizeNode {
 
     private boolean childrenCalculated = false;
 
-    public StaticResizer() {
-        setResized(true);
-        setMarginPaddingApplied(true);
-        setChildrenResized(true);
-        setLayoutDone(true);
-    }
+    public StaticResizer() {}
 
     @Override
-    public void initResizing(boolean onOpen) {}
+    public void initResizing(boolean onOpen) {
+        setChildrenResized(false);
+    }
 
     @Override
     public boolean isXCalculated() {

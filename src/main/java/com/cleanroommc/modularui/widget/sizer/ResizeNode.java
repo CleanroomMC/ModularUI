@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.widget.sizer;
 
 import com.cleanroommc.modularui.api.GuiAxis;
+import com.cleanroommc.modularui.api.ITreeNode;
 import com.cleanroommc.modularui.api.layout.IResizeable2;
 
 import org.jetbrains.annotations.ApiStatus;
@@ -9,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ResizeNode implements IResizeable2 {
+public abstract class ResizeNode implements IResizeable2, ITreeNode<ResizeNode> {
 
     private ResizeNode defaultParent;
     private ResizeNode parentOverride;
@@ -17,15 +18,18 @@ public abstract class ResizeNode implements IResizeable2 {
     private boolean requiresResize = true;
 
     @ApiStatus.Internal
+    @Override
     public List<ResizeNode> getChildren() {
         return children;
     }
 
+    @Override
     public ResizeNode getParent() {
         return parentOverride != null ? parentOverride : defaultParent;
     }
 
     public void dispose() {
+        if (getParent() != null) getParent().children.remove(this);
         this.defaultParent = null;
         this.parentOverride = null;
         this.children.clear();
@@ -61,9 +65,7 @@ public abstract class ResizeNode implements IResizeable2 {
     }
 
     @Override
-    public void initResizing(boolean onOpen) {
-        reset();
-    }
+    public void initResizing(boolean onOpen) {}
 
     public void reset() {}
 
@@ -74,6 +76,8 @@ public abstract class ResizeNode implements IResizeable2 {
     public void onResized() {
         this.requiresResize = false;
     }
+
+    public void postFullResize() {}
 
     public boolean requiresResize() {
         return this.requiresResize;
@@ -159,4 +163,7 @@ public abstract class ResizeNode implements IResizeable2 {
     public abstract boolean hasFixedSize();
 
     public abstract String getDebugDisplayName();
+
+    @Override
+    public abstract String toString();
 }

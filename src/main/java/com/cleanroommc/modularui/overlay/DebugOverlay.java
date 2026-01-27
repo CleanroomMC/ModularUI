@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.overlay;
 
-import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.drawable.IKey;
@@ -27,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 public class DebugOverlay extends CustomModularScreen {
 
     public static void register() {
-        OverlayManager.register(new OverlayHandler(screen -> ModularUIConfig.guiDebugMode && screen instanceof IMuiScreen, screen -> new DebugOverlay((IMuiScreen) screen)));
+        //OverlayManager.register(new OverlayHandler(screen -> ModularUIConfig.guiDebugMode && screen instanceof IMuiScreen, screen -> new DebugOverlay((IMuiScreen) screen)));
     }
 
     private static final IIcon CHECKMARK = GuiTextures.CHECKMARK.asIcon().size(8);
@@ -92,7 +91,7 @@ public class DebugOverlay extends CustomModularScreen {
 
     private boolean logWidgetTrees(int b) {
         for (ModularPanel panel : parent.getScreen().getPanelManager().getOpenPanels()) {
-            WidgetTree.printTree(panel);
+            WidgetTree.print(panel);
         }
         return true;
     }

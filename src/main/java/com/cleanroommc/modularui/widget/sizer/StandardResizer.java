@@ -37,6 +37,15 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
     }
 
     @Override
+    public void initResizing(boolean onOpen) {
+        setMarginPaddingApplied(false);
+        setResized(false);
+        this.childrenResized = false;
+        this.layoutResized = false;
+        super.initResizing(onOpen);
+    }
+
+    @Override
     public void reset() {
         this.x.reset();
         this.y.reset();
@@ -79,7 +88,7 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
 
     @Override
     public boolean canRelayout(boolean isParentLayout) {
-        return false;
+        return isParentLayout && (this.x.canRelayout() || this.y.canRelayout());
     }
 
     @Override
@@ -157,7 +166,7 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
         // this means for each edge there is at least one widget that touches it (plus padding and margin)
 
         // children are now calculated and now this area can be calculated if it requires childrens area
-        List<IWidget> children = widget.getChildren();
+        List<IWidget> children = widget.getChildren(); // TODO cover resizer children instead?
         int moveChildrenX = 0, moveChildrenY = 0;
 
         Box padding = getWidget().getArea().getPadding();
@@ -317,7 +326,7 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
     }
 
     @Override
-    public void onResized() {
+    public void postFullResize() {
         IWidget widget = getWidget();
         Area area = widget.getArea();
         // update rx and ry to be relative to the widget parent not the resize node parent
@@ -333,7 +342,7 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
             slot.xPos = widget.getArea().x - mainArea.x + 1;
             slot.yPos = widget.getArea().y - mainArea.y + 1;
         }
-        super.onResized();
+        super.postFullResize();
     }
 
     @Override
@@ -399,7 +408,7 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
 
     @Override
     public boolean dependsOnParentY() {
-        return this.x.dependsOnParent();
+        return this.y.dependsOnParent();
     }
 
     @Override
@@ -409,7 +418,7 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
 
     @Override
     public boolean dependsOnChildrenY() {
-        return this.x.dependsOnChildren();
+        return this.y.dependsOnChildren();
     }
 
     public StandardResizer expanded() {
