@@ -12,6 +12,7 @@ import com.cleanroommc.modularui.utils.Alignment;
 import net.minecraft.inventory.Slot;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.DoubleSupplier;
@@ -101,9 +102,15 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
         markDirty();
     }
 
+    @ApiStatus.Internal
     @Override
-    public void initResizing() {
-
+    public void checkExpanded(@Nullable GuiAxis axis) {
+        this.x.setExpanded(false);
+        this.y.setExpanded(false);
+        if (this.expanded && axis != null) {
+            if (axis.isHorizontal()) this.x.setExpanded(true);
+            else this.y.setExpanded(true);
+        }
     }
 
     @Override
@@ -307,6 +314,13 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
         this.y.applyMarginAndPaddingToPos(widget, area, relativeTo);
         // after all widgets x, y, width and height have been calculated we can now calculate the absolute position
         area.applyPos(relativeTo.x, relativeTo.y);
+    }
+
+    @Override
+    public void onResized() {
+        IWidget widget = getWidget();
+        Area area = widget.getArea();
+        // update rx and ry to be relative to the widget parent not the resize node parent
         Area parentArea = widget.getParentArea();
         area.rx = area.x - parentArea.x;
         area.ry = area.y - parentArea.y;
@@ -319,6 +333,7 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
             slot.xPos = widget.getArea().x - mainArea.x + 1;
             slot.yPos = widget.getArea().y - mainArea.y + 1;
         }
+        super.onResized();
     }
 
     @Override
@@ -347,36 +362,34 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
         this.y.setMarginPaddingApplied(b);
     }
 
+    @Override
     public boolean hasYPos() {
         return this.y.hasPos();
     }
 
+    @Override
     public boolean hasXPos() {
         return this.x.hasPos();
     }
 
+    @Override
     public boolean hasHeight() {
         return this.y.hasSize();
     }
 
+    @Override
     public boolean hasWidth() {
         return this.x.hasSize();
     }
 
+    @Override
     public boolean hasStartPos(GuiAxis axis) {
         return axis.isHorizontal() ? this.x.hasStart() : this.y.hasStart();
     }
 
+    @Override
     public boolean hasEndPos(GuiAxis axis) {
         return axis.isHorizontal() ? this.x.hasEnd() : this.y.hasEnd();
-    }
-
-    public boolean hasPos(GuiAxis axis) {
-        return axis.isHorizontal() ? hasXPos() : hasYPos();
-    }
-
-    public boolean hasSize(GuiAxis axis) {
-        return axis.isHorizontal() ? hasWidth() : hasHeight();
     }
 
     @Override
@@ -405,8 +418,57 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
         return this;
     }
 
+    @Override
     public boolean isExpanded() {
         return this.expanded;
+    }
+
+    @Override
+    public boolean hasFixedSize() {
+        return this.x.hasFixedSize() && this.y.hasFixedSize();
+    }
+
+    @Override
+    public boolean isFullSize() {
+        if (!hasHeight() || !hasWidth()) return false;
+        return this.x.isFullSize() && this.y.isFullSize();
+    }
+
+    @Override
+    public StandardResizer relative(ResizeNode resizeNode) {
+        setParentOverride(resizeNode);
+        return this;
+    }
+
+    @Override
+    public StandardResizer relativeToParent() {
+        setParentOverride(null);
+        return this;
+    }
+
+    @Override
+    public StandardResizer relativeToScreen() {
+        // TODO
+        return this;
+    }
+
+    @Override
+    public StandardResizer coverChildren() {
+        this.x.setCoverChildren(true, getWidget());
+        this.y.setCoverChildren(true, getWidget());
+        return this;
+    }
+
+    @Override
+    public StandardResizer coverChildrenWidth() {
+        this.x.setCoverChildren(true, getWidget());
+        return this;
+    }
+
+    @Override
+    public StandardResizer coverChildrenHeight() {
+        this.y.setCoverChildren(true, getWidget());
+        return this;
     }
 
     @ApiStatus.Internal

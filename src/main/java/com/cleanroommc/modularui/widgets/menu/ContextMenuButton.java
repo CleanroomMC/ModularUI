@@ -7,7 +7,7 @@ import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.widget.Widget;
-import com.cleanroommc.modularui.widget.sizer.Flex;
+import com.cleanroommc.modularui.widget.sizer.StandardResizer;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -92,7 +92,6 @@ public class ContextMenuButton<W extends ContextMenuButton<W>> extends Widget<W>
         }
         this.menuList.setSource(this);
         this.menuList.relative(this);
-        this.menuList.bypassLayerRestriction();
         this.direction.positioner.accept(this.menuList.flex());
     }
 
@@ -201,9 +200,9 @@ public class ContextMenuButton<W extends ContextMenuButton<W>> extends Widget<W>
         RIGHT_DOWN(flex -> flex.leftRel(1f).top(0)),
         UNDEFINED(flex -> {});
 
-        private final Consumer<Flex> positioner;
+        private final Consumer<StandardResizer> positioner;
 
-        Direction(Consumer<Flex> positioner) {
+        Direction(Consumer<StandardResizer> positioner) {
             this.positioner = positioner;
         }
     }

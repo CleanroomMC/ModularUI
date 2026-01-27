@@ -15,6 +15,8 @@ import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import com.cleanroommc.modularui.widget.sizer.ResizeNode;
+import com.cleanroommc.modularui.widget.sizer.ScreenResizeNode;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -77,6 +79,7 @@ public class ModularScreen {
     private final ModularGuiContext context = new ModularGuiContext(this);
     private final Map<Class<?>, List<IGuiAction>> guiActionListeners = new Object2ObjectOpenHashMap<>();
     private final Object2ObjectArrayMap<IWidget, Runnable> frameUpdates = new Object2ObjectArrayMap<>();
+    private final ScreenResizeNode resizeNode = new ScreenResizeNode(this);
     private boolean pausesGame = false;
     private boolean openParentOnClose = false;
 
@@ -179,9 +182,7 @@ public class ModularScreen {
         }
 
         this.context.pushViewport(null, this.context.getScreenArea());
-        for (ModularPanel panel : this.panelManager.getReverseOpenPanels()) {
-            WidgetTree.resizeInternal(panel, true);
-        }
+        WidgetTree.resizeInternal(this.resizeNode, true);
 
         this.context.popViewport(null);
         if (!isOverlay()) {
@@ -597,6 +598,10 @@ public class ModularScreen {
 
     public IMuiScreen getScreenWrapper() {
         return this.screenWrapper;
+    }
+
+    public ResizeNode getResizeNode() {
+        return resizeNode;
     }
 
     public Area getScreenArea() {

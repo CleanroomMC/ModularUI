@@ -22,6 +22,7 @@ import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
 import com.cleanroommc.modularui.widget.sizer.Bounds;
+import com.cleanroommc.modularui.widget.sizer.StandardResizer;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -66,9 +67,32 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
     @Nullable private List<IGuiAction> guiActionListeners; // TODO replace with proper event system
     @Nullable private Consumer<W> onUpdateListener;
 
+    public Widget() {
+        resizer(new StandardResizer(this));
+    }
+
     // -----------------
     // === Lifecycle ===
     // -----------------
+
+    @Override
+    void onInitInternal(boolean late) {
+        if (this.guiActionListeners != null) {
+            for (IGuiAction action : this.guiActionListeners) {
+                getContext().getScreen().registerGuiActionListener(action);
+            }
+        }
+
+        if (this.value != null && this.syncKey != null) {
+            throw new IllegalStateException("Widget has a value and a sync key for a synced value. This is not allowed!");
+        }
+        if (!getScreen().isClientOnly()) {
+            initialiseSyncHandler(getScreen().getSyncManager(), late);
+        }
+        if (isExcludeAreaInRecipeViewer()) {
+            getContext().getRecipeViewerSettings().addExclusionArea(this);
+        }
+    }
 
     /**
      * Retrieves, verifies, and initialises a linked sync handler.
@@ -104,11 +128,6 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
             }
             if (isExcludeAreaInRecipeViewer()) {
                 getContext().getRecipeViewerSettings().removeExclusionArea(this);
-            }
-        }
-        if (hasChildren()) {
-            for (IWidget child : getChildren()) {
-                child.dispose();
             }
         }
         super.dispose();

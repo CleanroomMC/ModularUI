@@ -1,26 +1,9 @@
 package com.cleanroommc.modularui.widget.sizer;
 
-import com.cleanroommc.modularui.GuiError;
-import com.cleanroommc.modularui.api.GuiAxis;
-import com.cleanroommc.modularui.api.layout.ILayoutWidget;
-import com.cleanroommc.modularui.api.layout.IResizeable;
-import com.cleanroommc.modularui.api.widget.IGuiElement;
-import com.cleanroommc.modularui.api.widget.IPositioned;
-import com.cleanroommc.modularui.api.widget.IVanillaSlot;
-import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.utils.Alignment;
-
-import net.minecraft.inventory.Slot;
-
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.function.DoubleSupplier;
-
 /**
  * This class handles resizing and positioning of widgets.
  */
+/*
 public class Flex implements IResizeable, IPositioned<Flex> {
 
     private final DimensionSizer x;
@@ -444,8 +427,8 @@ public class Flex implements IResizeable, IPositioned<Flex> {
             return true;
         }*/
 
-        // calculate x, y, width and height if possible
-        this.x.apply(guiElement.getArea(), relativeTo, guiElement::getDefaultWidth);
+// calculate x, y, width and height if possible
+    /*    this.x.apply(guiElement.getArea(), relativeTo, guiElement::getDefaultWidth);
         this.y.apply(guiElement.getArea(), relativeTo, guiElement::getDefaultHeight);
         return isFullyCalculated(isParentLayout);
     }
@@ -662,4 +645,4 @@ public class Flex implements IResizeable, IPositioned<Flex> {
     private Unit getHeight() {
         return this.y.getSize(this.parent);
     }
-}
+}*/

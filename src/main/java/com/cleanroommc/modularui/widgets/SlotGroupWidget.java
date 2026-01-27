@@ -248,7 +248,7 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
                         x += 18;
                         continue;
                     }
-                    widget.flex().left(x).top(y);
+                    widget.resizer().left(x).top(y);
                     slotGroupWidget.child(widget);
                     if (this.syncKey != null && widget instanceof ISynced<?> synced) {
                         synced.syncHandler(this.syncKey, syncId++);

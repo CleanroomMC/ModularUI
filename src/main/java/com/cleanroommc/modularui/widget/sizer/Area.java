@@ -472,7 +472,7 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
 
     /**
      * Transforms the four corners of this rectangle with the given pose stack. The new rectangle can be rotated.
-     * Then a min fit rectangle, which is not rotated and aligned with the screen, is put around the corners.
+     * Then a min fit rectangle, which is aligned with the screen axis, is put around the corners.
      *
      * @param stack pose stack
      */

@@ -84,18 +84,19 @@ public interface IDragResizeable {
      */
     static void applyDrag(IDragResizeable resizeable, IWidget widget, ResizeDragArea dragArea, Area startArea, int dx, int dy) {
         int keepPosFactor = resizeable.keepPosOnDragResize() || GuiScreen.isShiftKeyDown() ? 2 : 1;
-        if (dx != 0) {
+        // TODO
+        /*if (dx != 0) {
             if (dragArea.left) {
                 int s = startArea.width - dx * keepPosFactor;
                 if (s >= resizeable.getMinDragWidth()) {
-                    widget.flex().left(startArea.rx + dx);
-                    widget.flex().width(s);
+                    widget.left(startArea.rx + dx);
+                    widget.resizer().width(s);
                 }
             } else if (dragArea.right) {
                 int s = startArea.width + dx * keepPosFactor;
                 if (s >= resizeable.getMinDragWidth()) {
                     widget.flex().left(startArea.rx - dx * (keepPosFactor - 1));
-                    widget.flex().width(s);
+                    widget.resizer().width(s);
                 }
             }
         }
@@ -104,16 +105,16 @@ public interface IDragResizeable {
                 int s = startArea.height - dy * keepPosFactor;
                 if (s >= resizeable.getMinDragHeight()) {
                     widget.flex().top(startArea.ry + dy);
-                    widget.flex().height(s);
+                    widget.resizer().height(s);
                 }
             } else if (dragArea.bottom) {
                 int s = startArea.height + dy * keepPosFactor;
                 if (s >= resizeable.getMinDragHeight()) {
                     widget.flex().top(startArea.ry - dy * (keepPosFactor - 1));
-                    widget.flex().height(s);
+                    widget.resizer().height(s);
                 }
             }
-        }
+        }*/
         resizeable.onDragResize();
     }
 

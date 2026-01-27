@@ -1,5 +1,7 @@
 package com.cleanroommc.modularui.widget.sizer;
 
+import com.cleanroommc.modularui.api.GuiAxis;
+
 public abstract class StaticResizer extends ResizeNode {
 
     private boolean childrenCalculated = false;
@@ -12,7 +14,7 @@ public abstract class StaticResizer extends ResizeNode {
     }
 
     @Override
-    public void initResizing() {}
+    public void initResizing(boolean onOpen) {}
 
     @Override
     public boolean isXCalculated() {
@@ -85,4 +87,44 @@ public abstract class StaticResizer extends ResizeNode {
 
     @Override
     public void setYMarginPaddingApplied(boolean b) {}
+
+    @Override
+    public boolean hasYPos() {
+        return true;
+    }
+
+    @Override
+    public boolean hasXPos() {
+        return true;
+    }
+
+    @Override
+    public boolean hasHeight() {
+        return true;
+    }
+
+    @Override
+    public boolean hasWidth() {
+        return true;
+    }
+
+    @Override
+    public boolean hasStartPos(GuiAxis axis) {
+        return true;
+    }
+
+    @Override
+    public boolean hasEndPos(GuiAxis axis) {
+        return false;
+    }
+
+    @Override
+    public boolean hasFixedSize() {
+        return true;
+    }
+
+    @Override
+    public boolean isFullSize() {
+        return false;
+    }
 }

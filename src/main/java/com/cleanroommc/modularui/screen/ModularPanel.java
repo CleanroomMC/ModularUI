@@ -234,6 +234,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     public void onOpen(ModularScreen screen) {
         this.screen = screen;
         getArea().z(1);
+        resizer().setDefaultParent(this.screen.getResizeNode());
         initialise(this, false);
         // call first tick after everything is initialised
         WidgetTree.onUpdate(this);
@@ -787,7 +788,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @Override
     public boolean isExcludeAreaInRecipeViewer() {
-        return super.isExcludeAreaInRecipeViewer() || (!getScreen().isOverlay() && !this.invisible && !flex().isFullSize());
+        return super.isExcludeAreaInRecipeViewer() || (!getScreen().isOverlay() && !this.invisible && !resizer().isFullSize());
     }
 
     public ModularPanel bindPlayerInventory() {

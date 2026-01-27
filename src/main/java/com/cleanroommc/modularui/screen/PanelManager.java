@@ -99,7 +99,7 @@ public class PanelManager {
         this.dirty = true;
         panel.onOpen(this.screen);
         if (resize) {
-            WidgetTree.resizeInternal(panel, true);
+            WidgetTree.resizeInternal(panel.resizer(), true);
         }
     }
 

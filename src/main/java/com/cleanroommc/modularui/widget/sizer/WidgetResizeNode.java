@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widget.sizer;
 
+import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 
 import java.util.Objects;
@@ -19,5 +20,43 @@ public abstract class WidgetResizeNode extends ResizeNode {
     @Override
     public Area getArea() {
         return widget.getArea();
+    }
+
+    @Override
+    public void initResizing(boolean onOpen) {
+        super.initResizing(onOpen);
+        this.widget.beforeResize(onOpen);
+    }
+
+    @Override
+    public void onResized() {
+        super.onResized();
+        this.widget.onResized();
+    }
+
+    @Override
+    public boolean isLayout() {
+        return this.widget instanceof ILayoutWidget;
+    }
+
+    @Override
+    public boolean layoutChildren() {
+        if (this.widget instanceof ILayoutWidget layoutWidget) {
+            return layoutWidget.layoutWidgets();
+        }
+        return true;
+    }
+
+    @Override
+    public boolean postLayoutChildren() {
+        if (this.widget instanceof ILayoutWidget layoutWidget) {
+            return layoutWidget.postLayoutWidgets();
+        }
+        return true;
+    }
+
+    @Override
+    public String getDebugDisplayName() {
+        return "widget '" + this.widget + "' of screen '" + this.widget.getScreen() + "'";
     }
 }

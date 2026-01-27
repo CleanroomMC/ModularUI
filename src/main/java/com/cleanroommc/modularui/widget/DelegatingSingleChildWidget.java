@@ -3,8 +3,7 @@ package com.cleanroommc.modularui.widget;
 import com.cleanroommc.modularui.api.widget.IDelegatingWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import com.cleanroommc.modularui.widget.sizer.Flex;
-import com.cleanroommc.modularui.widget.sizer.ResizeNode;
+import com.cleanroommc.modularui.widget.sizer.StandardResizer;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -17,12 +16,7 @@ public class DelegatingSingleChildWidget<W extends SingleChildWidget<W>> extends
     @Override
     public void onInit() {
         super.onInit();
-        if (hasChildren()) getChild().flex().relative(getParent());
-    }
-
-    @Override
-    protected void onChildAdd(IWidget child) {
-        super.onChildAdd(child);
+        if (hasChildren()) getChild().resizer().relative(getParent());
     }
 
     @Override
@@ -57,12 +51,12 @@ public class DelegatingSingleChildWidget<W extends SingleChildWidget<W>> extends
     }
 
     @Override
-    public Flex getFlex() {
+    public StandardResizer getFlex() {
         return getDelegate() != null ? getDelegate().getFlex() : super.getFlex();
     }
 
     @Override
-    public @NotNull ResizeNode resizer() {
+    public @NotNull StandardResizer resizer() {
         return getDelegate() != null ? getDelegate().resizer() : super.resizer();
     }
 

@@ -7,9 +7,7 @@ import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import com.cleanroommc.modularui.widget.sizer.Flex;
-
-import com.cleanroommc.modularui.widget.sizer.ResizeNode;
+import com.cleanroommc.modularui.widget.sizer.StandardResizer;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -252,7 +250,10 @@ public interface IWidget extends IGuiElement {
     /**
      * @return flex of this widget. Creates a new one if it doesn't already have one.
      */
-    //Flex flex();
+    @NotNull
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    StandardResizer flex();
 
     /**
      * Does the same as {@link IPositioned#flex(Consumer)}
@@ -260,17 +261,19 @@ public interface IWidget extends IGuiElement {
      * @param builder function to build flex
      * @return this
      */
-    /*default IWidget flexBuilder(Consumer<Flex> builder) {
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    default IWidget flexBuilder(Consumer<StandardResizer> builder) {
         builder.accept(flex());
         return this;
-    }*/
+    }
 
     /**
      * @return resizer of this widget
      */
     @NotNull
     @Override
-    ResizeNode resizer();
+    StandardResizer resizer();
 
     /**
      * Called before a widget is resized.
@@ -290,11 +293,15 @@ public interface IWidget extends IGuiElement {
     /**
      * @return flex of this widget
      */
-    //Flex getFlex();
-    /*default boolean isExpanded() {
-        Flex flex = getFlex();
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Nullable
+    StandardResizer getFlex();
+
+    default boolean isExpanded() {
+        StandardResizer flex = getFlex();
         return flex != null && flex.isExpanded();
-    }*/
+    }
 
     @Nullable String getName();
 

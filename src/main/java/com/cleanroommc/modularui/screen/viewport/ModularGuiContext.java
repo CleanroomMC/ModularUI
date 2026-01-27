@@ -331,7 +331,7 @@ public class ModularGuiContext extends GuiContext {
                 draggable = new LocatedElement<>(iDraggable, hovered.getTransformationMatrix());
             } else if (widget instanceof ModularPanel panel) {
                 if (panel.isDraggable()) {
-                    if (!panel.flex().hasFixedSize()) {
+                    if (!panel.resizer().hasFixedSize()) {
                         throw new IllegalStateException("Panel must have a fixed size. It can't specify left AND right or top AND bottom!");
                     }
                     draggable = new LocatedElement<>(new DraggablePanelWrapper(panel), TransformationMatrix.EMPTY);

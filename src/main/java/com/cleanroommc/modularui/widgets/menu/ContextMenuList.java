@@ -51,11 +51,11 @@ public class ContextMenuList<W extends ContextMenuList<W>> extends ListWidget<IW
     @Override
     protected void onChildAdd(IWidget child) {
         super.onChildAdd(child);
-        if (!child.flex().hasHeight()) {
-            child.flex().height(12);
+        if (!child.resizer().hasHeight()) {
+            child.resizer().height(12);
         }
-        if (!child.flex().hasWidth()) {
-            child.flex().widthRel(1f);
+        if (!child.resizer().hasWidth()) {
+            child.resizer().widthRel(1f);
         }
     }
 

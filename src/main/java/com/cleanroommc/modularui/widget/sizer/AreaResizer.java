@@ -12,4 +12,9 @@ public class AreaResizer extends StaticResizer {
     public Area getArea() {
         return area;
     }
+
+    @Override
+    public String getDebugDisplayName() {
+        return "";
+    }
 }

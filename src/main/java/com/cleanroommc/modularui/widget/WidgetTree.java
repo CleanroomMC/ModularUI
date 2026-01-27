@@ -12,6 +12,7 @@ import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+import com.cleanroommc.modularui.widget.sizer.ResizeNode;
 
 import net.minecraft.util.text.TextComponentString;
 
@@ -453,13 +454,6 @@ public class WidgetTree {
         return InternalWidgetTree.findChildAt(parent, type, path, 0, false);
     }
 
-    public static void applyPos(IWidget parent) {
-        WidgetTree.foreachChildBFS(parent, child -> {
-            child.resizer().applyPos(child);
-            return true;
-        }, true);
-    }
-
     public static IWidget findParent(IWidget parent, Predicate<IWidget> filter) {
         if (parent == null) return null;
         while (!(parent instanceof ModularPanel)) {
@@ -548,35 +542,45 @@ public class WidgetTree {
     }
 
     @ApiStatus.Internal
-    public static void resizeInternal(IWidget parent, boolean onOpen) {
-        long fullTime = System.nanoTime();
+    public static void resizeInternal(ResizeNode parent, boolean onOpen) {
+        long time = System.nanoTime();
         // check if updating this widget's pos and size can potentially update its parents
-        while (!(parent instanceof ModularPanel) && (parent.getParent() instanceof ILayoutWidget || parent.getParent().resizer().dependsOnChildren())) {
+        while (parent.getParent() != null && (parent.getParent().dependsOnChildren() || parent.isLayout())) {
             parent = parent.getParent();
         }
-        long rawTime = System.nanoTime();
         // resize each widget and calculate their relative pos
-        if (!InternalWidgetTree.resizeWidget(parent, true, onOpen, false) && !InternalWidgetTree.resizeWidget(parent, false, onOpen, false)) {
+        if (!InternalWidgetTree.resize(parent, true, onOpen, false) && !InternalWidgetTree.resize(parent, false, onOpen, false)) {
             if (MCHelper.getPlayer() != null) {
-                MCHelper.getPlayer().sendMessage(new TextComponentString(IKey.RED + "ModularUI: Failed to resize sub tree of widget '"
-                        + parent + "' of screen '" + parent.getScreen().toString() + "'. See log for more info."));
+                MCHelper.getPlayer().sendMessage(new TextComponentString(IKey.RED + "ModularUI: Failed to resize sub tree of "
+                        + parent.getDebugDisplayName() + ". See log for more info."));
             }
-            ModularUI.LOGGER.error("Failed to resize widget. Affected widget tree:");
-            printTree(parent, INFO_RESIZED_COLLAPSED);
+            //ModularUI.LOGGER.error("Failed to resize widget. Affected widget tree:");
+            //printTree(parent, INFO_RESIZED_COLLAPSED);
         }
-        rawTime = System.nanoTime() - rawTime;
         // now apply the calculated pos
         applyPos(parent);
-        WidgetTree.foreachChildBFS(parent, child -> {
-            child.postResize();
-            return true;
-        }, true);
-
+        onResized(parent);
         if (WidgetTree.logResizeTime) {
-            fullTime = System.nanoTime() - fullTime;
-            ModularUI.LOGGER.info("Resized widget tree in {}s and {}s for full resize.",
-                    NumberFormat.formatNanos(rawTime),
-                    NumberFormat.formatNanos(fullTime));
+            time = System.nanoTime() - time;
+            ModularUI.LOGGER.info("Resized widget tree in {}s.", NumberFormat.formatNanos(time));
+        }
+    }
+
+    public static void applyPos(ResizeNode parent) {
+        parent.applyPos();
+        for (ResizeNode resizeNode : parent.getChildren()) {
+            if (!resizeNode.getChildren().isEmpty()) {
+                applyPos(resizeNode);
+            }
+        }
+    }
+
+    public static void onResized(ResizeNode parent) {
+        parent.onResized();
+        for (ResizeNode resizeNode : parent.getChildren()) {
+            if (!resizeNode.getChildren().isEmpty()) {
+                onResized(resizeNode);
+            }
         }
     }
 

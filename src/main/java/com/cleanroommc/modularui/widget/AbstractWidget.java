@@ -6,10 +6,7 @@ import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import com.cleanroommc.modularui.widget.sizer.Flex;
-import com.cleanroommc.modularui.widget.sizer.ResizeNode;
 import com.cleanroommc.modularui.widget.sizer.StandardResizer;
-import com.cleanroommc.modularui.widget.sizer.WidgetResizeNode;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -30,10 +27,9 @@ public abstract class AbstractWidget implements IWidget {
     private boolean enabled = true;
     private int timeHovered = -1;
     private int timeBelowMouse = -1;
-    private boolean excludeAreaInRecipeViewer = false;
 
     private final Area area = new Area();
-    private WidgetResizeNode resizer;
+    private StandardResizer resizer;
 
     /**
      * Returns the screen of the panel of this widget is being opened in.
@@ -56,12 +52,6 @@ public abstract class AbstractWidget implements IWidget {
         return this.resizer.requiresResize();
     }
 
-    @MustBeInvokedByOverriders
-    @Override
-    public void onResized() {
-        this.requiresResize = false;
-    }
-
     /**
      * Called when a panel is opened. Use {@link #onInit()} and {@link #afterInit()} for custom logic.
      *
@@ -77,24 +67,11 @@ public abstract class AbstractWidget implements IWidget {
             this.parent = parent;
             this.panel = parent.getPanel();
             this.context = parent.getContext();
-            getArea().setPanelLayer(this.panel.getArea().getPanelLayer());
             getArea().z(parent.getArea().z() + 1);
-            /*if (this.guiActionListeners != null) {
-                for (IGuiAction action : this.guiActionListeners) {
-                    this.context.getScreen().registerGuiActionListener(action);
-                }
-            }*/
-        }
-        /*if (this.value != null && this.syncKey != null) {
-            throw new IllegalStateException("Widget has a value and a sync key for a synced value. This is not allowed!");
+            resizer().setDefaultParent(parent.resizer());
         }
         this.valid = true;
-        if (!getScreen().isClientOnly()) {
-            initialiseSyncHandler(getScreen().getSyncManager(), late);
-        }
-        if (isExcludeAreaInRecipeViewer()) {
-            getContext().getRecipeViewerSettings().addExclusionArea(this);
-        }*/
+        onInitInternal(late);
         onInit();
         if (hasChildren()) {
             for (IWidget child : getChildren()) {
@@ -102,8 +79,10 @@ public abstract class AbstractWidget implements IWidget {
             }
         }
         afterInit();
-        this.resizer.onResized();
+        onResized();
     }
+
+    void onInitInternal(boolean late) {}
 
     /**
      * Called after this widget is initialised and before the children are initialised.
@@ -124,16 +103,6 @@ public abstract class AbstractWidget implements IWidget {
     @MustBeInvokedByOverriders
     @Override
     public void dispose() {
-        if (isValid()) {
-            /*if (this.guiActionListeners != null) {
-                for (IGuiAction action : this.guiActionListeners) {
-                    this.context.getScreen().removeGuiActionListener(action);
-                }
-            }
-            if (isExcludeAreaInRecipeViewer()) {
-                getContext().getRecipeViewerSettings().removeExclusionArea(this);
-            }*/
-        }
         if (hasChildren()) {
             for (IWidget child : getChildren()) {
                 child.dispose();
@@ -144,6 +113,7 @@ public abstract class AbstractWidget implements IWidget {
             this.parent = null;
             this.context = null;
         }
+        resizer().dispose();
         this.timeHovered = -1;
         this.timeBelowMouse = -1;
         this.valid = false;
@@ -299,14 +269,11 @@ public abstract class AbstractWidget implements IWidget {
     }
 
     @Override
-    public @NotNull ResizeNode resizer() {
-        if (this.resizer == null) {
-            this.resizer = new StandardResizer(this);
-        }
+    public @NotNull StandardResizer resizer() {
         return this.resizer;
     }
 
-    public void resizer(WidgetResizeNode resizer) {
+    protected void resizer(StandardResizer resizer) {
         this.resizer = Objects.requireNonNull(resizer);
     }
 
@@ -317,9 +284,15 @@ public abstract class AbstractWidget implements IWidget {
      *
      * @return flex of this widget
      */
+    @Nullable
     @Override
     public StandardResizer getFlex() {
-        return null;
+        return resizer;
+    }
+
+    @Override
+    public @NotNull StandardResizer flex() {
+        return resizer();
     }
 
     @Override

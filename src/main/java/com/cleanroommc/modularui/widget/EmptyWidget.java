@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.widget;
 
-import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
@@ -8,8 +7,7 @@ import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import com.cleanroommc.modularui.widget.sizer.Flex;
-import com.cleanroommc.modularui.widget.sizer.ResizeNode;
+import com.cleanroommc.modularui.widget.sizer.StandardResizer;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 public class EmptyWidget implements IWidget {
 
     private final Area area = new Area();
-    private final Flex flex = new Flex(this);
+    private final StandardResizer flex = new StandardResizer(this);
     private boolean requiresResize = false;
     private boolean enabled = true;
     private IWidget parent;
@@ -122,20 +120,17 @@ public class EmptyWidget implements IWidget {
     }
 
     @Override
-    public Flex flex() {
+    public StandardResizer flex() {
         return this.flex;
     }
 
     @Override
-    public @NotNull ResizeNode resizer() {
+    public @NotNull StandardResizer resizer() {
         return this.flex;
     }
 
     @Override
-    public void resizer(IResizeable resizer) {}
-
-    @Override
-    public Flex getFlex() {
+    public StandardResizer getFlex() {
         return this.flex;
     }
 

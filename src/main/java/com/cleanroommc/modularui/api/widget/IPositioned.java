@@ -2,9 +2,12 @@ package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import com.cleanroommc.modularui.widget.sizer.Flex;
+import com.cleanroommc.modularui.widget.sizer.AreaResizer;
+import com.cleanroommc.modularui.widget.sizer.ResizeNode;
 import com.cleanroommc.modularui.widget.sizer.StandardResizer;
 import com.cleanroommc.modularui.widget.sizer.Unit;
+
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
@@ -49,13 +52,24 @@ public interface IPositioned<W extends IPositioned<W>> {
         return getThis();
     }
 
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
     default W relative(IGuiElement guiElement) {
         return relative(guiElement.getArea());
     }
 
-    default W relative(Area guiElement) {
-        flex().relative(guiElement);
+    @Deprecated
+    default W relative(Area area) {
+        return relative(new AreaResizer(area));
+    }
+
+    default W relative(ResizeNode resizeNode) {
+        flex().relative(resizeNode);
         return getThis();
+    }
+
+    default W relative(IWidget widget) {
+        return relative(widget.resizer());
     }
 
     default W relativeToScreen() {
@@ -65,11 +79,6 @@ public interface IPositioned<W extends IPositioned<W>> {
 
     default W relativeToParent() {
         flex().relativeToParent();
-        return getThis();
-    }
-
-    default W bypassLayerRestriction() {
-        flex().bypassLayerRestriction();
         return getThis();
     }
 
@@ -434,7 +443,7 @@ public interface IPositioned<W extends IPositioned<W>> {
         return align(Alignment.Center);
     }
 
-    default W flex(Consumer<Flex> flexConsumer) {
+    default W flex(Consumer<StandardResizer> flexConsumer) {
         flexConsumer.accept(flex());
         return getThis();
     }

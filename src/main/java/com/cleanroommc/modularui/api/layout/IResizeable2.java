@@ -11,7 +11,7 @@ public interface IResizeable2 extends IResizeParent {
     /**
      * Called once before resizing
      */
-    void initResizing();
+    void initResizing(boolean onOpen);
 
     /**
      * Resizes the given element

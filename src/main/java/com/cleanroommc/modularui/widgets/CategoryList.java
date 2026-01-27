@@ -139,7 +139,7 @@ public class CategoryList extends AbstractParentWidget<IWidget, CategoryList> im
 
         private void updateHeight() {
             layoutWidgets();
-            WidgetTree.applyPos(this);
+            WidgetTree.applyPos(resizer());
         }
 
         @Override
