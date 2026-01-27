@@ -27,7 +27,9 @@ import com.cleanroommc.modularui.utils.fakeworld.SchemaRenderer;
 import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.value.IntValue;
 import com.cleanroommc.modularui.value.StringValue;
+import com.cleanroommc.modularui.value.sync.DynamicLinkedSyncHandler;
 import com.cleanroommc.modularui.value.sync.DynamicSyncHandler;
+import com.cleanroommc.modularui.value.sync.GenericListSyncHandler;
 import com.cleanroommc.modularui.value.sync.GenericSyncValue;
 import com.cleanroommc.modularui.value.sync.IntSyncValue;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
@@ -66,6 +68,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -80,7 +83,9 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -108,6 +113,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
     private final int duration = 80;
     private int progress = 0;
     private int cycleState = 0;
+    private List<Integer> serverInts = new ArrayList<>();
     private ItemStack displayItem = new ItemStack(Items.DIAMOND);
     private final IItemHandlerModifiable inventory = new ItemStackHandler(2) {
         @Override
@@ -141,6 +147,14 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         IntSyncValue cycleStateValue = new IntSyncValue(() -> this.cycleState, val -> this.cycleState = val);
         syncManager.getHyperVisor().syncValue("cycle_state", cycleStateValue);
         syncManager.syncValue("display_item", GenericSyncValue.forItem(() -> this.displayItem, null));
+        GenericListSyncHandler<Integer> numberListSyncHandler = GenericListSyncHandler.<Integer>builder()
+                .getter(() -> this.serverInts)
+                .setter(v -> this.serverInts = v)
+                .serializer(PacketBuffer::writeVarInt)
+                .deserializer(PacketBuffer::readVarInt)
+                .immutableCopy()
+                .build();
+        syncManager.syncValue("number_list", numberListSyncHandler);
         syncManager.bindPlayerInventory(guiData.getPlayer());
 
         DynamicSyncHandler dynamicSyncHandler = new DynamicSyncHandler()
@@ -157,6 +171,15 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                 .syncHandler(syncManager1.getOrCreateSyncHandler(name, i, ItemSlotSH.class, () -> new ItemSlotSH(new ModularSlot(handler, finalI)))));
                     }
                     return flow;
+                });
+
+        DynamicLinkedSyncHandler<GenericListSyncHandler<Integer>> dynamicLinkedSyncHandler = new DynamicLinkedSyncHandler<>(numberListSyncHandler)
+                .widgetProvider((syncManager1, value1) -> {
+                    List<Integer> vals = value1.getValue();
+                    return new Column()
+                            .widthRel(1f)
+                            .coverChildrenHeight()
+                            .children(vals.size(), i -> IKey.str(String.valueOf(vals.get(i))).asWidget().padding(2));
                 });
 
         Rectangle colorPickerBackground = new Rectangle().color(Color.RED.main);
@@ -463,7 +486,11 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                         }))))
                                                         .child(new DynamicSyncedWidget<>()
                                                                 .widthRel(1f)
-                                                                .syncHandler(dynamicSyncHandler)))
+                                                                .syncHandler(dynamicSyncHandler))
+                                                        .child(new DynamicSyncedWidget<>()
+                                                                .widthRel(1f)
+                                                                .coverChildrenHeight()
+                                                                .syncHandler(dynamicLinkedSyncHandler)))
                                         )
                                         .addPage(createSchemaPage(guiData))))
                         .child(SlotGroupWidget.playerInventory(false))
@@ -587,6 +614,12 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                 Collection<Item> vals = ForgeRegistries.ITEMS.getValuesCollection();
                 Item item = vals.stream().skip(new Random().nextInt(vals.size())).findFirst().orElse(Items.DIAMOND);
                 this.displayItem = new ItemStack(item, 26735987);
+
+                Random rnd = new Random();
+                this.serverInts.clear();
+                for (int i = 0; i < 5; i++) {
+                    this.serverInts.add(rnd.nextInt(100));
+                }
             }
         }
         if (++this.progress == this.duration) {

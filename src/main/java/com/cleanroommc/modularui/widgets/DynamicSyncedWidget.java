@@ -2,7 +2,9 @@ package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.value.sync.DynamicLinkedSyncHandler;
 import com.cleanroommc.modularui.value.sync.DynamicSyncHandler;
+import com.cleanroommc.modularui.value.sync.IDynamicSyncNotifiable;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 
@@ -16,24 +18,25 @@ import java.util.function.Supplier;
  * A widget which can update its child based on a function in {@link DynamicSyncHandler}.
  * Such a sync handler must be supplied or else this widget has no effect.
  * The dynamic child can be a widget tree of any size which can also contain {@link SyncHandler}s. These sync handlers MUST be registered
- * via a variant of {@link com.cleanroommc.modularui.value.sync.PanelSyncManager#getOrCreateSyncHandler(String, Class, Supplier)}.
+ * via a variant of {@link com.cleanroommc.modularui.value.sync.PanelSyncManager#getOrCreateSyncHandler(String, Class, Supplier) PanelSyncManager#getOrCreateSyncHandler(String, Class, Supplier)}.
+ * L
  *
  * @param <W> type of this widget
  */
 public class DynamicSyncedWidget<W extends DynamicSyncedWidget<W>> extends Widget<W> {
 
-    private DynamicSyncHandler syncHandler;
+    private IDynamicSyncNotifiable syncHandler;
     private IWidget child;
 
     @Override
     public boolean isValidSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
-        return syncOrValue.isTypeOrEmpty(DynamicSyncHandler.class);
+        return syncOrValue.isTypeOrEmpty(IDynamicSyncNotifiable.class);
     }
 
     @Override
     protected void setSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
         super.setSyncOrValue(syncOrValue);
-        this.syncHandler = syncOrValue.castNullable(DynamicSyncHandler.class);
+        this.syncHandler = syncOrValue.castNullable(IDynamicSyncNotifiable.class);
         if (this.syncHandler != null) this.syncHandler.attachDynamicWidgetListener(this::updateChild);
     }
 
@@ -60,6 +63,11 @@ public class DynamicSyncedWidget<W extends DynamicSyncedWidget<W>> extends Widge
     }
 
     public W syncHandler(DynamicSyncHandler syncHandler) {
+        setSyncOrValue(ISyncOrValue.orEmpty(syncHandler));
+        return getThis();
+    }
+
+    public W syncHandler(DynamicLinkedSyncHandler<?> syncHandler) {
         setSyncOrValue(ISyncOrValue.orEmpty(syncHandler));
         return getThis();
     }
