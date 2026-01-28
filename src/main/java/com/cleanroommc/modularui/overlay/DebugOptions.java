@@ -1,30 +1,30 @@
 package com.cleanroommc.modularui.overlay;
 
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.value.BoolValue;
+import com.cleanroommc.modularui.value.FloatValue;
+import com.cleanroommc.modularui.value.IntValue;
 
 public class DebugOptions {
 
     public static final DebugOptions INSTANCE = new DebugOptions();
 
-    public boolean showHovered = true;
-    public boolean showName = true;
-    public boolean showPos = true;
-    public boolean showSize = true;
-    public boolean showRelPos = true;
-    public boolean showWidgetTheme = true;
-    public boolean showOutline = true;
+    public BoolValue showHovered = new BoolValue(true);
+    public BoolValue showPos = new BoolValue(true);
+    public BoolValue showSize = new BoolValue(true);
+    public BoolValue showWidgetTheme = new BoolValue(true);
+    public BoolValue showExtra = new BoolValue(true);
+    public BoolValue showOutline = new BoolValue(true);
 
-    public boolean showParent = true;
-    public boolean showParentName = true;
-    public boolean showParentPos = true;
-    public boolean showParentSize = true;
-    public boolean showParentRelPos = false;
-    public boolean showParentWidgetTheme = false;
-    public boolean showParentOutline = true;
+    public BoolValue showParent = new BoolValue(true);
+    public BoolValue showParentPos = new BoolValue(true);
+    public BoolValue showParentSize = new BoolValue(true);
+    public BoolValue showParentWidgetTheme = new BoolValue(false);
+    public BoolValue showParentOutline = new BoolValue(true);
 
-    public int textColor = Color.argb(180, 40, 115, 220);
-    public int outlineColor = textColor;
-    public int cursorColor = Color.GREEN.main;
-    public float scale = 0.8f;
+    public IntValue textColor = new IntValue(Color.argb(180, 40, 115, 220));
+    public IntValue outlineColor = new IntValue(textColor.getIntValue());
+    public IntValue cursorColor = new IntValue(Color.withAlpha(Color.GREEN.main, 0.8f));
+    public FloatValue scale = new FloatValue(0.8f);
 
 }

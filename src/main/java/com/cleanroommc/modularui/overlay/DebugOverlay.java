@@ -14,7 +14,6 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
-import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.ToggleButton;
@@ -46,7 +45,7 @@ public class DebugOverlay extends CustomModularScreen {
                         .horizontalCenter()
                         .bottom(0)
                         .height(12)
-                        .width(100)
+                        .width(160)
                         .background(new Rectangle().color(Color.withAlpha(Color.WHITE.main, 0.2f)).cornerRadius(4))
                         .overlay(IKey.str("Debug Options"))
                         .openUp()
@@ -59,26 +58,39 @@ public class DebugOverlay extends CustomModularScreen {
                                                 .overlay(IKey.str("Print widget trees"))
                                                 .onMousePressed(this::logWidgetTrees)))
                                 .child(new ContextMenuButton<>()
-                                        .name("ctx_mb_sub")
+                                        .name("menu_button_hover_info")
                                         .height(10)
                                         .overlay(IKey.str("Widget hover info"))
                                         .openRightUp()
-                                        .menuList(new ContextMenuList<>("hover_info_ctx_ml2")
+                                        .menuList(new ContextMenuList<>("menu_list_hover_info")
                                                 .maxSize(100)
-                                                .child(toggleOption(1, "Name", new BoolValue.Dynamic(() -> DebugOptions.INSTANCE.showName, v -> DebugOptions.INSTANCE.showName = v)))
-                                                .child(toggleOption(2, "Pos", new BoolValue.Dynamic(() -> DebugOptions.INSTANCE.showPos, v -> DebugOptions.INSTANCE.showPos = v)))
-                                                .child(toggleOption(3, "Size", new BoolValue.Dynamic(() -> DebugOptions.INSTANCE.showSize, v -> DebugOptions.INSTANCE.showSize = v)))
-                                                .child(toggleOption(4, "Rel Pos", new BoolValue.Dynamic(() -> DebugOptions.INSTANCE.showRelPos, v -> DebugOptions.INSTANCE.showRelPos = v)))
-                                                .child(toggleOption(5, "Widget Theme", new BoolValue.Dynamic(() -> DebugOptions.INSTANCE.showWidgetTheme, v -> DebugOptions.INSTANCE.showWidgetTheme = v)))
-                                                .child(toggleOption(6, "Outline", new BoolValue.Dynamic(() -> DebugOptions.INSTANCE.showOutline, v -> DebugOptions.INSTANCE.showOutline = v)))
+                                                .child(toggleOption(0, "Any", DebugOptions.INSTANCE.showHovered))
+                                                .child(toggleOption(1, "Pos", DebugOptions.INSTANCE.showPos))
+                                                .child(toggleOption(2, "Size", DebugOptions.INSTANCE.showSize))
+                                                .child(toggleOption(3, "Widgettheme", DebugOptions.INSTANCE.showWidgetTheme))
+                                                .child(toggleOption(4, "Extra info", DebugOptions.INSTANCE.showExtra))
+                                                .child(toggleOption(5, "Outline", DebugOptions.INSTANCE.showOutline))
+                                        ))
+                                .child(new ContextMenuButton<>()
+                                        .name("menu_button_parent_hover_info")
+                                        .height(10)
+                                        .overlay(IKey.str("Parent widget hover info"))
+                                        .openRightUp()
+                                        .menuList(new ContextMenuList<>("menu_list_parent_hover_info")
+                                                .maxSize(100)
+                                                .child(toggleOption(10, "Any", DebugOptions.INSTANCE.showParent))
+                                                .child(toggleOption(11, "Pos", DebugOptions.INSTANCE.showParentPos))
+                                                .child(toggleOption(12, "Size", DebugOptions.INSTANCE.showParentSize))
+                                                .child(toggleOption(13, "Widgettheme", DebugOptions.INSTANCE.showParentWidgetTheme))
+                                                .child(toggleOption(14, "Outline", DebugOptions.INSTANCE.showParentOutline))
                                         ))));
     }
 
     public static ContextMenuOption<?> toggleOption(int i, String name, IBoolValue<?> boolValue) {
         return new ContextMenuOption<>()
-                .name("ctx_mo_sub" + i)
+                .name("hover_info_option" + i)
                 .child(new ToggleButton()
-                        .name("menu toggle " + name + "_ctx_tb" + i)
+                        .name("hover_info_toggle" + i)
                         .invisible()
                         .value(boolValue)
                         .overlay(true, new NamedDrawableRow()

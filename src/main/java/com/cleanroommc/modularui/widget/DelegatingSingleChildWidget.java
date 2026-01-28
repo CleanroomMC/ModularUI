@@ -28,8 +28,6 @@ public class DelegatingSingleChildWidget<W extends SingleChildWidget<W>> extends
             area.set(childArea);
             area.rx = childArea.rx;
             area.ry = childArea.ry;
-            //childArea.x = 0;
-            //childArea.y = 0;
             childArea.rx = 0;
             childArea.ry = 0;
         }
