@@ -57,6 +57,7 @@ class InternalWidgetTree {
             WidgetTree.resizeInternal(parent.resizer(), false);
         }
 
+
         float alpha = parent.getPanel().getAlpha();
         IViewport viewport = parent instanceof IViewport ? (IViewport) parent : null;
 
@@ -73,7 +74,7 @@ class InternalWidgetTree {
         if (canBeSeen) {
             // draw widget
             GlStateManager.color(1f, 1f, 1f, alpha);
-            WidgetThemeEntry<?> widgetTheme = parent.getWidgetTheme(context.getTheme());
+            WidgetThemeEntry<?> widgetTheme = parent.getWidgetTheme(parent.getPanel().getTheme());
             if (drawBackground) parent.drawBackground(context, widgetTheme);
             parent.draw(context, widgetTheme);
             parent.drawOverlay(context, widgetTheme);
@@ -160,7 +161,7 @@ class InternalWidgetTree {
 
         // draw widget
         GlStateManager.color(1f, 1f, 1f, alpha);
-        WidgetThemeEntry<?> widgetTheme = parent.getWidgetTheme(context.getTheme());
+        WidgetThemeEntry<?> widgetTheme = parent.getWidgetTheme(parent.getPanel().getTheme());
         parent.drawBackground(context, widgetTheme);
 
         GlStateManager.popMatrix();

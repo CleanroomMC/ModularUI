@@ -151,7 +151,7 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
         if (this.shadow != null) {
             this.shadow.drawAtZero(context, getArea().width, getArea().height, getActiveWidgetTheme(widgetTheme, isHovering()));
         }
-        IDrawable bg = getCurrentBackground(context.getTheme(), widgetTheme);
+        IDrawable bg = getCurrentBackground(getPanel().getTheme(), widgetTheme);
         if (bg != null) {
             bg.drawAtZero(context, getArea().width, getArea().height, getActiveWidgetTheme(widgetTheme, isHovering()));
         }
@@ -179,7 +179,7 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
      */
     @Override
     public void drawOverlay(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
-        IDrawable bg = getCurrentOverlay(context.getTheme(), widgetTheme);
+        IDrawable bg = getCurrentOverlay(getPanel().getTheme(), widgetTheme);
         if (bg != null) {
             bg.drawAtZeroPadded(context, getArea(), getActiveWidgetTheme(widgetTheme, isHovering()));
         }
@@ -574,12 +574,12 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
 
     @Override
     public int getDefaultWidth() {
-        return isValid() ? getWidgetTheme(getContext().getTheme()).getTheme().getDefaultWidth() : 18;
+        return isValid() ? getWidgetTheme(getPanel().getTheme()).getTheme().getDefaultWidth() : 18;
     }
 
     @Override
     public int getDefaultHeight() {
-        return isValid() ? getWidgetTheme(getContext().getTheme()).getTheme().getDefaultHeight() : 18;
+        return isValid() ? getWidgetTheme(getPanel().getTheme()).getTheme().getDefaultHeight() : 18;
     }
 
     @Override

@@ -53,7 +53,7 @@ public class ContextMenuList<W extends ContextMenuList<W>> extends ListWidget<IW
 
     @Override
     protected WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
-        return theme.getWidgetTheme(IThemeApi.CONTEXT_MENU);
+        return theme.getWidgetTheme(IThemeApi.PANEL);
     }
 
     public void checkClose() {

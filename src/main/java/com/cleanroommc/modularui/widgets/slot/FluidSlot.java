@@ -20,7 +20,6 @@ import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.value.sync.FluidSlotSyncHandler;
 import com.cleanroommc.modularui.widgets.AbstractFluidDisplayWidget;
 
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
@@ -144,7 +143,7 @@ public class FluidSlot extends AbstractFluidDisplayWidget<FluidSlot> implements 
     }
 
     public int getSlotHoverColor() {
-        WidgetThemeEntry<SlotTheme> theme = getWidgetTheme(getContext().getTheme(), SlotTheme.class);
+        WidgetThemeEntry<SlotTheme> theme = getWidgetTheme(getPanel().getTheme(), SlotTheme.class);
         return theme.getTheme().getSlotHoverColor();
     }
 

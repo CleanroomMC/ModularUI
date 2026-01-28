@@ -84,6 +84,7 @@ public class ModularScreen {
     private boolean pausesGame = false;
     private boolean openParentOnClose = false;
 
+    private String themeOverride;
     private ITheme currentTheme;
     private IMuiScreen screenWrapper;
     private boolean overlay = false;
@@ -713,9 +714,14 @@ public class ModularScreen {
         throw new IllegalArgumentException();
     }
 
+    @Nullable
+    public String getThemeOverride() {
+        return themeOverride;
+    }
+
     public ITheme getCurrentTheme() {
         if (this.currentTheme == null) {
-            useTheme(null);
+            useTheme(this.themeOverride);
         }
         return this.currentTheme;
     }
@@ -728,7 +734,8 @@ public class ModularScreen {
      * @return this for builder like usage
      */
     public ModularScreen useTheme(String theme) {
-        this.currentTheme = IThemeApi.get().getThemeForScreen(this, theme);
+        this.themeOverride = theme;
+        this.currentTheme = IThemeApi.get().getThemeForScreen(this, this.themeOverride);
         return this;
     }
 

@@ -12,6 +12,7 @@ public class MenuPanel extends ModularPanel {
         super(menuList.getName());
         fullScreenInvisible();
         child(menuList);
+        themeOverride("modularui.context_menu");
     }
 
     public void openSubMenu(ContextMenuList<?> menuList) {

@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.api;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.Scrollbar;
+import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.theme.SelectableTheme;
 import com.cleanroommc.modularui.theme.SlotTheme;
@@ -68,14 +69,6 @@ public interface IThemeApi {
     WidgetThemeKey<SelectableTheme> TOGGLE_BUTTON = get().widgetThemeKeyBuilder("toggleButton", SelectableTheme.class)
             .defaultTheme(SelectableTheme.whiteTextShadow(18, 18, GuiTextures.MC_BUTTON, GuiTextures.MC_BUTTON_DISABLED))
             .defaultHoverTheme(SelectableTheme.whiteTextShadow(18, 18, GuiTextures.MC_BUTTON_HOVERED, IDrawable.NONE))
-            .register();
-
-    WidgetThemeKey<WidgetTheme> CONTEXT_MENU = get().widgetThemeKeyBuilder("menu", WidgetTheme.class)
-            .defaultTheme(WidgetTheme.darkTextNoShadow(80, 100, GuiTextures.MENU_BACKGROUND))
-            .register();
-
-    WidgetThemeKey<WidgetTheme> MENU_OPTION = get().widgetThemeKeyBuilder("menuOption", WidgetTheme.class)
-            .defaultTheme(WidgetTheme.darkTextNoShadow(80, 12, IDrawable.EMPTY))
             .register();
 
     // sub widget themes
@@ -175,7 +168,32 @@ public interface IThemeApi {
      * @param defaultTheme default theme if no theme was found
      * @return the registered theme for the given screen or the given default theme or {@link #getDefaultTheme()}
      */
-    ITheme getThemeForScreen(String owner, String name, @Nullable String defaultTheme);
+    default ITheme getThemeForScreen(String owner, String name, @Nullable String defaultTheme, @Nullable String fallbackTheme) {
+        return getThemeForScreen(owner, name, null, defaultTheme, fallbackTheme);
+    }
+
+    /**
+     * Gets the appropriate theme for a screen.
+     *
+     * @param owner        owner of the screen
+     * @param name         name of the screen
+     * @param panel        the name
+     * @param defaultTheme default theme if no theme was found
+     * @return the registered theme for the given screen or the given default theme or {@link #getDefaultTheme()}
+     */
+    ITheme getThemeForScreen(String owner, String name, @Nullable String panel, @Nullable String defaultTheme, @Nullable String fallbackTheme);
+
+    /**
+     * Gets the appropriate theme for a specific panel.
+     *
+     * @param panel        the panel to find a theme for
+     * @param defaultTheme default theme if no theme was found
+     * @return the registered theme for the given screen or the given default theme or {@link #getDefaultTheme()}
+     */
+    default ITheme getThemeForScreen(ModularPanel panel, @Nullable String defaultTheme) {
+        ModularScreen screen = panel.getScreen();
+        return getThemeForScreen(screen.getOwner(), screen.getName(), panel.getName(), defaultTheme, screen.getThemeOverride());
+    }
 
     /**
      * Gets the appropriate theme for a screen.
@@ -185,7 +203,7 @@ public interface IThemeApi {
      * @return the registered theme for the given screen or the given default theme or {@link #getDefaultTheme()}
      */
     default ITheme getThemeForScreen(ModularScreen screen, @Nullable String defaultTheme) {
-        return getThemeForScreen(screen.getOwner(), screen.getName(), defaultTheme);
+        return getThemeForScreen(screen.getOwner(), screen.getName(), defaultTheme, null);
     }
 
     /**

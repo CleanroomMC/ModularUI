@@ -1,0 +1,12 @@
+{
+  "parent": "DEFAULT",
+  "panel": {
+    "background": {
+      "type": "texture",
+      "id": "menu"
+    }
+  },
+  "button": {
+    "background": "empty"
+  }
+}

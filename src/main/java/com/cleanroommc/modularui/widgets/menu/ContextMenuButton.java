@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.widgets.menu;
 
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.ITheme;
-import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
@@ -140,7 +139,7 @@ public class ContextMenuButton<W extends ContextMenuButton<W>> extends Widget<W>
 
     @Override
     protected WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
-        return isValid() && getPanel() instanceof MenuPanel ? theme.getWidgetTheme(IThemeApi.MENU_OPTION) : theme.getButtonTheme();
+        return theme.getButtonTheme();
     }
 
     public W menuList(ContextMenuList<?> menuList) {

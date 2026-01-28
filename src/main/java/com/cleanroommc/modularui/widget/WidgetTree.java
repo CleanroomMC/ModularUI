@@ -45,7 +45,7 @@ public class WidgetTree extends TreeUtil {
             .append(widget.getArea().height);
     public static final WidgetInfo INFO_ENABLED = (root, widget, builder) -> builder.append("Enabled: ").append(widget.isEnabled());
     public static final WidgetInfo INFO_WIDGET_THEME = (root, widget, builder) -> builder.append("Widget theme: ")
-            .append(widget.getWidgetTheme(widget.getContext().getTheme()).getKey().getFullName());
+            .append(widget.getWidgetTheme(widget.getPanel().getTheme()).getKey().getFullName());
 
     private WidgetTree() {}
 
