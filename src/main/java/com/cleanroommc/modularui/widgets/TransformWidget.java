@@ -2,14 +2,14 @@ package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.widget.DelegatingSingleChildWidget;
+import com.cleanroommc.modularui.widget.DelegatingWidget;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.util.function.Consumer;
 
-public class TransformWidget extends DelegatingSingleChildWidget<TransformWidget> {
+public class TransformWidget extends DelegatingWidget {
 
     private static final Vector3f sharedVec = new Vector3f();
 
@@ -17,10 +17,8 @@ public class TransformWidget extends DelegatingSingleChildWidget<TransformWidget
     private boolean hasConstTransform = false;
     private Consumer<IViewportStack> transform;
 
-    public TransformWidget() {}
-
     public TransformWidget(IWidget child) {
-        child(child);
+        super(child);
     }
 
     @Override

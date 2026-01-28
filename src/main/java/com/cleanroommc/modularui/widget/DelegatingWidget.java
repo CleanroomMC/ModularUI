@@ -8,14 +8,34 @@ import com.cleanroommc.modularui.widget.sizer.StandardResizer;
 
 import org.jetbrains.annotations.NotNull;
 
-public class DelegatingSingleChildWidget<W extends SingleChildWidget<W>> extends SingleChildWidget<W> implements IDelegatingWidget {
+public class DelegatingWidget extends AbstractWidget implements IDelegatingWidget {
+
+    private IWidget delegate;
+
+    public DelegatingWidget(IWidget delegate) {
+        this.delegate = delegate;
+    }
+
+    protected void setDelegate(IWidget delegate) {
+        if (this.delegate != null) {
+            this.delegate.dispose();
+        }
+        this.delegate = delegate;
+        if (this.delegate != null && isValid()) {
+            initialise(getParent(), true);
+            delegate.scheduleResize();
+        }
+        onChangeDelegate(delegate);
+    }
+
+    protected void onChangeDelegate(IWidget delegate) {}
 
     @Override
     public void afterInit() {
         super.resizer().setDefaultParent(null); // remove this widget from the resize node tree
         if (hasChildren()) {
-            getChild().resizer().setDefaultParentIsDelegating(true);
-            getChild().resizer().relative(getParent()); // add the delegated widget at the place of this widget on the resize node tree
+            getDelegate().resizer().setDefaultParentIsDelegating(true);
+            getDelegate().resizer().relative(getParent()); // add the delegated widget at the place of this widget on the resize node tree
         }
     }
 
@@ -23,7 +43,7 @@ public class DelegatingSingleChildWidget<W extends SingleChildWidget<W>> extends
     public void postResize() {
         super.postResize();
         if (getDelegate() != null) {
-            Area childArea = getChild().getArea();
+            Area childArea = getDelegate().getArea();
             Area area = super.getArea();
             area.set(childArea);
             area.rx = childArea.rx;
@@ -75,6 +95,6 @@ public class DelegatingSingleChildWidget<W extends SingleChildWidget<W>> extends
 
     @Override
     public IWidget getDelegate() {
-        return getChild();
+        return delegate;
     }
 }

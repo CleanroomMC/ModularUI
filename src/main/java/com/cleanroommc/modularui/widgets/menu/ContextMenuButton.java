@@ -85,8 +85,8 @@ public class ContextMenuButton<W extends ContextMenuButton<W>> extends Widget<W>
             this.menuList = new ContextMenuList<>("no_list")
                     .width(50)
                     .maxSize(30)
-                    .child(new ContextMenuOption<>()
-                            .widthRel(50)
+                    .child(new Widget<>()
+                            .widthRel(1f)
                             .height(12)
                             .overlay(IKey.str("No options supplied")));
         }
@@ -129,11 +129,6 @@ public class ContextMenuButton<W extends ContextMenuButton<W>> extends Widget<W>
                 parentMenuList.checkClose();
             }
         }
-    }
-
-    @Override
-    public void closeParent() {
-        closeMenu(false);
     }
 
     @Override

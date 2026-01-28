@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.ResizeNode;
 
@@ -46,13 +45,6 @@ public interface IGuiElement {
     default Area getParentArea() {
         return getParent().getArea();
     }
-
-    /**
-     * Draws this element
-     *
-     * @param context gui context
-     */
-    void draw(ModularGuiContext context);
 
     /**
      * Called when the mouse hovers this element. This means this element is directly below the mouse or there are widgets in between which

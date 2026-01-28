@@ -96,6 +96,7 @@ public abstract class ResizeNode implements IResizeable2, ITreeNode<ResizeNode> 
         return false;
     }
 
+    @ApiStatus.Internal
     public void setDefaultParent(ResizeNode resizeNode) {
         //ModularUI.LOGGER.info("Set default parent of {} to {}. Current: default: {}, override: {}", this, resizeNode, this.defaultParent, this.parentOverride);
         if (resizeNode == this) throw new IllegalArgumentException("Tried to set itself as default parent in " + this);

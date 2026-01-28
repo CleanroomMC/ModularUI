@@ -198,8 +198,7 @@ public class TestGuis extends CustomModularScreen {
         animator.reset(true);
         animator.animate(true);
         return ModularPanel.defaultPanel("main").size(150)
-                .child(new TransformWidget()
-                        .child(widget)
+                .child(new TransformWidget(widget)
                         .transform(stack -> {
                             double angle = Math.PI;
                             float x = (float) (55 * Math.cos(animator.getValue() * angle));

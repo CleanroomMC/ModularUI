@@ -52,12 +52,6 @@ class InternalWidgetTree {
     }
 
     static void drawTree(IWidget parent, ModularGuiContext context, boolean ignoreEnabled, boolean drawBackground) {
-        // skip delegating widgets and draw the delegates directly
-        /*while (parent instanceof IDelegatingWidget dw) {
-            if (dw.getDelegate() == null || (!parent.isEnabled() && !ignoreEnabled)) return;
-            parent = dw.getDelegate();
-        }*/
-
         if (!parent.isEnabled() && !ignoreEnabled) return;
         if (parent.requiresResize()) {
             WidgetTree.resizeInternal(parent.resizer(), false);

@@ -50,21 +50,7 @@ public interface IWidget extends IGuiElement, ITreeNode<IWidget> {
      * @param context     gui context
      * @param widgetTheme widget theme of this widget
      */
-    void drawBackground(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme);
-
-    /**
-     * Draws additional stuff in this widget.
-     * x = 0 and y = 0 is now in the top left corner of this widget.
-     * Do NOT override this method, it is never called. Use {@link #draw(ModularGuiContext, WidgetThemeEntry)} instead.
-     *
-     * @param context gui context
-     */
-    @ApiStatus.NonExtendable
-    @Deprecated
-    @Override
-    default void draw(ModularGuiContext context) {
-        draw(context, getWidgetTheme(context.getTheme()));
-    }
+    default void drawBackground(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {}
 
     /**
      * Draws extra elements of this widget. Called after {@link #drawBackground(ModularGuiContext, WidgetThemeEntry)} and before
@@ -73,7 +59,7 @@ public interface IWidget extends IGuiElement, ITreeNode<IWidget> {
      * @param context     gui context
      * @param widgetTheme widget theme
      */
-    void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme);
+    default void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {}
 
     /**
      * Draws the overlay of this theme.
@@ -81,7 +67,7 @@ public interface IWidget extends IGuiElement, ITreeNode<IWidget> {
      * @param context     gui context
      * @param widgetTheme widget theme
      */
-    void drawOverlay(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme);
+    default void drawOverlay(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {}
 
     /**
      * Draws foreground elements of this widget. For example tooltips.
@@ -89,7 +75,7 @@ public interface IWidget extends IGuiElement, ITreeNode<IWidget> {
      *
      * @param context gui context
      */
-    void drawForeground(ModularGuiContext context);
+    default void drawForeground(ModularGuiContext context) {}
 
     default void transform(IViewportStack stack) {
         stack.translate(getArea().rx, getArea().ry, 0);
@@ -106,7 +92,7 @@ public interface IWidget extends IGuiElement, ITreeNode<IWidget> {
     /**
      * Called 20 times per second.
      */
-    void onUpdate();
+    default void onUpdate() {}
 
     /**
      * @return the area this widget occupies
@@ -226,7 +212,7 @@ public interface IWidget extends IGuiElement, ITreeNode<IWidget> {
     /**
      * Marks tooltip for this widget as dirty.
      */
-    void markTooltipDirty();
+    default void markTooltipDirty() {}
 
     /**
      * @return the parent of this widget

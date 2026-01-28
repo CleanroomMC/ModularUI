@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.value.IBoolValue;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.NamedDrawableRow;
 import com.cleanroommc.modularui.drawable.Rectangle;
@@ -19,7 +20,6 @@ import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.ToggleButton;
 import com.cleanroommc.modularui.widgets.menu.ContextMenuButton;
 import com.cleanroommc.modularui.widgets.menu.ContextMenuList;
-import com.cleanroommc.modularui.widgets.menu.ContextMenuOption;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -52,11 +52,10 @@ public class DebugOverlay extends CustomModularScreen {
                         .menuList(new ContextMenuList<>("debug_options_ctx_ml1")
                                 .maxSize(100)
                                 .widthRel(1f)
-                                .child(new ContextMenuOption<>().name("ctx_mo")
-                                        .child(new ButtonWidget<>().name("ctx_b")
-                                                .invisible()
-                                                .overlay(IKey.str("Print widget trees"))
-                                                .onMousePressed(this::logWidgetTrees)))
+                                .child(new ButtonWidget<>().name("ctx_b")
+                                        .invisible()
+                                        .overlay(IKey.str("Print widget trees"))
+                                        .onMousePressed(this::logWidgetTrees))
                                 .child(new ContextMenuButton<>()
                                         .name("menu_button_hover_info")
                                         .height(10)
@@ -86,18 +85,16 @@ public class DebugOverlay extends CustomModularScreen {
                                         ))));
     }
 
-    public static ContextMenuOption<?> toggleOption(int i, String name, IBoolValue<?> boolValue) {
-        return new ContextMenuOption<>()
-                .name("hover_info_option" + i)
-                .child(new ToggleButton()
-                        .name("hover_info_toggle" + i)
-                        .invisible()
-                        .value(boolValue)
-                        .overlay(true, new NamedDrawableRow()
-                                .name(IKey.str(name))
-                                .drawable(CHECKMARK))
-                        .overlay(false, new NamedDrawableRow()
-                                .name(IKey.str(name))));
+    public static IWidget toggleOption(int i, String name, IBoolValue<?> boolValue) {
+        return new ToggleButton()
+                .name("hover_info_toggle" + i)
+                .invisible()
+                .value(boolValue)
+                .overlay(true, new NamedDrawableRow()
+                        .name(IKey.str(name))
+                        .drawable(CHECKMARK))
+                .overlay(false, new NamedDrawableRow()
+                        .name(IKey.str(name)));
     }
 
     private void drawDebug(GuiContext context, int x, int y, int w, int h, WidgetTheme widgetTheme) {
