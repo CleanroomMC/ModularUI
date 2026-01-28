@@ -174,23 +174,13 @@ public class DimensionSizer {
     }
 
     public void apply(Area area, ResizeNode relativeTo, IntSupplier defaultSize) {
-        // is already calculated
-        boolean sizeCalculated;
-        boolean posCalculated;
+        boolean sizeCalculated = isSizeCalculated();
+        boolean posCalculated = isPosCalculated();
+        if (sizeCalculated && posCalculated) return;
         int p, s;
-        int parentSize;
-        boolean calcParent;
-        Box padding;
-        try {
-            sizeCalculated = isSizeCalculated();
-            posCalculated = isPosCalculated();
-            if (sizeCalculated && posCalculated) return;
-            parentSize = relativeTo.getArea().getSize(this.axis);
-            calcParent = relativeTo.isSizeCalculated(this.axis);
-            padding = relativeTo.getArea().getPadding();
-        } catch (Throwable e) {
-            throw e;
-        }
+        int parentSize = relativeTo.getArea().getSize(this.axis);
+        boolean calcParent = relativeTo.isSizeCalculated(this.axis);
+        Box padding = relativeTo.getArea().getPadding();
 
         if (sizeCalculated) { // pos not calculated
             // size was calculated before
@@ -318,36 +308,36 @@ public class DimensionSizer {
         // apply self margin and parent padding if not done yet
         if (isMarginPaddingApplied()) return;
         setMarginPaddingApplied(true);
-        int left = area.getMargin().getStart(this.axis) + relativeTo.getPadding().getStart(this.axis);
-        int right = area.getMargin().getEnd(this.axis) + relativeTo.getPadding().getEnd(this.axis);
-        if (left > 0 && ((this.start != null && !this.start.isRelative()) ||
+        int start = area.getMargin().getStart(this.axis) + relativeTo.getPadding().getStart(this.axis);
+        int end = area.getMargin().getEnd(this.axis) + relativeTo.getPadding().getEnd(this.axis);
+        if (start > 0 && ((this.start != null && !this.start.isRelative()) ||
                 (this.end != null && !this.end.isRelative() && (this.size == null || !this.size.isRelative())))) {
-            left = 0;
+            start = 0;
         }
-        if (right > 0 && ((this.end != null && !this.end.isRelative()) ||
+        if (end > 0 && ((this.end != null && !this.end.isRelative()) ||
                 (this.start != null && !this.start.isRelative() && (this.size == null || !this.size.isRelative())))) {
-            right = 0;
+            end = 0;
         }
-        if (left == 0 && right == 0) return;
+        if (start == 0 && end == 0) return;
         int parentS = relativeTo.getSize(this.axis);
         int s = area.getSize(this.axis);
         int rp = area.getRelativePoint(this.axis); // relative pos
-        if (left > 0) {
-            if (right > 0) {
-                if (left + right + s > parentS) {
+        if (start > 0) {
+            if (end > 0) {
+                if (start + end + s > parentS) {
                     // widget and margin + padding is larger than available space
-                    area.setRelativePoint(this.axis, left);
+                    area.setRelativePoint(this.axis, start);
                     GuiError.throwNew(parent, GuiError.Type.SIZING, "Margin/padding is set on both sides on axis " + this.axis +
                             ", but total size exceeds parent size.");
                     return;
                 }
-                if (right > parentS - s - rp) area.setRelativePoint(this.axis, parentS - right - s);
-                else if (left > rp) area.setRelativePoint(this.axis, left);
+                if (end > parentS - s - rp) area.setRelativePoint(this.axis, parentS - end - s);
+                else if (start > rp) area.setRelativePoint(this.axis, start);
                 return;
             }
-            if (left > rp) area.setRelativePoint(this.axis, left);
-        } else if (right > 0) {
-            if (right > parentS - s - rp) area.setRelativePoint(this.axis, parentS - right - s);
+            if (start > rp) area.setRelativePoint(this.axis, start);
+        } else if (end > 0) {
+            if (end > parentS - s - rp) area.setRelativePoint(this.axis, parentS - end - s);
         }
     }
 

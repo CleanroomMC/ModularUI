@@ -10,6 +10,7 @@ public abstract class StaticResizer extends ResizeNode {
 
     @Override
     public void initResizing(boolean onOpen) {
+        super.initResizing(onOpen);
         setChildrenResized(false);
     }
 

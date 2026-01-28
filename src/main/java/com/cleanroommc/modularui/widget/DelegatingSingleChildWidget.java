@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widget;
 
+import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IDelegatingWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -7,44 +8,28 @@ import com.cleanroommc.modularui.widget.sizer.StandardResizer;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 public class DelegatingSingleChildWidget<W extends SingleChildWidget<W>> extends SingleChildWidget<W> implements IDelegatingWidget {
 
-    private boolean currentlyResizing = false;
-
     @Override
-    public void onInit() {
-        super.onInit();
-        if (hasChildren()) getChild().resizer().relative(getParent());
-    }
-
-    @Override
-    public void beforeResize(boolean onOpen) {
-        this.currentlyResizing = true;
-        super.beforeResize(onOpen);
-        if (getDelegate() != null) getDelegate().beforeResize(onOpen);
-    }
-
-    @Override
-    public void onResized() {
-        super.onResized();
-        if (getDelegate() != null) getDelegate().onResized();
+    public void afterInit() {
+        super.resizer().setDefaultParent(null); // remove this widget from the resize node tree
+        if (hasChildren()) {
+            getChild().resizer().setDefaultParentIsDelegating(true);
+            getChild().resizer().relative(getParent()); // add the delegated widget at the place of this widget on the resize node tree
+        }
     }
 
     @Override
     public void postResize() {
         super.postResize();
-        if (getDelegate() != null) getDelegate().postResize();
-        this.currentlyResizing = false;
         if (getDelegate() != null) {
             Area childArea = getChild().getArea();
             Area area = super.getArea();
             area.set(childArea);
             area.rx = childArea.rx;
             area.ry = childArea.ry;
-            childArea.x = 0;
-            childArea.y = 0;
+            //childArea.x = 0;
+            //childArea.y = 0;
             childArea.rx = 0;
             childArea.ry = 0;
         }
@@ -62,17 +47,22 @@ public class DelegatingSingleChildWidget<W extends SingleChildWidget<W>> extends
 
     @Override
     public Area getArea() {
-        return getDelegate() != null && this.currentlyResizing ? getDelegate().getArea() : super.getArea();
+        return getDelegate() != null ? getDelegate().getArea() : super.getArea();
     }
 
     @Override
-    public @NotNull List<IWidget> getChildren() {
-        return getDelegate() != null && this.currentlyResizing ? getDelegate().getChildren() : super.getChildren();
+    public void transform(IViewportStack stack) {
+        stack.translate(super.getArea().rx, super.getArea().ry, 0);
+    }
+
+    @Override
+    public boolean canBeSeen(IViewportStack stack) {
+        return false;
     }
 
     @Override
     public boolean requiresResize() {
-        return super.requiresResize() || (getDelegate() != null && getDelegate().requiresResize());
+        return getDelegate() != null && getDelegate().requiresResize();
     }
 
     @Override

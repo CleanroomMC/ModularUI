@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.GuiError;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.layout.IResizeable2;
+import com.cleanroommc.modularui.api.widget.IDelegatingWidget;
 import com.cleanroommc.modularui.api.widget.IPositioned;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.IWidget;
@@ -328,6 +329,10 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
     @Override
     public void postFullResize() {
         IWidget widget = getWidget();
+        if (widget instanceof IDelegatingWidget dw && dw.getDelegate() != null) {
+            super.postFullResize();
+            return;
+        }
         Area area = widget.getArea();
         // update rx and ry to be relative to the widget parent not the resize node parent
         Area parentArea = widget.getParentArea();

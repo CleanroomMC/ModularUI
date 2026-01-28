@@ -7,16 +7,14 @@ import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.widgets.ListWidget;
 
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
 
 @ApiStatus.Experimental
 public class ContextMenuList<W extends ContextMenuList<W>> extends ListWidget<IWidget, W> {
 
-    private final String name;
     private ContextMenuButton<?> source;
 
     public ContextMenuList(String name) {
-        this.name = name;
+        name(name);
         padding(2);
     }
 
@@ -24,12 +22,6 @@ public class ContextMenuList<W extends ContextMenuList<W>> extends ListWidget<IW
         if (this.source != null) {
             this.source.closeMenu(false);
         }
-    }
-
-    @NotNull
-    @Override
-    public String getName() {
-        return name;
     }
 
     public boolean isSelfOrChildHovered() {

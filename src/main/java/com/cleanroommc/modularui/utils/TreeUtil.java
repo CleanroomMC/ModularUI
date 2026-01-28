@@ -7,6 +7,7 @@ import com.cleanroommc.modularui.widget.sizer.ResizeNode;
 
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Streams;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
@@ -14,6 +15,7 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -41,18 +43,21 @@ public class TreeUtil {
             .append("X: ").append(str(node.isXCalculated()))
             .append(", Y: ").append(str(node.isYCalculated()))
             .append(", W: ").append(str(node.isWidthCalculated()))
-            .append(", H: ").append(str(node.isHeightCalculated()))
-            .append(", Can relayout: ").append(node.canRelayout(node.hasParent() && node.getParent().isLayout()));
+            .append(", H: ").append(str(node.isHeightCalculated()));
     public static final NodeInfo<ResizeNode> RESIZE_NODE_INFO_RESIZED_DETAILED = (root, node, builder) -> {
-        boolean self = node.isSelfFullyCalculated(node.hasParent() && node.getParent().isLayout());
-        builder.append("Self resized: ").append(str(self))
-                .append(", Is pos final: ").append(str(!node.canRelayout(node.hasParent() && node.getParent().isLayout())))
+        builder.append("XYWH: ")
+                .append(str(node.isXCalculated()))
+                .append(str(node.isYCalculated()))
+                .append(str(node.isWidthCalculated()))
+                .append(str(node.isHeightCalculated()))
                 .append(", Children resized: ").append(str(node.areChildrenCalculated()))
-                .append(", Layout done: ").append(str(node.isLayoutDone()));
-        if (!self) {
-            builder.append(", Self detail: ");
+                .append(", Self layout done: ").append(str(node.isLayoutDone()))
+                .append(", Parent layout done: ").append(str(!node.canRelayout(node.hasParent() && node.getParent().isLayout())));
+        /*if (!self) {
+            builder.append(", Self detail: (");
             RESIZE_NODE_INFO_SELF_RESIZED_DETAIL.addInfo(root, node, builder);
-        }
+            builder.append(")");
+        }*/
     };
     public static final NodeInfo<ResizeNode> RESIZE_NODE_INFO_RESIZED_COLLAPSED = (root, node, builder) -> {
         if (node.isFullyCalculated(node.hasParent() && node.getParent().isLayout())) {
@@ -418,11 +423,11 @@ public class TreeUtil {
      */
     public static <T extends ITreeNode<T>> StringBuilder toString(StringBuilder builder, T parent, Predicate<T> test, NodeInfo<T> additionalInfo) {
         if (builder == null) builder = new StringBuilder();
-        getTree(parent, parent, test, builder, additionalInfo, "", false);
+        getTree(parent, parent, test, builder, additionalInfo, "", false, null);
         return builder;
     }
 
-    protected static <T extends ITreeNode<T>> void getTree(T root, T parent, Predicate<T> test, StringBuilder builder, NodeInfo<T> additionalInfo, String indent, boolean hasNextSibling) {
+    protected static <T extends ITreeNode<T>> void getTree(T root, T parent, Predicate<T> test, StringBuilder builder, NodeInfo<T> additionalInfo, String indent, boolean hasNextSibling, Set<T> visited) {
         if (!indent.isEmpty()) {
             builder.append(indent);
             if (TreeUtil.allowUnicode) {
@@ -432,6 +437,12 @@ public class TreeUtil {
             }
             builder.append(' ');
         }
+        if (visited == null) visited = new ReferenceOpenHashSet<>();
+        if (visited.contains(parent)) {
+            builder.append("CYCLING TREE FOUND (").append(parent).append(")\n");
+            return;
+        }
+        visited.add(parent);
         builder.append(parent);
         if (additionalInfo != null) {
             builder.append(" {");
@@ -450,7 +461,7 @@ public class TreeUtil {
                     } else {
                         nextIndent += "  ";
                     }
-                    getTree(root, child, test, builder, additionalInfo, nextIndent, i < children.size() - 1);
+                    getTree(root, child, test, builder, additionalInfo, nextIndent, i < children.size() - 1, visited);
                 }
             }
         }

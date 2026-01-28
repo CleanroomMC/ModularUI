@@ -241,21 +241,28 @@ public class WidgetTree extends TreeUtil {
     public static void resizeInternal(ResizeNode parent, boolean onOpen) {
         long time = System.nanoTime();
         // check if updating this widget's pos and size can potentially update its parents
-        while (parent.getParent() != null && (parent.getParent().dependsOnChildren() || parent.isLayout())) {
+        while (parent.getParent() != null && (parent.getParent().dependsOnChildren() || parent.getParent().isLayout())) {
             parent = parent.getParent();
         }
         // resize each widget and calculate their relative pos
-        if (!InternalWidgetTree.resize(parent, true, onOpen, false) && !InternalWidgetTree.resize(parent, false, onOpen, false)) {
-            if (MCHelper.getPlayer() != null) {
-                MCHelper.getPlayer().sendMessage(new TextComponentString(IKey.RED + "ModularUI: Failed to resize sub tree of "
-                        + parent.getDebugDisplayName() + ". See log for more info."));
+        try {
+            if (!InternalWidgetTree.resize(parent, true, onOpen, false) && !InternalWidgetTree.resize(parent, false, onOpen, false)) {
+                if (MCHelper.getPlayer() != null) {
+                    MCHelper.getPlayer().sendMessage(new TextComponentString(IKey.RED + "ModularUI: Failed to resize sub tree of "
+                            + parent.getDebugDisplayName() + ". See log for more info."));
+                }
+                ModularUI.LOGGER.error("Failed to resize widget. Affected resize node tree:");
+                print(parent, RESIZE_NODE_INFO_RESIZED_COLLAPSED);
             }
-            ModularUI.LOGGER.error("Failed to resize widget. Affected resize node tree:");
+            // now apply the calculated pos
+            applyPos(parent);
+            postFullResize(parent);
+        } catch (Throwable e) {
+            ModularUI.LOGGER.fatal("An exception was thrown while resizing widgets. Affected node tree:");
             print(parent, RESIZE_NODE_INFO_RESIZED_COLLAPSED);
+            ModularUI.LOGGER.fatal(".");
         }
-        // now apply the calculated pos
-        applyPos(parent);
-        postFullResize(parent);
+
         if (WidgetTree.logResizeTime) {
             time = System.nanoTime() - time;
             ModularUI.LOGGER.info("Resized widget tree in {}s.", NumberFormat.formatNanos(time));

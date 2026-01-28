@@ -478,22 +478,22 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                 .name("page 4 storage")
                                                 .sizeRel(1f)
                                                 .child(new Column()
-                                                        .name("page 4 col, dynamic widgets")
-                                                        .padding(7)
-                                                        .child(new ItemSlot()
-                                                                .slot(new ModularSlot(this.storageInventory0, 0)
-                                                                        .changeListener(((newItem, onlyAmountChanged, client, init) -> {
-                                                                            if (client && !onlyAmountChanged) {
-                                                                                dynamicSyncHandler.notifyUpdate(packet -> NetworkUtils.writeItemStack(packet, newItem));
-                                                                            }
-                                                                        }))))
-                                                        .child(new DynamicSyncedWidget<>()
-                                                                .widthRel(1f)
-                                                                .syncHandler(dynamicSyncHandler))
-                                                        .child(new DynamicSyncedWidget<>()
+                                                                .name("page 4 col, dynamic widgets")
+                                                                .padding(7)
+                                                                .child(new ItemSlot()
+                                                                        .slot(new ModularSlot(this.storageInventory0, 0)
+                                                                                .changeListener(((newItem, onlyAmountChanged, client, init) -> {
+                                                                                    if (client && !onlyAmountChanged) {
+                                                                                        dynamicSyncHandler.notifyUpdate(packet -> NetworkUtils.writeItemStack(packet, newItem));
+                                                                                    }
+                                                                                }))))
+                                                                .child(new DynamicSyncedWidget<>()
+                                                                        .widthRel(1f)
+                                                                        .syncHandler(dynamicSyncHandler))
+                                                        /*.child(new DynamicSyncedWidget<>()
                                                                 .widthRel(1f)
                                                                 .coverChildrenHeight()
-                                                                .syncHandler(dynamicLinkedSyncHandler)))
+                                                                .syncHandler(dynamicLinkedSyncHandler))*/)
                                         )
                                         .addPage(createSchemaPage(guiData))))
                         .child(SlotGroupWidget.playerInventory(false))

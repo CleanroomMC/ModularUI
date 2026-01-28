@@ -36,6 +36,7 @@ public abstract class WidgetResizeNode extends ResizeNode {
 
     @Override
     public void postFullResize() {
+        super.postFullResize();
         this.widget.postResize();
     }
 

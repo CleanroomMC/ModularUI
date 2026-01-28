@@ -112,9 +112,9 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
             widget.resizer().setMarginPaddingApplied(true);
             this.separatorPositions.add(p);
             p += separatorSize;
-            if (isValid()) {
+            /*if (isValid()) {
                 widget.resizer().applyPos();
-            }
+            }*/
         }
         int size = p + getArea().getPadding().getEnd(axis);
         getScrollData().setScrollSize(size);

@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widget;
 
+import com.cleanroommc.modularui.api.widget.IDelegatingWidget;
 import com.cleanroommc.modularui.api.widget.INotifyEnabled;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
@@ -30,6 +31,10 @@ public abstract class AbstractWidget implements IWidget {
 
     private final Area area = new Area();
     private StandardResizer resizer;
+
+    public AbstractWidget() {
+        area.widget = this;
+    }
 
     /**
      * Returns the screen of the panel of this widget is being opened in.
@@ -63,12 +68,19 @@ public abstract class AbstractWidget implements IWidget {
     public final void initialise(@NotNull IWidget parent, boolean late) {
         this.timeHovered = -1;
         this.timeBelowMouse = -1;
+        if (this.resizer == null) {
+            throw new IllegalStateException("Resizer must be set before the widget initializes! Affected widget: " + this);
+        }
         if (!(this instanceof ModularPanel)) {
             this.parent = parent;
             this.panel = parent.getPanel();
             this.context = parent.getContext();
             getArea().z(parent.getArea().z() + 1);
-            resizer().setDefaultParent(parent.resizer());
+            if (parent instanceof AbstractWidget aw) {
+                this.resizer.setDefaultParent(aw.resizer);
+            } else {
+                this.resizer.setDefaultParent(parent.resizer());
+            }
         }
         this.valid = true;
         onInitInternal(late);
@@ -194,6 +206,19 @@ public abstract class AbstractWidget implements IWidget {
     }
 
     /**
+     * Shortcut to get the area of the parent
+     *
+     * @return parent area
+     */
+    public Area getParentArea() {
+        IWidget parent = getParent();
+        while (parent instanceof IDelegatingWidget dw) {
+            parent = dw.getParent();
+        }
+        return parent.getArea();
+    }
+
+    /**
      * Returns if this widget is currently enabled. Disabled widgets (and all its children) are not rendered and can't be interacted with.
      *
      * @return true if this widget is enabled.
@@ -273,8 +298,17 @@ public abstract class AbstractWidget implements IWidget {
         return this.resizer;
     }
 
+    protected final StandardResizer rawResizer() {
+        return this.resizer;
+    }
+
     protected void resizer(StandardResizer resizer) {
-        this.resizer = Objects.requireNonNull(resizer);
+        Objects.requireNonNull(resizer);
+        if (this.resizer == resizer) return;
+        if (isValid() && this.resizer != null) {
+            resizer.replacementOf(this.resizer);
+        }
+        this.resizer = resizer;
     }
 
     /**

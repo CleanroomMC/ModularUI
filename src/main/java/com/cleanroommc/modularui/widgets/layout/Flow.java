@@ -234,10 +234,10 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget {
                 widget.resizer().setPosResized(other, true);
                 widget.resizer().setMarginPaddingApplied(other, true);
             }
-            if (parent.isValid()) {
+            /*if (parent.isValid()) {
                 // we changed rel pos, but we need to calculate the new absolute pos and other stuff
                 widget.resizer().applyPos();
-            }
+            }*/
         }
         return true;
     }

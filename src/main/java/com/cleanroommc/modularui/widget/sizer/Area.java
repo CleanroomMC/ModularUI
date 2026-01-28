@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.widget.sizer;
 import com.cleanroommc.modularui.animation.IAnimatable;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.MathUtils;
 
@@ -30,13 +31,16 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
     /**
      * relative position (in most cases the direct parent)
      */
-    public int rx, ry;
+    public int rx;
+    public int ry;
     /**
      * the widget layer within this panel
      */
     private int z;
     private final Box margin = new Box();
     private final Box padding = new Box();
+
+    public IWidget widget;
 
     public Area() {}
 
@@ -55,6 +59,10 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
         this.z = area.z;
         getMargin().set(area.getMargin());
         getPadding().set(area.getPadding());
+    }
+
+    public boolean isWidget(String s) {
+        return widget != null && widget.getName() != null && (widget.getName().endsWith("ctx_tb6") || widget.getName().endsWith("ctx_mo_sub6"));
     }
 
     public int x() {
