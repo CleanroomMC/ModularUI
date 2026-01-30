@@ -90,12 +90,13 @@ public class ModularScreen {
     private boolean overlay = false;
 
     /**
-     * Creates a new screen with a ModularUI as its owner and a given {@link ModularPanel}.
-     *
-     * @param mainPanel main panel of this screen
+     * @deprecated use the other constructor
      */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
     public ModularScreen(@NotNull ModularPanel mainPanel) {
         this(ModularUI.ID, mainPanel);
+        ModularUI.LOGGER.error("The single arg ModularScreen constructor should not be used. Use the other one and pass in your mod id.");
     }
 
     /**

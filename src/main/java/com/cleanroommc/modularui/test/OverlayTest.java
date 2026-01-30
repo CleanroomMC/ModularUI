@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.test;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.overlay.OverlayHandler;
@@ -28,22 +29,23 @@ public class OverlayTest {
             TextWidget<?> title = new TextWidget<>(IKey.str("ModularUI"));
             int[] colors = {Color.WHITE.main, Color.AMBER.main, Color.BLUE.main, Color.GREEN.main, Color.DEEP_PURPLE.main, Color.RED.main};
             AtomicInteger k = new AtomicInteger();
-            return new ModularScreen(ModularPanel.defaultPanel("overlay")
-                    .fullScreenInvisible()
-                    .child(title.scale(5f)
-                            .shadow(true)
-                            .color(colors[k.get()])
-                            .leftRel(0.5f).topRel(0.07f))
-                    .child(new ButtonWidget<>() // test button overlapping
-                            .topRel(0.25f, 59, 0f)
-                            .leftRelOffset(0.5f, 91)
-                            .size(44)
-                            .overlay(IKey.str("Fun Button"))
-                            .onMousePressed(mouseButton -> {
-                                k.set((k.get() + 1) % colors.length);
-                                title.color(colors[k.get()]);
-                                return true;
-                            })));
+            return new ModularScreen(ModularUI.ID,
+                    ModularPanel.defaultPanel("overlay")
+                            .fullScreenInvisible()
+                            .child(title.scale(5f)
+                                    .shadow(true)
+                                    .color(colors[k.get()])
+                                    .leftRel(0.5f).topRel(0.07f))
+                            .child(new ButtonWidget<>() // test button overlapping
+                                    .topRel(0.25f, 59, 0f)
+                                    .leftRelOffset(0.5f, 91)
+                                    .size(44)
+                                    .overlay(IKey.str("Fun Button"))
+                                    .onMousePressed(mouseButton -> {
+                                        k.set((k.get() + 1) % colors.length);
+                                        title.color(colors[k.get()]);
+                                        return true;
+                                    })));
         }));
 
         OverlayManager.register(new OverlayHandler(screen -> screen instanceof GuiContainer, screen -> {

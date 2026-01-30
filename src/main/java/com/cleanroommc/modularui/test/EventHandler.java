@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.test;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
@@ -57,6 +58,7 @@ public class EventHandler {
             if (itemStack.getItem() == Items.DIAMOND) {
                 //ClientGUI.open(new TestGuis());
                 ClientGUI.open(new ModularScreen(
+                        ModularUI.ID,
                         new ModularPanel("test")
                                 .size(150)
                                 .child(new ButtonWidget<>()

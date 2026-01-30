@@ -126,7 +126,7 @@ public class TestGuis extends CustomModularScreen {
                                                                 .leftRel(1f)
                                                                 .heightRel(1f));
                                                     }
-                                                    ClientGUI.open(new ModularScreen(panel).openParentOnClose(true));
+                                                    ClientGUI.open(new ModularScreen(ModularUI.ID, panel).openParentOnClose(true));
                                                 } catch (IllegalAccessException | InvocationTargetException e) {
                                                     ModularUI.LOGGER.throwing(e);
                                                 }

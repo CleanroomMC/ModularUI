@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.config;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.packets.SyncConfig;
 import com.cleanroommc.modularui.screen.ModularScreen;
@@ -80,7 +81,7 @@ public class Config {
     }
 
     public ModularScreen createScreen() {
-        return new ModularScreen(new ConfigPanel(this));
+        return new ModularScreen(ModularUI.ID, new ConfigPanel(this));
     }
 
     public JsonObject serialize() {
