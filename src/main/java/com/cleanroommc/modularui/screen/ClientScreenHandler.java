@@ -16,7 +16,6 @@ import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.integration.jei.ModularUIJeiPlugin;
 import com.cleanroommc.modularui.network.ModularNetwork;
 import com.cleanroommc.modularui.overlay.DebugOptions;
-import com.cleanroommc.modularui.overlay.OverlayManager;
 import com.cleanroommc.modularui.overlay.OverlayStack;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
@@ -225,7 +224,7 @@ public class ClientScreenHandler {
             ModularNetwork.CLIENT.closeAll();
         }
 
-        OverlayManager.onGuiOpen(newScreen);
+        OverlayStack.onGuiOpen(newScreen);
     }
 
     private static void invalidateCurrentScreen() {

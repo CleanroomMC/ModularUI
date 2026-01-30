@@ -1,20 +1,26 @@
 package com.cleanroommc.modularui.overlay;
 
+import com.cleanroommc.modularui.ModularUIConfig;
+import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.OpenScreenEvent;
 
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraftforge.common.MinecraftForge;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-@ApiStatus.Experimental
+@ApiStatus.Internal
 public class OverlayStack {
 
     private static final List<ModularScreen> overlay = new ArrayList<>();
@@ -108,5 +114,31 @@ public class OverlayStack {
 
     public static boolean isHoveringOverlay() {
         return getHoveredElement() != null;
+    }
+
+    public static void onGuiOpen(GuiScreen newScreen) {
+        closeAll();
+        if (newScreen != null) {
+            // backwards compat
+            for (OverlayHandler handler : OverlayManager.overlays) {
+                if (handler.isValidFor(newScreen)) {
+                    ModularScreen overlay = Objects.requireNonNull(handler.createOverlay(newScreen), "Overlays must not be null!");
+                    overlay.constructOverlay(newScreen);
+                    OverlayStack.open(overlay);
+                }
+            }
+
+            OpenScreenEvent event = new OpenScreenEvent(newScreen);
+            MinecraftForge.EVENT_BUS.post(event);
+            for (ModularScreen overlay : event.getOverlays()) {
+                overlay.constructOverlay(newScreen);
+                open(overlay);
+            }
+            if (ModularUIConfig.guiDebugMode && newScreen instanceof IMuiScreen muiScreen) {
+                ModularScreen overlay = new DebugOverlay(muiScreen);
+                overlay.constructOverlay(newScreen);
+                open(overlay);
+            }
+        }
     }
 }

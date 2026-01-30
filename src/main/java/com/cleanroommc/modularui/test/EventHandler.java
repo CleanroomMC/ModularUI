@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
@@ -9,10 +10,13 @@ import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.factory.ClientGUI;
 import com.cleanroommc.modularui.holoui.HoloUI;
+import com.cleanroommc.modularui.screen.CustomModularScreen;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.OpenScreenEvent;
 import com.cleanroommc.modularui.screen.RichTooltipEvent;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.ReloadThemeEvent;
 import com.cleanroommc.modularui.theme.SelectableTheme;
 import com.cleanroommc.modularui.theme.ThemeBuilder;
@@ -20,12 +24,19 @@ import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
+import com.cleanroommc.modularui.widgets.TextWidget;
 
+import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class EventHandler {
 
@@ -93,5 +104,61 @@ public class EventHandler {
     @SubscribeEvent
     public void onThemeReload(ReloadThemeEvent.Pre event) {
         IThemeApi.get().registerTheme(testTheme);
+    }
+
+    @SubscribeEvent
+    public void onOpenScreen(OpenScreenEvent event) {
+        if (ModularUIConfig.enableTestOverlays) {
+            if (event.getScreen() instanceof GuiMainMenu gui) {
+                event.addOverlay(getMainMenuOverlayTest(gui));
+            } else if (event.getScreen() instanceof GuiContainer gui) {
+                event.addOverlay(getContainerOverlayTest(gui));
+            }
+        }
+    }
+
+    private ModularScreen getMainMenuOverlayTest(GuiMainMenu gui) {
+        TextWidget<?> title = new TextWidget<>(IKey.str("ModularUI"));
+        int[] colors = {Color.WHITE.main, Color.AMBER.main, Color.BLUE.main, Color.GREEN.main, Color.DEEP_PURPLE.main, Color.RED.main};
+        AtomicInteger k = new AtomicInteger();
+        return new ModularScreen(ModularUI.ID,
+                ModularPanel.defaultPanel("overlay")
+                        .fullScreenInvisible()
+                        .child(title.scale(5f)
+                                .shadow(true)
+                                .color(colors[k.get()])
+                                .leftRel(0.5f).topRel(0.07f))
+                        .child(new ButtonWidget<>() // test button overlapping
+                                .topRel(0.25f, 59, 0f)
+                                .leftRelOffset(0.5f, 91)
+                                .size(44)
+                                .overlay(IKey.str("Fun Button"))
+                                .onMousePressed(mouseButton -> {
+                                    k.set((k.get() + 1) % colors.length);
+                                    title.color(colors[k.get()]);
+                                    return true;
+                                })));
+    }
+
+    private ModularScreen getContainerOverlayTest(GuiContainer gui) {
+        return new CustomModularScreen() {
+
+            @Override
+            public @NotNull ModularPanel buildUI(ModularGuiContext context) {
+                return ModularPanel.defaultPanel("watermark_overlay", gui.getXSize(), gui.getYSize())
+                        .pos(gui.getGuiLeft(), gui.getGuiTop())
+                        .invisible()
+                        .child(GuiTextures.MUI_LOGO.asIcon().asWidget()
+                                .top(5).right(5)
+                                .size(18));
+            }
+
+            @Override
+            public void onResize(int width, int height) {
+                getMainPanel().pos(gui.getGuiLeft(), gui.getGuiTop())
+                        .size(gui.getXSize(), gui.getYSize());
+                super.onResize(width, height);
+            }
+        };
     }
 }

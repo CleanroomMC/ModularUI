@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.overlay;
 
-import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.drawable.IKey;
@@ -24,10 +23,6 @@ import com.cleanroommc.modularui.widgets.menu.ContextMenuList;
 import org.jetbrains.annotations.NotNull;
 
 public class DebugOverlay extends CustomModularScreen {
-
-    public static void register() {
-        OverlayManager.register(new OverlayHandler(screen -> ModularUIConfig.guiDebugMode && screen instanceof IMuiScreen, screen -> new DebugOverlay((IMuiScreen) screen)));
-    }
 
     private static final IIcon CHECKMARK = GuiTextures.CHECKMARK.asIcon().size(8);
 
