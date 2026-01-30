@@ -12,8 +12,7 @@ import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.value.DoubleValue;
 import com.cleanroommc.modularui.value.StringValue;
-import com.cleanroommc.modularui.widgets.layout.Column;
-import com.cleanroommc.modularui.widgets.layout.Row;
+import com.cleanroommc.modularui.widgets.layout.Flow;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
 import java.util.function.Consumer;
@@ -52,9 +51,9 @@ public class ColorPickerDialog extends Dialog<Integer> {
         updateAll(startColor);
         size(140, controlAlpha ? 106 : 94).background(GuiTextures.MC_BACKGROUND);
         PagedWidget.Controller controller = new PagedWidget.Controller();
-        child(new Column()
+        child(Flow.column()
                 .left(5).right(5).top(5).bottom(5)
-                .child(new Row()
+                .child(Flow.row()
                         .left(5).right(5).height(14)
                         .child(new PageButton(0, controller)
                                 .sizeRel(0.5f, 1f)
@@ -62,7 +61,7 @@ public class ColorPickerDialog extends Dialog<Integer> {
                         .child(new PageButton(1, controller)
                                 .sizeRel(0.5f, 1f)
                                 .overlay(IKey.str("HSV"))))
-                .child(new Row().widthRel(1f).height(12).marginTop(4)
+                .child(Flow.row().widthRel(1f).height(12).marginTop(4)
                         .child(IKey.str("Hex: ").asWidget().heightRel(1f))
                         .child(new TextFieldWidget()
                                 .height(12)
@@ -87,7 +86,7 @@ public class ColorPickerDialog extends Dialog<Integer> {
                         .controller(controller)
                         .addPage(createRGBPage(createAlphaSlider("rgb")))
                         .addPage(createHSVPage(createAlphaSlider("hsv"))))
-                .child(new Row()
+                .child(Flow.row()
                         .left(10).right(10).height(14)
                         .mainAxisAlignment(Alignment.MainAxis.SPACE_BETWEEN)
                         .child(new ButtonWidget<>()
@@ -107,23 +106,23 @@ public class ColorPickerDialog extends Dialog<Integer> {
     }
 
     private IWidget createRGBPage(IWidget alphaSlider) {
-        return new Column()
+        return Flow.column()
                 .sizeRel(1f, 1f)
-                .child(new Row()
+                .child(Flow.row()
                         .widthRel(1f).height(12)
                         .child(IKey.str("R: ").asWidget().heightRel(1f))
                         .child(createSlider(this.sliderBackgroundR)
                                 .name("red")
                                 .bounds(0, 255)
                                 .value(new DoubleValue.Dynamic(() -> this.red, this::updateRed))))
-                .child(new Row()
+                .child(Flow.row()
                         .widthRel(1f).height(12)
                         .child(IKey.str("G: ").asWidget().heightRel(1f))
                         .child(createSlider(this.sliderBackgroundG)
                                 .name("green")
                                 .bounds(0, 255)
                                 .value(new DoubleValue.Dynamic(() -> this.green, this::updateGreen))))
-                .child(new Row()
+                .child(Flow.row()
                         .widthRel(1f).height(12)
                         .child(IKey.str("B: ").asWidget().heightRel(1f))
                         .child(createSlider(this.sliderBackgroundB)
@@ -134,23 +133,23 @@ public class ColorPickerDialog extends Dialog<Integer> {
     }
 
     private IWidget createHSVPage(IWidget alphaSlider) {
-        return new Column()
+        return Flow.column()
                 .sizeRel(1f, 1f)
-                .child(new Row()
+                .child(Flow.row()
                         .widthRel(1f).height(12)
                         .child(IKey.str("H: ").asWidget().heightRel(1f))
                         .child(createSlider(new HueBar(GuiAxis.X))
                                 .name("hue")
                                 .bounds(0, 360)
                                 .value(new DoubleValue.Dynamic(() -> this.hue, this::updateHue))))
-                .child(new Row()
+                .child(Flow.row()
                         .widthRel(1f).height(12)
                         .child(IKey.str("S: ").asWidget().heightRel(1f))
                         .child(createSlider(this.sliderBackgroundS)
                                 .name("saturation")
                                 .bounds(0, 1)
                                 .value(new DoubleValue.Dynamic(() -> this.saturation, this::updateSaturation))))
-                .child(new Row()
+                .child(Flow.row()
                         .widthRel(1f).height(12)
                         .child(IKey.str("V: ").asWidget().heightRel(1f))
                         .child(createSlider(this.sliderBackgroundV)
@@ -170,7 +169,7 @@ public class ColorPickerDialog extends Dialog<Integer> {
     }
 
     private IWidget createAlphaSlider(String s) {
-        return controlAlpha ? new Row()
+        return controlAlpha ? Flow.row()
                 .widthRel(1f).height(12)
                 .child(IKey.str("A: ").asWidget().heightRel(1f))
                 .child(createSlider(this.sliderBackgroundA)

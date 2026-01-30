@@ -10,9 +10,8 @@ import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.value.sync.IntSyncValue;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.StringSyncValue;
+import com.cleanroommc.modularui.widgets.layout.Flow;
 import com.cleanroommc.modularui.widgets.slot.ItemSlot;
-import com.cleanroommc.modularui.widgets.layout.Column;
-import com.cleanroommc.modularui.widgets.layout.Row;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
@@ -61,13 +60,13 @@ public class ItemEditorGui implements IGuiHolder<GuiData> {
         }
         ModularPanel panel = ModularPanel.defaultPanel("item_editor");
         return panel.bindPlayerInventory()
-                .child(new Column()
+                .child(Flow.column()
                         .crossAxisAlignment(Alignment.CrossAxis.START)
                         .sizeRel(1f)
                         .margin(7)
                         .child(IKey.str("Item Editor").asWidget().marginTop(7).marginBottom(3))
                         .child(new ItemSlot().slot(new ModularSlot(this.stackHandler, 0)))
-                        .child(new Row()
+                        .child(Flow.row()
                                 .crossAxisAlignment(Alignment.CrossAxis.CENTER)
                                 .height(16)
                                 .margin(0, 4)

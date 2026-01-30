@@ -13,8 +13,8 @@ import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.Dialog;
 import com.cleanroommc.modularui.widgets.SortableListWidget;
+import com.cleanroommc.modularui.widgets.layout.Flow;
 import com.cleanroommc.modularui.widgets.layout.Grid;
-import com.cleanroommc.modularui.widgets.layout.Row;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -50,7 +50,7 @@ public class TestGui extends CustomModularScreen {
         final Map<String, SortableListWidget.Item<String>> items = new Object2ObjectOpenHashMap<>();
         for (String line : this.lines) {
             items.put(line, new SortableListWidget.Item<>(line)
-                    .child(item -> new Row()
+                    .child(item -> Flow.row()
                             .child(new Widget<>()
                                     .addTooltipLine(line)
                                     .widgetTheme(IThemeApi.BUTTON)

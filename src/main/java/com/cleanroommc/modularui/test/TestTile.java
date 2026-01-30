@@ -53,9 +53,7 @@ import com.cleanroommc.modularui.widgets.ScrollingTextWidget;
 import com.cleanroommc.modularui.widgets.SliderWidget;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import com.cleanroommc.modularui.widgets.ToggleButton;
-import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Flow;
-import com.cleanroommc.modularui.widgets.layout.Row;
 import com.cleanroommc.modularui.widgets.slot.FluidSlot;
 import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 import com.cleanroommc.modularui.widgets.slot.ModularCraftingSlot;
@@ -176,7 +174,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         DynamicLinkedSyncHandler<GenericListSyncHandler<Integer>> dynamicLinkedSyncHandler = new DynamicLinkedSyncHandler<>(numberListSyncHandler)
                 .widgetProvider((syncManager1, value1) -> {
                     List<Integer> vals = value1.getValue();
-                    return new Column()
+                    return Flow.column()
                             .widthRel(1f)
                             .coverChildrenHeight()
                             .children(vals.size(), i -> IKey.str(String.valueOf(vals.get(i))).asWidget().padding(2));
@@ -195,7 +193,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                 .size(176, 220)       // set a static size for the main panel
                 .align(Alignment.Center);    // center the panel in the screen
         panel
-                .child(new Row()
+                .child(Flow.row()
                         .name("Tab row")
                         .coverChildren()
                         .topRel(0f, 4, 1f)
@@ -252,13 +250,13 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                 .name("page 1 parent")
                                                 .sizeRel(1f, 1f)
                                                 .padding(7, 0)
-                                                .child(new Row()
+                                                .child(Flow.row()
                                                         .name("buttons, slots and more tests")
                                                         .height(137)
                                                         .coverChildrenWidth()
                                                         .verticalCenter()
                                                         //.padding(7)
-                                                        .child(new Column()
+                                                        .child(Flow.column()
                                                                         .name("buttons and slots test")
                                                                         .coverChildren()
                                                                         .marginRight(8)
@@ -312,7 +310,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                         .child(new ScrollingTextWidget(IKey.str("Very very long test string")).widthRel(1f).height(16))
                                                                 //.child(IKey.EMPTY.asWidget().debugName("Empty IKey"))
                                                         )
-                                                        .child(new Column()
+                                                        .child(Flow.column()
                                                                 .name("button and slots test 2")
                                                                 .coverChildren()
                                                                 //.widthRel(0.5f)
@@ -324,7 +322,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                         .progress(() -> this.progress / (double) this.duration)
                                                                         .texture(GuiTextures.PROGRESS_CYCLE, 20)
                                                                         .direction(ProgressWidget.Direction.CIRCULAR_CW))
-                                                                .child(new Row().coverChildrenWidth().height(18)
+                                                                .child(Flow.row().coverChildrenWidth().height(18)
                                                                         .reverseLayout(false)
                                                                         .child(new ToggleButton()
                                                                                 .value(new BoolValue.Dynamic(() -> cycleStateValue.getIntValue() == 0, val -> cycleStateValue.setIntValue(0)))
@@ -350,7 +348,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                         .width(30)
                                                                         .alwaysShowFull(false)
                                                                         .syncHandler(SyncHandlers.fluidSlot(this.fluidTankPhantom).phantom(true)))
-                                                                .child(new Column()
+                                                                .child(Flow.column()
                                                                         .name("button and slots test 3")
                                                                         .coverChildren()
                                                                         .child(new TextFieldWidget()
@@ -359,7 +357,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                                 .setNumbers(0, 9999999)
                                                                                 .hintText("integer")))
                                                         )))
-                                        .addPage(new Column()
+                                        .addPage(Flow.column()
                                                         .name("Slots test page")
                                                         .coverChildren()
                                                         //.height(120)
@@ -388,7 +386,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                 .key('I', index -> ItemSlot.create(index >= 2).slot(new ModularSlot(this.mixerItems, index).slotGroup("mixer_items")))
                                                                 .build().name("mixer inv")
                                                                 .disableSortButtons())
-                                                        .child(new Row()
+                                                        .child(Flow.row()
                                                                 .coverChildrenHeight()
                                                                 .child(new CycleButtonWidget()
                                                                         .size(14, 14)
@@ -430,7 +428,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                 .top(1)
                                                                 .left(32)
                                                                 .size(1, 40))*/
-                                                        .child(new Row()
+                                                        .child(Flow.row()
                                                                 .name("test config 1")
                                                                 .widthRel(1f).coverChildrenHeight()
                                                                 .crossAxisAlignment(Alignment.CrossAxis.CENTER)
@@ -442,7 +440,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                         .margin(8, 4))
                                                                 .child(IKey.str("Boolean config").asWidget()
                                                                         .height(14)))
-                                                        .child(new Row()
+                                                        .child(Flow.row()
                                                                 .name("test config 2")
                                                                 .widthRel(1f).height(14)
                                                                 .childPadding(2)
@@ -462,7 +460,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                 .left(5).height(14)
                                                                 .tooltip(tooltip -> tooltip.showUpTimer(10)
                                                                         .addLine(IKey.str("Config title tooltip"))))
-                                                        .child(new Row()
+                                                        .child(Flow.row()
                                                                 .name("test config 3")
                                                                 .widthRel(1f).height(14)
                                                                 .childPadding(2)
@@ -475,7 +473,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                         .addPage(new ParentWidget<>()
                                                 .name("page 4 storage")
                                                 .sizeRel(1f)
-                                                .child(new Column()
+                                                .child(Flow.column()
                                                         .padding(7)
                                                         .child(new ItemSlot()
                                                                 .slot(new ModularSlot(this.storageInventory0, 0)
