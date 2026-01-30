@@ -331,4 +331,12 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
     protected String getTypeName() {
         return this.axis.isHorizontal() ? "Row" : "Column";
     }
+
+    public boolean isRow() {
+        return getAxis().isHorizontal();
+    }
+
+    public boolean isColumn() {
+        return getAxis().isVertical();
+    }
 }

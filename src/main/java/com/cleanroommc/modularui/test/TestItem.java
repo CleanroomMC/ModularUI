@@ -16,7 +16,7 @@ import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandlers;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
-import com.cleanroommc.modularui.widgets.layout.Column;
+import com.cleanroommc.modularui.widgets.layout.Flow;
 import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 
@@ -63,7 +63,7 @@ public class TestItem extends Item implements IGuiHolder<PlayerInventoryGuiData>
                     new ModularSlot(inv, index));
         }
         ModularPanel panel = ModularPanel.defaultPanel("knapping_gui").resizeableOnDrag(true);
-        panel.child(new Column().margin(7)
+        panel.child(Flow.column().margin(7)
                 .child(new ParentWidget<>().widthRel(1f).expanded()
                         .child(SlotGroupWidget.builder()
                                 .row("II")

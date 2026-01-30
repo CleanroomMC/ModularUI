@@ -50,10 +50,8 @@ import com.cleanroommc.modularui.widgets.SchemaWidget;
 import com.cleanroommc.modularui.widgets.TextWidget;
 import com.cleanroommc.modularui.widgets.ToggleButton;
 import com.cleanroommc.modularui.widgets.TransformWidget;
-import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Flow;
 import com.cleanroommc.modularui.widgets.layout.Grid;
-import com.cleanroommc.modularui.widgets.layout.Row;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
 import net.minecraft.client.Minecraft;
@@ -220,10 +218,10 @@ public class TestGuis extends CustomModularScreen {
         Random rnd = new Random();
         return new ModularPanel("main")
                 .coverChildren()
-                .child(new Column()
+                .child(Flow.column()
                         .margin(12)
                         .coverChildren()
-                        .child(new Row()
+                        .child(Flow.row()
                                 .coverChildren()
                                 .child(IKey.str("Post ").asWidget()
                                         .transform((widget, stack) -> stack.translate(post.getValue(), 0)))
@@ -549,7 +547,7 @@ public class TestGuis extends CustomModularScreen {
         return new ModularPanel("aspect_ratio")
                 .coverChildren()
                 .padding(10)
-                .child(new Row()
+                .child(Flow.row()
                         .childPadding(10)
                         .coverChildren()
                         .child(new Rectangle().color(Color.BLUE_ACCENT.main)
