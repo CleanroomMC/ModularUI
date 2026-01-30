@@ -3,7 +3,7 @@ package com.cleanroommc.modularui.widget.sizer;
 import com.cleanroommc.modularui.GuiError;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
-import com.cleanroommc.modularui.api.layout.IResizeable2;
+import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.api.widget.IDelegatingWidget;
 import com.cleanroommc.modularui.api.widget.IPositioned;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
@@ -255,7 +255,7 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
             if (layout.shouldIgnoreChildSize(child)) continue;
             Area area = child.getArea();
             Box margin = area.getMargin();
-            IResizeable2 resizeable = child.resizer();
+            IResizeable resizeable = child.resizer();
             if (coverWidth) {
                 if (!child.resizer().dependsOnParentX()) {
                     hasIndependentChildX = true;

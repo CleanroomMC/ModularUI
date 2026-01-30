@@ -17,7 +17,7 @@ import java.util.Objects;
  * A rectangular widget area, composed of a position and a size.
  * Also has fields for a relative position, a layer and margin & padding.
  */
-public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> {
+public class Area extends Rectangle implements IAnimatable<Area> {
 
     public static boolean isInside(int x, int y, int w, int h, int px, int py) {
         SHARED.set(x, y, w, h);
@@ -500,11 +500,6 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
 
     public Box getPadding() {
         return this.padding;
-    }
-
-    @Override
-    public Area getArea() {
-        return this;
     }
 
     /**

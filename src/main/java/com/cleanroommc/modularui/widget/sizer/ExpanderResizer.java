@@ -4,11 +4,11 @@ import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.widgets.layout.IExpander;
 
-public class ExpanderStandardResizer extends StandardResizer implements IExpander {
+public class ExpanderResizer extends StandardResizer implements IExpander {
 
     private final GuiAxis axis;
 
-    public ExpanderStandardResizer(IWidget widget, GuiAxis axis) {
+    public ExpanderResizer(IWidget widget, GuiAxis axis) {
         super(widget);
         this.axis = axis;
     }

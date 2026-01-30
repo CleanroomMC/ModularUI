@@ -2,7 +2,7 @@ package com.cleanroommc.modularui.widget.sizer;
 
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.ITreeNode;
-import com.cleanroommc.modularui.api.layout.IResizeable2;
+import com.cleanroommc.modularui.api.layout.IResizeable;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ResizeNode implements IResizeable2, ITreeNode<ResizeNode> {
+public abstract class ResizeNode implements IResizeable, ITreeNode<ResizeNode> {
 
     private ResizeNode defaultParent;
     private ResizeNode parentOverride;

@@ -7,7 +7,7 @@ import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.ReversedList;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.sizer.Box;
-import com.cleanroommc.modularui.widget.sizer.ExpanderStandardResizer;
+import com.cleanroommc.modularui.widget.sizer.ExpanderResizer;
 
 import java.util.List;
 import java.util.function.IntFunction;
@@ -50,7 +50,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget {
 
     public Flow(GuiAxis axis) {
         this.axis = axis;
-        resizer(new ExpanderStandardResizer(this, axis));
+        resizer(new ExpanderResizer(this, axis));
         sizeRel(1f, 1f);
     }
 
