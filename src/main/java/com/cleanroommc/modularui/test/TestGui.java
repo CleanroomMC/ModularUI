@@ -35,6 +35,10 @@ public class TestGui extends CustomModularScreen {
 
     private Map<String, AvailableElement> availableElements;
 
+    public TestGui() {
+        super(ModularUI.ID);
+    }
+
     @Override
     public void onClose() {
         ModularUI.LOGGER.info("New values: {}", this.configuredOptions);

@@ -18,8 +18,11 @@ public abstract class CustomModularScreen extends ModularScreen {
     /**
      * Creates a new screen with ModularUI as its owner.
      */
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
     public CustomModularScreen() {
         super(ModularUI.ID);
+        ModularUI.LOGGER.error("The single arg ModularScreen constructor should not be used. Use the other one and pass in your mod id.");
     }
 
     /**

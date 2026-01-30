@@ -1,150 +1,37 @@
 package com.cleanroommc.modularui.widgets.menu;
 
-import com.cleanroommc.modularui.api.IPanelHandler;
-import com.cleanroommc.modularui.api.ITheme;
-import com.cleanroommc.modularui.api.drawable.IKey;
-import com.cleanroommc.modularui.api.widget.Interactable;
-import com.cleanroommc.modularui.theme.WidgetThemeEntry;
-import com.cleanroommc.modularui.widget.Widget;
-import com.cleanroommc.modularui.widget.sizer.StandardResizer;
+import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.widgets.ListWidget;
 
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
 @ApiStatus.Experimental
-public class ContextMenuButton<W extends ContextMenuButton<W>> extends Widget<W> implements IContextMenuOption, Interactable {
+public class ContextMenuButton<W extends ContextMenuButton<W>> extends AbstractMenuButton<W> {
 
-    private Direction direction = Direction.DOWN;
-    private boolean requiresClick;
-
-    private ContextMenuList<?> menuList;
-    private boolean open, softOpen;
-    private IPanelHandler panelHandler;
-
-    public boolean isOpen() {
-        return open;
-    }
-
-    public boolean isSoftOpen() {
-        return softOpen;
-    }
-
-    public void toggleMenu(boolean soft) {
-        if (this.open) {
-            if (this.softOpen) {
-                if (soft) {
-                    closeMenu(true);
-                } else {
-                    this.softOpen = false;
-                }
-            } else if (!soft) {
-                closeMenu(false);
-            }
-        } else {
-            openMenu(soft);
-        }
-    }
-
-    public void openMenu(boolean soft) {
-        if (this.open) {
-            if (this.softOpen && !soft) {
-                this.softOpen = false;
-            }
-            return;
-        }
-        initMenuList();
-        if (getPanel() instanceof MenuPanel menuPanel) {
-            menuPanel.openSubMenu(getMenuList());
-        } else {
-            getPanelHandler().openPanel();
-        }
-        this.open = true;
-        this.softOpen = soft;
-    }
-
-    public void closeMenu(boolean soft) {
-        if (!this.open || (!this.softOpen && soft)) return;
-        if (getPanel() instanceof MenuPanel menuPanel) {
-            menuPanel.remove(getMenuList());
-        } else {
-            getPanelHandler().closePanel();
-        }
-        this.open = false;
-        this.softOpen = false;
-    }
-
-    private ContextMenuList<?> getMenuList() {
-        return this.menuList;
-    }
-
-    private void initMenuList() {
-        if (this.menuList == null) {
-            this.menuList = new ContextMenuList<>("no_list")
-                    .width(50)
-                    .maxSize(30)
-                    .child(new Widget<>()
-                            .widthRel(1f)
-                            .height(12)
-                            .overlay(IKey.str("No options supplied")));
-        }
-        this.menuList.setSource(this);
-        this.menuList.relative(this);
-        this.direction.positioner.accept(this.menuList.resizer());
-    }
-
-    private IPanelHandler getPanelHandler() {
-        if (this.panelHandler == null) {
-            this.panelHandler = IPanelHandler.simple(getPanel(), (parentPanel, player) -> new MenuPanel(getMenuList()), true);
-        }
-        return this.panelHandler;
+    public ContextMenuButton(String panelName) {
+        super(panelName);
+        this.openOnHover = true;
     }
 
     @Override
-    public @NotNull Result onMousePressed(int mouseButton) {
-        toggleMenu(false);
-        return Result.SUCCESS;
+    protected Menu<?> createMenu() {
+        return null;
     }
 
-    @Override
-    public void onMouseEnterArea() {
-        super.onMouseEnterArea();
-        if (!this.requiresClick) {
-            openMenu(true);
-        }
-    }
-
-    @Override
-    public void onMouseLeaveArea() {
-        super.onMouseLeaveArea();
-        checkClose();
-    }
-
-    public void checkClose() {
-        if (!this.requiresClick && !isSelfOrChildHovered()) {
-            closeMenu(true);
-            if (getParent() instanceof ContextMenuList<?> parentMenuList) {
-                parentMenuList.checkClose();
-            }
-        }
-    }
-
-    @Override
-    public boolean isSelfOrChildHovered() {
-        if (IContextMenuOption.super.isSelfOrChildHovered()) return true;
-        if (!isOpen() || this.menuList == null) return false;
-        return this.menuList.isSelfOrChildHovered();
-    }
-
-    @Override
-    protected WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
-        return theme.getButtonTheme();
-    }
-
-    public W menuList(ContextMenuList<?> menuList) {
-        this.menuList = menuList;
+    public W menu(Menu<?> menu) {
+        setMenu(menu);
         return getThis();
+    }
+
+    public W menuList(Consumer<ListWidget<IWidget, ?>> builder) {
+        ListWidget<IWidget, ?> l = new ListWidget<>().widthRel(1f);
+        builder.accept(l);
+        return menu(new Menu<>()
+                .widthRel(1f)
+                .coverChildrenHeight()
+                .child(l));
     }
 
     public W direction(Direction direction) {
@@ -153,7 +40,7 @@ public class ContextMenuButton<W extends ContextMenuButton<W>> extends Widget<W>
     }
 
     public W requiresClick() {
-        this.requiresClick = true;
+        this.openOnHover = false;
         return getThis();
     }
 
@@ -185,19 +72,4 @@ public class ContextMenuButton<W extends ContextMenuButton<W>> extends Widget<W>
         return direction(Direction.UNDEFINED);
     }
 
-    public enum Direction {
-        UP(flex -> flex.bottomRel(1f)),
-        DOWN(flex -> flex.topRel(1f)),
-        LEFT_UP(flex -> flex.rightRel(1f).bottom(0)),
-        LEFT_DOWN(flex -> flex.rightRel(1f).top(0)),
-        RIGHT_UP(flex -> flex.leftRel(1f).bottom(0)),
-        RIGHT_DOWN(flex -> flex.leftRel(1f).top(0)),
-        UNDEFINED(flex -> {});
-
-        private final Consumer<StandardResizer> positioner;
-
-        Direction(Consumer<StandardResizer> positioner) {
-            this.positioner = positioner;
-        }
-    }
 }

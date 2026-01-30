@@ -8,14 +8,14 @@ import org.jetbrains.annotations.ApiStatus;
 @ApiStatus.Experimental
 public class MenuPanel extends ModularPanel {
 
-    public MenuPanel(ContextMenuList<?> menuList) {
-        super(menuList.getName());
+    public MenuPanel(String name, IWidget menu) {
+        super(name);
         fullScreenInvisible();
-        child(menuList);
+        child(menu);
         themeOverride("modularui.context_menu");
     }
 
-    public void openSubMenu(ContextMenuList<?> menuList) {
+    public void openSubMenu(IWidget menuList) {
         child(menuList);
     }
 

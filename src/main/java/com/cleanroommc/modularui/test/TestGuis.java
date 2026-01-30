@@ -39,11 +39,13 @@ import com.cleanroommc.modularui.utils.fakeworld.FakeEntity;
 import com.cleanroommc.modularui.utils.fakeworld.ISchema;
 import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.value.IntValue;
+import com.cleanroommc.modularui.value.ObjectValue;
 import com.cleanroommc.modularui.value.StringValue;
 import com.cleanroommc.modularui.widget.DraggableWidget;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.ColorPickerDialog;
+import com.cleanroommc.modularui.widgets.DropdownWidget;
 import com.cleanroommc.modularui.widgets.ListWidget;
 import com.cleanroommc.modularui.widgets.RichTextWidget;
 import com.cleanroommc.modularui.widgets.SchemaWidget;
@@ -55,7 +57,6 @@ import com.cleanroommc.modularui.widgets.layout.Flow;
 import com.cleanroommc.modularui.widgets.layout.Grid;
 import com.cleanroommc.modularui.widgets.layout.Row;
 import com.cleanroommc.modularui.widgets.menu.ContextMenuButton;
-import com.cleanroommc.modularui.widgets.menu.ContextMenuList;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
 import net.minecraft.client.Minecraft;
@@ -87,6 +88,10 @@ import java.util.stream.IntStream;
 public class TestGuis extends CustomModularScreen {
 
     public static boolean withCode = false;
+
+    public TestGuis() {
+        super(ModularUI.ID);
+    }
 
     @Override
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {
@@ -539,47 +544,46 @@ public class TestGuis extends CustomModularScreen {
     public static ModularPanel buildContextMenu() {
         List<String> options1 = IntStream.range(0, 5).mapToObj(i -> "Option " + (i + 1)).collect(Collectors.toList());
         List<String> options2 = IntStream.range(0, 5).mapToObj(i -> "Sub Option " + (i + 1)).collect(Collectors.toList());
+        ObjectValue<ItemStack> itemValue = new ObjectValue<>(ItemStack.class, new ItemStack(Items.ACACIA_DOOR));
         return new ModularPanel("context_menu_test")
                 .size(150)
-                .child(new ListWidget<>()
-                        .height(100)
-                        .left(25)
-                        .coverChildrenWidth()
-                        //.right(25)
-                        .top(40)
-                        .child(new ToggleButton()
-                                .coverChildrenHeight()
-                                .widthRel(1f)
-                                .child(true, new Row()
-                                        .coverChildrenHeight()
-                                        .widthRel(1f)
-                                        .mainAxisAlignment(Alignment.MainAxis.SPACE_BETWEEN)
-                                        .child(IKey.str("Text1").asWidget())
-                                        .child(new ItemDrawable(Items.PORKCHOP).asWidget()))
-                                .child(false, new Row()
-                                        .coverChildrenHeight()
-                                        .widthRel(1f)
-                                        .mainAxisAlignment(Alignment.MainAxis.SPACE_BETWEEN)
-                                        .child(IKey.str("Text2").asWidget())
-                                        .child(new ItemDrawable(Items.MAGMA_CREAM).asWidget()))))
-                .child(new ContextMenuButton<>()
+                .child(new ContextMenuButton<>("menu")
                         .top(7)
                         .width(100)
                         .horizontalCenter()
                         .height(16)
                         .overlay(IKey.str("Menu"))
-                        .menuList(new ContextMenuList<>("menu1")
-                                .widthRel(1f)
+                        .menuList(l -> l
                                 .maxSize(80)
                                 .children(options1, s -> IKey.str(s).asWidget())
-                                .child(new ContextMenuButton<>()
+                                .child(new ContextMenuButton<>("sub_menu")
+                                        .widthRel(1f)
+                                        .height(12)
                                         .overlay(IKey.str("Sub Menu"))
                                         .openRightDown()
-                                        .menuList(new ContextMenuList<>("menu2")
-                                                .coverChildrenWidth()
+                                        .menuList(l1 -> l1
                                                 //.width(90)
                                                 .maxSize(80)
-                                                .children(options2, s -> IKey.str(s).asWidget())))));
+                                                .children(options2, s -> IKey.str(s).asWidget())))))
+                .child(new DropdownWidget<>("test_dropdown", ItemStack.class)
+                        .top(45)
+                        .width(100)
+                        .horizontalCenter()
+                        .value(itemValue)
+                        .option(new ItemStack(Items.ACACIA_DOOR))
+                        .option(new ItemStack(Items.GOLD_INGOT))
+                        .option(new ItemStack(Items.APPLE))
+                        .option(new ItemStack(Items.FURNACE_MINECART))
+                        .option(new ItemStack(Items.IRON_SHOVEL))
+                        .option(new ItemStack(Items.STICK))
+                        .option(new ItemStack(Items.NETHER_STAR))
+                        .optionToWidget(i -> Flow.row()
+                                .coverChildrenHeight()
+                                .padding(4, 1)
+                                .mainAxisAlignment(Alignment.MainAxis.SPACE_BETWEEN)
+                                .child(new ItemDrawable(i).asWidget())
+                                .child(IKey.str(i.getDisplayName()).asWidget()))
+                );
     }
 
     public static @NotNull ModularPanel buildGraphUI() {

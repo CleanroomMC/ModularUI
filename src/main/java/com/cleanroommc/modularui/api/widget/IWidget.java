@@ -258,7 +258,7 @@ public interface IWidget extends IGuiElement, ITreeNode<IWidget> {
     }
 
     /**
-     * Does the same as {@link IPositioned#flex(Consumer)}
+     * Does the same as {@link IPositioned#resizer(Consumer)}
      *
      * @param builder function to build flex
      * @return this

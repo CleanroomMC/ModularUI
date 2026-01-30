@@ -39,11 +39,6 @@ public class TreeUtil {
     public static final NodeInfo<ResizeNode> RESIZE_NODE_INFO_FULLY_RESIZED = (root, node, builder) -> builder
             .append("Fully resized: ")
             .append(str(node.isFullyCalculated(node.hasParent() && node.getParent().isLayout())));
-    public static final NodeInfo<ResizeNode> RESIZE_NODE_INFO_SELF_RESIZED_DETAIL = (root, node, builder) -> builder
-            .append("X: ").append(str(node.isXCalculated()))
-            .append(", Y: ").append(str(node.isYCalculated()))
-            .append(", W: ").append(str(node.isWidthCalculated()))
-            .append(", H: ").append(str(node.isHeightCalculated()));
     public static final NodeInfo<ResizeNode> RESIZE_NODE_INFO_RESIZED_DETAILED = (root, node, builder) -> {
         builder.append("XYWH: ")
                 .append(str(node.isXCalculated()))

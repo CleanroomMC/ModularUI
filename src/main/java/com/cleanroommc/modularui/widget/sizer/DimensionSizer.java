@@ -173,6 +173,10 @@ public class DimensionSizer {
         return unit.isRelative() && unit.getAnchor() != 0;
     }
 
+    public boolean test() {
+        return resizer != null && axis.isVertical() && resizer.toString().contains("menu_list");
+    }
+
     public void apply(Area area, ResizeNode relativeTo, IntSupplier defaultSize) {
         boolean sizeCalculated = isSizeCalculated();
         boolean posCalculated = isPosCalculated();
@@ -190,7 +194,8 @@ public class DimensionSizer {
             } else if (this.end != null) {
                 p = calcPoint(this.end, padding, s, parentSize, calcParent) - s;
             } else {
-                throw new IllegalStateException();
+                p = 0;
+                this.posCalculated = true;
             }
         } else if (posCalculated) { // size not calculated
             // pos was calculated before

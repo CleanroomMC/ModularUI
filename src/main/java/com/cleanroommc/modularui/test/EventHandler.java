@@ -67,16 +67,7 @@ public class EventHandler {
         if (event.getEntityPlayer().getEntityWorld().isRemote) {
             ItemStack itemStack = event.getItemStack();
             if (itemStack.getItem() == Items.DIAMOND) {
-                //ClientGUI.open(new TestGuis());
-                ClientGUI.open(new ModularScreen(
-                        ModularUI.ID,
-                        new ModularPanel("test")
-                                .size(150)
-                                .child(new ButtonWidget<>()
-                                        .size(50)
-                                        .center()
-                                        .overlay(IKey.str("Button")))
-                ));
+                ClientGUI.open(new TestGuis());
             } else if (itemStack.getItem() == Items.EMERALD) {
                 HoloUI.builder()
                         .inFrontOf(Platform.getClientPlayer(), 5, false)
@@ -141,7 +132,7 @@ public class EventHandler {
     }
 
     private ModularScreen getContainerOverlayTest(GuiContainer gui) {
-        return new CustomModularScreen() {
+        return new CustomModularScreen(ModularUI.ID) {
 
             @Override
             public @NotNull ModularPanel buildUI(ModularGuiContext context) {

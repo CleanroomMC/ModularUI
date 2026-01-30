@@ -103,7 +103,7 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
     }
 
     @Override
-    public StandardResizer flex() {
+    public StandardResizer resizer() {
         return this;
     }
 
@@ -127,20 +127,6 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
     public boolean resize(boolean isParentLayout) {
         Area area = getArea();
         ResizeNode relativeTo = getParent();
-        //Area relativeArea = relativeTo.getArea();
-        //byte panelLayer = getArea().getPanelLayer();
-
-        /*if (!this.bypassLayerRestriction && (relativeArea.getPanelLayer() > panelLayer ||
-                (relativeArea.getPanelLayer() == panelLayer && relativeArea.z() >= this.parent.getArea().z()))) {
-            Area area = guiElement.getArea();
-            area.setSize(18, 18);
-            area.rx = 0;
-            area.ry = 0;
-            guiElement.resizer().setResized(true);
-            GuiError.throwNew(this.parent, GuiError.Type.SIZING, "Widget can't be relative to a widget at the same level or above");
-            return true;
-        }*/
-
         // calculate x, y, width and height if possible
         this.x.apply(area, relativeTo, () -> getWidget().getDefaultWidth());
         this.y.apply(area, relativeTo, () -> getWidget().getDefaultHeight());

@@ -594,10 +594,10 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         AtomicReference<String> value = new AtomicReference<>("");
         dialog.setDraggable(true);
         dialog.child(new TextFieldWidget()
-                        .flex(flex -> flex.size(100, 20).align(Alignment.Center))
+                        .resizer(flex -> flex.size(100, 20).align(Alignment.Center))
                         .value(new StringValue.Dynamic(value::get, value::set)))
                 .child(new ButtonWidget<>()
-                        .flex(flex -> flex.size(8, 8).top(5).right(5))
+                        .resizer(flex -> flex.size(8, 8).top(5).right(5))
                         .overlay(IKey.str("x"))
                         .onMousePressed(mouseButton -> {
                             dialog.closeWith(value.get());

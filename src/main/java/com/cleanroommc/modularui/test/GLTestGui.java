@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.test;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.GuiTextures;
@@ -39,6 +40,10 @@ public class GLTestGui extends CustomModularScreen {
 
     private RenderObject ro1;
     private RenderObject ro2;
+
+    public GLTestGui() {
+        super(ModularUI.ID);
+    }
 
     @Override
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {

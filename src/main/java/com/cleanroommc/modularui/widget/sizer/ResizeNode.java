@@ -119,8 +119,13 @@ public abstract class ResizeNode implements IResizeable, ITreeNode<ResizeNode> {
         }
     }
 
+    @ApiStatus.Internal
     public void setDefaultParentIsDelegating(boolean defaultParentIsDelegating) {
         this.defaultParentIsDelegating = defaultParentIsDelegating;
+    }
+
+    public boolean hasParentOverride() {
+        return this.parentOverride != null;
     }
 
     @Override
