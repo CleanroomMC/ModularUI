@@ -311,24 +311,6 @@ public abstract class AbstractWidget implements IWidget {
         this.resizer = resizer;
     }
 
-    /**
-     * Returns the flex of this widget. This is responsible for calculating size, pos and relative pos.
-     * Originally this was intended to be modular for custom flex class. May come back to this in the future.
-     * Same as {@link #flex()}.
-     *
-     * @return flex of this widget
-     */
-    @Nullable
-    @Override
-    public StandardResizer getFlex() {
-        return resizer;
-    }
-
-    @Override
-    public @NotNull StandardResizer flex() {
-        return resizer();
-    }
-
     @Override
     public @Nullable String getName() {
         return name;

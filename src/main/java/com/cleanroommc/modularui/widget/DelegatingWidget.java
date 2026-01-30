@@ -54,11 +54,6 @@ public class DelegatingWidget extends AbstractWidget implements IDelegatingWidge
     }
 
     @Override
-    public StandardResizer getFlex() {
-        return getDelegate() != null ? getDelegate().getFlex() : super.getFlex();
-    }
-
-    @Override
     public @NotNull StandardResizer resizer() {
         return getDelegate() != null ? getDelegate().resizer() : super.resizer();
     }

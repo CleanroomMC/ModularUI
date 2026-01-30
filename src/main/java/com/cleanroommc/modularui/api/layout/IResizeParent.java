@@ -8,7 +8,6 @@ public interface IResizeParent {
     /**
      * @return area of the element
      */
-    // TODO doesnt fit with the other api methods in this interface
     Area getArea();
 
     /**

@@ -58,7 +58,7 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
     public void beforeResize(boolean onOpen) {
         super.beforeResize(onOpen);
         if (this.mainAxisMaxSize != null) {
-            flex().setUnit(this.mainAxisMaxSize, getAxis(), Unit.State.SIZE);
+            resizer().setUnit(this.mainAxisMaxSize, getAxis(), Unit.State.SIZE);
         }
     }
 

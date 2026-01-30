@@ -163,7 +163,7 @@ public class SortableListWidget<T> extends ListValueWidget<T, SortableListWidget
 
         public Item(T value) {
             this.value = value;
-            flex().widthRel(1f).height(18);
+            resizer().widthRel(1f).height(18);
             background(GuiTextures.BUTTON_CLEAN);
         }
 

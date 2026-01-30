@@ -192,7 +192,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                 .top(0)
                 .rightRel(1f), true);
         PagedWidget.Controller tabController = new PagedWidget.Controller();
-        panel.flex()                        // returns object which is responsible for sizing
+        panel.resizer()                        // returns object which is responsible for sizing
                 .size(176, 220)       // set a static size for the main panel
                 .align(Alignment.Center);    // center the panel in the screen
         panel

@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 public class EmptyWidget implements IWidget {
 
     private final Area area = new Area();
-    private final StandardResizer flex = new StandardResizer(this);
+    private final StandardResizer resizer = new StandardResizer(this);
     private boolean requiresResize = false;
     private boolean enabled = true;
     private IWidget parent;
@@ -120,18 +120,8 @@ public class EmptyWidget implements IWidget {
     }
 
     @Override
-    public StandardResizer flex() {
-        return this.flex;
-    }
-
-    @Override
     public @NotNull StandardResizer resizer() {
-        return this.flex;
-    }
-
-    @Override
-    public StandardResizer getFlex() {
-        return this.flex;
+        return this.resizer;
     }
 
     @Override

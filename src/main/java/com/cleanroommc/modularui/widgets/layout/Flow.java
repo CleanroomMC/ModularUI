@@ -105,7 +105,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget {
         final int size = getArea().getSize(axis) - padding.getTotal(this.axis);
         Alignment.MainAxis maa = this.maa;
         if (!hasSize && maa != Alignment.MainAxis.START) {
-            if (flex().dependsOnChildren(this.axis)) {
+            if (resizer().dependsOnChildren(this.axis)) {
                 // if this flow covers the children, we can assume start
                 maa = Alignment.MainAxis.START;
             } else {

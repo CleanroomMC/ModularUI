@@ -238,12 +238,24 @@ public interface IWidget extends IGuiElement, ITreeNode<IWidget> {
     ModularPanel getPanel();
 
     /**
+     * @return flex of this widget
+     */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Nullable
+    default StandardResizer getFlex() {
+        return resizer();
+    }
+
+    /**
      * @return flex of this widget. Creates a new one if it doesn't already have one.
      */
     @NotNull
     @Deprecated
     @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
-    StandardResizer flex();
+    default StandardResizer flex() {
+        return resizer();
+    }
 
     /**
      * Does the same as {@link IPositioned#flex(Consumer)}
@@ -254,8 +266,7 @@ public interface IWidget extends IGuiElement, ITreeNode<IWidget> {
     @Deprecated
     @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
     default IWidget flexBuilder(Consumer<StandardResizer> builder) {
-        builder.accept(flex());
-        return this;
+        return resizerBuilder(builder);
     }
 
     /**
@@ -264,6 +275,11 @@ public interface IWidget extends IGuiElement, ITreeNode<IWidget> {
     @NotNull
     @Override
     StandardResizer resizer();
+
+    default IWidget resizerBuilder(Consumer<StandardResizer> builder) {
+        builder.accept(resizer());
+        return this;
+    }
 
     /**
      * Called before a widget is resized.
@@ -279,19 +295,6 @@ public interface IWidget extends IGuiElement, ITreeNode<IWidget> {
      * Called after the full widget tree is resized and the absolute positions are calculated.
      */
     default void postResize() {}
-
-    /**
-     * @return flex of this widget
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
-    @Nullable
-    StandardResizer getFlex();
-
-    default boolean isExpanded() {
-        StandardResizer flex = getFlex();
-        return flex != null && flex.isExpanded();
-    }
 
     @Nullable String getName();
 

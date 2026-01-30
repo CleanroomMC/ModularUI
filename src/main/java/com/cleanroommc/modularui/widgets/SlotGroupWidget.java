@@ -259,7 +259,7 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
                 y += 18;
                 x = 0;
             }
-            slotGroupWidget.flex().size(maxWidth, this.matrix.size() * 18);
+            slotGroupWidget.resizer().size(maxWidth, this.matrix.size() * 18);
             return slotGroupWidget;
         }
     }

@@ -91,7 +91,7 @@ public class ContextMenuButton<W extends ContextMenuButton<W>> extends Widget<W>
         }
         this.menuList.setSource(this);
         this.menuList.relative(this);
-        this.direction.positioner.accept(this.menuList.flex());
+        this.direction.positioner.accept(this.menuList.resizer());
     }
 
     private IPanelHandler getPanelHandler() {
