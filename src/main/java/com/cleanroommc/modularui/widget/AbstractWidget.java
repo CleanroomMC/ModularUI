@@ -77,9 +77,9 @@ public abstract class AbstractWidget implements IWidget {
             this.context = parent.getContext();
             getArea().z(parent.getArea().z() + 1);
             if (parent instanceof AbstractWidget aw) {
-                this.resizer.setDefaultParent(aw.resizer);
+                this.resizer.initialize(aw.resizer, parent.getScreen().getResizeNode());
             } else {
-                this.resizer.setDefaultParent(parent.resizer());
+                this.resizer.initialize(parent.resizer(), parent.getScreen().getResizeNode());
             }
         }
         this.valid = true;

@@ -26,6 +26,7 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
 
     private boolean childrenResized = false;
     private boolean layoutResized = false;
+    private boolean relativeToScreen = false;
 
     public StandardResizer(IWidget widget) {
         super(widget);
@@ -35,6 +36,14 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
 
     protected DimensionSizer createDimensionSizer(GuiAxis axis) {
         return new DimensionSizer(this, axis);
+    }
+
+    @Override
+    public void initialize(ResizeNode defaultParent, ResizeNode root) {
+        super.initialize(defaultParent, root);
+        if (this.relativeToScreen) {
+            setParentOverride(root);
+        }
     }
 
     @Override
@@ -437,18 +446,20 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
     @Override
     public StandardResizer relative(ResizeNode resizeNode) {
         setParentOverride(resizeNode);
+        this.relativeToScreen = false;
         return this;
     }
 
     @Override
     public StandardResizer relativeToParent() {
         setParentOverride(null);
+        this.relativeToScreen = false;
         return this;
     }
 
     @Override
     public StandardResizer relativeToScreen() {
-        // TODO
+        this.relativeToScreen = true;
         return this;
     }
 

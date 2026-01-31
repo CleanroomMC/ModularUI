@@ -237,7 +237,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     public void onOpen(ModularScreen screen) {
         this.screen = screen;
         getArea().z(1);
-        resizer().setDefaultParent(this.screen.getResizeNode());
+        resizer().initialize(this.screen.getResizeNode(), this.screen.getResizeNode());
         initialise(this, false);
         // call first tick after everything is initialised
         WidgetTree.onUpdate(this);
