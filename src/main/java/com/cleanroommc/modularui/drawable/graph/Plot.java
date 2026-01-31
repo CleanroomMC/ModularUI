@@ -1,13 +1,11 @@
 package com.cleanroommc.modularui.drawable.graph;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.DAM;
 import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.MathUtils;
-import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.Platform;
 
 public class Plot {
@@ -37,7 +35,6 @@ public class Plot {
     }
 
     private void redraw(GraphView view) {
-        long time = System.nanoTime();
         float dHalf = thickness * 0.5f;
 
         int n = xs.length * 4; // each point has 2 offset vertices and each vertex has an x and y component
@@ -139,8 +136,6 @@ public class Plot {
         lpoy = py * dHalf;
 
         storePoints(vertexIndex, view, x1, y1, lpox, lpoy);
-        time = System.nanoTime() - time;
-        ModularUI.LOGGER.error("Calculating vertices from {} data points took {}s", xs.length, NumberFormat.formatNanos(time));
     }
 
     private int storePoints(int index, GraphView view, float sx, float sy, float ox, float oy) {
@@ -167,12 +162,9 @@ public class Plot {
         int a = Color.getAlpha(color);
         Platform.setupDrawColor();
         Platform.startDrawing(Platform.DrawMode.TRIANGLE_STRIP, Platform.VertexFormat.POS_COLOR, buffer -> {
-            long time = System.nanoTime();
             for (int i = 0; i < this.vertexBuffer.length; i += 2) {
                 buffer.pos(this.vertexBuffer[i], this.vertexBuffer[i + 1], 0).color(r, g, b, a).endVertex();
             }
-            time = System.nanoTime() - time;
-            ModularUI.LOGGER.error("Drawing plot with {} points took {}s", xs.length, NumberFormat.formatNanos(time));
         });
     }
 

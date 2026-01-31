@@ -179,7 +179,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                     return new Column()
                             .widthRel(1f)
                             .coverChildrenHeight()
-                            .children(vals.size(), i -> IKey.str(String.valueOf(vals.get(i))).asWidget().padding(2));
+                            .children(vals.size(), i -> IKey.str(String.valueOf(vals.get(i))).asWidget().padding(2))
+                            .name("synced number col");
                 });
 
         Rectangle colorPickerBackground = new Rectangle().color(Color.RED.main);
@@ -191,7 +192,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                 .top(0)
                 .rightRel(1f), true);
         PagedWidget.Controller tabController = new PagedWidget.Controller();
-        panel.flex()                        // returns object which is responsible for sizing
+        panel.resizer()                        // returns object which is responsible for sizing
                 .size(176, 220)       // set a static size for the main panel
                 .align(Alignment.Center);    // center the panel in the screen
         panel
@@ -239,6 +240,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                         .build()
                                         .margin(5, 5, 20, 5).name("crafting"))))
                 .child(Flow.column()
+                        .name("main col")
                         .sizeRel(1f)
                         .paddingBottom(7)
                         .child(new ParentWidget<>()
@@ -476,21 +478,22 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                 .name("page 4 storage")
                                                 .sizeRel(1f)
                                                 .child(new Column()
-                                                        .padding(7)
-                                                        .child(new ItemSlot()
-                                                                .slot(new ModularSlot(this.storageInventory0, 0)
-                                                                        .changeListener(((newItem, onlyAmountChanged, client, init) -> {
-                                                                            if (client && !onlyAmountChanged) {
-                                                                                dynamicSyncHandler.notifyUpdate(packet -> NetworkUtils.writeItemStack(packet, newItem));
-                                                                            }
-                                                                        }))))
-                                                        .child(new DynamicSyncedWidget<>()
-                                                                .widthRel(1f)
-                                                                .syncHandler(dynamicSyncHandler))
-                                                        .child(new DynamicSyncedWidget<>()
+                                                                .name("page 4 col, dynamic widgets")
+                                                                .padding(7)
+                                                                .child(new ItemSlot()
+                                                                        .slot(new ModularSlot(this.storageInventory0, 0)
+                                                                                .changeListener(((newItem, onlyAmountChanged, client, init) -> {
+                                                                                    if (client && !onlyAmountChanged) {
+                                                                                        dynamicSyncHandler.notifyUpdate(packet -> NetworkUtils.writeItemStack(packet, newItem));
+                                                                                    }
+                                                                                }))))
+                                                                .child(new DynamicSyncedWidget<>()
+                                                                        .widthRel(1f)
+                                                                        .syncHandler(dynamicSyncHandler))
+                                                        /*.child(new DynamicSyncedWidget<>()
                                                                 .widthRel(1f)
                                                                 .coverChildrenHeight()
-                                                                .syncHandler(dynamicLinkedSyncHandler)))
+                                                                .syncHandler(dynamicLinkedSyncHandler))*/)
                                         )
                                         .addPage(createSchemaPage(guiData))))
                         .child(SlotGroupWidget.playerInventory(false))
@@ -591,10 +594,10 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         AtomicReference<String> value = new AtomicReference<>("");
         dialog.setDraggable(true);
         dialog.child(new TextFieldWidget()
-                        .flex(flex -> flex.size(100, 20).align(Alignment.Center))
+                        .resizer(flex -> flex.size(100, 20).align(Alignment.Center))
                         .value(new StringValue.Dynamic(value::get, value::set)))
                 .child(new ButtonWidget<>()
-                        .flex(flex -> flex.size(8, 8).top(5).right(5))
+                        .resizer(flex -> flex.size(8, 8).top(5).right(5))
                         .overlay(IKey.str("x"))
                         .onMousePressed(mouseButton -> {
                             dialog.closeWith(value.get());

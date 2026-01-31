@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.integration.jei;
 
 import com.cleanroommc.modularui.api.IMuiScreen;
-import com.cleanroommc.modularui.api.widget.IGuiElement;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerIngredientProvider;
 
 import net.minecraft.client.gui.GuiScreen;
@@ -83,7 +83,7 @@ public class ModularScreenJEIHandler<T extends GuiScreen & IMuiScreen> implement
         @Nullable
         @Override
         public Object getIngredientUnderMouse(@NotNull T guiContainer, int mouseX, int mouseY) {
-            IGuiElement hovered = guiContainer.getScreen().getContext().getTopHovered();
+            IWidget hovered = guiContainer.getScreen().getContext().getTopHovered();
             return hovered instanceof RecipeViewerIngredientProvider jip ? jip.getIngredient() : null;
         }
     }

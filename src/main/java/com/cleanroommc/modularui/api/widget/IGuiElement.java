@@ -1,13 +1,16 @@
 package com.cleanroommc.modularui.api.widget;
 
-import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import com.cleanroommc.modularui.widget.sizer.ResizeNode;
+
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Base interface for gui elements. For example widgets.
  */
+@ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+@Deprecated
 public interface IGuiElement {
 
     /**
@@ -27,7 +30,7 @@ public interface IGuiElement {
      */
     boolean hasParent();
 
-    IResizeable resizer();
+    ResizeNode resizer();
 
     /**
      * @return the area this element occupies
@@ -42,13 +45,6 @@ public interface IGuiElement {
     default Area getParentArea() {
         return getParent().getArea();
     }
-
-    /**
-     * Draws this element
-     *
-     * @param context gui context
-     */
-    void draw(ModularGuiContext context);
 
     /**
      * Called when the mouse hovers this element. This means this element is directly below the mouse or there are widgets in between which

@@ -3,7 +3,6 @@ package com.cleanroommc.modularui.widget.sizer;
 import com.cleanroommc.modularui.animation.IAnimatable;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
-import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.MathUtils;
 
@@ -17,7 +16,7 @@ import java.util.Objects;
  * A rectangular widget area, composed of a position and a size.
  * Also has fields for a relative position, a layer and margin & padding.
  */
-public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> {
+public class Area extends Rectangle implements IAnimatable<Area> {
 
     public static boolean isInside(int x, int y, int w, int h, int px, int py) {
         SHARED.set(x, y, w, h);
@@ -31,7 +30,8 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
     /**
      * relative position (in most cases the direct parent)
      */
-    public int rx, ry;
+    public int rx;
+    public int ry;
     /**
      * the widget layer within this panel
      */
@@ -473,7 +473,7 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
 
     /**
      * Transforms the four corners of this rectangle with the given pose stack. The new rectangle can be rotated.
-     * Then a min fit rectangle, which is not rotated and aligned with the screen, is put around the corners.
+     * Then a min fit rectangle, which is aligned with the screen axis, is put around the corners.
      *
      * @param stack pose stack
      */
@@ -495,17 +495,6 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
         return this.padding;
     }
 
-    @Override
-    public boolean resize(IGuiElement guiElement, boolean isParentLayout) {
-        guiElement.getArea().set(this);
-        return true;
-    }
-
-    @Override
-    public Area getArea() {
-        return this;
-    }
-
     /**
      * This creates a copy with size, pos, margin padding and z layer.
      *
@@ -520,8 +509,10 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
         return "Area{" +
                 "x=" + this.x +
                 ", y=" + this.y +
-                ", width=" + this.width +
-                ", height=" + this.height +
+                ", w=" + this.width +
+                ", h=" + this.height +
+                ", rx=" + this.rx +
+                ", ry=" + this.ry +
                 '}';
     }
 

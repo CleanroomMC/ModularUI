@@ -7,6 +7,7 @@ import com.cleanroommc.modularui.factory.GuiFactories;
 import com.cleanroommc.modularui.factory.PlayerInventoryGuiData;
 import com.cleanroommc.modularui.factory.inventory.InventoryTypes;
 import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.ItemCapabilityProvider;
@@ -48,6 +49,11 @@ import javax.annotation.Nonnull;
 public class TestItem extends Item implements IGuiHolder<PlayerInventoryGuiData>, IBauble {
 
     public static final TestItem testItem = new TestItem();
+
+    @Override
+    public ModularScreen createScreen(PlayerInventoryGuiData data, ModularPanel mainPanel) {
+        return new ModularScreen(ModularUI.ID, mainPanel);
+    }
 
     @Override
     public ModularPanel buildUI(PlayerInventoryGuiData guiData, PanelSyncManager guiSyncManager, UISettings settings) {

@@ -3,7 +3,6 @@ package com.cleanroommc.modularui.widget;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IDraggable;
-import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.DraggablePanelWrapper;
 import com.cleanroommc.modularui.screen.ModularPanel;
@@ -58,7 +57,7 @@ public class DragHandle extends Widget<DragHandle> implements IDraggable, IViewp
     }
 
     @Override
-    public boolean canDropHere(int x, int y, @Nullable IGuiElement widget) {
+    public boolean canDropHere(int x, int y, @Nullable IWidget widget) {
         return this.parentDraggable != null && this.parentDraggable.canDropHere(x, y, widget);
     }
 

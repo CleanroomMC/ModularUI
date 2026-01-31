@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,6 +36,8 @@ public class ModularUI {
             clientSide = "com.cleanroommc.modularui.ClientProxy",
             serverSide = "com.cleanroommc.modularui.CommonProxy")
     public static CommonProxy proxy;
+
+    public static final boolean isDev = FMLLaunchHandler.isDeobfuscatedEnvironment();
 
     @Mod.Instance
     public static ModularUI INSTANCE;

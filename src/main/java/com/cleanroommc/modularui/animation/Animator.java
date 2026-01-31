@@ -171,8 +171,6 @@ public class Animator extends BaseAnimator<Animator> implements IAnimator {
         return this;
     }
 
-
-
     /**
      * Sets a function which is executed everytime the progress updates, that is on every frame.
      * The argument of the function is the interpolated value.

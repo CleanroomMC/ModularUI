@@ -39,6 +39,7 @@ import com.cleanroommc.modularui.utils.fakeworld.FakeEntity;
 import com.cleanroommc.modularui.utils.fakeworld.ISchema;
 import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.value.IntValue;
+import com.cleanroommc.modularui.value.ObjectValue;
 import com.cleanroommc.modularui.value.StringValue;
 import com.cleanroommc.modularui.widget.DraggableWidget;
 import com.cleanroommc.modularui.widget.Widget;
@@ -54,6 +55,8 @@ import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Flow;
 import com.cleanroommc.modularui.widgets.layout.Grid;
 import com.cleanroommc.modularui.widgets.layout.Row;
+import com.cleanroommc.modularui.widgets.menu.ContextMenuButton;
+import com.cleanroommc.modularui.widgets.menu.DropdownWidget;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
 import net.minecraft.client.Minecraft;
@@ -79,10 +82,16 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class TestGuis extends CustomModularScreen {
 
     public static boolean withCode = false;
+
+    public TestGuis() {
+        super(ModularUI.ID);
+    }
 
     @Override
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {
@@ -122,7 +131,7 @@ public class TestGuis extends CustomModularScreen {
                                                                 .leftRel(1f)
                                                                 .heightRel(1f));
                                                     }
-                                                    ClientGUI.open(new ModularScreen(panel).openParentOnClose(true));
+                                                    ClientGUI.open(new ModularScreen(ModularUI.ID, panel).openParentOnClose(true));
                                                 } catch (IllegalAccessException | InvocationTargetException e) {
                                                     ModularUI.LOGGER.throwing(e);
                                                 }
@@ -194,8 +203,7 @@ public class TestGuis extends CustomModularScreen {
         animator.reset(true);
         animator.animate(true);
         return ModularPanel.defaultPanel("main").size(150)
-                .child(new TransformWidget()
-                        .child(widget)
+                .child(new TransformWidget(widget)
                         .transform(stack -> {
                             double angle = Math.PI;
                             float x = (float) (55 * Math.cos(animator.getValue() * angle));
@@ -279,6 +287,7 @@ public class TestGuis extends CustomModularScreen {
                     @Override
                     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
                         GuiDraw.drawEntity(entity, 0, 0, width, height, context.getCurrentDrawingZ(), e -> {
+                            // TODO the drawable doesnt seem to update the rotation
                             float scale = 0.9f;
                             GlStateManager.scale(scale, scale, scale);
                             GlStateManager.translate(0, 7, 0);
@@ -525,12 +534,59 @@ public class TestGuis extends CustomModularScreen {
     }
 
     public static @NotNull ModularPanel buildViewportTransformUI() {
-        return new TestPanel("test")
+        return new TestPanel("viewport_transform")
                 .child(new Widget<>()
                         .align(Alignment.Center)
                         .size(50, 50)
                         .background(GuiTextures.MC_BUTTON)
                         .hoverBackground(GuiTextures.MC_BUTTON_HOVERED));
+    }
+
+    public static ModularPanel buildContextMenu() {
+        List<String> options1 = IntStream.range(0, 5).mapToObj(i -> "Option " + (i + 1)).collect(Collectors.toList());
+        List<String> options2 = IntStream.range(0, 5).mapToObj(i -> "Sub Option " + (i + 1)).collect(Collectors.toList());
+        ObjectValue<ItemStack> itemValue = new ObjectValue<>(ItemStack.class, new ItemStack(Items.ACACIA_DOOR));
+        return new ModularPanel("context_menu_test")
+                .size(150)
+                .child(new ContextMenuButton<>("menu")
+                        .top(7)
+                        .width(100)
+                        .horizontalCenter()
+                        .height(16)
+                        .overlay(IKey.str("Menu"))
+                        .menuList(l -> l
+                                .maxSize(80)
+                                .children(options1, s -> IKey.str(s).asWidget())
+                                .child(new ContextMenuButton<>("sub_menu")
+                                        .widthRel(1f)
+                                        .height(12)
+                                        .overlay(IKey.str("Sub Menu"))
+                                        .openRightDown()
+                                        .menuList(l1 -> l1
+                                                //.width(90)
+                                                .maxSize(80)
+                                                .children(options2, s -> IKey.str(s).asWidget())))))
+                .child(new DropdownWidget<>("test_dropdown", ItemStack.class)
+                        .top(45)
+                        .width(100)
+                        .horizontalCenter()
+                        .value(itemValue)
+                        .option(new ItemStack(Items.ACACIA_DOOR))
+                        .option(new ItemStack(Items.GOLD_INGOT))
+                        .option(new ItemStack(Items.APPLE))
+                        .option(new ItemStack(Items.FURNACE_MINECART))
+                        .option(new ItemStack(Items.IRON_SHOVEL))
+                        .option(new ItemStack(Items.STICK))
+                        .option(new ItemStack(Items.NETHER_STAR))
+                        .optionToWidget((item, forSelected) -> Flow.row()
+                                .coverChildrenHeight()
+                                .padding(4, 1)
+                                .mainAxisAlignment(Alignment.MainAxis.SPACE_BETWEEN)
+                                .child(new ItemDrawable(item).asWidget())
+                                .child(IKey.str(item.getDisplayName()).asWidget()
+                                        .widgetTheme(IThemeApi.BUTTON)
+                                        .invisible()))
+                );
     }
 
     public static @NotNull ModularPanel buildGraphUI() {

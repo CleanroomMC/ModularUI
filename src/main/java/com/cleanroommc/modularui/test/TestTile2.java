@@ -1,11 +1,13 @@
 package com.cleanroommc.modularui.test;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.ItemDrawable;
 import com.cleanroommc.modularui.factory.PosGuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widget.ScrollWidget;
@@ -41,6 +43,11 @@ public class TestTile2 extends TileEntity implements IGuiHolder<PosGuiData>, ITi
             Item item = it.next();
             this.itemHandler.setStackInSlot(i, new ItemStack(item));
         }
+    }
+
+    @Override
+    public ModularScreen createScreen(PosGuiData data, ModularPanel mainPanel) {
+        return new ModularScreen(ModularUI.ID, mainPanel);
     }
 
     @Override

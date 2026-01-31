@@ -15,6 +15,8 @@ import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import com.cleanroommc.modularui.widget.sizer.ResizeNode;
+import com.cleanroommc.modularui.widget.sizer.ScreenResizeNode;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -30,6 +32,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import mezz.jei.gui.ghost.GhostIngredientDrag;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -77,20 +80,25 @@ public class ModularScreen {
     private final ModularGuiContext context = new ModularGuiContext(this);
     private final Map<Class<?>, List<IGuiAction>> guiActionListeners = new Object2ObjectOpenHashMap<>();
     private final Object2ObjectArrayMap<IWidget, Runnable> frameUpdates = new Object2ObjectArrayMap<>();
+    private final ScreenResizeNode resizeNode = new ScreenResizeNode(this);
     private boolean pausesGame = false;
     private boolean openParentOnClose = false;
 
+    private String themeOverride;
     private ITheme currentTheme;
     private IMuiScreen screenWrapper;
     private boolean overlay = false;
 
     /**
-     * Creates a new screen with a ModularUI as its owner and a given {@link ModularPanel}.
-     *
-     * @param mainPanel main panel of this screen
+     * @deprecated use the other constructor
      */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
     public ModularScreen(@NotNull ModularPanel mainPanel) {
         this(ModularUI.ID, mainPanel);
+        if (ModularUI.isDev) {
+            ModularUI.LOGGER.warn("The single arg ModularScreen constructor should not be used. Use the any of the other ones and pass in your mod id.");
+        }
     }
 
     /**
@@ -179,9 +187,8 @@ public class ModularScreen {
         }
 
         this.context.pushViewport(null, this.context.getScreenArea());
-        for (ModularPanel panel : this.panelManager.getReverseOpenPanels()) {
-            WidgetTree.resizeInternal(panel, true);
-        }
+        WidgetTree.verifyTree(this.resizeNode, new ReferenceOpenHashSet<>());
+        WidgetTree.resizeInternal(this.resizeNode, true);
 
         this.context.popViewport(null);
         if (!isOverlay()) {
@@ -599,6 +606,10 @@ public class ModularScreen {
         return this.screenWrapper;
     }
 
+    public ResizeNode getResizeNode() {
+        return resizeNode;
+    }
+
     public Area getScreenArea() {
         return this.context.getScreenArea();
     }
@@ -706,9 +717,14 @@ public class ModularScreen {
         throw new IllegalArgumentException();
     }
 
+    @Nullable
+    public String getThemeOverride() {
+        return themeOverride;
+    }
+
     public ITheme getCurrentTheme() {
         if (this.currentTheme == null) {
-            useTheme(null);
+            useTheme(this.themeOverride);
         }
         return this.currentTheme;
     }
@@ -721,7 +737,8 @@ public class ModularScreen {
      * @return this for builder like usage
      */
     public ModularScreen useTheme(String theme) {
-        this.currentTheme = IThemeApi.get().getThemeForScreen(this, theme);
+        this.themeOverride = theme;
+        this.currentTheme = IThemeApi.get().getThemeForScreen(this, this.themeOverride);
         return this;
     }
 

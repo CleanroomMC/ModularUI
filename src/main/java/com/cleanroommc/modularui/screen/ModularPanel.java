@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.animation.Animator;
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.layout.IViewport;
@@ -89,6 +90,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     private Animator animator;
 
     private boolean resizable = false;
+    private String themeOverride;
+    private ITheme theme;
 
     private Runnable onCloseAction;
 
@@ -234,6 +237,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     public void onOpen(ModularScreen screen) {
         this.screen = screen;
         getArea().z(1);
+        resizer().initialize(this.screen.getResizeNode(), this.screen.getResizeNode());
         initialise(this, false);
         // call first tick after everything is initialised
         WidgetTree.onUpdate(this);
@@ -785,9 +789,16 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         }
     }
 
+    public ITheme getTheme() {
+        if (this.theme == null) {
+            this.theme = IThemeApi.get().getThemeForScreen(this, this.themeOverride);
+        }
+        return this.theme;
+    }
+
     @Override
     public boolean isExcludeAreaInRecipeViewer() {
-        return super.isExcludeAreaInRecipeViewer() || (!getScreen().isOverlay() && !this.invisible && !flex().isFullSize());
+        return super.isExcludeAreaInRecipeViewer() || (!getScreen().isOverlay() && !this.invisible && !resizer().isFullSize());
     }
 
     public ModularPanel bindPlayerInventory() {
@@ -815,6 +826,12 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     public ModularPanel onCloseAction(Runnable onCloseAction) {
         this.onCloseAction = onCloseAction;
+        return this;
+    }
+
+    public ModularPanel themeOverride(String id) {
+        this.themeOverride = id;
+        this.theme = null;
         return this;
     }
 

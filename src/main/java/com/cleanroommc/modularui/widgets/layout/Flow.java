@@ -7,11 +7,12 @@ import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.ReversedList;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.sizer.Box;
+import com.cleanroommc.modularui.widget.sizer.ExpanderResizer;
 
 import java.util.List;
 import java.util.function.IntFunction;
 
-public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander {
+public class Flow extends ParentWidget<Flow> implements ILayoutWidget {
 
     public static Flow row() {
         return new Flow(GuiAxis.X);
@@ -49,6 +50,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
 
     public Flow(GuiAxis axis) {
         this.axis = axis;
+        resizer(new ExpanderResizer(this, axis));
         sizeRel(1f, 1f);
     }
 
@@ -67,8 +69,8 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         GuiAxis axis = this.axis;
         int total = getArea().getPadding().getTotal(axis);
         for (IWidget widget : getChildren()) {
-            if (shouldIgnoreChildSize(widget) || widget.flex().hasPos(axis)) continue;
-            if (widget.flex().isExpanded() || !widget.resizer().isSizeCalculated(axis)) {
+            if (shouldIgnoreChildSize(widget) || widget.resizer().hasPos(axis)) continue;
+            if (widget.resizer().isExpanded() || !widget.resizer().isSizeCalculated(axis)) {
                 total += axis.isHorizontal() ? widget.getDefaultWidth() : widget.getDefaultHeight();
             } else {
                 total += widget.getArea().getSize(axis);
@@ -103,7 +105,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         final int size = getArea().getSize(axis) - padding.getTotal(this.axis);
         Alignment.MainAxis maa = this.maa;
         if (!hasSize && maa != Alignment.MainAxis.START) {
-            if (flex().dependsOnChildren(this.axis)) {
+            if (resizer().dependsOnChildren(this.axis)) {
                 // if this flow covers the children, we can assume start
                 maa = Alignment.MainAxis.START;
             } else {
@@ -123,9 +125,9 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
             // ignore disabled child if configured as such
             if (shouldIgnoreChildSize(widget)) continue;
             // exclude children whose position of main axis is fixed
-            if (widget.flex().hasPos(this.axis)) continue;
+            if (widget.resizer().hasPos(this.axis)) continue;
             amount++;
-            if (widget.flex().isExpanded()) {
+            if (widget.resizer().isExpanded()) {
                 expandedAmount++;
                 childrenSize += widget.getArea().getMargin().getTotal(this.axis);
                 continue;
@@ -155,8 +157,8 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
                 // ignore disabled child if configured as such
                 if (shouldIgnoreChildSize(widget)) continue;
                 // exclude children whose position of main axis is fixed
-                if (widget.flex().hasPos(this.axis)) continue;
-                if (widget.flex().isExpanded()) {
+                if (widget.resizer().hasPos(this.axis)) continue;
+                if (widget.resizer().isExpanded()) {
                     widget.getArea().setSize(this.axis, newSize);
                     widget.resizer().setSizeResized(this.axis, true);
                 }
@@ -181,7 +183,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
                 continue;
             }
             // exclude children whose position of main axis is fixed
-            if (widget.flex().hasPos(this.axis)) {
+            if (widget.resizer().hasPos(this.axis)) {
                 widget.resizer().updateResized(); // this is required when the widget has a pos on the main axis, but not on the cross axis
                 continue;
             }
@@ -215,10 +217,10 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         List<IWidget> childrenList = reverseLayout ? new ReversedList<>(parent.getChildren()) : parent.getChildren();
         for (IWidget widget : childrenList) {
             // exclude children whose position of main axis is fixed
-            if (widget.flex().hasPos(axis)) continue;
+            if (widget.resizer().hasPos(axis)) continue;
             Box margin = widget.getArea().getMargin();
             // don't align auto positioned children in cross axis
-            if (!widget.flex().hasPos(other) && widget.resizer().isSizeCalculated(other)) {
+            if (!widget.resizer().hasPos(other) && widget.resizer().isSizeCalculated(other)) {
                 int crossAxisPos = margin.getStart(other) + padding.getStart(other);
                 if (hasWidth) {
                     if (caa == Alignment.CrossAxis.CENTER) {
@@ -232,10 +234,10 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
                 widget.resizer().setPosResized(other, true);
                 widget.resizer().setMarginPaddingApplied(other, true);
             }
-            if (parent.isValid()) {
+            /*if (parent.isValid()) {
                 // we changed rel pos, but we need to calculate the new absolute pos and other stuff
-                widget.flex().applyPos(widget);
-            }
+                widget.resizer().applyPos();
+            }*/
         }
         return true;
     }
@@ -320,11 +322,6 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
 
     public GuiAxis getAxis() {
         return axis;
-    }
-
-    @Override
-    public GuiAxis getExpandAxis() {
-        return this.axis;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.api;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
@@ -24,7 +25,8 @@ public interface IGuiHolder<T extends GuiData> {
      */
     @SideOnly(Side.CLIENT)
     default ModularScreen createScreen(T data, ModularPanel mainPanel) {
-        return new ModularScreen(mainPanel);
+        ModularUI.LOGGER.warn("IGuiHolder.createScreen() should be overridden to pass you own mod id to the ModularScreen. In future versions this method must be overridden or else it will crash!");
+        return new ModularScreen(ModularUI.ID, mainPanel);
     }
 
     /**

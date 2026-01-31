@@ -41,7 +41,7 @@ public class SizerTest {
     }
 
     ModularScreen testPanel(ModularPanel panel) {
-        ModularScreen screen = new ModularScreen(panel);
+        ModularScreen screen = new ModularScreen(ModularUI.ID, panel);
         screen.getContext().setSettings(new UISettings());
         ScreenWrapper wrapper = new ScreenWrapper(null, screen);
         screen.construct(wrapper);
