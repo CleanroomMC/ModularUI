@@ -303,7 +303,6 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
      * Should be called when information which is displayed in the tooltip via {@link ITooltip#tooltipDynamic(Consumer)}.
      * It will invalidate the current tooltip and be caused to rebuild.
      */
-    @Override
     public void markTooltipDirty() {
         if (this.tooltip != null) {
             this.tooltip.markDirty();

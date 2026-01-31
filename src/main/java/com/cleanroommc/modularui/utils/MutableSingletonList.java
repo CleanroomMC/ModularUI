@@ -28,6 +28,10 @@ public class MutableSingletonList<T> implements List<T> {
         return value;
     }
 
+    public T getOrNull() {
+        return hasValue ? value : null;
+    }
+
     public void set(T t) {
         this.value = t;
         this.hasValue = true;

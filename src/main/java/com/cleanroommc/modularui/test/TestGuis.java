@@ -287,6 +287,7 @@ public class TestGuis extends CustomModularScreen {
                     @Override
                     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
                         GuiDraw.drawEntity(entity, 0, 0, width, height, context.getCurrentDrawingZ(), e -> {
+                            // TODO the drawable doesnt seem to update the rotation
                             float scale = 0.9f;
                             GlStateManager.scale(scale, scale, scale);
                             GlStateManager.translate(0, 7, 0);

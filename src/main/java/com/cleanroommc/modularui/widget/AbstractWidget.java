@@ -16,6 +16,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
+/**
+ * Very basic implementation of {@link IWidget}.
+ */
 public abstract class AbstractWidget implements IWidget {
 
     // gui context

@@ -20,7 +20,6 @@ import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.function.Predicate;
 
 @ApiStatus.Internal
 class InternalWidgetTree {
@@ -275,28 +274,6 @@ class InternalWidgetTree {
                 children.remove(i--);
             }
             j++;
-        }
-    }
-
-    static void getTree(IWidget root, IWidget parent, Predicate<IWidget> test, StringBuilder builder, WidgetTree.WidgetInfo additionalInfo, String indent, boolean hasNextSibling) {
-        if (!indent.isEmpty()) {
-            builder.append(indent).append(hasNextSibling ? "├ " : "└ ");
-        }
-        builder.append(parent);
-        if (additionalInfo != null) {
-            builder.append(" {");
-            additionalInfo.addInfo(root, parent, builder);
-            builder.append("}");
-        }
-        builder.append('\n');
-        if (parent.hasChildren()) {
-            List<IWidget> children = parent.getChildren();
-            for (int i = 0; i < children.size(); i++) {
-                IWidget child = children.get(i);
-                if (test.test(child)) {
-                    getTree(root, child, test, builder, additionalInfo, indent + (hasNextSibling ? "│ " : "  "), i < children.size() - 1);
-                }
-            }
         }
     }
 }

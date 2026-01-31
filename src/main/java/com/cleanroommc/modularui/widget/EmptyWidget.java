@@ -107,9 +107,6 @@ public class EmptyWidget implements IWidget {
     }
 
     @Override
-    public void markTooltipDirty() {}
-
-    @Override
     public @NotNull IWidget getParent() {
         return this.parent;
     }

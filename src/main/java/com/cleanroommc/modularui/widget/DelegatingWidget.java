@@ -3,32 +3,44 @@ package com.cleanroommc.modularui.widget;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IDelegatingWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.utils.MutableSingletonList;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.StandardResizer;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 public class DelegatingWidget extends AbstractWidget implements IDelegatingWidget {
 
-    private IWidget delegate;
+    private final MutableSingletonList<IWidget> delegate = new MutableSingletonList<>();
 
     public DelegatingWidget(IWidget delegate) {
-        this.delegate = delegate;
+        this.delegate.set(delegate);
+        resizer(new StandardResizer(this));
     }
 
     protected void setDelegate(IWidget delegate) {
-        if (this.delegate != null) {
-            this.delegate.dispose();
+        if (!this.delegate.isEmpty()) {
+            this.delegate.get().dispose();
+            this.delegate.remove();
         }
-        this.delegate = delegate;
-        if (this.delegate != null && isValid()) {
-            initialise(getParent(), true);
-            delegate.scheduleResize();
+        if (delegate != null) {
+            this.delegate.set(delegate);
+            if (isValid()) {
+                initialise(getParent(), true);
+                delegate.scheduleResize();
+            }
+            onChangeDelegate(delegate);
         }
-        onChangeDelegate(delegate);
     }
 
     protected void onChangeDelegate(IWidget delegate) {}
+
+    @Override
+    public @NotNull List<IWidget> getChildren() {
+        return this.delegate;
+    }
 
     @Override
     public void afterInit() {
@@ -90,6 +102,6 @@ public class DelegatingWidget extends AbstractWidget implements IDelegatingWidge
 
     @Override
     public IWidget getDelegate() {
-        return delegate;
+        return delegate.getOrNull();
     }
 }

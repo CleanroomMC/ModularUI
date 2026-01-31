@@ -34,7 +34,7 @@ public class WidgetTree extends TreeUtil {
      */
     public static boolean logResizeTime = false;
 
-    public static final WidgetInfo INFO_AREA = (root, widget, builder) -> builder
+    public static final WidgetInfo WIDGET_INFO_AREA = (root, widget, builder) -> builder
             .append("Area xywh:")
             .append(widget.getArea().x - root.getArea().x)
             .append(", ")
@@ -43,8 +43,8 @@ public class WidgetTree extends TreeUtil {
             .append(widget.getArea().width)
             .append(", ")
             .append(widget.getArea().height);
-    public static final WidgetInfo INFO_ENABLED = (root, widget, builder) -> builder.append("Enabled: ").append(widget.isEnabled());
-    public static final WidgetInfo INFO_WIDGET_THEME = (root, widget, builder) -> builder.append("Widget theme: ")
+    public static final WidgetInfo WIDGET_INFO_ENABLED = (root, widget, builder) -> builder.append("Enabled: ").append(widget.isEnabled());
+    public static final WidgetInfo WIDGET_INFO_WIDGET_THEME = (root, widget, builder) -> builder.append("Widget theme: ")
             .append(widget.getWidgetTheme(widget.getPanel().getTheme()).getKey().getFullName());
 
     private WidgetTree() {}
@@ -258,9 +258,10 @@ public class WidgetTree extends TreeUtil {
             applyPos(parent);
             postFullResize(parent);
         } catch (Throwable e) {
-            ModularUI.LOGGER.fatal("An exception was thrown while resizing widgets. Affected node tree:");
+            ModularUI.LOGGER.fatal("An exception was thrown while resizing widgets. Exception:");
+            ModularUI.LOGGER.catching(e);
+            ModularUI.LOGGER.fatal("Affected node tree:");
             print(parent, RESIZE_NODE_INFO_RESIZED_COLLAPSED);
-            ModularUI.LOGGER.fatal(".");
         }
 
         if (WidgetTree.logResizeTime) {
