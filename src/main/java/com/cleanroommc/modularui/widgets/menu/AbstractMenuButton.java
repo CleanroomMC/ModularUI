@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * This is the base class for a button that can open a floating widget by clicking or hovering the button. In ModularUI this is used for
@@ -76,7 +77,11 @@ public abstract class AbstractMenuButton<W extends AbstractMenuButton<W>> extend
                     this.softOpen = false;
                 }
             } else if (!soft) {
-                closeMenu(false);
+                if (this.openOnHover) {
+                    this.softOpen = true;
+                } else {
+                    closeMenu(false);
+                }
             }
         } else {
             openMenu(soft);
@@ -149,6 +154,12 @@ public abstract class AbstractMenuButton<W extends AbstractMenuButton<W>> extend
 
     @Override
     public @NotNull Result onMousePressed(int mouseButton) {
+        if (!this.open) {
+            forEachSiblingMenuButton(w -> {
+                w.closeMenu(false);
+                return true;
+            });
+        }
         toggleMenu(false);
         return Result.SUCCESS;
     }
@@ -156,9 +167,17 @@ public abstract class AbstractMenuButton<W extends AbstractMenuButton<W>> extend
     @Override
     public void onMouseEnterArea() {
         super.onMouseEnterArea();
-        if (this.openOnHover) {
+        if (this.openOnHover && forEachSiblingMenuButton(mb -> !mb.open || mb.softOpen)) {
             openMenu(true);
         }
+    }
+
+    protected boolean forEachSiblingMenuButton(Predicate<AbstractMenuButton<?>> test) {
+        Menu<?> menuParent = WidgetTree.findParent(this, Menu.class);
+        if (menuParent != null) {
+            return WidgetTree.foreachChild(menuParent, w -> !(w instanceof AbstractMenuButton<?> mb) || mb == this || test.test(mb), false);
+        }
+        return true;
     }
 
     @Override

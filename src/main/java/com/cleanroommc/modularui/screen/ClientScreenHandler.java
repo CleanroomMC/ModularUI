@@ -579,6 +579,7 @@ public class ClientScreenHandler {
         float scale = DebugOptions.INSTANCE.scale.getFloatValue();
         int shift = (int) (11 * scale + 0.5f);
         int lineY = screenH - shift - 2;
+        if (ModularUI.Mods.JEI.isLoaded()) lineY -= 12;
         GuiDraw.drawText("Mouse Pos: " + mouseX + ", " + mouseY, 5, lineY, scale, outlineColor, true);
         lineY -= shift;
         GuiDraw.drawText("FPS: " + fpsCounter.getFps(), 5, lineY, scale, outlineColor, true);

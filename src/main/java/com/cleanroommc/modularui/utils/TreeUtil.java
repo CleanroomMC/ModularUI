@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.utils;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITreeNode;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.widget.sizer.ResizeNode;
 
@@ -385,9 +386,11 @@ public class TreeUtil {
      * @param additionalInfo additional info function which is executed for each widget
      */
     public static <T extends ITreeNode<T>> void print(T parent, Predicate<T> test, NodeInfo<T> additionalInfo) {
-        StringBuilder builder = new StringBuilder("Widget tree of ")
-                .append(parent)
-                .append('\n');
+        StringBuilder builder = new StringBuilder();
+        if (parent instanceof IWidget) builder.append("Widget");
+        else if (parent instanceof ResizeNode) builder.append("ResizeNode");
+        else builder.append(parent.getClass());
+        builder.append(" tree of ").append(parent).append('\n');
         ModularUI.LOGGER.info(toString(builder, parent, test, additionalInfo));
     }
 

@@ -11,10 +11,9 @@ import com.cleanroommc.modularui.drawable.NamedDrawableRow;
 import com.cleanroommc.modularui.drawable.Rectangle;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
 import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.TreeUtil;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.ListWidget;
@@ -44,19 +43,29 @@ public class DebugOverlay extends CustomModularScreen {
                         .bottom(0)
                         .height(12)
                         .width(160)
-                        .background(new Rectangle().color(Color.withAlpha(Color.WHITE.main, 0.2f)).cornerRadius(4))
+                        .background(new Rectangle().color(Color.withAlpha(DebugOptions.INSTANCE.outlineColor.getIntValue(), 0.4f)).cornerRadius(4))
+                        .disableHoverBackground()
                         .overlay(IKey.str("Debug Options"))
                         .openUp()
                         .menuList(l1 -> l1
                                 .name("menu_list")
                                 .maxSize(100)
                                 .widthRel(1f)
-                                .child(new ButtonWidget<>().name("ctx_b")
+                                .child(new ButtonWidget<>().name("print_widget_tree_button")
                                         .height(12)
                                         .widthRel(1f)
                                         .invisible()
                                         .overlay(IKey.str("Print widget trees"))
                                         .onMousePressed(this::logWidgetTrees))
+                                .child(new ButtonWidget<>().name("print_resizer_tree_button")
+                                        .height(12)
+                                        .widthRel(1f)
+                                        .invisible()
+                                        .overlay(IKey.str("Print resizer tree"))
+                                        .onMousePressed(b -> {
+                                            TreeUtil.print(parent.getScreen().getResizeNode());
+                                            return true;
+                                        }))
                                 .child(new ContextMenuButton<>("menu_hover_info")
                                         .height(10)
                                         .widthRel(1f)
@@ -65,9 +74,10 @@ public class DebugOverlay extends CustomModularScreen {
                                         .menu(new Menu<>()
                                                 .width(100)
                                                 .coverChildrenHeight()
+                                                .padding(2)
                                                 .child(new ListWidget<>()
                                                         .maxSize(100)
-                                                        .width(100)
+                                                        .widthRel(1f)
                                                         .child(toggleOption(0, "Any", DebugOptions.INSTANCE.showHovered))
                                                         .child(toggleOption(1, "Pos", DebugOptions.INSTANCE.showPos))
                                                         .child(toggleOption(2, "Size", DebugOptions.INSTANCE.showSize))
@@ -83,6 +93,7 @@ public class DebugOverlay extends CustomModularScreen {
                                         .menu(new Menu<>()
                                                 .width(100)
                                                 .coverChildrenHeight()
+                                                .padding(2)
                                                 .child(new ListWidget<>()
                                                         .maxSize(100)
                                                         .widthRel(1f)
@@ -106,10 +117,6 @@ public class DebugOverlay extends CustomModularScreen {
                         .drawable(CHECKMARK))
                 .overlay(false, new NamedDrawableRow()
                         .name(IKey.str(name)));
-    }
-
-    private void drawDebug(GuiContext context, int x, int y, int w, int h, WidgetTheme widgetTheme) {
-
     }
 
     private boolean logWidgetTrees(int b) {
