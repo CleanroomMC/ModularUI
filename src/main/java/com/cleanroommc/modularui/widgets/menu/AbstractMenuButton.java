@@ -6,36 +6,63 @@ import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.widget.Widget;
+import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.StandardResizer;
 
 import net.minecraft.util.text.TextFormatting;
 
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.function.Consumer;
 
-@ApiStatus.Experimental
+/**
+ * This is the base class for a button that can open a floating widget by clicking or hovering the button. In ModularUI this is used for
+ * context menus and dropdown menus. When the menu is opened a new panel is created and the {@link Menu} widget is added. If that menu
+ * contains another one of these menu buttons, it will be added to that panel.
+ *
+ * @param <W> type of this widget
+ */
 public abstract class AbstractMenuButton<W extends AbstractMenuButton<W>> extends Widget<W> implements IMenuPart, Interactable {
 
+    /**
+     * The general direction where the menu will be opened. This is just a shortcut to standard resizer calls.
+     * If this is null you can customize the position yourself.
+     */
     protected Direction direction = Direction.DOWN;
+    /**
+     * If this is true, the menu can be opened when the mouse hovers this button. The menu will automatically close, when the button AND
+     * all widgets in the menus tree are no longer hovered.
+     */
     protected boolean openOnHover = true;
 
+    /**
+     * The current menu widget. The menu will be created with {@link #createMenu()} if the menu is null when it's needed. If the method
+     * also returns a null value, a default menu is created. The menu can be set at any time with {@link #setMenu(Menu)}.
+     */
     private Menu<?> menu;
-    private boolean open, softOpen;
+    private boolean open, softOpen; // state, soft means opened by hovering
     private IPanelHandler panelHandler;
     private final String panelName;
 
+    /**
+     * @param panelName the name for the panel that may be created when opening the menu
+     */
     public AbstractMenuButton(String panelName) {
         this.panelName = Objects.requireNonNull(panelName);
         name(panelName);
     }
 
+    /**
+     * @return true if the menu is currently open (soft or hard)
+     */
     public boolean isOpen() {
         return open;
     }
 
+    /**
+     * @return true if the menu is currently soft open (opened by hovering)
+     */
     protected boolean isSoftOpen() {
         return softOpen;
     }
@@ -143,8 +170,9 @@ public abstract class AbstractMenuButton<W extends AbstractMenuButton<W>> extend
     protected void checkClose() {
         if (this.openOnHover && !isSelfOrChildHovered()) {
             closeMenu(true);
-            if (getParent() instanceof Menu<?> parentMenuList) {
-                parentMenuList.checkClose();
+            Menu<?> menuParent = WidgetTree.findParent(this, Menu.class);
+            if (menuParent != null) {
+                menuParent.checkClose();
             }
         }
     }

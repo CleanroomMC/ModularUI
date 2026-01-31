@@ -96,7 +96,9 @@ public class ModularScreen {
     @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
     public ModularScreen(@NotNull ModularPanel mainPanel) {
         this(ModularUI.ID, mainPanel);
-        ModularUI.LOGGER.warn("The single arg ModularScreen constructor should not be used. Use the any of the other ones and pass in your mod id.");
+        if (ModularUI.isDev) {
+            ModularUI.LOGGER.warn("The single arg ModularScreen constructor should not be used. Use the any of the other ones and pass in your mod id.");
+        }
     }
 
     /**

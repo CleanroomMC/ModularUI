@@ -45,7 +45,6 @@ import com.cleanroommc.modularui.widget.DraggableWidget;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.ColorPickerDialog;
-import com.cleanroommc.modularui.widgets.DropdownWidget;
 import com.cleanroommc.modularui.widgets.ListWidget;
 import com.cleanroommc.modularui.widgets.RichTextWidget;
 import com.cleanroommc.modularui.widgets.SchemaWidget;
@@ -57,6 +56,7 @@ import com.cleanroommc.modularui.widgets.layout.Flow;
 import com.cleanroommc.modularui.widgets.layout.Grid;
 import com.cleanroommc.modularui.widgets.layout.Row;
 import com.cleanroommc.modularui.widgets.menu.ContextMenuButton;
+import com.cleanroommc.modularui.widgets.menu.DropdownWidget;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
 import net.minecraft.client.Minecraft;
@@ -577,12 +577,14 @@ public class TestGuis extends CustomModularScreen {
                         .option(new ItemStack(Items.IRON_SHOVEL))
                         .option(new ItemStack(Items.STICK))
                         .option(new ItemStack(Items.NETHER_STAR))
-                        .optionToWidget(i -> Flow.row()
+                        .optionToWidget((item, forSelected) -> Flow.row()
                                 .coverChildrenHeight()
                                 .padding(4, 1)
                                 .mainAxisAlignment(Alignment.MainAxis.SPACE_BETWEEN)
-                                .child(new ItemDrawable(i).asWidget())
-                                .child(IKey.str(i.getDisplayName()).asWidget()))
+                                .child(new ItemDrawable(item).asWidget())
+                                .child(IKey.str(item.getDisplayName()).asWidget()
+                                        .widgetTheme(IThemeApi.BUTTON)
+                                        .invisible()))
                 );
     }
 
