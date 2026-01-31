@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.ITreeNode;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -19,9 +20,180 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * A widget in a Gui
+ * A widget in a Gui.
  */
 public interface IWidget extends IGuiElement, ITreeNode<IWidget> {
+
+    /**
+     * @return the screen this element is in
+     */
+    ModularScreen getScreen();
+
+    /**
+     * @return the parent of this widget
+     */
+    @NotNull
+    @Override
+    IWidget getParent();
+
+    @Override
+    default boolean hasParent() {
+        return isValid();
+    }
+
+    /**
+     * @return the context the current screen
+     */
+    ModularGuiContext getContext();
+
+    /**
+     * @return the panel this widget is in
+     */
+    @NotNull
+    ModularPanel getPanel();
+
+    /**
+     * @return the area this widget occupies
+     */
+    @Override
+    Area getArea();
+
+    /**
+     * Shortcut to get the area of the parent
+     *
+     * @return parent area
+     */
+    default Area getParentArea() {
+        return getParent().getArea();
+    }
+
+    /**
+     * Calculates if a given pos is inside this widgets area.
+     * This should be used over {@link Area#isInside(int, int)}, since this accounts for transformations.
+     *
+     * @param stack viewport stack
+     * @param mx    x pos
+     * @param my    y pos
+     * @return if pos is inside this widgets area
+     */
+    default boolean isInside(IViewportStack stack, int mx, int my) {
+        return isInside(stack, mx, my, true);
+    }
+
+    /**
+     * Calculates if a given pos is inside this widgets area.
+     * This should be used over {@link Area#isInside(int, int)}, since this accounts for transformations.
+     *
+     * @param stack    viewport stack
+     * @param mx       x pos
+     * @param my       y pos
+     * @param absolute true if the position is absolute or relative to the current stack transform otherwise
+     * @return if pos is inside this widgets area
+     */
+    default boolean isInside(IViewportStack stack, int mx, int my, boolean absolute) {
+        int x = mx;
+        int y = my;
+        if (absolute) {
+            x = stack.unTransformX(mx, my);
+            y = stack.unTransformY(mx, my);
+        }
+        return x >= 0 && x < getArea().w() && y >= 0 && y < getArea().h();
+    }
+
+    /**
+     * Called when the mouse hovers this element. This means this element is directly below the mouse or there are widgets in between which
+     * all allow to pass hover through. This is not called when the element is at any point below the mouse.
+     */
+    default void onMouseStartHover() {}
+
+    /**
+     * Called when the mouse no longer hovers this element. This widget can still be below the mouse on some level.
+     */
+    default void onMouseEndHover() {}
+
+    /**
+     * Called when the mouse enters this elements area with any amount of widgets above it from the current panel.
+     */
+    default void onMouseEnterArea() {}
+
+    /**
+     * Called when the mouse leaves the area, or it started hovering a different panel.
+     */
+    default void onMouseLeaveArea() {}
+
+    /**
+     * @return if this widget is currently right below the mouse
+     */
+    default boolean isHovering() {
+        return isHoveringFor(0);
+    }
+
+    /**
+     * Returns if this element is right blow the mouse for a certain amount of time
+     *
+     * @param ticks time in ticks
+     * @return if this element is right blow the mouse for a certain amount of time
+     */
+    default boolean isHoveringFor(int ticks) {
+        return false;
+    }
+
+    default boolean isBelowMouse() {
+        return isBelowMouseFor(0);
+    }
+
+    default boolean isBelowMouseFor(int ticks) {
+        return false;
+    }
+
+    /**
+     * If this widget can be seen on the screen even partly. If this returns false it will be culled. This is visually only!
+     *
+     * @param stack viewport stack
+     * @return false if this widget can not be seen currently and should not be drawn
+     */
+    default boolean canBeSeen(IViewportStack stack) {
+        return Stencil.isInsideScissorArea(getArea(), stack);
+    }
+
+    /**
+     * Determines if this widget can have any hover interaction. Interactions with mouse or keyboard like clicks ignore this.
+     * This is useful, when you have a widget which changes its background when hovered or has a tooltip and some decoration child. Normally
+     * you can click through the child, but while you hover it the widget will not show its tooltip etc. To change that return false here.
+     *
+     * @return if this widget can have any hover interaction
+     */
+    default boolean canHover() {
+        return true;
+    }
+
+    /**
+     * Determines if widgets below this can receive a click callback. This is only called when this widget didn't consume the click.
+     *
+     * @return if widgets below this should be able to receive a click
+     */
+    default boolean canClickThrough() {
+        return true;
+    }
+
+    default boolean canHoverThrough() {
+        return false;
+    }
+
+    /**
+     * @return default width if it can't be calculated
+     */
+    default int getDefaultWidth() {
+        return 18;
+    }
+
+    /**
+     * @return default height if it can't be calculated
+     */
+    default int getDefaultHeight() {
+        return 18;
+    }
+
 
     /**
      * Validates and initialises this element.
@@ -43,6 +215,11 @@ public interface IWidget extends IGuiElement, ITreeNode<IWidget> {
      * @return if this is in a valid gui
      */
     boolean isValid();
+
+    /**
+     * Called 20 times per second.
+     */
+    default void onUpdate() {}
 
     /**
      * Draws the background of this widget.
@@ -90,50 +267,6 @@ public interface IWidget extends IGuiElement, ITreeNode<IWidget> {
     }
 
     /**
-     * Called 20 times per second.
-     */
-    default void onUpdate() {}
-
-    /**
-     * @return the area this widget occupies
-     */
-    @Override
-    Area getArea();
-
-    /**
-     * Calculates if a given pos is inside this widgets area.
-     * This should be used over {@link Area#isInside(int, int)}, since this accounts for transformations.
-     *
-     * @param stack viewport stack
-     * @param mx    x pos
-     * @param my    y pos
-     * @return if pos is inside this widgets area
-     */
-    default boolean isInside(IViewportStack stack, int mx, int my) {
-        return isInside(stack, mx, my, true);
-    }
-
-    /**
-     * Calculates if a given pos is inside this widgets area.
-     * This should be used over {@link Area#isInside(int, int)}, since this accounts for transformations.
-     *
-     * @param stack    viewport stack
-     * @param mx       x pos
-     * @param my       y pos
-     * @param absolute true if the position is absolute or relative to the current stack transform otherwise
-     * @return if pos is inside this widgets area
-     */
-    default boolean isInside(IViewportStack stack, int mx, int my, boolean absolute) {
-        int x = mx;
-        int y = my;
-        if (absolute) {
-            x = stack.unTransformX(mx, my);
-            y = stack.unTransformY(mx, my);
-        }
-        return x >= 0 && x < getArea().w() && y >= 0 && y < getArea().h();
-    }
-
-    /**
      * @return all children of this widget
      */
     @NotNull
@@ -150,92 +283,9 @@ public interface IWidget extends IGuiElement, ITreeNode<IWidget> {
         return !getChildren().isEmpty();
     }
 
-    /**
-     * Returns if this element is enabled. Disabled elements are not drawn and can not be interacted with. If this is disabled, the children
-     * will be considered disabled to without actually being disabled.
-     *
-     * @return if this element is enabled
-     */
-    @Override
-    boolean isEnabled();
+    void scheduleResize();
 
-    void setEnabled(boolean enabled);
-
-    /**
-     * Checks if all ancestors are enabled. Only then this widget is visible and interactable.
-     *
-     * @return if all ancestors are enabled.
-     */
-    default boolean areAncestorsEnabled() {
-        IWidget parent = this;
-        do {
-            if (!parent.isEnabled()) return false;
-            parent = parent.getParent();
-        } while (parent.hasParent());
-        return true;
-    }
-
-    /**
-     * If this widget can be seen on the screen even partly. If this returns false it will be culled. This is visually only!
-     *
-     * @param stack viewport stack
-     * @return false if this widget can not be seen currently and should not be drawn
-     */
-    default boolean canBeSeen(IViewportStack stack) {
-        return Stencil.isInsideScissorArea(getArea(), stack);
-    }
-
-    /**
-     * Determines if this widget can have any hover interaction. Interactions with mouse or keyboard like clicks ignore this.
-     * This is useful, when you have a widget which changes its background when hovered or has a tooltip and some decoration child. Normally
-     * you can click through the child, but while you hover it the widget will not show its tooltip etc. To change that return false here.
-     *
-     * @return if this widget can have any hover interaction
-     */
-    default boolean canHover() {
-        return true;
-    }
-
-    /**
-     * Determines if widgets below this can receive a click callback. This is only called when this widget didn't consume the click.
-     *
-     * @return if widgets below this should be able to receive a click
-     */
-    default boolean canClickThrough() {
-        return true;
-    }
-
-    default boolean canHoverThrough() {
-        return false;
-    }
-
-    /**
-     * Marks tooltip for this widget as dirty.
-     */
-    default void markTooltipDirty() {}
-
-    /**
-     * @return the parent of this widget
-     */
-    @NotNull
-    @Override
-    IWidget getParent();
-
-    @Override
-    default boolean hasParent() {
-        return isValid();
-    }
-
-    /**
-     * @return the context the current screen
-     */
-    ModularGuiContext getContext();
-
-    /**
-     * @return the panel this widget is in
-     */
-    @NotNull
-    ModularPanel getPanel();
+    boolean requiresResize();
 
     /**
      * @return flex of this widget
@@ -295,6 +345,31 @@ public interface IWidget extends IGuiElement, ITreeNode<IWidget> {
      * Called after the full widget tree is resized and the absolute positions are calculated.
      */
     default void postResize() {}
+
+    /**
+     * Returns if this element is enabled. Disabled elements are not drawn and can not be interacted with. If this is disabled, the children
+     * will be considered disabled to without actually being disabled.
+     *
+     * @return if this element is enabled
+     */
+    @Override
+    boolean isEnabled();
+
+    void setEnabled(boolean enabled);
+
+    /**
+     * Checks if all ancestors are enabled. Only then this widget is visible and interactable.
+     *
+     * @return if all ancestors are enabled.
+     */
+    default boolean areAncestorsEnabled() {
+        IWidget parent = this;
+        do {
+            if (!parent.isEnabled()) return false;
+            parent = parent.getParent();
+        } while (parent.hasParent());
+        return true;
+    }
 
     @Nullable String getName();
 
