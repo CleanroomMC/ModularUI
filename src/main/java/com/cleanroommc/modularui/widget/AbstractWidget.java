@@ -35,10 +35,6 @@ public abstract class AbstractWidget implements IWidget {
     private final Area area = new Area();
     private StandardResizer resizer;
 
-    public AbstractWidget() {
-        area.widget = this;
-    }
-
     /**
      * Returns the screen of the panel of this widget is being opened in.
      *

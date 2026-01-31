@@ -42,7 +42,9 @@ public class WidgetTree extends TreeUtil {
             .append(", ")
             .append(widget.getArea().width)
             .append(", ")
-            .append(widget.getArea().height);
+            .append(widget.getArea().height)
+            .append(", rx: ").append(widget.getArea().rx)
+            .append(", ry: ").append(widget.getArea().ry);
     public static final WidgetInfo WIDGET_INFO_ENABLED = (root, widget, builder) -> builder.append("Enabled: ").append(widget.isEnabled());
     public static final WidgetInfo WIDGET_INFO_WIDGET_THEME = (root, widget, builder) -> builder.append("Widget theme: ")
             .append(widget.getWidgetTheme(widget.getPanel().getTheme()).getKey().getFullName());
@@ -255,6 +257,7 @@ public class WidgetTree extends TreeUtil {
                 print(parent, RESIZE_NODE_INFO_RESIZED_COLLAPSED);
             }
             // now apply the calculated pos
+            preApplyPos(parent);
             applyPos(parent);
             postFullResize(parent);
         } catch (Throwable e) {
@@ -267,6 +270,13 @@ public class WidgetTree extends TreeUtil {
         if (WidgetTree.logResizeTime) {
             time = System.nanoTime() - time;
             ModularUI.LOGGER.info("Resized widget tree in {}s.", NumberFormat.formatNanos(time));
+        }
+    }
+
+    public static void preApplyPos(ResizeNode parent) {
+        parent.preApplyPos();
+        for (ResizeNode resizeNode : parent.getChildren()) {
+            preApplyPos(resizeNode);
         }
     }
 

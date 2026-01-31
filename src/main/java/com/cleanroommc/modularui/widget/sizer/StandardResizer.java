@@ -310,7 +310,7 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
     }
 
     @Override
-    public void applyPos() {
+    public void preApplyPos() {
         IWidget widget = getWidget();
         Area relativeTo = getParent().getArea();
         Area area = widget.getArea();
@@ -322,7 +322,7 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
     }
 
     @Override
-    public void postFullResize() {
+    public void applyPos() {
         IWidget widget = getWidget();
         if (widget instanceof IDelegatingWidget dw && dw.getDelegate() != null) {
             super.postFullResize();
@@ -342,7 +342,6 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
             slot.xPos = widget.getArea().x - mainArea.x + 1;
             slot.yPos = widget.getArea().y - mainArea.y + 1;
         }
-        super.postFullResize();
     }
 
     @Override

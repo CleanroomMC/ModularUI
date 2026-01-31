@@ -32,6 +32,11 @@ public interface IResizeable extends IResizeParent {
      * Called after all elements in the tree are resized and the absolute positions needs to be calculated from the
      * relative postion.
      */
+    default void preApplyPos() {}
+
+    /**
+     * This converts the relative pos to resizer parent to relative pos to widget parent.
+     */
     default void applyPos() {}
 
     void setChildrenResized(boolean resized);

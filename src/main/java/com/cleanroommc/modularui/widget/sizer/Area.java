@@ -3,7 +3,6 @@ package com.cleanroommc.modularui.widget.sizer;
 import com.cleanroommc.modularui.animation.IAnimatable;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
-import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.MathUtils;
 
@@ -40,8 +39,6 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     private final Box margin = new Box();
     private final Box padding = new Box();
 
-    public IWidget widget;
-
     public Area() {}
 
     public Area(int x, int y, int w, int h) {
@@ -59,10 +56,6 @@ public class Area extends Rectangle implements IAnimatable<Area> {
         this.z = area.z;
         getMargin().set(area.getMargin());
         getPadding().set(area.getPadding());
-    }
-
-    public boolean isWidget(String s) {
-        return widget != null && widget.getName() != null && (widget.getName().endsWith("ctx_tb6") || widget.getName().endsWith("ctx_mo_sub6"));
     }
 
     public int x() {
@@ -516,8 +509,10 @@ public class Area extends Rectangle implements IAnimatable<Area> {
         return "Area{" +
                 "x=" + this.x +
                 ", y=" + this.y +
-                ", width=" + this.width +
-                ", height=" + this.height +
+                ", w=" + this.width +
+                ", h=" + this.height +
+                ", rx=" + this.rx +
+                ", ry=" + this.ry +
                 '}';
     }
 

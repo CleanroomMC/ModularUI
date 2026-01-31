@@ -5,9 +5,9 @@ import com.cleanroommc.modularui.animation.Animator;
 import com.cleanroommc.modularui.api.widget.IValueWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.GuiTextures;
+import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
 import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.widget.DraggableWidget;
-import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
 import org.jetbrains.annotations.NotNull;
@@ -189,11 +189,11 @@ public class SortableListWidget<T> extends ListValueWidget<T, SortableListWidget
         @Override
         public void onDrag(int mouseButton, long timeSinceLastClick) {
             super.onDrag(mouseButton, timeSinceLastClick);
-            // TODO this kind of assumes the hovered is in bounds of the parent Item, which may not be true.
-            IWidget hovered = getContext().getTopHovered();
-            SortableListWidget.Item<?> item = WidgetTree.findParent(hovered, Item.class);
-            if (item != null && item != this && item.listWidget == this.listWidget) {
-                this.listWidget.moveTo(this.index, item.index);
+            for (LocatedWidget hovering : getPanel().getAllHoveringList(false)) {
+                if (hovering.getElement() instanceof SortableListWidget.Item<?> item && item != this && item.listWidget == this.listWidget) {
+                    this.listWidget.moveTo(this.index, item.index);
+                    break;
+                }
             }
         }
 
