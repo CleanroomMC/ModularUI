@@ -30,11 +30,11 @@ public interface IByteBufSerializer<T> {
         }
     }
 
-    default IByteBufSerializer<T> wrapNullSafe() {
+    static <T> IByteBufSerializer<T> wrapNullSafe(IByteBufSerializer<T> serializer) {
         return (buffer, value) -> {
             buffer.writeBoolean(value == null);
             if (value != null) {
-                serialize(buffer, value);
+                serializer.serialize(buffer, value);
             }
         };
     }

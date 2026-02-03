@@ -167,8 +167,8 @@ public class GenericSyncValue<T> extends AbstractGenericSyncValue<T> {
         super(type, getter, setter);
         Objects.requireNonNull(deserializer);
         Objects.requireNonNull(serializer);
-        this.deserializer = nullable ? deserializer.wrapNullSafe() : deserializer;
-        this.serializer = nullable ? serializer.wrapNullSafe() : serializer;
+        this.deserializer = nullable ? IByteBufDeserializer.wrapNullSafe(deserializer) : deserializer;
+        this.serializer = nullable ? IByteBufSerializer.wrapNullSafe(serializer) : serializer;
         if (equals == null) equals = IEquals.defaultTester();
         this.equals = nullable ? IEquals.wrapNullSafe(equals) : equals;
         if (copy == null) copy = ICopy.ofSerializer(serializer, deserializer);

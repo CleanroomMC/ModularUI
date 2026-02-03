@@ -31,7 +31,7 @@ public interface IByteBufDeserializer<T> {
         }
     }
 
-    default IByteBufDeserializer<T> wrapNullSafe() {
-        return buffer -> buffer.readBoolean() ? null : deserialize(buffer);
+    static <T> IByteBufDeserializer<T> wrapNullSafe(IByteBufDeserializer<T> deserializer) {
+        return buffer -> buffer.readBoolean() ? null : deserializer.deserialize(buffer);
     }
 }
