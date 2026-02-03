@@ -145,7 +145,7 @@ public class GenericSyncValue<T> extends AbstractGenericSyncValue<T> {
 
     @Override
     protected T createDeepCopyOf(T value) {
-        return this.copy.createDeepCopy(value);
+        return value == null ? null : this.copy.createDeepCopy(value);
     }
 
     @Override
