@@ -114,6 +114,18 @@ public class GenericSyncValue<T> extends AbstractGenericSyncValue<T> {
         this(null, getter, setter, deserializer, serializer, equals, copy);
     }
 
+    @ApiStatus.Obsolete
+    public GenericSyncValue(@NotNull Class<T> type,
+                            @NotNull Supplier<T> getter,
+                            @Nullable Consumer<T> setter,
+                            @NotNull IByteBufAdapter<T> adapter,
+                            @Nullable ICopy<T> copy,
+                            boolean nullable) {
+        this(type, getter, setter, adapter, adapter, adapter, copy, nullable);
+    }
+
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
     public GenericSyncValue(@NotNull Class<T> type,
                             @NotNull Supplier<T> getter,
                             @Nullable Consumer<T> setter,
@@ -122,6 +134,7 @@ public class GenericSyncValue<T> extends AbstractGenericSyncValue<T> {
         this(type, getter, setter, adapter, adapter, adapter, copy);
     }
 
+    @ApiStatus.Obsolete
     public GenericSyncValue(@NotNull Class<T> type,
                             @NotNull Supplier<T> getter,
                             @Nullable Consumer<T> setter,
@@ -129,6 +142,8 @@ public class GenericSyncValue<T> extends AbstractGenericSyncValue<T> {
         this(type, getter, setter, adapter, adapter, adapter, null);
     }
 
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.3.0")
+    @Deprecated
     public GenericSyncValue(@NotNull Class<T> type,
                             @NotNull Supplier<T> getter,
                             @Nullable Consumer<T> setter,
@@ -136,11 +151,28 @@ public class GenericSyncValue<T> extends AbstractGenericSyncValue<T> {
                             @NotNull IByteBufSerializer<T> serializer,
                             @Nullable IEquals<T> equals,
                             @Nullable ICopy<T> copy) {
+
+        this(type, getter, setter, deserializer, serializer, equals, copy, false);
+    }
+
+    @ApiStatus.Obsolete
+    public GenericSyncValue(@NotNull Class<T> type,
+                            @NotNull Supplier<T> getter,
+                            @Nullable Consumer<T> setter,
+                            @NotNull IByteBufDeserializer<T> deserializer,
+                            @NotNull IByteBufSerializer<T> serializer,
+                            @Nullable IEquals<T> equals,
+                            @Nullable ICopy<T> copy,
+                            boolean nullable) {
         super(type, getter, setter);
-        this.deserializer = Objects.requireNonNull(deserializer);
-        this.serializer = Objects.requireNonNull(serializer);
-        this.equals = equals == null ? Objects::equals : IEquals.wrapNullSafe(equals);
-        this.copy = copy == null ? ICopy.ofSerializer(serializer, deserializer) : copy;
+        Objects.requireNonNull(deserializer);
+        Objects.requireNonNull(serializer);
+        this.deserializer = nullable ? deserializer.wrapNullSafe() : deserializer;
+        this.serializer = nullable ? serializer.wrapNullSafe() : serializer;
+        if (equals == null) equals = IEquals.defaultTester();
+        this.equals = nullable ? IEquals.wrapNullSafe(equals) : equals;
+        if (copy == null) copy = ICopy.ofSerializer(serializer, deserializer);
+        this.copy = copy; // null check in createDeepCopyOf()
     }
 
     @Override
@@ -178,6 +210,7 @@ public class GenericSyncValue<T> extends AbstractGenericSyncValue<T> {
         private IByteBufSerializer<T> serializer;
         private IEquals<T> equals;
         private ICopy<T> copy;
+        private boolean nullable;
 
         public Builder(Class<T> type) {
             this.type = type;
@@ -231,8 +264,13 @@ public class GenericSyncValue<T> extends AbstractGenericSyncValue<T> {
                     .equals(adapter);
         }
 
+        public Builder<T> nullable() {
+            this.nullable = true;
+            return this;
+        }
+
         public GenericSyncValue<T> build() {
-            return new GenericSyncValue<>(type, getter, setter, deserializer, serializer, equals, copy);
+            return new GenericSyncValue<>(type, getter, setter, deserializer, serializer, equals, copy, nullable);
         }
     }
 }

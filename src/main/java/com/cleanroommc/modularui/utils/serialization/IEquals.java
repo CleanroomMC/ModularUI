@@ -14,11 +14,11 @@ public interface IEquals<T> {
     /**
      * Tests two objects for equality. Parameters are not null.
      *
-     * @param t1 first object
-     * @param t2 second object
+     * @param a first object
+     * @param b second object
      * @return true if objects are equal
      */
-    boolean areEqual(@NotNull T t1, @NotNull T t2);
+    boolean areEqual(@NotNull T a, @NotNull T b);
 
     /**
      * Wraps a {@link IEquals} function to accept nullable parameters.
@@ -29,9 +29,9 @@ public interface IEquals<T> {
      */
     @SuppressWarnings("ConstantValue")
     static <T> IEquals<T> wrapNullSafe(IEquals<T> equals) {
-        return (t1, t2) -> {
-            if (t1 == null || t2 == null) return t1 == t2;
-            return equals.areEqual(t1, t2);
+        return (a, b) -> {
+            if (a == null || b == null) return a == b;
+            return equals.areEqual(a, b);
         };
     }
 

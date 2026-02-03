@@ -4,9 +4,9 @@ import com.cleanroommc.modularui.utils.serialization.IByteBufAdapter;
 import com.cleanroommc.modularui.utils.serialization.IByteBufDeserializer;
 import com.cleanroommc.modularui.utils.serialization.IByteBufSerializer;
 
-import io.netty.buffer.Unpooled;
-
 import net.minecraft.network.PacketBuffer;
+
+import io.netty.buffer.Unpooled;
 
 import java.io.IOException;
 
@@ -33,4 +33,8 @@ public interface ICopy<T> {
     }
 
     T createDeepCopy(T t);
+
+    static <T> ICopy<T> wrapNullSafe(ICopy<T> copy) {
+        return t -> t == null ? null : copy.createDeepCopy(t);
+    }
 }

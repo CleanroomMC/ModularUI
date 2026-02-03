@@ -29,4 +29,13 @@ public interface IByteBufSerializer<T> {
             ModularUI.LOGGER.catching(e);
         }
     }
+
+    default IByteBufSerializer<T> wrapNullSafe() {
+        return (buffer, value) -> {
+            buffer.writeBoolean(value == null);
+            if (value != null) {
+                serialize(buffer, value);
+            }
+        };
+    }
 }
