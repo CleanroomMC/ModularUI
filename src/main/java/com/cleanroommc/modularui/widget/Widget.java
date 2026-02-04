@@ -21,7 +21,6 @@ import com.cleanroommc.modularui.value.sync.ISyncRegistrar;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
-import com.cleanroommc.modularui.widget.sizer.Bounds;
 import com.cleanroommc.modularui.widget.sizer.StandardResizer;
 
 import org.jetbrains.annotations.ApiStatus;
@@ -566,10 +565,6 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
     // ----------------
     // === Resizing ===
     // ----------------
-
-    public void estimateSize(Bounds bounds) {
-
-    }
 
     @Override
     public int getDefaultWidth() {
