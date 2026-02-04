@@ -1,7 +1,13 @@
 package com.cleanroommc.modularui.utils;
 
 import com.google.common.base.CaseFormat;
-import com.google.gson.*;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.lang.reflect.Type;
@@ -60,7 +66,30 @@ public class Alignment {
      */
     public enum MainAxis {
 
-        START, CENTER, END, SPACE_BETWEEN, SPACE_AROUND
+        /**
+         * All children will be put at the start of the Flow next to each other.
+         */
+        START,
+        /**
+         * All children will be put in the center of the Flow next to each other.
+         */
+        CENTER,
+        /**
+         * All children will be put at the end of the Flow next to each other (this does not reverse children order).
+         */
+        END,
+        /**
+         * This maximizes the space between children with the given available space of the Flow. The first widget will be put at the very
+         * start and the last widget will be put at the very end. If the flow has exactly one child, then this behaves the same as
+         * {@link #CENTER}.
+         */
+        SPACE_BETWEEN,
+        /**
+         * This maximizes the space around the children with the given available space of the Flow. Contrary to {@link #SPACE_BETWEEN} this
+         * does not put one "space" between every widget, but rather one "space" on both sides of every widget. If the flow has exactly one
+         * child, then this behaves the same as {@link #CENTER}.
+         */
+        SPACE_AROUND
     }
 
     /**
@@ -69,7 +98,18 @@ public class Alignment {
      */
     public enum CrossAxis {
 
-        START, CENTER, END
+        /**
+         * All children will be put at the start of the Flow next to each other.
+         */
+        START,
+        /**
+         * All children will be put in the center of the Flow next to each other.
+         */
+        CENTER,
+        /**
+         * All children will be put at the end of the Flow next to each other (this does not reverse children order).
+         */
+        END
     }
 
     public static class Json implements JsonDeserializer<Alignment>, JsonSerializer<Alignment> {

@@ -14,10 +14,12 @@ import com.cleanroommc.modularui.widget.scroll.ScrollData;
 import com.cleanroommc.modularui.widget.scroll.VerticalScrollData;
 import com.cleanroommc.modularui.widget.sizer.Unit;
 import com.cleanroommc.modularui.widgets.layout.Flow;
+import com.cleanroommc.modularui.widgets.layout.SimpleFlow;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
@@ -112,9 +114,6 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
             widget.resizer().setMarginPaddingApplied(true);
             this.separatorPositions.add(p);
             p += separatorSize;
-            /*if (isValid()) {
-                widget.resizer().applyPos();
-            }*/
         }
         int size = p + getArea().getPadding().getEnd(axis);
         getScrollData().setScrollSize(size);
@@ -133,7 +132,9 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
 
     @Override
     public boolean postLayoutWidgets() {
-        return Flow.layoutCrossAxisListLike(this, getAxis(), this.caa, this.reverseLayout);
+        SimpleFlow flow = new SimpleFlow();
+        flow.widgets.addAll(getChildren());
+        return Flow.layoutCrossAxisListLike(this, Collections.singletonList(flow), getAxis(), this.caa, 0);
     }
 
     @Override

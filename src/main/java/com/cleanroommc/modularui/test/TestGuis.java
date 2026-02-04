@@ -71,6 +71,8 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.TextFormatting;
 
 import com.google.common.base.CaseFormat;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -86,6 +88,13 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class TestGuis extends CustomModularScreen {
+
+    public static final IntList LIGHT_COLORS = ColorShade.getAll().stream()
+            .filter(cs -> !cs.name.contains("accent"))
+            .filter(cs -> cs.brighterShadeCount() > 1)
+            .mapToInt(cs -> cs.brighter(1))
+            .filter(c -> Color.getHSLSaturation(c) > 0.4f)
+            .collect(IntArrayList::new, IntList::add, IntList::addAll);
 
     public static boolean withCode = false;
 
@@ -626,6 +635,42 @@ public class TestGuis extends CustomModularScreen {
                                 .asWidget().size(80)
                                 .overlay(IKey.str("4:3 | height = 45\nBottom Right"))))
                 .overlay();
+    }
+
+    public static @NotNull ModularPanel buildWrappedFlowUI() {
+        IntList colors = new IntArrayList(LIGHT_COLORS);
+        Random rnd = new Random();
+        int minRectSize = 10;
+        int maxRectSize = 40;
+        return new ModularPanel("wrapped_flow")
+                .size(150)
+                .padding(4)
+                .child(Flow.row()
+                        .name("wrap")
+                        .wrap()
+                        .widthRel(1f)
+                        .coverChildrenHeight()
+                        .padding(2)
+                        .crossAxisAlignment(Alignment.CrossAxis.START)
+                        .mainAxisAlignment(Alignment.MainAxis.CENTER)
+                        .childPadding(2)
+                        .crossAxisChildPadding(2)
+                        .background(rndRect(colors, rnd))
+                        .children(5, i -> {
+                            IWidget widget = rndRect(colors, rnd).asWidget()
+                                    .width(rnd.nextInt(maxRectSize - minRectSize) + minRectSize)
+                                    .height(rnd.nextInt(maxRectSize - minRectSize) + minRectSize)
+                                    .name("rect_" + (i + 1));
+                            if (i % 2 == 1) widget.resizer().expanded();
+                            return widget;
+                        }));
+    }
+
+    private static Rectangle rndRect(IntList colors, Random random) {
+        int i = random.nextInt(colors.size());
+        int c = colors.removeInt(i);
+        if (colors.isEmpty()) colors.addAll(LIGHT_COLORS);
+        return new Rectangle().color(c);
     }
 
     private static class TestPanel extends ModularPanel {
