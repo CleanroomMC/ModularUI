@@ -93,6 +93,10 @@ public class TestGuis extends CustomModularScreen {
         super(ModularUI.ID);
     }
 
+    /**
+     * This method finds all 'build___UI' methods in this class via reflection and adds a button that opens that UI to a list widget.
+     * This makes it very convenient to add and test test-screens without having to swap out the screen that the diamond item opens.
+     */
     @Override
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {
         // collect all test from all build methods in this class via reflection
@@ -124,6 +128,7 @@ public class TestGuis extends CustomModularScreen {
                                                 try {
                                                     ModularPanel panel = (ModularPanel) m.invoke(null);
                                                     if (TestGuis.withCode) {
+                                                        // WIP: this is meant to put an image of the code next to ui for showcase purpose
                                                         panel.child(UITexture.builder()
                                                                 .location("gui/code/" + codeTextureName)
                                                                 .build()

@@ -27,12 +27,6 @@ public class Unit {
         }
     }
 
-    public static final byte UNUSED = -2;
-    public static final byte DEFAULT = -1;
-    public static final byte START = 0;
-    public static final byte END = 1;
-    public static final byte SIZE = 2;
-
     private boolean autoAnchor = true;
     private float value = 0f;
     private DoubleSupplier valueSupplier = null;

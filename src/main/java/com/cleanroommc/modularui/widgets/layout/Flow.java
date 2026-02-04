@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widgets.layout;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
@@ -210,10 +211,10 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget {
     public static boolean layoutCrossAxisListLike(IWidget parent, GuiAxis axis, Alignment.CrossAxis caa, boolean reverseLayout) {
         if (!parent.hasChildren()) return true;
         GuiAxis other = axis.getOther();
-        int width = parent.getArea().getSize(other);
+        int availableSize = parent.getArea().getSize(other);
         Box padding = parent.getArea().getPadding();
-        boolean hasWidth = parent.resizer().isSizeCalculated(other);
-        if (!hasWidth && caa != Alignment.CrossAxis.START) return false;
+        boolean hasSize = parent.resizer().isSizeCalculated(other);
+        if (!hasSize && caa != Alignment.CrossAxis.START) return false;
         List<IWidget> childrenList = reverseLayout ? new ReversedList<>(parent.getChildren()) : parent.getChildren();
         for (IWidget widget : childrenList) {
             // exclude children whose position of main axis is fixed
@@ -221,12 +222,23 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget {
             Box margin = widget.getArea().getMargin();
             // don't align auto positioned children in cross axis
             if (!widget.resizer().hasPos(other) && widget.resizer().isSizeCalculated(other)) {
-                int crossAxisPos = margin.getStart(other) + padding.getStart(other);
-                if (hasWidth) {
-                    if (caa == Alignment.CrossAxis.CENTER) {
-                        crossAxisPos = (int) (width / 2f - widget.getArea().getSize(other) / 2f);
-                    } else if (caa == Alignment.CrossAxis.END) {
-                        crossAxisPos = width - widget.getArea().getSize(other) - margin.getEnd(other) - padding.getStart(other);
+                int start = margin.getStart(other) + padding.getStart(other);
+                int crossAxisPos = 0;
+                if (caa == Alignment.CrossAxis.START) {
+                    crossAxisPos = start;
+                } else {
+                    int end = margin.getEnd(other) + padding.getEnd(other);
+                    int s = widget.getArea().getSize(other);
+                    if (caa == Alignment.CrossAxis.END) {
+                        crossAxisPos = availableSize - s - end;
+                    } else if (caa == Alignment.CrossAxis.CENTER) {
+                        crossAxisPos = (int) (availableSize / 2f - widget.getArea().getSize(other) / 2f);
+                        if (availableSize < s + start + end) {
+                            ModularUI.LOGGER.warn("Widget {} is larger with padding on axis {} than parent {}. Padding can't be applied correctly!", widget, other, parent);
+                        } else {
+                            if (crossAxisPos < start) crossAxisPos = start;
+                            else if (crossAxisPos > availableSize - end - s) crossAxisPos = availableSize - end - s;
+                        }
                     }
                 }
                 widget.getArea().setRelativePoint(other, crossAxisPos);
@@ -234,10 +246,6 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget {
                 widget.resizer().setPosResized(other, true);
                 widget.resizer().setMarginPaddingApplied(other, true);
             }
-            /*if (parent.isValid()) {
-                // we changed rel pos, but we need to calculate the new absolute pos and other stuff
-                widget.resizer().applyPos();
-            }*/
         }
         return true;
     }
