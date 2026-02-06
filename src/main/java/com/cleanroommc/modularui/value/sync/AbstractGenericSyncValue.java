@@ -24,7 +24,10 @@ public abstract class AbstractGenericSyncValue<T> extends ValueSyncHandler<T> {
         this.getter = Objects.requireNonNull(getter);
         this.setter = setter;
         this.cache = getter.get();
-        if (type == null && this.cache != null) {
+        if (type == null) {
+            if (this.cache == null) {
+                throw new IllegalArgumentException("If the value class is not give, then the getter must return a non null value!");
+            }
             type = (Class<T>) this.cache.getClass();
         }
         this.type = type;
@@ -44,7 +47,10 @@ public abstract class AbstractGenericSyncValue<T> extends ValueSyncHandler<T> {
             this.setter = serverSetter != null ? serverSetter : clientSetter;
         }
         this.cache = this.getter.get();
-        if (type == null && this.cache != null) {
+        if (type == null) {
+            if (this.cache == null) {
+                throw new IllegalArgumentException("If the value class is not give, then the getter must return a non null value!");
+            }
             type = (Class<T>) this.cache.getClass();
         }
         this.type = type;
@@ -100,25 +106,15 @@ public abstract class AbstractGenericSyncValue<T> extends ValueSyncHandler<T> {
         setValue(deserialize(buffer), true, false);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Class<T> getValueType() {
-        return (Class<T>) getType();
+        return type;
     }
 
     @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
     @Deprecated
-    @SuppressWarnings("unchecked")
     public @Nullable Class<? extends T> getType() {
-        if (this.type != null) return type;
-        if (this.cache != null) {
-            return (Class<? extends T>) this.cache.getClass();
-        }
-        T t = this.getter.get();
-        if (t != null) {
-            return (Class<? extends T>) t.getClass();
-        }
-        return null;
+        return type;
     }
 
     @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
