@@ -272,13 +272,9 @@ public class ClientScreenHandler {
             if (ModularUI.Mods.JEI.isLoaded()) {
                 GhostIngredientDrag<?> drag = ModularUIJeiPlugin.getGhostDrag();
                 if (drag != null) {
-                    if (!RecipeViewerGhostHandler.checkRecipeViewerGhostDrag(muiScreen, button, drag)) {
-                        // no target found -> tell jei to drop the ghost ingredient
-                        // stop all further interaction since dropping the ingredient counts as an interaction
-                        ModularUIJeiPlugin.getGhostDragManager().stopDrag();
-                    }
-                    // in both cases we want to stop further click processing
-                    return true;
+                    // try inserting ghost ingredient into MUI
+                    // if failure, let JEI handle failure
+                    return RecipeViewerGhostHandler.checkRecipeViewerGhostDrag(muiScreen, button, drag);
                 }
             }
             return doAction(muiScreen, ms -> ms.onMousePressed(button));
