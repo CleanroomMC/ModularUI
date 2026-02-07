@@ -159,7 +159,12 @@ public class TextWidget<W extends TextWidget<W>> extends Widget<W> {
         return this.shadow;
     }
 
+    @Deprecated
     public W alignment(Alignment alignment) {
+        return textAlign(alignment);
+    }
+
+    public W textAlign(Alignment alignment) {
         this.alignment = alignment;
         return getThis();
     }

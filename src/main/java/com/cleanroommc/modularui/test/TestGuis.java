@@ -48,6 +48,7 @@ import com.cleanroommc.modularui.widgets.ColorPickerDialog;
 import com.cleanroommc.modularui.widgets.ListWidget;
 import com.cleanroommc.modularui.widgets.RichTextWidget;
 import com.cleanroommc.modularui.widgets.SchemaWidget;
+import com.cleanroommc.modularui.widgets.ScrollingTextWidget;
 import com.cleanroommc.modularui.widgets.TextWidget;
 import com.cleanroommc.modularui.widgets.ToggleButton;
 import com.cleanroommc.modularui.widgets.TransformWidget;
@@ -69,6 +70,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import com.google.common.base.CaseFormat;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -80,7 +82,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
@@ -440,26 +441,36 @@ public class TestGuis extends CustomModularScreen {
     }
 
     public static @NotNull ModularPanel buildSearchTest() {
-        List<String> items = Arrays.asList("Chicken", "Jockey", "Flint", "Steel", "Steve", "Diamond", "Ingot", "Iron", "Armor", "Greg");
         StringValue searchValue = new StringValue("");
-        return ModularPanel.defaultPanel("search", 100, 150)
+        return ModularPanel.defaultPanel("search", 130, 200)
                 .child(Flow.column()
                         .padding(5)
                         .child(new TextFieldWidget()
                                 .value(searchValue)
                                 .height(16)
-                                .widthRel(1f))
+                                .widthRel(1f)
+                                .autoUpdateOnChange(true))
                         .child(new ListWidget<>()
                                 .collapseDisabledChild()
                                 .expanded()
                                 .widthRel(1f)
-                                .children(items.size(), i -> new TextWidget<>(IKey.str(items.get(i)))
-                                        .alignment(Alignment.Center)
-                                        .color(Color.WHITE.main)
-                                        .widthRel(1f)
-                                        .height(16)
-                                        .background(GuiTextures.MC_BUTTON)
-                                        .setEnabledIf(w -> items.get(i).toLowerCase().contains(searchValue.getStringValue())))));
+                                .children(ForgeRegistries.ITEMS, item -> {
+                                    ItemStack stack = new ItemStack(item);
+                                    String text = stack.getDisplayName();
+                                    return Flow.row()
+                                            .height(20).widthRel(1f)
+                                            .padding(2)
+                                            .widgetTheme(IThemeApi.BUTTON)
+                                            .mainAxisAlignment(Alignment.MainAxis.SPACE_BETWEEN)
+                                            .setEnabledIf(w -> text.toLowerCase().contains(searchValue.getStringValue()))
+                                            .child(new ItemDrawable(stack).asWidget())
+                                            .child(new ScrollingTextWidget(IKey.str(text))
+                                                    .widgetTheme(IThemeApi.BUTTON)
+                                                    .textAlign(Alignment.CENTER)
+                                                    .expanded()
+                                                    .height(16)
+                                                    .invisible());
+                                })));
     }
 
     public static @NotNull ModularPanel buildColorTheoryUI() {
