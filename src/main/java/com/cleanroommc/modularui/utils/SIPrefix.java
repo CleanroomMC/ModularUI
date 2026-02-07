@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 
 public enum SIPrefix {
 
-    Infinite('∞', Integer.MAX_VALUE),
+    Infinite('∞', Double.MAX_VALUE, true),
     Quetta('Q', 30),
     Ronna('R', 27),
     Yotta('Y', 24),
@@ -17,7 +17,7 @@ public enum SIPrefix {
     Giga('G', 9),
     Mega('M', 6),
     Kilo('k', 3),
-    One(Character.MIN_VALUE, 0),
+    One(),
     Milli('m', -3),
     Micro('µ', -6),
     Nano('n', -9),
@@ -28,7 +28,7 @@ public enum SIPrefix {
     Yocto('y', -24),
     Ronto('r', -27),
     Quecto('q', -30),
-    Infinitesimal('∞', Integer.MIN_VALUE);
+    Infinitesimal('∞', Double.MIN_NORMAL, true);
 
     public final char symbol;
     public final String stringSymbol;
@@ -38,19 +38,28 @@ public enum SIPrefix {
     public final BigDecimal bigOneOverFactor;
     public final boolean infiniteLike;
 
-    SIPrefix(char symbol, int powerOfTen) {
+    SIPrefix() {
+        this.symbol = Character.MIN_VALUE;
+        this.stringSymbol = "";
+        this.factor = 1.0;
+        this.oneOverFactor = 1.0;
+        this.bigFactor = BigDecimal.ONE;
+        this.bigOneOverFactor = BigDecimal.ONE;
+        this.infiniteLike = false;
+    }
+
+    SIPrefix(char symbol, double f, boolean inf) {
         this.symbol = symbol;
-        this.stringSymbol = symbol != Character.MIN_VALUE ? Character.toString(symbol) : "";
-        this.infiniteLike = powerOfTen == Integer.MAX_VALUE || powerOfTen == Integer.MIN_VALUE;
-        if (this.infiniteLike) {
-            this.factor = Double.MAX_VALUE;
-            this.bigFactor = new BigDecimal(Double.MAX_VALUE);
-        } else {
-            this.factor = Math.pow(10, powerOfTen);
-            this.bigFactor = new BigDecimal(this.factor);
-        }
-        this.oneOverFactor = 1 / this.factor;
+        this.stringSymbol = Character.toString(symbol);
+        this.factor = f;
+        this.oneOverFactor = 1 / f;
+        this.bigFactor = new BigDecimal(f);
         this.bigOneOverFactor = new BigDecimal(this.oneOverFactor);
+        this.infiniteLike = inf;
+    }
+
+    SIPrefix(char symbol, int powerOfTen) {
+        this(symbol, Math.pow(10, powerOfTen), false);
     }
 
     public boolean isOne() {
