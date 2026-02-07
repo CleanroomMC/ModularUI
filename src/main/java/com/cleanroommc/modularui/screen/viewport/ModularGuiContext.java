@@ -486,6 +486,10 @@ public class ModularGuiContext extends GuiContext {
         }
     }
 
+    public boolean hasSettings() {
+        return this.settings != null;
+    }
+
     private class HoveredIterable implements Iterable<IWidget> {
 
         @NotNull

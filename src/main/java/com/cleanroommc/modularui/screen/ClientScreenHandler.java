@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.GuiErrorHandler;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.IMuiScreen;
+import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
@@ -575,15 +576,27 @@ public class ClientScreenHandler {
         float scale = DebugOptions.INSTANCE.scale.getFloatValue();
         int shift = (int) (11 * scale + 0.5f);
         int lineY = screenH - shift - 2;
-        if (ModularUI.Mods.JEI.isLoaded()) lineY -= 12;
+        if (ModularUI.Mods.JEI.isLoaded() &&
+                muiScreen.getContext().hasSettings() &&
+                muiScreen.getContext().getRecipeViewerSettings().isEnabled(muiScreen)) {
+            lineY -= 20;
+        }
         GuiDraw.drawText("Mouse Pos: " + mouseX + ", " + mouseY, 5, lineY, scale, outlineColor, true);
         lineY -= shift;
         GuiDraw.drawText("FPS: " + fpsCounter.getFps(), 5, lineY, scale, outlineColor, true);
         lineY -= shift;
-        GuiDraw.drawText("Theme ID: " + context.getTheme().getId(), 5, lineY, scale, outlineColor, true);
+
         LocatedWidget locatedHovered = muiScreen.getPanelManager().getTopWidgetLocated(true);
         boolean showHovered = DebugOptions.INSTANCE.showHovered.getBoolValue();
         boolean showParent = DebugOptions.INSTANCE.showParent.getBoolValue();
+        ITheme theme;
+        if (locatedHovered != null && (showHovered || showParent)) {
+            theme = locatedHovered.getElement().getPanel().getTheme();
+        } else {
+            theme = context.getTheme();
+        }
+        GuiDraw.drawText("Theme ID: " + theme.getId(), 5, lineY, scale, outlineColor, true);
+
         if (locatedHovered != null && (showHovered || showParent)) {
             drawSegmentLine(lineY -= 4, scale, outlineColor);
             lineY -= 10;
@@ -644,9 +657,9 @@ public class ClientScreenHandler {
                     drawSegmentLine(lineY -= 4, scale, textColor);
                     lineY -= 10;
                     ModularSlot slot = slotWidget.getSlot();
-                    GuiDraw.drawText("Slot Index: " + slot.getSlotIndex(), 5, lineY, scale, textColor, false);
+                    GuiDraw.drawText("Slot Index: " + slot.getSlotIndex(), 5, lineY, scale, textColor, true);
                     lineY -= shift;
-                    GuiDraw.drawText("Slot Number: " + slot.slotNumber, 5, lineY, scale, textColor, false);
+                    GuiDraw.drawText("Slot Number: " + slot.slotNumber, 5, lineY, scale, textColor, true);
                     lineY -= shift;
                     if (slotWidget.isSynced()) {
                         SlotGroup slotGroup = slot.getSlotGroup();
