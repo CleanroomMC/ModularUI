@@ -68,16 +68,16 @@ public abstract class AbstractScrollWidget<I extends IWidget, W extends Abstract
     public void beforeResize(boolean onOpen) {
         super.beforeResize(onOpen);
         this.scroll.applyWidgetTheme(getPanel().getTheme().getScrollbarTheme().getTheme(isHovering()));
-        if (onOpen) checkScrollbarActive(true);
+        checkScrollbarActive(false);
         getScrollArea().getScrollPadding().scrollPaddingAll(0);
         applyAdditionalOffset(this.scroll.getScrollX());
         applyAdditionalOffset(this.scroll.getScrollY());
     }
 
-    private void checkScrollbarActive(boolean onOpen) {
+    protected void checkScrollbarActive(boolean resizeOnChange) {
         boolean scrollYActive = this.scroll.getScrollY() != null && this.scroll.getScrollY().isScrollBarActive(getScrollArea());
-        boolean scrollXActive = this.scroll.getScrollX() != null && this.scroll.getScrollX().isScrollBarActive(getScrollArea(), this.scrollYActive);
-        if (!onOpen && (scrollYActive != this.scrollYActive || scrollXActive != this.scrollXActive)) {
+        boolean scrollXActive = this.scroll.getScrollX() != null && this.scroll.getScrollX().isScrollBarActive(getScrollArea(), scrollYActive);
+        if (resizeOnChange && (scrollYActive != this.scrollYActive || scrollXActive != this.scrollXActive)) {
             scheduleResize();
         }
         this.scrollXActive = scrollXActive;
@@ -123,7 +123,7 @@ public abstract class AbstractScrollWidget<I extends IWidget, W extends Abstract
     @Override
     public void onUpdate() {
         super.onUpdate();
-        checkScrollbarActive(false);
+        checkScrollbarActive(true);
     }
 
     @Override
