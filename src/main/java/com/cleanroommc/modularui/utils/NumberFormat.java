@@ -183,7 +183,8 @@ public class NumberFormat {
     }
 
     public static SIPrefix findBestPrefix(double number) {
-        if (number >= 1 && number < 10_000) return SIPrefix.One;
+        number = Math.abs(number);
+        if ((number >= 1 && number < 10_000) || number == 0) return SIPrefix.One;
         SIPrefix[] high = SIPrefix.HIGH;
         SIPrefix[] low = SIPrefix.LOW;
         int n = high.length - 1;
@@ -209,7 +210,10 @@ public class NumberFormat {
     }
 
     public static SIPrefix findBestPrefix(BigDecimal number) {
-        if (number.compareTo(BigDecimal.ONE) >= 0 && number.compareTo(TEN_THOUSAND) < 0) return SIPrefix.One;
+        number = number.abs();
+        if ((number.compareTo(BigDecimal.ONE) >= 0 && number.compareTo(TEN_THOUSAND) < 0) || number.equals(BigDecimal.ZERO)) {
+            return SIPrefix.One;
+        }
         SIPrefix[] high = SIPrefix.HIGH;
         SIPrefix[] low = SIPrefix.LOW;
         int n = high.length - 1;
