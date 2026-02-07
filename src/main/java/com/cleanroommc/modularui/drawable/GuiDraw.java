@@ -326,7 +326,7 @@ public class GuiDraw {
     }
 
     public static void drawStandardSlotAmountText(int amount, String format, Area area) {
-        if (amount != 1 || format != null) {
+        if (amount > 1 || format != null) {
             drawAmountText(amount, format, 0, 0, area.width, area.height, Alignment.BottomRight);
         }
     }
