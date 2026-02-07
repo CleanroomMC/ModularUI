@@ -257,6 +257,7 @@ public class NumberFormat {
     }
 
     private static String formatInternal(double number, int maxLength, Params params) {
+        if (Double.isNaN(number)) return "NaN";
         SIPrefix prefix = findBestPrefix(number);
         if (prefix.infiniteLike) return prefix.stringSymbol;
         return formatToString(number * prefix.oneOverFactor, prefix.symbol, maxLength, params);

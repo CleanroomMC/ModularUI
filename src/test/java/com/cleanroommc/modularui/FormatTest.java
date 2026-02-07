@@ -44,6 +44,11 @@ public class FormatTest {
     void testDefaultFormatting() {
         formatParams = defaultParams;
 
+        test("0", 0.0);
+        test("∞", Double.POSITIVE_INFINITY);
+        test("-∞", Double.NEGATIVE_INFINITY);
+        test("NaN", Double.NaN);
+
         test("1.235", 1.23456);
         test("12.35", 12.3456);
         test("123.5", 123.456);
@@ -132,6 +137,8 @@ public class FormatTest {
 
     private void test(String s, double value) {
         assertEquals(s, NumberFormat.format(value, formatParams));
-        assertEquals(s, NumberFormat.format(new BigDecimal(value), formatParams));
+        if (!Double.isInfinite(value) && !Double.isNaN(value)) {
+            assertEquals(s, NumberFormat.format(new BigDecimal(value), formatParams));
+        }
     }
 }
