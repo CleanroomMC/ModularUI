@@ -207,4 +207,17 @@ public class MathUtils {
         v = (v - fromMin) / (fromMax - fromMin); // reverse lerp
         return toMin + (toMax - toMin) * v; // forward lerp
     }
+
+    public static int intPlaces(BigDecimal x) {
+        return Math.max(1, x.precision() - x.scale());
+    }
+
+    public static int intPlaces(double x) {
+        if (x == 0.0) return 1;
+        x = Math.abs(x);
+        int d = (int) Math.floor(Math.log10(x)) + 1;
+        // correct rounding errors
+        if (Math.pow(10, d - 1) > x) d--;
+        return Math.max(d, 1);
+    }
 }

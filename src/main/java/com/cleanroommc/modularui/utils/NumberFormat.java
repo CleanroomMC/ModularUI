@@ -89,6 +89,10 @@ public class NumberFormat {
         public String format(double number) {
             return NumberFormat.format(number, this);
         }
+
+        public String format(BigDecimal number) {
+            return NumberFormat.format(number, this);
+        }
     }
 
     public static class ParamsBuilder {
@@ -178,13 +182,27 @@ public class NumberFormat {
         return formattedNumber;
     }
 
+    public static String format(BigDecimal number, Params params) {
+        boolean negative = number.compareTo(BigDecimal.ZERO) < 0;
+        int maxLength = params.maxLength;
+        if (negative) {
+            number = number.negate();
+            if (params.considerMinusForLength) maxLength--;
+        }
+        String formattedNumber = formatInternal(number, maxLength, params);
+        if (negative) formattedNumber = "-" + formattedNumber;
+        return formattedNumber;
+    }
+
     public static String formatFromUnit(double number, SIPrefix unit, Params params) {
         return format(number * unit.factor, params);
     }
 
     public static SIPrefix findBestPrefix(double number) {
+        if (Double.isNaN(number)) return SIPrefix.One;
+        if (Double.isInfinite(number)) return SIPrefix.Infinite;
         number = Math.abs(number);
-        if ((number >= 1 && number < 10_000) || number == 0) return SIPrefix.One;
+        if (number == 0 || (number >= 1 && number < 10_000)) return SIPrefix.One;
         SIPrefix[] high = SIPrefix.HIGH;
         SIPrefix[] low = SIPrefix.LOW;
         int n = high.length - 1;
@@ -240,6 +258,7 @@ public class NumberFormat {
 
     private static String formatInternal(double number, int maxLength, Params params) {
         SIPrefix prefix = findBestPrefix(number);
+        if (prefix.infiniteLike) return prefix.stringSymbol;
         return formatToString(number * prefix.oneOverFactor, prefix.symbol, maxLength, params);
     }
 
@@ -248,13 +267,10 @@ public class NumberFormat {
             maxLength--;
             if (params.spaceAfterNumber) maxLength--;
         }
-        if (params.considerDecimalSeparatorForLength) {
-            maxLength--;
-        }
+        if (params.considerDecimalSeparatorForLength) maxLength--;
         if (!params.considerOnlyDecimalsForLength) {
             if (value % 1 > 0) {
-                int intDigits = (int) (Math.log10(Math.floor(value)) + 1);
-                maxLength -= intDigits;
+                maxLength -= MathUtils.intPlaces(value);
             }
         }
         int m1 = params.format.getMaximumFractionDigits();
@@ -265,11 +281,39 @@ public class NumberFormat {
         params.format.setMinimumFractionDigits(m2);
 
         if (prefix != Character.MIN_VALUE) {
-            if (params.spaceAfterNumber) {
-                s += ' ' + prefix;
-            } else {
-                s += prefix;
+            if (params.spaceAfterNumber) s += ' ';
+            s += prefix;
+        }
+        return s;
+    }
+
+    private static String formatInternal(BigDecimal number, int maxLength, Params params) {
+        SIPrefix prefix = findBestPrefix(number);
+        if (prefix.infiniteLike) return prefix.stringSymbol;
+        return formatToString(number.multiply(prefix.bigOneOverFactor), prefix.symbol, maxLength, params);
+    }
+
+    private static String formatToString(BigDecimal value, char prefix, int maxLength, Params params) {
+        if (params.considerSuffixForLength && prefix != Character.MIN_VALUE) {
+            maxLength--;
+            if (params.spaceAfterNumber) maxLength--;
+        }
+        if (params.considerDecimalSeparatorForLength) maxLength--;
+        if (!params.considerOnlyDecimalsForLength) {
+            if (value.remainder(BigDecimal.ONE).signum() > 0) {
+                maxLength -= MathUtils.intPlaces(value);
             }
+        }
+        int m1 = params.format.getMaximumFractionDigits();
+        int m2 = params.format.getMinimumFractionDigits();
+        params.format.setMaximumFractionDigits(maxLength);
+        String s = params.format.format(value);
+        params.format.setMaximumFractionDigits(m1);
+        params.format.setMinimumFractionDigits(m2);
+
+        if (prefix != Character.MIN_VALUE) {
+            if (params.spaceAfterNumber) s += ' ';
+            s += prefix;
         }
         return s;
     }

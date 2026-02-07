@@ -1,8 +1,11 @@
 package com.cleanroommc.modularui;
 
 import com.cleanroommc.modularui.utils.NumberFormat;
+import com.cleanroommc.modularui.utils.SIPrefix;
 
 import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -11,6 +14,31 @@ public class FormatTest {
     // non localized separator for unified test results
     private static final NumberFormat.Params defaultParams = NumberFormat.DEFAULT.copyToBuilder().decimalSeparator('.').build();
     private static NumberFormat.Params formatParams = defaultParams;
+
+    @Test
+    void testSiPrefix() {
+        test(0.0, SIPrefix.One);
+        test(Double.NaN, SIPrefix.One);
+        test(Double.POSITIVE_INFINITY, SIPrefix.Infinite);
+        test(1.0, SIPrefix.One);
+        test(10.0, SIPrefix.One);
+        test(1000.0, SIPrefix.One);
+        test(9_999.999999999, SIPrefix.One);
+        test(10_000, SIPrefix.Kilo);
+        test(123_456, SIPrefix.Kilo);
+        test(1_234_567, SIPrefix.Mega);
+        test(123_456_789_123_456_789.0, SIPrefix.Peta);
+        test(123_456_789_123_456_789.2320340280257190234710932475, SIPrefix.Peta);
+        test(0.999999999999999999999, SIPrefix.One);
+        test(0.000_1, SIPrefix.Micro);
+        test(0.000_000_000_000_000_069, SIPrefix.Atto);
+        test(1000.000_000_000_000_000_069, SIPrefix.One);
+    }
+
+    private void test(double x, SIPrefix prefix) {
+        assertEquals(NumberFormat.findBestPrefix(x), prefix);
+        assertEquals(NumberFormat.findBestPrefix(-x), prefix);
+    }
 
     @Test
     void testDefaultFormatting() {
@@ -104,5 +132,6 @@ public class FormatTest {
 
     private void test(String s, double value) {
         assertEquals(s, NumberFormat.format(value, formatParams));
+        assertEquals(s, NumberFormat.format(new BigDecimal(value), formatParams));
     }
 }

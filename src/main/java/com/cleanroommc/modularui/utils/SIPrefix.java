@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 
 public enum SIPrefix {
 
+    Infinite('∞', Integer.MAX_VALUE),
     Quetta('Q', 30),
     Ronna('R', 27),
     Yotta('Y', 24),
@@ -26,7 +27,8 @@ public enum SIPrefix {
     Zepto('z', -21),
     Yocto('y', -24),
     Ronto('r', -27),
-    Quecto('q', -30);
+    Quecto('q', -30),
+    Infinitesimal('∞', Integer.MIN_VALUE);
 
     public final char symbol;
     public final String stringSymbol;
@@ -34,13 +36,20 @@ public enum SIPrefix {
     public final double oneOverFactor;
     public final BigDecimal bigFactor;
     public final BigDecimal bigOneOverFactor;
+    public final boolean infiniteLike;
 
     SIPrefix(char symbol, int powerOfTen) {
         this.symbol = symbol;
         this.stringSymbol = symbol != Character.MIN_VALUE ? Character.toString(symbol) : "";
-        this.factor = Math.pow(10, powerOfTen);
+        this.infiniteLike = powerOfTen == Integer.MAX_VALUE || powerOfTen == Integer.MIN_VALUE;
+        if (this.infiniteLike) {
+            this.factor = Double.MAX_VALUE;
+            this.bigFactor = new BigDecimal(Double.MAX_VALUE);
+        } else {
+            this.factor = Math.pow(10, powerOfTen);
+            this.bigFactor = new BigDecimal(this.factor);
+        }
         this.oneOverFactor = 1 / this.factor;
-        this.bigFactor = new BigDecimal(this.factor);
         this.bigOneOverFactor = new BigDecimal(this.oneOverFactor);
     }
 
