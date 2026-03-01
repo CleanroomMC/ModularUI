@@ -329,20 +329,21 @@ public class TreeUtil {
         return filter.test(parent) ? parent : null;
     }
 
+    @Nullable
     public static <T extends ITreeNode<T>, R extends ITreeNode<T>> R findParent(T parent, Class<R> type) {
         return findParent(parent, type, null);
     }
 
+    @Nullable
     @SuppressWarnings("unchecked")
     public static <T extends ITreeNode<T>, R extends ITreeNode<T>> R findParent(T parent, Class<R> type, @Nullable Predicate<R> test) {
-        if (parent == null) return null;
-        while (!(parent instanceof ModularPanel)) {
+        while (parent != null) {
             if (type.isAssignableFrom(parent.getClass()) && (test == null || test.test((R) parent))) {
                 return (R) parent;
             }
             parent = parent.getParent();
         }
-        return type.isAssignableFrom(parent.getClass()) && (test == null || test.test((R) parent)) ? (R) parent : null;
+        return null;
     }
 
     /**

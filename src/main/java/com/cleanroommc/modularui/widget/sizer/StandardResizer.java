@@ -10,6 +10,7 @@ import com.cleanroommc.modularui.api.widget.IPositioned;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.TreeUtil;
 import com.cleanroommc.modularui.widgets.layout.IExpander;
 
 import net.minecraft.inventory.Slot;
@@ -477,6 +478,13 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
     @Override
     public StandardResizer relativeToScreen() {
         this.relativeToScreen = true;
+        if (getParent() != null) {
+            // if this is currently part of a tree, try to find the root and attach ourselves to it
+            ScreenResizeNode root = TreeUtil.findParent(this, ScreenResizeNode.class);
+            if (root != null) {
+                setParentOverride(root);
+            }
+        }
         return this;
     }
 
