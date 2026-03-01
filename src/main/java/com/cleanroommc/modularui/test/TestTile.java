@@ -250,6 +250,15 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
                                                                 .reverseLayout(false)
                                                                 .child(new ToggleButton()
                                                                         .valueWrapped(cycleStateValue, 0)
+                                                                        .tooltipBuilder(false, t -> {
+                                                                            t.addLine("Wow! This button sure isnt selected! Not one bit!");
+                                                                            if (!this.oversizedStorage.getStackInSlot(this.cycleState).isEmpty()) {
+                                                                                t.addLine("Here is a cool item: ");
+                                                                                t.add(new ItemDrawable(this.oversizedStorage.getStackInSlot(this.cycleState)));
+                                                                            }
+                                                                        })
+                                                                        .tooltipBuilder(true, t -> t.addLine("Wow! This button IS selected! How cool!"))
+                                                                        .tooltipAutoUpdate(true)
                                                                         .overlay(GuiTextures.CYCLE_BUTTON_DEMO.getSubArea(0, 0, 1, 1 / 3f)))
                                                                 .child(new ToggleButton()
                                                                         .valueWrapped(cycleStateValue, 1)

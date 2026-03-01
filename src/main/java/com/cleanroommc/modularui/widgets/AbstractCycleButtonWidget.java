@@ -568,6 +568,22 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
         return getThis();
     }
 
+    /**
+     * Sets the tooltip auto update value for all states.
+     *
+     * @param update true if tooltips should automatically update
+     * @return this
+     */
+    @Override
+    public W tooltipAutoUpdate(boolean update) {
+        super.tooltipAutoUpdate(update);
+        expectCount();
+        for (RichTooltip tooltip : this.tooltip) {
+            tooltip.setAutoUpdate(update);
+        }
+        return getThis();
+    }
+
     protected W stateCount(int stateCount) {
         updateStateCount(stateCount, true);
         return getThis();
