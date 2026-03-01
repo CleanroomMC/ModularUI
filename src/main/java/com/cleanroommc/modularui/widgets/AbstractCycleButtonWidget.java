@@ -16,9 +16,7 @@ import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.value.IntValue;
-import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.SingleChildWidget;
-import com.cleanroommc.modularui.widget.Widget;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -470,6 +468,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
      */
     @Override
     public W tooltipAlignment(Alignment alignment) {
+        super.tooltipAlignment(alignment);
         expectCount();
         for (RichTooltip tooltip : this.tooltip) {
             tooltip.alignment(alignment);
@@ -485,6 +484,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
      */
     @Override
     public W tooltipPos(RichTooltip.Pos pos) {
+        super.tooltipPos(pos);
         expectCount();
         for (RichTooltip tooltip : this.tooltip) {
             tooltip.pos(pos);
@@ -501,6 +501,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
      */
     @Override
     public W tooltipPos(int x, int y) {
+        super.tooltipPos(x, y);
         expectCount();
         for (RichTooltip tooltip : this.tooltip) {
             tooltip.pos(x, y);
@@ -516,6 +517,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
      */
     @Override
     public W tooltipScale(float scale) {
+        super.tooltipScale(scale);
         expectCount();
         for (RichTooltip tooltip : this.tooltip) {
             tooltip.scale(scale);
@@ -531,6 +533,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
      */
     @Override
     public W tooltipTextColor(int textColor) {
+        super.tooltipTextColor(textColor);
         expectCount();
         for (RichTooltip tooltip : this.tooltip) {
             tooltip.textColor(textColor);
@@ -561,6 +564,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
      */
     @Override
     public W tooltipShowUpTimer(int showUpTimer) {
+        super.tooltipShowUpTimer(showUpTimer);
         expectCount();
         for (RichTooltip tooltip : this.tooltip) {
             tooltip.showUpTimer(showUpTimer);
