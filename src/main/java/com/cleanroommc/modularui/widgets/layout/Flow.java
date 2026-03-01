@@ -269,6 +269,14 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget {
         }
     }
 
+    public boolean isRow() {
+        return getAxis().isHorizontal();
+    }
+
+    public boolean isColumn() {
+        return getAxis().isVertical();
+    }
+
     public Flow children(Iterable<IWidget> widgets) {
         for (IWidget widget : widgets) {
             child(widget);
