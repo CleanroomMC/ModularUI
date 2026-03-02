@@ -549,6 +549,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
      */
     @Override
     public W tooltipTextShadow(boolean textShadow) {
+        super.tooltipTextShadow(textShadow);
         expectCount();
         for (RichTooltip tooltip : this.tooltip) {
             tooltip.textShadow(textShadow);
