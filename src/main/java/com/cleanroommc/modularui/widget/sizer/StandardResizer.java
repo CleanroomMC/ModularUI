@@ -603,6 +603,7 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
         return this;
     }
 
+    @Override
     public StandardResizer anchorLeft(float val) {
         getLeft().setAnchor(val);
         getLeft().setAutoAnchor(false);
@@ -610,6 +611,7 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
         return this;
     }
 
+    @Override
     public StandardResizer anchorRight(float val) {
         getRight().setAnchor(1 - val);
         getRight().setAutoAnchor(false);
@@ -617,6 +619,7 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
         return this;
     }
 
+    @Override
     public StandardResizer anchorTop(float val) {
         getTop().setAnchor(val);
         getTop().setAutoAnchor(false);
@@ -624,6 +627,7 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
         return this;
     }
 
+    @Override
     public StandardResizer anchorBottom(float val) {
         getBottom().setAnchor(1 - val);
         getBottom().setAutoAnchor(false);
@@ -631,6 +635,8 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
         return this;
     }
 
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.3.0")
+    @Deprecated
     public StandardResizer anchor(Alignment alignment) {
         if (this.x.hasStart() || !this.x.hasEnd()) {
             anchorLeft(alignment.x);
