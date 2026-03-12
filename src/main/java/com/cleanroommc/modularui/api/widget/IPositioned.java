@@ -452,15 +452,15 @@ public interface IPositioned<W extends IPositioned<W>> {
     }
 
     default W horizontalCenter() {
-        return alignX(Alignment.CENTER);
+        return leftRel(0.5f);
     }
 
     default W verticalCenter() {
-        return alignY(Alignment.CENTER);
+        return topRel(0.5f);
     }
 
     default W center() {
-        return align(Alignment.Center);
+        return horizontalCenter().verticalCenter();
     }
 
     default W resizer(Consumer<StandardResizer> flexConsumer) {

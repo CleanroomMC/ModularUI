@@ -155,10 +155,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         IPanelHandler panelSyncHandler = syncManager.syncedPanel("other_panel", true, this::openSecondWindow);
 
         PagedWidget.Controller tabController = new PagedWidget.Controller();
-        panel.resizer()                        // returns object which is responsible for sizing
-                .size(176, 210)       // set a static size for the main panel
-                .align(Alignment.Center);    // center the panel in the screen
-        panel
+        panel.size(176, 210)
                 .child(Flow.row()
                         .name("Tab row")
                         .coverChildren()
