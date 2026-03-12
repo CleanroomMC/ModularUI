@@ -170,22 +170,22 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
     }
 
     @Override
-    public IDrawable getCurrentBackground(ITheme theme, WidgetThemeEntry<?> widgetTheme) {
+    public IDrawable getCurrentBackground(WidgetThemeEntry<?> widgetTheme) {
         // make sure texture is up-to-date
         int state = getState();
         if (isHovering() && this.hoverBackground != null && this.hoverBackground[state] != null && this.hoverBackground[state] != IDrawable.NONE) {
             return this.hoverBackground[state];
         }
-        return this.background != null && this.background[state] != null ? this.background[state] : super.getCurrentBackground(theme, widgetTheme);
+        return this.background != null && this.background[state] != null ? this.background[state] : super.getCurrentBackground(widgetTheme);
     }
 
     @Override
-    public IDrawable getCurrentOverlay(ITheme theme, WidgetThemeEntry<?> widgetTheme) {
+    public IDrawable getCurrentOverlay(WidgetThemeEntry<?> widgetTheme) {
         int state = getState();
         if (isHovering() && this.hoverOverlay != null && this.hoverOverlay[state] != null && this.hoverOverlay[state] != IDrawable.NONE) {
             return this.hoverOverlay[state];
         }
-        return this.overlay != null && this.overlay[state] != null ? this.overlay[state] : super.getCurrentOverlay(theme, widgetTheme);
+        return this.overlay != null && this.overlay[state] != null ? this.overlay[state] : super.getCurrentOverlay(widgetTheme);
     }
 
     @Override
@@ -222,7 +222,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
             Arrays.fill(this.hoverBackground, IDrawable.NONE);
         }
         if (getHoverBackground() == null) {
-            super.hoverBackground(IDrawable.NONE);
+            super.hoverBackgroundOverlay(IDrawable.NONE);
         }
         return getThis();
     }
@@ -245,7 +245,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
             Arrays.fill(this.background, IDrawable.EMPTY);
         }
         if (getBackground() == null) {
-            super.background(IDrawable.EMPTY);
+            super.backgroundOverlay(IDrawable.EMPTY);
         }
         return disableHoverBackground();
     }

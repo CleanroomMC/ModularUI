@@ -55,6 +55,8 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
     @Nullable private String syncKey;
     @Nullable private SyncHandler syncHandler;
     // rendering
+    private boolean disableThemeBackground = false;
+    private boolean disableHoverThemeBackground = false;
     @Nullable private IDrawable shadow = null;
     @Nullable private IDrawable background = null;
     @Nullable private IDrawable overlay = null;
@@ -147,12 +149,19 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
      */
     @Override
     public void drawBackground(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
+        WidgetTheme theme = getActiveWidgetTheme(widgetTheme, isHovering());
         if (this.shadow != null) {
-            this.shadow.drawAtZero(context, getArea().width, getArea().height, getActiveWidgetTheme(widgetTheme, isHovering()));
+            this.shadow.drawAtZero(context, getArea(), theme);
         }
-        IDrawable bg = getCurrentBackground(getPanel().getTheme(), widgetTheme);
+        if (!this.disableThemeBackground || !this.disableHoverThemeBackground) {
+            IDrawable bg = getThemeBackground(widgetTheme, theme);
+            if (bg != null) {
+                bg.drawAtZero(context, getArea(), theme);
+            }
+        }
+        IDrawable bg = getCurrentBackground(widgetTheme);
         if (bg != null) {
-            bg.drawAtZero(context, getArea().width, getArea().height, getActiveWidgetTheme(widgetTheme, isHovering()));
+            bg.drawAtZero(context, getArea(), theme);
         }
     }
 
@@ -178,7 +187,7 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
      */
     @Override
     public void drawOverlay(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
-        IDrawable bg = getCurrentOverlay(getPanel().getTheme(), widgetTheme);
+        IDrawable bg = getCurrentOverlay(widgetTheme);
         if (bg != null) {
             bg.drawAtZeroPadded(context, getArea(), getActiveWidgetTheme(widgetTheme, isHovering()));
         }
@@ -196,6 +205,18 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
         if (tooltip != null && isHoveringFor(tooltip.getShowUpTimer())) {
             tooltip.draw(context);
         }
+    }
+
+    public boolean isDisableThemeBackground() {
+        return disableThemeBackground;
+    }
+
+    public boolean isDisableHoverThemeBackground() {
+        return disableHoverThemeBackground;
+    }
+
+    public @Nullable IDrawable getShadow() {
+        return shadow;
     }
 
     /**
@@ -237,33 +258,49 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
         return this.hoverOverlay;
     }
 
+    public @Nullable IDrawable getThemeBackground(WidgetThemeEntry<?> widgetTheme) {
+        return getThemeBackground(widgetTheme, getActiveWidgetTheme(widgetTheme, isHovering()));
+    }
+
+    public @Nullable IDrawable getThemeBackground(WidgetThemeEntry<?> widgetTheme, WidgetTheme activeTheme) {
+        IDrawable bg = null;
+        if (isHovering()) {
+            bg = activeTheme.getBackground();
+            if (bg == null || bg == IDrawable.NONE || this.disableHoverThemeBackground) {
+                bg = getActiveWidgetTheme(widgetTheme, false).getBackground();
+            }
+        } else if (!this.disableThemeBackground) {
+            bg = activeTheme.getBackground();
+        }
+        return bg;
+    }
+
     /**
      * Returns the actual currently displayed background.
      *
-     * @param theme       current theme
      * @param widgetTheme widget theme which is used by this widget
      * @return currently displayed background
      */
-    public @Nullable IDrawable getCurrentBackground(ITheme theme, WidgetThemeEntry<?> widgetTheme) {
+    public @Nullable IDrawable getCurrentBackground(WidgetThemeEntry<?> widgetTheme) {
         if (isHovering()) {
             IDrawable hoverBackground = getHoverBackground();
-            if (hoverBackground == null) hoverBackground = getActiveWidgetTheme(widgetTheme, true).getBackground();
             if (hoverBackground != null && hoverBackground != IDrawable.NONE) return hoverBackground;
         }
-        IDrawable background = getBackground();
-        return background == null ? getActiveWidgetTheme(widgetTheme, false).getBackground() : background;
+        return getBackground();
     }
 
     /**
      * Returns the actual currently displayed overlay.
      *
-     * @param theme       current theme
      * @param widgetTheme widget theme which is used by this widget
      * @return currently displayed background
      */
-    public @Nullable IDrawable getCurrentOverlay(ITheme theme, WidgetThemeEntry<?> widgetTheme) {
-        IDrawable hoverBackground = getHoverOverlay();
-        return hoverBackground != null && hoverBackground != IDrawable.NONE && isHovering() ? hoverBackground : getOverlay();
+    public @Nullable IDrawable getCurrentOverlay(WidgetThemeEntry<?> widgetTheme) {
+        if (isHovering()) {
+            IDrawable hoverBackground = getHoverOverlay();
+            if (hoverBackground != null && hoverBackground != IDrawable.NONE) return hoverBackground;
+        }
+        return getOverlay();
     }
 
     /**
@@ -359,16 +396,42 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
     }
 
     /**
-     * Sets a background override. Ideally this is set in the used theme. Also consider using {@link #overlay(IDrawable...)} instead.
-     * Using {@link IDrawable#EMPTY} will make the background invisible while still overriding the widget theme.
-     * Background are drawn before the widget and overlays are drawn.
+     * Sets a shadow. Shadows are drawn before the background and don't actually have to be shadows. This doesn't effect theme backgrounds
+     * and doesn't change when hovered.
+     *
+     * @param shadow background to use.
+     * @return this
+     */
+    public W shadow(IDrawable... shadow) {
+        this.shadow = IDrawable.of(shadow);
+        return getThis();
+    }
+
+    /**
+     * Sets a background. The theme background will be drawn before this override.
+     * <p>
+     * NOTE: This will NOT disable the theme background. Disable it separately with {@link #disableThemeBackground(boolean)}.
+     * </p>
+     * This method is meant for unique textures. For generic backgrounds please use themes. Also consider using
+     * {@link #overlay(IDrawable...)} instead. Using {@link IDrawable#EMPTY} will make the background invisible while still overriding
+     * the widget theme. Background are drawn before the widget and overlays are drawn.
      *
      * @param background background to use.
      * @return this
      */
-    public W background(IDrawable... background) {
+    public W backgroundOverlay(IDrawable... background) {
         this.background = IDrawable.of(background);
         return getThis();
+    }
+
+    /**
+     * Sets a background and disables the theme background. See {@link #backgroundOverlay(IDrawable...)} for more information.
+     *
+     * @param background background
+     * @return this
+     */
+    public W background(IDrawable... background) {
+        return backgroundOverlay(background).disableThemeBackground(true);
     }
 
     /**
@@ -383,24 +446,40 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
     }
 
     /**
-     * Sets a hover background override. Ideally this is set in the used theme. Also consider using {@link #hoverOverlay(IDrawable...)} instead.
-     * Using {@link IDrawable#EMPTY} will make the background invisible while still overriding the widget theme.
-     * Background are drawn before the widget and overlays are drawn.
+     * Sets a hover background. The hover theme background will be drawn before this override.
+     * <p>
+     * NOTE: This will NOT disable the hover theme background. Disable it separately with {@link #disableHoverThemeBackground(boolean)}.
+     * </p>
+     * <p>
+     * This method is meant for unique textures. For generic backgrounds please use themes. Also consider using
+     * {@link #hoverOverlay(IDrawable...)} instead. Using {@link IDrawable#EMPTY} will make the background invisible while still
+     * overriding the widget theme. Background are drawn before the widget and overlays are drawn.
      * <p>
      * Following argument special cases should be considered:
      * <ul>
      *     <li>{@code null} will fallback to {@link WidgetThemeEntry#getHoverTheme()}</li>
      *     <li>{@link IDrawable#EMPTY} will make the hover background invisible</li>
-     *     <li>{@link IDrawable#NONE} will use the normal background instead (which is also achieved using {@link #disableHoverBackground()})</li>
+     *     <li>{@link IDrawable#NONE} will use the normal background instead (which is also achieved using {@link #disableHoverBackground()})
+     *     (note that this won't disable the hover theme background)</li>
      *     <li>multiple drawables, will result in them being drawn on top of each other in the order they are passed to the method</li>
      * </ul>
      *
      * @param background hover background to use.
      * @return this
      */
-    public W hoverBackground(IDrawable... background) {
+    public W hoverBackgroundOverlay(IDrawable... background) {
         this.hoverBackground = IDrawable.of(background);
         return getThis();
+    }
+
+    /**
+     * Sets a background and disables the theme background. See {@link #backgroundOverlay(IDrawable...)} for more information.
+     *
+     * @param background background
+     * @return this
+     */
+    public W hoverBackground(IDrawable... background) {
+        return hoverBackgroundOverlay(background).disableHoverThemeBackground(true);
     }
 
     /**
@@ -411,7 +490,7 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
      * Following argument special cases should be considered:
      * <ul>
      *     <li>{@link IDrawable#EMPTY} will make the hover overlay invisible</li>
-     *     <li>{@code null} and {@link IDrawable#NONE} will use the normal overlay instead (which is also achieved using {@link #disableHoverOverlay()} ()})</li>
+     *     <li>{@code null} and {@link IDrawable#NONE} will use the normal overlay instead (which is also achieved using {@link #disableHoverOverlay()})</li>
      *     <li>multiple drawables, will result in them being drawn on top of each other in the order they are passed to the method</li>
      * </ul>
      *
@@ -423,13 +502,23 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
         return getThis();
     }
 
+    public W disableThemeBackground(boolean b) {
+        this.disableThemeBackground = b;
+        return getThis();
+    }
+
+    public W disableHoverThemeBackground(boolean b) {
+        this.disableHoverThemeBackground = b;
+        return getThis();
+    }
+
     /**
-     * Forces the hover background to use the normal background instead.
+     * Forces the hover background to use the normal background instead. This also diables the hover theme background.
      *
      * @return this
      */
     public W disableHoverBackground() {
-        return hoverBackground(IDrawable.NONE);
+        return hoverBackgroundOverlay(IDrawable.NONE).disableHoverThemeBackground(true);
     }
 
     /**
@@ -467,7 +556,7 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
     }
 
     public W invisible() {
-        return background(IDrawable.EMPTY)
+        return disableThemeBackground(true)
                 .disableHoverBackground();
     }
 

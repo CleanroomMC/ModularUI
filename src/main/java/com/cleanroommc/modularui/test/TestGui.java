@@ -119,7 +119,7 @@ public class TestGui extends CustomModularScreen {
         private final IDrawable background = GuiTextures.SLOT_FLUID;
 
         @Override
-        public AvailableElement background(IDrawable... background) {
+        public AvailableElement backgroundOverlay(IDrawable... background) {
             throw new UnsupportedOperationException("Use overlay()");
         }
 

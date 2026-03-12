@@ -23,12 +23,12 @@ public class CycleButtonWidget extends AbstractCycleButtonWidget<CycleButtonWidg
 
     public CycleButtonWidget stateBackground(int state, IDrawable drawable) {
         this.background = addToArray(this.background, drawable, state);
-        return getThis();
+        return disableThemeBackground(true);
     }
 
     public CycleButtonWidget stateHoverBackground(int state, IDrawable drawable) {
         this.hoverBackground = addToArray(this.hoverBackground, drawable, state);
-        return getThis();
+        return disableHoverThemeBackground(true);
     }
 
     public CycleButtonWidget stateOverlay(int state, IDrawable drawable) {
