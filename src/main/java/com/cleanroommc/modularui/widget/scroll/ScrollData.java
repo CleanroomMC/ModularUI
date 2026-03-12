@@ -298,6 +298,9 @@ public abstract class ScrollData {
         drawable.draw(context, x, y, w, h, widgetTheme);
     }
 
+    @SideOnly(Side.CLIENT)
+    public abstract void drawScrollShadow(ScrollArea area, ModularGuiContext context);
+
     public boolean onMouseClicked(ScrollArea area, int mainAxisPos, int crossAxisPos, int button) {
         if (isOnAxisStart() ? crossAxisPos <= getThickness() : crossAxisPos >= area.getSize(this.axis.getOther()) - getThickness()) {
             this.dragging = true;

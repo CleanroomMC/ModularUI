@@ -74,40 +74,72 @@ public class ScrollPadding extends Box {
         return scrollPaddingAll(box.scrollPaddingLeft, box.scrollPaddingRight, box.scrollPaddingTop, box.scrollPaddingBottom);
     }
 
+    @Override
     public int getLeft() {
         return this.left + this.scrollPaddingLeft;
     }
 
+    @Override
     public int getRight() {
         return this.right + this.scrollPaddingRight;
     }
 
+    @Override
     public int getTop() {
         return this.top + this.scrollPaddingTop;
     }
 
+    @Override
     public int getBottom() {
         return this.bottom + this.scrollPaddingBottom;
     }
 
+    public int getScrollPaddingLeft() {
+        return scrollPaddingLeft;
+    }
+
+    public int getScrollPaddingRight() {
+        return scrollPaddingRight;
+    }
+
+    public int getScrollPaddingTop() {
+        return scrollPaddingTop;
+    }
+
+    public int getScrollPaddingBottom() {
+        return scrollPaddingBottom;
+    }
+
+    @Override
     public int vertical() {
         return super.vertical() + this.scrollPaddingTop + this.scrollPaddingBottom;
     }
 
+    @Override
     public int horizontal() {
         return super.horizontal() + this.scrollPaddingLeft + this.scrollPaddingRight;
     }
 
+    public int verticalScrollPadding() {
+        return this.scrollPaddingTop + this.scrollPaddingBottom;
+    }
+
+    public int horizontalScrollPadding() {
+        return this.scrollPaddingLeft + this.scrollPaddingRight;
+    }
+
+    @Override
     public int getStart(GuiAxis axis) {
         return axis.isHorizontal() ? this.left + this.scrollPaddingLeft : this.top + this.scrollPaddingTop;
     }
 
+    @Override
     public int getEnd(GuiAxis axis) {
         return axis.isHorizontal() ? this.right + this.scrollPaddingRight : this.bottom + this.scrollPaddingBottom;
     }
 
     public int getTotalScrollPadding(GuiAxis axis) {
-        return axis.isHorizontal() ? this.scrollPaddingLeft + this.scrollPaddingRight : this.scrollPaddingTop + this.scrollPaddingBottom;
+        return axis.isHorizontal() ? horizontalScrollPadding() : verticalScrollPadding();
     }
 
     @Override

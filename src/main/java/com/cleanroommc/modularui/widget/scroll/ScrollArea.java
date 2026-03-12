@@ -227,4 +227,16 @@ public class ScrollArea extends Area {
             this.scrollY.drawScrollbar(this, context, widgetTheme, texture);
         }
     }
+
+    @SideOnly(Side.CLIENT)
+    public void drawScrollShadow(ModularGuiContext context) {
+        boolean isXActive = false; // micro optimisation
+        if (this.scrollX != null && this.scrollX.isScrollBarActive(this, false)) {
+            isXActive = true;
+            this.scrollX.drawScrollShadow(this, context);
+        }
+        if (this.scrollY != null && this.scrollY.isScrollBarActive(this, isXActive)) {
+            this.scrollY.drawScrollShadow(this, context);
+        }
+    }
 }
