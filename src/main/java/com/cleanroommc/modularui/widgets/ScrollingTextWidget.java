@@ -110,4 +110,24 @@ public class ScrollingTextWidget extends TextWidget<ScrollingTextWidget> {
         this.animator = new SequentialAnimator(this.forward, new Wait(500), this.backward, new Wait(1000)).repeatsOnFinish(20);
         return this;
     }
+
+    public float getProgress() {
+        return progress;
+    }
+
+    public IAnimator getAnimator() {
+        return animator;
+    }
+
+    public Animator getForward() {
+        return forward;
+    }
+
+    public Animator getBackward() {
+        return backward;
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
 }

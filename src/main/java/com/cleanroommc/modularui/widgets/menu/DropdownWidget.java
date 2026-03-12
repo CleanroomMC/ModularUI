@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.ListWidget;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -206,6 +207,19 @@ public class DropdownWidget<T, W extends DropdownWidget<T, W>> extends AbstractM
     public W directionDown() {
         this.direction = Direction.DOWN;
         return getThis();
+    }
+
+    public int getMaxListSize() {
+        return maxListSize;
+    }
+
+    @Override
+    public @Nullable IValue<T> getValue() {
+        return value;
+    }
+
+    public Class<T> getValueType() {
+        return valueType;
     }
 
     public interface ToWidget<T> {

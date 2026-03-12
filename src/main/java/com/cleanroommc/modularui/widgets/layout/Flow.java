@@ -298,6 +298,34 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget {
         return getThis();
     }
 
+    public Alignment.MainAxis getMaa() {
+        return maa;
+    }
+
+    public Alignment.CrossAxis getCaa() {
+        return caa;
+    }
+
+    public int getChildPadding() {
+        return childPadding;
+    }
+
+    public int getCrossAxisChildPadding() {
+        return crossAxisChildPadding;
+    }
+
+    public boolean isCollapseDisabledChild() {
+        return collapseDisabledChild;
+    }
+
+    public boolean isReverseLayout() {
+        return reverseLayout;
+    }
+
+    public boolean isWrap() {
+        return wrap;
+    }
+
     /**
      * Sets the main axis alignment of this flow. This determines how multiple widgets are laid out along the main axis in this flow.
      *

@@ -152,4 +152,12 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
         this.flipLighterThanAir = flipLighterThanAir;
         return getThis();
     }
+
+    public Box getContentPadding() {
+        return contentPadding;
+    }
+
+    public SIPrefix getBaseUnitPrefix() {
+        return baseUnitPrefix;
+    }
 }

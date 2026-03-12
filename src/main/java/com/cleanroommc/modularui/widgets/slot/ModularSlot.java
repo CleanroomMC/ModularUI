@@ -267,4 +267,20 @@ public class ModularSlot extends SlotItemHandler {
     public static boolean isPlayerSlot(SlotItemHandler slot) {
         return slot.getItemHandler() instanceof PlayerInvWrapper || slot.getItemHandler() instanceof PlayerMainInvWrapper;
     }
+
+    public boolean isCanTake() {
+        return canTake;
+    }
+
+    public boolean isCanPut() {
+        return canPut;
+    }
+
+    public boolean isCanDragInto() {
+        return canDragInto;
+    }
+
+    public Predicate<ItemStack> getFilter() {
+        return filter;
+    }
 }

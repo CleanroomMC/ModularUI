@@ -139,6 +139,46 @@ public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
         return schema.getLastRayTrace();
     }
 
+    public float getScale() {
+        return scale;
+    }
+
+    public float getPitch() {
+        return pitch;
+    }
+
+    public float getYaw() {
+        return yaw;
+    }
+
+    public Vector3f getOffset() {
+        return offset;
+    }
+
+    public int getLastMouseY() {
+        return lastMouseY;
+    }
+
+    public int getLastMouseX() {
+        return lastMouseX;
+    }
+
+    public boolean isEnableScaling() {
+        return enableScaling;
+    }
+
+    public boolean isEnableTranslation() {
+        return enableTranslation;
+    }
+
+    public boolean isEnableRotation() {
+        return enableRotation;
+    }
+
+    public BaseSchemaRenderer getSchema() {
+        return schema;
+    }
+
     public static class LayerButton extends ButtonWidget<LayerButton> {
 
         private final int minLayer;

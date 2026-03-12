@@ -635,4 +635,12 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
         this.tooltip[index].tooltipBuilder(builder);
         return getThis();
     }
+
+    public int getStateCount() {
+        return stateCount;
+    }
+
+    public IIntValue<?> getIntValue() {
+        return intValue;
+    }
 }

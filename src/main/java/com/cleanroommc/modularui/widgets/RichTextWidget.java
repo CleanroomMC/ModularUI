@@ -168,4 +168,8 @@ public class RichTextWidget extends Widget<RichTextWidget> implements IRichTextB
         markDirty();
         return this;
     }
+
+    public boolean isAutoUpdate() {
+        return autoUpdate;
+    }
 }

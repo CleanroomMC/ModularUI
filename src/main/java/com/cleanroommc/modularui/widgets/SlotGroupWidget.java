@@ -157,6 +157,14 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
         return new Builder();
     }
 
+    public String getSlotGroupName() {
+        return slotGroupName;
+    }
+
+    public SlotGroup getSlotGroup() {
+        return slotGroup;
+    }
+
     public interface SlotConsumer {
 
         ItemSlot apply(int index, ItemSlot widgetSlot);

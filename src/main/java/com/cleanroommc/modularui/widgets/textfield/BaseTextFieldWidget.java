@@ -376,4 +376,36 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
     public static char getGroupSeparator() {
         return format.getDecimalFormatSymbols().getGroupingSeparator();
     }
+
+    public Alignment getTextAlignment() {
+        return textAlignment;
+    }
+
+    public int getScrollOffset() {
+        return scrollOffset;
+    }
+
+    public float getScale() {
+        return scale;
+    }
+
+    public boolean isFocusOnGuiOpen() {
+        return focusOnGuiOpen;
+    }
+
+    public Integer getTextColor() {
+        return textColor;
+    }
+
+    public Integer getMarkedColor() {
+        return markedColor;
+    }
+
+    public String getHintText() {
+        return hintText;
+    }
+
+    public Integer getHintTextColor() {
+        return hintTextColor;
+    }
 }

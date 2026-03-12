@@ -153,6 +153,10 @@ public abstract class AbstractScrollWidget<I extends IWidget, W extends Abstract
         return this.scroll.getScrollY() != null ? this.scroll.getScrollY().getScroll() : 0;
     }
 
+    public boolean isShowScrollShadows() {
+        return showScrollShadows;
+    }
+
     public W showScrollShadows(boolean showScrollShadows) {
         this.showScrollShadows = showScrollShadows;
         return getThis();

@@ -85,4 +85,13 @@ public class FluidDisplayWidget extends AbstractFluidDisplayWidget<FluidDisplayW
     public FluidDisplayWidget fluidTooltip(BiConsumer<RichTooltip, FluidStack> tooltip) {
         return tooltipAutoUpdate(true).tooltipBuilder(t -> tooltip.accept(t, getFluidStack()));
     }
+
+    @Override
+    public @Nullable IValue<FluidStack> getValue() {
+        return value;
+    }
+
+    public boolean isDisplayAmount() {
+        return displayAmount;
+    }
 }

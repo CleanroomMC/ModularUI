@@ -84,4 +84,16 @@ public class PageButton extends Widget<PageButton> implements Interactable {
     public boolean invertSelected() {
         return this.invert;
     }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public PagedWidget.Controller getController() {
+        return controller;
+    }
+
+    public boolean isInvert() {
+        return invert;
+    }
 }

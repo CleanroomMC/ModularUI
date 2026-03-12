@@ -55,4 +55,8 @@ public class TransformWidget extends DelegatingWidget {
         sharedVec.set(x, y, z);
         return sharedVec;
     }
+
+    public boolean hasConstTransform() {
+        return hasConstTransform;
+    }
 }

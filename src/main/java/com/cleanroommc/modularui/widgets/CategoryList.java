@@ -123,6 +123,26 @@ public class CategoryList extends AbstractParentWidget<IWidget, CategoryList> im
         return this;
     }
 
+    public List<CategoryList> getSubCategories() {
+        return subCategories;
+    }
+
+    public boolean isExpanded() {
+        return expanded;
+    }
+
+    public int getTotalHeight() {
+        return totalHeight;
+    }
+
+    public IDrawable getExpandedOverlay() {
+        return expandedOverlay;
+    }
+
+    public IDrawable getCollapsedOverlay() {
+        return collapsedOverlay;
+    }
+
     public static class Root extends ListWidget<IWidget, Root> {
 
         private final List<CategoryList> categories = new ArrayList<>();

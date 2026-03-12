@@ -160,4 +160,8 @@ public class SortButtons extends Widget<SortButtons> {
         this.horizontal = false;
         return this;
     }
+
+    public boolean isHorizontal() {
+        return horizontal;
+    }
 }

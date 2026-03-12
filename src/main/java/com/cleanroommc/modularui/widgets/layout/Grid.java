@@ -29,8 +29,8 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
     private final Box minElementMargin = new Box();
     private int minRowHeight = 5, minColWidth = 5;
     private Alignment alignment = Alignment.Center;
-    private boolean dirty = false;
     private boolean collapseDisabledChild = false;
+    private boolean dirty = false;
 
     public Grid() {
         super(null, null);
@@ -316,6 +316,26 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
             matrix.get(r).add(widgetCreator.apply(i));
         }
         return matrix;
+    }
+
+    public Box getMinElementMargin() {
+        return minElementMargin;
+    }
+
+    public int getMinRowHeight() {
+        return minRowHeight;
+    }
+
+    public int getMinColWidth() {
+        return minColWidth;
+    }
+
+    public Alignment getAlignment() {
+        return alignment;
+    }
+
+    public boolean isCollapseDisabledChild() {
+        return collapseDisabledChild;
     }
 
     public interface IndexedElementMapper<T, I> {

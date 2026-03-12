@@ -83,4 +83,11 @@ public class DynamicSyncedWidget<W extends DynamicSyncedWidget<W>> extends Widge
         this.child = child;
         return getThis();
     }
+
+    public @NotNull IDynamicSyncNotifiable getDynamicSyncHandler() {
+        if (this.syncHandler == null) {
+            throw new IllegalStateException("Widget is not initialised or not synced!");
+        }
+        return syncHandler;
+    }
 }

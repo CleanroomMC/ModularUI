@@ -327,4 +327,24 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
         this.reverseLayout = reverseLayout;
         return getThis();
     }
+
+    public IIcon getChildSeparator() {
+        return childSeparator;
+    }
+
+    public boolean isCollapseDisabledChild() {
+        return collapseDisabledChild;
+    }
+
+    public boolean isWrapTight() {
+        return wrapTight;
+    }
+
+    public Alignment.CrossAxis getCaa() {
+        return caa;
+    }
+
+    public boolean isReverseLayout() {
+        return reverseLayout;
+    }
 }

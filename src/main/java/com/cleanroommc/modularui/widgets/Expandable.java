@@ -170,4 +170,24 @@ public class Expandable extends Widget<Expandable> implements Interactable, IVie
         this.interpolation = interpolation;
         return this;
     }
+
+    public boolean isExpanded() {
+        return expanded;
+    }
+
+    public Animator getAnimator() {
+        return animator;
+    }
+
+    public BiConsumer<Rectangle, Boolean> getStencilTransform() {
+        return stencilTransform;
+    }
+
+    public int getAnimationDuration() {
+        return animationDuration;
+    }
+
+    public IInterpolation getInterpolation() {
+        return interpolation;
+    }
 }

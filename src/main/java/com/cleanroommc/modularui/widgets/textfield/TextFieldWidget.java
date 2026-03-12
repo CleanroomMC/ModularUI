@@ -353,4 +353,24 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         tooltipOverride = true;
         return super.addTooltipStringLines(lines);
     }
+
+    public Function<String, String> getValidator() {
+        return validator;
+    }
+
+    public boolean isNumbers() {
+        return numbers;
+    }
+
+    public double getDefaultNumber() {
+        return defaultNumber;
+    }
+
+    public boolean isTooltipOverride() {
+        return tooltipOverride;
+    }
+
+    public boolean isAcceptsExpression() {
+        return acceptsExpression;
+    }
 }

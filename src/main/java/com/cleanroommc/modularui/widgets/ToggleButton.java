@@ -115,4 +115,8 @@ public class ToggleButton extends AbstractCycleButtonWidget<ToggleButton> {
     public boolean invertSelected() {
         return this.invert;
     }
+
+    public boolean isInvert() {
+        return invert;
+    }
 }

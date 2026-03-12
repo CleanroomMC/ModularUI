@@ -184,4 +184,17 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
         this.clickSound = clickSound;
         return getThis();
     }
+
+    public boolean isPlayClickSound() {
+        return playClickSound;
+    }
+
+    public Runnable getClickSound() {
+        return clickSound;
+    }
+
+    @Override
+    public @NotNull InteractionSyncHandler getSyncHandler() {
+        return syncHandler;
+    }
 }

@@ -76,4 +76,13 @@ public class ItemDisplayWidget extends Widget<ItemDisplayWidget> implements Reci
     public @Nullable Object getIngredient() {
         return value.getValue();
     }
+
+    @Override
+    public @Nullable IValue<ItemStack> getValue() {
+        return value;
+    }
+
+    public boolean isDisplayAmount() {
+        return displayAmount;
+    }
 }

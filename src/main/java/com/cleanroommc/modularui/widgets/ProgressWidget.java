@@ -14,6 +14,7 @@ import com.cleanroommc.modularui.widget.Widget;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.DoubleSupplier;
 
@@ -198,6 +199,31 @@ public class ProgressWidget extends Widget<ProgressWidget> {
     public ProgressWidget direction(Direction direction) {
         this.direction = direction;
         return this;
+    }
+
+    public UITexture[] getFullTexture() {
+        return fullTexture;
+    }
+
+    public UITexture getEmptyTexture() {
+        return emptyTexture;
+    }
+
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public int getImageSize() {
+        return imageSize;
+    }
+
+    public IDoubleValue<?> getDoubleValue() {
+        return doubleValue;
+    }
+
+    @Override
+    public @Nullable IDoubleValue<?> getValue() {
+        return doubleValue;
     }
 
     public enum Direction {

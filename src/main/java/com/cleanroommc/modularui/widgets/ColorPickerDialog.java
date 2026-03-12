@@ -269,4 +269,40 @@ public class ColorPickerDialog extends Dialog<Integer> {
         this.sliderBackgroundV.horizontalGradient(Color.withValue(color, 0f), Color.withValue(color, 1f));
         this.preview.color(color);
     }
+
+    public int getColor() {
+        return color;
+    }
+
+    public int getRed() {
+        return red;
+    }
+
+    public int getGreen() {
+        return green;
+    }
+
+    public int getBlue() {
+        return blue;
+    }
+
+    public double getHue() {
+        return hue;
+    }
+
+    public double getSaturation() {
+        return saturation;
+    }
+
+    public double getHSVValue() {
+        return value;
+    }
+
+    public int getColorAlpha() {
+        return alpha;
+    }
+
+    public boolean isControlAlpha() {
+        return controlAlpha;
+    }
 }

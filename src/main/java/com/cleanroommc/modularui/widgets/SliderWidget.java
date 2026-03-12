@@ -285,4 +285,44 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
         this.stopperHeight = h;
         return this;
     }
+
+    public IDoubleValue<?> getDoubleValue() {
+        return doubleValue;
+    }
+
+    public IDrawable getStopperDrawable() {
+        return stopperDrawable;
+    }
+
+    public IDrawable getHandleDrawable() {
+        return handleDrawable;
+    }
+
+    public GuiAxis getAxis() {
+        return axis;
+    }
+
+    public int getStopperWidth() {
+        return stopperWidth;
+    }
+
+    public int getStopperHeight() {
+        return stopperHeight;
+    }
+
+    public Unit getSliderWidth() {
+        return sliderWidth;
+    }
+
+    public Unit getSliderHeight() {
+        return sliderHeight;
+    }
+
+    public Area getSliderArea() {
+        return sliderArea;
+    }
+
+    public double getEach() {
+        return each;
+    }
 }
