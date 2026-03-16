@@ -13,6 +13,7 @@ import net.minecraftforge.common.MinecraftForge;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +80,9 @@ public class OverlayStack {
         }
         overlay.add(screen);
         screen.onOpen();
+        if (!Keyboard.areRepeatEventsEnabled()) {
+            Keyboard.enableRepeatEvents(true);
+        }
     }
 
     public static void close(ModularScreen screen) {
