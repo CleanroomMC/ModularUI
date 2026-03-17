@@ -72,8 +72,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     private final String name;
     private ModularScreen screen;
     private IPanelHandler panelHandler;
-    private State state = State.IDLE;
-    private boolean cantDisposeNow = false;
+    private State state = State.CLOSED;
+    private boolean cantCloseNow = false;
     private final ObjectList<LocatedWidget> hovering = ObjectList.create();
     private final Input keyboard = new Input();
     private final Input mouse = new Input();
@@ -135,7 +135,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
      * @return true if this panel is currently open on a screen
      */
     public boolean isOpen() {
-        return this.state == State.OPEN;
+        return this.state.open;
     }
 
     /**
@@ -144,6 +144,14 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
      */
     public void closeIfOpen() {
         if (!isOpen()) return;
+        if (this.cantCloseNow) {
+            if (!this.state.disposing) {
+                this.state = State.WAIT_CLOSING;
+            } else {
+                this.state = State.WAIT_CLOSING_AND_DISPOSING;
+            }
+            return;
+        }
         closeSubPanels();
         if (isMainPanel()) {
             // close screen and let NEA handle animation
@@ -267,12 +275,16 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @MustBeInvokedByOverriders
     @Override
     public void dispose() {
-        if (this.state == State.DISPOSED) return;
-        if (this.state != State.CLOSED && this.state != State.WAIT_DISPOSING) {
+        if (this.state.disposing) return;
+        if (this.state.open && !this.state.closing) {
             throw new IllegalStateException("Panel must be closed before disposing!");
         }
-        if (this.cantDisposeNow) {
-            this.state = State.WAIT_DISPOSING;
+        if (this.cantCloseNow) {
+            if (this.state.closing) {
+                this.state = State.WAIT_CLOSING_AND_DISPOSING;
+            } else {
+                this.state = State.WAIT_DISPOSING;
+            }
             return;
         }
         super.dispose();
@@ -293,12 +305,18 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         if (this.state == State.DISPOSED) return null;
         // make sure the screen is also not disposed
         return getScreen().getPanelManager().doSafe(() -> {
-            this.cantDisposeNow = true;
+            this.cantCloseNow = true;
             T t = runnable.get();
-            this.cantDisposeNow = false;
-            if (this.state == State.WAIT_DISPOSING) {
-                this.state = State.CLOSED;
-                dispose();
+            this.cantCloseNow = false;
+            if (this.state.open) {
+                if (this.state.closing) {
+                    this.state = State.OPEN;
+                    closeIfOpen();
+                }
+                if (this.state.disposing) {
+                    this.state = State.CLOSED;
+                    dispose();
+                }
             }
             return t;
         });
@@ -846,26 +864,39 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     public enum State {
-        /**
-         * Initial state of any panel.
-         */
-        IDLE,
+
         /**
          * State after the panel opened.
          */
-        OPEN,
+        OPEN(true, false, false),
         /**
          * State after panel closed. Panel can still be reopened in this state.
          */
-        CLOSED,
+        CLOSED(false, true, false),
         /**
          * State after panel disposed. The panel is now lost and has to be rebuilt, when reopening it.
          */
-        DISPOSED,
+        DISPOSED(false, true, true),
+        /**
+         * Panel is open and is waiting to be closed.
+         */
+        WAIT_CLOSING(true, true, false),
         /**
          * Panel is closed and is waiting to be disposed.
          */
-        WAIT_DISPOSING
+        WAIT_DISPOSING(true, false, true),
+        /**
+         * Panel is open abd is waiting to close and then to be disposed.
+         */
+        WAIT_CLOSING_AND_DISPOSING(true, true, true);
+
+        public final boolean open, closing, disposing;
+
+        State(boolean open, boolean closing, boolean disposing) {
+            this.open = open;
+            this.closing = closing;
+            this.disposing = disposing;
+        }
     }
 
     /**

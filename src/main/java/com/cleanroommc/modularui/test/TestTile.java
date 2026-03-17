@@ -24,6 +24,7 @@ import com.cleanroommc.modularui.value.sync.GenericSyncValue;
 import com.cleanroommc.modularui.value.sync.IntSyncValue;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+import com.cleanroommc.modularui.value.sync.StringSyncValue;
 import com.cleanroommc.modularui.widget.EmptyWidget;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
@@ -44,6 +45,7 @@ import com.cleanroommc.modularui.widgets.slot.ModularCraftingSlot;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.PhantomItemSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
+import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -85,6 +87,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
     private final int duration = 80;
     private int progress = 0;
     private int cycleState = 0;
+    private String s = "";
     private List<Integer> serverInts = new ArrayList<>();
     private ItemStack displayItem = new ItemStack(Items.DIAMOND);
     private final ItemStackHandler storage = new ItemStackHandler(9);
@@ -341,6 +344,9 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
         IPanelHandler panelSyncHandler = syncManager.syncedPanel("other_panel_2", true, (syncManager1, syncHandler1) ->
                 openThirdWindow(syncManager1, syncHandler1, number));
         IntSyncValue num = syncManager.getHyperVisor().findSyncHandler("cycle_state", IntSyncValue.class);
+        panel.child(new TextFieldWidget()
+                .size(60, 14).pos(10, 80)
+                .value(new StringSyncValue(() -> s, v -> s = v)));
         panel.child(ButtonWidget.panelCloseButton())
                 .child(new ButtonWidget<>()
                         .size(10).top(14).right(4)

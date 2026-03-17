@@ -196,7 +196,7 @@ public class PanelManager {
         openPanel(panel, true);
     }
 
-    public void closePanel(@NotNull ModularPanel panel) {
+    void closePanel(@NotNull ModularPanel panel) {
         if (!hasOpenPanel(panel)) {
             throw new IllegalArgumentException("Panel '" + panel.getName() + "' is open in this screen!");
         }
