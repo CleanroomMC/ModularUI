@@ -15,6 +15,7 @@
     "minecraft.MinecraftMixin"
   ],
   "mixins": [
+    "forge.CombinedInvWrapperAccessor",
     "minecraft.ContainerAccessor",
     "minecraft.FontRendererAccessor",
     "minecraft.InventoryCraftingAccessor"

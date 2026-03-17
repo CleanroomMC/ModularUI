@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widgets.slot;
 
+import com.cleanroommc.modularui.core.mixins.early.forge.CombinedInvWrapperAccessor;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -10,7 +11,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.SlotItemHandler;
+import net.minecraftforge.items.wrapper.PlayerArmorInvWrapper;
 import net.minecraftforge.items.wrapper.PlayerInvWrapper;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 
@@ -266,6 +269,28 @@ public class ModularSlot extends SlotItemHandler {
 
     public static boolean isPlayerSlot(SlotItemHandler slot) {
         return slot.getItemHandler() instanceof PlayerInvWrapper || slot.getItemHandler() instanceof PlayerMainInvWrapper;
+    }
+
+    public static EntityPlayer getPlayerSlotPlayer(Slot slot) {
+        return slot.inventory instanceof InventoryPlayer inv ? inv.player : null;
+    }
+
+    public static EntityPlayer getPlayerSlotPlayer(SlotItemHandler slot) {
+        if (slot.getItemHandler() instanceof PlayerInvWrapper inv) {
+            for (IItemHandlerModifiable ih : ((CombinedInvWrapperAccessor) inv).getItemHandler()) {
+                if (ih instanceof PlayerMainInvWrapper mainInv) {
+                    return mainInv.getInventoryPlayer().player;
+                }
+            }
+            return null;
+        }
+        if (slot.getItemHandler() instanceof PlayerMainInvWrapper wrapper) {
+            return wrapper.getInventoryPlayer().player;
+        }
+        if (slot.getItemHandler() instanceof PlayerArmorInvWrapper wrapper) {
+            return wrapper.getInventoryPlayer().player;
+        }
+        return null;
     }
 
     public boolean isCanTake() {
