@@ -53,7 +53,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.items.ItemStackHandler;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -62,7 +61,6 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -388,9 +386,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData>, ITic
     public void update() {
         if (!this.world.isRemote) {
             if (this.time++ % 20 == 0) {
-                Collection<Item> vals = ForgeRegistries.ITEMS.getValuesCollection();
-                Item item = vals.stream().skip(new Random().nextInt(vals.size())).findFirst().orElse(Items.DIAMOND);
-                this.displayItem = new ItemStack(item, 26735987);
+                this.displayItem = TestEventHandler.getRandomItem();
+                this.displayItem.setCount(26735987);
             }
             if (++this.time % 60 == 0) {
                 Random rnd = new Random();

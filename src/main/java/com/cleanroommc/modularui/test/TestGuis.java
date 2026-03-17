@@ -38,17 +38,23 @@ import com.cleanroommc.modularui.utils.fakeworld.ArraySchema;
 import com.cleanroommc.modularui.utils.fakeworld.FakeEntity;
 import com.cleanroommc.modularui.utils.fakeworld.ISchema;
 import com.cleanroommc.modularui.value.BoolValue;
+import com.cleanroommc.modularui.value.DoubleValue;
 import com.cleanroommc.modularui.value.IntValue;
 import com.cleanroommc.modularui.value.ObjectValue;
 import com.cleanroommc.modularui.value.StringValue;
 import com.cleanroommc.modularui.widget.DraggableWidget;
+import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.ColorPickerDialog;
+import com.cleanroommc.modularui.widgets.CycleButtonWidget;
+import com.cleanroommc.modularui.widgets.ItemDisplayWidget;
 import com.cleanroommc.modularui.widgets.ListWidget;
+import com.cleanroommc.modularui.widgets.ProgressWidget;
 import com.cleanroommc.modularui.widgets.RichTextWidget;
 import com.cleanroommc.modularui.widgets.SchemaWidget;
 import com.cleanroommc.modularui.widgets.ScrollingTextWidget;
+import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import com.cleanroommc.modularui.widgets.TextWidget;
 import com.cleanroommc.modularui.widgets.ToggleButton;
 import com.cleanroommc.modularui.widgets.TransformWidget;
@@ -92,6 +98,13 @@ public class TestGuis extends CustomModularScreen {
             .filter(cs -> !cs.name.contains("accent"))
             .filter(cs -> cs.brighterShadeCount() > 1)
             .mapToInt(cs -> cs.brighter(1))
+            .filter(c -> Color.getHSLSaturation(c) > 0.4f)
+            .collect(IntArrayList::new, IntList::add, IntList::addAll);
+
+    public static final IntList DARK_COLORS = ColorShade.getAll().stream()
+            .filter(cs -> !cs.name.contains("accent"))
+            .filter(cs -> cs.darkerShadeCount() > 1)
+            .mapToInt(cs -> cs.darker(1))
             .filter(c -> Color.getHSLSaturation(c) > 0.4f)
             .collect(IntArrayList::new, IntList::add, IntList::addAll);
 
@@ -664,7 +677,7 @@ public class TestGuis extends CustomModularScreen {
                         .mainAxisAlignment(Alignment.MainAxis.CENTER)
                         .childPadding(2)
                         .crossAxisChildPadding(2)
-                        .background(rndRect(colors, rnd))
+                        .background(new Rectangle().color(DARK_COLORS.getInt(rnd.nextInt(DARK_COLORS.size()))))
                         .children(5, i -> {
                             IWidget widget = rndRect(colors, rnd).asWidget()
                                     .width(rnd.nextInt(maxRectSize - minRectSize) + minRectSize)
@@ -673,6 +686,60 @@ public class TestGuis extends CustomModularScreen {
                             if (i % 2 == 1) widget.resizer().expanded();
                             return widget;
                         }));
+    }
+
+    public static @NotNull ModularPanel buildMachineLikeUI() {
+        return new ModularPanel("machine_like")
+                .coverChildren()
+                .padding(7)
+                .child(Flow.col()
+                        .coverChildren()
+                        .childPadding(8)
+                        .child(Flow.row().name("machine_inventory")
+                                .coverChildren()
+                                .childPadding(8)
+                                .child(SlotGroupWidget.builder()
+                                        .matrix("II", "II")
+                                        .key('I', i -> new ItemDisplayWidget().item(TestEventHandler.getRandomItem()))
+                                        .build()
+                                        .coverChildren())
+                                .child(new ProgressWidget()
+                                        .size(20)
+                                        .texture(GuiTextures.PROGRESS_ARROW, 20)
+                                        .value(new DoubleValue.Dynamic(() -> Minecraft.getSystemTime() % 5000 / 5000.0, null)))
+                                .child(SlotGroupWidget.builder()
+                                        .matrix("II", "II")
+                                        .key('I', i -> new ItemDisplayWidget().item(TestEventHandler.getRandomItem()))
+                                        .build()
+                                        .coverChildren()))
+                        .child(SlotGroupWidget.builder()
+                                .matrix("IIIIII", "IIIIII")
+                                .key('I', i -> new ItemDisplayWidget().item(ItemStack.EMPTY))
+                                .build()
+                                .coverChildren()
+                                .name("play_inventory_mimic")))
+                .child(new ParentWidget<>()
+                        .coverChildren()
+                        .decoration()
+                        .padding(3)
+                        .background(GuiTextures.MC_BACKGROUND.getSubArea(0, 0, 1, 0.5f))
+                        .horizontalCenter()
+                        .anchorTop(1)
+                        .child(IKey.str("Machine Name").asWidget())
+                        .name("title"))
+                .child(new ParentWidget<>()
+                        .coverChildren()
+                        .decoration()
+                        .padding(3)
+                        .paddingLeft(1)
+                        .background(GuiTextures.MC_BACKGROUND.getSubArea(0.5f, 0, 1, 1f))
+                        .bottom(7)
+                        .rightRelAnchor(0, 1f)
+                        .child(new CycleButtonWidget()
+                                .value(new IntValue(0))
+                                .stateCount(3)
+                                .stateOverlay(GuiTextures.CYCLE_BUTTON_DEMO))
+                        .name("side_options"));
     }
 
     private static Rectangle rndRect(IntList colors, Random random) {
