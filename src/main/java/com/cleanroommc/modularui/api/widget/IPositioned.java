@@ -47,6 +47,21 @@ public interface IPositioned<W extends IPositioned<W>> {
         return coverChildrenWidth().coverChildrenHeight();
     }
 
+    /**
+     * Sets if this resizer is decoration. Decoration will be ignored during coverChildren and margin/padding calculations.
+     *
+     * @param decoration true if this resizer is decoration
+     * @return this
+     */
+    default W decoration(boolean decoration) {
+        resizer().decoration(decoration);
+        return getThis();
+    }
+
+    default W decoration() {
+        return decoration(true);
+    }
+
     default W expanded() {
         resizer().expanded();
         return getThis();

@@ -618,8 +618,8 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
     }
 
     protected static void splitTexture(UITexture texture, IDrawable[] dest) {
+        float a = 1f / dest.length;
         for (int i = 0; i < dest.length; i++) {
-            float a = 1f / dest.length;
             dest[i] = texture.getSubArea(0, i * a, 1, i * a + a);
         }
     }

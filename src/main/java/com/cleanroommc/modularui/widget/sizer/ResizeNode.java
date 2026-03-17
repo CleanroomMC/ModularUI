@@ -214,6 +214,10 @@ public abstract class ResizeNode implements IResizeable, ITreeNode<ResizeNode> {
     @ApiStatus.Internal
     public void checkExpanded(@Nullable GuiAxis axis) {}
 
+    public boolean isDecoration() {
+        return false;
+    }
+
     public abstract boolean hasYPos();
 
     public abstract boolean hasXPos();
