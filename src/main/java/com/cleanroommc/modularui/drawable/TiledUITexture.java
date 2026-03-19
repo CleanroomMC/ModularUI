@@ -4,6 +4,8 @@ import net.minecraft.util.ResourceLocation;
 
 import com.google.gson.JsonObject;
 
+import java.util.Objects;
+
 public class TiledUITexture extends UITexture {
 
     private final int imageWidth, imageHeight;
@@ -19,6 +21,11 @@ public class TiledUITexture extends UITexture {
     }
 
     @Override
+    public TiledUITexture register(String name) {
+        return (TiledUITexture) super.register(name);
+    }
+
+    @Override
     public void draw(float x, float y, float width, float height) {
         if (width == this.imageWidth && height == this.imageHeight) {
             super.draw(x, y, width, height);
@@ -28,12 +35,11 @@ public class TiledUITexture extends UITexture {
     }
 
     @Override
-    public boolean saveToJson(JsonObject json) {
+    protected void saveTextureToJson(JsonObject json) {
         super.saveToJson(json);
-        if (json.entrySet().size() > 1) {
-            json.addProperty("tiled", true);
-        }
-        return true;
+        json.addProperty("imageWidth", this.imageWidth);
+        json.addProperty("imageHeight", this.imageHeight);
+        json.addProperty("tiled", true);
     }
 
     @Override
@@ -44,5 +50,19 @@ public class TiledUITexture extends UITexture {
     @Override
     public TiledUITexture withColorOverride(int color) {
         return (TiledUITexture) super.withColorOverride(color);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o != null && getClass() == o.getClass() && isEqual((TiledUITexture) o);
+    }
+
+    protected boolean isEqual(TiledUITexture texture) {
+        return super.isEqual(texture) && imageWidth == texture.imageWidth && imageHeight == texture.imageHeight;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), imageWidth, imageHeight);
     }
 }

@@ -3,12 +3,19 @@ package com.cleanroommc.modularui.utils;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.drawable.DrawableSerialization;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSerializationContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -16,20 +23,33 @@ import java.util.function.Function;
 
 public class JsonHelper {
 
-    public static final Gson gson = new GsonBuilder()
+    public static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
             .registerTypeAdapter(IDrawable.class, new DrawableSerialization())
             .registerTypeAdapter(Alignment.class, new Alignment.Json())
             .create();
 
+    public static final JsonDeserializationContext DESERIALIZER = GSON::fromJson;
+    public static final JsonSerializationContext SERIALIZER = new JsonSerializationContext() {
+        @Override
+        public JsonElement serialize(Object o) {
+            return GSON.toJsonTree(o);
+        }
+
+        @Override
+        public JsonElement serialize(Object o, Type type) {
+            return GSON.toJsonTree(o, type);
+        }
+    };
+
     public static final JsonParser parser = new JsonParser();
 
     public static JsonElement serialize(Object object) {
-        return gson.toJsonTree(object);
+        return GSON.toJsonTree(object);
     }
 
     public static <T> T deserialize(JsonElement json, Class<T> clazz) {
-        return gson.fromJson(json, clazz);
+        return GSON.fromJson(json, clazz);
     }
 
     public static <T> T deserialize(JsonObject json, Class<T> clazz, T defaultValue, String... keys) {
