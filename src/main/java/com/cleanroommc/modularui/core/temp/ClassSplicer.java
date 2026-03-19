@@ -19,13 +19,6 @@
 
 package com.cleanroommc.modularui.core.temp;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Set;
-import java.util.function.Consumer;
-
 import com.cleanroommc.modularui.core.ModularUICore;
 
 import com.google.common.collect.Lists;
@@ -42,7 +35,20 @@ import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
+import java.util.function.Consumer;
+
+/**
+ * This class only exists for compatibility with AE2. Remove once
+ * <a href="https://github.com/AE2-UEL/Applied-Energistics-2/pull/572">AE2-UEL#572</a> is merged.
+ */
+@Deprecated
 public class ClassSplicer {
+
     public static byte[] processNode(byte[] data, Consumer<ClassNode> classNodeConsumer) {
         ClassReader reader = new ClassReader(data);
         ClassNode nodeOrig = new ClassNode();
@@ -60,7 +66,6 @@ public class ClassSplicer {
             throw new RuntimeException(e);
         }
     }
-
 
     public static void spliceClasses(final ClassNode nodeData, final byte[] dataSplice, final String className, final String... methods) {
         // System.out.println("Splicing from " + className + " to " + targetClassName)
@@ -96,8 +101,7 @@ public class ClassSplicer {
                 boolean added = false;
 
                 for (int j = 0; j < nodeData.methods.size(); j++) {
-                    if (nodeData.methods.get(j).name.equals(mn.name)
-                            && nodeData.methods.get(j).desc.equals(mn.desc)) {
+                    if (nodeData.methods.get(j).name.equals(mn.name) && nodeData.methods.get(j).desc.equals(mn.desc)) {
                         MethodNode oldMn = nodeData.methods.get(j);
                         System.out.println("Spliced in METHOD: " + targetClassName + "." + mn.name);
                         nodeData.methods.set(j, mn);
@@ -105,9 +109,7 @@ public class ClassSplicer {
                             ListIterator<AbstractInsnNode> nodeListIterator = mn.instructions.iterator();
                             while (nodeListIterator.hasNext()) {
                                 AbstractInsnNode node = nodeListIterator.next();
-                                if (node instanceof MethodInsnNode
-                                        && node.getOpcode() == Opcodes.INVOKESPECIAL) {
-                                    MethodInsnNode methodNode = (MethodInsnNode) node;
+                                if (node instanceof MethodInsnNode methodNode && node.getOpcode() == Opcodes.INVOKESPECIAL) {
                                     if (targetClassName2.equals(methodNode.owner)) {
                                         methodNode.owner = nodeData.superName;
                                     }
@@ -152,6 +154,5 @@ public class ClassSplicer {
                 }
             }
         }
-
     }
 }

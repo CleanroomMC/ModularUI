@@ -26,6 +26,11 @@ import net.minecraft.network.PacketBuffer;
 
 import io.netty.buffer.ByteBuf;
 
+/**
+ * This class only exists for compatibility with AE2. Remove once
+ * <a href="https://github.com/AE2-UEL/Applied-Energistics-2/pull/572">AE2-UEL#572</a> is merged.
+ */
+@Deprecated
 public class PacketUtilPatch extends PacketBuffer {
 
     public PacketUtilPatch(ByteBuf wrapped) {
