@@ -163,12 +163,28 @@ public abstract class ResizeNode implements IResizeable, ITreeNode<ResizeNode> {
         return this.requiresResize;
     }
 
-    public boolean dependsOnParentX() {
+    public boolean widthDependsOnParent() {
         return false;
     }
 
-    public boolean dependsOnParentY() {
+    public boolean heightDependsOnParent() {
         return false;
+    }
+
+    public boolean xDependsOnParent() {
+        return false;
+    }
+
+    public boolean yDependsOnParent() {
+        return false;
+    }
+
+    public boolean dependsOnParentX() {
+        return widthDependsOnParent() || xDependsOnParent();
+    }
+
+    public boolean dependsOnParentY() {
+        return heightDependsOnParent() || yDependsOnParent();
     }
 
     public boolean dependsOnParent() {

@@ -147,13 +147,15 @@ public class DimensionSizer {
     }
 
     public boolean dependsOnParent() {
-        if (this.coverChildrenMinSize >= 0) {
-            // if we cover children we ignore size config
-            return this.end != null || (this.start != null && this.start.isRelative());
-        }
-        return this.end != null ||
-                (this.start != null && this.start.isRelative()) ||
-                (this.size != null && this.size.isRelative());
+        return posDependsOnParent() || sizeDependsOnParent();
+    }
+
+    public boolean sizeDependsOnParent() {
+        return this.coverChildrenMinSize < 0 && this.size != null && this.size.isRelative();
+    }
+
+    public boolean posDependsOnParent() {
+        return this.end != null || (this.start != null && this.start.isRelative());
     }
 
     public void setResized(boolean all) {
