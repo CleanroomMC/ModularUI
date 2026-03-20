@@ -215,7 +215,7 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
                 if (!resizer.xDependsOnParent()) {
                     if (!resizer.isXCalculated()) return true;
                     x0 = Math.min(x0, area.rx - padding.getLeft() - margin.getLeft());
-                    x1 = Math.max(x1, area.rx + area.width + padding.right + margin.right);
+                    x1 = Math.max(x1, area.rx + area.width + padding.getRight() + margin.getRight());
                 }
             }
 
@@ -226,7 +226,7 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
                 if (!resizer.yDependsOnParent()) {
                     if (!resizer.isYCalculated()) return true;
                     y0 = Math.min(y0, area.ry - padding.getTop() - margin.getTop());
-                    y1 = Math.max(y1, area.ry + area.height + padding.bottom + margin.bottom);
+                    y1 = Math.max(y1, area.ry + area.height + padding.getBottom() + margin.getBottom());
                 }
             }
         }
@@ -319,7 +319,7 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
                     withDefaultW = Math.max(withDefaultW, s);
                     if (!resizer.xDependsOnParent()) {
                         if (!resizer.isXCalculated()) return;
-                        x1 = Math.max(x1, area.rx + area.width + padding.right + margin.right);
+                        x1 = Math.max(x1, area.rx + area.width + padding.getRight() + margin.getRight());
                     }
                 } else if (coverByDefaultSizeX) {
                     withDefaultW = Math.max(withDefaultW, child.getDefaultWidth() + margin.horizontal() + padding.horizontal());
@@ -335,7 +335,7 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
                     withDefaultH = Math.max(withDefaultH, s);
                     if (!resizer.yDependsOnParent()) {
                         if (!resizer.isYCalculated()) return;
-                        y1 = Math.max(y1, area.ry + area.height + padding.bottom + margin.bottom);
+                        y1 = Math.max(y1, area.ry + area.height + padding.getBottom() + margin.getBottom());
                     }
                 } else if (coverByDefaultSizeY) {
                     withDefaultH = Math.max(withDefaultH, child.getDefaultHeight() + margin.vertical() + padding.vertical());
@@ -361,7 +361,7 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
                 return;
             }
         }
-        
+
         if (w == 0) w = withDefaultW; // only use default sizes, if no size is defined
         if (h == 0) h = withDefaultH;
         if (x1 == Integer.MIN_VALUE) x1 = 0;
