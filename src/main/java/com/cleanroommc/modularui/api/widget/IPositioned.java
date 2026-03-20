@@ -34,11 +34,11 @@ public interface IPositioned<W extends IPositioned<W>> {
     }
 
     default W coverChildrenWidth() {
-        return coverChildrenWidth(18);
+        return coverChildrenWidth(8);
     }
 
     default W coverChildrenHeight() {
-        return coverChildrenHeight(18);
+        return coverChildrenHeight(8);
     }
 
     default W coverChildrenWidth(int minWidth) {
