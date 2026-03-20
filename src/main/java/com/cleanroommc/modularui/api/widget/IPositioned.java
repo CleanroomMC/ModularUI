@@ -63,6 +63,18 @@ public interface IPositioned<W extends IPositioned<W>> {
         return coverChildrenWidth(minWidth).coverChildrenHeight(minHeight);
     }
 
+    default W disableCoverChildrenWidth() {
+        return coverChildrenWidth(-1);
+    }
+
+    default W disableCoverChildrenHeight() {
+        return coverChildrenWidth(-1);
+    }
+
+    default W disableCoverChildren() {
+        return disableCoverChildrenWidth().disableCoverChildrenHeight();
+    }
+
     /**
      * Sets if this resizer is decoration. Decoration will be ignored during coverChildren and margin/padding calculations.
      *
