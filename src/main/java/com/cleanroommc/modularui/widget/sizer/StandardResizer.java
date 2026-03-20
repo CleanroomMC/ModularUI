@@ -247,11 +247,23 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
         // now calculate new x, y, width and height based on the children area
         ResizeNode relativeTo = getParent();
         if (coverWidth) {
+            int minSize = this.x.getCoverChildrenMinSize();
+            int diff = minSize - x1 + x0;
+            if (diff > 0) {
+                x0 -= diff / 2;
+                x1 += diff / 2;
+            }
             // apply the size to this widget
             // the return value is the amount of pixels we need to move the children
             moveChildrenX = this.x.postApply(this, relativeTo, x0, x1);
         }
         if (coverHeight) {
+            int minSize = this.y.getCoverChildrenMinSize();
+            int diff = minSize - y1 + y0;
+            if (diff > 0) {
+                y0 -= diff / 2;
+                y1 += diff / 2;
+            }
             moveChildrenY = this.y.postApply(this, relativeTo, y0, y1);
         }
         // since the edges might have been moved closer to the widgets, the widgets should move back into it's original (absolute) position
@@ -330,8 +342,14 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
         if (h > y1) y1 = h;
 
         ResizeNode relativeTo = getParent();
-        if (coverWidth) this.x.postApply(this, relativeTo, 0, x1);
-        if (coverHeight) this.y.postApply(this, relativeTo, 0, y1);
+        if (coverWidth) {
+            int minSize = this.x.getCoverChildrenMinSize();
+            this.x.postApply(this, relativeTo, 0, Math.max(x1, minSize));
+        }
+        if (coverHeight) {
+            int minSize = this.y.getCoverChildrenMinSize();
+            this.y.postApply(this, relativeTo, 0, Math.max(y1, minSize));
+        }
     }
 
     protected void coverChildrenForEmpty() {
@@ -512,21 +530,14 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
     }
 
     @Override
-    public StandardResizer coverChildren() {
-        this.x.setCoverChildren(true, getWidget());
-        this.y.setCoverChildren(true, getWidget());
+    public StandardResizer coverChildrenWidth(int minWidth) {
+        this.x.setCoverChildren(minWidth, getWidget());
         return this;
     }
 
     @Override
-    public StandardResizer coverChildrenWidth() {
-        this.x.setCoverChildren(true, getWidget());
-        return this;
-    }
-
-    @Override
-    public StandardResizer coverChildrenHeight() {
-        this.y.setCoverChildren(true, getWidget());
+    public StandardResizer coverChildrenHeight(int minHeight) {
+        this.y.setCoverChildren(minHeight, getWidget());
         return this;
     }
 

@@ -34,17 +34,32 @@ public interface IPositioned<W extends IPositioned<W>> {
     }
 
     default W coverChildrenWidth() {
-        resizer().coverChildrenWidth();
-        return getThis();
+        return coverChildrenWidth(0);
     }
 
     default W coverChildrenHeight() {
-        resizer().coverChildrenHeight();
+        return coverChildrenHeight(0);
+    }
+
+    @ApiStatus.Experimental
+    default W coverChildrenWidth(int minWidth) {
+        resizer().coverChildrenWidth(minWidth);
+        return getThis();
+    }
+
+    @ApiStatus.Experimental
+    default W coverChildrenHeight(int minHeight) {
+        resizer().coverChildrenHeight(minHeight);
         return getThis();
     }
 
     default W coverChildren() {
         return coverChildrenWidth().coverChildrenHeight();
+    }
+
+    @ApiStatus.Experimental
+    default W coverChildren(int minWidth, int minHeight) {
+        return coverChildrenWidth(minWidth).coverChildrenHeight(minHeight);
     }
 
     /**
