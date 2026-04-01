@@ -231,6 +231,9 @@ public class TextRenderer {
     }
 
     protected int getStartY(float maxHeight, float height) {
+        if (this.maxHeight > 0) {
+            maxHeight = this.maxHeight;
+        }
         if (this.alignment.y > 0 && maxHeight > 0 && height != maxHeight) {
             return this.y + Math.round(maxHeight * this.alignment.y) - Math.round(height * this.alignment.y);
         }
@@ -242,6 +245,9 @@ public class TextRenderer {
     }
 
     protected int getStartX(float maxWidth, float lineWidth) {
+        if (this.maxWidth > 0) {
+            maxWidth = this.maxWidth;
+        }
         if (this.alignment.x > 0 && maxWidth > 0) {
             return Math.max(this.x, this.x + Math.round(maxWidth * this.alignment.x) - Math.round(lineWidth * this.alignment.x));
         }
