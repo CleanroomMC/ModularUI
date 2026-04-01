@@ -141,6 +141,9 @@ public abstract class AbstractMenuButton<W extends AbstractMenuButton<W>> extend
 
     protected void setMenu(Menu<?> menu) {
         this.menu = menu;
+        if (this.panelHandler != null) {
+            this.panelHandler.deleteCachedPanel();
+        }
     }
 
     protected abstract Menu<?> createMenu();
