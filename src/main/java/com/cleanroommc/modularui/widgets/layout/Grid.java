@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widgets.layout;
 
+import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.widget.IParentWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
@@ -50,12 +51,40 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
         }
     }
 
-    private int getElementWidth(Area area) {
-        return area.width + Math.max(area.getMargin().getLeft(), this.minElementMargin.getLeft()) + Math.max(area.getMargin().getRight(), this.minElementMargin.getRight());
+    private int getMarginStart(Area area, GuiAxis axis, int border) {
+        int m = 0;
+        if (border > -1) {
+            m += Math.max(area.getMargin().getStart(axis), this.minElementMargin.getStart(axis));
+        } else {
+            m += area.getMargin().getStart(axis);
+        }
+        return m;
     }
 
-    private int getElementHeight(Area area) {
-        return area.height + Math.max(area.getMargin().getTop(), this.minElementMargin.getTop()) + Math.max(area.getMargin().getBottom(), this.minElementMargin.getBottom());
+    private int getMarginEnd(Area area, GuiAxis axis, int border) {
+        int m = 0;
+        if (border > -1) {
+            m += Math.max(area.getMargin().getEnd(axis), this.minElementMargin.getEnd(axis));
+        } else {
+            m += area.getMargin().getEnd(axis);
+        }
+        return m;
+    }
+
+    private int getElementWidth(Area area, int border) {
+        // border: -1 = start, 0 = none, 1 = end
+        return area.width + getMarginStart(area, GuiAxis.X, border) + getMarginEnd(area, GuiAxis.X, border);
+    }
+
+    private int getElementHeight(Area area, int border) {
+        // border: -1 = start, 0 = none, 1 = end
+        return area.height + getMarginStart(area, GuiAxis.Y, border) + getMarginEnd(area, GuiAxis.Y, border);
+    }
+
+    private int border(int index, int size) {
+        if (index == 0) return -1;
+        if (index == size - 1) return 1;
+        return 0;
     }
 
     @Override
@@ -67,14 +96,16 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
         for (List<IWidget> row : this.matrix) {
             j = 0;
             rowSizes.add(this.minRowHeight);
+            int yBorder = border(i, this.matrix.size());
             for (IWidget child : row) {
                 if (i == 0) {
                     colSizes.add(this.minColWidth);
                 }
                 if (!shouldIgnoreChildSize(child)) {
                     if (!child.resizer().isWidthCalculated() || !child.resizer().isHeightCalculated()) return false;
-                    rowSizes.set(i, Math.max(rowSizes.getInt(i), getElementHeight(child.getArea())));
-                    colSizes.set(j, Math.max(colSizes.getInt(j), getElementWidth(child.getArea())));
+                    int xBorder = border(j, row.size());
+                    rowSizes.set(i, Math.max(rowSizes.getInt(i), getElementHeight(child.getArea(), yBorder)));
+                    colSizes.set(j, Math.max(colSizes.getInt(j), getElementWidth(child.getArea(), xBorder)));
                 }
                 j++;
             }
@@ -89,8 +120,15 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
                 int width = colSizes.get(c);
                 IWidget child = this.matrix.get(r).get(c);
                 if (child != null) {
-                    child.getArea().rx = (int) (x + (width - child.getArea().width) * alignment.x);
-                    child.getArea().ry = (int) (y + (height - child.getArea().height) * alignment.y);
+                    Area area = child.getArea();
+                    int xBorder = border(c, colSizes.size());
+                    int yBorder = border(r, rowSizes.size());
+                    int xs = getMarginStart(area, GuiAxis.X, xBorder);
+                    int xe = getMarginEnd(area, GuiAxis.X, xBorder);
+                    int ys = getMarginStart(area, GuiAxis.Y, yBorder);
+                    int ye = getMarginEnd(area, GuiAxis.Y, yBorder);
+                    child.getArea().rx = (int) (x + xs + (width - xs - xe - area.width) * alignment.x);
+                    child.getArea().ry = (int) (y + ys + (height - ys - ye - area.height) * alignment.y);
                     child.resizer().setPosResized(true, true);
                 }
                 x += width;
@@ -128,11 +166,13 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
     @Override
     public int getDefaultHeight() {
         int h = 0;
-        for (List<IWidget> row : this.matrix) {
+        for (int i = 0; i < this.matrix.size(); i++) {
+            List<IWidget> row = this.matrix.get(i);
+            int yBorder = border(i, this.matrix.size());
             int rowHeight = 0;
             for (IWidget child : row) {
                 if (!shouldIgnoreChildSize(child)) {
-                    rowHeight = Math.max(rowHeight, getElementHeight(child.getArea()));
+                    rowHeight = Math.max(rowHeight, getElementHeight(child.getArea(), yBorder));
                 }
             }
             h += Math.max(rowHeight, this.minRowHeight);
@@ -151,7 +191,8 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
                     colSizes.add(this.minColWidth);
                 }
                 if (!shouldIgnoreChildSize(child)) {
-                    colSizes.set(j, Math.max(colSizes.getInt(j), getElementWidth(child.getArea())));
+                    int xBorder = border(j, row.size());
+                    colSizes.set(j, Math.max(colSizes.getInt(j), getElementWidth(child.getArea(), xBorder)));
                 }
                 j++;
             }
