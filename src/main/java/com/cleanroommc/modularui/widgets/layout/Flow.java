@@ -192,15 +192,9 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget {
             flow.layout(this.axis, size, padding, maa, this.childPadding);
         }
         for (IWidget widget : this.ignoredWidgets) {
-            // ignore disabled child if configured as such
+            widget.resizer().updateResized();
             if (shouldIgnoreChildSize(widget)) {
-                widget.resizer().updateResized();
                 widget.resizer().setMarginPaddingApplied(true);
-                continue;
-            }
-            // exclude children whose position of main axis is fixed
-            if (widget.resizer().hasPos(this.axis)) {
-                widget.resizer().updateResized(); // this is required when the widget has a pos on the main axis, but not on the cross axis
             }
         }
         return true;
