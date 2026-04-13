@@ -88,7 +88,7 @@ public class GuiManager {
         int windowId = player.currentWindowId;
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         factory.writeGuiData(guiData, buffer);
-        int nid = ModularNetwork.SERVER.activate(msm);
+        int nid = ModularNetwork.SERVER.activate(player, msm);
         NetworkHandler.sendToPlayer(new OpenGuiPacket<>(windowId, nid, factory, buffer), player);
         // open container // this mimics forge behavior
         player.openContainer = container;

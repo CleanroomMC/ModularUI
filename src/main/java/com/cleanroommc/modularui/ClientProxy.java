@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.factory.inventory.InventoryTypes;
 import com.cleanroommc.modularui.holoui.HoloScreenEntity;
 import com.cleanroommc.modularui.holoui.ScreenEntityRender;
 import com.cleanroommc.modularui.keybind.KeyBindHandler;
+import com.cleanroommc.modularui.network.ModularNetwork;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.test.TestItem;
 import com.cleanroommc.modularui.theme.ThemeManager;
@@ -21,6 +22,7 @@ import net.minecraft.util.Timer;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -179,6 +181,18 @@ public class ClientProxy extends CommonProxy {
                 }
                 return false;
             });
+        }
+    }
+
+    @SubscribeEvent
+    public void onUnloadWorld(WorldEvent.Unload event) {
+        if (Minecraft.getMinecraft().player != null) {
+            ModularNetwork.CLIENT.onPlayerLeave(Minecraft.getMinecraft().player);
+
+            if (Minecraft.getMinecraft().isIntegratedServerRunning()) {
+                // we need to handle single player here, since PlayerLoggedOutEvent is not triggered for some reason
+                ModularNetwork.SERVER.onPlayerLeave(Minecraft.getMinecraft().player);
+            }
         }
     }
 

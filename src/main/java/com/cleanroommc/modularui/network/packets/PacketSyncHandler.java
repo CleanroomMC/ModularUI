@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.network.IPacket;
 import com.cleanroommc.modularui.network.ModularNetwork;
 import com.cleanroommc.modularui.network.NetworkUtils;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.PacketBuffer;
@@ -53,13 +54,13 @@ public class PacketSyncHandler implements IPacket {
     @SideOnly(Side.CLIENT)
     @Override
     public @Nullable IPacket executeClient(NetHandlerPlayClient handler) {
-        ModularNetwork.CLIENT.receivePacket(this);
+        ModularNetwork.CLIENT.receivePacket(Minecraft.getMinecraft().player, this);
         return null;
     }
 
     @Override
     public @Nullable IPacket executeServer(NetHandlerPlayServer handler) {
-        ModularNetwork.SERVER.receivePacket(this);
+        ModularNetwork.SERVER.receivePacket(handler.player, this);
         return null;
     }
 }

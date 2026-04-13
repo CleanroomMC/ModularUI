@@ -22,18 +22,11 @@ import java.io.IOException;
 
 public abstract class ModularNetworkSide {
 
-    private final boolean client;
     private final Int2ReferenceOpenHashMap<ModularSyncManager> activeScreens = new Int2ReferenceOpenHashMap<>();
     private final Reference2IntOpenHashMap<ModularSyncManager> inverseActiveScreens = new Reference2IntOpenHashMap<>();
     // TODO: contextual syncer stack: in game containers shouldn't be closed in closeAll
 
-    ModularNetworkSide(boolean client) {
-        this.client = client;
-    }
-
-    public boolean isClient() {
-        return client;
-    }
+    public abstract boolean isClient();
 
     abstract void sendPacket(IPacket packet, EntityPlayer player);
 
@@ -41,6 +34,11 @@ public abstract class ModularNetworkSide {
         if (activeScreens.containsKey(networkId)) throw new IllegalStateException("Network ID " + networkId + " is already active.");
         activeScreens.put(networkId, manager);
         inverseActiveScreens.put(manager, networkId);
+    }
+
+    public void onPlayerLeave(EntityPlayer player) {
+        this.activeScreens.clear();
+        this.inverseActiveScreens.clear();
     }
 
     public void closeAll(EntityPlayer player) {
@@ -69,7 +67,7 @@ public abstract class ModularNetworkSide {
     }
 
     @ApiStatus.Internal
-    public void receivePacket(PacketSyncHandler packet) {
+    public void receivePacket(EntityPlayer player, PacketSyncHandler packet) {
         ModularSyncManager msm = activeScreens.get(packet.networkId);
         if (msm == null) return; // silently discard packets for inactive screens
         try {
