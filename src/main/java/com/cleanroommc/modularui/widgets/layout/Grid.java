@@ -63,7 +63,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
 
     private int getMarginEnd(Area area, GuiAxis axis, int border) {
         int m = 0;
-        if (border > -1) {
+        if (border < 1) {
             m += Math.max(area.getMargin().getEnd(axis), this.minElementMargin.getEnd(axis));
         } else {
             m += area.getMargin().getEnd(axis);
