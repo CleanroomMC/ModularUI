@@ -69,7 +69,7 @@ public class TestGui extends CustomModularScreen {
         SortableListWidget<String> sortableListWidget = new SortableListWidget<String>()
                 .children(configuredOptions, items::get)
                 .name("sortable list");
-        List<List<AvailableElement>> availableMatrix = Grid.mapToMatrix(2, this.lines, (index, value) -> {
+        List<List<AvailableElement>> availableMatrix = Grid.createGridOfWidthElements(2, this.lines, (x, y, index, value) -> {
             AvailableElement availableElement = new AvailableElement().overlay(IKey.str(value))
                     .widthRel(0.5f).height(14)
                     .addTooltipLine(value)

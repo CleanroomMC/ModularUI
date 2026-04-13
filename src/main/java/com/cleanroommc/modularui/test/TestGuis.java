@@ -206,7 +206,7 @@ public class TestGuis extends CustomModularScreen {
                         .children(4, i -> new Grid()
                                 .left(0)
                                 .coverChildren()
-                                .mapTo(4, 16, j -> {
+                                .gridOfWidthHeight(4, 4, (x, y, j) -> {
                                     return new ToggleButton()
                                             .overlay(GuiTextures.BOOKMARK)
                                             .value(new BoolValue.Dynamic(() -> states[i][j], val -> states[i][j] = val))
