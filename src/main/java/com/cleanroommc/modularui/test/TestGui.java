@@ -98,7 +98,7 @@ public class TestGui extends CustomModularScreen {
             ModularPanel panel1 = new Dialog<>("Option Selection").setDisablePanelsBelow(false).setDraggable(false).size(150, 120);
             return panel1.child(ButtonWidget.panelCloseButton())
                     .child(new Grid()
-                            .matrix(availableMatrix)
+                            .grid(availableMatrix)
                             .scrollable()
                             .pos(7, 7).right(16).bottom(7).name("available list"));
         }, true);

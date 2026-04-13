@@ -268,6 +268,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
     }
 
     public Grid child(@Nullable IWidget widget) {
+        if (this.matrix.isEmpty()) this.matrix.add(new ArrayList<>());
         this.matrix.get(this.matrix.size() - 1).add(widget);
         this.dirty = true;
         this.unsanitized = true;
@@ -290,7 +291,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
     public <T, I extends IWidget> Grid mapTo(int rowLength, @NotNull List<T> list, @NotNull IndexedElementMapper<T, I> widgetCreator) {
         Objects.requireNonNull(widgetCreator);
         Objects.requireNonNull(list);
-        return matrix(mapToMatrix(rowLength, list, widgetCreator));
+        return grid(mapToMatrix(rowLength, list, widgetCreator));
     }
 
     /**
@@ -310,7 +311,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
     @Deprecated
     public <I extends IWidget> Grid mapTo(int rowLength, int size, @NotNull IntFunction<I> widgetCreator) {
         Objects.requireNonNull(widgetCreator);
-        return matrix(mapToMatrix(rowLength, size, widgetCreator));
+        return grid(mapToMatrix(rowLength, size, widgetCreator));
     }
 
     /**
@@ -322,7 +323,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
      * @return this
      */
     public <I extends IWidget> Grid gridOfWidthHeight(int width, int height, GridPosMapper<I> widgetCreator) {
-        return matrix(createGridOfWidthHeight(width, height, widgetCreator));
+        return grid(createGridOfWidthHeight(width, height, widgetCreator));
     }
 
     /**
@@ -334,7 +335,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
      * @return this
      */
     public <I extends IWidget> Grid gridOfSizeHeight(int size, int height, GridPosMapper<I> widgetCreator) {
-        return matrix(createGridOfSizeHeight(size, height, widgetCreator));
+        return grid(createGridOfSizeHeight(size, height, widgetCreator));
     }
 
     /**
@@ -346,7 +347,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
      * @return this
      */
     public <I extends IWidget> Grid gridOfSizeWidth(int size, int width, GridPosMapper<I> widgetCreator) {
-        return matrix(createGridOfSizeWidth(size, width, widgetCreator));
+        return grid(createGridOfSizeWidth(size, width, widgetCreator));
     }
 
     /**
@@ -359,7 +360,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
      * @return this
      */
     public <T, I extends IWidget> Grid gridOfElements(Iterable<? extends Iterable<T>> matrix, GridPosElementMapper<T, I> widgetCreator) {
-        return matrix(createGridOfElements(matrix, widgetCreator));
+        return grid(createGridOfElements(matrix, widgetCreator));
     }
 
     /**
@@ -371,7 +372,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
      * @return this
      */
     public <I extends IWidget> Grid gridOf(int width, Iterable<I> list) {
-        return matrix(createGridOfWidthElements(width, list, (x, y, i, e) -> e));
+        return grid(createGridOfWidthElements(width, list, (x, y, i, e) -> e));
     }
 
     /**
