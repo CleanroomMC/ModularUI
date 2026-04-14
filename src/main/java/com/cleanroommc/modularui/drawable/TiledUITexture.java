@@ -13,9 +13,9 @@ public class TiledUITexture extends UITexture {
     /**
      * Use {@link UITexture#builder()} with {@link Builder#tiled()}
      */
-    TiledUITexture(ResourceLocation location, float u0, float v0, float u1, float v1, int imageWidth, int imageHeight, ColorType colorType,
-                   boolean nonOpaque) {
-        super(location, u0, v0, u1, v1, colorType, nonOpaque);
+    TiledUITexture(ResourceLocation location, float u0, float v0, float u1, float v1, ColorType colorType, boolean nonOpaque,
+                   int colorOverride, int imageWidth, int imageHeight) {
+        super(location, u0, v0, u1, v1, colorType, nonOpaque, colorOverride);
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;
     }
@@ -44,7 +44,7 @@ public class TiledUITexture extends UITexture {
 
     @Override
     protected TiledUITexture copy() {
-        return new TiledUITexture(location, u0, v0, u1, v1, imageWidth, imageHeight, colorType, nonOpaque);
+        return new TiledUITexture(location, u0, v0, u1, v1, colorType, nonOpaque, colorOverride, imageWidth, imageHeight);
     }
 
     @Override
